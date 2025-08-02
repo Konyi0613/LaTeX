@@ -1,0 +1,368 @@
+\lecture{4}{11 July. 9:00}{}
+We first finish the proof above.
+\begin{exercise}
+    Let \(S \subseteq \mathbb{R} \). Prove that if \(\left\vert s - s^{\prime}  \right\vert \le 3 \) for all \(s, s^{\prime} \in S\), then
+    \begin{enumerate}
+        \item \(S\) is bounded. 
+        \item \(\sup S - \inf S \le 3\).  
+    \end{enumerate}   
+\end{exercise}
+
+\begin{exercise}
+    If we change the \(\le\) to \(<\) in the above exercise, is it still correct?  
+\end{exercise}
+
+\section{Series}
+\begin{definition}
+    Let \(a_n\) be a sequence in \(\mathbb{R} \). We say that the series \(\sum_{i=1}^{\infty}  \) converges to / has sum a real number \(S\) if \(\lim_{n \to \infty} s_n = S \), where \(s_n \coloneqq \sum_{i=1}^{n} a_i \), the \(n\)-th partial sum of \(\sum_{i}a_i \).     If such \(S\) exists (resp. does not exist), we say that the series \(\sum a_n \) is convergent (resp. divergent).  
+\end{definition}
+
+\begin{eg}
+    Suppose \(a_n = \frac{1}{2^n}\), then \(s_n = 1 + \frac{1}{2} + \dots + \frac{1}{2^{n-1} }= \frac{1 - \left( \frac{1}{2} \right)^n }{1 - \frac{1}{2}}\), so \(\lim_{n \to \infty} s_n = \frac{1}{1 - \frac{1}{2}} = 2\).  
+\end{eg}
+
+\begin{note}
+    However, given a sequence \(a_n\), it is not always possible to write down \(s_n\) explicitly. 
+\end{note} 
+
+\begin{eg}
+    \(1 + \frac{1}{2} + \frac{1}{3} +\dots + \frac{1}{n}\)=?, \ \(1 - \frac{1}{2} + \frac{1}{3} - \frac{1}{4} + \dots + \frac{(-1)^{n-1} }{n}\) = ?  
+\end{eg}
+
+\begin{notation}
+    For a series \(\sum_{n} a_n\) and \(l, m \in \mathbb{N} \), \(l < m\), we let
+    \[
+        s_{l,m} \coloneqq \sum_{i=l}^m a_i,
+    \] the \((l,m)\)-tail. 
+\end{notation}
+
+\begin{exercise}
+    \(\sum_{n} a_n = 0 \) implies \(\lim_{n \to \infty} a_n = 0 \).  
+\end{exercise}
+\begin{proof}
+    We know \(a_n = s_n - s_{n-1}\) and also \(\lim_{n \to \infty} s_n - s_{n-1} = 0\) if \(\sum_{n} a_n \) is convergent. 
+\end{proof}
+
+\begin{prev}
+ \(\sum_{n} a_n \) converges iff \(s_n\) converges iff \(s_n\) is Cauchy, i.e. \(\forall \varepsilon > 0\), \(\exists N \in \mathbb{N} \) such that \(n, m \ge N\) implies \(\left\vert s_n - s_m \right\vert \le \varepsilon  \).       
+\end{prev}
+Now if \(n > m\), then \(s_n - s_m = a_{m+1} + \dots + a_n\), so we can rewrite the stamtement as: \(\forall \varepsilon > 0\), \(\exists N \in \mathbb{N} \) such that \(k > N\) and \(l \ge 0\) implies \(\left\vert a_k + \dots + a_{k+l} \right\vert < \varepsilon  \). Hence, there is another equivalent condition of converging, which is: \(\forall \varepsilon > 0\), \(\exists N \in \mathbb{N} \) such that \(k > N\) and \(l \ge 0\) implies \(\vert a_k \vert + \dots + \left\vert a_{k+1} \right\vert < \varepsilon \). If we have this, we can deduce that \(\sum_{n} a_n \) is convergent since by triangle inequality this implies the above Cauchy condition. Also, notice that "\(\forall \varepsilon > 0\), \(\exists N \in \mathbb{N} \) such that \(k > N\) and \(l \ge 0\) implies \(\vert a_k \vert + \dots + \left\vert a_{k+1} \right\vert < \varepsilon \)" is equivalent to \(\sum_{n} \vert a_n \vert  \) is convergent.  Besides, notice that
+\begin{center}
+    \(\sum_{n} \vert a_n \vert  \) converges if and only if \(\exists M > 0 \forall n \in \mathbb{N} \) we have \(\vert a_1 \vert + \vert a_2 \vert + \dots + \vert a_n \vert \le M\),
+\end{center}
+since \(\left\{ s_n  \right\} \) is nondecreasing. 
+
+This tells us 
+\begin{corollary}
+    If \(b_n\) is a positive sequence, then \(\sum_{n} b_n \) converges if and only if \(\exists M > 0\) such that \(\forall n \in \mathbb{N} \) we have \(b_1 + b_2 + \dots + b_n \le M\).   
+\end{corollary}
+and the important result is 
+\begin{corollary}
+    If \(\sum_{n} \vert a_n \vert\) converges, then \(\sum_{n} a_n \) converges.  
+\end{corollary}
+
+\begin{notation}
+    If \(a_n \ge 0\) for all \(n\), then we write \(\sum_{n} a_n < \infty  \) (resp. \(\infty \)) to mean that \(\sum_{n} a_n \) converges (resp. diverges).  
+\end{notation}
+
+\begin{eg}
+    Is \(\sum_{n=1}^{\infty} \frac{1}{n} \) convergent?
+\end{eg}
+\begin{explanation}
+    Notice that
+    \[
+        s_4 = 1+ \frac{1}{2} + \frac{1}{3} + \frac{1}{4} > 1 + \frac{1}{2} + \frac{1}{4} + \frac{1}{4}.
+    \] 
+    Hence, we have \(\forall m \in \mathbb{N} \),
+    \[
+        s_{2^m} = 1+ \frac{1}{2} + \frac{1}{3} + \frac{1}{4} + \dots + \frac{1}{2^{m-1} + 1} + \dots + \frac{1}{2^{m-1} + 2^{m-1}} > 1 + \frac{m}{2},
+    \] so \(s_n\) is unbounded, and thus \(\sum_{n=1}^{\infty} \frac{1}{n} = \infty  \).  
+\end{explanation}
+
+\begin{eg}
+    Is \(\sum_{n=1}^{\infty} \frac{1}{n^2} \) convergent? 
+\end{eg}
+\begin{explanation}
+    Since 
+    \[
+        \frac{1}{n^2} < \frac{1}{(n-1)n} = \frac{1}{n-1} - \frac{1}{n},
+    \] so we know
+    \[
+        s_n = 1 + \frac{1}{2^2} + \dots + \frac{1}{n^2} < 1 + \left( \frac{1}{1} - \frac{1}{2} \right) + \left( \frac{1}{2} - \frac{1}{3} \right) + \dots + \left( \frac{1}{n-1} - \frac{1}{n} \right) = 2 - \frac{1}{n} < 2.   
+    \]
+    Hence, we know \(s_n\) is bounded above and nondecreasing, and thus \(s_n\) is convergent.  
+\end{explanation}
+
+\begin{eg}
+    Is \(\sum_{n=1}^{\infty} \frac{\sin n}{n^k} \) convergent for some \(k \ge 2\) and \(k \in \mathbb{N} \)?   
+\end{eg}
+
+\begin{explanation}
+    Since we know 
+    \[
+        \left\vert \frac{\sin 1}{1^k} \right\vert + \dots + \left\vert \frac{\sin n}{n^k} \right\vert < 1 + \dots + \frac{1}{n^k} < 1 + \dots + \frac{1}{n^2} < 2 \quad \forall n \in \mathbb{N}. 
+    \]
+    Hence, we know \(\sum_{n=1}^{\infty} \left\vert \frac{\sin n}{n^k} \right\vert < \infty \), and thus \(\sum_{n=1}^{\infty} \frac{\sin n}{n^k} \) converges. 
+\end{explanation}
+
+\begin{exercise}
+    For \(a > 1\) and \(k \in \mathbb{N} \), show that \(\sum_{n=1}^{\infty} \frac{n^k}{a^n} < \infty  \).   
+\end{exercise}
+
+\begin{definition}
+    Given a sequence \(a_n\), we say that
+    \begin{enumerate}
+        \item \(\sum_{n} a_n \) converges absolutely if \(\sum_{n} \vert a_n \vert < \infty \) (and thus \(\sum_{n} a_n \) converges). 
+        \item \(\sum_{n} a_n \) converges conditionally if \(\sum_{n} \vert a_n \vert = \infty \) but \(\sum_{n} a_n \) converges.     
+    \end{enumerate} 
+\end{definition}
+
+\subsection{Comparison Test} \label{subsec: ct}
+\begin{theorem}[Comparison Test] \label{thm: Comparison Test}
+    Given \(a_n, b_n\) are two non-negative sequences, then if "\(\exists C > 0\) and \(N \in \mathbb{N} \) such that \(n \ge N\) implies \(a_n \le C b_n\)", then "\(\sum_{n} b_n < \infty \) implies \(\sum_{n} a_n < \infty \)".   
+\end{theorem}
+\begin{proof}
+    For \(n \ge N\), we have 
+    \begin{align*}
+        a_1 + \dots + a_n &= a_1 +\dots + a_N + a_{N+1} + \dots + a_n  \le a_1 + \dots + a_N + C \left( b_{N+1} + \dots + b_n  \right) \\
+        &\le a_1 + \dots + a_N + CM \quad \text{for some }M>0. 
+    \end{align*}
+\end{proof}
+
+\begin{claim}
+    If \(a_n,b_n\) are two non-negative sequences, then \(\lim_{n \to \infty} \frac{a_n}{b_n} \) exists implies \(\exists C > 0\) and \(N \in \mathbb{N} \) such that \(n \ge N\) implies \(a_n \le C b_n\).   
+\end{claim}
+
+\begin{explanation}
+    Let \(l \coloneqq \lim_{n \to \infty} \frac{a_n}{b_n} \) and \(\varepsilon = 1\), then \(\exists N \in \mathbb{N} \) such that \(n \ge N\) implies \(\left\vert \frac{a_n}{b_n} - l \right\vert \le 1 \). Hence,
+    \[
+        \frac{a_n}{b_n} \le l + 1 \iff a_n \le (l + 1) b_n.
+    \]    
+\end{explanation}
+
+\begin{corollary}
+    If \(\lim_{n \to \infty} \frac{a_n}{b_n} \) exists, then 
+    \[
+        \sum_{n} b_n < \infty \implies \sum_{n} a_n < \infty. 
+    \] 
+\end{corollary}
+
+\begin{exercise}
+    If \(\lim_{n \to \infty} u_n\) exists, where \(u_n = \sup \left\{ \frac{a_m}{b_m} \mid m \ge n \right\} \), then "\(\exists C > 0\) and \(N \in \mathbb{N} \) such that \(n \ge N\) implies \(a_n \le C b_n\)".  
+\end{exercise}
+\begin{exercise}[The ratio test]
+    Let \(a_n\) be a non-negative sequence. Then show that 
+    \[
+        \lim_{n \to \infty} \frac{a_{n+1}}{a_n} < 1 \implies \exists N \in \mathbb{N} \text{ and } C < 1 \text{ such that } n \ge N \text{ implies } a_{n+1} \le C a_n,  
+    \] and thus \(\sum_{n} a_n \) converges. Besides, prove that  
+    \[
+        \lim_{n \to \infty} \frac{a_{n+1}}{a_n} > 1 \implies \exists N \in \mathbb{N} \text{ and } C > 1 \text{ such that } n \ge N \text{ implies } a_{n+1} \ge C a_n,  
+    \]and thus \(\sum_{n} a_n = \infty  \). However, if \(\lim_{n \to \infty} \frac{a_{n+1}}{a_n} = 1 \), then we cannot conclude anything.  
+\end{exercise}
+\begin{exercise}[The root test]
+    If \(a_n\) is a non-negative sequence, then 
+    \[
+        \lim_{n \to \infty} \left( a_n \right)^{\frac{1}{n}} < 1 \implies \exists N \in \mathbb{N} \text{ and } C < 1 \text{ such that } n \ge N \text{ implies } a_{n} \le C^n,
+    \] and thus \(\sum_{n} a_n \) converges. Besides, prove that 
+    \[
+        \lim_{n \to \infty} \left( a_n \right)^{\frac{1}{n}} > 1 \implies \exists N \in \mathbb{N} \text{ and } C > 1 \text{ such that } n \ge N \text{ implies } a_{n} \ge C^n,
+    \] and thus \(\sum_{n} a_n = \infty  \). 
+\end{exercise}
+
+Now we have a question: Does \(\sum_{n=1}^{\infty} \frac{(-1)^{n-1}}{n} \) converges (conditionally)?
+\newpage
+
+\begin{definition}
+    A series \(\sum_{n} a_n \) is an alternating series if \(\exists b_n > 0\) (\(n \in \mathbb{N} \)) such that
+    \[
+        a_n = (-1)^{n-1} b_n (n \in \mathbb{N} ).
+    \]
+\end{definition}
+
+\begin{theorem}[Leibnize's criterion]
+    If \(\sum_{n} a_n\) is an alternating series and \(b_n = \vert a_n \vert \) is decreasing and converging to \(0\) as \(n \to \infty \), then \(\sum_{n} a_n \) converges.     
+\end{theorem}
+\begin{proof}
+    Suppose \(b_n = (-1)^{n-1} a_n \)
+    \begin{align*}
+        \left\vert a_k + \dots + a_{k+l} \right\vert  &= \left\vert  (-1)^{k-1} \left( b_k - b_{k+1} + \dots + (-1)^l b_{k+l} \right) \right\vert \\
+        &= b_k - b_{k+1} + \dots + (-1)^l b_{k+l} \\ &= 
+        \begin{dcases}
+            b_k - (b_{k+1} - b_{k+2}) - \dots - (b_{k + l - 1} - b_{k+l}), &\text{ if } 2 \mid l  ;\\
+            b_k - (b_{k+1} - b_{k+2}) - \dots - (b_{k+l-2} - b_{k+l-1}) - b_{k+l}, &\text{ otherwise}.
+        \end{dcases} \\
+        & \le b_k = \vert a_k \vert 
+    \end{align*}
+    Since \(\lim_{n \to \infty} b_n = 0 \), so \(\forall \varepsilon > 0 \ \exists N \in \mathbb{N} \) such that \(n \ge N \implies \vert b_n \vert < \varepsilon  \). Hence, if \(k \ge N\), we have 
+    \[
+        \left\vert a_k + \dots + a_{k+l}  \right\vert \le b_k \le \varepsilon \quad \forall l > 0. 
+    \] 
+\end{proof}
+
+Given a sequence \(a_n\), we can separate all terms into two sequences. The first sequence is 
+\[
+    a_{n_1}, a_{n_2}, \dots,
+\] while the second one is 
+\[
+    a_{n_1^{\prime} }, a_{n_2^{\prime} }, \dots 
+\] with \(n_1 < n_2 < \dots \) and \(n_1^{\prime} < n_2^{\prime} < \dots \) and \(\left\{ n_1, n_2, \dots \right\} \cup \left\{ n_1^{\prime} , n_2^{\prime} , \dots  \right\}  = \mathbb{N} \) such that \(a_{n_j} \ge 0\) and \(a_{n_k^{\prime} } \le 0\) for all \(j, k \in \mathbb{N} \). Let \(p_j \coloneqq a_{n_j}\) and \(q_k \coloneqq -a_{n_k^{\prime} }\) to construct two non-negative sequences.  
+
+\begin{exercise}
+    Show that \(\sum_{n} \vert a_n \vert < \infty  \) iff \(\sum_{j} p_j \) nad \(\sum_{k} q_k \) are both convergent. Moreover, if any side holds, then
+    \[
+        \sum_{n} \vert a_n \vert = \sum_{j} p_j + \sum_{k} q_k \text{ and } \sum_{n} a_n = \sum_{j} p_j - \sum_{k} q_k.       
+    \]   
+\end{exercise}
+
+\begin{exercise}
+    Suppose \(\sum_{n} a_n \) and \(\sum_{n} b_n \) are both convergent, then 
+\[
+    \sum_{n} \left( a_n \pm b_n \right) = \sum_{n} a_n \pm \sum_{n} b_n.  
+\]
+\end{exercise}
+
+\begin{exercise}
+    Inserting \(0\)s to a series will not affect its convergence / divergence and its sum if the sum exists. 
+\end{exercise}
+
+\subsection{Rearrangement}
+
+\begin{definition}
+    We know a sequence is a map from \(\mathbb{N} \) to \(\mathbb{R} \), and a subsequence is a double-map frome \(\mathbb{N} \) to \(\mathbb{N} \) to \(\mathbb{R} \), where the first map from \(\mathbb{N} \) to \(\mathbb{N} \) is increasing. Moreover, a rearrangement is also a double-map from \(\mathbb{N} \) to \(\mathbb{N} \) to \(\mathbb{R} \), where the first map is a bijection.           
+\end{definition}
+
+Now we have a question. If \(\sum_{n} a_n \) converges, then 
+\begin{enumerate}
+    \item is \(\sum_{m} a_{n(m)} \) converges where \(a_{n(m)}\) is a rearrangement of \(a_n\)?
+    \item \(\sum_{m} a_{n(m)} = \sum_{n} a_n \)?    
+\end{enumerate} 
+
+\begin{note}
+    We will prove that if the series is absolutely convergent, then rearrangement does not affect the sum of the infinite series.
+\end{note}
+
+\begin{enumerate}
+    \item If \(a_n \ge 0\) for \(n \in \mathbb{N} \), the answers are affirmative. 
+
+    \item If \(\sum_{n} \vert a_n \vert < \infty  \) , then the answers are affirmative.
+\end{enumerate}
+In fact, 1. implies 2 (by the 4-th exercise in \autoref{subsec: ct}). (Why?)
+
+Why does 1. hold? Actually \(\sum_{n} a_n = \sup \left\{ a_{n_1} + a_{n_2} + \dots + a_{n_k} \mid n_1 < \dots < n_k, \ k \in \mathbb{N} \right\}  \) (including the case \(\infty \)) (Why?), and hence 1. holds.
+
+\begin{theorem}[Dirichlet's Rearrangement theorem (1829)]
+    If \(\sum_{n} a_n \) converges absolutely, then for every rearrangement \(a_{n(m)}\) we have \(\sum_{m=1}^{\infty} a_{n(m)} = \sum_{n=1}^{\infty} a_n \).   
+\end{theorem}
+
+\begin{theorem}[Riemann's rearrangement theorem (1852)]
+    If \(\sum_{n} a_n \) converges conditionally, then for every \(L \in \mathbb{R} \) there exists a rearrangement \(a_{n(m)}\) of \(a_n\) such that \(\sum_{m=1}^{\infty} a_{n(m)} = L\).     
+\end{theorem}
+\begin{proof}
+    We will only use two known facts given by the conditional convergence of \(\sum_{n} a_n \): 
+    \begin{enumerate}
+        \item \(\sum_{j} p_j = \infty  \) and \(\sum_{k} q_k = \infty\). 
+        \item \(\lim_{n \to \infty} p_n = \lim_{n \to \infty}q_n = 0 \). (Since \(p_n, q_n\) are subsequence of \(a_n\).)  
+    \end{enumerate} 
+    Our thought is to add up \(p_1 + p_2 + \dots + p_{m_1}\) so that 
+    \[
+        p_1 + p_2 + \dots + p_{m_1 - 1} < L < p_1 + p_2 + \dots + p_{m_1}.
+    \] Now we start to minus \(q_1 + q_2 + \dots + q_{m_1^{\prime} }\) so that 
+    \[
+        \sum_{i=1}^{m_1} p_i - \sum_{i=1}^{m_1^{\prime}} q_i < L < \sum_{i=1}^{m_1} p_i - \sum_{i=1}^{m_1^{\prime} - 1} q_i,  
+    \] and we continuew to add up some \(p_i\) to make the series bigger than \(L\), and jump back by minusing some \(q_i\). This is feasible since \(L\) is not a upper bound of \(\sum_{n} p_n \) and not a lower bound of \(\sum_{n} q_n \). Note that this method construct many partial sums of some rearrangement, say the partial sum of the rearrangement is \(s_n\), we want to show \(\lim_{n \to \infty} s_n = L \).
+
+\begin{figure}[H]
+    \centering
+    \incfig{RiemannJump}
+    \caption{Riemann jump}
+    \label{fig:RiemannJump}
+\end{figure}
+    
+    Since \(\exists\) natural numbers \(m_1 < m_2 < \dots \) and \(m_1^{\prime} < m_2^{\prime} < \dots  \) such that 
+    \[
+        \left\vert s_{m_{l-1}^{\prime} + m_l + k^{\prime} } - L \right\vert < p_{m_l} \quad \text{if } 0 \le k^{\prime}  < m_l^{\prime} - m_{l-1}^{\prime}. 
+    \]
+
+    Similarly,
+    \[
+        \left\vert s_{m_l + m_{l}^{\prime} + k} - L \right\vert < q_{m_l^{\prime} } \quad \text{if } 0 \le k < m_{l+1} - m_l 
+    \] if we start jumping from \(q\). Since we know \(\lim_{n \to \infty} p_{m_l} = \lim_{n \to \infty} q_{m_l^{\prime} } = 0\), so \(\forall \varepsilon > 0, \ \exists N_0 \in \mathbb{N} \) such that \(l \ge N_0\) implies \(p_{m_l}\) and \(q_{m_l^{\prime} } < \varepsilon \). Let \(N = m_{N_0 - 1}^{\prime} + m_{N_0} \). Then \(n \ge N\) implies \(\left\vert s_n - L \right\vert < \varepsilon\).         
+\end{proof}
+
+\begin{remark}
+    In 1827, Dirichlet made the following observation:
+    \begin{align*}
+        S &= 1 - \frac{1}{2} + \frac{1}{3} - \frac{1}{4} + \frac{1}{5} - \dots \\ 
+        2S &= 2 - 1 + \frac{2}{3} - \frac{2}{4} - \frac{2}{5} + \frac{2}{6} - \dots \\
+        &= 1 - \frac{1}{2} + \frac{1}{3} - \frac{1}{4} + \frac{1}{5} - \dots 
+    \end{align*}
+    by combining some terms.
+\end{remark}
+
+\subsubsection{Multiplying absolutely convergent series}
+Let \(\sum_{n=0}^{\infty}  a_n \) and \(\sum_{n=0}^{\infty}  b_n \) both converge absolutely.
+
+\begin{theorem}
+    Let \(c_n = a_n b_0 + \dots + a_0 b_n = \sum_{\substack{i + k = n \\ i,k \ge 0}} a_i b_k \). Then \(\sum_{n} \vert c_n \vert < \infty\) and
+\[
+    \sum_{n=0}^{\infty} c_n = \left( \sum_{i=0}^{\infty} a_i  \right) \left( \sum_{k=0}^{\infty} b_k  \right).  
+\]  
+\end{theorem}
+\begin{proof}
+    First, for all \(n \in \mathbb{N} \) we know
+\[
+    \vert c_1 \vert + \vert c_2 \vert + \dots + \vert c_n \vert = \sum_{m=0}^n \left\vert \sum_{\substack{j + k = m \\ j,k \ge 0}} a_j b_k    \right\vert \le \sum_{m=0}^n \sum_{\substack{j + k = m \\ j,k \ge 0}} \vert a_j \vert \vert b_k \vert \le \left( \sum_{j=0}^n \vert a_j \vert   \right) \left( \sum_{k=0}^n \vert b_k \vert   \right) \le MN
+\] for some \(M, N\). Hence, \(\sum_{n=0}^{\infty} c_n \) is absolutely convergent.
+
+Let \(A_n \coloneqq a_0 + \dots + a_n\), \(B_n \coloneqq b_0 + \dots + b_n\), \(C_n \coloneqq c_0 + \dots + c_n\). Hence, we want to show
+\[
+    \lim_{n \to \infty} C_n = \lim_{n \to \infty} A_n \cdot \lim_{n \to \infty} B_n. 
+\]  
+\begin{claim}
+    \(\lim_{n \to \infty} A_n B_n - C_n = 0 \). 
+\end{claim}  
+\begin{explanation}
+First, we know 
+\begin{align*}
+        0 \le \left\vert A_n B_n - C_n \right\vert  =  \sum_{\substack{j + k > n \\ 0 \le j,k \le n}} \left\vert a_j b_k \right\vert &\le \left( \sum_{j = \lfloor \frac{n}{2}  \rfloor}^n \vert a_j \vert  \right) \left( \sum_{k = 0}^n \vert b_k \vert  \right) + \left( \sum_{j = 0}^n \vert a_j \vert  \right) \left( \sum_{k = \lfloor \frac{n}{2} \rfloor}^n \vert b_k \vert  \right) \\ &\to 0 * M + N * 0
+\end{align*}
+when \(n \to \infty \). The last part is derived by convergence implies Cauchy, and the former part can be derived by drawing grids in a square representing the choice of \(a_j\) and \(b_k\).
+\end{explanation}
+\end{proof}
+
+\begin{theorem}
+    If \(\sum_{n=1}^{\infty}  a_n \) and \(\sum_{n=1}^{\infty}  b_n \) converges absolutely and \(\mathbb{N} \to \mathbb{N} \times \mathbb{N} \) is a bijection such that \(n \mapsto \left( j(n), k(n) \right) \), and \(c_n \coloneqq a_{j(n)} b_{k(n)}\) for all \(n \in \mathbb{N} \), then \(\sum_{n} \vert c_n \vert < \infty \) and 
+    \[
+        \sum_{n} c_n = \left( \sum_{n} a_n  \right) \left( \sum_{n} b_n  \right).   
+    \]      
+\end{theorem}
+\begin{proof}
+    \(\forall n \in \mathbb{N} \), let \(l = \max \left\{ j(1), j(2), \dots , j(n), k(1), k(2), \dots , k(n)\right\} \). Then
+    \begin{align*}
+                \vert c_1 \vert + \vert c_2 \vert + \dots + \vert c_n \vert &= \vert a_{j(1)} b_{k(1)} \vert + \vert a_{j(2)} b_{k(2)} \vert + \dots + \vert a_{j(n)} b_{k(n)} \vert \\ &\le \left( \sum_{j=1}^l \vert a_j \vert   \right) \left( \sum_{k=1}^l \vert b_k \vert \right) \le M \times N. 
+    \end{align*}
+    Hence, \(\sum_{n} \vert c_n \vert\) converges absolutely. Note that since \(\sum_{n} \vert c_n \vert\) converges absolutely, so we can change the order of every term if we want. That is, we can use other bijection to get same value of sum.
+    
+    Let \(A_n = a_1 + \dots + a_n\), \(B_n = b_1 + \dots + b_n\), and \(C_n = c_1 + \dots + c_n\), then we know 
+    \begin{align*}
+        A_n B_n &= \left( a_1 + \dots + a_n \right) \left( b_1 + \dots + b_n \right) = \sum_{1 \le j,k \le n} a_j b_k.  
+    \end{align*} 
+    Replace the bijection \(\mathbb{N} \to \mathbb{N} \times \mathbb{N} \) by: 
+\begin{figure}[H]
+    \centering
+    \incfig{bijcn}
+    \caption{New bijection}
+    \label{fig:bijcn}
+\end{figure}
+then we know 
+\[
+    \sum_{1 \le j,k \le n} a_j b_k = C_{n^2}. 
+\]
+Hence, we know 
+\[
+    \lim_{n \to \infty} A_n B_n = \lim_{n \to \infty} C_{n^2} = \lim_{n \to \infty} C_n.   
+\]
+\end{proof}
+
+
+

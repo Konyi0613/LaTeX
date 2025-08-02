@@ -1,0 +1,908 @@
+\chapter{Singular Value Decomposition (SVD)}
+\section{Introduciton}
+Singular Value Decomposition (SVD) is a type of factorization of matrix.
+It says that a matrix \(A\)  can be written as a product of three matrices $A=UDV^t$
+where the columns of \(U\) and \(V\) are orthonormal and the matrix \(D\) is idagonal.
+SVD can be used to find a low rank matrix to be a good approximation of the original matrix \(A\).
+
+Unlike Spectral Decomposition Theorem, SVD is defined for all matrices (rectangular or square), 
+and since \(U\) and \(V\) are orthogonal matrices, so we know
+\[
+  A^{-1} =VD^{-1} U^t
+\]
+
+To gain insight into the SVD, treat the rows of an \(n \times d\) matrix \(A\) as \(n\) points in a
+\(d\)-dimensional space and consider the problem of finding the best \(k\)-dimensional subspace w.r.t.\ the set of points.
+Here best means minimize the sum of the squares of the perpendicular distances of the points to the subspace. 
+We begin with a special case where the subspace is \(1\)-dimensional, a line through the origin. 
+We will see that the best-fitting \(k\)-dimensional subspace can be found by \(k\) applicaitons 
+of the best fitting line algorithm.
+
+Suppose we have a set of points \(\left\{ \mathbf{x}_i \mid 1 \le i \le n \right\} \) in the plane.
+Consider projecting a point \( \mathbf{x}_i\) onto a line through the origin. Then
+\[
+  x_{i1}^2 + x_{i2}^2 + \dots + x_{id}^2 = \left( \text{length of projection} \right)^2 + \left( \text{distance of point to line} \right)^2  
+\]  
+
+\begin{figure}[H]
+  \centering
+  \incfig{proj}
+  \caption{The projection of the point \(\mathbf{x}_i\) onto the line through
+  the origin in the direction of \(\mathbf{v} \) }
+  \label{fig:proj}
+\end{figure}
+
+See \autoref{fig:proj}. Thus,
+\[
+  \left( \text{distance of point to line} \right)^2 = x_{i1}^2 + x_{i2}^2 + \dots + x_{id}^2 -  \left( \text{length of projection} \right)^2 
+\]
+and notice that \(\sum_{i=1}^{n}\left( x_{i1}^2 + x_{i2}^2 + \dots  + x_{id}^2 \right)  \)
+is a constant (not dependent on the line), so minimizing the sum of the squares 
+of the distances is equivalent to maximizing the sum of the squares of the lengths 
+of the projections onto the line.
+
+The reason to choose "square" is because the square has many beautiful properties,
+such as Pythagoras theorem. By this, we can deduce the equivalence of evaluating
+the maximum of the sum of squared projection. In addition, we will see that we can
+use Greedy Algorithm to find the best-fit \(k\)-dimensional subspaces (which we will define soon)
+and for this too, the square is important. Just like the least-square method in Calculus,
+there is a reason behind choosing square. 
+
+\section{Singular Vectors}
+
+We now define the \textit{singular vectors} of an \(n \times d\) matrix \(A\).
+Consider the rows of \(A\) as \(n\) points in a \(d\)-dimensional space. 
+Consider the best fit line through the origin. Let \(\mathbf{v} \) be a unit vector
+along this line. The length of the projection of \(\mathbf{a_i}\), the \(i^{th}\) row of \(A\),
+onto \(\mathbf{v} \) is \(\vert \mathbf{a_i} \cdot \mathbf{v} \vert \).
+From this, we see that the sum of length squared of the projections is \(\vert A \mathbf{v}  \vert^2 \). The best fit line is the one that maximizing \(\vert A \mathbf{v}  \vert^2\)  and hence minimizing the sum of the squared distances of the points to the line.
+
+With this in mind, define the \textit{first singular vector} \(\mathbf{v_1} \), of \(A\), which is a column vector, as the best fit line through the origin for \(n\) points in \(d-\)space that are the rows of \(A\). Thus
+\[
+  \mathbf{v_1} = \arg \max _{\vert \mathbf{v}  \vert = 1} \vert A \mathbf{v}  \vert.
+\]
+
+The value \(\sigma _1(A)=\vert A \mathbf{v_1}  \vert \) is called the \textit{first singular value} of \(A\). Note that \(\sigma _1^2\) is the sum of the squares of the projections of the points to the line determined by \(\mathbf{v_1} \). 
+
+The greedy approach to find the best \(2-\)dimensional subspce for a matrix \(A\), takes \(\mathbf{v_1} \) as the first basis vector for the \(2-\)dimensional subspace and finds the best \(2-\)dimensional subspace containing \(\mathbf{v_1} \). The fact that we are using the sum of squared distances will again help. For every \(2-\)dimensional subspace containing \(\mathbf{v_1} \), the sum of squared lengths of the projections onto the subspace equals the sum of squared projections onto \(\mathbf{v_1} \) in the subspace plus the sum of squared projections along a vector perpendicular to \(\mathbf{v_1} \) in the subspace. See \autoref{fig:proj2dim}.
+
+\begin{figure}[H]
+  \centering
+  \incfig{proj2dim}
+  \caption{The squared length of projection from original vector to a subspace spanned by \(\mathbf{v_1} \) and a unit vector perpendicular to \(\mathbf{v_1} \),  \(\mathbf{v_2} \), is the squared length of projection on \(\mathbf{v_1} \) plus the squared length of projection on \(\mathbf{v_2} \).  }
+  \label{fig:proj2dim}
+\end{figure}
+
+Thus, instead of looking for the best \(2\)-dimensional subspace containing \(\mathbf{v_1} \), look for a unit vector perpendicular to \(\mathbf{v_1} \), which is the \(\mathbf{v_2} \) above, that maximizes \(\vert A \mathbf{v}  \vert^2 \) among all such unit vectors. Using the same greedy strategy to find the best three and higher dimensional subspaces, defines \(\mathbf{v_3}, \mathbf{v_4}, \dots  \) in similar manner, and we may guess this strategy is correct. We will see that the greedy strategy is in fact true for every dimeension. 
+
+The \textit{second singular vector}, \(\mathbf{v_2} \), is defined by the best fit line perpendicular to \(\mathbf{v_1} \). 
+\[
+  \mathbf{v_2} = \argmax_{ v \perp v_1 , \vert \mathbf{v}  \vert = 1  } \vert A \mathbf{v}  \vert   .
+\]  
+
+The value \(\sigma _2(A)=\vert A \mathbf{v_2}  \vert \) is called the \textit{second singular value} of \(A\). The \textit{third singular vector} \(\mathbf{v_3}  \) is defined similarly by
+
+\[
+  \mathbf{v_3} = \argmax_{v \perp \mathbf{v_1}, \mathbf{v_2}, \vert \mathbf{v}  \vert=1  }\vert A \mathbf{v}  \vert  
+\]
+and so on. The process stops when we have found 
+\[
+  \mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_r}   
+\]
+as singular vectors and
+\[
+  \argmax_{v \perp \mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_r}  , \vert v \vert=1 }  \vert A \mathbf{v}  \vert = 0 .
+\]
+
+\begin{note}
+  Here we know \(r\) is \(\rank A\) since if we extend \(S=\left\{ \mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_r}    \right\} \) to an orthogonal basis by Gram-Schmidt process, say \(B=S \cup T\), then we know \(\forall t \in T\), \(t \in \ker A\) by above arguments, so \(T \subseteq \ker A\). Conversely, we can show that \(\ker A \subseteq T\) by some simple proof. Hence, \(T\) spans \(\ker A\), and by rank and nullity theorem we have \(\vert S \vert = r =\rank A\).       
+\end{note}
+
+Here we show that the greedy algorithm indeed find the best subspaces of every dimension. That is, it is impossible that we find a better subspace by picking some \(\mathbf{v_i} \) that does not maximize \(\vert A \mathbf{v}  \vert \) in the greedy process.  
+
+\begin{theorem}\label{thm: greedy best-fit}
+    Let \(A\) be an \(n \times d\) matrix where \(\mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_r}\) are the singular vectors defined above. For \(1 \le k \le r\), let \(V_k\) be the subspace spanned by \(\mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_k}\). Then for each \(k\), \(V_k\) is the best-fit \(k\)-dimensional subspace for \(A\).          
+\end{theorem}
+\begin{proof}
+    The statement is obviously true for \(k=1\). For \(k=2\), let \(W\) be a best-fit \(2\)-dimensional subspace of \(A\). For any basis \(\mathbf{w_1}, \mathbf{w_2}  \)   of \(W\), \(\vert A \mathbf{w_1}  \vert^2 + \vert A \mathbf{w_2}  \vert^2  \) is the sum of squared lengths of the projections of the rows of \(A\) on \(W\).  Now choose a basis \(\mathbf{w_1}, \mathbf{w_2}  \) of \(W\) so that \(\mathbf{w_2} \) is perpendicular to \(\mathbf{v_1} \). If \(\mathbf{v_1} \) is perpendicular to \(W\), then we can pick any unit vector of \(W\) to be \(\mathbf{w_2} \). If not, choose \(\mathbf{w_2} \) to be the unit vector in \(W\) perpendicular to the projection of \(\mathbf{v_1} \) onto \(W\) (such \(\mathbf{w_2} \) is perpendicular to \(\mathbf{v_1} \) by Theorem of Three Perpendiculars). Now since \(\mathbf{v_1} \) was chosen to maximize \(\vert A \mathbf{v_1}  \vert^2 \), it follows that \(\vert A \mathbf{w_1}  \vert^2 \le \vert A \mathbf{v_1}  \vert^2  \). Since \(\mathbf{v_2} \) was chosen to maximize \(\vert A \mathbf{v_2}  \vert^2 \) over all unit \(\mathbf{v} \) perpendicular to \(\mathbf{v_1} \), we have \(\vert A \mathbf{w_2}  \vert^2 \le \vert A \mathbf{v_2}  \vert^2  \) . Thus
+    \[
+      \vert A \mathbf{w_1}  \vert^2 + \vert A \mathbf{w_2}  \vert^2 \le \vert A \mathbf{v_1}  \vert^2 + \vert A \mathbf{v_2}  \vert^2.  
+    \]   
+    Hence, \(V_2\) is at least as good as \(W\) and so is a best-fit \(2\)-dimensional subspace.  
+
+    Now for general \(k\), proceed by induction. By the induction hypothesis, \(V_{k-1}\) is a best-fit \(k-1\)-dimensional subspace. Suppose \(W\) is a best-fit \(k\)-dimensional subspace. Choose a basis \(\mathbf{w_1}, \mathbf{w_2}, \dots , \mathbf{w_k} \) of \(W\) so that \(\mathbf{w_k} \) is perpendicular to \(\mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_{k-1}} \)\footnote{We prove in \autoref{appendix} that such basis exists}. Then
+    \[
+      \sum_{i=1}^{k} \vert A \mathbf{w_i}  \vert^2 \le  \sum_{i=1}^{k-1} \vert A \mathbf{v_i}  \vert^2  + \vert A \mathbf{w_k}  \vert^2 
+    \]  
+    since \(V_{k-1}\) is an optimal \(k-1\)-dimensional subspace. Since \(\mathbf{w_k} \) is perpendicular to \(\mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_{k-1}}   \), by the definition of \(\mathbf{v_k} \), \( \vert A \mathbf{w_k} \vert^2 \le \vert A \mathbf{v_k} \vert^2  \). Thus
+    \[
+     \sum_{i=1}^{k} \vert A \mathbf{w_i}  \vert^2 \le  \sum_{i=1}^{k} \vert A \mathbf{v_i}  \vert^2 ,
+    \]   
+    proving that \(V_k\) is at least as good as \(W\) and hence is optimnal. 
+\end{proof}
+
+\begin{note}
+  Note that the \(n\) vectors \(A \mathbf{v_i} \) is really a list of lengths (with signs) of the projections of the rows of \(A\) onto \(\mathbf{v_i} \). Think of \(\vert A \mathbf{v_i} \vert = \sigma _i (A)   \) as the "component" of the matrix \(A\) along \(\mathbf{v_i} \). For this intepretation to make sense it should be true that adding up the squares of the components of \(A\) along each of the \(\mathbf{v_i} \) gives the square of the "whole content of the matrix \(A\)". This is indeed the case and is the matrix analogy of decomposing a vector into its components along orthognal directions.     
+\end{note}
+
+Consider one row, say \(\mathbf{a_j} \) of \(A\). Since \(\mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_r}   \) span the space of all rows of \(A\), \(\mathbf{a_j} \cdot \mathbf{v} = 0 \) for all \(\mathbf{v} \) perpendicular to \(\mathbf{v_1}, \mathbf{v_2}, \dots  , \mathbf{v_r} \). Thus, for each row \(\mathbf{a_j} \), we have
+\[
+  \sum_{i=1}^{r} (\mathbf{a_j} \cdot v_i )^2= \vert \mathbf{a_j}  \vert^2.  
+\]       
+Summing over all rows \(j\), 
+\[
+  \sum_{j=1}^{n} \vert \mathbf{a_j}  \vert^2 = \sum_{j=1}^{n} \sum_{i=1}^{r} (\mathbf{a_j} \cdot \mathbf{v_i} )^2 =  \sum_{i=1}^{r} \sum_{j=1}^{n} (\mathbf{a_j} \cdot \mathbf{v_i}  )^2 = \sum_{i=1}^{r} \vert A \mathbf{v_i}  \vert^2 = \sum_{i=1}^{r} \sigma _i^2(A).   
+\] 
+But \(\sum_{j=1}^{n} \vert \mathbf{a_j}  \vert^2 = \sum_{j=1}^{n} \sum_{k=1}^{d} a_{jk}^2  \), the sum of squares of all entries of \(A\). Thus, the sum of squares of the singular values of \(A\) is indeef the square of "whole contentcof \(A\)", i.e., the sum of squares of all the entries. There is an important norm associated with this quantity, the Frobenius norm of \(A\), denoted \(\left\lVert A \right\rVert _F \)  defined as 
+\[
+  \left\lVert A \right\rVert _F = \sqrt{\sum_{j,k} a_{jk}^2}.  
+\]    
+
+\begin{lemma}\label{lm: frobenius norm}
+  For any matrix \(A\), the sum of squares of the singular values equals the Frobenius norm. That is, \(\sum \sigma _i^2(A)= \lVert A \rVert _F^2 \).  
+\end{lemma}
+
+\begin{proof}
+  By the preceding discussion.
+\end{proof}
+
+A matrix \(A\) can be described fully by how it transforms the vectors \(v_i\). Every vector \(v\) can be written as a linear combination of \(\mathbf{v_1} , \mathbf{v_2} , \dots , \mathbf{v_r} \) and a vector perpendicular to all the \(\mathbf{v_i} \). Now \(A \mathbf{v} \) is the same linear combination of \(A \mathbf{v_1}, A \mathbf{v_2}, \dots  ,A \mathbf{v_r}   \) as \(\mathbf{v} \) is of \(\mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_r} \). So the \(A \mathbf{v_1}, A \mathbf{v_2}, \dots  ,A \mathbf{v_r}   \)  form a fundamental set of vector associated with \(A\), We normalize them to length one by 
+\[
+  \mathbf{u_i}= \frac{1}{\sigma _i (A)}A \mathbf{v_i}.  
+\]     
+The vectors \(\mathbf{u_1}, \mathbf{u_2}, \dots , \mathbf{u_r}   \) are called the \textit{left singular vectors} of \(A\). The \(\mathbf{v_i} \) are called the \textit{right singular vectors}. The \hyperref[thm: SVD theorem]{SVD theorem} will fully explain the reason for these terms.   
+
+Clearly, the right singular vectors are orthogonal by definition. We now show that the left singular vectors are also orthogonal and that \(A=\sum_{i=1}^r \sigma _i \mathbf{u_i} \mathbf{v_i}^t  \). 
+
+\begin{theorem}
+  Let \(A\) be a rank \(r\) matrix. The left singular vectors of \(A\), \(\mathbf{u_1}, \mathbf{u_2}, \dots  , \mathbf{u_r}  \), are orthogonal.    
+\end{theorem}
+\begin{proof}
+  The proof is by induction on \(r\). For \(r=1\), there is only one \(\mathbf{u_i} \) so the theorem is trivially true. For the inductive part consider the matrix
+  \[
+    B=A-\sigma _1 \mathbf{u_1} \mathbf{v_1}^t.  
+  \]
+  The implied algorithm in the definition of singular value decomposition applied to \(B\) is identical to a run of the algorithm on \(A\) for its second and later singular vectors and singular values. To see this, first observe that \(B \mathbf{v_1} = A \mathbf{v_1} - \sigma_1 \mathbf{u_1} \mathbf{v_1}^t \mathbf{v_1} = 0.  \) since \(\sigma _1 \mathbf{u_1} = A \mathbf{v_1}  \) and \(\mathbf{v_1}^t \mathbf{v_1} = \langle \mathbf{v_1}, \mathbf{v_1}   \rangle = 1   \). It then follows that the first right singular vector, call it \(\mathbf{z} \), of \(B\) will be perpendicular to \(\mathbf{v_1} \) since if it had a component \(\mathbf{z_1} \) along \(\mathbf{v_1} \), then
+  \[
+    \left\vert B \frac{\mathbf{z} - \mathbf{z_1} }{\vert \mathbf{z} - \mathbf{z_1} \vert } \right\vert = \frac{\vert B \mathbf{z}  \vert }{\vert \mathbf{z} - \mathbf{z_1} \vert } > \vert B \mathbf{z}  \vert,
+  \]     
+  contradicting the arg max definition of \(z\). But for any \(\mathbf{v} \) perpendicular to \(\mathbf{v_1} \), \(B \mathbf{v}  = A \mathbf{v} \). Thus, the top singular vector of \(B\) is indeed a second singular vector of \(A\). Repeating this argument shows that a run of the algorithm on \(B\) is the same as a run on \(A\) for its second and later singular vectors \footnote{Notice that every singular vector of \(B\) must be perpendicular to \(\mathbf{v_1} \) by the above argument about if it has a component \(\mathbf{z_1} \) along \(\mathbf{v_1} \).    }.  Thus, there is a run of the algorithm that finds that \(B\) has right singular vectors \(\mathbf{v_2}, \mathbf{v_3}, \dots \mathbf{v_r}   \) and corresponding left singular vectors \(\mathbf{u_2}, \mathbf{u_3}, \dots , \mathbf{u_r}   \). By the induction hypothesis, \(\mathbf{u_2}, \mathbf{u_3}, \dots , \mathbf{u_r}\) is orthogonal. 
+  
+  It remains to show that \(\mathbf{u_1} \) is orthogonal to the other \(\mathbf{u_i} \). Suppose not and for some \(i \geq 2\), \(\mathbf{u_1}^t \mathbf{u_i} \neq 0  \). Without loss of generality assume that \(\mathbf{u_1}^t \mathbf{u_i}>0\). The proof is symmetric for the case where \(\mathbf{u_1}^t \mathbf{u_i} < 0\). Now, for infinitesimally small \(\varepsilon >0\), the vector 
+  \[
+    A \left( \frac{\mathbf{v_1} + \varepsilon  \mathbf{v_i}  }{\vert \mathbf{v_1} + \varepsilon  \mathbf{v_i} \vert } \right) = \frac{\sigma _1 \mathbf{u_1} + \varepsilon \sigma _i \mathbf{u_i}  }{\sqrt{1+\varepsilon ^2} }
+  \]      
+  has length at least as large as its component along \(\mathbf{u_1} \) which is 
+  \[
+    \mathbf{u_1}^t \left( \frac{\sigma _1 \mathbf{u_1} + \varepsilon  \sigma _i \mathbf{u_i} }{\sqrt{1+\varepsilon ^2} } \right)=\left( \sigma _1+\varepsilon \sigma _i \mathbf{u_1}^t \mathbf{u_i}  \right) \left( 1-\frac{\varepsilon ^2}{2} + O\left( \varepsilon ^4 \right)  \right) = \sigma _1 + \varepsilon \sigma _i \mathbf{u_1}^t \mathbf{u_i}  - O\left( \varepsilon ^ 2\right) > \sigma _1  
+  \] a contradiction. Thus, \(\mathbf{u_1}, \mathbf{u_2}, \dots , \mathbf{u_r}   \) are orthogonal. 
+\end{proof}
+
+\section{Singular Value Decomposition (SVD)}
+
+Let \(A\) be an \(n \times d\) matrix with singular vectors \(\mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_r} \) and corresponding singular values \(\sigma _1, \sigma _2, \dots , \sigma _r\). Then, \(\mathbf{u_i} = \frac{1}{\sigma _i}A \mathbf{v_i}  \), for all \(i=1,2,\dots ,r\), are the left singular vectors and by \autoref{thm: SVD theorem}, \(A\) can be decomposed into a sum of rank one matrices as 
+\[
+  A=\sum_{i=1}^{r} \sigma _i \mathbf{u_i} \mathbf{v_i}^t .  
+\]      
+
+We first prove a simple lemma stating that two matrices \(A\) and \(B\) are identical if and only if \(Av=Bv\) for all vectors \(v\).
+
+\begin{lemma} \label{lm: identical matrices}
+ Two matrices \(A\) and \(B\) are identical if and only if \(Av=Bv\) for all vectors \(v\). 
+\end{lemma}
+\begin{proof}
+  We only prove the "if" direction. Notice that \(a_{ij} = e_i^t A e_j = e_i^t B e_j = b_{ij}\) for all \(i,j\), so this is true.
+\end{proof}
+
+\begin{note}
+  The lemma statas that in the abstract, a matrix \(A\) can be viewed as a transformation that maps vector \(v\) onto \(Av\).   
+\end{note}
+
+\begin{theorem}[SVD theorem]\label{thm: SVD theorem}
+  Let \(A\) be an \(n \times d\) matrix with right singular vectors \(\mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_r}   \), left singular vectors \(\mathbf{u_1}, \mathbf{u_2}, \dots , \mathbf{u_r}\), and corresponding singular values \(\sigma _1, \sigma _2, \dots , \sigma _r\). Then
+  \[
+    A= \sum_{i=1}^{r} \sigma _i \mathbf{u_i} \mathbf{v_i}^t.  
+  \]  
+\end{theorem}
+\begin{proof}
+  For each singular vector \(\mathbf{v_j} \), we know
+  \[
+    A \mathbf{v_j} = \sigma _j \mathbf{u_j}  = \sigma _j \mathbf{u_j} \mathbf{v_j}^t \mathbf{v_j} = \sum_{i=1}^{r} \sigma _i \mathbf{u_i} \mathbf{v_i}^t \mathbf{v_j}.    
+  \] 
+  Since any vector \(\mathbf{v} \) can be expressed as a linear combination of the singular vectors plus a vector perpendicular to the \(\mathbf{v_i} \)'s. Hence, we know \(A \mathbf{v} = \sum_{i=1}^{r} \sigma _i \mathbf{u_i} \mathbf{v_i}^t \mathbf{v}  \) and by \autoref{lm: identical matrices} we know \(A=\sum_{i=1}^{r} \sigma _i \mathbf{u_i} \mathbf{v_i}^t\). 
+\end{proof}
+
+\begin{definition}
+  The decomposition in \autoref{thm: SVD theorem} is called the \textit{singular value decomposition}, SVD, of \(A\). In matrix notation \(A=UDV^t\) where the columns of \(U\) and \(V\) consist of the left and right singular vectors, respectively, and \(D\) is a diagonal matrix whose diagonal entries are the singular values of \(A\).      
+\end{definition}
+\begin{align*}
+  UDV^t &=
+  \begin{pmatrix}
+    \mathbf{u_1}  & \mathbf{u_2}  & \cdots  &\mathbf{u_r}\\
+  \end{pmatrix}
+  \begin{pmatrix}
+    \sigma _1 &  &  &  \\
+     &  \sigma _2&   &  \\
+     &  &  \ddots&  \\
+     &  &  & \sigma _r \\
+  \end{pmatrix}
+  \begin{pmatrix}
+     \mathbf{v_1}  \\
+      \mathbf{v_2} \\
+      \vdots\\
+      \mathbf{v_r}
+  \end{pmatrix} \\
+  &= \begin{pmatrix}
+    \sigma _1 \mathbf{u_1}  &\sigma _2 \mathbf{u_2}  &\dots   &\sigma _r \mathbf{u_{r} }   \\
+  \end{pmatrix}
+ \begin{pmatrix}
+     \mathbf{v_1}  \\
+      \mathbf{v_2} \\
+      \vdots\\
+      \mathbf{v_r}
+  \end{pmatrix} \\
+  &= \sigma _1 \mathbf{u_1}\mathbf{v_1}^t + \sigma _2 \mathbf{u_2}\mathbf{v_2}^t + \dots + \sigma _r \mathbf{u_{r} }\mathbf{v_r}^t = A.
+\end{align*}
+
+\begin{note}
+  The above \(U, D, V^t\) forms the reduced (compact) SVD, since \(U \in M_{n \times r}(F)\), \(D \in M_{r \times r}(F)\), and \(V^t \in M_{r \times d}(F)\). Actually the full SVD is to fill \(0\)s in \(U, D, V^t\) to make these \(3\) matrices square. We prefer to use reduced SVD since it can save less entries than full SVD.   
+\end{note}
+
+\begin{note}
+  For any matrix \(A\), the sequence of singular values is unique and if the singular values are all distinct, then the sequence of singular vectors is unique, too. However, when some set of singular values are equal, the corresponding singular vectors span some subspace. Any set of orthonormal vectors spanning this subspace can be used as the singular vectors. 
+\end{note}
+
+\section{Best Rank \(k\) Approximations} \label{sec: best rank k approx}
+
+There are two important matrix norms, the Frobenius norm denoted \(\lVert A \rVert_F \) and the \(2\)-norm denoted \(\lVert A \rVert_2 \). The \(2\)-norm of the matrix \(A\) is given by 
+\[
+  \max _{\vert \mathbf{v}  \vert =1} \vert A \mathbf{v}  \vert 
+\] 
+and thus equals to the largest singular value of the matrix. 
+
+Let \(A\) be an \(n \times d\) matrix and think of the rows of \(A\) as \(n\) points in \(d\)-dimensional space. The Frobenius norm of \(A\) is the square root of the sum of squared distnace of the points to the origin. The \(2\)-norm is the square root of the sum of squared distances to the origin along the direction that maximizes this quantity. More specifically, suppose \(r_1, r_2, \dots , r_n \) are the \(n\) rows of \(A\), then 
+\[
+  \lVert A \rVert_F = \sqrt{\lVert r_1 \rVert^2 + \lVert r_2 \rVert^2 + \dots + \lVert r_n \rVert^2   } = \sqrt{\sum_{i=1}^{n}\sum_{j=1}^{d} \vert a_{ij} \vert^2   },
+\]   
+and since \(\vert r_i \cdot \mathbf{v}  \vert \) is the length of the projection from \(r_i\) to the line in the direction of \(\mathbf{v} \), so \(\vert A \vert_2 \) is like finding the maximum of the sum of lenghts of all projections. 
+
+Let 
+\[
+  A = \sum_{i=1}^{r} \sigma _i \mathbf{u_i} \mathbf{v_i}^t  
+\]
+be the SVD of \(A\). For \(k \in \left\{ 1,2, \dots  , r \right\} \), let 
+\[
+ A_k = \sum_{i=1}^{k} \sigma _i \mathbf{u_i} \mathbf{v_i}^t  
+\]  
+be the sum truncated after \(k\) termns. It is clear that \(A_k\) has rank \(k\)\footnote{See \autoref{appendix: Ak rank k}}. Furthermore, \(A_k\) is the best rank \(k\) approximation to \(A\) when the error is measured in either \(2\)-norm or the Frobenius norm.    
+
+
+
+\begin{lemma}\label{lm: Ak relation}
+  The rows of \(A_k\) are the projections of the rows of \(A\) onto the subspace \(V_k\) spanned by the first \(k\)  singular vectors of \(A\).    
+\end{lemma}
+\begin{proof}
+  Let \(\mathbf{a} \) be an arbitrary row vector of \(A\). Since the \(\mathbf{v_i} \) are orthonormal, the projection of the vector \(\mathbf{a} \) onto \(V_k\) is given by 
+  \[
+    \sum_{i=1}^{k} (\mathbf{a}  \cdot \mathbf{v_i} ) \mathbf{v_i}^t. \footnote{Since \(\left\{ \mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_k}  \right\} \) is an orthonormal basis of \(V_k\) and \(\mathbf{a} \cdot \mathbf{v_i} = \langle \mathbf{a} , \mathbf{v_i}  \rangle \) .  } 
+  \]    
+  Thus, the matrix whose rows are the projections of the rows of \(A\) onto \(V_k\) is given by \(\sum_{i=1}^{k} A \mathbf{v_i} \mathbf{v_i}^t  \). The last expression simplifies to
+  \[
+    \sum_{i=1}^{k} A \mathbf{v_i} \mathbf{v_i}^t = \sum_{i=1}^{k} \sigma _i \mathbf{u_i} \mathbf{v_i}^t = A_k.  
+  \]   
+\end{proof}
+
+The matrix \(A_k\) is the best rank \(k\) approximation to \(A\) in both the Frobenius and the \(2\)-norm. First we show that the matrix \(A_k\) is the best approximation to \(A\) in the Frobenius norm.     
+
+\begin{theorem}
+  For any matrix \(B\) of rank at most \(k\)
+  \[
+    \lVert A-A_k \rVert_F \leq \lVert A-B \rVert_F.  
+  \]  
+\end{theorem}
+\begin{proof}
+First notice that the meaning of \(\lVert A-B \rVert_F^2 \) is that, if we regard the rows of \(A,B\) as some vectors, then \(\lVert A-B \rVert_F^2 \) is the sum of squared distance of \(a_i - b_i\)  for all \(i\), where \(a_i,b_i\) are the \(i\)-th  rows of \(A\) and \(B\).       
+
+  Let \(B\) minimize \(\lVert A-B \rVert_F^2 \) among all rank \(k\) or less matrices. Let \(V\) be the space spanned by the rows of \(B\). The dimension of \(V\) is at most \(k\). Since \(B\) minimizes \(\lVert A-B \rVert_F^2 \), it must be that each row of \(B\) is the projeciton of the corresponding row of \(A\) onto \(V\), otherwise replacing the rows of \(B\) with the projection of the corresponding row of \(A\) onto \(V\) does not make the rank of new \(B\) exceeding \(k\) since all the new rows of \(B\) are in \(V\) and \(\dim V \le k\). However, this would reduce \(\lVert A-B \rVert_F^2 \) (think about the meaning of \(\lVert A-B \rVert_F^2 \) ).
+  
+  Since each row of \(B\) is the projection of the corresponding row of \(A\), it follows that \(\lVert A-B \rVert_F^2 \) is the sum of squared distance of rows of \(A\) to \(V\).     
+
+  Now if we pick \(V\) as \(V_k\), the space spanned by the first \(k\) left singular vectors, then by \autoref{thm: greedy best-fit}, we know this is the best-fit \(k\)-dimensional space of \(A\), and by \autoref{lm: Ak relation}, we know
+  \[
+    \lVert A-A_k \rVert_F^2 \le \lVert A-B \rVert_F^2  
+  \] for all matrix \(B\) of rank at most \(k\).  
+\end{proof}
+
+Next we tackle the \(2\)-norm. We first show that the square of the \(2\)-norm of \(A-A_k\) is the square of the \((k+1)^{st} \) singular value of \(A\).
+
+\begin{lemma}\label{lm:2norm A-Ak}
+  \(\lVert A-A_k \rVert_2^2=\sigma _{k+1}^2 \). 
+\end{lemma}
+
+\begin{proof}
+  Let \(A=\sum_{i=1}^{r} \sigma _i \mathbf{u_i} \mathbf{v_i}^t\) be the singular value decomposition of \(A\). Then \(A_k = \sum_{i=1}^k \sigma _i \mathbf{u_i} \mathbf{v_i}^t\) and \(A-A_k = \sum_{i=k+1}^{r}  \sigma _i \mathbf{u_i} \mathbf{v_i}^t\). Let \(\mathbf{v} \) be the top singular vector of \(A - A_k\). Let \(\mathbf{v} \) be the top singular vector of \(A-A_k\). Express \(\mathbf{v} \) as a linear combination of \(\mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_r}\)   \footnote{Since we can extend \(\mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_r}   \) to an orthonormal basis of \(\mathbb{R} ^d\) (Suppose \(A \in M_{n \times d}(\mathbb{R})\) ) , and since the part of this basis except \(\mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_r}\) is a basis of \(\ker A\), so express \(\mathbf{v} \) in this basis is equivalent to express \(\mathbf{v} \) in \(\mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_r}\)    } . That is, write \(\mathbf{v} = \sum_{i=1}^{r} \alpha _i \mathbf{v_i}  \).
+  
+  Then
+  \begin{align*}
+    \vert (A-A_k)\mathbf{v}  \vert &= \left\vert \sum_{i=k+2}^{r}\sigma _i \mathbf{u_i} \mathbf{v_i}^t \sum_{j=1}^{r} \alpha _i \mathbf{v_j}      \right\vert = \left\vert \sum_{i=1}^{k+1} \alpha _i \sigma _i \mathbf{u_i} \mathbf{v_i}^t \mathbf{v_i}    \right\vert  \\
+    &= \left\vert \sum_{i=k+1}^{r} \alpha _i \sigma _i \mathbf{u_i}   \right\vert = \sqrt{\sum_{i=k+1}^r \alpha _i^2\sigma _i^2 }. 
+  \end{align*}         
+
+  The \(\mathbf{v} \)  maximizing this last quantity, subject to the constraint that \(\vert \mathbf{v}  \vert = \sum_{i=1}^r \alpha _i^2 = 1  \), occurs when \(\alpha _{k+1}=1\) and the rest of the \(\alpha _i\)'s are \(0\). Thus,
+  \[
+    \lVert A-A_k \rVert_2^2 = \sigma _{k+1}^2 
+  \]    proving the lemma.
+\end{proof}
+
+Finally, we prove that \(A_k\) is the best rank \(k\) \(2\)-norm approximation of \(A\).
+
+\begin{theorem}
+  If \(A\) is a \(n \times d\) matrix. For any matrix \(B\) of rank at most \(k\)
+  \[
+    \lVert A-A_k \rVert_2 \le \lVert A-B \rVert_2.  
+  \]    
+\end{theorem}
+\begin{proof}
+  If \(A\) is of rank \(k\) or less, the theorem is obviously true since \(\lVert A-A_k \rVert_2 = 0 \). Thus assume that \(A\) is of rank greater than \(k\). By \autoref{lm:2norm A-Ak}, \(\lVert A-A_k \rVert_2^2=\sigma _{k+1}^2 \). Now suppose there is some matrix \(B\) of rank at most \(k\) such that \(B\) is a better \(2\)-norm approximation to \(A\) than \(A_k\). That is, \(\lVert A-B \rVert_2 < \sigma _{k+1} \)\footnote{Later we will see that \(\sigma _i>0\) for all \(i\)}. Note that \(\ker B\) is at least \(d-k\). Let \(\mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_{k+1} }   \) be the first \(k+1\) singular vectors of \(A\). By a dimension argument, it follows that there exists a \(\mathbf{z}  \neq 0\) in 
+  \[
+    \ker B \cap \operatorname{span}\{\mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_{k+1}}\}. 
+  \]
+  Scale \(z\) so that \(\vert \mathbf{z}  \vert=1 \). We now show that for this vector \(\mathbf{z} \), which lies in the space of the first \(k+1\) singular vectors of \(A\), that \((A-B)\mathbf{z} \ge \sigma _{k+1}\). Hence, the \(2\)-norm of \(A-B\) is at least \(\sigma _{k+1}\) contradicting the assumption that \(\lVert A-B \rVert_2 < \sigma _{k+1} \). First 
+  \[
+    \lVert A-B \rVert_2^2 \ge \vert (A-B)\mathbf{z}  \vert^2.  
+  \]                  
+  Since \(B \mathbf{z} = 0\),
+  \[
+    \lVert A-B \rVert_2^2 \ge \vert A \mathbf{z}  \vert^2.  
+  \] 
+  Since \(\mathbf{z} \) is in the \(\operatorname{span}\{\mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_{k+1}}\} \) ,
+  \[
+    \vert A \mathbf{z}  \vert^2 = \left\vert \sum_{i=1}^n \sigma _i \mathbf{u_i} \mathbf{v_i}6t \mathbf{z} \right\vert^2 = \sum_{i=1}^{n} \sigma _i^2 \left( \mathbf{v_i}^t \mathbf{z} \right)^2 = \sum_{i=1}^{k+1}\sigma _i^{2}  \left( \mathbf{v_i}^t \mathbf{z}   \right)^2 \ge \sigma _{k+1}^2 \sum_{i=1}^{k+1}\left( \mathbf{v_i}^t \mathbf{z}   \right)^2 = \footnote{Since \(\mathbf{z} \) is in \(\operatorname{span}\{\mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_{k+1}}\}\), so \(\mathbf{z} = \sum_{i=1}^{k+1}\left( \mathbf{v_i}^t \mathbf{z}   \right)^2 v_i \) and since \(\vert \mathbf{z}  \vert=1 \), so we know \(\sum_{i=1}^{k+1}\left( \mathbf{v_i}^t \mathbf{z}  \right)^2=1\).} \sigma _{k+1}^2.       
+  \] 
+  It follows that 
+  \[
+    \lVert A-B \rVert_2^2 \ge \sigma_{k+1}^2 
+  \]
+  contradicting the assumption that \(\lVert A-B \rVert_2 < \sigma _{k+1} \). This proves the theorem.
+\end{proof}
+
+\section{Computing Singular Values}
+\begin{prev}
+    We know \(A \mathbf{v_j} = \sigma _i \mathbf{u_j}  \) for all \(j\).  
+\end{prev}
+
+Now if we write down the transpose of \(A\), then we know 
+\[
+  A^t = \sum_{i=1}^{r} \sigma _i \mathbf{v_i} \mathbf{u_i}^t  , 
+\]  
+and thus we have  
+\[
+  A^t \mathbf{u_i} = \sigma _i \mathbf{v_i}.  
+\]
+
+Now we can observe that 
+\[
+  A^t A \mathbf{v_i} = A^t \sigma _i \mathbf{u_i} = \sigma _i^2 \mathbf{v_i}
+\]
+and 
+\[
+  A A^t \mathbf{u_i} = A \sigma _i \mathbf{v_i} = \sigma _i^2 \mathbf{u_i},  
+\]
+so it seems that the singular values of \(A\)  are identical to the eigenvalues of \(A^t A, A A^t\) , and we'll prove that in fact this is true. 
+
+We first introduce a concept called positive semi-definite matrix. 
+
+\begin{definition}
+  A \(n \times n\)  square matrix \(A\) is called \textit{positive semi-definite} if 
+  \begin{itemize}
+    \item \(A\) is symmetric. 
+    \item \(x^t A x \geq  0 \) for all \(x \in \F^n \).   
+  \end{itemize}
+\end{definition}
+
+We now show some equivalent conditions of a matrix \(A\) to be positive semi-definite. 
+\begin{lemma} \label{lm: positive semi-df}
+  For a symmetric \(n \times n\) matrix \(A\), the followings are equivalent. 
+  \begin{enumerate}
+    \item \(v^t A v \geq 0\) for all \(v \in \F^n\). 
+    \item All the eigenvalues of \(A\) are non negative. 
+    \item There exists some matrix \(B\) such that \(A = B^t B\). 
+    \item \(A\) is a gram matrix, that is, \(A_{ij} = u_i^t u_j\) for every \(i,j\), and \(u_1, u_2, \dots , u_n \in U \), which is a vector space.    
+  \end{enumerate}  
+\end{lemma}
+
+\begin{proof}[proof of 1. \(\to \) 2.]
+    For any eigenvector \(v\)  of \(A\), suppose its corresponding eigenvalue is \(\lambda \), then we know 
+    \[
+      v^t A v = v^t \lambda v = \lambda v^t v \ge 0
+    \] and since \(v^t v \ge 0\), so \(\lambda  \ge 0\). 
+\end{proof}
+
+\begin{proof}[proof of 2. \(\to\) 3.]
+Since \(A\) is symmetric, so it is self-adjoint, so there exists an orthonormal basis \(\mathcal{B} = \left\{ v_1,v_2, \dots ,v_n \right\}  \) such that \([A]_\mathcal{B} \) is diagonal  , and suppose 
+    \[
+      [A]_\mathcal{B}  = \begin{pmatrix}
+        \lambda _1 &  &  &   \\
+         & \lambda _2  &  &   \\
+         &  & \ddots &   \\
+         &  &  & \lambda _n  \\
+      \end{pmatrix},
+    \]
+  now if we define \(S(v_i) = \sqrt{\lambda _i} v_i \) for all \(i\) in \(1,2, \dots ,n\) and extend it to a linear transformation, then we know
+  \[
+    [S]_\mathcal{B} = \begin{pmatrix}
+      \sqrt{\lambda _1}  &  &  &   \\
+       &\sqrt{\lambda _2}   &  &   \\
+       &  &\ddots   &   \\
+       &  &  &\sqrt{\lambda _n}    \\
+    \end{pmatrix}.
+  \] 
+  
+  Besides, notice that \([S]_\mathcal{B} \) is self-adjoint, that is, \([S]_\mathcal{B} = S_{\mathcal{B} ^t} \), and also 
+  \[
+    [S]_\mathcal{B} ^t [S]_\mathcal{B} = \begin{pmatrix}
+        \lambda _1 &  &  &   \\
+         & \lambda _2  &  &   \\
+         &  & \ddots &   \\
+         &  &  & \lambda _n  \\
+      \end{pmatrix} = [A]_\mathcal{B} . 
+  \]  
+\end{proof}
+\begin{proof}[proof of \(3. \to 4.\) ]
+  Suppose \(A = B^t B\), and if \(B = \begin{bmatrix}
+    b_1 &b_2  &\dots   &b_n   \\
+  \end{bmatrix}\), where \(b_i\) is the \(i\)-th column of \(B\)    , then we know \(\left( B^t B\right)_{ij} = b_i^t b_j  \). 
+\end{proof}
+\begin{proof}[proof of \(4. \to 1.\) ]
+  Suppose \(A_{ij} = u_i^t u_j\), then for any vector \(v = \begin{pmatrix}
+    v_1 & v_2 & \dots  &v_n   \\
+  \end{pmatrix}^t\) , we know 
+  \begin{align*}
+    v^t A v &= \sum_{i=1}^n \sum_{j=1}^n v_i A_{ij} v_j =  \sum_{i=1}^n \sum_{j=1}^n v_i u_i^t u_j v_j  \\
+    &= \left( \sum_{i=1}^n u_i v_i \right)^t \left(  \sum_{j=1}^n u_j v_j \right) = \left\lVert \sum_{i=1}^n u_i v_i \right\rVert^2 \ge 0.   
+  \end{align*}
+\end{proof}
+
+Now go back to see \(A^t A\), suppose \(A = UDV^t\), then we can see that 
+\[
+  A^t A = V D^t U^t U D V^t = V D^t D V^t,
+\]  
+where
+\[
+  D^t D = \begin{pmatrix}
+    \sigma _1^2 &  &  &  &&& \\
+     &\sigma_2^2 & &  &&& \\
+     &  &\ddots  &  &&&\\
+     &  &  &\sigma _r^2  &&&\\
+     &&& & 0&& \\
+     &&&&& \ddots& \\
+     &&&&&&0 \\
+  \end{pmatrix},
+\] 
+and since \(V\) is an orthogonal matrix, so \(A^t A \sim D^t D\), which means the eigenvalues of \(A^t A\) are exactly \(\sigma _i^2\). Now we have another problem, is \(\sigma_i > 0\) or \(\sigma _i < 0\)? Notice that \(\left( A^t A \right)^t = A^t A \)      , and thus it is symmetric. Also, for any \(v\) satisfies the size of \(A^t A\),  
+\[
+  v^t A^t A v = (Av)^t (Av) \ge 0,
+\]
+so all of the eigenvalues of \(A^t A\) are positive by \autoref{lm: positive semi-df}. 
+
+Hence, if we want to find all singular values of \(A\), we can just find the eigenvalues of \(A^t A\). 
+
+\begin{note}
+  Observe the matrix \(D^t D\), we can found that if some of the eigenvalues of \(A^t A\) repeat, then some of the \(\sigma _i^2\) repeat, and thus the sequence, \(\sigma _1^2, \sigma _2^2, \dots , \sigma _r^2\) is unique.    
+\end{note}
+
+\section{Power Method for Computing the Singular Value Decomposition}
+
+Conputing the singular value decomposition is an important branch of numerical analysis in which there have been many sophiscated developments over a long period of time. Here we present an "in-principle" method to establish that the approximation of SVD of a matrix \(A\) can be computed in polynomial time. The method we present is called the Power Method, is simple and in fact the conceptual starting point for many algorithms. It is easiest to describe first in the case when \(A\) is square symmetric and has the same rignt and left sngular vectors \footnote{See \autoref{appendix: sym matrix same l,r SV}, which shows the left and right singular vectors of a square symmetric matrix must be identical. }, namely, 
+
+\[
+  A = \sum_{i=1}^r \sigma _i \mathbf{v_i} \mathbf{v_i}^t.     
+\]
+In this case, we have 
+\[
+  A^2 = \left( \sum_{i=1}^r \sigma _i \mathbf{v_i} \mathbf{v_i}^t    \right) \left( \sum_{j=1}^r \sigma _j \mathbf{v_j} \mathbf{v_j}^t    \right) = \sum_{i,j=1}^r \sigma _i \sigma _j \mathbf{v_i} \mathbf{v_i}^t \mathbf{v_j} \mathbf{v_j}^t = \sum_{i=1}^r \sigma _i^2 \mathbf{v_i} \mathbf{v_i}^t.     
+\]
+
+\begin{note}
+The outer product  \(\mathbf{v_i} \mathbf{v_j}^t  \) is a matrix rather than a value and is not zero even for \(i \neq j\). 
+\end{note}
+
+Similarly, if we take the \(k\)-th power of \(A\), again all the cross terms are zero and we will get 
+\[
+  A^k = \sum_{i=1}^r \sigma _i^k \mathbf{v_i} \mathbf{v_i}^t.   
+\]  
+
+If we had \(\sigma _1 > \sigma _2\), we would have 
+\[
+  \frac{1}{\sigma _1^k} A^k \to \mathbf{v_1} \mathbf{v_1}^t. 
+\] 
+Now we do not know \(\sigma _1\) beforehand and cannot find this limit, but if we just take \(A^k\) and divide by \( \left\lVert A^k \right\rVert _F \) so that the Frobenius norm is normalized to \(1\) now, that matrix will converge to the rank \(1\) \footnote{See \autoref{appendix: outer product}, which proves it is rank one.} matrix \(\mathbf{v_1} \mathbf{v_1}^t \)\footnote{See \autoref{appendix: divind Frobenius norm}, which shows it converges.} from which \(\mathbf{v_1} \) may be computed.
+
+\begin{note}
+  This is still an intuitive description, which we will make precise shortly.
+\end{note}
+
+First, we cannot make the assumption that \(A\) is square and has the same right and left singular vectors. But \(B = A A^t\) satisfies both these conditions. If again, the SVD of \(A\) is \(\sum_{i} \sigma _i \mathbf{u_i} \mathbf{v_i}^t\), then by direct computation we know 
+\[
+  B = AA^t = \left( \sum_{i} \sigma _i \mathbf{u_i} \mathbf{v_i}^t    \right)\left( \sum_{j} \sigma _j \mathbf{v_j} \mathbf{u_j}^t    \right)  = \sum_{i} \sigma _i^2 \mathbf{u_i} \mathbf{u_i}^t.   
+\]    
+
+This is the spectral decomposition of \(B\) \footnote{See \autoref{appendix: spectral decomposition} for detail.}. Using same kind of calculation above,
+\[
+  B^k = \sum_{i} \sigma _i^{2k} \mathbf{u_i} \mathbf{u_i}^t.   
+\] 
+
+As \(k\) increases, for \(i>1\), \(\sigma _i^{2k} / \sigma _1^{2k} \) goes to \(0\) and \(B^k\) is approximately equal to \(\sigma _1^{2k} \mathbf{u_1} \mathbf{u_1}^t  \)  provided that for each \(i>1\), \(\sigma _i (A)  < \sigma _1 (A)\).  This is because 
+\[
+  B^k = \sigma _1^{2k} \left( \mathbf{u_1} \mathbf{u_1}^t + \sum_{i \neq 1} \frac{\sigma_i^2}{\sigma _1^2} \mathbf{u_i} \mathbf{u_i}^t     \right) \to \sigma _1^2 \mathbf{u_1} \mathbf{u_1}^t.  
+\]
+
+This suggests a way of finding \(\sigma _1\) and \(\mathbf{u_1} \), by successively powering \(B\). But there are two issues. First, if there is a significant gap between the first and second singular values of a matrix, then the above argument applies and the power method will quickly converge to the first left singular vector.   Suppose there is no significant gap. In the extreme case, there may be ties for the top singular values. Then the above argument does not work. There are cubersome eays of overcoming this by assuming a "gap" between \(\sigma _1\) and \(\sigma _2\); such proofs do have the advantage that with a greater gap, better results can be proved, but at the cost of some mess. Here, instead, we will adopt a clean solution in \autoref{thm: Pr 1/10} below which states that even with ties, the power method converges to some vector in the span of thosse singular vectors corresponding to the "nearly highest" singular values. 
+
+A second issue is that computing \(B^k\) costs \(k\) matrix multiplications when done in a straight-foward manner or \(O(\log k)\) when done by successive squaring. Instead we compute 
+\[
+  B^k \mathbf{x} 
+\]   where \(\mathbf{x} \) is a random unit length vector, the idea being that the component of \(\mathbf{x} \) in the direction of \(\mathbf{u_1} \) would get multiplied by \(\sigma _1^2\) each time, while the component of \(\mathbf{x} \) along other \(\mathbf{u_i} \) would be multiplied only by \(\sigma _i^2\). Of course, if the component of \(\mathbf{x} \) along \(\mathbf{u_1} \) is zero to start with, this would not help at all - it will always remain \(0\)\footnote{The core of power method is to use \(\sigma _1^{2k} \mathbf{u_1} \left( \mathbf{u_1}^t \cdot \mathbf{x}   \right)  \) to approximate \(\mathbf{u_1} \), but if \(\mathbf{x} \) has no component in the direction of \(\mathbf{u_1} \), then this approximation would be invalid since the inner product in the preceding equation would be zero.    }. But, this problem is fixed by picking \(\mathbf{x} \) to be random as we show in \autoref{lm: Pr 9/10}.
+
+Each increase in \(k\) requires multiplying \(B\) by the vector \(B^{k-1} \mathbf{x} \), which can further break up into 
+\[
+  B^k \mathbf{x} = A \left( A^t \left( B^{k-1} \mathbf{x}  \right)  \right) .
+\]   
+This requires two matrix-vector products, involving the matrices \(A^t\) and \(A\). In many applications, data matrices are sparse - many entries are \(0\)\footnote{A leading example is the matrix of hypertext links in the web. There are more than \(10^{10} \) web pages and the matrix would be \(10^{10} \) by \(10^{10} \). But on the average only about \(10\) entries per row are non-zero; so only about \(10^{11} \) of the possible \(10^{20} \) entries are non-zero. }. Sparse matrices are often represented by giving just a linked list of the non-zero entries and their values. If \(A\) is represented in this sparsed manner, then we can calculate a matrix vector product in time proportional to the number of nonzero entries in \(A\). Since \(B^k \mathbf{x} \thickapprox  \sigma _1^{2k} \mathbf{u_1} \left( \mathbf{u_1}^t \cdot \mathbf{x}   \right)  \)   is a scalar multiple of \(\mathbf{u_1} \), \(\mathbf{u_1} \) can be recovered from \(B^k \mathbf{x} \) by normalization (since \(\lVert \mathbf{u_1}  \rVert = 1 \) ).       
+
+We start with a technical lemma needed in the proof of the theorem. 
+
+\begin{lemma} \label{lm: Pr 9/10}
+  Let \((x_1, x_2, \dots , x_d)\) be a unit \(d\)-dimensional vector picked at random from the set \(\left\{ \mathbf{x} : \vert \mathbf{x}  \vert \le 1  \right\} \). The probability that \(\vert \mathbf{x_1}  \vert \ge \frac{1}{20\sqrt{d} } \) is at least \(\frac{9}{10}\).     
+\end{lemma}
+
+\begin{proof}
+  We first show that for a vector \(\mathbf{v} \) picked at random with \(\mathbf{v} \le 1\), the probability that \(v_1 \ge \frac{1}{20\sqrt{d} }\) is at least \(\frac{9}{10}\). Then we let \(\mathbf{x} = \frac{\mathbf{v} }{\vert \mathbf{v}  \vert }\) . This can only increase the value of \(v_1\), so the result follows. 
+  
+  Let \(\alpha  = \frac{1}{20\sqrt{d} }\). The probability that \(\vert v_1 \vert \ge \alpha \) equals one minus the probability that \(\vert v_1 \vert \le \alpha  \). The  probability that \(\vert v_1 \vert \le \alpha  \) is equal to the fraction of the volume of the unit sphere with \(\vert v_1 \vert \le \alpha  \). To get an upper bound on the volume of the sphere with \(\vert v_1 \vert \le \alpha  \), consider twice the volume of the unit radius cylinder of height \(\alpha \). The volume of the portion of the sphere with \(\vert v_1 \vert \le \alpha  \) is less than or equal to \(2 \alpha  V(d-1)\)\footnote{\(V(n)\) is the volume of a unit sphere in \(n\)-dimensional space.  }, and 
+  \[
+    \Pr(\vert v_1 \vert \le \alpha ) \le \frac{2 \alpha  V(d-1)}{V(d)} .
+  \]
+
+  \begin{figure}[H]
+    \centering
+    \incfig{d-dim_sphere}
+    \caption{A \(d\)-dimensional sphere with a cylinder of radius one and height \(\frac{1}{20\sqrt{d} }\).  }
+    \label{fig: d-dim_sphere}
+  \end{figure}
+
+  Now the volume of the unit radius sphere is at least twice the volume of the cylinder of height \(\frac{1}{\sqrt{d-1} }\) and radius \(\sqrt{1 - \frac{1}{d-1}} \) or 
+  \[
+    V(d) \ge \frac{2}{\sqrt{d-1} }V(d-1)\left( 1 - \frac{1}{d-1} \right)^{\frac{d-1}{2}}. 
+  \]  
+  Using \((1-x)^a \ge 1 - ax\)\footnote{See \url{https://en.wikipedia.org/wiki/Bernoulli\%27s_inequality}.},
+  \[
+    V(d) \ge \frac{2}{\sqrt{d-1} }V(d-1)\left( 1-\frac{d-1}{2}\frac{1}{d-1} \right) \ge \frac{V(d-1)}{\sqrt{d-1} }
+  \]
+  and 
+  \[
+    \Pr(\vert v_1 \vert \le \alpha  ) \le \frac{2\alpha  V(d-1)}{\frac{1}{\sqrt{d-1}}V(d-1)} \le \frac{\sqrt{d-1}}{10\sqrt{d} } \le \frac{1}{10}. 
+  \]
+  Thus the probability that \(v_1 \ge \frac{1}{20\sqrt{d} }\) is at least \(\frac{9}{10}\).  
+\end{proof}
+
+\begin{note}
+  This lemma tells us if we pick any random unit vector, then with high probability, its component along any direcion is big enough (\(\ge \frac{1}{20\sqrt{d} }\) ). Hence, this can prevent the case the component in the \(\mathbf{\mathbf{u_1} } \) is too small or even \(0\).  
+\end{note}
+
+\begin{theorem} \label{thm: Pr 1/10}
+  Let \(A\) be an \(n \times d\) matrix and \(\mathbf{x} \) a random unit length vector. Let \(V\) be the vector space spanned by the left singular vectors of \(A\) corresponding to singular value greater than \((1 - \varepsilon )\sigma _1\). Let \(k\) be \(\Omega \left( \frac{\ln \left( d / \varepsilon  \right) }{\varepsilon } \right). \) Let \(\mathbf{w} \) be the unit vector after \(k\) iterations of the power method, namely, 
+  \[
+    \mathbf{w} = \frac{\left( A A^t \right)^k \mathbf{x}  }{\left\vert \left( A A^t \right)^k \mathbf{x}   \right\vert }.
+  \]      The probability that \(\mathbf{w} \) has a component of at least \(\varepsilon \) perpendicular to \(V\) is at most \(\frac{1}{10}\).        
+\end{theorem}
+
+\begin{proof}
+  Let 
+  \[
+    A = \sum_{i=1}^r \sigma _i \mathbf{u_i} \mathbf{v_i}^t  
+  \] be the SVD of \(A\). If the rank of \(A\) is less than \(d\), then complete \(\left\{ \mathbf{u_1}, \mathbf{u_2}, \dots , \mathbf{u_r} \right\} \) into a basis \(\left\{ \mathbf{u_1}, \mathbf{u_2}, \dots , \mathbf{u_d}    \right\} \) of \(d\)-space. Write \(\mathbf{x} \) in the basis of the \(\mathbf{u_i} \)'s as 
+  \[
+    \mathbf{x} = \sum_{i=1}^{d} c_i \mathbf{u_i}.  
+  \]   
+  Since \(\left( A A^t \right)^k = \sum_{i=1}^d \sigma _i^{2k} \mathbf{u_i} \mathbf{u_i}^t \) , it follows that \(\left( A A^t \right)^k \mathbf{x}  = \sum_{i=1}^d \sigma _i^{2k} c_i \mathbf{u_i}    \). For a random unit length vector \(\mathbf{x} \) picked independent of \(A\), the \(\mathbf{u_i} \) are fixed vectors and picking \(\mathbf{x} \) at random is equivalent to picking random \(c_i\). From \autoref{lm: Pr 9/10}, \(\vert c_1 \vert \ge \frac{1}{20\sqrt{d} } \) with probability at least \(\frac{9}{10}\).
+  
+  Suppose that \(\sigma _1, \sigma _2, \dots , \sigma _m\) are the singular values of \(A\) that are greater than or equal to \((1 - \varepsilon )\sigma _1\) and that \(\sigma _{m+1}, \dots , \sigma _n\) are the singular values that are less than \((1 - \varepsilon )\sigma _i\). 
+  Now
+  \[
+    \vert \left( A A^t \right)^k \mathbf{x}  \vert^2 = \left\vert \sum_{i=1}^{d} \sigma _i^{2k} c_i \mathbf{u_i}    \right\vert^2 = \sum_{i=1}^d \sigma_i^{4k} c_i^2 \ge \sigma _1^{4k} \ge \frac{1}{400d}\sigma _1^{4k},   
+  \]
+  with probability at least \(\frac{9}{10}\). \footnote{If we did not choose \(\mathbf{x} \) at random, then \(c_1\) could be \(0\) and this argument won't work.   }
+
+  Now we want to calculate the upper bound of the length of the component of \(\left( A A^t \right)^k \mathbf{x}  \) which is perpendicular to \(V\). Notice that this part of component is 
+  \[
+    \sum_{i=m+1}^{d} \sigma _i^{2k} c_i \mathbf{u_i},   
+  \]   
+  and also we know the upper bound of the squared length of this component is
+  \[
+    \sum_{i=m+1}^d \sigma _i^{4k} c_i^2 \le (1 - \varepsilon )^{4k} \sigma _1^{4k} \sum_{i=m+1}^{d} c_i^2 \le (1 - \varepsilon )^{4k} \sigma _1^{4k},       
+  \]  since \(\sum_{i=1}^{d} c_i^2 = \vert \mathbf{x}  \vert = 1  \).  Thus, the component of \(\mathbf{w} \) perpendicular to \(V\) is at most 
+  \[
+    \frac{(1 - \varepsilon )^{2k} \sigma _1^{2k}  }{\frac{1}{20 \sqrt{d} } \sigma _1^{2k} } = O \left( \sqrt{d} (1 - \varepsilon )^{2k}  \right) = O \left( \sqrt{d} e^{-2 \varepsilon k} \right) = O \left( \sqrt{d} e^{- \Omega \left( \ln \left(  d / \varepsilon \right)  \right) }  \right)   = O(\varepsilon )
+  \]
+  as desired.
+
+  \begin{note}
+    Now we prove that the probability of \(\mathbf{w} \) has a component of at most \(\varepsilon \) perpendicular to \(V\)  is greater than \(\frac{9}{10}\) since we need the condition that 
+    \[
+      \left\vert \left( A A^t \right)^k \mathbf{x}   \right\vert^2 \ge \frac{1}{400d}\sigma _1^{4k} .
+    \]  
+
+    Hence, the probability that \(\mathbf{w} \) has a component of at least \(\varepsilon \) perpendicular to \(V\)  is at most \(\frac{1}{10}\). 
+  \end{note}
+\end{proof}
+
+\begin{note}
+  After enough times of iteration (\(\Omega \left( \frac{\ln \left( d / \varepsilon  \right) }{\varepsilon } \right)\) ), if we pick \(\varepsilon \) small enough, we can make \(\mathbf{w} \) almost have only the component in the direction of \(\mathbf{u_1} \), or at least the component in the wrong direction would not be too large (probability of length exceeding \(\varepsilon \) \(\leq  \frac{1}{10}\) ).
+\end{note}
+
+\section{Application of Singular Value Decomposition}
+\subsection{Principal Component Analysis}
+The traditional use of SVD is in Principal Component Analysis (PCA). PCA is illustrated by an example - customer- product data where there are \(n\) customers buying \(d\) products. Let matrix \(A\) with elements \(a_{ij}\) represent the probability of customer \(i\) purchasing product \(j\) (or the amount or utility of project \(j\) to customer \(i\)). 
+
+Now \(A\) may be very huge, so we want to save the matrix with less information, here we first talk about we can save the whole \(A\), but we still want to store it with less information, and then we will talk about what if \(A\) is too big so that we cannot even know what evey entry of \(A\) is, and in this case we have to predict the entries of \(A\) with small portion of the entry of \(A\) and then store the prediction result with less information.
+
+But how can we save \(A\)  with less information? One hypothesis is that there are really only \(k\) underlying basic factors like age, income, family size, etc, that determine a customer's purchase behavior. An individual customer's behavior is determined by some weighted combination of these undelying factors. That is, a customer's purchase behavior can be characterized by a \(k\)-dimensional vector where \(k\) is much smaller than \(n\) and \(d\). The components of the vector are weights for each of the basic factors. Associated with each basic factor is a vector of probabilities, each component of which is the probability of purchasing a given product by someone whose behavior depends only on that factor. More abstractly, \(A\) is an \(n \times d\) matrix that can be expressed as the product of two matrices \(U\) and \(V\), where \(U\) is an \(n \times k\) matrix expressing the factor weights for each customer and \(V\) is a \(k \times d\) matrix expressing the purchase probabilities of products that correspond to that factor. One twist is that \(A\) may not be equal to \(UV\), but close to it since there may be noise or random perturbations.
+
+Taking the best rank \(k\) approximation \(A_k\) from SVD (recall \hyperref[sec: best rank k approx]{Best rank \(k\) approximation }) gives us such \(U, V\) since we can do SVD on \(A_k\) and this gives \((UD)\) and \(V^t\) this two rank \(k\) matrices.
+
+In this traditional setting, one assumed that \(A\) was available fully and we wished to find \(U,V\) to identify the basic factors or in some applications to "denoise" \(A\) (if we think \(A-UV\) as noise). Now imagine that \(n\) and \(d\) are very large, on the order of thousands or even millions, there is probably little one could do to estimate or even store \(A\). In this setting, we may assume that we are given just a few elements of \(A\) and wish to estimate (predict) \(A\). If \(A\) was an arbitrary matrix of size \(n \times d\), this would requires \(\Omega (nd)\) pieces of information and cannot be done with a few entries. But again hypothesis that \(A\) was a small rank matrix with added noise. If now we also assume that the given entries are randomly drawn according to some known distribution, then there is a possibility that SVD cn be used to estimate the whole of \(A\) and gives \(U\) and \(V\) to approximate \(A\). The area is called collaborative filtering.  It uses machine learning to imitate SVD and find the solution to minimize the loss function
+\[
+  \min _{U, V} \sum_{(i,j) \in \Omega } \left( A_{ij} - \langle u_i, v_j \rangle  \right)^2 + \lambda \left( \lVert u_i \rVert^2 + \lVert v_i \rVert^2   \right).   
+\]      
+where \(\Omega \) is the set of observed entries in \(A\) (the entries we know).       
+
+\subsection{Clustering a mixture of Spherical Gaussians}
+\subsection{An Application of SVD to a Discrete Optimization Problem}
+In the last example, SVD was used as a dimension reduction technique. It found a \(k\)-dimensional subspace (the space of centers) of a \(d\)-dimensional space and made the Gaussian clustering problem easier by projecting the data to the subspace. Here, instead of fitting a model to data, we have an optimization problem. Again applying dimension reduction to the data makes the problem easier. The use of SVD to solve discrete optimization problems is a relatively new subject with many applications. We start with an important NP-hard problem, the Maximum Cut Problem for a directed graph \(G(V,E)\).  
+
+The Maximum Cut Problem is to partition the node set \(V\) of a directed graph into two subsets \(S\) and \(\overline{S} \) so that the number of edges from \(S\) to \(\overline{S} \) is maximized. Let \(A=(a_{ij})_{n \times n}\) be the adjacency matrix of the graph. With each vertex \(i\), associate an indicator variable \(x_i\).  The variable \(x_i\) will be set to \(1\) for \(i \in S\) and \(0\) for \(i \in \overline{S} \). The vector \(\mathbf{x} = \begin{pmatrix}
+  x_1 & x_2 & \dots  & x_n  \\
+\end{pmatrix}\) is unknown and we are trying to find it (or equivalently the cut) , so as to maximize the number of edges accross the cut. The number of edges across the cut is precisely 
+\[
+  \sum_{i, j} x_i (1-x_j)a_{ij} .
+\] 
+Thus, the Maximum Cut problem can be posed as the optimization problem 
+
+\[
+  \text{Maximize } \sum_{i, j} x_i (1-x_j) a_{ij} \quad \text{ subject to } x_i \in \left\{ 0, 1 \right\}.   
+\]
+
+In matrix notation, 
+\begin{equation}\label{eq: opt restate}
+    \sum_{i,j} x_i (1-x_j) a_{ij} = \mathbf{x} ^t A (\mathbf{1} - \mathbf{x} ),  
+\end{equation}
+
+where \(\mathbf{1} \) denotes the vector of all \(1\)'s. So, the problem can be restated as 
+\[
+  \text{Maximize } \mathbf{x} ^t A (\mathbf{1} - \mathbf{x}  ) \quad \text{ subject to } x_i \in \left\{ 0,1 \right\} .
+\]  
+The SVD is used to solve this problem approximately by computing the SVD of \(A\) and replacing \(A\) by \(A_k=\sum_{i=1}^k \sigma _i \mathbf{u_i} \mathbf{v_i}^t   \) in \autoref{eq: opt restate} to get,
+
+\begin{equation} \label{eq: op restate Ak}
+   \text{Maximize } \mathbf{x} ^t A_k (\mathbf{1} - \mathbf{x}  ) \quad \text{ subject to } x_i \in \left\{ 0,1 \right\} . 
+\end{equation}
+
+Note that the matrix \(A_k\) is no longer a 0-1 adjacency matrix. 
+We will show that 
+\begin{enumerate}
+  \item For each 0-1 vector \(\mathbf{x} \), \(\mathbf{x} ^t A_k (\mathbf{1} - \mathbf{x}  )\) and \(\mathbf{x} ^t A (\mathbf{1} - \mathbf{x}  )\)  differ by at most  \(\frac{n^2}{\sqrt{k+1} }\). Thus, the maxima in \autoref{eq: opt restate} and \autoref{eq: op restate Ak} differ by at most this amount. 
+  \item A near optimal \(\mathbf{x} \) for \autoref{eq: op restate Ak} can be found by exploiting the low rank of \(A_k\), which by Item \(1\) is near optimal for \autoref{eq: opt restate} where near optimal means with additive error at most \(\frac{n^2}{\sqrt{k+1} }\).       
+\end{enumerate}  
+
+\begin{proof}[proof of 1.]
+  Since \(\mathbf{x} \) and \(\mathbf{1} - \mathbf{x}  \) are 0-1 \(n\)-vectors, each has length at most \(\sqrt{n} \). By the definition of \(2\)-norm,
+  \[
+    \vert \left( A - A_k \right)(\mathbf{1} - \mathbf{x}  ) \vert \le \sqrt{n} \left\lVert A - A_k \right\rVert _2.   
+  \]  
+  Now since \(\mathbf{x} ^t (A-A_k) (\mathbf{1} - \mathbf{x}  )\) is the dot product of the vector \(\mathbf{x} \) with the vector \((A-A_k) (\mathbf{1} - \mathbf{x}  )\), 
+  \[
+       \vert \mathbf{x} ^t\left( A - A_k \right)(\mathbf{1} - \mathbf{x}  ) \vert \le n \left\lVert A - A_k \right\rVert _2.  
+  \]  
+  By \autoref{lm:2norm A-Ak}, we know \(\left\lVert A - A_k \right\rVert _2 = \sigma _{k+1}(A) \). The inequalities,
+  \[
+    (k+1) \sigma _{k+1}^2 \le \sigma _1^2 + \sigma _2^2 +\dots +\sigma _{k+1}^2 \le \lVert A \rVert_F^2 = \sum_{i, j} a_{ij}^2 \le n^2 
+  \] 
+  imply that \(\sigma _{k+1}^2 \le \frac{n^2}{k+1}\) and hence \(\lVert A - A_k \rVert_2 \le \frac{n}{\sqrt{k+1} } \) proving 1.  
+\end{proof}
+
+  It is instructive to look at the special case when \(k=1\) and \(A\) is approximated by the rank one matrix \(A_1\). An even more special case when the left and right singular vectors \(\mathbf{u} \) and \(\mathbf{v} \) are required to be identical is already NP-hard to solve exactly because it subsumes the problem of whether for a set of \(n\) integers, \(\left\{ a_1,a_2, \dots ,a_n \right\} \) \footnote{See \autoref{appendix: optmization problem set partition} for detail.}, there is a partition into two subsets whose sums are equal. So look for algorithms that solve the MAximum Cut Problem Approximately. 
+
+\begin{proof}[proof of 2.]   
+  For Item \(2\), we want to maximize \(\sum_{i=1}^k \sigma _i \left( \mathbf{x} ^t \mathbf{u_i}  \right) \left( \mathbf{v_i}^t (\mathbf{1} - \mathbf{x}  )  \right)   \) over 0-1 vectors \(\mathbf{x} \).   A piece of notation will be useful. For any \(S \subseteq \left\{ 1,2,\dots ,n \right\} \), write \(\mathbf{u_i}(S) \) for the sum of coordinateds of the vector \(\mathbf{u_i} \) corrsponding to elements in the set \(S\) and also for \(\mathbf{v_i} \).        That is, \(\mathbf{u_i}(S) = \sum_{j \in S} u_{ij}\). We will maximize \(\sum_{i=1}^k \sigma _i \mathbf{u_i}(S) \mathbf{v_i}(\overline{S} )   \) by dynamic programming.  
+
+  \begin{note}
+    Notice that for a 0-1 vector \(\mathbf{x} \), it is corresponding to a \(S \subseteq \left\{ 1,2,\dots ,n \right\} \) (if \(\mathbf{x_i} = 1\), then \(i \in S\)  ).  Hence, \(\mathbf{x} ^t \mathbf{u_i} = \sum_{j \in S} u_{ij} = \mathbf{u_i}(S) \) and \(\mathbf{v_i}^t ( \mathbf{1} - \mathbf{x}) = \sum_{j \notin S} v_{ij} = \mathbf{v_i}(\overline{S} )\) , so \(\sum_{i=1}^k \sigma _i \left( \mathbf{x} ^t \mathbf{u_i}  \right) \left( \mathbf{v_i}^t (\mathbf{1} - \mathbf{x}  )  \right)  = \sum_{i=1}^k \sigma _i \mathbf{u_i}(S) \mathbf{v_i}(\overline{S} )   \).     
+  \end{note}
+
+  For a subset of \(\left\{ 1,2, \dots , n \right\} \), define the \(2k\)-dimensional vector
+  \[
+    \mathbf{w} (S) =  \left(     \mathbf{u_1}(S),  \mathbf{v_1}(\overline{S} ) , \mathbf{u2} (S)  , \mathbf{v_2}(\overline{S} ) ,\dots  \right).
+  \] If we had the list of all such vectors (for all possible \(S\) ), we could find \(\sum_{i=1}^k \sigma _i \mathbf{u_i}(S) \mathbf{v_i}(\overline{S}) \) for each of them and take the maximum. There are \(2^n\) subsets of \(S\), but several \(S\) could have the same \(\mathbf{w} (S)\) and in that case it sufficies to list just one of them. Round each coordinate of each \(\mathbf{u_i} \) to the nearest integer multiple of \(\frac{1}{nk^2}\).
+  
+  \begin{note}
+    That is, suppose one coordinate of \(\mathbf{u_i} \) is \(0.041\) and \(\frac{1}{nk^2}\) is \(0.015\), then we set this component to \(0.045\) since this is the closest number to original value and is a multiple of \(\frac{1}{nk^2}\).      
+  \end{note}
+  
+  Call the rounded vector \(\widetilde{\mathbf{u_i} } \). Similarly obtain \(\widetilde{\mathbf{v_i} } \). Let  \(\widetilde{\mathbf{w} } \) denote the vector 
+  \[
+    \widetilde{\mathbf{u_1} }(S), \widetilde{\mathbf{v_1} }(S), \widetilde{\mathbf{u_2} } (S), \widetilde{\mathbf{v_2} }(S), \dots , \widetilde{\mathbf{u_k} }(S), \widetilde{\mathbf{v_k} }(S).     
+  \]     We will construct a list of all possible values of the vectors \(\widetilde{\mathbf{w} }(S) \). 
+
+  \begin{note}
+    Again, if several different \(S\)'s lead to the same vector \(\widetilde{\mathbf{w} }(S) \), we will keep only one copy of the vector \(\widetilde{\mathbf{w} } (S)\) .  
+  \end{note}
+
+  The list will be constructed by Dynamic Programming. For the recursive step of Dynamic Programming, assume we already have a list of all such vectors for \(S \subseteq \left\{ 1,2,\dots ,i \right\} \) and wish to construct the list for \(S \subseteq \left\{ 1,2,\dots , i+1 \right\} \)  . Each \(S \subseteq \left\{ 1,2,\dots ,i \right\} \) leads to two possible \(S^{\prime}  \subseteq \left\{ 1,2,\dots ,i+1 \right\} \), namely, \(S\) and \(S \cup \left\{ i+1 \right\} \). In the first case, the vector 
+  \[
+    \widetilde{\mathbf{w} }(S^{\prime} ) = \left( \widetilde{\mathbf{u_1} }(S), \widetilde{\mathbf{v_1} }(\overline{S} ) + \widetilde{v}_{1,i+1}, \widetilde{\mathbf{u_2} }(S), \widetilde{\mathbf{v_2} }(\overline{S} ) + \widetilde{v}_{2,i+1}, \dots         \right) . 
+  \]    In the seconde case, the vector
+  \[
+       \widetilde{\mathbf{w} }(S^{\prime} ) = \left( \widetilde{\mathbf{u_1} }(S) + \widetilde{u}_{1,i+1}, \widetilde{\mathbf{v_1} }(\overline{S} ) , \widetilde{\mathbf{u_2} }(S)  + \widetilde{u}_{2,i+1}, \widetilde{\mathbf{v_2} }(\overline{S} ), \dots         \right) .  
+  \]
+  We put in these two vectors for each vector in the previous list. Then, crucially, we prune - i.e. eliminate duplicates. 
+
+  Assume that \(k\) is a constant. Now we show the error is at most \(\frac{n^2}{\sqrt{k+1} }\) as claimed. Since \(\mathbf{u_i}, \mathbf{v_i}  \) are unit vectors, \(\left\vert \mathbf{u_i}(S)  \right\vert, \left\vert \mathbf{v_i}(\overline{S} )  \right\vert \le \sqrt{n} \) (By Cauchy's Inequality). Also \(\left\vert  \widetilde{\mathbf{u_i} }(S) - \mathbf{u_i}(S)  \right\vert \le \frac{n}{nk^2}=\frac{1}{k^2} \) (By measuring the error in every coordinate after rounding) and similarly for \(\mathbf{v_i} \). To bound the error, we use an elementary fact: if \(a,b\) are reals with \(\vert a \vert, \vert b \vert   \le M\)        and we estimate \(a\) by \(a^{\prime} \) and \(b\) by \(b^{\prime} \) so that \(\vert a - a^{\prime}  \vert, \vert b - b^{\prime}  \vert \le \delta \le M  \), then 
+  \[
+    \vert ab - a^{\prime} b^{\prime}  \vert = \vert a(b-b^{\prime} ) + b^{\prime} (a - a^{\prime} ) \vert \le \vert a \vert \vert b - b^{\prime}  \vert + (\vert b \vert + \vert b - b^{\prime}  \vert  )\vert a - a^{\prime}  \vert \le 3M \delta .     
+  \]
+  Using this, we get that 
+  \[
+    \left\vert \sum_{i=1}^{k} \sigma _i \widetilde{\mathbf{u_i} }(S) \widetilde{\mathbf{v_i} }  (\overline{S} ) - \sum_{i=1}^k \sigma _i \mathbf{u_i}(S) \mathbf{v_i}(\overline{S} ) \right\vert  \le \frac{3k \sigma _1 \sqrt{n} }{k^2} \le \frac{3n^{\frac{3}{2}}}{k},
+  \]    and this meets the claimed error bound.
+  
+  \begin{note}
+    By measuring every
+   \[
+    \left\vert \widetilde{\mathbf{u_i} }(S) \widetilde{\mathbf{v_i} }  (\overline{S} ) - \mathbf{u_i}(S) \mathbf{v_i}(\overline{S} ) \right\vert,
+   \] we know it is \(\le 3 \cdot \sqrt{n} \cdot \frac{1}{k^2} \), and adding every term for each \(i\) we can get the desired inequality.  
+
+   In the last \(\le\) sign, we need \(\sigma _1 \le n\), this can be proved with \autoref{lm: frobenius norm}. By this, we know 
+   \[
+    \sigma _1 \le \left\lVert A \right\rVert _F, 
+   \] and also 
+   \[
+    \left\lVert A \right\rVert _F = \sqrt{\sum_{i, j} a_{ij}^2 } \le \sqrt{n^2} = n  
+   \] since \(A\) is an adjacency matrix with \(n^2\) entries.  
+  \end{note}
+
+  Next, we show that the running time is polynomially bound. \(\left\vert \widetilde{\mathbf{u_i} }(S)   \right\vert , \left\vert \widetilde{\mathbf{v_i} }(S)  \right\vert \le 2\sqrt{n}  \). Since \(\widetilde{\mathbf{u_i} }(S), \widetilde{\mathbf{v_i} }(\overline{S} )  \) are all integer multiples of \(\frac{1}{nk^2}\), there are at most \(4n\sqrt{n}k^2 \) possible values\footnote{Since it may be positive or negative and thus between \(-2\sqrt{n} \) and \(2\sqrt{n} \).  } of \(\widetilde{\mathbf{u_i} }(S),  \mathbf{v_i}(\overline{S} ) \) from which it follows that the list of \(\widetilde{\mathbf{w} } (S)\) never gets larger than \(\left( 4n\sqrt{n}k^2  \right)^{2k} = 4^{2k} n^{3k} k^{4k}  \) which for fixed \(k\) is polynomially bounded.        
+\end{proof}
+
+We summarized what we have accomplished. 
+\begin{theorem}
+  Given a directed graph \(G(V,E)\), a cut of size at least the maximum cut minus \(O\left( \frac{n^2}{\sqrt{k} } \right) \) can be computed in polynomial time of \(n\) for any fixed \(k\).   
+\end{theorem}
+
+It could be quite a surprise to have an algorithm that actually achieves the same accuracy in time polunomial in \(n\) and \(k\) because it would give an exact max cut in polynomial time (when \(k\) grows large, the error will approach \(0\)  ).  
+
+\subsection{SVD as a Compression Algorithm}
+Suppose \(A\) is the pixel intensity matrix of a large image. The entry \(a_{ij} \) gives the intensity of the \(ij\)-th pixel. If \(A\) is \(n \times n\), the transmission of \(A\) requires transmitting \(O \left( n^2 \right) \) real numbers. Instead, one could send \(A_k\), that is, the top \(k\) singular values  \(\sigma _1, \sigma _2, \dots , \sigma _k\) along with the left and right singular vectors \(\mathbf{u_1}, \mathbf{u_2}, \dots , \mathbf{u_k}   \) and \(\mathbf{v_1}, \mathbf{v_2}, \dots , \mathbf{v_k}\). This would require sending \(O(kn)\) real numbers instead of \(O(n^2)\) real numbers. If \(k\) is much smaller than \(n\), this results in savings. For many images, a \(k\) much smaller than \(n\) can be used to reconstruct the image procided that a very low resolution version of the image is sufficient. Thus, one could use SVD as a compression method.
+
+It turns out that in a more sophiscated approach, for certain classes of pictures one could use a fixed basis so that the top hundred singular vectors are sufficient to represent any picture approximately . This means that the space spanned by the top hundred singular vectors is not too different from the space spanned by the top two hundred singular vectors of a given matrix in that class. For example, Human face pictures are all similar, so the top first hundred singular vectors may not differ too much for different human face pictures and thus we can pick these singular vectors as a standard basis. Compressing these matrices by this standard basis can save substantially since the standard basis is transmitted only once and a matrix is transmitted by sending the top several hundred singular values for the standard basis (no need to send singular vectors again).
+
+\begin{figure}[H]
+  \centering
+  % 第一張圖片
+  \begin{minipage}[h]{0.45\linewidth}
+    \centering
+    \includegraphics[height=4cm]{./Figures/SVD/rank_001.jpg}
+    \caption{Rank = 1}
+  \end{minipage}
+  \hfill
+  % 第二張圖片
+  \begin{minipage}[h]{0.45\linewidth}
+    \centering
+    \includegraphics[height=4cm]{./Figures/SVD/rank_048.jpg}
+    \caption{Rank = 48}
+  \end{minipage}
+
+  \vspace{1em} % 行間距
+
+  % 第三張圖片
+  \begin{minipage}[h]{0.45\linewidth}
+    \centering
+    \includegraphics[height=4cm]{./Figures/SVD/rank_100.jpg}
+    \caption{Rank = 100}
+  \end{minipage}
+  \hfill
+  % 第四張圖片
+  \begin{minipage}[h]{0.45\linewidth}
+    \centering
+    \includegraphics[height=4cm]{./Figures/SVD/rank_723.jpg}
+    \caption{Rank = 723 (Original)}
+  \end{minipage}
+
+  \caption{SVD compressed image}
+\end{figure}
+
+We can see that low rank pictures have more noise. 
+
+\begin{lstlisting}[language=iPython, caption={Source Code of SVD Compression}]
+import numpy as np
+import matplotlib.pyplot as plt
+import cv2
+import ipywidgets as widgets
+from IPython.display import display, clear_output
+
+def load_color_image(path):
+    img_bgr = cv2.imread(path)
+    img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+    return img_rgb.astype(float) / 255.0
+
+def svd_compress_channel(channel, k):
+    U, S, VT = np.linalg.svd(channel, full_matrices=False)
+    S_k = np.diag(S[:k])
+    U_k = U[:, :k]
+    VT_k = VT[:k, :]
+    compressed = U_k @ S_k @ VT_k
+    return np.clip(compressed, 0, 1)
+
+def compress_color_image(img_rgb, k):
+    channels = [svd_compress_channel(img_rgb[:, :, i], k) for i in range(3)]
+    return np.stack(channels, axis=2)
+
+def plot_two_images(original, compressed, rank):
+    fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+    axes[0].imshow(original)
+    axes[0].set_title('Original Image')
+    axes[0].axis('off')
+
+    axes[1].imshow(compressed)
+    axes[1].set_title(f'Compressed Image (rank={rank})')
+    axes[1].axis('off')
+
+    plt.tight_layout()
+    # 不用 plt.show()，return fig
+    return fig
+
+def save_image(img_rgb, rank):
+    filename = f"rank_{rank:03d}.jpg"
+    img_uint8 = (np.clip(img_rgb, 0, 1) * 255).astype(np.uint8)
+    img_bgr = cv2.cvtColor(img_uint8, cv2.COLOR_RGB2BGR)
+    cv2.imwrite(filename, img_bgr)
+    print(f"Saved compressed image as {filename}")
+
+def interactive_svd_compression(image_path):
+    img_rgb = load_color_image(image_path)
+    max_rank = min(img_rgb.shape[0], img_rgb.shape[1])
+
+    slider = widgets.IntSlider(value=10, min=1, max=max_rank, step=1, description='Rank:')
+    out = widgets.Output()
+    save_button = widgets.Button(description="Save Compressed Image")
+
+    def update(change):
+        k = change['new']
+        compressed_img = compress_color_image(img_rgb, k)
+        with out:
+            clear_output(wait=True)
+            fig = plot_two_images(img_rgb, compressed_img, k)
+            display(fig)
+        save_button.compressed_img = compressed_img
+        save_button.current_rank = k
+
+    def on_save_clicked(b):
+        if hasattr(save_button, 'compressed_img') and hasattr(save_button, 'current_rank'):
+            save_image(save_button.compressed_img, save_button.current_rank)
+        else:
+            print("No compressed image to save yet.")
+
+    slider.observe(update, names='value')
+    save_button.on_click(on_save_clicked)
+
+    display(slider, save_button, out)
+
+    # 預先觸發一次
+    slider.value = slider.value
+
+# 使用你的圖片檔案名
+interactive_svd_compression("argue.jpg")
+\end{lstlisting}
+
+\subsection{Singular Vectors and ranking Documents}
+

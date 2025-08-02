@@ -1,0 +1,215 @@
+\chapter{Learning and VC-dimension}
+
+\section{Learning}
+Learning algorithms are general purpose tools that solve problems often without detailed domain-specific knowledge (領域專業知識). They have proven to be very effective in a large number of contexts. We start with an example. Suppose one wants an algorithm to distinguish among different types of motor vehicles such as cars, trucks, and tractors. Using domain knowledge one can create a set of features. Some examples of featurs are number of wheels, the power of the engine, the number of doors, and the length of vehicle. If there are \(d\) features, each object can be represented as a \(d\)-dimensional vector, calledf the feature vector, with each component of vector giving the value of one feature such as engine power, the number of doors, etc. Using domain knowledge one develops a set of rules to distinguish among different types of objects. A learning algorithm uses the feature vector representation of an object, which is assumed to be given by the domain "expert". Instead of having the domain expert develop a set of rules, the algorithm only asks the expert, called the teacher, to label each vector. In this example, the labels would be "car", "truck", and "tractor". The algorithm's task is to develop a set of rules that applied to the given vectors gives the same labels as the teacher. Each feature vector is called an example and the given set of labeled examples is called the \textit{training set}. The task of the learner is to output a set of rules that correctly labels all training examples. Of course, for this limited task, one could output the rule "for each training example, use the teacher's label". But we insist on Occam's razor principle that states that the rules output by the algorithm must be more succint than the table of all training examples. This is akin to developing a specific theory to explain extensive observations. The theory must be more succinct than just a list of observations. 
+
+However, the general task of interest is not to be correct just on the training example, but have learnt rules correctly predict the labels of future examples. Intuitively, if the classifier is trained on sufficiently many training example, then it seems likely that it would work well on the space of all examples. We will see later that the theory of Vapnik-Chervonenkis dimension (VC-dimension) confirms this intuition. In general, optimization technieques such as linear and convex programming, play an important role in learning algorithms. Throughout this chapter, we assume all the labels are binary. It is not difficult to see that the general problem of classifying into one of several types can be reduced to binary classification. Classifying into car or non-car, tractor or non-tractor, etc. will pin down the type of vehicle. So the teacher's labels are assumed to be \(+1\) or \(-1\). For an illustration, see \autoref{fig:training_set}, where, examples are in \(2\)-dimensions (there are two features) where those labeled \(-1\) are unfilled circles and those labeled \(+1\) are filled circles. The right hand picture illustrates a rule that the algorithm could come up with: the examples above the thick line are \(-1\) and those below are \(+1\). 
+
+The simplest rule in \(d\)-dimensional space is generalization of a line in the plane, namely, a half space. Does a weighted sum of feature values exceed a threshold? Such a rule may be thought of as being implemented by a threshold gate that tackes feature values as inputs, computes their weighted sum and output yes or no depending whether or not the sum is greater than the threshold. One could also look at a network of interconnected thershold gates called a neural net. Threshold gates are sometimes called perceptrons (感知器) since one model of human perception is that it is done by a neural net in the brain.  
+
+\begin{figure}[H]
+    \centering
+    \incfig{training_set}
+    \caption{Training set and the rule that is learnt}
+    \label{fig:training_set}
+\end{figure}
+
+\section{Linear Separators, the Perception Algorithm, and Margins}
+
+The problem of learning a half-space or a linear seperator consists of \(n\) labeled examples \(\mathbf{a_1}, \mathbf{a_2}, \dots , \mathbf{a_n}\) in \(d\)-dimensional space. The task is to find a \(d\)-dimensional vector \(\mathbf{w} \), if one exists, and a threshold \(b\) such that
+
+\begin{equation} \label{eq: threshold in hyperplane}
+    \begin{aligned} 
+    \mathbf{w} \cdot \mathbf{a_i} > b \text{ for each } \mathbf{a_i} \text{ labelled } +1, \\
+    \mathbf{w} \cdot \mathbf{a_i} < b \text{ for each } \mathbf{a_i} \text{ labelled } -1. 
+\end{aligned}
+\end{equation}
+    
+\begin{definition}[linear separator]\label{dfn: linear separator}
+    A vector-threshold pair, \((\mathbf{w} , b)\), satisfying the \autoref{eq: threshold in hyperplane} is called a \textit{linear separator}. 
+\end{definition}
+
+The above formulation is a linear program (LP) \footnote{See \autoref{appendix: LP}.} in the unknowns \(\mathbf{w} \) and \(b\) that can be solved by a general purpose LP algorithm. Linear programming is solvable in polynomial time but a simpler algorithm called the \textit{perceptron learning algorithm} can be much faster when there is a feasible solution \(\mathbf{w} \) with a lot of wiggle room or margin \footnote{That is, datas in different categories are not too close and thus can be separated easier.}, though it is not polynomial time bounded in general.   
+
+We begin by adding an extra coordinate to each \(\mathbf{a_i} \) and \(\mathbf{w} \), writing \(\hat{\mathbf{a_i}} = (\mathbf{a_i}, 1 ) \) and \(\hat{\mathbf{w} } = (\mathbf{w} , -b)\). Suppose \(l_i\) is the \(\pm 1\) label on \(\hat{\mathbf{a_i} } \). Then, the inequalities in \autoref{eq: threshold in hyperplane} can be rewritten as 
+\[
+    \left( \hat{\mathbf{w} } \cdot \hat{\mathbf{a_i} }  \right) l_i > 0 \quad 1 \le i \le n .
+\] Since the right hand side is zero, we may scale \(\hat{\mathbf{a_i} } \) so that \(\left\vert \hat{\mathbf{a_i} }  \right\vert = 1\). Adding the extra coordinate increased the dimension by one but now the separator contains the origin. For simplicity of notation, in the rest of this section, we drop the hats and let \(\mathbf{a_i} \) and \(\mathbf{w} \) stand for the corresponding \(\hat{\mathbf{a_i} } \) and \(\hat{\mathbf{w} } \) .
+
+\begin{note}
+    Actually we can more specifically give another definition of linear separator as a hyperplane: 
+    \begin{definition}
+        A linear separator is a hyperplane 
+        \[
+            \mathbf{w} \cdot \mathbf{x} = b,
+        \]
+        and it is equivalent to what we describe it above, as a tuple \((\mathbf{w} , b)\) .
+    \end{definition}
+
+    and thus we say the new linear separator contains the origin after adding a new dimension since new hyperpplane is 
+    \(\mathbf{w} \cdot \mathbf{x} = 0\). 
+\end{note}
+
+\subsection{The perceptron learning algorithm}
+
+The perceptron learning algorithm is simple and elegant. We wish to find a solution \(\mathbf{w} \) to 
+\begin{equation} \label{eq: rule eq}
+    \left( \mathbf{w}  \cdot \mathbf{a_i}  \right) l_i > 0 \quad 1 \leq i \leq n 
+\end{equation}
+where \(\vert \mathbf{a_i}  \vert = 1 \). Starting with \(\mathbf{w} = l_1 \mathbf{a_1} \), pick any \(\mathbf{a_i} \) with \(\left( \mathbf{w} \cdot \mathbf{a_i} \right) l_i \le 0 \), and replace \(\mathbf{w} \) by \(\mathbf{w} + l_i \mathbf{a_i} \). Repeat until \((\mathbf{w} \cdot \mathbf{a_i} ) l_i > 0\) for all \(i\). 
+
+The intuition behind the algorithm is that correcting \(\mathbf{w} \) by adding \(\mathbf{a_i} l_i\) causes the new \(\left( \mathbf{w} \cdot \mathbf{a_i}  \right) l_i \) to be higher by \(\mathbf{a_i} \cdot \mathbf{a_i} l_i^2 = \vert \mathbf{a_i}  \vert^2  \). This is good for this \(\mathbf{a_i} \). But this change may be bad for other \(\mathbf{a_j} \). The proof below show that this is very simple process quickly yields a solution \(\mathbf{w} \) provided there exists a solution with a good margin. 
+
+\begin{definition}[margin]
+    For a solution \(\mathbf{w} \) to \autoref{eq: rule eq}, where \(\vert \mathbf{a_i}  \vert = 1 \) for all examples, the margin is defined to be the minimum distance of the hyperplane \(\left\{ \mathbf{x} \mid \mathbf{w} \cdot \mathbf{x} = 0 \right\} \) to any  \(\mathbf{a_i} \), namely, \(\min _i \frac{(\mathbf{w} \cdot \mathbf{a_i} ) l_i}{\vert \mathbf{w}  \vert }\) \footnote{See \autoref{appendix: margin}}.  
+\end{definition}
+
+\begin{figure}[H]
+    \centering
+    \incfig{margin}
+    \caption{Margin of a linear separator}
+    \label{fig:margin}
+\end{figure}
+
+If we did not require that all \(\vert \mathbf{a_i}  \vert = 1\) in \autoref{eq: rule eq}, then one could artificially increase the margin by scailing up the \(\mathbf{a_i} \). If we did not divide by \(\vert \mathbf{w}  \vert \) in the definition of margin, then again, one could artificially increase the margin by scailing \(\mathbf{w} \) up. The interesting thing is that the number of steps of the algorithm depends only upon the best margin any solution can achieve, not upon \(n\) and \(d\). In practice, the perception learning algorithm works well.   
+
+\begin{note}
+    We require \(\vert \mathbf{a_i}  \vert = 1 \) and dividing \(\vert \mathbf{w}  \vert \) is because the algorithm relies on the margin of the datas, so we need to prevent some meaningless zooming on the margin, which do not help to identify the pattern. That is, we need the stable geometric meaning and thus it represents the speed of convergence of this algortihm.
+\end{note}
+
+\begin{theorem}
+    Suppose there is a solution \(\mathbf{w}^*\) to \autoref{eq: rule eq} with margin \(\delta > 0\). Then, the perceptron learning algorithm finds some solution \(\mathbf{w} \) with \(\left( \mathbf{w} \cdot \mathbf{a_i}  \right) l_i > 0\) for all \(i\) in at most \(\frac{1}{\delta ^2} - 1\) iterations.      
+\end{theorem}
+\begin{proof}
+    Without loss of generality by scaling \(\mathbf{w} ^*\) so that \(\left\vert \mathbf{w} ^* \right\vert = 1 \). Consider the cosine of the angle between the current vector \(\mathbf{w} \) and \(\mathbf{w} ^*\), that is, that is, \(\frac{\mathbf{w} ^t \mathbf{w} ^*}{\vert \mathbf{w}  \vert }\). In each step of the algorithm, the numerator of this fraction increase by at least \(\delta \) because 
+    \[
+        \left( \mathbf{w} + \mathbf{a_i} l_i \right) \cdot \mathbf{w} ^* = \mathbf{w} \cdot \mathbf{w} ^* + l_i \mathbf{a_i} \cdot \mathbf{w} ^* \ge \mathbf{w} ^t \mathbf{w} ^* + \delta .
+    \]   
+    
+    On the other hand, the square of the denominator increases by at most one since 
+    \[
+        \left\vert \mathbf{w} + \mathbf{a_i} l_i  \right\vert^2 = \left( \mathbf{w} + \mathbf{a_i} l_i  \right) \left( \mathbf{w} + \mathbf{a_i} l_i \right) = \vert \mathbf{w}  \vert^2 + 2 \left( \mathbf{w}  \cdot \mathbf{a_i}  \right) l_i + \vert \mathbf{a_i}  \vert^2 l_i^2 \le \vert \mathbf{w}  \vert^2 + 1       
+    \]
+    where, since \(\mathbf{w}^t \mathbf{a_i} l_i \le 0  \), the cross term is non-positive.
+    
+    \begin{note}
+        We only modifty \(\mathbf{w} \) by adding \(\mathbf{a_i} l_i \)  when \((\mathbf{w}  \cdot \mathbf{a_i} )l_i \le 0\), so the cross term is non-positive.
+    \end{note}
+
+    After \(t\) iterations, \(\mathbf{w} \cdot \mathbf{w} ^* \ge (t+1) \delta \) since at the start \(\mathbf{w} \cdot \mathbf{w} ^* = l_1 \left( \mathbf{a_1} \cdot \mathbf{w} ^* \right) \ge \delta  \) and at each iteration \(\mathbf{w} ^t \mathbf{w} ^*\) increases by at least \(\delta \). Similarly after \(t\) iterations \(\vert \mathbf{w}  \vert^2 \le t + 1 \) since at the start \(\vert \mathbf{w}  \vert = \vert \mathbf{a_1}  \vert \le 1 \) and at each iteration \(\vert \mathbf{w}  \vert^2 \) increases by at most \(1\). Thus the cosine of the angle between \(\mathbf{w} \) and \(\mathbf{w} ^*\) is at least \(\frac{(t+1) \delta }{\sqrt{t+1} }\) and the cosine cannot exceed one. Therefore, the algorithm must stop before \(\frac{1}{\delta ^2}-1\) iterations and at termination, \(\left( \mathbf{w} \cdot \mathbf{a_i}  \right) l_i > 0 \) for all \(i\). This proves the theorem.                
+\end{proof}
+
+How strong is the assumption that there is a separator with margin at least \(\delta \)? Suppose for the moment, the \(\mathbf{a_i} \) are picked from the uniform density on the surface of the unit hypersphere. There is a result that states that for any fixed hyperplane passing through the origin, most of the mass of the unit sphere is within distance \(O\left( \frac{1}{\sqrt{d} } \right) \) of the hyperplane. So, the probablity of one fixed hyperplane having a margin more than \(\frac{c}{\sqrt{d} }\) is low. But this does not mean that there is no hyperplane with a larger margin. By the union bound, one can only assert that the probability of some hyperplane having a large margin is at most the probability of a specific one having a large margin times the number of hyperplanes, which is infinite. Later we will see using VC-dimension arguments that indeed the probability of some hyperplane having a large margin is low if the examples are selected at random from the hypersphere. So the assumption of large margin separators existing may not be valid for the simplest random models. But intuitively, if what is to be learnt, like whether something is a car, is not very hard, then, with enough features in the model, there will not be many "near cars" that could be confused with cars nor many "near non-cars". In a real problem such as this, uniform density is not a valid assumption. In this case, there should be a large margin separator and the theorem would work.
+
+The question arises as to how small margins can be. Suppose the examples \(\mathbf{a_1}, \mathbf{a_2}, \dots , \mathbf{a_n}   \) were vectors with \(d\) coordinates, each coordinate a \(0\) or \(1\) and the decision rule for labeling the examples was the following. 
+
+\begin{center}
+    If the first \(1\) coordinate of the example is odd, label the example \(+1\). \\
+    If the first \(1\) coordinate of the example is even, label the example \(-1\). \\
+\end{center}
+This rule can be represented by the decision rule 
+\[
+    \left( a_{i1}, a_{i2}, \dots , a_{in}  \right) \left( 1, -\frac{1}{2}, \frac{1}{4}, -\frac{1}{8}, \dots  \right)^t = a_{i1} - \frac{1}{2}a_{i2} + \frac{1}{4}a_{i3} - \frac{1}{8}a_{i4}+\dots >0.     
+\]
+However, the margin in this example can be exponentially small. Indeed, if for an example \(\mathbf{a} \), the first \(\frac{d}{10}\) coordinates are all \(0\)s, then the margin is \(O\left( 2^{-\frac{d}{10}} \right) \).     
+
+\subsection{Maximizing the Margin}
+
+In this section, we present an algorithm to find the maximum separator. The margin of a solution \(\mathbf{w} \) to \(\left( \mathbf{w} ^t \mathbf{a_i}  \right) l_i > 0, \ 1 \le i \le n \), where \(\lvert \mathbf{a_i} \rvert = 1 \) is \(\delta  = \min _i \frac{l_i \left( \mathbf{w} ^t \mathbf{a_i}  \right) }{\vert \mathbf{w}  \vert }\). Since this is not a concave function of \(\mathbf{w} \), it is difficult to deal with computationally.     
+
+Convex optimization techniques in general can only handle the maximization of concave functions or the minimization of convex functions over convex sets. However, by modifying the weight vector, one can convert the optimization problem to one with a concave objective function. Note that
+\[
+    l_i \left( \frac{\mathbf{w} ^t \mathbf{a_i} }{\vert \mathbf{w}  \vert \delta  } \right) \ge 1 
+\]
+for all \(\mathbf{a_i} \). Let \(\mathbf{v} = \frac{\mathbf{w} }{\delta  \vert \mathbf{w}  \vert }\) be the modified weight vector. The maximizing \(\delta \) is equivalent to minimizeing \(\vert \mathbf{v}  \vert \). So the optimization problem is 
+\begin{center}
+    minimize \(\vert \mathbf{v}  \vert \) subject to \(l_i \left( \mathbf{v} ^t \mathbf{a_i}  \right) \ge 1, \ \forall i \). 
+\end{center}   
+Although \(\vert \mathbf{v}  \vert \) is a convex function of the coordinates of \(\mathbf{v} \), a better convex function to minimize is \(\vert \mathbf{v}  \vert^2 \) since \(\vert \mathbf{v}  \vert^2 \) is differentiable. So we reformulate the problem as: 
+\subsubsection{Maximum Margin Problem}   
+
+\begin{center}
+    minimize \(\vert \mathbf{v}  \vert^2 \) subject to \(l_i \left( \mathbf{v} ^t \mathbf{a_i}  \right) \ge 1, \ \forall i \). 
+\end{center}  
+
+\begin{note}
+    Notice that if we find such \(\mathbf{v} \), then there must be some \(\mathbf{a_i} \) such that \(l_i \left( \mathbf{v} ^t \mathbf{a_i}  \right) = 1 \), otherwise, if for all \(i\) we have \(l_i \left( \mathbf{v} ^t \mathbf{a_i}  \right) > 1\), then we can scale down \(\mathbf{v} \) and still satisfy all the inequalities, but this means we find a smaller \(\mathbf{v} \), which is a contradiction. Now if we know \(l_i \left( \mathbf{v} ^t \mathbf{a_i}  \right) = 1 \), then we know
+    \[
+        \frac{l_i \left( \mathbf{v} ^t \mathbf{a_i}  \right) }{\vert \mathbf{v}  \vert } = \frac{1}{\vert \mathbf{v}  \vert }, 
+    \]   which means the margin must be \(\frac{1}{\vert v \vert }\) since for all \(j\) we have \(l_j \left( \mathbf{v} ^t \mathbf{a_j}  \right) \ge 1\).        
+\end{note}
+
+This convex optimization problem has been much studied and algorithms that use the special structure of this problem solve it more efficiently than general convex optimization methods. We do not discuss these improvents here. An optimal solution \(\mathbf{v} \) to this problem has the follwing property. Let \(V\) be the space spanned by the examples \(\mathbf{a_i} \) for which there is equality, namely for which \(l_i \left( \mathbf{v} ^t \mathbf{a_i}  \right) = 1\). We claim that \(\mathbf{v} \) lies in \(V\).  If not, \(\mathbf{v} \) has a component orthogonal to \(V\). Reducing this component infinitesimally does not violate any inequality, since, we are moving orthogonally to the exactly satisfied constraints; but it does decrease \(\vert \mathbf{v}  \vert \) contradicting the optimality. If \(V\) is full dimensional, then there are \(d\) (\(\mathbf{v} , \mathbf{a_i} \) are \(d\)-dimensional vectors.) independent examples for which inequality holds. These \(d\) equations then have a unique solution \(\mathbf{v} \) must be that solution. These examples are then called the \textit{suppoer vectors}. The \(d\) support vectors determine uniquely the maximum margin separator.             
+
+\begin{note}
+    If \(V\) is full dimensional, then we have \(d\) equations like 
+    \[
+        l_i \left( \mathbf{v} ^t \mathbf{a_i}  \right) = 1,
+    \]  
+    and since \(\mathbf{v} \) is in the space spanned by these \(d\) vectors, and thus \(\mathbf{v} = \sum_{j=1}^d c_j \mathbf{a_j}  \). Hence, we have 
+    \[
+        l_i \left( \sum_{j=1}^d c_j \mathbf{a_j}^t \mathbf{a_i}  \right) = 1 \quad \forall 1 \le i \le d. 
+    \] 
+    Now if we deinfe a \(d \times d\) matrix \(M\) by 
+    \(M_{ij} = l_i \left( \mathbf{a_j}^t \mathbf{a_i}   \right)  \) and \(\mathbf{c}  = \begin{pmatrix}
+        \mathbf{c_1}  & \mathbf{c_2}  & \dots   & \mathbf{c_d}   \\
+    \end{pmatrix}^t\), then we have 
+    \[
+        M \mathbf{c} = \mathbf{1}, 
+    \]    where \(\mathbf{1} \) is a column vector whose every component is \(1\). Now we show that \(M\) is invertible and thus \(\mathbf{c} \) is unique, which means \(\mathbf{v} \) is unique. Since \(M = DG\), where \(D\) is a diagonal matrix where \(\diag D = \begin{pmatrix}
+        l_1 & l_2 & \dots  & l_d  \\
+    \end{pmatrix}\) and \(G\) is a gram matrix where \(G_{ij} = \mathbf{a_j}^t \mathbf{a_i}  \). Now we show that \(D,G\) are both invertible, and thus \(M\) is invertible. First, since \(D\) is diagonal, and thus it is invertible. Now notice that \(G\) is positive defnite since \(G\) is a gram matrix, and thus if \(\mathbf{x} = \begin{pmatrix}
+        x_1 & x_2 & \dots  & x_d  \\
+    \end{pmatrix}^t\), then 
+    \[
+        \mathbf{x} ^t G \mathbf{x} = \sum_{i=1}^d \sum_{j=1}^d x_i x_j \mathbf{a_j}^t \mathbf{a_i} = \left\lVert \sum_{i=1}^d x_i \mathbf{a_i}   \right\rVert^2    
+    \] and if \(\mathbf{x} \neq \mathbf{0} \), then the above equation is \(>0\) since \(\left\{ \mathbf{a_i} \right\} _{i=1}^d  \) is linearly independent. Now we have a claim:
+    \begin{claim}
+        If \(G\) is a positive definite matrix, then it is invertible. 
+    \end{claim}  
+    \begin{explanation}
+        Suppose \(G\) is not invertible, then there exists \(\mathbf{v} \neq \mathbf{0} \) such that \(G \mathbf{v} = 0\) (If invertible, then \(\ker G = \left\{ 0 \right\} \) ). However, this means
+        \(\mathbf{v} ^t G \mathbf{v} = 0\) for some \(\mathbf{v} \neq 0\), which means \(G\) is not positive definite, a contradiction. By this, we know \(G\) is invertible, and we're done.      
+    \end{explanation}
+
+\end{note}
+
+\begin{definition}
+    Suppose we have a training data set \(\left\{ (\mathbf{a_i}, l_i ) \right\}_{i=1}^n \), where \(\mathbf{a_i} \) is the characteristic vector and \(\vert \mathbf{a_i}  \vert = 1 \) , and \(l_i \in \left\{ +1, -1 \right\} \) is the corresponding label to \(\mathbf{a_i} \) , then if we want to solve
+    \begin{center}
+    \(\min _\mathbf{v} \vert \mathbf{v}  \vert^2 \) subject to \(l_i \left( \mathbf{v} ^t \mathbf{a_i}  \right) \ge 1, \ \forall i \),
+\end{center}  
+    and suppose \(\mathbf{v} \) is the best separator (the one with maximal margin), then \textit{support vectors} are
+    \[
+        \left\{ \mathbf{a_i} \mid l_i \left( \mathbf{v} ^t \mathbf{a_i}  \right)  = 1  \right\},
+    \] which are the vectors most close to the separator hyperplane.
+\end{definition}
+
+\subsection{Linear Separators that classify most examples correctly}
+It may happen that there are linear separators for which almost all but a small fraction of examples are on the correct side. Going back to \autoref{eq: rule eq} ask if there is a \(\mathbf{w} \) for which at least \((1 - \varepsilon )n\) of the \(n\) inequalities in \autoref{eq: rule eq} are satisfied. Unfortunately, such problems are NP-hard and there are no good algorithms to solve them. A good way to think about this is that we suffer a "loss" of one for each misclassified point and would like to minimize the loss. But this loss function is discontinuous, it goes from \(0\) to \(1\) abruptly. However, with a nicer loss function it is possible to solve the problem. One possibility is to introduce slack variables \(y_i\), \(i=1,2,\dots ,n\), where \(y_i\) measures how badly the example \(\mathbf{a_i} \) is classified. We then include the slack variables in the objective function to be minimized: 
+
+\begin{equation}
+    \begin{aligned}
+        &\text{minimize } \vert \mathbf{v}  \vert^2 + c \sum_{i=1}^n y_i \\
+        &\text{subject to } \begin{rcases}
+            \left( \mathbf{v} \cdot \mathbf{a_i}  \right) l_i \ge 1 - y_i\\
+            y_i \ge 0
+        \end{rcases} i = 1,2, \dots ,n 
+    \end{aligned}
+\end{equation}
+
+\begin{note}
+    \(\left\{ y_i \right\}_{i=1}^n \) is a set of parameters that will be computed by the algorithm, and we needs \(y_i \ge 0\) since we want \(1 - y_i < 1\), which makes the classification not too rigorous. We do this because sometimes the training datas cannot be fully classified by a linear separators.  
+\end{note}
+
+If for some \(i\), \(l_i \left( \mathbf{v} \cdot \mathbf{a_i}  \right) \le 1\), then set \(y_i\) to its lowest value, namely \(0\), since each \(y_i\) has positive coefficient in the coset function. If, however, \(l_i \left( \mathbf{v} \cdot \mathbf{a_i}  \right) < 1 \), then set \(y_i = 1 - l_i \left( \mathbf{v} \cdot \mathbf{a_i}  \right) \), so \(y_i\) is just the amount of violation of this inequality. Thus, the objective function is trying to minimize a combination of the total violation as well as \(1 /\)margin (the squared length of \(\mathbf{v} \)). It is easy to see that this is the same as minimizing 
+\[
+    \vert \mathbf{v}  \vert^2 + c \sum_{i} (1-l_i \left( \mathbf{v} \cdot \mathbf{a_i}  \right) )^+ \footnotemark, 
+\]
+\footnotetext{\( x^+ = \begin{dcases}
+    0, &\text{ if } x \le 0 ;\\
+    x, &\text{ otherwise} .
+\end{dcases}\)}
+subject to the constraints. The second term is the sum of the violations.
+
+\section{Nonlinear Separators, Support Vector Machines, and Kernels}

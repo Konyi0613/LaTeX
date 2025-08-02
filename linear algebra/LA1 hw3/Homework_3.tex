@@ -1,0 +1,325 @@
+%Template by Saintan. 
+\documentclass[a4paper]{article}
+    %% font & format %%
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{type1cm, titlesec, fancyhdr, titling}
+\usepackage{multicol}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{ulem}
+    %% Math, Logos & symbols %%
+\usepackage{amsmath,amsthm,amssymb, mathtools}
+\usepackage{yhmath, faktor, dsfont}
+\usepackage{academicons, wasysym, marvosym}
+\usepackage[scr]{rsfso}
+\usepackage{braket}
+
+%% Enhancement %%
+\usepackage{graphicx, tabularx}
+\usepackage[shortlabels,inline]{enumitem}
+%% TikZ %%
+\usepackage{tikz-cd}
+\usepackage[breakable]{tcolorbox}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{calc, arrows,matrix}
+
+%% Reference: Make sure these are the last packages included! %%
+\usepackage[english]{babel}
+\usepackage[nameinlink]{cleveref}
+
+
+%%%頁面設定 with titling%%%
+\setlength{\headheight}{15pt}
+\setlength{\droptitle}{-1.5cm}
+\parindent=24pt
+
+\newtheoremstyle{mystyle}
+  {6pt}{15pt}% 上下間距
+  {}%          內文字體
+  {}%              縮排
+  {\bf}%       標頭字體
+  {.}%       標頭後標點
+  {1em}% 內文與標頭距離
+  {}% Theorem head spec (can be left empty, meaning 'normal')
+
+\theoremstyle{mystyle}	
+\newtheorem{theorem}{Theorem}
+\newtheorem*{definition}{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{exercise}[theorem]{Exercise}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{property}[theorem]{Property}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{answer}{Answer}[section]
+\newtheorem{fact}[theorem]{fact}
+\newtheorem*{recall}{Recall}
+\newtheorem*{remark}{Remark}
+\newtheorem*{claim}{Claim}
+\newtheorem*{observation}{Observation}
+
+%% New commands %%
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\renewcommand{\Pr}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\B}{\mathcal{B}}
+\newcommand{\mcC}{\mathcal{C}}
+\renewcommand{\L}{\mathcal{L}}
+
+\DeclareMathOperator{\Dom}{Dom}
+\DeclareMathOperator{\id}{id}
+\newcommand{\6}{\partial}
+\newcommand{\ds}{\displaystyle}
+
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert} %Use \norm* for \left\| \right\|
+\DeclarePairedDelimiter{\gen}{\langle}{\rangle}
+\DeclarePairedDelimiter{\innerp}{\langle}{\rangle}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclareMathOperator{\vsspan}{span}
+\DeclareMathOperator{\image}{Im}
+\DeclareMathOperator{\nullity}{nullity}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\ch}{ch}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\m}{m}
+
+\usepackage{xeCJK}
+    \xeCJKsetup{AutoFakeBold=true, AutoFakeSlant=true}
+    \setCJKmainfont{PingFang TC}
+    %\setmainfont{Times New Roman}
+\begin{document}
+\title{\textbf{Homework 3}}
+\author{Linear Algebra (II), Spring 2025 \\ B13902024 張沂魁}
+\date{\textbf{Deadline: 3/12 (Wed.) 12:10}}
+\maketitle
+
+\begin{exercise}
+    Let $T:V\to V$ be a linear operator with
+    $\ch_T(x)=(x-\lambda)^n$ and
+    $$
+    V=\bigoplus_{i=1}^rZ(v_i;T)
+    $$
+    be the decomposition of $V$ into a direct sum of $T$-cyclic subspaces according to Theorem 3.2. Let $s_i=\dim Z(v_i;T)$ and assume that $s_1\geq s_2\geq\cdots\geq s_r$. Determine $\m_T(x)$ and $\dim E_\lambda$. (Express them in terms of $r$ and $s_i$.)
+\end{exercise}
+
+\hfill \\ \textbf{Solution: }
+Suppose $m_T(x)=(x-\lambda)^d$ and note that
+\[
+   V = \ker (ch_T(T)) = \ker (T-\lambda I)^n = K_\lambda
+\]
+so we have $V=K_\lambda$, and we know $m_T(T)(v)=0$ for all $v \in V$. Since we must have
+\begin {gather*}
+(T-\lambda I)^d(v_1)=0 \\ 
+(T-\lambda I)^d(v_2)=0 \\
+\vdots \\ 
+(T-\lambda I)^d(v_r)=0
+\end {gather*}
+so we know $d=\max_{1 \le i \le r} p_i$ such that $p_i$ is the smallest positive integer 
+with $(T-\lambda I)^{p_i}(v_i)=0$ since if $d$ is smaller than
+this number, then there exists some $v_i$ such that $(T-\lambda I)^d(v_i) \neq 0$,
+and if $d=\max_{1 \le i \le r} p_i$, then $(T-\lambda I)^d(v_i)=0$ for all $i$ such that $1 \le i \le r$.
+Now note that in the process of constructing $V$ in Theorem 3.2, we have $(T-\lambda I)^{s_i}(v_i)=0$ for all $i$, 
+and since we know
+\[ B_i= \set{v_i, (T-\lambda I)(v_i), (T-\lambda I)^2(v_i), \cdots , (T-\lambda I)^{s_i-1}(v_i)}\]
+is a basis of $Z(v_i ; T)$, so $(T-\lambda I)^{x_i}(v_i) \neq 0$ for all $x_i \le s_i-1$, so $s_i$ is the 
+smallest positive integer $p_i$ such that $(T-\lambda I)^{p_i}(v_i)=0$. That is,
+ $d=\max_{1 \le i \le r} s_i = s_1$, so $m_T(x)=(x-\lambda)^{s_1}$. \\
+Now we consider the Jordan form of $T$ being
+\[
+T_J=
+\begin{pmatrix}
+J_1 &0 &\cdots &0 &0 \\
+0 &J_2 &\cdots &0 &0\\
+&&\vdots \\ 
+0 &0 &\cdots &0 &J_r
+\end{pmatrix}
+\]
+where $J_i$ is a $s_i \times s_i$ Jordan block for all $i$. Now we claim that for every Jordan block
+$J_i$, it has only $\lambda$ for its eigenvalue and the dimension of its eigenspace is $1$. First,
+ since we can find a basis $\beta_i$ of $Z(v_i;T)$ so that $T|_{Z(v_i;T)}$'s matrix representation 
+ with respect to $\beta_i$ is $J_i$, and since $Z(v_i;T)$ is a $T$-invariant space, so $T|_{Z(v_i;T)}$'s characteristic polynomial divides
+ the characteristic polynomial of $T$, and because $T$ only has $\lambda$ for its eigenvalue, so $T|_{Z(v_i;T)}$ also only have $\lambda$ for its eigenvalue.
+ Note that
+ \[
+ J_i=
+ \begin{pmatrix}
+    \lambda &1  \\
+    &\lambda &1  \\
+    &&\ddots &1\\ 
+    &&&\lambda
+ \end{pmatrix}
+ \]
+ and if
+ \[
+    \begin{pmatrix}
+        \lambda &1  \\
+        &\lambda &1  \\
+        &&\ddots &1\\ 
+        &&&\lambda
+     \end{pmatrix}
+     \begin{pmatrix}
+        a_1 \\
+        a_2 \\ 
+        \vdots \\
+        a_r
+     \end{pmatrix}
+     =
+     \lambda
+     \begin{pmatrix}
+     a_1 \\
+     a_2 \\ 
+     \vdots \\
+     a_r
+     \end{pmatrix}
+ \]
+ we must have $a_2=a_3=\cdots=a_r=0$ and $a_1$ can be any number, so the dimension of the eigenspace of
+ $J_i$ is one. Now suppose we pick some $v_i$ such that $v_i$ is an eigenvector of $J_i$, then we know $\set{v_i}$ is a basis of
+ the eigenspace of $J_i$, and we know
+ \[
+ \begin{pmatrix}
+    v_1 \\ 0 \\ 0 \\ \vdots \\ 0
+ \end{pmatrix}, 
+ \begin{pmatrix}
+    0 \\ v_2 \\ 0 \\ \vdots \\ 0
+ \end{pmatrix},
+ \begin{pmatrix}
+    0 \\ 0 \\ v_3 \\ \vdots \\ 0
+ \end{pmatrix},
+ \begin{pmatrix}
+    0 \\ 0 \\ 0 \\ \vdots \\ v_r
+ \end{pmatrix}
+ \] are all the eigenvectors of $T_J$, which can be easily verified by block matrix multiplication.
+ Now we call the set consisting of these eigenvectors is called $U$, and the element of $U$ with $v_i$ embedded in it is called $u_i$, then we know all elements in $U$ are linearly independent, so $\dim E_\lambda \ge r.$
+Now we claim that $U$ is a basis of $E_\lambda$. First, it is easy to verify $\vsspan U \subseteq E_\lambda$, now we show
+that $E_\lambda \subseteq \vsspan U$. Suppose
+\[
+w =
+\begin{pmatrix}
+    w_1 \\ w_2 \\ \vdots \\ w_r
+\end{pmatrix} \in E_\lambda
+\] with each $w_i$ a $s_i \times s_i$ block matrix, so we must have
+\[
+T_J w = \begin{pmatrix}
+    J_1 &0 &\cdots &0 &0 \\
+    0 &J_2 &\cdots &0 &0\\
+    &&\vdots \\ 
+    0 &0 &\cdots &0 &J_r
+    \end{pmatrix} \begin{pmatrix}
+        w_1 \\ w_2 \\ \vdots \\ w_r
+    \end{pmatrix} = 
+    \begin{pmatrix}
+        J_1w_1 \\ J_2w_2 \\ \vdots \\ J_rw_r
+    \end{pmatrix} =
+    \lambda \begin{pmatrix}
+        w_1 \\ w_2 \\ \vdots \\ w_r
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        \lambda w_1 \\ \lambda w_2 \\ \vdots \\ \lambda w_r
+    \end{pmatrix}
+\] we can notice that $J_i w_i=\lambda w_i$ for all $i$, that is, $w_i$ is an eigenvector of $J_i$ for all $i$,
+so $w_i =c_i v_i$ for some scalar $c_i$, so
+\[ 
+w=\sum_{i=1}^r c_i u_i
+\]
+which means $w \in \vsspan U$, so now we know $E_\lambda = \vsspan U$, and thus $\dim E_\lambda = \dim U = r$.
+ \begin{exercise}
+    Let $T$ be a linear operator on a finite-dimensional vector space $V$ with Jordan canonical form
+    \[
+    \left(
+    \begin{array}{cccccccc}
+        2 & 1 & \multicolumn{1}{l|}{0} & 0 & 0 & 0 & 0 \\
+        0 & 2 & \multicolumn{1}{l|}{1} & 0 & 0 & 0 & 0 \\
+        0 & 0 & \multicolumn{1}{l|}{2} & 0 & 0 & 0 & 0 \\ \cline{1-5}
+        0 & 0 & \multicolumn{1}{l|}{0} & 2 & \multicolumn{1}{l|}{1} & 0 & 0 \\
+        0 & 0 & \multicolumn{1}{l|}{0} & 0 & \multicolumn{1}{l|}{2} & 0 & 0 \\ \cline{4-7}
+        0 & 0 & 0 & 0 & \multicolumn{1}{l|}{0} & 3 & 0 \\
+        0 & 0 & 0 & 0 & \multicolumn{1}{l|}{0} & 0 & 3
+    \end{array}
+    \right).
+    \]
+    \begin{enumerate}[(a)]
+        \item Determine $\ch_T(x)$ and $\m_T(x)$.
+        \item Determine $\dim E_\lambda$ for each eigenvalue $\lambda$ of $T$.
+        \item For each eigenvalue $\lambda$ of $T$, determine the smallest positive integer $p$ for which $K_\lambda=\ker((T-\lambda I)^p)$.
+    \end{enumerate}
+\end{exercise}
+
+\hfill \\ \textbf{Solution: } First note that $T$ has $2, 3$ as its eigenvalues.
+\begin{itemize}
+    \item [(a)] Since $V= K_2 \oplus K_3$, and the submatrix with $2$ on its diagonal line is with size $5 \times 5$, while the
+    submatrix with $3$ on its diagonal line has size $2 \times 2$, so $ch_T(x)=(x-2)^5(x-3)^2$. Now
+    suppose $m_T(x)=(x-2)^{d_2}(x-3)^{d_3}$, then by Exercise 1 we know $d_2$ is the largest size of the Jordan block with respect to eigenvalue 2,
+    while $d_3$ is the largest size of the Jordan block with respect to eigenvalue $3$, so $d_2=3$ and $d_3=1$.
+    Therefore, $m_T(x)=(x-2)^3(x-3)$.
+    \item [(b)] By Exercise 1, we know $\dim E_\lambda$ is the number of Jordan block with respect to eigenvalue $\lambda$, so
+    $\dim E_2=2$, and $\dim E_3 = 2$.
+    \item [(c)] Claim: For every eigenvalue $\lambda$, if $K_\lambda=\bigoplus_{i=1}^r Z(v_i;T)$, where $Z(v_i; T)$ is the 
+    $T$-cyclic subspace generated by $v_i$(We use the method in Theorem 3.2 to determine $v_i$), and $s_i=\dim Z(v_i;T)$, and without lose of generacity we suppose
+    $s_1 \ge s_2 \ge \cdots \ge s_r$, now if $p$ is the smallest
+    positive integer such that $K_\lambda=\ker ((T-\lambda I)^p)$, then $p=s_1$. \\ 
+    Proof: It is easy to prove that $\ker ((T-\lambda I)^s_1) \subseteq K_\lambda$. Now note that
+    \[ B=\bigcup_{i=1}^r\set{v_i, T(v_i), T^2(v_i), \cdots , T^{s_i-1}(v_i)}\]
+    is a basis of $\bigoplus_{i=1}^r Z(v_i;T)$, so for all $u \in K_\lambda$, we can write
+    $u=\sum_{i=1}^r\sum_{j=0}^{s_i-1}\alpha_{ij}T^j(v_i)$ for some scalar $\alpha_{ij}$. Besides, note that $(T-\lambda I)^{s_1}(v_i)=0$ for all $1 \le i \le r$.
+    The reason has been explained in Exercise 1. Therefore, we have 
+    \[ 
+    (T-\lambda I)^{s_1}\left(\sum_{i=1}^r\sum_{j=0}^{s_i-1}\alpha_{ij}T^j(v_i)\right)=\sum_{i=1}^r\sum_{j=0}^{s_i-1}\alpha_{ij}T^j(T-\lambda I)^{s_1}(v_i)=0
+    \] for all $\alpha_{ij}$. In other words, $K_\lambda \subseteq \ker((T-\lambda I)^{s_1})$, so 
+    $K_\lambda = \ker((T-\lambda I)^{s_1})$. Now we have to prove the minimality of $s_1$. If there is a positive integer 
+    $k$ such that $K_\lambda=\ker((T-\lambda I)^{s_1-k})$, then $(T-\lambda I)^{s_1 - k}(v_1)=0$, but since $s_1$ is the smallest positive integer 
+    $p$ such that $(T-\lambda I)^p(v_1)=0$, so it is impossible to have such $k$, and we are done. \\
+    By this claim, if we say the smallest positive integer $p$ such that $K_\lambda=\ker((T-\lambda I)^p)$ is $p_\lambda$, then
+    $p_2=3, p_3=1$.
+\end{itemize}
+
+\begin{exercise}
+    Let
+    $$
+    A=\begin{pmatrix}
+        11 & -26 & -11 & 14 & 9 & -7\\
+        4 & -10 & -3 & 4 & 3 & -2 \\
+        11 & -22 & -13 & 12 & 9 & -6 \\
+        4 & -8 & -4 & 2 & 4 & -2 \\
+        2 & -4 & -2 & 2 & 0 & -1\\
+        0 & 0 & 0 & 0 & 0 & -2
+    \end{pmatrix}.
+    $$
+    It is known that $\ch_A(x)=(x+2)^6$. 
+    \begin{enumerate}[(a)]
+        \item Determine $\m_A(x)$ and $\dim E_{-2}$.
+        \item Determine the Jordan form of $A$. \\
+        \textit{Hint}: What do the properties proved in Exercise 1 tell you?
+    \end{enumerate} 
+\end{exercise}
+\hfill \\ \textbf{Solution: }
+\begin{itemize}
+    \item [(a)] Suppose $m_A(x)=(x+2)^d$, then by calculation we know $3$ is the smallest positive integer $p$ such that $(A+2I)^p=0$, that is, $d=3$.
+    Besides, we know $\dim ker(A+2I)=3$, which can also be done by easy computation.
+    \item [(b)] By $(a)$ and Exercise 1, we know in the Jordan form of $A$, the biggest Jordan block has the size $3$ since $m_A(x)=(x+2)^3$, and the number 
+    of Jordan blocks is $3$, now since the sum of the size of the Jordan block is $6$, which is the size of $A$, and the size of every Jordan block must be greater than $0$, 
+    so there are $3$ Jordan blocks of the size $3,2,1$, respectively, in the Jordan form of $A$, and since the only eigenvalue of $A$ is $-2$, so the Jordan form of $A$ is
+    \[
+    \begin{pmatrix}
+        -2 &1 &0 &0 &0 &0 \\ 
+        0 &-2 &1 &0 &0 &0 \\ 
+        0 &0 &-2 &0 &0 &0 \\ 
+        0 &0 &0 &-2 &1 &0 \\ 
+        0 &0 &0 &0 &-2 &0 \\ 
+        0 &0 &0 &0 &0 &-2
+    \end{pmatrix} 
+    \]
+\end{itemize}
+
+\begin{figure}[h]
+    \includegraphics[width=\textwidth]{我的人生已經失敗了吧.jpg}
+    \caption{Me after doing HW3}
+\end{figure}
+
+\end{document}

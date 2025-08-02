@@ -1,0 +1,371 @@
+\documentclass{article}
+\usepackage{geometry}
+\usepackage{amsmath, amssymb, mathtools, physics}
+\usepackage{graphicx, booktabs, array}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{fontawesome5}
+\usepackage[mathscr]{euscript}
+\usepackage{bm}
+\usepackage{tabularx}
+\usepackage{makecell}
+
+\usepackage{ltablex}
+\usepackage{xparse}
+\usepackage{hyperref}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{newtxtext}
+\keepXColumns % <--- 這行非常重要！
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X} % 改善 X 欄排版
+
+
+\geometry{a4paper, margin=1in}
+\definecolor{codebg}{rgb}{0.95,0.95,0.97}
+\definecolor{titlebg}{rgb}{0.1,0.3,0.5}
+\newcommand{\snippet}[1]{\textcolor{titlebg}{\texttt{#1}}}
+\newcommand{\example}[1]{\colorbox{codebg}{\texttt{#1}}}
+
+% Custom commands used in snippets
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Prb}{\operatorname{Pr}}
+\newcommand{\identity}{\mathbf{I}}
+\newcommand{\Homomorphism}{\operatorname{Hom}}
+\newcommand{\Object}{\operatorname{Obj}}
+\newcommand{\Morphism}{\operatorname{Mor}}
+\newcommand{\quotient}[2]{#1/#2}
+\newcommand{\at}[3]{#1|_{#2}^{#3}}
+
+\title{\color{titlebg}\Huge\textbf{LaTeX Snippets Comprehensive Reference}}
+\author{\Large DeepSeek-R1}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{center}
+\faIcon{code} Comprehensive guide for mathematical typesetting \\[5pt]
+\small Created from original snippet definitions
+\end{center}
+
+\section{Introduction}
+This document explains all snippets from your original file with detailed examples. Snippets are organized by functionality and context awareness.
+
+\subsection{Context Functions}
+\begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Context Detection]
+\begin{verbatim}
+global
+function math(context) {
+    return context.scopes.findLastIndex(s => s.startsWith("meta.math")) > 
+           context.scopes.findLastIndex(s => s.startsWith("comment") || 
+           s.startsWith("meta.text.normal.tex"));
+}
+function notmath(context) {
+    return context.scopes.findLastIndex(s => s.startsWith("meta.math")) <= 
+           context.scopes.findLastIndex(s => s.startsWith("comment") || 
+           s.startsWith("meta.text.normal.tex"));
+}
+endglobal
+\end{verbatim}
+These functions automatically detect whether you're in a math environment or regular text.
+\end{tcolorbox}
+
+\section{Table Environments}
+
+\begin{tcolorbox}[colback=green!5!white,colframe=green!75!black,title=Table Generator]
+\snippet{table<rows> <cols>} - Creates a full table environment
+
+\example{table3 4} → 
+\begin{verbatim}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c|c|c|c}
+        \toprule
+        A1 & A2 & A3 & A4 \\ \midrule
+        B1 & B2 & B3 & B4 \\
+        C1 & C2 & C3 & C4 \\ \bottomrule
+    \end{tabular}
+    \caption{caption}
+    \label{tab:label}
+\end{table}
+\end{verbatim}
+\end{tcolorbox}
+
+\section{Matrix \& Array Environments}
+
+\begin{tcolorbox}[colback=purple!5!white,colframe=purple!75!black,title=Matrix Generators]
+\begin{itemize}[leftmargin=*]
+\item \snippet{ary<rows> <cols>} - Math array environment
+\example{ary2 3} → 
+\(\begin{array}{ccc}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23}
+\end{array}\)
+
+\item \snippet{bmat<rows> <cols>} - Bracket matrix
+\example{bmat2 2} → 
+\(\begin{bmatrix}
+a_{11} & a_{12} \\
+a_{21} & a_{22}
+\end{bmatrix}\)
+
+\item \snippet{pmat<rows> <cols>} - Parenthesis matrix
+\example{pmat2 2} → 
+\(\begin{pmatrix}
+a_{11} & a_{12} \\
+a_{21} & a_{22}
+\end{pmatrix}\)
+\end{itemize}
+\end{tcolorbox}
+
+\section{Greek Letters \& Symbols}
+
+\begin{tcolorbox}[colback=orange!5!white,colframe=orange!75!black,title=Greek Letters]
+\begin{tabularx}{\textwidth}{lXlX}
+\textbf{Trigger} & \textbf{Output} & \textbf{Trigger} & \textbf{Output} \\
+\hline
+\snippet{;a} & \(\alpha\) & \snippet{;A} & \\
+\snippet{;b} & \(\beta\) & \snippet{;B} & \\
+\snippet{;g} & \(\gamma\) & \snippet{;G} & \(\Gamma\) \\
+\snippet{;d} & \(\delta\) & \snippet{;D} & \(\Delta\) \\
+\snippet{;t} & \(\theta\) & \snippet{;T} & \(\Theta\) \\
+\snippet{;s} & \(\sigma\) & \snippet{;S} & \(\Sigma\) \\
+\snippet{;p} & \(\pi\) & \snippet{;P} & \(\Pi\) \\
+\snippet{;m} & \(\mu\) & \snippet{;r} & \(\rho\) \\
+\snippet{;z} & \(\zeta\) & \snippet{;l} & \(\lambda\) \\
+\snippet{;o} & \(\omega\) & \snippet{;O} & \(\Omega\) \\
+\snippet{eps} & \(\epsilon\) & \snippet{veps} & \(\varepsilon\) \\
+\snippet{ell} & \(\ell\) & \snippet{vt} & \(\vartheta\) \\
+\snippet{vp} & \(\varphi\) & \snippet{;;p} & \(\phi\) \\
+\snippet{;;;p} & \(\psi\) & \snippet{;;;P} & \(\Psi\) \\
+\end{tabularx}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Mathematical Symbols]
+\begin{tabularx}{\textwidth}{lXlX}
+\textbf{Trigger} & \textbf{Output} & \textbf{Trigger} & \textbf{Output} \\
+\hline
+\snippet{>=} & \(\geq\) & \snippet{<=} & \(\leq\) \\
+\snippet{!=} & \(\neq\) & \snippet{~~} & \(\approx\) \\
+\snippet{->} & \(\to\) & \snippet{=>} & \(\implies\) \\
+\snippet{:=} & \(\coloneqq\) & \snippet{=:} & \(\eqqcolon\) \\
+\snippet{<>} & \(\langle\rangle\) & \snippet{in} & \(\in\) \\
+\snippet{nin} & \(\notin\) & \snippet{subset} & \(\subset\) \\
+\snippet{subseteq} & \(\subseteq\) & \snippet{supset} & \(\supset\) \\
+\snippet{cup} & \(\cup\) & \snippet{cap} & \(\cap\) \\
+\snippet{circ} & \(\circ\) & \snippet{times} & \(\times\) \\
+\snippet{oplus} & \(\oplus\) & \snippet{otimes} & \(\otimes\) \\
+\snippet{sum} & \(\sum\) & \snippet{prod} & \(\prod\) \\
+\snippet{int} & \(\int\) & \snippet{partial} & \(\partial\) \\
+\snippet{infty} & \(\infty\) & \snippet{nabla} & \(\nabla\) \\
+\snippet{forall} & \(\forall\) & \snippet{exists} & \(\exists\) \\
+\snippet{ldots} & \(\dots\) & \snippet{cdots} & \(\cdots\) \\
+\snippet{varnothing} & \(\varnothing\) & \snippet{therefore} & \(\therefore\) \\
+\end{tabularx}
+\end{tcolorbox}
+
+\section{Formatting \& Operators}
+
+\begin{tcolorbox}[colback=teal!5!white,colframe=teal!75!black,title=Formatting Tools]
+\begin{itemize}[leftmargin=*]
+\item \snippet{//} - Fraction: \example{a//b} → \(\frac{a}{b}\)
+\item \snippet{sq} - Square root: \example{sq{x}} → \(\sqrt{x}\)
+\item \snippet{hat} - Hat: \example{hat{x}} → \(\hat{x}\)
+\item \snippet{bar} - Bar: \example{bar{x}} → \(\bar{x}\)
+\item \snippet{vec} - Vector: \example{vec{v}} → \(\vec{v}\)
+\item \snippet{mathbf} - Bold: \example{mathbf{x}} → \(\mathbf{x}\)
+\item \snippet{bm} - Bold math: \example{bm{x}} → \(\bm{x}\)
+\item \snippet{mathcal} - Calligraphic: \example{Xcal} → \(\mathcal{X}\)
+\item \snippet{mathscr} - Script: \example{Sscr} → \(\mathscr{S}\)
+\item \snippet{mathfrak} - Fraktur: \example{gfk} → \(\mathfrak{g}\)
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!75!black,title=Advanced Operators]
+\begin{itemize}[leftmargin=*]
+\item \snippet{dint} - Definite integral: \example{dint} → \(\int_{-\infty}^{\infty} \dd{x}\)
+\item \snippet{lim} - Limit: \example{lim} → \(\lim_{n \to \infty}\)
+\item \snippet{Pr} - Probability: \example{Pr} → \(\Pr\)
+\item \snippet{mean} - Expectation: \example{mean} → \(\mathbb{E}\)
+\item \snippet{Var} - Variance: \example{Var} → \(\Var\)
+\item \snippet{Cov} - Covariance: \example{Cov} → \(\Cov\)
+%\item \snippet{ind} - Indicator: \example{ind_A} → \(\mathbbm{1}_A\)
+\end{itemize}
+\end{tcolorbox}
+
+\section{Text Mode Snippets}
+
+\begin{tcolorbox}[colback=cyan!5!white,colframe=cyan!75!black,title=Text Specific]
+\begin{itemize}[leftmargin=*]
+\item \snippet{\%--} - Separator line: \example{\%--} → \textcolor{gray}{\%────────────────────}
+\item \snippet{wrt} - With respect to: \example{wrt} → w.r.t.
+\item \snippet{iid} - Independent identical: \example{iid} → i.i.d.
+\item \snippet{wp} - With probability: \example{wp} → w.p.
+\item \snippet{fig} - Figure environment
+\item \snippet{rmk} - Remark environment
+\item \snippet{dfn} - Definition environment
+\item \snippet{qed} - QED symbol: \(\blacksquare\)
+\end{itemize}
+\end{tcolorbox}
+
+\section{Advanced Structures}
+
+\begin{tcolorbox}[colback=violet!5!white,colframe=violet!75!black,title=Complex Structures]
+\begin{itemize}[leftmargin=*]
+\item \snippet{split} - Split equations:
+\example{split} → 
+\begin{verbatim}
+\begin{split}
+    a &= b \\
+    &= c
+\end{split}
+\end{verbatim}
+
+\item \snippet{cases} - Cases environment:
+\example{cases} → 
+\(\begin{dcases}
+a & \text{if } b \\
+c & \text{otherwise}
+\end{dcases}\)
+
+\item \snippet{opmin} - Minimization problem:
+\example{opmin} → 
+\[\begin{aligned}
+\min~ & c^{\top}x \\
+&Ax = b \\
+&x \geq 0
+\end{aligned}\]
+
+\item \snippet{opPD} - Primal-dual problem:
+\begin{verbatim}
+\begin{alignedat}{5}
+\min~ & c^{\top}x && \max~ & y^{\top}b \\
+&Ax = b && & y^{\top}A \leq c^{\top} \\
+&x \geq 0 && 
+\end{alignedat}
+\end{verbatim}
+\end{itemize}
+\end{tcolorbox}
+
+
+\section{Smart Features}
+
+\begin{tcolorbox}[colback=pink!5!white,colframe=pink!75!black,title=Intelligent Behaviors]
+\begin{itemize}[leftmargin=*]
+\item \textbf{Automatic context detection}: Snippets know if you're in math/text
+\item \textbf{Smart fractions}: \example{(a+b)/c} → \(\frac{a+b}{c}\)
+\item \textbf{Auto-subscripts}: \example{x\_ij} → \(x_{ij}\)
+\item \textbf{Auto-superscripts}: \example{x\^2} → \(x^2\)
+\item \textbf{Vector completion}: \example{v,} → \(\vec{v}\)
+\item \textbf{Prime completion}: \example{f'} → \(f^{\prime}\)
+\item \textbf{Operator detection}: \example{sin} → \(\sin\)
+\end{itemize}
+\end{tcolorbox}
+
+\section{Complete Reference Table}
+\begin{center}
+\begin{tabularx}{\textwidth}{lY}
+\textbf{Snippet} & \textbf{Description} \\
+\hline
+\snippet{\%--} & Full-width separator line \\
+\snippet{wrt} & With respect to (w.r.t.) \\
+\snippet{iid} & Independent and identically distributed (i.i.d.) \\
+\snippet{wp} & With probability (w.p.) \\
+\snippet{opn} & Operator name (\verb|\operatorname|) \\
+\snippet{fm} & Inline math (\( \)) \\
+\snippet{dm} & Display math environment \\
+\snippet{<>} & Angle brackets ($\langle\rangle$) \\
+\snippet{lr,} & Auto-scaled angle brackets \\
+\snippet{lrd} & Auto-scaled parentheses \\
+\snippet{\{\}} & Curly braces \\
+\snippet{lra} & Auto-scaled curly braces \\
+\snippet{lrq} & Auto-scaled square brackets \\
+\snippet{ceil} & Ceiling function \\
+\snippet{Ceil} & Auto-scaled ceiling \\
+\snippet{flr} & Floor function \\
+\snippet{Flr} & Auto-scaled floor \\
+\snippet{abs} & Absolute value \\
+\snippet{Abs} & Auto-scaled absolute value \\
+\snippet{norm} & Norm \\
+\snippet{Norm} & Auto-scaled norm \\
+\snippet{scup} & Disjoint union \\
+\snippet{cup} & Union \\
+\snippet{Cup} & Big union \\
+\snippet{cap} & Intersection \\
+\snippet{Cap} & Big intersection \\
+\snippet{Conj} & Conjunction \\
+\snippet{Disj} & Disjunction \\
+\snippet{sub} & Subset \\
+\snippet{nsub} & Not subset \\
+\snippet{sube} & Subset or equal \\
+\snippet{subn} & Proper subset \\
+\snippet{sups} & Superset \\
+\snippet{nsup} & Not superset \\
+\snippet{supe} & Superset or equal \\
+\snippet{supn} & Proper superset \\
+\snippet{nlim} & No limits \\
+\snippet{lim} & Limit \\
+\snippet{lsup} & Limit superior \\
+\snippet{linf} & Limit inferior \\
+\snippet{prd} & Product \\
+\snippet{Prd} & Big product \\
+\snippet{coprd} & Coproduct \\
+\snippet{pt} & Partial differential \\
+\snippet{pdif} & Partial derivative \\
+\snippet{dif} & Derivative \\
+\snippet{sq} & Square root \\
+\snippet{oo} & Infinity \\
+\snippet{\texttt{\textasciicircum}oo} & Superscript infinity \\
+\snippet{EE} & Existential quantifier \\
+\snippet{AA} & Universal quantifier \\
+\snippet{o+} & Circle plus \\
+\snippet{o.} & Circle dot \\
+\snippet{.x} & Times \\
+\snippet{inv} & Inverse \\
+\snippet{tp} & Transpose \\
+\snippet{prp} & Perpendicular \\
+\snippet{cp} & Complement \\
+\snippet{qs} & Square \\
+\snippet{!>} & Mapsto \\
+\snippet{dint} & Definite integral \\
+\snippet{not} & Logical not \\
+\snippet{'} & Prime \\
+\snippet{--} & Set minus \\
+\snippet{rm} & Roman text \\
+\snippet{st} & Star \\
+\snippet{**} & Asterisk \\
+\snippet{\texttt{\textasciicircum}.} & Dot accent \\
+\snippet{dot\.} & Double dot \\
+\snippet{>>} & Much greater \\
+\snippet{<<} & Much less \\
+\snippet{spt} & Support \\
+\snippet{sim} & Similar to \\
+\snippet{apx} & Approximately \\
+\snippet{bino} & Binomial \\
+\snippet{ems} & Empty set \\
+\snippet{emph} & Emphasis \\
+\snippet{begg} & Begin environment \\
+\snippet{idd} & Identity \\
+\snippet{quo} & Quotient \\
+\snippet{at} & Evaluation bar \\
+\snippet{atf} & Autoreference \\
+\snippet{hpr} & Hyperreference \\
+\snippet{lbl} & Label \\
+\snippet{vph} & Vertical phantom \\
+\snippet{hom} & Homomorphism \\
+\snippet{Obj} & Object \\
+\snippet{mor} & Morphism \\
+\snippet{\_\_} & Underset \\
+\snippet{\texttt{\textasciicircum\textasciicircum}
+} & Overset \\
+\snippet{fk} & Fraktur \\
+\snippet{tg} & Triangle \\
+\end{tabularx}
+\end{center}
+
+\end{document}

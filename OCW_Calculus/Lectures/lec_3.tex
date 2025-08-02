@@ -1,0 +1,177 @@
+\lecture{3}{10 July. 18:00}{}
+\begin{prev}
+    We can think a sequence as a function mapping from \(\mathbb{N} \) to \(\mathbb{R} \), and the sequence converges means when \(N\) is big enough, then the value of every term after \(a_N\) will be located in a closed interval \([L - \varepsilon , L + \varepsilon ]\).  
+\end{prev}
+
+\begin{eg}
+    If \(a > 1\), then \(\lim_{n \to \infty} \frac{1}{a^n} = 0\).   
+\end{eg}
+\begin{explanation}
+    First, we know 
+    \[
+        \frac{1}{a^n} = \frac{1}{\left( 1 + (a-1) \right)^n } \le \frac{1}{1+n(a-1)} \le \frac{1}{n(a-1)}.
+    \]
+    Then, we can use the deduction that \(\lim_{n \to \infty} \frac{1}{n} = 0 \) to prove that this is correct. (We may need to use the following argument.)
+    \begin{exercise}
+        Suppose \(\lim_{n \to \infty} a_n = L \) and \(\lim_{n \to \infty} b_n = L \), now if \(a_n \le c_n \le b_n\) for all \(n \in \mathbb{N} \), show that \(\lim_{n \to \infty} c_n = L \).     
+    \end{exercise}
+    Now we know \(0 \le \frac{1}{a^n} \le \frac{1}{n(a-1)}\), so we can prove \(\lim_{n \to \infty} \frac{1}{a^n} = 0 \).  
+\end{explanation}
+
+\begin{definition}
+    A sequence \(a_n\) in \(\mathbb{R} \) is 
+    \begin{enumerate}
+        \item nondecreasingly monotone / increasing if \(a_n \le a_{n+1} \forall n \in \mathbb{N} \). 
+        \item nonincreasingly monotone / decreasing if \(a_n \ge a_{n+1} \forall n \in \mathbb{N} \).
+        \item strictly increasing (resp. strictly decreasing) if \(\forall n \in \mathbb{N} \), we have \(a_n < a_{n+1} \) (resp. \(a_n > a_{n+1} \)).   
+    \end{enumerate}  
+\end{definition}
+
+\begin{theorem}\label{thm: converge sup}
+    If \(a_n\) is nondecreasing and \(\left\{ a_n \mid n \in \mathbb{N}  \right\} \) has a upper bound, then  \(a_n\) converges to \(\sup \left\{ a_n \mid n \in \mathbb{N} \right\} \) . 
+\end{theorem}
+\begin{proof}
+    \(\left\{ a_n \mid n \in \mathbb{N} \right\} \) has an upper bound, so \(L \coloneqq  \sup \left\{ a_n \mid n \in \mathbb{N}  \right\} \) exists. Now we claim that \(\lim_{n \to \infty} a_n = L \). 
+
+    First, we know \(\forall \varepsilon > 0\), \(L - \varepsilon < L\), and hence \(\exists N \in \mathbb{N} \) such that \(L - \varepsilon < a_N\), otherwise \(L - \varepsilon \) is an upper bound. Since \(a_n\) is nondecreasing, so \(\forall n \ge N\), we have
+    \[
+        L - \varepsilon < a_N \le a_n \le L < L + \varepsilon.
+    \]
+    Hence, \(\left\vert a_n - L \right\vert < \varepsilon  \). 
+\end{proof}
+
+\begin{eg}
+    A decimal expression gives a real number, say it is \(0.d_1 d_2 d_3 \dots \), and suppose
+    \[
+        a_n = 0. d_1 d_2 d_3 \dots = \frac{d_1}{10} + \dots + \frac{d_n}{10^n}.
+    \]
+    Since we know
+    \[
+        a_n < \frac{9}{10} + \frac{9}{10^2} + \dots + \frac{9}{10^n} = \frac{9}{10}\frac{1 - \left( \frac{1}{10} \right)^{n+1}}{1 - \frac{1}{10}} < 1,
+    \] and since \(\left\{ a_n \right\} \) is nondecreasing, so \(\lim_{n \to \infty} a_n = 0.d_1 d_2 \dots \). 
+\end{eg}
+
+\begin{note}
+    Hence, a real number may have more than one way of representation. For example, \(0.1\) and \(0.09999\dots \) are same, this can be seen by the limits of both of the decimal representation.    
+\end{note}
+
+\begin{eg}[The natural base \(e\)]
+    We first define 
+    \[
+        e \coloneqq \lim_{n \to \infty} \left( 1+ \frac{1}{n} \right)^n ,
+    \]
+    but we have to show that this limit exists.
+\end{eg}
+\begin{explanation}
+     Suppose
+    \[
+        a_n = \left( 1 + \frac{1}{n} \right)^n = \sum_{i = 0}^n \binom{n}{i}\left( \frac{1}{n} \right)^i,
+    \]
+    we know 
+    \begin{align*}
+                \binom{n}{i}\left( \frac{1}{n} \right)^i &= \frac{n!}{r! (n-r)!} \frac{1}{n^i} = \frac{1}{i!} \left( \frac{n(n-1)\dots (n-i+1)}{n \cdot n \cdots n} \right) \\ 
+                &= \frac{1}{i!}\left( 1 - \frac{1}{n} \right) \left( 1 - \frac{2}{n} \right) \dots  \left( 1 - \frac{i-1}{n} \right).  
+    \end{align*}
+    Hence, 
+    \[
+        a_n = 1 + 1 + \frac{1}{2!} \left( 1 - \frac{1}{n} \right) \dots + \frac{1}{i!}\left( 1 - \frac{1}{n} \right) \left( 1 - \frac{2}{n} \right) \dots  \left( 1 - \frac{i-1}{n} \right) +\dots.  
+    \]
+    By this, we can see that \(a_n < a_{n+1} \) since we can see that by replacing \(n\) with \(n+1\) in the above equation then it becomes \(a_{n+1} \).    
+    Also, we can see that 
+   \begin{align*}
+            a_n &< 1 + 1 + \frac{1}{2!} + \dots + \frac{1}{i!} + \dots + \frac{1}{n!} \\
+            &< 1 + 1 + \frac{1}{2} + \frac{1}{2^2} + \dots + \frac{1}{2^{i-1} } + \dots + \frac{1}{2^{n-1}} \\
+            &= 1 + \frac{1 - \left( \frac{1}{2} \right)^n }{1 - \frac{1}{2} } < 1 + \frac{1}{\frac{1}{2}} = 3,
+   \end{align*} 
+   so it has upper bound and nondecreasing, and thus it converges and \(e\) is well-defined. 
+   \begin{note}
+    In the near future, we will see that \(e = \lim_{n \to \infty} 1 + 1 + \frac{1}{2!} + \dots + \frac{1}{n!}\). 
+\end{note}
+\end{explanation}
+
+\begin{definition}
+    A sequence of intervals \(I_n\) (\(n \in \mathbb{N} \)) is nested if \(I_n \neq \varnothing \) and \(I_{n+1} \subseteq I_n\) for all \(n \in \mathbb{N}\). (\(I_1 \supseteq I_2 \supseteq \dots\)).     
+\end{definition}
+
+Now we want to know \(\bigcap_{n \in \mathbb{N} }^{\infty} I_n \neq \varnothing \)?
+
+Here is some counterexamples. Consider \(I_n = (0, \frac{1}{n})\), \(n \in \mathbb{N} \). We can show that \(\bigcap_{n=1}^{\infty} I_n = \varnothing  \) by Archimedean Property. Besides, if \(I_n = [n, \infty )\), \(n \in \mathbb{N} \), this is trivial that \(\bigcap_{n=1}^{\infty} I_n = \varnothing  \). 
+
+\begin{theorem}[Theorem of nested intervals]\label{thm: nested interval}
+    If \(I_n\) (\(n \in \mathbb{N} \)) is a sequence of bounded closed nested intervals, then \(\bigcap_{n=1}^{\infty} I_n \neq \varnothing  \).  
+\end{theorem}
+
+\begin{proof}
+    Write \(I_n = [a_n,b_n]\) for all \(n \in \mathbb{N} \). First, we know \(I_n\) is nested iff \(a_n \le b_n\) and \(a_n\) is nondecreasing and \(b_n\) is nonincreasing. Hence, \(\forall n,m \in \mathbb{N} \), we have \(a_n \le a_{\max \left\{ n,m \right\} } \le b_{\max \left\{ n,m \right\} } \le b_m\). In other words, for every \(m \in \mathbb{N} \), \(b_m\) is a upper bound of \(\left\{ a_n \right\} \). Hence, we know \(c = \lim_{n \to \infty} a_n  = \sup \left\{ a_n \right\} \).exists. Then, \(c \le b_m\) for all \(m \in \mathbb{N} \). Also, \(c \ge a_n\) for all \(n \in \mathbb{N} \). Hence, \(a_n \le c \le b_n\) for all \(n \in \mathbb{N} \), and thus we know \(c \in I_n\) for all \(n \in \mathbb{N} \). Thus, \(c \in \bigcap_{n=1}^{\infty} I_n \).                     
+\end{proof}
+
+\begin{exercise}
+    What if \(I_n = (a_n, b_n)\) is nested but \(a_n\) is strictly increasing and \(b_n\) is strictly decreasing, is theorem of nested interval still correct?   
+\end{exercise}
+
+\begin{exercise}
+    \(I_n = (a_n, \infty )\) is nested and \(\left\{ a_n \right\} \) bounded from above, is theorem of nested interval still correct?  
+\end{exercise}
+
+\begin{exercise}
+    We can use \autoref{thm: nested interval} and \autoref{thm: Archimedean} to show \autoref{thm: Dedekind's gapless}.   
+\end{exercise}
+
+Now we have a neq question, if we have a sequence \(\left\{ a_n \right\} \) in \(\mathbb{R} \), can we determine whether \(\left\{ a_n \right\} \) converges or not without referring a limit candidate \(L\) but concluding according to the mutual behaviour of the terms of \(\left\{ a_n \right\} \). 
+
+\begin{definition}[Cauchy Sequence]
+    A sequence \(\left\{ a_n \right\} \) in \(\mathbb{R} \) is a Cauchy Sequence if \(\forall \varepsilon > 0\), \(\exists N \in \mathbb{N} \) such that \(n, m \ge \mathbb{N} \) implies \(\left\vert a_n - a_m \right\vert < \varepsilon \).      
+\end{definition}
+\begin{exercise}
+    \(a_n\) is convergent implies \(a_n\) is a Cauchy sequence.  
+\end{exercise}
+\begin{exercise}
+    If \(a_n\) is a Cauchy sequence, then \(a_n\) is bounded.  
+\end{exercise}
+
+\begin{theorem}\label{thm: convergent iff cauchy}
+    Let \(a_n\) be a sequence in \(\mathbb{R} \), then 
+    \begin{center}
+        \(a_n\) is convergent \(\iff\) \(a_n\) is Cauchy.   
+    \end{center}
+\end{theorem}
+\begin{proof}[proof from Cauchy to convergent]
+    We first give a part of the proof as exercise.
+    \begin{definition*}
+        Let \(a_n\) be a bounded sequence in \(\mathbb{R} \).   
+    \end{definition*}
+    \begin{definition*}
+        \(u_n \coloneqq \sup \left\{ a_m \mid m \geq n \right\} \). 
+    \end{definition*}
+    \begin{definition*}
+        \(l_n \coloneqq \inf \left\{ a_m \mid m \geq n \right\} \). 
+    \end{definition*}
+    Now we know \(l_n \le a_m \le u_n \) for all \(m,n \in \mathbb{N} \) and \(m \geq n\) . Also, we know \(l_n\) is increasing and \(u_n\) is decreasing. 
+    \begin{exercise}
+        \(a_n\) converge if and only if \(\lim_{n \to \infty} u_n = \lim_{n \to \infty} l_n\), and if any of both sides holds, then 
+        \[
+            \lim_{n \to \infty} a_n = \lim_{n \to \infty} u_n = \lim_{n \to \infty} l_n.   
+        \]  
+    \end{exercise}
+
+    Let \(a_n, b_n\) be two bounded seuences, then 
+    \[
+        \lim_{n \to \infty} u_{a_n + b_n} \le \lim_{n \to \infty} u_{an} + \lim_{n \to \infty} u_{bn}, \quad \lim_{n \to \infty} l_{a_n + b_n} \ge \lim_{n \to \infty} l_{an} + \lim_{n \to \infty} l_{bn}.     
+    \] (Why?) 
+
+    Now we start the proof. Assume that \(a_n\) is Cauchy. We claim that \(\lim_{n \to \infty} (u_n - l_n) = 0\). For \(\varepsilon > 0\), there is some \(N \in \mathbb{N} \) such that \(m,n \ge N\) implies \(\left\vert a_n - a_m \right\vert < \varepsilon  \). In particular, \(n \ge N\) implies
+    \[
+        a_N - \varepsilon < a_n < a_N + \varepsilon,
+    \]      
+    which also implies 
+    \[
+        a_N - \varepsilon \le l_N \le u_N \le a_N + \varepsilon ,
+    \]
+    so we have 
+    \[
+        0 \le u_n - l_n \le u_N - l_N \le (a_N + \varepsilon) - (a_N - \varepsilon ) = 2\varepsilon.
+    \]
+    By adjusting the coefficient of \(\varepsilon \) we can show that for any \(\varepsilon > 0\), there exists \(N \in \mathbb{N} \) such that \(n \geq N\) implies \(0 \le u_n - l_n \le \varepsilon \), which means \(\lim_{n \to \infty} (u_n - l_n) = 0\).
+    
+    Hence, by the exercise above, we know \(\lim_{n \to \infty} a_n = \lim_{n \to \infty} u_n = \lim_{n \to \infty} l_n  \), and \(a_n\) is convergent. 
+\end{proof}
