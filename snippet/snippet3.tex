@@ -1,0 +1,935 @@
+\documentclass{article}
+% Setting up page geometry
+\usepackage[margin=1in]{geometry}
+% Including essential packages for math and symbols
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+% Including booktabs for table formatting
+\usepackage{booktabs}
+% Including mathtools for dcases and other math enhancements
+\usepackage{mathtools}
+% Including hyperref for references
+\usepackage{hyperref}
+% Including graphicx for figures
+\usepackage{graphicx}
+% Including verbatim for code snippets
+\usepackage{verbatim}
+% Including bbm for indicator function
+\usepackage{bbm}
+% Including enumitem for list formatting
+\usepackage{enumitem}
+% Defining custom commands that were previously undefined
+\newcommand{\identity}{\mathrm{id}}
+\newcommand{\quotient}[2]{\frac{#1}{#2}}
+\newcommand{\at}[3]{#1|_{#2}^{#3}}
+% Setting up font for compatibility
+\usepackage{lmodern}
+
+\usepackage{mathrsfs}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+
+\title{HyperSnips \LaTeX\ Snippets User Guide}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\section{Introduction}
+This guide describes how to use the custom \LaTeX{} snippets defined in the provided \texttt{.hsnips} file with HyperSnips (e.g., in VS Code). Each snippet is triggered by typing a keyword (often followed by pressing \texttt{Tab}) and will expand into a predefined \LaTeX{} code template. Below, snippets are organized into categories with their triggers, descriptions, usage examples, and the resulting expanded output. Beginners should find clear explanations and examples to understand and use these shortcuts.
+
+\section{Document Structures and Environments}
+This section covers snippets related to common document elements and environments.
+
+\subsection{Figures and Tables}
+\begin{itemize}[leftmargin=*, label={}]
+\item \textbf{Trigger:} \texttt{fig} \\
+\textbf{Description:} Inserts a \texttt{figure} environment with placeholders for an image, caption, and label. \\
+\textbf{Usage:} Type \texttt{fig} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{<image path>}
+    \caption{<caption>}
+    \label{fig:<label>}
+\end{figure}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{table\textit{m} \textit{n}} \\
+\textbf{Description:} Creates a \texttt{table} environment with a \texttt{tabular} of \texttt{m} rows and \texttt{n} columns (all centered, separated by \texttt{|}). Includes \texttt{\textbackslash toprule}, \texttt{\textbackslash midrule}, and \texttt{\textbackslash bottomrule}, and placeholders for caption and label. \\
+\textbf{Usage:} For example, type \texttt{table2 3} and press \texttt{Tab} to generate a 2x3 table template. \\
+\textbf{Output (for 2x3 example):}
+\begin{verbatim}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c|c|c}
+    \toprule
+    a & b & c \\
+    \midrule
+    d & e & f \\
+    \bottomrule
+    \end{tabular}
+    \caption{<caption>}
+    \label{tab:<label>}
+\end{table}
+\end{verbatim}
+Replace \texttt{a,b,\dots,f} and the caption/label with your content.
+\end{itemize}
+
+\subsection{Theorem-like Environments}
+\begin{itemize}[leftmargin=*, label={}]
+\item \textbf{Trigger:} \texttt{dfn} \\
+\textbf{Description:} Inserts a \texttt{definition} environment skeleton. \\
+\textbf{Usage:} Type \texttt{dfn} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\begin{definition}
+    <content>
+\end{definition}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{rmk} \\
+\textbf{Description:} Inserts a \texttt{remark} environment skeleton. \\
+\textbf{Usage:} Type \texttt{rmk} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\begin{remark}
+    <content>
+\end{remark}
+\end{verbatim}
+\end{itemize}
+
+\subsection{References and Labels}
+\begin{itemize}[leftmargin=*, label={}]
+\item \textbf{Trigger:} \texttt{lbl} \\
+\textbf{Description:} Inserts a \verb|\label| command for referencing a figure, table, or section. \\
+\textbf{Usage:} Type \texttt{lbl} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\label{<key>}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{atf} \\
+\textbf{Description:} Inserts a \verb|\autoref| command (requires \texttt{hyperref} package). \\
+\textbf{Usage:} Type \texttt{atf} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\autoref{<key>}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{hpr} \\
+\textbf{Description:} Inserts a \verb|\hyperref| command. \\
+\textbf{Usage:} Type \texttt{hpr} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\hyperref[<label>]{<text>}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{qed} \\
+\textbf{Description:} Inserts \verb|\qed| (end-of-proof symbol). \\
+\textbf{Usage:} Type \texttt{qed} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\qed
+\end{verbatim}
+\end{itemize}
+
+\section{Mathematical Environments and Equations}
+\begin{itemize}[leftmargin=*, label={}]
+\item \textbf{Trigger:} \texttt{fm} \\
+\textbf{Description:} Creates an inline math environment \verb|\( ... \)|, with careful spacing. \\
+\textbf{Usage:} Type \texttt{fm} and press \texttt{Tab}, then enter your math content. \\
+\textbf{Output:}
+\begin{verbatim}
+\(<content>\)
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{dm} \\
+\textbf{Description:} Creates a display math environment using \verb|\[ ... \]|. \\
+\textbf{Usage:} Type \texttt{dm} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\[
+    <content>
+\]
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{ary\textit{m} \textit{n}} \\
+\textbf{Description:} Inserts an \verb|array| environment with \texttt{m} rows and \texttt{n} columns (all centered). \\
+\textbf{Usage:} For example, type \texttt{ary2 2} and press \texttt{Tab} to get a 2x2 array. \\
+\textbf{Output (for 2x2):}
+\begin{verbatim}
+\begin{array}{cc}
+    a_{11} & a_{12} \\
+    a_{21} & a_{22}
+\end{array}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{bmat\textit{n} \textit{m}} or \texttt{pmat\textit{n} \textit{m}} \\
+\textbf{Description:} Inserts a \texttt{bmatrix} (brackets) or \texttt{pmatrix} (parentheses) with \texttt{n} rows and \texttt{m} columns. \\
+\textbf{Usage:} For example, type \texttt{bmat2 2} and press \texttt{Tab}. \\
+\textbf{Output (for \texttt{bmat2 2}):}
+\begin{verbatim}
+\begin{bmatrix}
+    a_{11} & a_{12} \\
+    a_{21} & a_{22}
+\end{bmatrix}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{case} \\
+\textbf{Description:} Inserts a \texttt{dcases} environment for piecewise definitions. Multiple lines with conditionals are provided. \\
+\textbf{Usage:} Type \texttt{case} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\begin{dcases}
+    <expr1>, & \text{if } <cond1>; \\
+    <expr2>, & \text{if } <cond2>; \\
+    <expr3>, & \text{otherwise}.
+\end{dcases}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{split} \\
+\textbf{Description:} Inserts a \texttt{split} environment (for breaking equations over lines) inside an equation. \\
+\textbf{Usage:} Type \texttt{split} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\begin{split}
+    <content>
+\end{split}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{opmin} \\
+\textbf{Description:} Template for an optimization problem (minimization). \\
+\textbf{Usage:} Type \texttt{opmin} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\[
+\begin{aligned}
+    \min~ & <objective>  \\
+    & <constraints>
+\end{aligned}
+\]
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{opmax} \\
+\textbf{Description:} Template for a maximization problem. \\
+\textbf{Usage:} Type \texttt{opmax} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\[
+\begin{aligned}
+    \max~ & <objective>  \\
+    & <constraints>
+\end{aligned}
+\]
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{opPD} \\
+\textbf{Description:} Primal-dual optimization problem template (primal (P) and dual (D)). \\
+\textbf{Usage:} Type \texttt{opPD} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\[
+\begin{alignedat}{5}
+    \min~&c^{\top}x\quad\;\;& &\max ~\;& &y^{\top}b\\
+    &Ax = b              & &      & &y^{\top}A \le c^{\top}\\
+    (\mathrm{P})\; &x \ge 0 & &(\mathrm{D})\; & &      
+\end{alignedat}
+\]
+\end{verbatim}
+\end{itemize}
+
+\section{Text and Abbreviations}
+\begin{itemize}[leftmargin=*, label={}]
+\item \textbf{Trigger:} \texttt{wrt} \\
+\textbf{Description:} Expands to “\emph{w.r.t.}” (with respect to). \\
+\textbf{Usage:} Type \texttt{wrt} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+w.r.t.
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{iid} \\
+\textbf{Description:} Expands to “\emph{i.i.d.}” (independent and identically distributed). \\
+\textbf{Usage:} Type \texttt{iid} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+i.i.d.
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{wp} \\
+\textbf{Description:} Expands to “\emph{w.p.}” (with probability). \\
+\textbf{Usage:} Type \texttt{wp} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+w.p.
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{\%--} \\
+\textbf{Description:} Inserts a long horizontal comment line. \\
+\textbf{Usage:} Type \texttt{\%--} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+%----------------------------------------------------------------------------
+%----------------------------------------------------------------------------
+\end{verbatim}
+\end{itemize}
+
+\section{Greek Letters (Math Mode)}
+All snippets below work in math mode and expand to the corresponding Greek letter. Triggers usually start with a semicolon (\texttt{;}).
+
+\begin{itemize}[leftmargin=*, label={}]
+\item \textbf{Trigger:} \texttt{;a} or \texttt{;alpha} \quad\textbf{Output:} $\alpha$.
+\item \textbf{Trigger:} \texttt{;b} or \texttt{;beta} \quad\textbf{Output:} $\beta$.
+\item \textbf{Trigger:} \texttt{;g} or \texttt{;gamma} \quad\textbf{Output:} $\gamma$.
+\item \textbf{Trigger:} \texttt{;G} or \texttt{;Gamma} \quad\textbf{Output:} $\Gamma$.
+\item \textbf{Trigger:} \texttt{;m} or \texttt{;mu} \quad\textbf{Output:} $\mu$.
+\item \textbf{Trigger:} \texttt{;S} or \texttt{;Sigma} \quad\textbf{Output:} $\Sigma$.
+\item \textbf{Trigger:} \texttt{;d} or \texttt{;delta} \quad\textbf{Output:} $\delta$.
+\item \textbf{Trigger:} \texttt{;D} or \texttt{;Delta} \quad\textbf{Output:} $\Delta$.
+\item \textbf{Trigger:} \texttt{;z} or \texttt{;zeta} \quad\textbf{Output:} $\zeta$.
+\item \textbf{Trigger:} \texttt{;e} or \texttt{;eta} \quad\textbf{Output:} $\eta$.
+\item \textbf{Trigger:} \texttt{;t} or \texttt{;theta} \quad\textbf{Output:} $\theta$.
+\item \textbf{Trigger:} \texttt{;T} or \texttt{;Theta} \quad\textbf{Output:} $\Theta$.
+\item \textbf{Trigger:} \texttt{;vt} or \texttt{;vartheta} \quad\textbf{Output:} $\vartheta$.
+\item \textbf{Trigger:} \texttt{;i} or \texttt{;iota} \quad\textbf{Output:} $\iota$.
+\item \textbf{Trigger:} \texttt{;k} or \texttt{;kappa} \quad\textbf{Output:} $\kappa$.
+\item \textbf{Trigger:} \texttt{;l} or \texttt{;lambda} \quad\textbf{Output:} $\lambda$.
+\item \textbf{Trigger:} \texttt{;L} or \texttt{;Lambda} \quad\textbf{Output:} $\Lambda$.
+\item \textbf{Trigger:} \texttt{;n} or \texttt{;nu} \quad\textbf{Output:} $\nu$.
+\item \textbf{Trigger:} \texttt{;;n} or \texttt{;nable} \quad\textbf{Output:} $\nabla$.
+\item \textbf{Trigger:} \texttt{;p} or \texttt{;pi} \quad\textbf{Output:} $\pi$.
+\item \textbf{Trigger:} \texttt{;P} or \texttt{;Pi} \quad\textbf{Output:} $\Pi$.
+\item \textbf{Trigger:} \texttt{;r} or \texttt{;rho} \quad\textbf{Output:} $\rho$.
+\item \textbf{Trigger:} \texttt{;u} or \texttt{;upsilon} \quad\textbf{Output:} $\upsilon$.
+\item \textbf{Trigger:} \texttt{;U} or \texttt{;Upsilon} \quad\textbf{Output:} $\Upsilon$.
+\item \textbf{Trigger:} \texttt{;;p} or \texttt{;phi} \quad\textbf{Output:} $\phi$.
+\item \textbf{Trigger:} \texttt{;;P} or \texttt{;Phi} \quad\textbf{Output:} $\Phi$.
+\item \textbf{Trigger:} \texttt{;vp} or \texttt{;varphi} \quad\textbf{Output:} $\varphi$.
+\item \textbf{Trigger:} \texttt{;c} or \texttt{;chi} \quad\textbf{Output:} $\chi$.
+\item \textbf{Trigger:} \texttt{;;;p} or \texttt{;psi} \quad\textbf{Output:} $\psi$.
+\item \textbf{Trigger:} \texttt{;;;P} or \texttt{;Psi} \quad\textbf{Output:} $\Psi$.
+\item \textbf{Trigger:} \texttt{;o} or \texttt{;omega} \quad\textbf{Output:} $\omega$.
+\item \textbf{Trigger:} \texttt{;O} or \texttt{;Omega} \quad\textbf{Output:} $\Omega$.
+\item \textbf{Trigger:} \texttt{;x} or \texttt{;xi} \quad\textbf{Output:} $\xi$.
+\item \textbf{Trigger:} \texttt{;X} or \texttt{;Xi} \quad\textbf{Output:} $\Xi$.
+\end{itemize}
+
+\section{Mathematical Operators and Symbols}
+\subsection{Basic Operations}
+\begin{itemize}[leftmargin=*, label={}]
+\item \textbf{Trigger:} \texttt{frac} (or typing a number followed by \texttt{/}) \\
+\textbf{Description:} Inserts a fraction. \\
+\textbf{Usage:} Type \texttt{frac} and press \texttt{Tab}, or type e.g.\ \texttt{1/} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\frac{<num>}{<den>}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{sq} \\
+\textbf{Description:} Inserts a square root. \\
+\textbf{Usage:} Type \texttt{sq} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\sqrt{<content>}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{sum} \\
+\textbf{Description:} Inserts a summation symbol with a subscript placeholder. \\
+\textbf{Usage:} Type \texttt{sum} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\sum_{i} 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{Sum} \\
+\textbf{Description:} Inserts a big summation \(\sum_{i=1}^\infty\). \\
+\textbf{Usage:} Type \texttt{Sum} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\sum_{i=1}^{\infty}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{int} \\
+\textbf{Description:} Inserts an integral symbol. \\
+\textbf{Usage:} Type \texttt{int} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\int 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{dint} \\
+\textbf{Description:} Inserts a definite integral from \(-\infty\) to \(\infty\). \\
+\textbf{Usage:} Type \texttt{dint} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\int_{-\infty}^{\infty} <integrand>\,\mathrm{d}<variable>
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{pdif} \\
+\textbf{Description:} Inserts a partial derivative \(\frac{\partial V}{\partial x}\). \\
+\textbf{Usage:} Type \texttt{pdif} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\frac{\partial <V>}{\partial <x>}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{dif} \\
+\textbf{Description:} Inserts a total derivative \(\frac{\mathrm{d}y}{\mathrm{d}x}\). \\
+\textbf{Usage:} Type \texttt{dif} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\frac{\mathrm{d}<y>}{\mathrm{d}<x>}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{oo} \\
+\textbf{Description:} Inserts the infinity symbol \(\infty\). \\
+\textbf{Usage:} Type \texttt{oo} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\infty
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{\^oo} \\
+\textbf{Description:} Inserts superscript infinity \(^{\infty}\). \\
+\textbf{Usage:} Type \texttt{\^oo} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+^{\infty}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{Conj} \\
+\textbf{Description:} Inserts big logical conjunction \(\bigwedge\) with index. \\
+\textbf{Usage:} Type \texttt{Conj} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\bigwedge_{i=1}^{\infty}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{Disj} \\
+\textbf{Description:} Inserts big logical disjunction \(\bigvee\) with index. \\
+\textbf{Usage:} Type \texttt{Disj} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\bigvee_{i=1}^{\infty}
+\end{verbatim}
+\end{itemize}
+
+\subsection{Set and Logic Symbols}
+\begin{itemize}[leftmargin=*, label={}]
+\item \textbf{Trigger:} \texttt{cap} \\
+\textbf{Description:} Intersection \(\cap\). \\
+\textbf{Usage:} Type \texttt{cap} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\cap 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{Cap} \\
+\textbf{Description:} Big intersection \(\bigcap\) with limits. \\
+\textbf{Usage:} Type \texttt{Cap} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\bigcap_{i=1}^{\infty}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{cup} \\
+\textbf{Description:} Union \(\cup\). \\
+\textbf{Usage:} Type \texttt{cup} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\cup 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{Cup} \\
+\textbf{Description:} Big union \(\bigcup\) with limits. \\
+\textbf{Usage:} Type \texttt{Cup} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\bigcup_{i=1}^{\infty}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{sub} \\
+\textbf{Description:} Subset \(\subset\). \\
+\textbf{Usage:} Type \texttt{sub} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\subset 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{sube} \\
+\textbf{Description:} Subset or equal \(\subseteq\). \\
+\textbf{Usage:} Type \texttt{sube} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\subseteq 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{subn} \\
+\textbf{Description:} Proper subset \(\subsetneq\). \\
+\textbf{Usage:} Type \texttt{subn} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\subsetneq 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{sups} \\
+\textbf{Description:} Superset \(\supset\). \\
+\textbf{Usage:} Type \texttt{sups} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\supset 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{supe} \\
+\textbf{Description:} Superset or equal \(\supseteq\). \\
+\textbf{Usage:} Type \texttt{supe} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\supseteq 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{supn} \\
+\textbf{Description:} Proper superset \(\supsetneq\). \\
+\textbf{Usage:} Type \texttt{supn} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\supsetneq 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{nsub} \\
+\textbf{Description:} Not a subset \(\nsubseteq\). \\
+\textbf{Usage:} Type \texttt{nsub} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\nsubseteq 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{nsup} \\
+\textbf{Description:} Not a superset \(\nsupseteq\). \\
+\textbf{Usage:} Type \texttt{nsup} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\nsupseteq 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{nin} \\
+\textbf{Description:} Not an element \(\notin\). \\
+\textbf{Usage:} Type \texttt{nin} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\notin 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{land} \\
+\textbf{Description:} Logical AND \(\land\). \\
+\textbf{Usage:} Type \texttt{land} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\land 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{lor} \\
+\textbf{Description:} Logical OR \(\lor\). \\
+\textbf{Usage:} Type \texttt{lor} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\lor 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{\textbackslash|=} or \texttt{mdl} \\
+\textbf{Description:} ``Models'' symbol \(\models\). \\
+\textbf{Usage:} Type \texttt{\textbackslash|=} or \texttt{mdl} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\models 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{\textbackslash|-} or \texttt{vdh} \\
+\textbf{Description:} Turnstile (derivability) symbol \(\vdash\). \\
+\textbf{Usage:} Type \texttt{\textbackslash|-} or \texttt{vdh} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\vdash 
+\end{verbatim}
+\end{itemize}
+
+\subsection{Relations and Comparisons}
+\begin{itemize}[leftmargin=*, label={}]
+\item \textbf{Trigger:} \texttt{>=} or \texttt{geq} \\
+\textbf{Description:} Greater-than or equal \(\geq\). \\
+\textbf{Usage:} Type \texttt{>=} or \texttt{geq} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\geq 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{<=} or \texttt{leq} \\
+\textbf{Description:} Less-than or equal \(\leq\). \\
+\textbf{Usage:} Type \texttt{<=} or \texttt{leq} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\leq 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{!=} or \texttt{neq} \\
+\textbf{Description:} Not equal \(\neq\). \\
+\textbf{Usage:} Type \texttt{!=} or \texttt{neq} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\neq 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{==} \\
+\textbf{Description:} Equivalent \(\equiv\). \\
+\textbf{Usage:} Type \texttt{==} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\equiv 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{\~} or \texttt{apx} \\
+\textbf{Description:} Approximately equal \(\approx\). \\
+\textbf{Usage:} Type \texttt{apx} or \texttt{\~} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\approx 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{\~=} \\
+\textbf{Description:} Congruence \(\cong\). \\
+\textbf{Usage:} Type \texttt{\~=} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\cong 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{\~-} \\
+\textbf{Description:} Approximately equal \(\simeq\). \\
+\textbf{Usage:} Type \texttt{\~-} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\simeq 
+\end{verbatim}
+\end{itemize}
+
+\subsection{Arrows and Implications}
+\begin{itemize}[leftmargin=*, label={}]
+\item \textbf{Trigger:} \texttt{->} or \texttt{to} \\
+\textbf{Description:} Right arrow \(\to\). \\
+\textbf{Usage:} Type \texttt{->} or \texttt{to} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\to 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{<->} \\
+\textbf{Description:} Double arrow \(\leftrightarrow\). \\
+\textbf{Usage:} Type \texttt{<->} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\leftrightarrow 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{=>} or \texttt{implies} \\
+\textbf{Description:} Implies \(\implies\). \\
+\textbf{Usage:} Type \texttt{=>} or \texttt{implies} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\implies 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{=<} or \texttt{impliedby} \\
+\textbf{Description:} Implied by \(\impliedby\). \\
+\textbf{Usage:} Type \texttt{=<} or \texttt{impliedby} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\impliedby 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{iff} \\
+\textbf{Description:} If and only if \(\iff\). \\
+\textbf{Usage:} Type \texttt{iff} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\iff 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{!>} \\
+\textbf{Description:} Maps to \(\mapsto\). \\
+\textbf{Usage:} Type \texttt{!>} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\mapsto 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{>>} \\
+\textbf{Description:} Much greater than \(\gg\). \\
+\textbf{Usage:} Type \texttt{>>} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\gg 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{<<} \\
+\textbf{Description:} Much less than \(\ll\). \\
+\textbf{Usage:} Type \texttt{<<} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\ll 
+\end{verbatim}
+\end{itemize}
+
+\subsection{Miscellaneous Symbols}
+\begin{itemize}[leftmargin=*, label={}]
+\item \textbf{Trigger:} \texttt{||} \\
+\textbf{Description:} \(\mid\) (vertical bar used as a divisor symbol). \\
+\textbf{Usage:} Type \texttt{||} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\mid 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{prp} \\
+\textbf{Description:} \(\perp\) (perpendicular symbol). \\
+\textbf{Usage:} Type \texttt{prp} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+^{\perp}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{inv} \\
+\textbf{Description:} \(^{-1}\) (inverse superscript). \\
+\textbf{Usage:} Type \texttt{inv} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+^{-1}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{qs} \\
+\textbf{Description:} \(^{2}\) (square superscript). \\
+\textbf{Usage:} Type \texttt{qs} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+^{2}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{vph} \\
+\textbf{Description:} \verb|\vphantom| (vertical phantom for spacing). \\
+\textbf{Usage:} Type \texttt{vph} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\vphantom{<content>}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{fk} \\
+\textbf{Description:} \(\mathfrak{}\) (fraktur font). \\
+\textbf{Usage:} Type \texttt{fk} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\mathfrak{<letter>}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{tg} \\
+\textbf{Description:} \(\triangle\) symbol. \\
+\textbf{Usage:} Type \texttt{tg} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\triangle
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{**} \\
+\textbf{Description:} \(^{\ast}\) (superscript asterisk). \\
+\textbf{Usage:} Type \texttt{**} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+^{\ast}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{\_*} \\
+\textbf{Description:} \(_{\ast}\) (subscript asterisk). \\
+\textbf{Usage:} Type \texttt{\_*} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+_{\ast}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{'} \\
+\textbf{Description:} \(^{\prime}\) (prime symbol). \\
+\textbf{Usage:} Type \texttt{'} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+^{\prime}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{\textbackslash .} \\
+\textbf{Description:} \(^{\prime\prime}\) (double prime). \\
+\textbf{Usage:} Type \texttt{\textbackslash .} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+^{\prime\prime}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{\_} \\
+\textbf{Description:} \(\_\{\}\) (subscript command). \\
+\textbf{Usage:} Type \texttt{\_} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+_{<text>}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{\\\^} \\
+\textbf{Description:} \(\\^\{\}\) (superscript command). \\
+\textbf{Usage:} Type \texttt{\\\^} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+^{<text>}
+\end{verbatim}
+\end{itemize}
+
+\section{Font and Formatting Commands}
+\begin{itemize}[leftmargin=*, label={}]
+\item \textbf{Trigger:} \texttt{(letter)bf} \\
+\textbf{Description:} Inserts \(\mathbf{}\). E.g., \texttt{xbf} becomes \(\mathbf{x}\). \\
+\textbf{Usage:} Type letter + \texttt{bf} in math mode. \\
+\textbf{Output:}
+\begin{verbatim}
+\mathbf{x}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{(word)bf} \\
+\textbf{Description:} Inserts \verb|\textbf{...}|. E.g., \texttt{Hello bf} yields \verb|\textbf{Hello}|. \\
+\textbf{Usage:} Type word + \texttt{bf} in text. \\
+\textbf{Output:}
+\begin{verbatim}
+\textbf{Hello}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{emph} \\
+\textbf{Description:} Inserts \verb|\emph{}|. \\
+\textbf{Usage:} Type \texttt{emph} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\emph{<text>}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{(letter)cal} \\
+\textbf{Description:} Inserts \(\mathcal{}\). E.g., \texttt{Acal} becomes \(\mathcal{A}\). \\
+\textbf{Usage:} Type letter + \texttt{cal} in math mode. \\
+\textbf{Output:}
+\begin{verbatim}
+\mathcal{A}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{(letter)scr} \\
+\textbf{Description:} Inserts \(\mathscr{}\). E.g., \texttt{Ascr} becomes \(\mathscr{A}\). \\
+\textbf{Usage:} Type letter + \texttt{scr} in math mode. \\
+\textbf{Output:}
+\begin{verbatim}
+\mathscr{A}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{rm} \\
+\textbf{Description:} Inserts \(\mathrm{}\) (upright font in math). \\
+\textbf{Usage:} Type \texttt{rm} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\mathrm{<text>}
+\end{verbatim}
+\end{itemize}
+
+\section{Probability and Statistics Notation}
+\begin{itemize}[leftmargin=*, label={}]
+\item \textbf{Trigger:} \texttt{mean} \\
+\textbf{Description:} Inserts expectation \(\mathbb{E}[\cdot]\). \\
+\textbf{Usage:} Type \texttt{mean} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\mathbb{E}_{<sub>}[<arg>]
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{Var} \\
+\textbf{Description:} Inserts variance \(\Var[\cdot]\). \\
+\textbf{Usage:} Type \texttt{Var} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\Var_{<sub>}[<arg>]
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{Cov} \\
+\textbf{Description:} Inserts covariance \(\Cov[\cdot]\). \\
+\textbf{Usage:} Type \texttt{Cov} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\Cov_{<sub>}[<arg>]
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{Pr} \\
+\textbf{Description:} Inserts probability \(\Pr(\cdot)\). \\
+\textbf{Usage:} Type \texttt{Pr} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\Pr_{<sub>}(<arg>)
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{spt} \\
+\textbf{Description:} Support \(\mathop{\mathrm{supp}}(\cdot)\). \\
+\textbf{Usage:} Type \texttt{spt} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\mathop{\mathrm{supp}}(<arg>)
+\end{verbatim}
+\end{itemize}
+
+\section{Common Commands and Miscellaneous}
+\begin{itemize}[leftmargin=*, label={}]
+\item \textbf{Trigger:} \texttt{ind} \\
+\textbf{Description:} Inserts \(\mathbbm{1}_{}\) (indicator function). \\
+\textbf{Usage:} Type \texttt{ind} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\mathbbm{1}_{<set>}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{::} \\
+\textbf{Description:} Inserts \verb|\colon| (colon in math). \\
+\textbf{Usage:} Type \texttt{::} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\colon 
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{idd} \\
+\textbf{Description:} Inserts identity symbol \(\identity_{}\). \\
+\textbf{Usage:} Type \texttt{idd} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\identity_{<arg>}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{quo} \\
+\textbf{Description:} Inserts quotient symbol \(\quotient{a}{b}\). \\
+\textbf{Usage:} Type \texttt{quo} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\quotient{<a>}{<b>}
+\end{verbatim}
+
+\item \textbf{Trigger:} \texttt{|\_} \\
+\textbf{Description:} Inserts custom \(\at{a}{b}{c}\) macro. \\
+\textbf{Usage:} Type \texttt{|\_} and press \texttt{Tab}. \\
+\textbf{Output:}
+\begin{verbatim}
+\at{<a>}{<b>}{<c>}
+\end{verbatim}
+\end{itemize}
+
+\section{Summary}
+This guide has cataloged all the \LaTeX{} snippet triggers from the \texttt{.hsnips} file, organized by category. To use a snippet, type its trigger keyword and press \texttt{Tab}. The snippet will expand into the template shown in the output examples above. Replace placeholders like \texttt{<content>}, \texttt{<arg>}, \texttt{<caption>} etc.\ with your actual text or math. With practice, these shortcuts will speed up your \LaTeX{} writing process.
+
+\end{document}
