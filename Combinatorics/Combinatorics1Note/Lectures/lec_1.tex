@@ -1,1 +1,238 @@
+\chapter{Chatting}
 \lecture{1}{2 Sep. 15:30}{First Lecture}
+\section{Prime Numbers}
+\begin{theorem}[Euclid \(\thickapprox 300\) BCE]
+  There are infinitely many primes.
+\end{theorem}
+\begin{proof}[proof. (Saidak, 2006)]
+\vphantom{ }
+\begin{itemize}
+  \item Every natural number has at least one prime factor.
+  \item No prime divides \(n\) and \(n+1\), for any \(n \in \mathbb{N} \).   
+\end{itemize}
+Consider a sequence of ?? number 
+\[
+  p_1 = 2, \ p_{n+1} = p_n(p_n + 1).
+\]
+Then the number of prime factors of \(p_n\) is strictly increasing in \(n\): \(p_{n+1}\) has all the factors of \(p_n\) together with the (disstinct) ones of \(p_n + 1\). 
+\begin{eg}
+  \(p_1=2, p_2=6, p_3=42,p_4=1806 \), where the prime factors of them are \(\left\{ 2 \right\}\), \(\left\{ 2,3 \right\}, \left\{ 2,3,7 \right\}, \left\{ 2,3,7,43 \right\} \).
+\end{eg}     
+\end{proof}
+
+\subsection{How many prime numbers are there?}
+\begin{definition}
+  We define 
+  \[
+    \pi (n) = \left\vert \left\{ p: 1 \le p \le n : p \text{ is prime}\right\}  \right\vert. 
+  \]
+\end{definition}
+\begin{note}
+  By Saidak's proof, we know \(\pi (p_n) \ge n\). In fact, \(\pi (p_n) \ge \log _2 n\). 
+\end{note}
+\begin{theorem}[Legendre, \(\thickapprox 1800\) LE ]
+  \[
+    \pi (n) \thickapprox \frac{n}{\ln n} \iff \lim_{n \to \infty} \frac{\pi (n) \ln n}{n} = 1 
+  \]
+\end{theorem}
+\begin{note}
+  Proven by Hadamard and independently de la Vallée Poussin(1896).
+\end{note}
+\begin{theorem}[Better Approximation]
+  \vphantom{text} \\
+  Dirichlet: \(\pi (x) \approx Li(x) = \int_2^x \frac{1}{\ln t} dt\) . \\ 
+  Known: \(\pi (n) = Li(n) + O\left( n e^{-a \sqrt{\ln n} } \right) \) \\
+  Believed: \(\pi (n) = Li(n) + O\left( \sqrt{n} \ln n  \right) \)  
+\end{theorem}
+
+\chapter{Elementary Counting Principles}
+Fundemental problem: Given a set \(S\), and we want to determine \(\vert S \vert \). 
+\section{Sum Rule}
+\begin{theorem}[Sum Rule]
+  If \(S = \bigcupdot_{i=1}^{k} S_i \), then \(\vert S \vert = \sum_{i=1}^k \vert S_i \vert\). 
+\end{theorem}
+\begin{note}
+  \(\bigcupdot\) means disjoint union. 
+\end{note}
+
+\begin{eg}
+  A drawer contains \(8\) pairs of yellow socks, \(5\) pairs of blue socks, and \(3\) pairs of red socks. How many socks are there in total.   
+\end{eg}
+\begin{proof}[Informal proof]
+  \(2 \times (8 + 5 + 3) = 32\). 
+\end{proof}
+\begin{proof}
+  Let \(S\) be the set of socks in the drawer, then \(S = \bigcupdot_{p \in P} S_p \), where \(P\) is the set of pairs of socks, and \(S_p\) is the set of two socks in the pair where \(p \in P\). By the sum rule, 
+  \[
+    \left\vert S \right\vert = \sum_{p \in P} \vert S_p \vert = \sum_{p \in P} 2  = 2 \vert P \vert = 32.
+  \]   
+  \(P = P_{\text{yellow}} \cupdot P_{\text{blue}} \cupdot P_{\text{red}}\). By the sum rule, 
+  \[
+    \vert P \vert = \vert P_{\text{yellow}} \vert + \vert P_{\text{blue}} \vert + \vert P_{\text{red}} \vert = 8 + 5 + 3 = 16.
+  \] 
+\end{proof}
+
+\begin{note}
+  Sum rule is the basis for case analysis arguments. It needs two requirements:
+  \begin{itemize}
+    \item Cover each case.
+    \item Cover each case exactly once.
+  \end{itemize}
+\end{note}
+
+\begin{eg}
+  Counting subset of a general set. 
+\end{eg}
+\begin{proof}
+\begin{notation}
+  If \(X\) is a set, and \(k \in \mathbb{N} \cup \left\{ 0 \right\} \), then 
+  \[
+    \binom{X}{k} = \left\{ T: \ T \subseteq X, \ \vert T \vert = k  \right\}. 
+  \] 
+\end{notation}
+We define the binomial coefficient as 
+\[
+  \binom{\vert X \vert }{k} = \left\vert \binom{X}{k} \right\vert. 
+\]
+i.e. Given \(n \ge k \ge 0\), \(\binom{n}{k}\) is the number of \(k\)-element subsets of a set of size \(n\).    
+\end{proof}
+\begin{proposition}[Pascal's relation]
+  If \(n \ge k \ge 1\), then 
+  \[
+    \binom{n}{k} = \binom{n-1}{k} + \binom{n-1}{k-1}.
+  \] 
+\end{proposition}
+\begin{proof}
+  Let \(X\) be an \(n\)-element set (e.g. \(X = [n] = \left\{ 1,2, \dots ,n \right\} \)), and let \(S=\binom{X}{k}=\left\{ T \subseteq X: \vert T \vert = k  \right\} \). Then, by definition, \(\binom{n}{k} = \vert S \vert \).  For each \(k\)-element subset, we can ask: "Do you contain \(n\)?" Let
+  \[
+    S_0 = \left\{ T: T \subseteq X, n \notin T, \vert T \vert = k  \right\},
+  \]   and 
+  \[
+    S_1 = \left\{ T: T \subseteq X, n \in T, \vert T \vert = k  \right\}. 
+  \]
+  Then, \(S = S_0 \cupdot S_1\). By the sum rule, \(\vert S \vert = \vert S_0 \vert + \vert S_1 \vert   \).  Observe that 
+  \begin{align*}
+    S_0 &= \left\{ T \subseteq [n], n \notin T, \vert T \vert = k  \right\} \\
+    &= \left\{ T \subseteq [n-1], \vert T \vert = k  \right\} ,
+  \end{align*} 
+  so by definition, 
+  \[
+    \vert S_0 \vert  = \binom{\vert [n-1] \vert }{k}=\binom{n-1}{k}.
+  \]
+  \[
+    S_1 = \left\{ T \subseteq [n], n \in T, \vert T \vert = k  \right\}. 
+  \]
+  Let
+  \[
+    S_1^{\prime} = \left\{ T^{\prime}  \subseteq [n-1], \vert T^{\prime}  \vert = k-1 \right\}, 
+  \] then we know a bijection from \(S_1\) to \(S_1^{\prime} \): 
+  \[
+    T \in S_1 \longleftrightarrow T\backslash \left\{ n \right\} \in S_1^{\prime}.
+  \]  
+  \begin{theorem}[bijection rule]
+    Given two sets \(S\) and \(S^{\prime} \), if there is a bijection \(f: S \to S^{\prime} \), then \(\vert S \vert = \vert S^{\prime}  \vert \).    
+  \end{theorem}
+  By this rule, we know 
+  \[
+    \vert S_1 \vert = \vert S_1^{\prime}  \vert = \binom{\vert [n-1] \vert }{k-1}= \binom{n-1}{k-1}.  
+  \]
+  Hence, 
+  \[
+    \binom{n}{k} = \vert S \vert = \vert S_0 \vert + \vert S_1 \vert = \binom{n-1}{k} + \binom{n-1}{k-1}.  
+  \]
+\end{proof}
+\subsection{Pascal's Triangle}
+We can use Pascal's relation to compute \(\binom{n}{k}\). 
+\begin{note}
+  Boundary case: \(\binom{n}{0} = 1\), \(\binom{n}{n} = 1\). Also, \(\binom{n}{k} = 0\) for \(k=-1,n+1\).    
+\end{note} 
+% https://q.uiver.app/#q=WzAsMTAsWzMsMCwiXFxiaW5vbXswfXswfSJdLFsyLDEsIlxcYmlub217MX17MH0iXSxbNCwxLCJcXGJpbm9tezF9ezF9Il0sWzEsMiwiXFxiaW5vbXsyfXswfSJdLFszLDIsIlxcYmlub217Mn17MX0iXSxbNSwyLCJcXGJpbm9tezJ9ezJ9Il0sWzAsMywiXFxiaW5vbXszfXswfSJdLFsyLDMsIlxcYmlub217M317MX0iXSxbNCwzLCJcXGJpbm9tezN9ezJ9Il0sWzYsMywiXFxiaW5vbXszfXszfSJdLFsxLDRdLFsyLDRdLFszLDddLFs0LDddLFs0LDhdLFs1LDhdXQ==
+\[\begin{tikzcd}[sep=tiny]
+	&&& {\binom{0}{0}} \\
+	&& {\binom{1}{0}} && {\binom{1}{1}} \\
+	& {\binom{2}{0}} && {\binom{2}{1}} && {\binom{2}{2}} \\
+	{\binom{3}{0}} && {\binom{3}{1}} && {\binom{3}{2}} && {\binom{3}{3}}
+	\arrow[from=2-3, to=3-4]
+	\arrow[from=2-5, to=3-4]
+	\arrow[from=3-2, to=4-3]
+	\arrow[from=3-4, to=4-3]
+	\arrow[from=3-4, to=4-5]
+	\arrow[from=3-6, to=4-5]
+\end{tikzcd}\]
+
+\section{Product Rule}
+\begin{theorem}
+  If \(S = S_1 \times S_2 \times \dots \times S_k = \left\{ \left( x_1,x_2 ..,x_k \right), x_i \in S_i  \right\} \), then \(\vert S \vert = \prod_{i=1}^{k}\vert S_i \vert. \) 
+\end{theorem} 
+\begin{proof}
+  Induction on \(k\): \\
+  Base case: \(k=1\), trivial. \\
+  Induction step: seperate into cases bases on choice of \(x_{k+1} \in S_{k+1}\). Let
+  \[
+    S(x) = \left\{ \left( x_1, \dots , x_{k+1} \right) \in S, x_{k+1}=x\in S_{k+1}  \right\},
+  \] then 
+  \[
+    S = \bigcupdot_{x \in S_{k+1}}S(x) \to \vert S \vert = \sum_{x \in S_{k+1}} \left\vert S(x) \right\vert.   
+  \]
+  But \(S(x) = S_1 \times S_2 \times \dots \times \left\{ x \right\} \), which is in bijection with \(S_1 \times S_2 \times \dots \times S_k\). By induction rule, 
+  \[
+    \vert S(x) \vert = \vert S_1 \times S_2 \times \dots \times S_k \vert  \quad \forall x
+  \]  
+  Hence, 
+  \begin{align*}
+    \vert S \vert &= \sum_{x \in S_{k+1}} \vert S(x) \vert = \sum_{x \in S_{k+1}} \left\vert S_1 \times S_2 \times \dots S_k \right\vert \\ 
+    &= \left\vert S_1 \times S_2 \times \dots \times S_k \right\vert \times \vert S_{k+1} \vert = \vert S_1 \vert  \times \vert S_2 \vert \times \dots \times \vert S_{k+1} \vert.  
+  \end{align*}
+\end{proof}
+\begin{eg}
+  Consider binary strings of length \(n\). 
+\end{eg}
+\begin{proof}
+  \[
+    S = \left\{ 0,1 \right\}^n \implies \vert S \vert = \vert \left\{ 0,1 \right\}^n  \vert = \vert \left\{ 0,1 \right\}  \vert^n = 2^n.   
+  \] 
+\end{proof}
+
+\begin{definition}[Power Set]
+  Given a finite set \(X\), let \(2^X\) denote the set of all subsets of \(X\) (also denoted \(\mathcal{P} (x)\)), which is called the power set. 
+\end{definition}
+\begin{corollary}
+  \(\left\vert 2^X \right\vert = 2^{\vert X \vert } \). 
+\end{corollary}
+\begin{proof}
+  Without lose of generality, \(X = [n]\). We build a bijection between \(2^{[n]}\) and the set of binary string of length \(n\). Suppose for every \(T \in 2^{[n]}\), we have \(\chi _T = \left( x_1, x_2, \dots ,x_n \right) \), where 
+  \[
+    x_i = \begin{dcases}
+      1, &\text{ if }  i \in T;\\
+      0, &\text{ if }  i \notin T.
+    \end{dcases}
+  \]
+  Then,
+  \[
+    \left\vert 2^{[n]} \right\vert = \left\vert \left\{ 0,1 \right\}^n  \right\vert = 2^n .  
+  \]    
+\end{proof}
+\section{Double-Counting argument}
+If we count a set in two different ways, the answer should be equal. 
+\begin{eg}
+  Count \(2^{[n]}\). 
+\end{eg}
+\begin{explanation}
+  \vphantom{text}
+  \begin{itemize}
+    \item [1.] Product rule \(\to 2^n\). 
+    \item [2.] Use the sum rule, split the subsets by size. 
+  \end{itemize}
+      \[
+        2^{[n]} = \binom{[n]}{0} \cupdot \binom{[n]}{1} \cupdot \dots \cupdot \binom{[n]}{n}
+      \]
+    Hence, we have the following proposition: 
+    \begin{proposition}
+      For all \(n \ge 0\), 
+      \[
+        2^n = \sum_{k=0}^n \binom{n}{k}. 
+      \] 
+    \end{proposition}
+\end{explanation}
+
+
