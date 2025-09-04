@@ -1,155 +1,275 @@
-\chapter{Introduction}
-\lecture{1}{13 Oct. 08:00}{First Lecture}
-\section{Useful Environment}
-We now see some common environment you'll need to complete your note.
+%────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-\begin{definition}[Natural number]\label{def}
-  We denote the set of \emph{natural numbers} as \(\mathbb{\MakeUppercase{n}} \).
-\end{definition}
-
-
-\begin{lemma}[Useful lemma]\label{lma}
-  Given the axioms of \hyperref[def]{natural numbers \(\mathbb{\MakeUppercase{n}} \)}, we have
-  \[
-    0\neq 1.
-  \]
+\begin{problem}[10pts]
+Dyadic density via the Archimedean property. Let \(a < b\)  be real numbers. Prove that there exists a dyadic rational
+\[
+  q = \frac{k}{2^n} \in \mathbb{Q} \quad (k \in \mathbb{Z}, n \in \mathbb{N} )
+\]
+such that \(a < q < b\). Further show that there are infinitely many such dyadic
+rationals in \((a,b)\).
+\end{problem}
+\begin{proof}
+We first need to show a lemma first:
+\begin{lemma}\label{lm: lm in 1}
+  For any real numbers \(a, b\) such that \(a<b\) , there exists \(n \in \mathbb{N} \) such that \(2^n a > b\).   
 \end{lemma}
-\begin{proof}[An obvious proof]
-  Obvious.
-\end{proof}
-\begin{proposition}[Useful proposition]\label{prop}
-  From \autoref{lma}, we have
-  \[
-    0<1.
-  \]
-\end{proposition}
-\begin{exercise}
-  Prove that \(1 < 2\).
-\end{exercise}
-\begin{answer}
-  We note the following.
-  \begin{note}
-    We have \autoref{prop}! We can use it iteratively!
-  \end{note}
-  With the help of \autoref{lma}, this holds trivially.
-\end{answer}
-\begin{eg}
-  We now can have \(a < b\) for \(a < b\)!
-\end{eg}
 \begin{explanation}
-  Iteratively apply the exercise we did above.
+By Archimedean Property, we know there exists \(q \in \mathbb{N} \) such that \(qa > b\), so if we pick \(n = q+2\), then we have 
+\[
+  2^n = 2^{q+2} > q+2 > q, 
+\] 
+so we have \(2^n a > qa > b\), and we're done.  
 \end{explanation}
-\begin{remark}
-  We see that \autoref{prop} is really powerful. We now give an immediate application of it.
-\end{remark}
+Now using \autoref{lm: lm in 1} , we can get there exists some \(n \in \mathbb{N} \) such that \(2^n(b-a)>1\), so if we let \(k = \lfloor 2^n a \rfloor + 1\), then we have 
+\[
+  2^n a < \lfloor 2^n a \rfloor + 1 = k \le 2^n a + 1 < 2^n b.
+\]   
+Hence, 
+\[
+  a < \frac{k}{2^n} < b
+\]
+here. Note that \(n \in \mathbb{N} \) and \(k \in \mathbb{Z} \), so we can pick \(q = \frac{k}{2^n}\).
 
-\begin{theorem}[Mass-energy equivalence]\label{thm}
-  Given \autoref{prop}, we then have
-  \[
-    E = mc^2.
-  \]
-\end{theorem}
-\begin{proof}
-  The blank left for me is too small,\footnote{\url{https://en.wikipedia.org/wiki/Richard_Feynman}} hence we put the proof in \autoref{appendix}.
+Next we'll show that there are infinitely many such dyadic rationals in \((a,b)\). Actually we can just repeat the step above but let \(a\) be \(q^{(0)}\) that \(q^{(0)}\) is the \(q\) we found above and then we know there exists another dyadic rationals \(q^{(1)}\)  in \((q^{(0)}, b)\), and then doing again this step we know there exists another dyadic rationals \(q^{(2)}\) in \((q^{(1)}, b)\). and so on. Then, since \(q^{(i)} \neq q^{(j)}\) if \(i \neq j\), so we know 
+\[
+  a < q^{(0)} < q^{(1)} < q^{(2)} < \dots < b,
+\]  which means there are infinitely many such dyadic rationals in \((a,b)\). 
 \end{proof}
 
-From \autoref{thm}, we then have the following.
-\begin{corollary}[Riemann hypothesis]\label{col}
-  The real part of every nontrivial zero of the Riemann zeta function is \(\frac{1}{2}\), where the Riemann zeta function is just
-  \[
-    \zeta (s)=\sum _{n=1}^{\infty }{\frac {1}{n^{s}}}={\frac {1}{1^{s}}}+{\frac {1}{2^{s}}}+{\frac {1}{3^{s}}}+\cdots.
-  \]
-\end{corollary}
+%────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+\begin{problem}[\textbf{A tour of the $p$-adic world.}]
+
+The field $\mathbb{Q}$ inherits the Euclidean metric from $\mathbb{R}$, but it also carries 
+a very different metric: the \emph{$p$-adic metric}. 
+
+\medskip
+
+Given a prime number $p$ and an integer $n$, the $p$-adic norm of $n$ is defined as
+\[
+|n|_p = \frac{1}{p^k},
+\]
+where $p^k$ is the largest power of $p$ dividing $n$.  
+(We define $|0|_p := 0$.)  
+The more factors of $p$ appear in $n$, the smaller the $p$-adic norm becomes. 
+
+\medskip
+
+For a rational number $x=\tfrac{a}{b}$ with $a,b\in\mathbb{Z}$, we may factor $x$ as
+\[
+x = p^k \cdot \frac{r}{s},
+\]
+where $k \in \mathbb{Z}$ and $p$ divides neither $r$ nor $s$. We then define
+\[
+|x|_p = p^{-k}.
+\]
+
+\medskip
+
+The $p$-adic metric on $\mathbb{Q}$ is given by
+\[
+d_p(x,y) := |x-y|_p.
+\]
+
+\begin{enumerate}
+
+\item[\textbf{(a)}] To compute the $5$-adic norm $|x|_5$ of a rational number $x$, 
+we examine how many factors of $5$ occur in $x$ (in either numerator or denominator).
+
+\begin{itemize}
+\item If $x=5^k \cdot \tfrac{a}{b}$ with $a,b$ not divisible by $5$ and $k\in \mathbb{Z}$, 
+then the $5$-adic norm is
+\[
+|x|_5 = 5^{-k}.
+\]
+
+\item \textbf{Examples.}
+\begin{enumerate}
+\item $30 = 2 \cdot 3 \cdot 5$. There is exactly one factor of $5$, so
+\[
+|30|_5 = 5^{-1} = \tfrac{1}{5}.
+\]
+
+\item $32 = 2^5$. There is no factor of $5$, so
+\[
+|32|_5 = 5^{0} = 1.
+\]
+
+\item Compute $\left|\tfrac{1}{250}\right|_5$.
+
+\[
+250 = 2 \cdot 5^3.
+\]
+
+So
+\[
+\frac{1}{250} = \frac{1}{2 \cdot 5^3} 
+= 5^{-3} \cdot \frac{1}{2},
+\]
+where $\tfrac{1}{2}$ has no factor of $5$ in numerator or denominator.
+
+Therefore,
+\[
+\left|\tfrac{1}{250}\right|_5 
+= 5^{-(-3)} 
+= 5^3 
+= 125.
+\]
+
+Hence,
+\[
+\boxed{\;\;\left|\tfrac{1}{250}\right|_5 = 125.\;\;}
+\]
+\end{enumerate}
+\end{itemize}
+
+\medskip
+
+Now practice computing the following $5$-adic norms:
+ (6 pts) 
+\begin{enumerate}
+\item $|75|_5$
+\item $\left|\tfrac{10}{9}\right|_5$
+\item $\left|-\tfrac{20}{375}\right|_5$
+\end{enumerate}
+
+\medskip
+
+\item[\textbf{(b)}]  (9 pts)  Further properties of the $5$-adic norm.
+\begin{enumerate}
+\item Determine all rational numbers $x$ satisfying $|x|_5\le 1$. 
+\item Which rational numbers $x$ satisfy $|x|_5=1$?
+\item What is $\lim_{n \to \infty} 5^n$ in $(\mathbb{Q}, d_5)$ (the $5$-adic metric)? \\
+\emph{Hint:} Compute $d_5(5^n,0)$.
+\end{enumerate}
+
+\medskip
+
+\item[\textbf{(c)}] (15 pts) \textbf{Non-Archimedean absolute value and metric.}  
+Prove that $|\cdot|_p$ satisfies
+\[
+|xy|_p=|x|_p|y|_p,\qquad |x+y|_p\le \max\{|x|_p,|y|_p\},
+\]
+and show that $d_p$ is a metric on $\mathbb{Q}$.
+
+\end{enumerate}
+\end{problem}
+
+%────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\begin{problem}[exercise 1.1.3 (20 pts)] 
+Let $X$ be a set, and let $d : X \times X \to [0,\infty)$ be a function. 
+
+\begin{enumerate}
+\item[(a)] Give an example of a pair $(X,d)$ which obeys axioms (bcd) of Definition~1.1.2, but not (a). 
+\hfill (Hint: modify the discrete metric.)
+\item[(b)] Give an example of a pair $(X,d)$ which obeys axioms (acd) of Definition~1.1.2, but not (b).
+\item[(c)] Give an example of a pair $(X,d)$ which obeys axioms (abd) of Definition~1.1.2, but not (c).
+\item[(d)] Give an example of a pair $(X,d)$ which obeys axioms (abc) of Definition~1.1.2, but not (d). 
+\hfill (Hint: try examples where $X$ is a finite set.)
+\end{enumerate}
+\end{problem}
+
+\begin{problem}[20 pts]  
+Let $x=(x_1,\dots,x_n)$ and $y=(y_1,\dots,y_n)$ be vectors in $\mathbb{R}^n$.
+
+\vfill
+\bigskip
+
+\begin{enumerate}
+\item[(a)] The $\ell^1$ metric is defined by
+\[
+d_1(x,y) := \sum_{i=1}^n |x_i - y_i|.
+\]
+Show that $d_1$ is a metric on $\mathbb{R}^n$
+
+
+\item[(b)] The $\ell^\infty$ metric is defined by
+\[
+d_\infty(x,y) := \max_{1 \leq i \leq n} |x_i - y_i|.
+\]
+Show that $d_{\infty}$ is a metric on $\mathbb{R}^n$
+
+\end{enumerate}
+\end{problem}
+
+%────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+\begin{problem}[10 pts]  
+  A \emph{vector space} $V$ over $\mathbb{R}$ s a set 
+equipped with two operations:
+\begin{enumerate}
+  \item \textbf{Vector addition:} $+: V \times V \to V$, written $(u,v) \mapsto u+v$.
+  \item \textbf{Scalar multiplication:} $\cdot : \mathbb{R} \times V \to V$, written $(\alpha,v) \mapsto \alpha v$,
+\end{enumerate}
+such that the following properties hold for all $u,v,w \in V$ and $\alpha,\beta \in \mathbb{R}$:
+\begin{enumerate}
+  \item[(VS1)] $(u+v)+w = u+(v+w)$ \hfill (associativity of addition)
+  \item[(VS2)] $u+v = v+u$ \hfill (commutativity of addition)
+  \item[(VS3)] There exists $0 \in V$ such that $u+0=u$ \hfill (additive identity)
+  \item[(VS4)] For each $u \in V$, there exists $-u \in V$ such that $u+(-u)=0$ \hfill (additive inverse)
+  \item[(VS5)] $\alpha(u+v) = \alpha u + \alpha v$ \hfill (distributivity I)
+  \item[(VS6)] $(\alpha+\beta)u = \alpha u + \beta u$ \hfill (distributivity II)
+  \item[(VS7)] $(\alpha\beta)u = \alpha(\beta u)$ \hfill (compatibility of scalar multiplication)
+  \item[(VS8)] $1 \cdot u = u$ \hfill (identity element of scalar multiplication)
+\end{enumerate}
+
+A function $\|\cdot\| : V \to [0,\infty)$ is called a \emph{norm} on $V$ if, 
+for all $u,v \in V$ and $\alpha \in \mathbb{R}$, the following properties hold:
+\begin{enumerate}
+  \item[(N1)] $\|v\| \geq 0$, and $\|v\| = 0$ if and only if $v=0$. \hfill (positivity)
+  \item[(N2)] $\|\alpha v\| = |\alpha| \cdot \|v\|$. \hfill (homogeneity)
+  \item[(N3)] $\|u+v\| \leq \|u\| + \|v\|$. \hfill (triangle inequality)
+\end{enumerate}
+
+Given a norm $\|\cdot\|$ on $V$, define $d : V \times V \to [0,\infty)$ by
+\[
+d(u,v) = \|u-v\|.
+\]
+
+
+ Prove that $d$ is a \emph{metric} on $V$, that is, for all $x,y,z \in V$ show that:
+  \begin{enumerate}
+    \item $d(x,y) \geq 0$ and $d(x,y)=0$ if and only if $x=y$.
+    \item $d(x,y) = d(y,x)$.
+    \item $d(x,z) \leq d(x,y) + d(y,z)$.
+  \end{enumerate}
+(Thus we conclude that every normed vector space $(V,\|\cdot\|)$ is also a metric space with metric $d(u,v)=\|u-v\|$.
+)
+\end{problem}
+%────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+\begin{problem}[10 pts]  
+Let $S$ be a bounded nonempty set of real numbers, and let $a$ and $b$
+be fixed  nonzero real numbers. Define $T=\{as+b| s\in S\}$ Find formulas
+for
+$\sup T$ and $\inf T$ in terms of $\sup S$ and $\inf S$. Prove your
+formulas.
+\end{problem}
 \begin{proof}
-  The proof should be trivial, we left it to you.\todo{DIY}
-\end{proof}
-\begin{prev}
-  We see that \autoref{lma} is really helpful in the proof!
-\end{prev}
-
-\subsubsection{Internal Link}
-You should see all the common usages of internal links. Additionally, we can use citations as~\cite{newton1726philosophiae}, which just link to the reference page!
-
-\section{Figures}
-A simple demo for drawing:
-\begin{figure}[H]
-  \centering
-  \incfig{test}
-  \caption[Caption]{A \(3\)-torus.\footnotemark}
-  \label{fig:test}
-\end{figure}
-\footnotetext{For detailed information, please see \url{https://github.com/sleepymalc/VSCode-LaTeX-Inkscape}.}
-
-\section{Commutative Diagram}
-We can use the package \texttt{tikz-cd} to draw some commutative diagram.
-\begin{eg}
-  The cellular homology agrees with singular homology.
-\end{eg}
+\begin{claim}
+  \(\sup T = a \sup S + b\). 
+\end{claim}
 \begin{explanation}
-  The following commutative diagram shows everything.
-
-  \adjustbox{scale=0.85,center}{%
-    \begin{tikzcd}[column sep=tiny]
-      &&&& {\color{red}0} \\
-      & {\color{red}0} && {\color{red}H_n(X^{n+1})\cong H_n(X)} \\
-      && {\color{red}H_n(X^n)} \\
-      \ldots & {\color{red}H_{n+1}(X^{n+1}, X^n)} && {\color{red}H_n(X^n, X^{n-1})} && {H_{n-1}(X^{n-1}, X^{n-2})} & \ldots \\
-      &&&& {\color{red}H_{n-1}(X^{n-1})} \\
-      &&& 0
-      \arrow[color={rgb,255:red,214;green,92;blue,92}, from=2-2, to=3-3]
-      \arrow["{\partial_{n+1}}", color={rgb,255:red,214;green,92;blue,92}, from=4-2, to=3-3]
-      \arrow[color={rgb,255:red,214;green,92;blue,92}, from=2-4, to=1-5]
-      \arrow[color={rgb,255:red,214;green,92;blue,92}, from=3-3, to=2-4]
-      \arrow[from=4-6, to=4-7]
-      \arrow["{d_n}"', from=4-4, to=4-6]
-      \arrow["{\partial_n}"', color={rgb,255:red,214;green,92;blue,92}, from=4-4, to=5-5]
-      \arrow["{j_{n-1}}"', from=5-5, to=4-6]
-      \arrow[from=6-4, to=5-5]
-      \arrow["{d_{n+1}}", from=4-2, to=4-4]
-      \arrow["{j_n}", color={rgb,255:red,214;green,92;blue,92}, from=3-3, to=4-4]
-      \arrow[from=4-1, to=4-2]
-    \end{tikzcd}
-  }
+First notice that for all \(t \in T\), we can write \(t = as + b\) for some \(s \in S\). Hence, 
+\[
+  t = a s + b \le  a \sup S + b,
+\]   
+which means \(a \sup S + b\) is an upper bound of \(T\). Now if \(a \sup S + b \neq \sup T\), then there exists some \(t^{\prime} \in T\) such that \(t^{\prime} > a \sup S + b\), and we can write \(t^{\prime} = as^{\prime} +b\) for some \(s^{\prime} \in S\), so we have 
+\[
+  a s^{\prime} + b = t^{\prime} > a \sup S + b \iff s^{\prime}  > \sup S,
+\] which is a contradiction, so \(\sup T = a \sup S + b\).        
 \end{explanation}
-
-\section{Fancy Stuffs}
-With this header, you can achieve some cool things. For example, we can have multiple definitions under a parent environment, while maintains the numbering of definition. This is achieved by \texttt{definition*} environment with \texttt{definition} inside. For example, we can have the following.
-\begin{definition*}
-  We have the following number system.
-  \begin{definition}[Rational number]\label{def:rational}
-    The set of \emph{rational number}, denote as \(\mathbb{\MakeUppercase{q}} \).
-  \end{definition}
-  \begin{definition}[Real number]\label{def:real}
-    The set of \emph{real number}, denote as \(\mathbb{\MakeUppercase{r}} \).
-  \end{definition}
-  \begin{definition}[Complex number]\label{def:complex}
-    The set of \emph{complex number}, denote as \(\mathbb{\MakeUppercase{c}} \).
-  \end{definition}
-\end{definition*}
-
-\begin{note}
-  And indeed, we can still reference them correctly. For instance, we can use \hyperref[def:rational]{rational numbers} to define \hyperref[def:real]{real numbers} and then further use it to define \hyperref[def:complex]{complex numbers}.
-\end{note}
-
-Furthermore, we can completely control the name of our environments. We already saw we can name definition, lemma, proposition, corollary and theorem environment. In fact, we can also name remark, note, example and proof as follows.
-\begin{eg}[Interesting Example]\label{eg}
-  We note that \(1 \neq 2\)!
-  \begin{note}[Important note]
-    As a consequence, \(2 \neq 3\) also.
-  \end{note}
-
-  \begin{remark}[Easy observation]
-    We see that from here, we easily have the following theorem.
-    \begin{theorem}[Lebesgue Differentiation Theorem]\label{thm:Lebesgue-differentiation-theorem}
-      Let \(f\in L^1\), then
-      \[
-        \lim\limits_{r \to 0} \frac{1}{m(B(x, r))}\int_{B(x, r)}\left\vert f(y) - f(x) \right\vert   \,\mathrm{d}y = 0
-      \]
-      for a.e. \(x\).
-    \end{theorem}
-    \begin{proof}[An obvious proof of \autoref{thm:Lebesgue-differentiation-theorem}]
-      Obvious.
-    \end{proof}
-  \end{remark}
-\end{eg}
-As we can see, specifically for the \texttt{proof} environment, we allow \texttt{autoref} and \texttt{hyperref}. One can actually allow all example, note and remark environment's name to use reference, but I think that is overkilled. But this can be achieved by modify the header in an obvious way.\footnote{This time I mean it!}
+\begin{claim}
+  \(\inf T = a \inf S + b\) 
+\end{claim}
+\begin{explanation}
+First notice that for all \(t \in T\), we can write \(t = as + b\) for some \(s \in S\). Hence, 
+\[
+  t = a s + b \ge  a \inf S + b,
+\]   
+which means \(a \inf S + b\) is a lower bound of \(T\). Now if \(a \inf S + b \neq \inf T\), then there exists some \(t^{\prime} \in T\) such that \(t^{\prime} < a \inf S + b\), and we can write \(t^{\prime} = as^{\prime} +b\) for some \(s^{\prime} \in S\), so we have 
+\[
+  a s^{\prime} + b = t^{\prime} < a \inf S + b \iff s^{\prime}  < \inf S,
+\] which is a contradiction, so \(\inf T = a \inf S + b\).   
+\end{explanation}
+\end{proof}
