@@ -1,0 +1,313 @@
+\lecture{3}{9 Sep. 09:10}{}
+\begin{definition}[Cartesian Product]\label{dfn:Cartesian Product}
+    Let \(A, B\) be sets. The cartesian product of \(A\) and \(B\) is defined by 
+    \[
+        A \times B = \left\{ (a, b) \mid a \in A, b \in B \right\}. 
+    \]   
+    Similarly, the cartesian product of \(X_1, X_2, \dots , X_n\) is 
+    \[
+        X_1 \times X_2 \times \dots \times X_n = \left\{ (x_1, x_2, \dots , x_n) \mid x_i \in X_i \ \forall 1 \le i \le n\right\}. 
+    \] 
+\end{definition}
+
+\begin{definition}[Functions] \label{def: functions}
+    Let \(X_1, X_2, \dots , X_n\) be sets and let \(Y\) be another set. A fuction of \(n\) variables with codomains is a map \(f: X_1 \times X_2 \times \dots \times X_n \to Y\) which assigns each \(n\)-tuple \((x_1, x_2, \dots , x_n)\) with \(x_i \in X_i\) a unique element \(f(x_1, x_2, \dots , x_n)\).       
+\end{definition}
+
+\begin{definition*}
+    We talk about the definition of domain, codomain, and range:
+    \begin{definition}
+        The domain of \(f\) is \(X_1 \times X_2 \times \dots \times X_n\) and \(Y\) is the codomain of \(f\).   
+    \end{definition}
+    \begin{definition}
+        The range of \(f\) is 
+        \[
+            \left\{ f(x_1, x_2, \dots ,x_n) \in Y \mid x_i \in X_i \ \forall i \right\}.
+        \] 
+    \end{definition}
+\end{definition*}
+
+In the definition of metric space, we write \((X, d)\) to emphasize our set \(X\) and \(d\) is a distance function defined on \(X \times X\), i.e. 
+\[
+    d: X \times X \to [0, \infty) \subseteq \mathbb{R},
+\]    where 
+\[
+    d: (x,y) \mapsto d(x,y)
+\]
+for \(x, y \in X\). Let \((X, d)\) be a metric space and \(Y \subseteq X\). Then \((Y, d \vert _{Y \times Y})\) is also a metric space with distance function defined by 
+\[
+    d \vert _{Y \times Y} \to [0, \infty)
+\]    and 
+\[
+    d \vert _{Y \times Y}: (\alpha , \beta) \mapsto d(\alpha , \beta ) \text{ for } \alpha , \beta \in Y.
+\]
+
+\begin{eg}
+    Recall the \hyperref[def: l1-metric]{Taxi-cab metric}, it can be used in cryptography. For example, for two binary strings, we know 
+    \[
+        d_1((10010), (10101)) = 3 = \text{the number of mismatched bits}.
+    \]
+\end{eg}
+
+\begin{eg}
+    Recall the \hyperref[def: linf-metric]{\(l^{\infty} \)-metric}. Suppose two jobs where each consists of \(3\) tasks, and the time (in hours) to complete each task is represented by a vector 
+    \[
+        x = (2, 4, 6), \ y = (3, 7, 5),
+    \]  so 
+    \[
+        d_\infty (x, y) = \max \left\{ \vert 2 - 3 \vert, \vert 4 - 7 \vert, \vert 6 - 5 \vert \right\} = 3. 
+    \]
+\end{eg}
+
+\begin{definition}[Lipschitz equivalent metrics] \label{def: Lipschitz equivalent metric}
+    Let \((X, d_1)\) and \((X, d_2)\) be two metrics on \(X\). We say \(d_1\) and \(d_2\) are Lipschitz equivalent if \(\exists c_1, c_2 > 0\) s.t. 
+    \[
+        c_1 d_1(x, y) \le d_2(x, y) \le c_2 d_1(x, y).
+    \] 
+\end{definition} 
+\begin{remark}
+    They will have same topology (defined later).
+\end{remark}
+
+\begin{proposition} \label{prop: ineq between d1 d2 doo}
+    For all \(x, y \in \mathbb{R} ^n\), 
+    \begin{align}
+        d_2(x, y) &\le d_1(x, y) \le \sqrt{n} d_2(x,y) \\
+        d_\infty (x, y) &\le d_2(x, y) \le \sqrt{n} d_\infty (x, y) 
+    \end{align}
+\end{proposition}
+\begin{remark}
+    \begin{align*}
+        d_\infty (x, y) &\ge \frac{1}{\sqrt{n}} d_2(x, y) \\
+        &\ge \frac{1}{\sqrt{n}} \frac{1}{\sqrt{n}} d_1(x, y) = \frac{1}{n}d_1(x, y).
+    \end{align*}
+    Also, 
+    \[
+        d_\infty (x, y) \le d_2(x, y) \le d_1(x, y).
+    \]
+\end{remark}
+\begin{remark}
+    \(d_1, d_2, d_\infty \) are all Lipschitz equivalent. 
+\end{remark}
+\begin{proof}[proof of \autoref{prop: ineq between d1 d2 doo} ]
+    Recall \(x = (x_1, \dots , x_n), y = (y_1, \dots , y_n)\), then 
+    \[
+        d_1(x, y) = \sum_{i=1}^n \vert x_i - y_i \vert, \quad d_2(x,y) = \left( \sum_{i=1}^n (x_i - y_i)^2  \right)^\frac{1}{2}.   
+    \] 
+    By Cauchy-Schurwatz inequality, 
+    \begin{align*}
+        d_1(x, y) &= \sum_{i=1}^n \vert x_i - y_i \vert \\
+        &\le \left( \sum_{i=1}^n \vert x_i - y_i \vert   \right)^\frac{1}{2} \left( \sum_{i=1}^n 1^2  \right)^\frac{1}{2} = \sqrt{n} d_2(x,y).     
+    \end{align*}
+
+    Now we show that \(d_1(x, y) \ge d_2(x, y)\). 
+    \begin{align*}
+        \left( d_1(x, y) \right)^2 &= \left( \sum_{i=1}^n \vert x_i - y_i \vert   \right)^2 \\
+        &= \sum_{i=1}^n \vert x_i - y_i \vert^2 + 2 \sum_{1 \le i < j \le n} \vert x_i - y_i \vert \vert x_j - y_j \vert \\
+        & \ge \sum_{i=1}^n \vert x_i - y_i \vert^2 = d_2(x, y)^2.         
+    \end{align*} 
+    Hence, we have \(d_1(x, y) \ge d_2(x, y)\).
+    
+    Now we show that \(d_2(x, y) \le \sqrt{n} d_\infty (x, y) \). Note that 
+    \[
+        d_2(x, y) = \left( \sum_{i=1}^n \vert x_i - y_i \vert^2  \right)^\frac{1}{2}, \quad d_\infty (x, y) = \max_{1 \le i \le n} \vert x_i - y_i \vert.   
+    \] For each \(i\), we know 
+    \[
+        \vert x_i - y_i \vert \le d_\infty (x, y), 
+    \] so 
+    \[
+        d_2(x, y) ^2 \le \sum_{i=1}^n d_\infty (x, y)^2 = n d_\infty (x, y)^2, 
+    \] so \(d_2(x, y) \le \sqrt{n} d_\infty (x, y) \). 
+\end{proof}
+
+\begin{definition}[Discrete metric] \label{def: Discrete metric}
+    Let \(X\) be any set, define the discreye metric:
+    \[
+        d_{\text{disc}}: X \times X \to \left\{ 0,1 \right\} 
+    \] where 
+    \[
+        d_{\text{disc}}(x, y) = \begin{dcases}
+            0 , &\text{ if } x = y ;\\
+            1, &\text{ if }  x \neq y.
+        \end{dcases}
+    \]
+\end{definition}
+Why this is a metric? Because
+\begin{itemize}
+    \item \(d_{\text{disc}}(x, y) \ge 0\) for all \(x, y \in X\) and \(d(x, y) = 0\) if and only if \(x = y\). 
+    \item \(d_{\text{disc}}(x, y) = d_{\text{disc}}(y, x)\) by definition. 
+    \item \(d_{\text{disc}}(x, z) \le d_{\text{disc}} (x, y) + d_{\text{disc}}(y, z)\)?      
+\end{itemize}
+
+\begin{proof}[proof of triangle inequality in discrete metric]
+    We first consider the case that \(x=z\), then 
+    \[
+        d_{\text{disc}}(x,z)=0,
+    \]
+    so it is obviously that the triangle inequality is true. 
+    
+    Now if \(x \neq z\), then either \(y \neq z\) or \(y \neq x\) must happen, so the triangle inequality must be true.   
+\end{proof}
+
+\begin{eg}
+    We can define 
+    \[
+        d(x, x) = 0, \quad d(x, y) = \text{minimal length of a path from }x \text{ to } y,
+    \] then this is also a metric.
+\end{eg}
+\begin{figure}[H]
+    \centering
+    \incfig{GraphMetric}
+    \caption{Graph metrics}
+    \label{fig:GraphMetric}
+\end{figure}
+
+\begin{definition}[Convergence in metric space] \label{def: convergence in metric space}
+    Let \(m\) be an integer, \((X, d)\) be a metric space, and let \(\left( X^{(n)} \right)_{n=m}^{\infty}\) be a sequence of points in \(X\). Let \(x \in X\). We say that \(\left( X^{(n)} \right)_{n=m}^{\infty}  \) converges to \(x\) with respect to \(d\) iff 
+    \[
+        \lim_{n \to \infty} d\left( X^{(n)}, x \right) = 0,
+    \] 
+    where \(\lim_{n \to \infty} d\left( X^{(n)} , x\right) = 0 \) iff for every \(\varepsilon > 0\), \(\exists N \ge m\) s.t. \(d \left( X^{(n)}, x \right) \le \varepsilon  \) for all \(n \ge N\). 
+    \begin{notation}
+        We also write \(\lim_{n \to \infty} X^{(n)} = x\) in \((X, d)\).  
+    \end{notation}    
+\end{definition}
+\begin{remark}
+    Suppose \(\left( X^{(n)} \right)_{n=m}^{\infty}  \) converges to \(x\) in \((X, d)\), then \(\left( X^{(n)} \right)_{n = m_1}^{\infty}  \) also converges to \(x\) in \((X, d)\) if \(m_1 \ge m\).       
+\end{remark}
+
+\begin{eg}
+    Let \(\left( X^{(n)} \right)_{n=1}^{\infty}  \) denote the sequence \(X^{(n)} = (\frac{1}{n}, \frac{1}{n})\) in \(\mathbb{R} ^2\), then what will this sequence converges to  for different metric?   
+\end{eg}
+\begin{explanation}
+    \vphantom{text}
+    \begin{itemize}
+        \item If the metric is \(d_1\), then 
+        \[
+            d_1 \left( X^{(n)}, (0, 0) \right) = \left\vert \frac{1}{n} - 0 \right\vert + \left\vert \frac{1}{n} - 0\right\vert = \frac{2}{n},   
+        \] so 
+        \[
+            \lim_{n \to \infty} d_1 \left( X^{(n)}, (0, 0) \right) = \lim_{n \to \infty} \frac{2}{n} = 0.  
+        \]
+        \item If the metric is \(d_2\), then 
+        \[
+            d_2 \left( X^{(d)}, (0, 0) \right) = \sqrt{\left( \frac{1}{n} - 0 \right)^2 + \left( \frac{1}{n} - 0 \right)^2 } = \frac{\sqrt{2}}{n}.   
+        \]
+        Hence, under \(l_2\)-metric \(\left\{ X^{(n)} \right\} \) also converges to \(0\).   
+        \item If the metric is \(d_\infty \), then 
+        \[
+            d_\infty \left( X^{(n)}, (0, 0) \right) = \max \left\{ \left\vert \frac{1}{n} \right\vert, \left\vert \frac{1}{n} \right\vert   \right\} = \frac{1}{n},  
+        \] so it also converges to \(0\). 
+        \item If the metric is discrete metric, then however, it will not converges to \((0, 0)\) since 
+        \[
+            \lim_{n \to \infty} d_{\text{disc}} \left( X^{(n)}, (0, 0) \right) = \lim_{n \to \infty}  d_{\text{disc}} \left( \left( \frac{1}{n}, \frac{1}{n} \right) , (0, 0) \right) = 1. 
+        \] 
+    \end{itemize}
+\end{explanation}
+
+\begin{definition*}
+    Let \(f: X \to Y\) be a function with domain \(X\) and codomain \(Y\). The range of \(f = \left\{ f(x) \mid x \in X \right\} \subseteq Y\). 
+    
+    \begin{definition}[injective] \label{def: injective}
+        We say \(f\) is injective or one-to-one if for all \(x_1, x_2 \in X\), \(f(x_1) = f(x_2)\) implies \(x_1 = x_2\).    
+    \end{definition}
+
+    \begin{definition}[surjective] \label{def: surjective}
+        We say \(f\) is surjective or onto if for every \(y \in Y\), \(\exists x \in X\) s.t. \(f(x) = y\).    
+    \end{definition}
+
+    \begin{definition}[bijective] \label{def: bijective}
+        We say \(f\) is bijective if \(f\) is injective and surjective.  
+    \end{definition}
+\end{definition*}
+
+\begin{corollary}
+    If \(f\) is bijective, then there exists \(f^{-1}: Y \to X\) defined by \(f^{-1}(y) = x\) if \(f(x) = y\). We also have 
+    \begin{align*}
+        f \left( f^{-1} (y) \right) &= y \ \forall y \in Y \\
+        f^{-1} \left( f(x) \right) &= x \ \forall x \in X.
+    \end{align*}
+\end{corollary}
+
+\begin{eg}
+    \(\lim_{n \to \infty} \frac{1}{n} = 0 \) in \(\mathbb{R} , d\), where \(d\) is the standard metric in \(\mathbb{R} \), which is defined by 
+    \[
+        d(x, y) = \vert x - y \vert. 
+    \]    
+    But in different metric, \(\lim_{n \to \infty} \frac{1}{n} \) may not be \(0\).  
+\end{eg}
+\begin{explanation}
+    Define \(f: [0, 1] \to [0, 1]\) defined by
+\[
+    f(x) = \begin{dcases}
+        x, &\text{ if } 0<x<1  ;\\
+        1, &\text{ if } x=0;\\
+        0, &\text{ if } x=1.
+    \end{dcases}
+\]
+\(f\) is bijective on \([0, 1]\) to \([0, 1]\)  
+
+Define another metric \(d^1\) on \([0, 1]\) by 
+\[
+    d^1(x, y) = d(f(x), f(y)).
+\]  
+We want to show that \(d^1\) is also a metric on \([0, 1]\). 
+\begin{itemize}
+    \item \(d^1(x,y)=d(f(x), f(y)) = \vert f(x) - f(y) \vert \ge 0\)
+    \item \(d^1(x, y) = 0\) iff \(f(x) = f(y)\) iff \(x=y\) since \(f\) is injective.  
+    \item The triangle inequality is trivially true since we can just use the triangle inequality in \(d\).   
+\end{itemize}  
+
+In fact, \(\lim_{n \to \infty} \frac{1}{n} = 1 \) in \(\left( [0, 1], d^1 \right) \) since 
+\[
+    \lim_{n \to \infty} d^{1}\left( \frac{1}{n}, 1 \right) = \lim_{n \to \infty} d \left( \frac{1}{n}, 0 \right) = \lim_{n \to \infty} \left\vert \frac{1}{n} \right\vert = 0.      
+\]  
+\end{explanation}
+
+\section{Some point set topology of metric space}
+\begin{definition}[ball] \label{def: ball}
+    Let \((X,d)\) be a metric space. let \(x_0 \in X\) and \(r > 0\). We define the ball \(B_{(X, d)} (x_0, r)\) in \(X\), centered at \(x_0\) and with radius \(r\) in the metric \(d\), to the set 
+    \[
+        B_{(X_0, d)} (X_0, Y) \coloneqq \left\{ x \in X \mid d(x_0, x) < r \right\}.
+    \]
+    Sometimes, we write it as \(B_X(x_0, r)\) or \(B(x_0, r)\).   
+\end{definition}
+
+\begin{eg}
+    In \(\mathbb{R} ^2\), 
+    \begin{align*}
+        B_{(\mathbb{R} ^2, d_2)} \left( (0, 0), 1 \right) &= \left\{ (x, y) \mid d_2 ((x, y), (0, 0)) = \sqrt{x^2 + y^2}  < 1 \right\},
+    \end{align*}
+    and 
+    \[
+        B_{(\mathbb{R} ^2, d_1)}((0,0), 1) = \left\{ (x, y) \mid d_1((x, y), (0, 0)) = \vert x \vert + \vert y \vert < 1   \right\}, 
+    \] and 
+    \[
+        B_{(\mathbb{R} ^2, d_\infty)} ((0,0), 1) = \left\{ (x, y) \mid d_\infty ((x, y), (0, 0)) = \max \left\{ \vert x \vert, \vert y \vert < 1   \right\}  \right\},
+    \]
+    also we can consider the \(d_{\text{disc}}\) case but I am too lazy to write it down. 
+\end{eg}
+
+\begin{notation}
+    Let \(E \subseteq X\), we will write 
+    \[
+        X \setminus E \coloneqq  \left\{ x \in X \mid x \notin E\right\}. 
+    \] 
+\end{notation}
+
+\begin{definition*}
+    Let \((X, d)\) be a metric space and \(E \subseteq X\). For a point \(x_0 \in X\),
+    \begin{definition}[interior point] \label{def: interior point}
+        \(x_0\) is an interior point of \(E\) if \(\exists r > 0\) s.t. \(B(x_0, r) \subseteq E\).     
+    \end{definition}
+    \begin{definition}[exterior point] \label{def: exterior point}
+        \(x_0\) is an exterior point of \(E\) if \(\exists r > 0\) s.t. \(B(x_0, r) \subseteq X \setminus E\).    
+    \end{definition}
+    \begin{definition}[boundary point] \label{def: boundary point}
+        \(x_0\) is a boundary point of \(E\) if it is neither an interior point nor an exterior point of \(E\).   
+    \end{definition}
+\end{definition*}
+
+\begin{proposition}
+    \(x_0\) is a boundary point of \(E\) iff for all \(r>0\), \(B(x_0, r) \cap E \neq \varnothing \) and \(B(x_0, r) \cap \left( X \setminus E \right) \neq \varnothing\).     
+\end{proposition}
