@@ -1,0 +1,191 @@
+\lecture{3}{10 Sep 10:20}{}
+\begin{prev}
+    A basis of a vector space \(V\)  is a set \(\left\{ v_1, v_2, \dots , v_n \right\} \) that is linearly independent and simultaneously spans \(V\). That is, suppose we have \(\sum_{} a_i v_i = 0\) for some scalars \(a_i\), then \(a_i = 0\) for all \(i\). Also, we call the number \(n\), the dimension of \(V\).  
+\end{prev}
+
+\begin{eg}
+    Suppose we have \(V=F^n= \left\{ (\alpha _1, \alpha _2, \dots , \alpha _n) \mid \alpha _i \in F\right\} \), then we have a \textbf{standard basis}, which is 
+    \begin{align*}
+        e_1 &= (1, 0, \dots , 0) \\
+        e_2 &= (0, 1, \dots , 0) \\
+        &\vdots \\
+        e_n &= (0, 0, \dots , 1)
+    \end{align*}  
+    since \(\left\{ e_i \right\}_{i=1}^n \) is linearly independent and for every \(\vec{a} = (a_1, \dots , a_n)\), we know 
+    \[
+        \vec{a} = \sum_{i=1}^n a_i e_i. 
+    \] 
+\end{eg}
+
+\begin{eg}
+    Suppose 
+    \[
+        V = M_{n \times n}(F) = \left\{ \begin{pmatrix}
+            \alpha _{11} & \alpha _{12} & \dots  & \alpha _{1n}  \\
+            \alpha _{21} & \ddots &  & \alpha _{2n}  \\
+            \vdots &  &  &   \\
+            \alpha _{n1} & \cdots  &  & \alpha _{nn}  \\
+        \end{pmatrix} \right\},
+    \] then we know 
+    \[
+        \left\{ e_{ij} \right\}_{1 \le i ,j \le n} = \begin{pmatrix}
+            0 & 0 &  &  &   \\
+            0 &  &  &  &   \\
+             &  & 1 &  &   \\
+            0 &  &  & 0 &   \\
+            0 &  &  &  & 0  \\
+        \end{pmatrix} ,
+    \] where the \(1\) is in the \(i\)-th row and \(j\)-th column.   
+\end{eg}
+
+\begin{theorem} \label{thm: sizeof(linearly ind.) less than sizeof(bases) and extend basis}
+    Suppose \(V\) is a vector space, and \(V = \langle v_1, v_2, \dots , v_n \rangle \)  and \(\left\{ w_1, w_2, \dots , w_n \right\} \) is linearly independent, then \(m \le n\). Furtheremore, one can make 
+    \[
+        \langle w_1, w_2, \dots , w_m, v_{m+1}, \dots , v_n \rangle = V 
+    \] after rearrangement of \(v_1, \dots , v_n\). 
+\end{theorem}
+\begin{proof}
+    We can do induction on \(m\). It is trivial that \(m=0\) is true. Suppose the statement holds for a fixed \(m\) with \(m \le n\) . Let \(w_1, w_2, \dots , w_{m+1}\) be linearly independent.  In particular, \(w_1, w_2, \dots , w_m\) is linearly independent. 
+    \begin{claim}
+        \(m+1 \le n\). 
+    \end{claim} 
+    \begin{explanation}
+        Otherwise, if \(m+1 > n\), then since \(m \le n\), so \(m = n\). Hence, by induction hypothesis, we know \(\langle w_1, w_2, \dots , w_m \rangle = V \). However, by \autoref{lm: adding w not in span remains linearly independent} and the note following it, we know 
+        \[
+            \left\{ w_1, w_2, \dots , w_m \right\} \cup \left\{ w_{m+1} \right\}  
+        \] can not be linearly indepndent since \(w_{m+1} \in V = \langle w_1, \dots , w_m \rangle \).
+    \end{explanation}
+
+    Now we know \(m+1 \le n\). By induction hypothesis, we know 
+    \[
+        \langle w_1, w_2, \dots , w_m, v_{m+1}, \dots , v_n \rangle = V
+    \] 
+    \begin{claim}
+        One of \(v_{m+1}, \dots , v_n\) can be replaced by \(w_{m+1}\).  
+    \end{claim}
+    \begin{explanation}
+        Since 
+        \[
+            w_{m+1} = \sum_{i=1}^n \alpha _i w_i + \sum_{j=m+1}^n \beta _j w_j.  
+        \]
+        Trivially, one of \(\beta _j \neq 0\), say \(\beta _{m+1} \neq 0\) . Check 
+        \[
+            \langle w_1, \dots , w_m, w_{m+1}, v_{m+2}, \dots , v_n  \rangle = V.
+        \] 
+    \end{explanation}
+\end{proof}
+
+\begin{corollary} \label{cl: basis size unique}
+    If \(\left\{ v_1, v_2, \dots , v_n \right\} \) and \(\left\{ w_1, w_2, \dots , w_m \right\} \) are bases of \(V\), then \(n = m\).    
+\end{corollary}
+
+\begin{remark}
+    \autoref{cl: basis size unique} tells us \(\dim V\) is well-defined, which means the size of the bases of a vector space is unique.  
+\end{remark}
+
+\begin{corollary}
+    Suppose \(\dim V = n\), then if \(\langle v_1, v_2, \dots , v_m \rangle = V \), then \(m \ge n\). If \(\left\{ w_1, w_2, \dots , w_m \right\} \) is linearly independent, then \(m \le n\). Also, anu \(\left\{ v_i \right\}_{i=1}^m \) with \(m > n\) is linearly independent.  
+\end{corollary}
+
+\begin{lemma} \label{lm: adding w not in span remains linearly independent}
+    Suppose \(v_1, v_2, \dots , v_n\) is linearly independent. If \(w \notin \langle v_1, v_2, \dots , v_n \rangle \), then 
+    \[
+        \left\{ v_1, v_2, \dots , v_n, w \right\} 
+    \] is linearly independent.
+\end{lemma}
+\begin{proof}
+    Suppose \(\sum_{i=1}^n \alpha _i v_i + \alpha _{i+1} w = 0\), then if \(\alpha _{i+1} = 0\), we know \(\alpha _1 = \alpha _2 =\dots = \alpha _n = 0\) since \(\left\{ v_i \right\}_{i=1}^n \) is linearly independent. If \(\alpha _{i+1} \neq 0\), then \(w = \frac{1}{\alpha _{i+1}} \sum_{i=1}^n \alpha _i v_i \in \langle v_1, v_2, \dots , v_n \rangle  \), which is a contradiction.      
+\end{proof}
+
+\begin{note}
+    The reverse of \autoref{lm: adding w not in span remains linearly independent} is still correct and is trivial. That is, if \(w \notin \left\{ v_1, \dots , v_n \right\} \) and \(\left\{ v_1, v_2, \dots , v_n, w \right\} \) is linearly independent, then \(\left\{ v_1, \dots , v_n \right\} \) is linearly independent.    
+\end{note}
+
+\begin{corollary}
+    If \(W \subseteq V\) is a subspace of \(V\), then \(\dim W \le \dim V\).   
+\end{corollary}
+\begin{proof}
+    If \(\dim V = n\), and \(\left\{ w_i \right\}_{i=1}^m \) is a basis of \(W\), then this basis is linearly independent in \(V\), which means \(m \le n\) by \autoref{thm: sizeof(linearly ind.) less than sizeof(bases) and extend basis}.       
+\end{proof}
+
+\begin{corollary}
+    If \(v_1, v_2, \dots , v_m\) is linearly independent, then \(\left\{ v_1, v_2, \dots , v_m \right\} \) forms a basis for some \(v_{m+1}, \dots , v_n\).  
+\end{corollary}
+
+\begin{theorem}[Dual version] \label{thm: srhink basis}
+    If \(\langle v_1, v_2, \dots , v_n \rangle = V \), then \(\left\{ v_1, v_2, \dots , v_m \right\} \) forms a basis after rearrangement.  
+\end{theorem}
+
+\begin{remark}
+    Most of the time, we consider finite-dimensional vector spaces.
+\end{remark}
+
+\begin{remark}[Examples of \(\infty \)-dim vector space]
+    \vphantom{text}
+    \begin{itemize}
+        \item     \[
+        V = \left\{ \text{all polynomials over } F \right\} = F[x] = \left\{ a_0 + a_1 x + \dots + a_n x^n \text{ for some } n \text{ where } a_i \in F\right\}. 
+    \]
+        \item
+    \[
+        W = \left\{ (a_0, a_1, \dots ) \mid a_i \in \mathbb{R}  \right\}. 
+    \]
+    Notice that 
+    \[
+         W^{\prime} = \left\{ \text{convergent sequence} \right\} \subseteq W. 
+    \] and 
+    \[
+        W^{\prime\prime}  = l^2 = \left\{ (a_i) \mid \sum_{i=0}^{\infty} a_i^2 \text{ finite}  \right\} \subseteq W^{\prime} 
+    \]
+    \end{itemize}
+\end{remark}
+
+\begin{remark}
+    We define \(\dim \left\{ 0 \right\} = 0 \), which is the only vector space with dimension \(0\), and we define \(\langle \varnothing  \rangle = \left\{ 0 \right\}\), which means \(\varnothing \) is the basis of \(\left\{ 0 \right\} \).  
+\end{remark}
+
+\begin{note}
+    We call a subspace \(W \subsetneq V\) is proper. 
+\end{note}
+
+\section{More on subspaces}
+\begin{theorem} \label{thm: intersection of subspace is subspace}
+    If \(W_1\) and \(W_2\) are subspace of \(V\), then \(W_1 \cap W_2\) is a subspace.    
+\end{theorem}
+
+\begin{theorem} \label{thm: W1 plus W2 is subspace}
+    If \(W_1, W_2\) are subspaces of \(V\), then \(W_1 + W_2\) is still a subspace of \(V\).    
+\end{theorem}
+
+\begin{remark}
+    If \(W_1, W_2\) are subspaces of \(V\), then \(W_1 \cup W_2\) may not be a subspace. (See HW1). 
+\end{remark}
+
+\begin{remark}
+    In fact, \(W_1 \cap W_2\) is the largest subspaces contained in \(W_1\) and \(W_2\).   
+\end{remark}
+
+\begin{remark}
+    In fact, \(W_1 + W_2\) is the smallest subspace containing both \(W_1\) and \(W_2\).   
+\end{remark}
+
+\begin{corollary}
+    Suppose \(S\) is the index set, and for all \(i \in S\), \(W_i\) is a subspace of \(V\), then 
+    \[
+        \bigcap_{i \in S} W_i = \left\{ v \in V \mid v \in W_i \ \forall i \right\}  
+    \] is also a subspace of \(V\). 
+\end{corollary}
+
+\begin{corollary}
+    Suppose \(S\) is the index set, and for all \(i \in S\), \(W_i\) is a subspace of \(V\), then 
+    \[
+        \sum_{i \in S} W_i = \left\{ w_{i_1} + w_{i_2} + \dots + w_{i_n} \text{ for some } i_j \in S \right\}  
+    \] is also a subspace of \(V\).  
+\end{corollary}
+
+\begin{proposition}[Dimension theorem] \label{prop: dimension theorem}
+   Suppose \(W_1, W_2 \subseteq V\) are subspaces of \(V\), then 
+   \[
+    \dim (W_1 + W_2) = \dim W_1 + \dim W_2 - \dim (W_1 \cap W_2).
+   \]  
+\end{proposition}
