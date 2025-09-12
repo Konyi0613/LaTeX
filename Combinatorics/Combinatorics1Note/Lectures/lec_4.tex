@@ -1,0 +1,125 @@
+\lecture{4}{12 Sep. 12:20}{}
+\section{Number of nonnegative integer solution to \(x_1 + \dots + x_k = n\)}
+We can represent solutions using a "stars and bar" diagaram:
+\begin{itemize}
+    \item \(n\) stars represent the items 
+    \item \(k-1\) bars to divides the groups  
+\end{itemize}
+\begin{eg}
+    \(x_1 = 3, x_2 = 1, x_3 = 0, x_4 = 5\). \((k=4, n=9)\)  
+\end{eg}
+\begin{explanation}
+    \[
+        \underbrace{* * *}_{x_1} \mid \underbrace{*}_{x_2} \mid \mid \underbrace{* * * * *}_{x_3}
+    \]
+\end{explanation}
+
+Hence, we can use a projection between solution and diagrams with \(k-1\) bars and \(n\) stars. 
+
+Each diagram consists of \(n + k - 1\) symbols. Once we know which are the bars, we know the sull diagram. 
+
+\[
+    \text{number of diagrams} < \binom{n + k - 1}{k - 1} = \binom{n + k - 1}{n}
+\]
+
+\begin{proposition}
+    The number of non-negative integer solutions to \(x_1 + \dots + x_k = n\) is \(\binom{n + k - 1}{k - 1}\). 
+\end{proposition}
+Now we have a new problem. How many solutions are there to \(x_1 + \dots + x_k = n\) with \(x_i \ge 1\) for all \(i\)?
+
+We can let \(y_i = x_i - 1\), then \(y_i \ge 0\) and \(y_1 + \dots + y_k = n - k\). Hence, the answer is 
+\[
+    \binom{(n - k) + (k - 1)}{k-1} = \binom{n-1}{k-1}.
+\]   
+
+\begin{definition}[Multisets] \label{def: multiset}
+    An unordered collection of elements with repretition allowed. 
+    \[
+        \left\{ \left\{ 1,1,1,2,3 \right\}  \right\} \neq \left\{ \left\{ 1,2,3 \right\}  \right\} 
+    \] can represent as an ordered tuple in increasing order.
+\end{definition}
+
+\begin{eg}
+    How many multisets of size \(n\) are there from a set of size \(k\)?  
+\end{eg}
+\begin{explanation}
+    Let \(x_i\) be the multiplicites of the \(i\)-th element in the multiset. Then \(x_i \ge 0\) and 
+    \[
+        x_1 + \dots + x_k = n.
+    \]   
+    Hence, the number of multisets is 
+    \[
+        \binom{n + k - 1}{k - 1}.
+    \]
+\end{explanation}
+
+Alternatively, multisets are \((a_1, \dots , a_n)\) with \(1 \le a_1 \le \dots \le a_n \le k\). Now if we let \(b_i = a_i + i - 1\), then 
+\[
+    (b_1, \dots , b_n) = (a_1, a_2 + 1, \dots , a_n + n - 1) \text{ with } 1 \le b_1 < b_2 < \dots < b_n \le n + k - 1.
+\]   Note that there is a bijection between \(\left\{ (a_1, \dots , a_n) \right\} \) and \(\left\{ (b_1, \dots , b_n) \right\} \). This shows the number of multisets of size \(n\) from \([k]\) is the number of subsets of \([n + k - 1]\) of size \(n\), which is 
+\[
+    \binom{n + k - 1}{n} = \binom{n + k - 1}{k - 1}.
+\]      
+Now we add some new setting. 
+\begin{itemize}
+    \item Distinguishable items 
+    \item Indistinguishable groups 
+    \item Groups non-empty.
+\end{itemize}
+The objects we are counting is 
+\[
+    \left\{ S_1, S_2, \dots , S_k \right\} 
+\] with \(S_1 \cupdot S_2 \cupdot \dots \cupdot S_k = [n]\) and \(S_i \neq \varnothing \) for all \(i\). 
+
+\begin{definition}[The Stirling Number of the second kind] \label{def: stirling num second kind}
+\(S(n,k)\) is defined be number of partitions of \(n\) distinct items into \(k\) indistinguishable non-empty groups.
+\end{definition}
+
+\begin{eg}
+    \(S(n, 1) = 1\) for all \(n \ge 1\). \(S(n, n) = 1\) for all \(n\). \(S(n, n-1) = \binom{n}{2}\) for all \(n \ge 2\). \(S(n, 2) = 2^{n-1} - 1\).       
+\end{eg}
+\begin{explanation}
+    We just talk about the \(S(n, 2)\) one. Since we can choose any subset of \([n]\), so there are \(2^n\) possibilities, but each partition is counted twice, so we have to divide it by \(2\), and subtract the partition that includes empty group, so it is \(2^{n-1} - 1\).    
+\end{explanation}
+
+\begin{proposition}
+    For all \(n, k\), 
+    \[
+        S(n, k) = S(n-1, k-1) + k S(n-1,k).
+    \]  
+\end{proposition}
+\begin{proof}
+    Case analysis: 
+    \begin{itemize}
+        \item Case 1: \(\left\{ n \right\} \) is a group. \\
+        This means the remaining \(n-1\) elements are partitioned into \(k-1\) groups, so there are \(S(n-1, k-1)\) possibilities. 
+        \item Case 2: \(\left\{ n \right\} \) is not a group.  \\
+        \(n - 1\) left elments is first partitioned into \(k\) groups, then we can distribute the \(n\)-th element into each group, so there are \(k S(n-1, k)\) possibilities.    
+    \end{itemize}
+    By sum rule, we know 
+    \[
+        S(n, k) = S(n - 1, k - 1) + k S(n - 1, k).
+    \]
+\end{proof}
+
+\begin{eg}
+    Using induction to prove 
+    \[
+        S(n, n - 1) = \binom{n}{2}.
+    \]
+\end{eg}
+\begin{explanation}
+    \begin{align*}
+        S(n, n - 1) &= S(n - 1, n - 2) + (n - 1) S(n - 1, n - 1) = S(n - 1, n - 2) + (n - 1) \\
+        &= \dots = 1 + 2 + \dots + n - 1 = \binom{n}{2}.
+    \end{align*}
+\end{explanation}
+
+Now what if the groups are distinguishable? Also, we have
+\begin{itemize}
+    \item items distinguishable 
+    \item groups distinguishable
+    \item groups non-empty.
+\end{itemize}
+
+Short answer: \(S(n, k) k!\). 
