@@ -1,0 +1,266 @@
+\begin{problem}[11pts] \label{pr: 1}
+    If $(X,d)$ is a metric space, define
+\[
+d'(x,y) = \frac{d(x,y)}{1 + d(x,y)}.
+\]
+Prove that $d'$ is also a metric on $X$. 
+
+\noindent
+Note that $0 \leq d'(x,y) < 1$ for all $x,y \in X$.
+\end{problem}
+\begin{proof}
+    In the first three properties we are going to check, they are all true since we can directly these properties on \(d\) to conclude that these properties are also true on \(d^{\prime} \).  
+    \begin{itemize}
+        \item We know \(d^{\prime} (x, x) = \frac{d(x, x)}{1 + d(x, x)} = 0\) for every \(x \in X\). 
+        \item For every distinct \(x, y \in X\), we have 
+        \[
+            d^{\prime} (x, y) = \frac{d(x, y)}{1 + d(x, y)} > 0.
+        \]
+        \item For any \(x, y \in X\), we have \(d^{\prime} (x, y) = d^{\prime} (y,x)\), which is trivial.  
+        \item For any \(x,y,z \in X\), suppose
+        \[
+            a = d(x,z) \quad b = d(x, y) \quad c=d(y,z),
+        \]
+        we want to show that 
+        \[
+            \frac{a}{1+a} \le \frac{b}{1+b} + \frac{c}{1+c},
+        \] where we know \(a,b,c \ge 0\) and \(a \le b + c\). By directly computing, we know it is equivalent to
+        \begin{align*}
+          &a(1+b)(1+c) \le (1+a)(1+c)b + (1+a)(1+b)c \\
+          &\iff a(1 + b + c + bc) \le (1 + a + c + ac)b + (1 + a + b + ab)c \\
+          &\iff a \le b(1+c) + c(1+b+ab) = b + c + 2bc + abc.
+        \end{align*}
+        Hence, we know this inequality holds because we know \(a,b,c \ge 0\). 
+    \end{itemize}
+\end{proof}
+%────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\begin{problem}[ (12 pts) exercise 1.2.4]
+  Let $(X,d)$ be a metric space, $x_0$ be a point in $X$, and $r>0$. Let $B$ be the open ball
+\[
+B := B(x_0,r) = \{ x \in X : d(x,x_0) < r \},
+\]
+and let $C$ be the closed ball
+\[
+C := \{ x \in X : d(x,x_0) \leq r \}.
+\]
+
+\begin{enumerate}
+  \item[(a)] Show that $\overline{B} \subseteq C$.
+  \item[(b)] Give an example of a metric space $(X,d)$, a point $x_0$, and a radius $r>0$ such that $\overline{B} \neq C$.
+\end{enumerate}
+  
+\end{problem}
+\begin{proof}
+  \vphantom{text}
+  \begin{itemize}
+    \item [(a)] For all \(b \in \overline{B} \), we know for all \(r^{\prime} > 0\), we have \(B(b, r^{\prime} ) \cap B(x_0, r) \neq \varnothing \). Now if \(d(b, x_0) >r\), say \(\varepsilon = d(b, x_0) - r > 0\). Suppose \(z \in B(b, \varepsilon )\), we have 
+    \begin{align*}
+      d(z, x_0) \ge d(b, x_0) - d(z, b) \\
+                > d(b, x_0) - \varepsilon = r
+    \end{align*}      
+    by triangle inequality. However, this means \(z \notin B(x_0, r)\). Hence, \(B(b, \varepsilon ) \cap B(x_0, r) = \varnothing \), which is a contradiction. By this, we know \(d(b, x_0) \le r\) for all \(b \in \overline{B} \), so \(\overline{B} \subseteq C \).     
+    \item [(b)] Suppose the metric space is \((\mathbb{R} , d_{\mathrm{disc} } )\), where \(d_{\mathrm{disc} }\) is the discrete metric defined by 
+    \[
+      d_{\mathrm{disc} } = \begin{dcases}
+        1, &\text{ if } x \neq y ;\\
+        0, &\text{ if } x = y,
+      \end{dcases}
+    \]
+      and suppose \(x_0 = 0\) and \(r = 1\) Thus, we know \(\overline{B} = B \cup \partial B\), but notice that 
+      \[
+        B = \left\{ x \in X \mid d(x, 0) < 1 \right\} = \left\{ 0 \right\},  
+      \]  and \(\partial B = \varnothing \) since for all \(x \neq 0\), we know 
+      \[
+        B\left( x, \frac{1}{2} \right)  = \left\{ x \right\} \subseteq X \setminus B(0, 1), 
+      \] so we know \(\mathrm{Ext}(B) = \mathbb{R} \setminus \left\{ 0 \right\}  \). Also, we know \(\mathrm{Int}(B) = \left\{ 0 \right\}\) since \(B(0, 1) \subseteq B\) and \(\mathrm{Ext}(B) \cap \mathrm{Int}(B) = \varnothing\), so \(\partial B = \varnothing \). Now we know \(\overline{B} = B \cup \partial B = \left\{ 0 \right\}  \), but 
+      \[
+        C = \left\{ x \in X \mid d(x, 0) \le 1 \right\} = \mathbb{R},
+      \] so \(\overline{B} \neq C \). 
+  \end{itemize}
+\end{proof}
+%────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\begin{problem}[21pts]
+  Two metrics $d_1$ and $d_2$ on a set $X$ are said to be \emph{Lipschitz equivalent} if there exist constants $C_1>0$ and $C_2>0$ such that
+\[
+C_1 d_2(x,y) \leq d_1(x,y) \leq C_2 d_2(x,y) \quad \text{for all } x,y \in X.
+\]
+Let $E \subset X$.
+\begin{enumerate}
+  \item[(a)] Prove that $E$ is open in $(X,d_1)$ if and only if $E$ is open in $(X,d_2)$.
+  \item[(b)] Prove that $E$ is closed in $(X,d_1)$ if and only if $E$ is closed in $(X,d_2)$.
+  \item[(c)] Two metrics $d_1$ and $d_2$ on a set $X$ are said to be \emph{topologically equivalent} if they induce the same topology on $X$. That is, a set $U \subset X$ is open in $(X,d_1)$ if and only if it is open in $(X,d_2)$. Give examples of topologically equivalent metrics that are not Lipschitz equivalent.
+\end{enumerate}  
+\end{problem}
+\begin{proof}
+In the following text, if we write \(\mathrm{Int}_1, \mathrm{Int}_2, B_1, B_2\), then the number of the subscript means it is under which metric. For example, \(\mathrm{Int}_1(E) \) means the interior points of \(E\) in \((X, d_1)\), and the others are similarly defined.    
+  \begin{itemize}
+    \item [(a)] \begin{itemize}
+      \item [\((\implies )\)] If \(E\) is open in \((X, d_1)\), then we know \(E = \mathrm{Int}_1(E) \). Thus, \(\forall x_0 \in E, \exists r > 0\) s.t. 
+      \[B_1(x_0, r) = \left\{ x \in X \mid d_1(x, x_0) < r \right\}  \subseteq E.\]
+      However, it means for all \(x_0 \in E\), we know 
+      \[
+        B_2 \left( x_0, \frac{r}{C_2} \right) = \left\{ x \in X \mid d_2(x, x_0) < \frac{r}{C_2} \right\} \subseteq B_1(x_0, r) \subseteq  E
+      \] because for all \(x \in B_2 \left( x_0, \frac{r}{C_2} \right) \), we have \(d_2(x, x_0) < \frac{r}{C_2}\), so it must have \(d_1(x, x_0) < r\) since 
+      \[
+        d_1(x, x_0) \le C_2 d_2(x,x_0) < r.
+      \]   Hence, we have \(E \subseteq \mathrm{Int}_2(E)\).
+      
+      Also, for every \(x \in \mathrm{Int}_2(E) \), we know there exists \(r > 0\) s.t. \(B_2(x, r) \subseteq E\), and also \(x \in B_2(x, r)\), so \(x \in E\), which means \(\mathrm{Int}_2(E) \subseteq E \).  
+      
+      Hence, we have \(\mathrm{Int}_2(E) = E\), which means \(E\) is open in \((X, d_2)\).
+      
+      \item [\((\impliedby )\)] Since we know 
+      \[
+        \frac{1}{C_2} d_1(x, y) \le d_2(x,y) \le \frac{1}{C_1} d_1(x,y) \quad \forall x,y \in X,
+      \] so we can just use the same method in the \((\implies )\)'s proof to prove \((\impliedby )\) direction.  
+    \end{itemize}
+    \item [(b)] 
+    \begin{align*}
+      E \text{ is closed in } (X, d_1) &\iff X \setminus E \text{ is open in } (X, d_1) \\
+      & \iff X \setminus E \text{ is open in }(X, d_2) \quad \text{(by (a))} \\
+      &\iff E \text{ is closed in } (X, d_2).
+    \end{align*}
+    \item [(c)] For \(X = \mathbb{R} \), \(d_1 = \vert x-y \vert \), and \(d_2 = \frac{d_1}{1 + d_1}\), we claim that \(d_1\) and \(d_2\) are not Lipschitz equivalent and are topologically equivalent. 
+    \begin{note}
+        In the course, we have shown that \(d_1\) is a metric, and in \autoref{pr: 1} we have shown that \(d_2\) is a metric. 
+    \end{note}
+    \begin{claim}
+      \(d_1\) and \(d_2\) are not Lipschitz equivalent. 
+    \end{claim}
+    \begin{explanation}
+      Note that \(d_1(x, y)\) can be arbitraty large in \(\mathbb{R} \) and \(d_2(x, y) < 1\) for any \(x, y \in \mathbb{R} \), so there does not exist a constant \(c\) s.t. \(d_1(x, y) < c d_2(x, y)\), which means \(d_1\) and \(d_2\) are not Lipschitz equivalent.    
+    \end{explanation}
+    Now we show that a set \(U \subseteq \mathbb{R} \) is open in \((\mathbb{R} , d_1)\) if and only if \(U\) is open in \((\mathbb{R} , d_2)\).
+
+          First notice that 
+      \[
+        d_2(x, y) = \frac{d_1(x, y)}{1 + d_1(x, y)} \iff d_1(x, y) = \frac{d_2(x,y)}{1 - d_2(x,y)}.
+      \]
+
+      \begin{itemize}[itemsep=5pt plus 2pt, parsep=5pt plus 2pt]
+        \item [\((\implies )\)] If \(U\) is open in \((\mathbb{R} , d_1)\), then for all \(u \in U\), there exists \(r > 0\) s.t. 
+        \[
+          B_1(u, r) = \left\{ x \in X \mid d_1(x, u) < r \right\} \subseteq X. 
+        \]
+        Also, we know 
+        \[
+          d_1(x, u) < r \iff \frac{d_2(x, u)}{1 - d_2(x, u)} < r \iff d_2(x, u) < \frac{r}{1+ r}.
+        \]
+        Thus, we know in \((\mathbb{R} , d_2)\), for all \(u \in U\), there exists \(\frac{r}{1+r} > 0\) s.t. 
+        \[
+          B_2 \left( u, \frac{r}{1+r} \right) = \left\{ x \in X \mid d_2(x,u) < \frac{r}{1+r} \right\} \subseteq X, 
+        \] which means \(\mathrm{Int}_2(U) = U\) and thus \(U\) is open in \((\mathbb{R} , d_2)\).  
+        \item [\((\impliedby )\) ] If \(U\) is open in \((\mathbb{R} , d_2)\), then for all \(u \in U\), there exists \(r > 0\) s.t. 
+        \[
+          B_2(u, r) = \left\{ x \in X \mid d_2(x, u) < r \right\} \subseteq X. 
+        \] Besides, we can let \(r < 1\). (If \(r \ge 1 > r_2\), then \(B_2(u, r_2) \subseteq B(u, r) \subseteq X\), and then we can let \(r = r_2\).) 
+        Also, we know 
+        \[
+          d_2(x, u) < r \iff \frac{d_1(x, u)}{1 + d_1(x, u)} < r \iff d_1(x, u) < \frac{r}{1 - r}.
+        \]
+        Notice that since \(0 < r < 1\), so \(\frac{r}{1 - r} > 0\).  
+        Thus, we know in \((\mathbb{R} , d_2)\), for all \(u \in U\), there exists \(\frac{r}{1-r} > 0\) s.t. 
+        \[
+          B_1 \left( u, \frac{r}{1-r} \right) = \left\{ x \in X \mid d_1(x,u) < \frac{r}{1-r} \right\} \subseteq X, 
+        \] which means \(\mathrm{Int}_1(U) = U\) and thus \(U\) is open in \((\mathbb{R} , d_1)\). 
+      \end{itemize}
+      
+  \end{itemize}
+\end{proof}
+%────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\begin{problem}[15 pts]
+    Let $\mathcal{M}_n = M_n(\mathbb{R})$ denote the set of all $n \times n$ real matrices. Define a function on $\mathcal{M}_n \times \mathcal{M}_n$ by
+\[
+\rho(A,B) = \operatorname{rank}(A-B).
+\]
+Then $\rho$ is a metric on $\mathcal{M}_n$ and it is topologically equivalent to the discrete metric on $\mathcal{M}_n$.
+\end{problem}
+\begin{proof}
+  We first show that \(\rho \) is a metric on \(\mathcal{M} _n\). 
+  \begin{itemize}
+    \item For all \(A \in \mathcal{M} _n\), we know \(\rho (A, A) = \rank (A - A) = \rank 0 = 0\). 
+    \item For any distinct \(A, B \in \mathcal{M} _n\), we know there is a row of \(A - B\) not equal to \(0\)-vector, so \(\rank (A - B) > 0\). 
+    \item For \(A, B \in \mathcal{M} _n\), we know \(\rank (A - B) = \rank (B - A)\), so \(\rho (A, B) = \rho (B, A)\). 
+    \item For \(A, B, C \in \mathcal{M} _n\), we want to show \(\rank (A - C) \le \rank (A - B) + \rank (B - C)\). Suppose \(A - B = X, B - C = Y\), then we want to show \(\rank (X + Y) \le \rank X + \rank Y\), which is equivalent to show 
+    \[
+      \dim \Im (X+Y) \le \dim (\Im X) + \dim (\Im Y).
+    \] Notice that 
+    \[
+      \Im (X+Y) = \left\{ w \mid (X+Y)v = w \text{ for some } v \right\} \subseteq \left\{ a + b \mid a \in \Im X, b \in \Im Y \right\} = \Im X + \Im Y. 
+    \]Hence, we have \(\dim \Im (X+Y) \le \dim (\Im X + \Im Y).\) Also, we know 
+    \[
+      \dim (\Im X + \Im Y) = \dim \Im X + \dim \Im Y - \dim \Im X \cap \Im Y \le \dim \Im X + \dim \Im Y.
+    \] 
+    Hence, we know \(\dim \Im (X + Y) \le \dim \Im X +\dim \Im Y\).  
+  \end{itemize}  
+  Now we prove that \(\rho \) is topologically equivalent to the discrete metric on \(\mathcal{M} _n\), called \(d_{\mathrm{disc}} \). Now we show that for any set \(U \subseteq \mathcal{M}_n\), \(U\) is open in \((\mathcal{M} _n, \rho )\) and \((\mathcal{M} , d_{\mathrm{disc} })\). For any \(U \subseteq \mathcal{M} _n\), and for all \(u \in U\), we know \(B_{\rho }\left( u, \frac{1}{2} \right)  = \left\{ u \right\} \subseteq U \), so \(U = \mathrm{Int}_{\rho }(U)  \), which means \(U\) is open in \((\mathcal{M}_n, \rho )\). Similarly, for all \(u \in U\), \(B_{\mathrm{disc}}\left( u, \frac{1}{2} \right) = \left\{ u \right\} \subseteq U  \), so we can similarly conclude that \(U\) is open in \((\mathcal{M} _n, d_{\mathrm{disc} })\). Hence, we can say that \(U \subseteq X\) is open in \((\mathcal{M} , \rho )\) if and only if \(U\) is open in \((\mathcal{M} _n, d_{\mathrm{disc} })\), so these two metrics are topologically equivalent.         
+\end{proof}
+%────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\begin{problem}[20 pts]
+    Let $E$ be a subset of a metric space $(X,d)$. Prove the following:
+\begin{enumerate}
+  \item[(a)] The boundary of $E$ is a closed set.  
+  \item[(b)]  $\partial E= \overline{E} \cap    \overline{X \setminus E}$ 
+    \item[(c)]  If $E$ is clopen (closed and open), what is $\partial E$?
+  \item[(d)] Give an example of $S \subset \mathbb{R}$ such that $\partial(\partial S) \neq \varnothing$, and infer that ``the boundary of the boundary $\partial \circ \partial$ is not always zero.''
+\end{enumerate}
+\end{problem}
+\begin{proof}
+  \vphantom{text}
+  \begin{itemize}
+    \item [(a)] We want to show that \(\partial (\partial E) \subseteq \partial E\). For all \(x \in \partial (\partial E)\), if \(x \in \partial E\), then we're done. Now consider the second case: \(x \in \mathrm{Int}(E) \cup \mathrm{Ext}(E)\). Note that for all \(r > 0\), we have 
+    \[
+      B(x, r) \cap \partial E \neq \varnothing \quad B(x,r) \cap (X \setminus \partial E) \neq \varnothing.
+    \]
+    \begin{itemize}
+      \item [Case 1:] \(x \in \mathrm{Int}(E) \). \\
+      We know there exists \(r^{\prime} > 0\) s.t. \(B(x, r^{\prime}) \subseteq E\). If there exists \(c \in B(x, r^{\prime} ) \cap \partial E\), then we know \(c \in B(x, r^{\prime} ) \subseteq E\), so \(c \in E\). Also, we know 
+      \[
+        B(c, r^{\prime\prime} ) \cap E \neq \varnothing \quad B(c, r^{\prime\prime} ) \cap (X \setminus E) \neq \varnothing \quad \forall r^{\prime\prime} >0.
+      \]
+      Now suppose \(\varepsilon = d(c, x) < r^{\prime} \). If we pick some \(r^{\prime\prime} < r^{\prime}  - \varepsilon \), then for all \(p \in B(c, r^{\prime\prime} )\), we have \(d(p, c) < r^{\prime\prime} \), and by triangle inequality we have 
+      \[
+        d(p,x) \le d(p,c) + d(c,x) < r^{\prime\prime} + \varepsilon < r^{\prime} - \varepsilon + \varepsilon = r^{\prime} ,
+      \] which means \(p \in B(x, r^{\prime} )\). Hence, \(B(c, r^{\prime\prime} ) \subseteq B(x, r^{\prime} ) \subseteq E\), which means \(B(c, r^{\prime\prime} ) \cap (X \setminus E) = \varnothing \), and this is a contradiction, so we know there does not exist \(x \in \partial (\partial E) \) s.t. \(x \in \mathrm{Int}(E) \).   
+      \item [Case 2:] \(x \in \mathrm{Ext}(E) \). \\ 
+      We know there exists \(r^{\prime} > 0\) s.t. \(B(x, r^{\prime}) \subseteq X\setminus E\). If there exists \(c \in B(x, r^{\prime} ) \cap \partial E\), then we know \(c \in B(x, r^{\prime} ) \subseteq X\setminus E\), so \(c \in X\setminus E\). Also, we know 
+      \[
+        B(c, r^{\prime\prime} ) \cap E \neq \varnothing \quad B(c, r^{\prime\prime} ) \cap (X \setminus E) \neq \varnothing \quad \forall r^{\prime\prime} >0.
+      \]
+      Now suppose \(\varepsilon = d(c, x) < r^{\prime} \). If we pick some \(r^{\prime\prime} < r^{\prime}  - \varepsilon \), then for all \(p \in B(c, r^{\prime\prime} )\), we have \(d(p, c) < r^{\prime\prime} \), and by triangle inequality we have 
+      \[
+        d(p,x) \le d(p,c) + d(c,x) < r^{\prime\prime} + \varepsilon < r^{\prime} - \varepsilon + \varepsilon = r^{\prime} ,
+      \] which means \(p \in B(x, r^{\prime} )\). Hence, \(B(c, r^{\prime\prime} ) \subseteq B(x, r^{\prime} ) \subseteq X\setminus E\), which means \(B(c, r^{\prime\prime} ) \cap E = \varnothing \), and this is a contradiction, so we know there does not exist \(x \in \partial (\partial E) \) s.t. \(x \in \mathrm{Ext}(E) \).   
+    \end{itemize}
+    \item [(b)]
+    \begin{align*}
+      \text{a point } x \in \partial E &\iff \begin{dcases}
+        B(x, r) \cap E \neq \varnothing \\
+        B(x,r) \cap (X\setminus E) \neq \varnothing 
+      \end{dcases} \\
+      & \iff x \in \overline{E} \text{ and } x \in \overline{X \setminus E}.  \\
+      &\iff x \in \overline{E} \cap x \in \overline{X \setminus E}.  
+    \end{align*}
+    \item [(c)]
+    \item [(d)]
+  \end{itemize}
+\end{proof}
+%────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\begin{problem}[21 pts]
+    In a metric space $(X,d)$, if subsets satisfy $A \subseteq S \subseteq \overline{A}$, where $\overline{A}$ is the closure of $A$, then $A$ is said to be \emph{dense} in $S$. 
+For example, the set $\mathbb{Q}$ of rational numbers is dense in $\mathbb{R}$. 
+
+\begin{enumerate}
+  \item[(a)] If $A$ is dense in $S$ and $S$ is dense in $T$, prove that $A$ is dense in $T$.
+  
+  \item[(b)]  If $A$ is dense in $S$ and if $B$ is open in $S$, prove that
+\[
+B \subseteq \overline{A \cap B}.
+\]
+  \item[(c)]  If each of $A$ and $B$ is dense in $S$ and if $B$ is open in $S$, prove that
+\[
+A \cap B \quad \text{is dense in } S.
+\]
+\end{enumerate}
+
+\end{problem}
