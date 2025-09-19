@@ -1,0 +1,73 @@
+\lecture{6}{19 Sep. 12:20}{}
+\begin{corollary}
+    \[
+        \sum_{k=j}^i (-1)^{k-j} S(i, k) s_{k,j} = \delta _{i,j} = \begin{dcases}
+            1, &\text{ if } i=j ;\\
+            0, &\text{ if }  i \neq j.
+        \end{dcases} 
+    \]
+\end{corollary}
+\begin{proof}
+    \begin{align*}
+        x^i &= \sum_{k=0}^i S(i, k)x^{\underline{k}} = \sum_{k=0}^i S(i, k) \left[ \sum_{j=0}^k (-1)^{k-j} s_{k, j}x^k  \right] \\
+        &= \sum_{k=0}^i \sum_{j=0}^k (-1)^{k-j} S(i, k) s_{k, j}x^j \\
+        &= \sum_{j=0}^i \left( \sum_{k=j}^i (-1)^{k-j} S(i, k) s_{k, j} \right) x^j = x^i.    
+    \end{align*}
+    Since \(\left\{ x^0, x^1, x^2, \dots  \right\} \) is a basis of \(F[x]\), the coefficient of \(x^j\) is \(1\) is \(i=j\) and is \(0\) is \(i \neq j\).      
+\end{proof}
+
+\begin{question}
+    How many ways can we distribute \$100000 of prize money to six players in the tournaments?
+    \begin{itemize}
+        \item Whole dollars only. 
+        \item Nonnegative prices.
+    \end{itemize}
+\end{question}
+It is an arbitrary partition, and there are \(k=6\) distinct groups(players). Hence, there are \(\binom{1000005}{5}\) ways of distribution? However, this is not what we want, since in a tournament a better player should get more money. Actually, in this scenario, groups are indistinguishable since largest prize is for first place, and so on. Thus, our goal is to dividing \(n\) indistinguishable items into \(k\) indistinguishable (non-empty) groups. 
+
+\begin{definition}[number partition]
+    A number partition is a decomposition of \(n\) and a sum of \(k\) unordered natural numbers.  
+    \[
+        \lambda = (\lambda _1, \lambda _2, \dots , \lambda _k) \text{ s.t. } \lambda _1 \ge \lambda _2 \ge \dots \ge \lambda _k, \ \sum_{i=1}^k \lambda  _i = n \text{ with } \lambda _i \in \mathbb{N} . 
+    \]
+    We write \(\lambda \vdash n\). We define 
+    \[
+        p(n, k) = \left\vert \left\{ \lambda = (\lambda _1, \dots , \lambda _k) : \lambda \vdash n \right\}  \right\vert.
+    \] 
+    We also define 
+    \begin{align*}
+        p(n, \le k) &= \sum_{i=0}^k p(n, i) \\
+        p(n) &= p(n, \le n) = \sum_{i=0}^n p(n, i) .
+    \end{align*}
+\end{definition}
+
+Observe that 
+\begin{itemize}
+    \item
+    \[
+        p(n, 0) = \begin{dcases}
+            1, &\text{ if } n=0 ;\\
+            0, &\text{ if } n=1.
+        \end{dcases}
+    \]
+    \item \(p(n, n) = 1\) 
+    \item \(p(n, n-1) = 1  = \vert \left\{ 2,1,1,\dots  \right\}  \vert \)  
+    \item \(p(n, 1) = 1\). 
+    \item \(p(n, 2) = \left\lfloor \frac{n}{2} \right\rfloor\).  
+\end{itemize}
+
+\begin{proposition}
+    \(\forall n \ge k \ge 1\),
+    \[
+        p(n, k) = p(n - 1, k - 1) + p(n - k, k).
+    \] 
+\end{proposition}
+\begin{proof}
+    Case analysis based on size of smallest part: 
+    \begin{itemize}
+        \item Case 1: \(\lambda _k = 1\). \\
+        Then remove the last part to get a partition of \(n-1\) into \(k-1\) nonempty parts. (bijective, can add part of size \(1\) to the end of a partition), so there are \(p(n-1, k-1)\) such cases.  
+        \item Case 2: \(\lambda _k \ge 2\). \\
+        Consider \(\lambda ^{\prime} = (\lambda _1 -1, \lambda _2 - 1, \dots , \lambda _k - 1)\), then \(\lambda ^{\prime}  \vdash n - k\), and this is a bijection, so there are \(p(n-k, k)\) such cases.  
+    \end{itemize}
+\end{proof}
