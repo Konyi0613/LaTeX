@@ -45,6 +45,90 @@ Is the converse true?
   \]
 \end{enumerate}
 \end{problem}
+\begin{proof}[a]
+  We verify the following properties:
+    \begin{itemize}
+        \item Reflexive: $\operatorname{LIM}_{n\to\infty} x_n$ and $\operatorname{LIM}_{n\to\infty} x_n$ are equal since $d$ is metric, so $\forall n, d(x_n, x_n) = 0$.
+        \item Symmetry: If $\operatorname{LIM}_{n\to\infty} x_n$ and $\operatorname{LIM}_{n\to\infty} y_n$ are equal, this mean $\lim_{n\to\infty} d(x_n,y_n) = 0$. And since $d$ is metric, so $\lim_{n\to\infty} d(y_n,x_n) = 0$, hence $\operatorname{LIM}_{n\to\infty} y_n$ and $\operatorname{LIM}_{n\to\infty} x_n$ are equal.
+        \item Transitive: If $\operatorname{LIM}_{n\to\infty} x_n$ and $\operatorname{LIM}_{n\to\infty} y_n$ are equal and $\operatorname{LIM}_{n\to\infty} y_n$ and $\operatorname{LIM}_{n\to\infty} z_n$ are equal, then we have \(\lim_{n \to \infty} d(x_n, y_n) = \lim_{n \to \infty}  d(y_n, z_n) = 0  \). By definition, there exists \(N_1, N_2 > 0\) s.t. for all \(n \ge N_1\), we have \(d(x_n, y_n) < \frac{\varepsilon}{2}\) and for all \(n \ge N_2\) we have \(d(y_n, z_n) < \frac{\varepsilon}{2}\). Thus, for all \(n \ge \max \left\{ N_1, N_2 \right\} \), we have
+        \[
+            d(x_n, z_n) \le d(x_n, y_n) + d(y_n, z_n) < \frac{\varepsilon}{2} + \frac{\varepsilon}{2} = \varepsilon ,
+        \] which means \(\lim_{n \to \infty} d(x_n, z_n) = 0 \), and thus \(\mathrm{LIM}_{n \to \infty} x_n = \mathrm{LIM}_{n \to \infty } z_n  \).  
+    \end{itemize}
+\end{proof}
+\begin{proof}[b]
+  We first show that the limit exists. Note that \(\lim_{n \to \infty} d(x_n, y_n) \in \mathbb{R}_{\ge 0} \) for all Cauchy sequence \(\left\{ x_n \right\}_{n=1}^{\infty} , \left\{ y_n \right\}_{n=1}^{\infty}   \) in \(X\). We already know \((\mathbb{R}, \vert \cdot \vert ) \) is complete, so we know \((\mathbb{R} _{\ge 0}, \vert \cdot \vert )\) is also complete as it is a closed subspace of \((\mathbb{R}, \vert \cdot \vert ) \). Now we define \(u_n \coloneqq d(x_n, y_n)\) for all \(n \ge 1\), then we want to show that \(\left\{ u_n \right\}_{n=1}^{\infty}  \) is Cauchy in \(\mathbb{R}_{\ge 0}\) , and then we can conclude that \(\left\{ u_n \right\}_{n=1}^{\infty}  \) converges in \(\mathbb{R} _{\ge 0}\), and thus \(\lim_{n \to \infty} d(x_n, y_n) \) exists.
+ \begin{claim} \label{clm: reverse triangle}
+  Suppose \((X, d)\) is a metric space, then for all \(a, b, c, d \in X\) we have 
+  \[
+    \left\vert d(a, b) - d(c, d) \right\vert \le d(a, c) + d(b, d)
+  \]  
+ \end{claim}
+ \begin{explanation}
+    Since
+    \[
+      \begin{dcases}
+        d(a, b) \le d(a, c) + d(c, b) \le d(a, c) + d(c, d) + d(d, b) \\
+        d(c, d) \le d(c, a) + d(a, d) \le d(c, a) + d(a, b) + d(b, d),
+      \end{dcases}
+    \] so we have 
+    \[
+      \begin{dcases}
+        d(a, b) - d(c, d) \ge d(a, c) + d(d, b) \\
+        -d(c, a) - d(b, d) \le d(a, b) - d(c, d),
+      \end{dcases}
+    \] so we can conbine these two equations and get the result.
+ \end{explanation}
+  By \autoref{clm: reverse triangle}, we know for all \(p, q \ge 1\), we have 
+  \[
+    \left\vert u_p - u_q \right\vert = \left\vert d(x_p, y_p) - d(x_q, y_q) \right\vert \le d(x_p, x_q) + d(y_p, y_q).
+  \]  
+  Now since \(\left\{ x_n \right\}_{n=1}^{\infty}  \) and \(\left\{ y_n \right\}_{n=1}^{\infty }  \) are Cauchy, so for every \(\varepsilon > 0\), there exists \(N_1, N_2 > 0\) s.t. 
+  \[
+    \begin{dcases}
+      d(x_p, x_q) < \frac{\varepsilon}{2} \quad \forall p, q \ge N_1 \\
+      d(y_p, y_q) < \frac{\varepsilon}{2} \quad \forall p, q \ge N_2.
+    \end{dcases}
+  \]   
+  Thus, for all \(p, q \ge \max \left\{ N_1, N_2 \right\} \), we know
+  \[
+    \vert u_p - u_q \vert \le d(x_p, x_q) + d(y_p, y_q) \le \frac{\varepsilon}{2} + \frac{\varepsilon}{2} = \varepsilon.
+  \]
+  Hence, we know \(\left\{ u_n \right\}_{n=1}^{\infty}  \) is Cauchy in \(\mathbb{R}_{\ge 0}, \vert \cdot \vert \).  
+
+  Now we show that \(d_{\overline{X} }\) is well-defined. In other words, if \(\mathrm{LIM}_{n \to \infty } x_n = \mathrm{LIM}_{n \to \infty } z_n \), then we want to show
+  \[
+    d_{\overline{X} }\left( \mathrm{LIM}_{n \to \infty }x_n, \mathrm{LIM}_{n \to \infty }y_n   \right) = d_{\overline{X} } \left( \mathrm{LIM}_{n \to \infty }z_n, \mathrm{LIM}_{n \to \infty } y_n  \right) \quad \forall \text{ Cauchy } \left\{ y_n \right\}_{n=1}^{\infty} \text{ in } (X, d).   
+  \]  Equivalently, we want to show \(\lim_{n \to \infty} d(x_n, y_n) = \lim_{n \to \infty} d(z_n, y_n) \). Note that we have 
+  \[
+     \lim_{n \to \infty} d(x_n, z_n) = 0 \text{ and } d(x_n, y_n) \le d(x_n, z_n) + d(z_n, y_n),
+  \] so we know
+  \[
+    \lim_{n \to \infty} d(x_n, y_n) \le \lim_{n \to \infty} d(x_n, z_n) + \lim_{n \to \infty} d(z_n, y_n) = \lim_{n \to \infty} d(z_n, y_n).  
+  \]
+  Also, we have \(d(z_n, y_n) \le d(z_n, x_n) + d(x_n, y_n)\), so we know 
+  \[
+  \lim_{n \to \infty} d(z_n, y_n) \le \lim_{n \to \infty} d(z_n, x_n) + \lim_{n \to \infty} d(x_n, y_n) = \lim_{n \to \infty} d(x_n, y_n),
+  \] and thus we can conclude that \(\lim_{n \to \infty} d(x_n, y_n) = \lim_{n \to \infty} d(z_n, y_n)  \). 
+  
+  Finally, we want to show that \(\left( \overline{X}, d_{\overline{X} }  \right) \) is a metric space. 
+  \begin{itemize}
+    \item \(\forall \text{ Cauchy } \left\{ x_n \right\}_{n=1}^{\infty} \in X, \ d_{\overline{X} } (\mathrm{LIM}_{n \to \infty } x_n, \mathrm{LIM}_{n\to \infty } x_n  ) = \lim_{n \to \infty} d(x_n, x_n) = 0  \). 
+    \item \(\forall \text{ Cauchy } \left\{ x_n \right\}_{n=1}^{\infty} , \left\{ y_n \right\}_{n=1}^{\infty} \in X  \), 
+    \begin{align*}
+      d_{\overline{X} }(\mathrm{LIM}_{n \to \infty }x_n, \mathrm{LIM}_{n \to \infty }y_n  ) = \lim_{n \to \infty} d(x_n, y_n)  &= \lim_{n \to \infty} d(y_n, x_n) \\ &= d_{\overline{X}} (\mathrm{LIM}_{n \to \infty } y_n, \mathrm{LIM}_{n \to \infty } x_n  )   
+    \end{align*}
+    \item \(\forall \text{ Cauchy } \left\{ x_n \right\}_{n=1}^{\infty} , \left\{ y_n \right\}_{n=1}^{\infty}, \left\{ z_n \right\}_{n=1}^{\infty}   \in X  \), \begin{align*}
+      d_{\overline{X} }(\mathrm{LIM}_{n \to \infty }x_n, \mathrm{LIM}_{n \to \infty }z_n  ) &= \lim_{n \to \infty} d(x_n, z_n) \\
+      &\le \lim_{n \to \infty} (d(x_n, y_n) + d(y_n, z_n)) = \lim_{n \to \infty} d(x_n, y_n) + \lim_{n \to \infty} d(y_n, z_n) \\
+      &= d_{\overline{X} } (\mathrm{LIM}_{n \to \infty }x_n, \mathrm{LIM}_{n \to \infty }y_n ) + d_{\overline{X} } (\mathrm{LIM}_{n \to \infty }y_n, \mathrm{LIM}_{n \to \infty }z_n ). 
+    \end{align*}
+  \end{itemize}
+  Hence, we know \(\left( \overline{X}, d_{\overline{X} }  \right) \) is a metric space. 
+\end{proof}
+\begin{proof}[c]
+  
+\end{proof}
 
 \begin{problem}
     In the following, all the sets are subsets of a metric space $(X,d)$.
