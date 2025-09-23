@@ -127,9 +127,63 @@ Is the converse true?
   Hence, we know \(\left( \overline{X}, d_{\overline{X} }  \right) \) is a metric space. 
 \end{proof}
 \begin{proof}[c]
-  
+  We want to show that for all \(\left\{ u_n \right\}_{n=1}^{\infty}  \subseteq \overline{X}  \), there exists \(\left\{ z_n \right\}_{n=1}^{\infty} \subseteq X \) s.t. \(\lim_{n \to \infty} u_n = \mathrm{LIM}_{n \to \infty } z_n \). Since \(\left\{ u_n \right\}_{n=1}^{\infty } \) is a sequence of formal limit of Cauchy sequences in \(X\), so we can define \(u_k = \mathrm{LIM}_{n \to \infty } x_n^{(k)} \) for all \(k \ge 1\). Now we construct \(\left\{ z_n \right\}_{n=1}^{\infty}  \). Since we know for all \(k \ge 1\), \(\left\{ x^{(k)}_n \right\}_{n=1}^{\infty}  \) is a Cauchy sequence in \(X\), so for all \(k \ge 1\), there exists \(N_k > 0\) s.t. \(n \ge N_k\) implies \(d\left( x_n^{(k)}, x_{N_k}^{(k)} \right) < \frac{1}{k} \). Now we let \(z_k = x_{N_k}^{(k)}\) for all \(k \ge 1\). 
+  \begin{claim} \label{clm: zk Cauchy}
+    \(\left\{ z_k \right\}_{k=1}^{\infty}  \) is a Cauchy sequence in \(X\).  
+  \end{claim} 
+  \begin{explanation}
+    For all \(\varepsilon > 0\), we know there exists \(K \ge 0\) s.t. \(\frac{1}{K} < \frac{\varepsilon}{3}\). Also, since \(\left\{ u_n \right\}_{n=1}^{\infty}  \) is Cauchy, so there exists \(N > 0\) s.t. \(i, j \ge N\) implies \(d_{\overline{X} }(u_i, u_j) < \frac{\varepsilon}{3} \), which can be writen as \(\lim_{n \to \infty} d\left( x_n^{(i)}, x_n^{(j)} \right) < \frac{\varepsilon}{3}  \). To be more precise, there exists \(N > 0\) and \(N^{\prime}  > 0\) s.t. if \(i, j \ge N\) and \(n \ge N^{\prime} \), then \(d\left( x_n^{(i)}, x_n^{(j)} \right) < \frac{\varepsilon}{3} \). Now for all \(p, q \ge \max \left\{ N, K \right\} \) and \(n \ge \max \left\{ N_p, N_q, N^{\prime}  \right\} \), we have 
+    \begin{align*}
+       d(z_p, z_q ) &= d\left( x_{N_p}^{(p)}, x_{N_q}^{(q)} \right) \le d\left( x_{N_p}^{(p)}, x_n^{(p)} \right) + d\left( x_n^{(p)}, x_{N_q}^{(q)} \right) \\
+       &\le d\left( x_{N_p}^{(p)}, x_n^{(p)} \right) + d\left( x_n^{(p)}, x_n^{(q)} \right) + d\left( x_n^{(q)}, x_{N_q}^{(q)} \right) \\
+       &< \frac{1}{p} + \varepsilon + \frac{1}{q} < \frac{1}{K} + \frac{\varepsilon}{3} + \frac{1}{K} < \frac{\varepsilon}{3} + \frac{\varepsilon}{3} + \frac{\varepsilon}{3} = \varepsilon.  
+    \end{align*}    
+    Hence, we know \(\left\{ z_k \right\}_{k=1}^{\infty}  \) is Cauchy.           
+  \end{explanation}
+
+  \begin{claim} \label{clm: cauchy converge to z}
+    \(\lim_{n \to \infty} u_n = \mathrm{LIM}_{n \to \infty } z_n\). 
+  \end{claim}
+  \begin{explanation}
+    Suppose \(L = \mathrm{LIM}_{n \to \infty } z_n \). For all \(\varepsilon > 0\), we want to show there exists \(N > 0\) s.t. \(m \ge N\) implies \(d_{\overline{X} }\left( u_m, L \right) < \varepsilon  \), which is equivalent to \(\lim_{n \to \infty} d\left( x_n^{(m)}, z_n \right) < \varepsilon   \). To be more precise, we want to show there exists \(N \ge 0\) and \(N^{\prime} > 0\) s.t. if \(m \ge N\) and \(n \ge N^{\prime} \), then \(d\left( x_n^{(m)}, z_n \right) < \varepsilon  \). Note that \(d\left( x_n^{(m)}, z_n \right) \le d\left( x_n^{(m)}, z_m \right) + d(z_m, z_n)  \). Suppose \(K > 0\) has \(\frac{1}{K} < \frac{\varepsilon}{2}\), we know such \(K\) exists. Also, since \(\left\{ z_n \right\}_{n=1}^{\infty}  \) is Cauchy, so we know there exists \(N_1^{\prime} > 0\) s.t. for all \(p, q \ge N_1^{\prime} \), we have \(d\left( z_p, z_q \right) < \frac{\varepsilon}{2} \). Hence, if we pick \(m \ge \max \left\{ K, N_1^{\prime}  \right\} \) and \(n \ge \max \left\{ N_m, N_1^{\prime}  \right\} \), then 
+    \begin{align*}
+      d\left( x_n^{(m)}, z_n \right) &\le d\left( x_n^{(m)}, z_m \right) + d(z_m, z_n) < \frac{1}{m} + \frac{\varepsilon}{2} \\
+      &\le \frac{1}{K} + \frac{\varepsilon}{2} < \frac{\varepsilon}{2} + \frac{\varepsilon}{2} = \varepsilon ,
+    \end{align*}
+    and we're done.           
+  \end{explanation}
+  By \autoref{clm: zk Cauchy} and \autoref{clm: cauchy converge to z}, we know every Cauchy sequence in \(\overline{X} \) converges to a formal limit of a Cauchy sequence of \(X\), which means it converges in \(\overline{X} \), and thus \(\left( \overline{X}, d_{\overline{X} }  \right) \) is complete.
 \end{proof}
 
+\begin{proof}[d]
+  We first show that \(x = y \iff \mathrm{LIM}_{n \to \infty } x = \mathrm{LIM}_{n \to \infty } y  \). If \(x = y\), then we know 
+  \[
+    \lim_{n \to \infty} d(x, y) = \lim_{n \to \infty} d(x, x) = 0,  
+  \]  which means \(\mathrm{LIM}_{n \to  \infty } x = \mathrm{LIM}_{n \to \infty }y  \). Now we prove the converse, if \(\mathrm{LIM}_{n \to \infty } x = \mathrm{LIM}_{n \to \infty } y  \), then we know \(\lim_{n \to \infty} d(x, y) = d(x, y) = 0 \), so \(x = y\). 
+  
+  Now we show that \(d(x, y) - d_{\overline{X} }(x, y)\). Note that 
+  \[
+    d_{\overline{X} }(x, y) = \lim_{n \to \infty} d(x, y) = d(x, y), 
+  \] so this is true.
+\end{proof}
+
+\begin{proof}[e]
+  Since we know \(\mathrm{cl}_{\overline{X}} (X) \subseteq \overline{X} \), we only need to show \(\overline{X} \subseteq \mathrm{cl}_{\overline{X} }(X)  \). Suppose \(x \in \overline{X} \), then \(x = \mathrm{LIM}_{n \to \infty } x_n\) where \(\left\{ x_n \right\}_{n=1}^{\infty}  \) is a Cauchy sequence in \(X\). Now we want to show that \(x \in \mathrm{cl}_{\overline{X} } (X) \), which is equivalent to show for all \(\varepsilon > 0\), there exists \(y \in X\) s.t. \(y \in B_{\overline{X} }(x, \varepsilon )\). If such \(y\) exists, then \(d_{\overline{X} }(x, y)< \varepsilon \), which means \(\lim_{n \to \infty} d(x_n, y) < \varepsilon  \). However, \(\left\{ x_n \right\}_{n=1}^{\infty}  \) is a Cauchy sequence, so there exists \(N > 0\) s.t. \(i, j \ge N\) implies \(d(x_i, x_j) < \frac{\varepsilon}{2}\). Thus, we can pick \(y = x_N\), and then we have for all \(n \ge N\), \(d(x_n, y) < \frac{\varepsilon}{2} < \varepsilon \) Hence, we have \(\lim_{n \to \infty} d(x_n, y) < \varepsilon \), and we're done.              
+\end{proof}
+\begin{proof}[f]
+  Since \(\left\{ x_n \right\}_{n=1}^{\infty}  \) can be seen as a sequence of elements in \(\overline{X} \), and notice that \(\left\{ x_n \right\}_{n=1}^{\infty}  \) is still Cauchy in \(\overline{X} \) since for all \(\varepsilon > 0\), we know there exists \(N > 0\) s.t. \(p, q \ge N\) implies \(d(x_p, x_q) < \varepsilon  \), so under same circumstances, we know 
+  \[
+    d_{\overline{X} }(x_p, x_q) = \lim_{n \to \infty} d(x_p, x_q) < \varepsilon , 
+  \] and we're done. Now since we have proved \(\overline{X} \) is complete in (c), so we know there exists \(L \in \overline{X} \) s.t. \(\lim_{n \to \infty} x_n = L \). Also, since \(L \in \overline{X} \), so \(L = \mathrm{LIM}_{n \to \infty }a_n \) for some Cauchy sequence \(\left\{ a_n \right\}_{n=1}^{\infty}  \) in \(X\). Now we want to show \(\mathrm{LIM}_{n \to \infty } a_n = \mathrm{LIM}_{n \to \infty } x_n  \). Hence, we want to show \(\lim_{n \to \infty} d(a_n, x_n) = 0 \), which is equivalent to prove \(\forall \varepsilon > 0\), \(\exists N > 0\) s.t. \(n \ge N\) implies \(d(a_n, x_n) < \varepsilon \). 
+  \begin{itemize}
+    \item Notice that since \(\lim_{n \to \infty} x_n = L \in \overline{X} \), so \(\forall \varepsilon >0\), \(\exists N_1 > 0\) s.t. \(p \ge N_1\) implies \(d_{\overline{X} }(x_p, L) < \frac{\varepsilon}{2}\), and thus \(\lim_{n \to \infty} d(x_p, a_n) < \frac{\varepsilon}{2} \). Hence, there exists \(M > 0\) s.t. if \(p \ge N_1\) and \(n \ge M\), then \(d(x_p, a_n) < \frac{\varepsilon}{2}\). 
+    \item Also, since \(\left\{ x_n \right\}_{n=1}^{\infty}  \) is Cauchy in \(X\), so there exists \(N_2 > 0\) s.t. \(p, q \ge N_2\) implies \(d(x_p, x_q) < \frac{\varepsilon}{2}\).             
+  \end{itemize}            
+  Use the above two properties, we know for all \(n \ge \max \left\{ M, N_2 \right\} \) we can choose \(s \ge \max \left\{ N_1, N_2 \right\} \) so that 
+  \[
+    d(a_n, x_n) \le d(a_n, x_s) + d(x_s, x_n) < \frac{\varepsilon}{2} + \frac{\varepsilon}{2} = \varepsilon,
+  \] and we're done.
+\end{proof}
 \begin{problem}
     In the following, all the sets are subsets of a metric space $(X,d)$.
 
