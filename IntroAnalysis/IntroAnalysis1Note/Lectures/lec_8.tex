@@ -1,0 +1,203 @@
+\lecture{8}{25 Sep. 10:20}{}
+\begin{theorem}[Review \autoref{thm: compact to subcover}]
+    Let \(Y\) be a compact subset of a metric space \((X, d)\) and let \(\left\{ V_\alpha  \right\}_{\alpha \in A} \) be an open cover of \(Y\). Then \(\exists \) a finite subcover of \(\left\{ V_\alpha  \right\}_{\alpha \in A} \) i.e. \(\exists \alpha _1, \dots ,\alpha _n \in A\) s.t. \(Y \subseteq \bigcap_{i=1}^{n} V_{\alpha _i}. \)        
+\end{theorem}
+
+\begin{remark}
+    \begin{align*}
+        Y \text{ is compact } &\iff \text{ Any open cover of } Y \text{ has a finite subcover.}
+    \end{align*}
+\end{remark}
+
+\begin{corollary}
+    Let \((X, d)\) be a metric space and let \(K_1, K_2, \dots \) be a sequence of nonempty compact subsets of \(X\) s.t. \(K_{i+1} \subseteq K_i\) for \(i \in \mathbb{N} \), that is, \(K_1 \supseteq K_2 \supseteq K_3 \supseteq \dots  \) for \(i \in \mathbb{N} \), then 
+    \[
+        \bigcap_{i=1}^{\infty} K_i \neq \varnothing. 
+    \]       
+\end{corollary}
+\begin{proof}
+    Suppose \(\bigcap_{i=1}^{\infty} K_i = \varnothing  \). Since \(K_i\)'s are compact, so they are closed. Also, we have 
+    \[
+        \bigcup_{i=1}^{\infty} \left( K_1 \setminus K_n \right) = K_1 \setminus \left( \bigcap_{i=1}^{\infty} K_n \right) = K_1.
+    \]  
+    Let \(V_i = K_1 \setminus K_i = K_1 \cap K_i^C\). Note that \(K_i^C\) is open in \(X\). Hence, we have \(V_i\) is open in \(K_1\), and thus \(\left\{ V_i \right\}_{i=1}^{\infty}  \) is an open cover of \(K_1\) in \(K_1\). (\((K_1, d\vert_{K_1 \times K_1})\) is compact.) By \autoref{thm: compact to subcover}, we know there exists \(\alpha _1, \alpha _2, \dots , \alpha _l\) with \(\alpha _1 < \alpha _2 < \dots < \alpha _l\) s.t. 
+    \begin{align*}
+        K_1 &\subseteq \bigcup_{i=1}^{l} V_{\alpha _i} = \bigcup_{i=1}^{l} \left( K_1 \setminus K_{\alpha _i} \right) \\
+            &= K_1 \setminus \bigcap_{i=1}^l K_{\alpha _i} = K \setminus K_{\alpha _l} 
+    \end{align*} since \(K_{\alpha _1} \supseteq K_{\alpha _2} \supseteq \dots \supseteq K_{\alpha _l}\). However, \(K_{\alpha _l} \subseteq K_1\) and \(K_{\alpha _l} \neq \varnothing \). Thus, we have a contradiction.  
+\end{proof}
+
+\begin{eg}
+    Consider \(I_1 = [0, 1]\), and \(I_2 = [0, \frac{1}{3}] \cup [\frac{2}{3}, 1]\), and picking \(I_3, I_4, \dots \) with same method, then \(I_{n+1} \subseteq I_n\) for all \(n\) and they are compact, so
+    \[
+        \bigcap_{i=1}^{\infty} I_i \neq \varnothing . 
+    \]      
+\end{eg}
+
+\begin{theorem}
+    Let \((X, d)\) be a metric space. 
+    \begin{itemize}
+        \item [(a)] If \(Y\) is a compact subset of \(X\), and \(Z \subseteq Y\), then \(Z\) is compact iff \(Z\) is closed.      
+        \item [(b)] If \(Y_1, \dots , Y_n\) are a finite collection of compact subsets of \(X\), then \(\bigcup_{i=1}^{n} Y_i \) are also compact.   
+    \end{itemize} 
+\end{theorem}
+\begin{proof}[proof of (a)]
+    If \(Z\) is compact, then by \autoref{cl: compact subset of X is closed and bounded}, we know \(Z\) is closed. Now we show that if \(Z\) is closed, then \(Z\) is comapct. If \(Z\) is closed, then \(Y \setminus Z\) is open in \(Y\), then we know 
+    \[
+        Y \setminus Z = V \cap Y
+    \] for some open set \(V \subseteq Y\), so note that \((Y \setminus Z) \subseteq V\). Now suppose \(\left\{ U_\alpha  \right\}_{\alpha \in A} \) is an open cover of \(Z\). Hence, we know \(\left\{ U_\alpha  \right\}_{\alpha \in A} \cup \left\{ V \right\}  \) is an open cover of \(Y\) since the former covers \(Z\) and the latter covers \(Y \setminus Z\). Now since \(Y\) is compact, so we know for some \(\alpha _1, \alpha _2, \dots , \alpha _n\), there is 
+    \[
+        Y \subseteq \left( \bigcup_{i=1}^{n} U_i \right) \cup V, 
+    \] and thus we can write
+    \[
+        Z \subseteq Y \subseteq \left( \bigcup_{i=1}^{n} U_i  \right) \cup V. 
+    \]  
+    However, note that \(Z \cap V = \varnothing \) since
+    \[
+        Z = Y \setminus (Y \setminus Z) = Y \setminus (V \cap Y) = (Y \setminus V) \cup (Y \setminus Y) = Y \setminus V.
+    \]
+    Hence, we know 
+    \[
+        Z \subseteq \bigcup_{i=1}^{n} U_i, 
+    \] and thus for any open cover of \(Z\), we know there exists a finite subcover of \(Z\), and we're done.
+\end{proof}
+\chapter{Continuous functions on metric spaces}
+Suppose \((X, d_x)\) and \((Y, d_y)\) are metric space. Let \(f: X \to Y\) be a function from \(X\) to \(Y\). Then we want that if \(x \in X\) is close to \(y \in X\), then, then \(f(x)\in Y\) is close to \(f(y) \in Y\). 
+
+\begin{definition}[Continuous function] \label{def: continuous}
+    Let \((X, d_X)\) and \((Y, d_Y)\) be metric spaces and let \(f: X \to Y\) be a function. Suppose \(x_0 \in X\), we will say \(f\) is continous at \(x_0\) iff for every \(\varepsilon > 0\), there exists \(\delta > 0\) s.t. 
+    \[
+        d_Y(f(x), f(x_0)) < \varepsilon \quad \text{whereas } d_X(x, x_0) < \delta.
+    \] We say \(f\) is continuous if \(f\) is continuous at every point \(x \in X\).     
+\end{definition}
+
+\begin{definition}[Preimage] \label{def: preimage}
+    Let \(f : X \to Y\) be a function from \(X \to Y\) and \(V \subseteq Y\). The preimage (inverse image) of \(V\) is 
+    \[
+        f^{-1}(V) = \left\{ x\in X \mid f(x) \in V \right\}.
+    \]    
+\end{definition}
+
+\begin{eg}
+    Suppose \(f(x) = x^2\), then what is the preimage of \((1, \infty )\)?  
+\end{eg}
+\begin{explanation}
+    \[
+        f^{-1}((1, \infty )) = (-\infty , -1) \cup (1, \infty ).
+    \]
+\end{explanation}
+Now we build an equivalent definition of continuity. If \(f\) is continuous at \(x_0\), then given any \(\varepsilon > 0\), \(\exists \delta > 0\) s.t. 
+\[
+    f(x) \in B_Y(f(x_0), \varepsilon ) \quad \text{whereas } x \in B_X(x_0, \delta ).
+\]  Also, \(f(x) \in B_Y(f(x_0), \varepsilon )\) if and only if
+\[
+    x \in f^{-1}(B_Y(f(x_0, \varepsilon ), \varepsilon )).
+\] Hence, we have 
+\begin{corollary}
+    \(f\) is continuous at \(x_0\) if and only if 
+    \begin{center}
+        Given any \(\varepsilon > 0\), \(\exists \delta > 0\), we have \(B_X(x_0, \delta ) \subseteq f^{-1}(B_Y(f(x_0), \varepsilon )).\).   
+    \end{center}  
+\end{corollary}
+
+\begin{remark} \label{rmk: if f conti then f intersect K conti}
+    If \(f: X \to Y\) is continuous and \(K \subseteq X\), then \(f\vert_K : K \to Y\) is continuous.   
+\end{remark}
+\begin{explanation}
+    Given any point \(x_0 \in K \subseteq X\). Since \(f\) is continuous at \(x_0\), so \(\forall \varepsilon > 0\), \(\exists \delta > 0\) s.t. 
+    \[
+        d\left( f(x), f(x_0) \right) < \varepsilon \quad \text{ if } d_X(x, x_0) < \delta. 
+    \]     
+    If \(z \in K\) and \(d_K(z, x_0) < \delta \), then \(d_Y(f(z), f(x)) <\varepsilon \), so \(f\) is continuous on \(K\).     
+\end{explanation}
+
+\begin{theorem} \label{thm: continuous TFAE 1}
+    Suppose that \((X, d_X)\) and \((Y, d_Y)\) be metric spaces, and \(f:X \to Y\) is a function and let \(x_0 \in X\), then TFAE: 
+    \begin{itemize}
+        \item [(a)] \(f\) is continuous at \(x_0\).  
+        \item [(b)] Whenever \(\left( x^{(n)} \right)_{n=1}^{\infty}  \) is a sequence in \(X\) converges to \(x_0\), then 
+        \[
+            \lim_{n \to \infty} f \left( x^{(n)} \right) = f(x_0) \text{ in } \left( Y, d_Y \right).   
+        \]
+        \item [(c)] For every open set \(V \subseteq Y\) that contains \(f(x_0)\), \(\exists \) a open set \(U \subseteq X\) containing \(x_0\) s.t. \(f(U) \subseteq V\), or equivalently, \(U \subseteq f^{-1}(V)\) .      
+    \end{itemize}  
+\end{theorem}
+\begin{proof}[proof of (a) \(\implies \) (b)]
+    Given any \(\varepsilon > 0\), since \(f\) is continuous at \(x_0\), so \(\exists \delta > 0\) s.t. if \(d_X(x, x_0) < \delta \), then \(d_Y (f(x), f(x_0)) < \varepsilon \). Now if \(\lim_{n \to \infty} x^{(n)} = x_0 \). Then there exists \(N > 0\) s.t. \(n \ge N\) implies \(d_X \left( x^{(n)}, x_0 \right) < \delta  \). Hence, we know \(d_Y \left( f \left( x^{(n)}\right),f(x_0)   \right) < \varepsilon \). Hence, for this \(\varepsilon \), we know there exists \(N\) s.t. \(n \ge N\) implies \(d_Y \left( f \left( x^{(n)} \right), f(x_0)  \right) < \varepsilon  \), and thus \(\lim_{n \to \infty} f \left( x^{(n)} \right) = f(x_0)  \).         
+\end{proof}
+\begin{proof}[proof of (b) \(\implies \) (c)]
+    Let \(f(x_0) \in V \subseteq Y\).
+    \begin{claim}
+        There exists an open set \(u\) s.t. \(x_0 \in u \subseteq X\) and \(f(u) \subseteq V\).   
+    \end{claim}
+    \begin{explanation}
+        If this is not true, then this implies that for every open set \(u\) with \(x_0 \in u\), consider \(B_X \left( x_0, \frac{1}{n} \right) \), \(\exists x_u \in u\) and \(f(x_u) \notin V\), then pick all of this \(x_u\) to be \(\left\{ x^{(n)} \right\}_{n=1}^{\infty}  \), we know \(\forall x^{(n)}\) we have \(f \left( x^{(n)} \right) \notin V \).    
+        Then, \(\left\{ x^{(n)} \right\}_{n=1}^{\infty}  \) is a sequence converges to \(x_0\). By (b), we know \(\lim_{n \to \infty} f \left( x^{(n)} \right) = f(x_0)  \). However, by our choice, \(f \left( x^{(n)} \right) \notin V \), so \(f \left( x^{(n)} \right) \in Y \setminus V \). Since \(V\) is open, so \(Y\setminus V\) is closed. Hence, we must have \(\lim_{n \to \infty} f \left( x^{(n)} \right) = f(x_0) \in Y \setminus V  \), which is a contradiction. 
+    \end{explanation}
+\end{proof}
+\begin{proof}[proof of (c) \(\implies \) (a)]
+    Suppose (c) holds, then we want to show \(f\) is continuous at \(x_0\), which means for all \(\varepsilon > 0\), there exists \(\delta > 0\) s.t. \(B_X(x_0, \delta ) \subseteq f^{-1} \left( B_Y(f(x_0), \varepsilon ) \right) \). Now consider \(V = B_Y(f(x_0), \varepsilon ) \subseteq Y\), then by (c) we know there exists open \(U \subseteq X\) s.t. \(x_0 \in U \subseteq X\) s.t. \(U \subseteq f^{-1}(V) \). Now since \(U\) is open and \(x_0 \in U\), so there exists \(B_X(x_0, \delta ) \subseteq U\), and thus 
+    \[
+        B_X(x_0, \delta ) \subseteq U \subseteq f^{-1}(V) = f^{-1} \left( B_Y (f(x_0), \varepsilon ) \right), 
+    \] and we're done.
+\end{proof}
+
+\begin{theorem}
+    Suppose \(f: X \to Y\), then TFAE 
+    \begin{itemize}
+        \item [(a)] \(f\) is continuous. 
+        \item [(b)] If \(\lim_{n \to \infty} x^{(n)} = x \in (X, d_X)\), then \(\lim_{n \to \infty} f \left( x^{(n)} \right) = f(x)  \) in \(\left( Y, d_Y \right) \). 
+        \item [(c)] If \(V\) is open in \(Y\), then \(f^{-1}(V)\) is open in \(X\). 
+        \item [(d)] Whenever \(F\) is closed in \(Y\), then \(f^{-1}(F)\) is closed in \(X\).         
+    \end{itemize}
+\end{theorem}
+\begin{proof}[(a) \(\iff \) (b)]
+    By \autoref{thm: continuous TFAE 1}, we know it is true. 
+\end{proof}
+\begin{proof}[(c) is equivalent to (c) in \autoref{thm: continuous TFAE 1}]
+    For each \(x \in f^{-1}(V)\), we have \(f(x) \in V\), so there exists an open set \(u_x\) s.t. \(x \in u_x \subseteq f^{-1}(V)\). Hence, 
+    \[
+        f^{-1}(V) = \bigcup_{x \in f^{-1}(V)} u_x .  
+    \] Since \(u_x\) is open, so \(f^{-1}(V)\) is open.     
+\end{proof}
+\begin{proof}[(c) \(\iff \) (d)]
+    If \(F\) is closed in \(Y\), then \(Y \setminus F\) is open in \(Y\), and thus \(F^{-1}(Y \setminus F) \) is open in \(X\), and since \(f^{-1} (Y \setminus F) = X \setminus f^{-1}(F) \) is open, so \(f^{-1}(F) \) is closed.        
+\end{proof}
+
+\begin{remark}
+    If \(f\) is continuous, then the image of an open set on \(f\) may not be open, and the image of a closed set on \(f\) may not be closed.     
+\end{remark}
+
+\begin{eg}
+    Consider \(f(x) = x^2\), then \(f(-1, 1) = [0, 1)\) is not open.   
+\end{eg}
+
+\begin{eg}
+    Consider \(f(x) = \arctan (x)\), then \(f([0, \infty )) = [0, \frac{\pi}{2}]\).  
+\end{eg}
+
+Now if \(f: X \to Y\) and \(g: X \to Z\), then consider
+\[
+    (f, g) : X \to Y \times Z \text{ with } x \mapsto (f(x), g(x)),
+\] then \(Y \times Z\) has a natural metric. Note that if \((y_1, z_1) \) and \((y_2, z_2)\) are in \(Y \times Z\), then 
+\[
+    d_{Y \times Z}\left( (y_1, z_1), (y_2, z_2) \right) = d_Y(y_1, y_2) + d_Z(z_1, z_2). 
+\]    
+
+\begin{lemma}
+    Consider \(f: X \to Y\) and \(g: X \to Z\) and \((f, g): X \to Y \times Z\), then \(f\) and \(g\) are both continuous if and only if \((f, g)\) is continuous.       
+\end{lemma}
+\begin{proof}
+    Given \(x \in X\), we know \(\lim_{n \to \infty} x^{(n)} = x \in (X, d_X) \) implies 
+    \[
+        \lim_{n \to \infty} f \left( x^{(n)} \right) = f(x) \text{ and } \lim_{n \to \infty} g \left( x^{(n)} \right) = x.    
+    \] 
+    \begin{claim}
+        \[
+            \lim_{n \to \infty} (f, g)(x^n) = (f, g)(x). 
+        \]
+    \end{claim}
+    \begin{explanation}
+        Check.
+    \end{explanation}
+\end{proof}
