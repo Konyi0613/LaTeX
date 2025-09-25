@@ -6,6 +6,42 @@ S = \{ x^{(n)} : n\ge m \}.
 Is the converse true?
 \end{problem}
 
+\begin{proof}
+    Suppose $L$ is a limit point of the sequence. By definition,
+    \[
+    \forall N \geq m, \forall \varepsilon > 0,\ \exists n \geq N \text{ such that } d(x^{(n)}, L) \leq \varepsilon.
+    \]
+    This implies that for every $\varepsilon > 0$, there exists $n \geq m$ with
+    \[
+    x^{(n)} \in B(L,\varepsilon) \cap S \neq \varnothing.
+    \]
+    Hence,
+    \[
+    \forall \varepsilon > 0,\ B(L,\varepsilon)\cap S \neq \varnothing 
+    \quad \Rightarrow \quad 
+    L \text{ is an adherent point of } S.
+    \]
+
+    Now, we check the converse. The converse statement is \textbf{NOT} true.  
+    Consider $X = \mathbb{R}$ with the standard metric, and let $m=1$. Define
+    \[
+    x^{(n)} = \frac{1}{n}, \quad \text{so } S = \{1, \tfrac{1}{2}, \tfrac{1}{3}, \dots \}.
+    \]
+    It is clear that $1$ is an adherent point of $S$, since for every $\varepsilon > 0$,
+    \[
+    1 \in (1-\varepsilon, 1+\varepsilon), 
+    \quad \Rightarrow \quad 
+    B(1,\varepsilon)\cap S \neq \varnothing.
+    \]
+    However, $1$ is not a limit point of the sequence. Indeed, if $N \geq 2$, then for all $n \geq N$,
+    \[
+    d(x^{(n)},1) = \bigg| \frac{1}{n} - 1 \bigg| \geq \frac{1}{2}.
+    \]
+    So if we take $\varepsilon = 0.48763$ and $N = 2$, there is no $n \geq N$ such that $d(x^{(n)},1)\leq \varepsilon$.
+    Therefore, $1$ is not a limit point of $(x^{(n)})_{n=1}^\infty$, 
+    even though it is an adherent point of $S$.
+\end{proof}
+
 \begin{problem}
     The following construction generalizes the construction of the reals from the rationals in Chapter~5, allowing one to view any metric space as a subspace of a complete metric space. In what follows we let $(X,d)$ be a metric space.
 \begin{enumerate}
@@ -45,7 +81,8 @@ Is the converse true?
   \]
 \end{enumerate}
 \end{problem}
-\begin{proof}[a]
+
+\begin{proof}[a] %In 2.a, I change the transitive one so that we dont need squeeze lemma
   We verify the following properties:
     \begin{itemize}
         \item Reflexive: $\operatorname{LIM}_{n\to\infty} x_n$ and $\operatorname{LIM}_{n\to\infty} x_n$ are equal since $d$ is metric, so $\forall n, d(x_n, x_n) = 0$.
@@ -56,6 +93,7 @@ Is the converse true?
         \] which means \(\lim_{n \to \infty} d(x_n, z_n) = 0 \), and thus \(\mathrm{LIM}_{n \to \infty} x_n = \mathrm{LIM}_{n \to \infty } z_n  \).  
     \end{itemize}
 \end{proof}
+
 \begin{proof}[b]
   We first show that the limit exists. Note that \(\lim_{n \to \infty} d(x_n, y_n) \in \mathbb{R}_{\ge 0} \) for all Cauchy sequence \(\left\{ x_n \right\}_{n=1}^{\infty} , \left\{ y_n \right\}_{n=1}^{\infty}   \) in \(X\). We already know \((\mathbb{R}, \vert \cdot \vert ) \) is complete, so we know \((\mathbb{R} _{\ge 0}, \vert \cdot \vert )\) is also complete as it is a closed subspace of \((\mathbb{R}, \vert \cdot \vert ) \). Now we define \(u_n \coloneqq d(x_n, y_n)\) for all \(n \ge 1\), then we want to show that \(\left\{ u_n \right\}_{n=1}^{\infty}  \) is Cauchy in \(\mathbb{R}_{\ge 0}\) , and then we can conclude that \(\left\{ u_n \right\}_{n=1}^{\infty}  \) converges in \(\mathbb{R} _{\ge 0}\), and thus \(\lim_{n \to \infty} d(x_n, y_n) \) exists.
  \begin{claim} \label{clm: reverse triangle}
@@ -74,7 +112,7 @@ Is the converse true?
     \] so we have 
     \[
       \begin{dcases}
-        d(a, b) - d(c, d) \ge d(a, c) + d(d, b) \\
+        d(a, b) - d(c, d) \le d(a, c) + d(d, b) \\
         -d(c, a) - d(b, d) \le d(a, b) - d(c, d),
       \end{dcases}
     \] so we can conbine these two equations and get the result.
@@ -113,6 +151,10 @@ Is the converse true?
   
   Finally, we want to show that \(\left( \overline{X}, d_{\overline{X} }  \right) \) is a metric space. 
   \begin{itemize}
+    \item \(\forall \text{ Cauchy } \left\{x_n\right\}_{n=1}^{\infty}, \left\{y_n\right\}_{n=1}^{\infty}\), we have 
+    \[
+        d_{\overline{X}}(\mathrm{LIM}_{n \to \infty}, x_n, \mathrm{LIM}_{n \to \infty}, y_n) = \lim_{n \to \infty} d(x_n, y_n) \ge 0
+    \] since \(d\) is a metric.
     \item \(\forall \text{ Cauchy } \left\{ x_n \right\}_{n=1}^{\infty} \in X, \ d_{\overline{X} } (\mathrm{LIM}_{n \to \infty } x_n, \mathrm{LIM}_{n\to \infty } x_n  ) = \lim_{n \to \infty} d(x_n, x_n) = 0  \). 
     \item \(\forall \text{ Cauchy } \left\{ x_n \right\}_{n=1}^{\infty} , \left\{ y_n \right\}_{n=1}^{\infty} \in X  \), 
     \begin{align*}
@@ -136,7 +178,7 @@ Is the converse true?
     \begin{align*}
        d(z_p, z_q ) &= d\left( x_{N_p}^{(p)}, x_{N_q}^{(q)} \right) \le d\left( x_{N_p}^{(p)}, x_n^{(p)} \right) + d\left( x_n^{(p)}, x_{N_q}^{(q)} \right) \\
        &\le d\left( x_{N_p}^{(p)}, x_n^{(p)} \right) + d\left( x_n^{(p)}, x_n^{(q)} \right) + d\left( x_n^{(q)}, x_{N_q}^{(q)} \right) \\
-       &< \frac{1}{p} + \varepsilon + \frac{1}{q} < \frac{1}{K} + \frac{\varepsilon}{3} + \frac{1}{K} < \frac{\varepsilon}{3} + \frac{\varepsilon}{3} + \frac{\varepsilon}{3} = \varepsilon.  
+       &< \frac{1}{p} + \frac{\varepsilon}{3} + \frac{1}{q} < \frac{1}{K} + \frac{\varepsilon}{3} + \frac{1}{K} < \frac{\varepsilon}{3} + \frac{\varepsilon}{3} + \frac{\varepsilon}{3} = \varepsilon.  
     \end{align*}    
     Hence, we know \(\left\{ z_k \right\}_{k=1}^{\infty}  \) is Cauchy.           
   \end{explanation}
@@ -161,7 +203,7 @@ Is the converse true?
     \lim_{n \to \infty} d(x, y) = \lim_{n \to \infty} d(x, x) = 0,  
   \]  which means \(\mathrm{LIM}_{n \to  \infty } x = \mathrm{LIM}_{n \to \infty }y  \). Now we prove the converse, if \(\mathrm{LIM}_{n \to \infty } x = \mathrm{LIM}_{n \to \infty } y  \), then we know \(\lim_{n \to \infty} d(x, y) = d(x, y) = 0 \), so \(x = y\). 
   
-  Now we show that \(d(x, y) - d_{\overline{X} }(x, y)\). Note that 
+  Now we show that \(d(x, y) = d_{\overline{X} }(x, y)\). Note that 
   \[
     d_{\overline{X} }(x, y) = \lim_{n \to \infty} d(x, y) = d(x, y), 
   \] so this is true.
@@ -170,6 +212,7 @@ Is the converse true?
 \begin{proof}[e]
   Since we know \(\mathrm{cl}_{\overline{X}} (X) \subseteq \overline{X} \), we only need to show \(\overline{X} \subseteq \mathrm{cl}_{\overline{X} }(X)  \). Suppose \(x \in \overline{X} \), then \(x = \mathrm{LIM}_{n \to \infty } x_n\) where \(\left\{ x_n \right\}_{n=1}^{\infty}  \) is a Cauchy sequence in \(X\). Now we want to show that \(x \in \mathrm{cl}_{\overline{X} } (X) \), which is equivalent to show for all \(\varepsilon > 0\), there exists \(y \in X\) s.t. \(y \in B_{\overline{X} }(x, \varepsilon )\). If such \(y\) exists, then \(d_{\overline{X} }(x, y)< \varepsilon \), which means \(\lim_{n \to \infty} d(x_n, y) < \varepsilon  \). However, \(\left\{ x_n \right\}_{n=1}^{\infty}  \) is a Cauchy sequence, so there exists \(N > 0\) s.t. \(i, j \ge N\) implies \(d(x_i, x_j) < \frac{\varepsilon}{2}\). Thus, we can pick \(y = x_N\), and then we have for all \(n \ge N\), \(d(x_n, y) < \frac{\varepsilon}{2} < \varepsilon \) Hence, we have \(\lim_{n \to \infty} d(x_n, y) < \varepsilon \), and we're done.              
 \end{proof}
+
 \begin{proof}[f]
   Since \(\left\{ x_n \right\}_{n=1}^{\infty}  \) can be seen as a sequence of elements in \(\overline{X} \), and notice that \(\left\{ x_n \right\}_{n=1}^{\infty}  \) is still Cauchy in \(\overline{X} \) since for all \(\varepsilon > 0\), we know there exists \(N > 0\) s.t. \(p, q \ge N\) implies \(d(x_p, x_q) < \varepsilon  \), so under same circumstances, we know 
   \[
@@ -184,6 +227,7 @@ Is the converse true?
     d(a_n, x_n) \le d(a_n, x_s) + d(x_s, x_n) < \frac{\varepsilon}{2} + \frac{\varepsilon}{2} = \varepsilon,
   \] and we're done.
 \end{proof}
+
 \begin{problem}
     In the following, all the sets are subsets of a metric space $(X,d)$.
 
@@ -285,6 +329,7 @@ Is the converse true?
   \]
   Also, \([1, 2] \cup [2, 3] = [1, 3]\), so \(\mathrm{Int}\left( [1,2] \cup [2, 3] \right) = \mathrm{Int}[1, 3] = (1, 3)   \). This is the case the equality fails. 
 \end{proof}
+
 \begin{problem}
     Let $(X, d)$ be a metric space and $Y \subset X$ be an open subset. For any subset $A \subset Y$, show
 that $A$ is open in $Y$ if and only if it is open in $X$.
@@ -300,6 +345,7 @@ that $A$ is open in $Y$ if and only if it is open in $X$.
     \item [\((\impliedby )\)]  Now if \(A\) is open in \(X\), then for all \(x \in X\), there exists \(B_X(x, r) \subseteq A\), but \(B_Y (x, r) \subseteq B_X(x, r)\), so we have \(B_Y(x, r) \subseteq A\), and thus \(A\) is open in \(Y\).                     
   \end{itemize}
 \end{proof}
+
 \begin{problem}
     On the space $(0,1]$, we may consider the topology induced by the metric space $(\mathbb{R},d)$ defined by
 $d(x,y)=|x-y|$ . Alternatively, we may also define a distance $d'$ on $(0,1]$, given by
@@ -322,6 +368,109 @@ d'(x,y) = \left| \frac{1}{x} - \frac{1}{y} \right|, \qquad \forall x,y \in (0,1]
  \item[(e)] Is $((0,1],d')$ a complete metric space? How about $((0,1],d)$?
 \end{enumerate}
 \end{problem}
+
+\begin{proof}[(a)]
+    We verify the following properties:
+    \begin{itemize}
+        \item $d'(x,y) \geq 0$ since $\lvert \cdot \rvert \geq 0$.
+        \item $d'(x,y) = 0 \iff \lvert\frac{1}{x} - \frac{1}{y}\rvert \iff x=y$.
+        \item $d'(x,y) = \lvert\frac{1}{x} - \frac{1}{y}\rvert = \lvert\frac{1}{y} - \frac{1}{x}\rvert = d'(y,x)$.
+        \item We know if $a, b \in \mathbb{R}$, the triangular inequality $\lvert a \rvert + \lvert b \rvert \geq \lvert a+b \rvert$ holds.
+        Then we can plug $a = \frac{1}{x} - \frac{1}{y}$ and $b = \frac{1}{y} - \frac{1}{z}$ in. Then we can get $\lvert \frac{1}{x} - \frac{1}{y} + \frac{1}{y} - \frac{1}{z} \rvert \leq \lvert \frac{1}{x} - \frac{1}{y} \rvert + \lvert \frac{1}{y} - \frac{1}{z} \rvert$. Hence $d'(x,z) \leq d'(x,y) + d'(y,z)$.
+    \end{itemize}
+    Hence, $d'$ is indeed a metric on $(0.1]$.
+\end{proof}
+
+\begin{proof}[(b)]
+    We assume that $d(x,y) = \varepsilon'' < \varepsilon$.
+    \begin{claim}
+        We claim that if we pick $\varepsilon' = \varepsilon - \varepsilon'' > 0$, then $B_{d'}(y,\varepsilon') \subseteq B_d(x,\varepsilon)$
+    \end{claim}
+    \begin{explanation}
+        $\forall z \in B_{d'}(y, \varepsilon')$, $\lvert \frac{1}{y} - \frac{1}{z} \rvert < \varepsilon'$. Then $\lvert \frac{z-y}{zy} \rvert < \varepsilon'$, $\lvert z-y \rvert < \varepsilon'zy$ (Since $z > 0$ and $y > 0$). \\
+        Hence we know that $d(y,z) = \lvert y-z \rvert < \varepsilon'zy < \varepsilon'$. \\
+        Since $d$ is metric, so $d(x,z) \leq d(x,y) + d(y,z) < \varepsilon'' + (\varepsilon - \varepsilon'') = \varepsilon$. \\
+        Hence $z \in B_d(x, \varepsilon)$.
+    \end{explanation}
+    By the claim above, we're done.
+\end{proof}
+
+\begin{proof}[(c)]
+    Suppose $E = B_{d'}(x, r)$, we first analyze the properties of the elements in $E$ first, $y \in E$ if $\lvert \frac{1}{y} - \frac{1}{x} \rvert < r$, we can solve $\frac{1}{x} - r < \frac{1}{y} < \frac{1}{x} + r$:
+    \begin{itemize}
+        \item Condition 1: $\frac{1}{y} < \frac{1}{x} +r$, so $y > \frac{x}{1+rx} > 0$
+        \item Condition 2 (Case 1): If $\frac{1}{y} > \frac{1}{x} - r$ and $\frac{1}{x} - r \leq 0$, then any $y \in (0,1]$ satisfy the condition.
+        \item Condition 2 (Case 2): If $\frac{1}{y} > \frac{1}{x} - r$, $\frac{1}{x} - r > 0$ and $x \geq 1-rx$, then $y \leq 1 < \frac{x}{1-rx}$
+        \item Condition 2 (Case 3): If $\frac{1}{y} > \frac{1}{x} - r$, $\frac{1}{x} - r > 0$ and $x < 1-rx$, then $y < \frac{x}{1-rx} < 1$
+    \end{itemize}
+    Then we can construct open ball which is also equal to $E$ in another metric space by selecting center point and radius:\\
+    For case 1 and 2, we may choose $c = 1 \in (0,1]$ and $r' = 1 - \frac{x}{1+rx}$, since
+    \[
+    B_{((0,1],d)}(c,r') = B_{(\mathbb{R},d)}(c,r') \cap (0,1] = \{ z \in \mathbb{R} \mid 1-r' < z < 1+r' \} \cap (0,1] = \{ z \in (0,1] \mid 1-r' < z\}
+    \]
+    \[
+    B_{((0,1],d)}(c,r) = \{ z \in (0,1] \mid \frac{x}{1+rx} < z\}
+    \]
+    This is indeed same as the condition requirement.\\
+    For case 3, let $a = \frac{x}{1+rx}$, $b = \frac{x}{1-rx}$, we choose $c = \frac{a+b}{2}$ and $r' = \frac{b-a}{2}$, since
+    \[
+    B_{((0,1],d)}(c,r') = B_{(\mathbb{R},d)}(c,r') \cap (0,1] = \{ z \in \mathbb{R} \mid c-r' < z < c+r' \} \cap (0,1] = \{ z \in (0,1] \mid a < z < b\}
+    \]
+    \[
+    B_{((0,1],d)}(c,r) = \{ z \in (0,1] \mid \frac{x}{1+rx} < z < \frac{x}{1-rx}\}
+    \]
+    This is also same as the condition requirement.
+    Hence we proved.
+    
+\end{proof}
+
+% \begin{proof}[(c)(Discard fuck!!!)]
+%     To prove this, we need to show given $x \in (0,1], \varepsilon >0, B = B_{d'}(x, \varepsilon)$, for every $y \in B$, we can find $\varepsilon' > 0$ such that $B_d(y, \varepsilon') \subseteq B = B_{d'}(x, \varepsilon)$,
+%     We may assume that $d'(x,y) = \varepsilon'' < \varepsilon$. \\
+%     First, we show that the value of $y$ has a lower bound.
+%     Since $\lvert \frac{1}{y} - \frac{1}{x} \rvert < \varepsilon''$, $\frac{1}{y} < \varepsilon'' + \frac{1}{x}$, so we know that $y > \frac{x}{1+\varepsilon''x}$, to make the following proof easier, we may assume that $m = \frac{x}{1+\varepsilon''x} > 0$. 
+%     \begin{claim}
+%         We claim that if we pick $\varepsilon' = \frac{m^2(\varepsilon - \varepsilon'')}{m(\varepsilon - \varepsilon'') + 1} > 0$, then then $B_{d}(y,\varepsilon') \subseteq B_{d'}(x,\varepsilon)$
+%     \end{claim}
+%     \begin{explanation}
+%         First, notice that $y > m = \frac{m^2(\varepsilon - \varepsilon'') + m}{m(\varepsilon - \varepsilon'') + 1} > \varepsilon' = \frac{m^2(\varepsilon - \varepsilon'')}{m(\varepsilon - \varepsilon'') + 1}$, so $y - \varepsilon' > 0$. \\
+%         $\forall z \in B_{d}(y, \varepsilon')$, $\lvert y - z \rvert < \varepsilon'$, so $z > y - \varepsilon' > 0$ Then $\lvert \frac{1}{y} - \frac{1}{z} \rvert =\lvert \frac{y-z}{yz} \rvert < \frac{\varepsilon'}{yz} < \frac{\varepsilon'}{m(m-\varepsilon')}$. \\
+%         Hence we know that $d'(y,z) < \frac{\varepsilon'}{m(m-\varepsilon')}$. \\
+%         Since $d'$ is metric, so 
+%         \begin{align*}
+%             d'(x,z) &\leq d'(x,y) + d'(y,z) < \frac{\varepsilon'}{m(m-\varepsilon')} + \varepsilon'' \\ &= \frac{\frac{m^2(\varepsilon - \varepsilon'')}{m(\varepsilon - \varepsilon'') + 1}}{m(m-\frac{m^2(\varepsilon - \varepsilon'')}{m(\varepsilon - \varepsilon'') + 1})} + \varepsilon'' = \frac{m(\varepsilon - \varepsilon'')}{(m(m(\varepsilon-\varepsilon'')+1)-m^2(\varepsilon - \varepsilon'') )} + \varepsilon'' \\ &= \frac{m(\varepsilon - \varepsilon'')}{m} + \varepsilon'' = \varepsilon,
+%         \end{align*}
+%          and thus $z \in B_{d'}(x, \varepsilon)$.
+%     \end{explanation}
+%     And the claim above is sufficient to show that for every open ball in $E$ in $((0,1],d')$, there exist some $r > 0$ such that $d'(x,r) \subseteq E$, so $E$ is also the open set in $((0,1],d)$, hence we proved.
+% \end{proof}
+
+\begin{proof}[(d)]
+    % Trivial since from (b) it is equivalent that given any open set $E$ in $((0,1],d)$, $E$ is also an open set in $((0,1],d')$, and from (c) we show that given any open set $E$ in $((0,1],d')$, $E$ is also an open set in $((0,1],d)$. \\
+    % So given any $E$, $E$ is open in $((0,1],d')$ if and only if $E$ is open in $((0,1],d)$, hence we prove that $((0,1],d')$ and $((0,1],d)$ are topologically equivalent.
+    \vphantom{text}
+    \begin{itemize}
+        \item [\((\implies )\)] Suppose A is open in $((0,1],d)$, then $\forall x\in A, \exists r_x > 0$ such that $B_d(x, r_x) \subseteq A$. So $A = \bigcup_{x\in A} B_d(x, r_x)$, and from (b), we know any open ball in $((0,1],d)$ is also open in $((0,1],d')$, so $A$ is also the union of infinitely many open set in $((0,1],d')$. By the proposition we have shown in class, we conclude $A$ is also a open set in $((0,1],d')$.
+        \item [\((\impliedby )\)] Suppose A is open in $((0,1],d')$, then $\forall x\in A, \exists r_x > 0$ such that $B_{d'}(x, r_x) \subseteq A$. So $A = \bigcup_{x\in A} B_{d'}(x, r_x)$. and from (c), we know for any open ball in $((0,1],d')$ is also open in $((0,1],d)$, so $A$ is also the union of infinitely many open set in $((0,1],d)$. By the proposition we have shown in class, we conclude $A$ is also a open set in $((0,1],d)$.
+    \end{itemize}
+    Hence, we proved that $A$ is open set in $((0,1],d')$ if and only if it is open in $((0,1],d)$.
+\end{proof} 
+
+\begin{proof}[(e)]
+    We first show that $((0,1],d')$ is complete metric space. \\
+    Given Cauchy sequence $(x_n)_{n=m}^\infty$ in $((0,1],d')$, $\forall \varepsilon > 0, \exists N$ such that $\forall n,m \geq N$, $d'(x_n,x_m) = \lvert \ \frac{1}{x_n} - \frac{1}{x_m} \rvert < \varepsilon$. \\
+    Then we can construct another sequence $(y_n)_{n=m}^\infty$ such that $y_n = \frac{1}{x_n}$ and since $x_n \in (0, 1]$, $y_n \in [1,\inf)$. \\
+    $(y_n)$ is Cauchy sequence since $\forall \varepsilon > 0, \exists N' = N$ such that $\forall n,m \geq N'$, $d(y_n, y_m) = \lvert y_n - y_m\rvert = \lvert \ \frac{1}{x_n} - \frac{1}{x_m} \rvert < \varepsilon$ by previous proof. \\
+    Notice that $[1, \infty)$ is a closed subset in $\mathbb{R}$ and we know $(\mathbb{R}, d)$ is complete, so $([1, \infty ),d)$ is also complete. Hence $(y_n)$ converge to some $L \in [1,\infty)$, and this will imply that $(x_n)$ converge to $\frac{1}{L} \in (0,1]$, so given any Cauchy sequence in $((0,1],d')$, it converges to some $L' \in (0,1]$, so $((0,1],d')$ is complete.
+
+    We show that $((0,1],d)$ is \textbf{NOT} complete by showing an example.
+    Consider $(z_n)_{n=m}^\infty$, $z_n = \frac{1}{n}$. It is Cauchy sequence since $\forall \varepsilon = \frac{1}{k}> 0, \exists N = \lceil k \rceil$ such that $\forall n, m \geq N$, WLOG suppose $n \geq m$,
+    \[
+      d(x_n, x_m) = x_n - x_m < x_n \leq \frac{1}{\lceil k \rceil} \leq  \frac{1}{k} = \varepsilon.
+    \]
+    However, it converges to $0$, which is not in $(0,1]$, so the series $(z_n)$ doesn't converge in $((0,1],d)$, hence $((0,1],d)$ is not complete.
+    
+\end{proof}
 
 \begin{problem}
     \begin{enumerate}
@@ -355,3 +504,75 @@ and the nesting condition
 is satisfied.
   Show that a metric space $(M,d)$ is complete if and only if every decreasing sequence of closed balls with radii going to zero has a nonempty intersection. \end{enumerate}
 \end{problem}
+
+\begin{proof}[(a)]
+    Consider the following example:
+    $X = \mathbb{N}$, and 
+    \[
+    d(x,y)=
+    \begin{cases}
+    0, & \text{if } x=y,\\[4pt]
+    1+\dfrac{1}{\min\{x,y\}}, & \text{if } x\ne y .
+    \end{cases}
+    \]
+    and $C_n = \overline{B}_d\!\left(n,\,1+\frac{1}{n}\right) = \{\, x \in X \mid d(x,n) \le 1+\tfrac{1}{n} \,\}$.
+    \begin{claim}
+        $\forall n \in \mathbb{N}, C_n = \{n, n+1, n+2...\}$
+    \end{claim}
+    \begin{explanation}
+        $\forall m < n$, $d(n,m) = 1 + \frac{1}{m} > 1 + \frac{1}{n}$, so $m \notin C_n$.
+        $\forall m \geq n$, $d(n,m) = 1 + \frac{1}{n} \leq 1 + \frac{1}{n}$, so $m \in C_n$
+        So $C_n$ is indeed $\{n, n+1, ...\}$.
+    \end{explanation}
+    
+    $\forall n, C_{n+1} \subseteq C_{n}$, So $\bigl(C_n)_{n\ge 1}$ is a decreasing sequence of closed balls. However, $\forall n, n \notin C_{n+1}$, so $\bigcap_{n=1}^{\infty} C_n = \emptyset$.
+
+    Then we show that $(X, d)$ is complete metric space.
+    For every Cauchy sequence $(x_n)_{n=1}^\infty$ in $(X, d)$, $\forall \varepsilon > 0, \exists N$ such that $\forall n,m \geq N$, $d(x_n, x_m) < \varepsilon$. \\
+    Then we can take $\varepsilon = 0.48763$, by definition, exists $N$ such that $\forall n,m \geq N$, $d(x_n, x_m) < 0.48763$. However if $x_n \neq x_m$, then $d(x_n,x_m) = 1 + \dfrac{1}{\min\{x_n,x_m\}} > 1$, so we know $\forall n \geq N, x_n = x_N$, and this will make the sequence coverage to $x_N \in \mathbb{N}$ since this is a constant sequence.
+
+    Hence, every Cauchy sequence in $X$ coverage to some point in $X = \mathbb{N}$, so $(X, d)$ is complete metric space.
+    
+\end{proof}
+
+\begin{proof}[(b)]
+    First, we show that if the nested condition is satisfied and the radii goes to \(0\), then $(x_n)_{n=1}^\infty$ is Cauchy sequence. \\
+    Since $r_n \;\to\; 0 \quad\text{as } n\to\infty$, $\forall \varepsilon' > 0, \exists N'$ such that $\forall n \geq N', r_n < \frac{\varepsilon}{2}$. \\
+    And since $\overline{B}(x_{n+1},r_{n+1}) \;\subseteq\; \overline{B}(x_n,r_n) \quad\text{for all } n\in\mathbb{N}$, so $\{x_{n+1},x_{n+2}, ...\} \subseteq \overline{B}(x_n,r_n)$ hence $\forall n, m \geq N', d(x_n, x_m) \leq d(x_n, x_{N'}) + d(x_{N'}, x_m) \leq \frac{\varepsilon}{2} + \frac{\varepsilon}{2} = \varepsilon$.
+    So by definition. $(x_n)_{n=1}^\infty$ is Cauchy sequence.
+
+    Then we can start our proof:
+    \begin{itemize}
+        \item [\((\implies )\)] Since $(M,d)$ is complete and $(x_n)$ is Cauchy sequence, $(x_n)$ will converge to some $x' \in M$. \\
+        \begin{claim}
+            $x' \in \overline{B}(x_m,r_m)$ for all $m \in \mathbb{N}$
+        \end{claim}
+        \begin{explanation}
+            Since $(x_n)_{n=1}^\infty$ is Cauchy sequence, the subsequence $(x_n)_{n=m}^\infty$ is also Cauchy sequence and also converge to $x'$. \\
+            And since $\overline{B}(x_m,r_m)$ is an close ball in $(M, d)$, $x' \in \overline{B}(x_m,r_m)$ by properties we have shown in class.
+        \end{explanation}
+        Since $x' \in \overline{B}(x_m,r_m)$ for all $m \in \mathbb{N}$, the intersection of these ball are not empty, hence we proved.
+
+        \item [\((\impliedby )\)] First we do a big claim below:
+        \begin{claim}
+            For every Cauchy sequence $(x_n)_{n=1}^\infty$, we can construct $(r_n)_{n=1}^\infty$ such that there is a subsequence $(x'_n, r'_n)_{n=1}^\infty$.
+            $\overline{B}(x'_n,r'_n)$ satisfy nested condition. And further more, $r'_n \;\to\; 0 \quad\text{as } n\to\infty$.
+        \end{claim}
+        \begin{explanation}
+            Since $(x_n)$ is Cauchy sequence, $\forall \varepsilon > 0, \exists N$ such that $\forall n, m \geq N, d(x_n,x_m) < \varepsilon$. \\
+            Then we might take $\varepsilon = 1$ and discard those term that $(x_n)_{n=1}^{n=N}$, and do the following construction:\\
+            For those $r_n, n \geq N$ terms, let $T_n = \{x_n, x_{n+1}, ...\}$. \\
+            We define $d_n = \sup \{\, d(x_j,x_k) \mid x_j,x_k \in T_n \,\}$, since given any pair, the distance is smaller than 1 by the definition, so $d_n$ has a upper bound so supremum exists. \\
+            The let $r_n = 2d_n$, then $T_n \subseteq \overline{B}(x_n,d_n) \subseteq \overline{B}(x_n,r_n)$. \\
+            Since $x_n$ is Cauchy sequence, $d_n \to 0 \quad\text{as } n\to\infty$, hence $r_n \to 0 \quad\text{as } n\to\infty$.
+            Then we show that $\overline{B}(x_k,r_k) \subseteq \overline{B}(x_n,r_n) , \text{for some } k > n$. \\
+            First, we need to carefully pick $k$. Since $x_n$ is Cauchy, again, for $\varepsilon = \frac{d_n}{2}$, exist some $k = N'$ such that $d_k < \varepsilon$. \\
+            Then $\forall z \in \overline{B}(x_k,r_k), d(x_n, z) \leq d(x_n, x_k) + d(x_k, z) \leq d_n + r_k \leq d_n + d_n = r_n$. \\
+            Then we start from $N$-th terms and recursively do the above construction, we can get a sequence $(x'_n, r'_n)_{n=1}^\infty$, which is the subsequence of $(x_n, r_n)_{n=1}^\infty$, satisfy the nest condition and $r'_n \to 0 \;\text{as } n\to\infty$ since $r_n \to 0$.
+        \end{explanation}
+        Then we know the intersection of $\overline{B}(x'_n,r'_n)$ is not empty by hypothesis, let it $x'$, we know that $\lim_{n \to \infty} x'_n$ lie in infinitely many nested close ball, so $\lim_{n \to \infty} x'_n \in \lim_{n \to \infty} \overline{B}(x'_n,r'_n)$ $0 \leq \lim_{n \to \infty} d(x'_n, x') = 0 \leq r'_n \text{ since } \lim_{n \to \infty} r'_n = 0,\text{and this implies } x'_n \to x'.$
+        Hence, we show that $(x'_n)$ converge to $x'$, and we know if a Cauchy sequence's subsequence converge to some point $x'$, the original Cauchy sequence also converge to $x'$, so $(x_n)$ converge to $x$.\\
+        since for every Cauchy sequence converge, so $(M,d)$ is complete.
+        
+    \end{itemize}
+\end{proof}
