@@ -1,6 +1,6 @@
 \lecture{8}{25 Sep. 10:20}{}
 \begin{theorem}[Review \autoref{thm: compact to subcover}]
-    Let \(Y\) be a compact subset of a metric space \((X, d)\) and let \(\left\{ V_\alpha  \right\}_{\alpha \in A} \) be an open cover of \(Y\). Then \(\exists \) a finite subcover of \(\left\{ V_\alpha  \right\}_{\alpha \in A} \) i.e. \(\exists \alpha _1, \dots ,\alpha _n \in A\) s.t. \(Y \subseteq \bigcap_{i=1}^{n} V_{\alpha _i}. \)        
+    Let \(Y\) be a compact subset of a metric space \((X, d)\) and let \(\left\{ V_\alpha  \right\}_{\alpha \in A} \) be an open cover of \(Y\). Then \(\exists \) a finite subcover of \(\left\{ V_\alpha  \right\}_{\alpha \in A} \) i.e. \(\exists \alpha _1, \dots ,\alpha _n \in A\) s.t. \(Y \subseteq \bigcup_{i=1}^{n} V_{\alpha _i}. \)        
 \end{theorem}
 
 \begin{remark}
@@ -8,8 +8,58 @@
         Y \text{ is compact } &\iff \text{ Any open cover of } Y \text{ has a finite subcover.}
     \end{align*}
 \end{remark}
+\begin{proof}
+    The \((\implies )\) direction is proved. Now we proved the other direction.
+    \begin{claim} \label{clm: compact complete open cover ver}
+        If \((X, d)\) is a metric space and for all open cover of \(X\), there exists finite subcover of \(X\), then \(X\) is complete.    
+    \end{claim} 
+    \begin{explanation}
+        We will prove this by contradiction, using the definition of compactness (the open cover property).
 
-\begin{corollary}
+        \textbf{1. Assumption}
+        Assume for the sake of contradiction that $X$ is \textbf{compact} but \textbf{not complete}.
+        Since $X$ is not complete, there exists a \textbf{Cauchy sequence} $\{x_n\}_{n=1}^{\infty}$ in $X$ that \textbf{does not converge} to any point $p \in X$.
+
+        \textbf{2. Constructing the Open Cover}
+        Since $\{x_n\}$ does not converge to a point $p \in X$, for every $p \in X$, the point $p$ is not the limit of the sequence. This means there exists some $\epsilon_p > 0$ such that the open ball $B_{\epsilon_p}(p)$ contains only a \textbf{finite number of terms} of the sequence $\{x_n\}$.
+
+        To see why, suppose for a contradiction that there was some $p \in X$ such that for all $\epsilon > 0$, the ball $B_{\epsilon}(p)$ contains an infinite number of terms of $\{x_n\}$. Let $\{x_{n_k}\}$ be a subsequence with $x_{n_k} \in B_{1/k}(p)$. This subsequence converges to $p$. Since $\{x_n\}$ is a Cauchy sequence and has a convergent subsequence, the entire sequence $\{x_n\}$ must converge to the same limit $p$, which contradicts our initial assumption.
+        Therefore, the property holds: for every $p \in X$, there is an $\epsilon_p > 0$ such that $B_{\epsilon_p}(p)$ contains $x_n$ for only finitely many $n$.
+
+        Consider the collection of open balls
+        $\mathcal{U} = \{B_{\epsilon_p}(p) : p \in X\}.$
+        Since the union of these balls covers every point $p \in X$, $\mathcal{U}$ is an \textbf{open cover} of $X$:
+        $$X \subseteq \bigcup_{p \in X} B_{\epsilon_p}(p).$$
+
+        \textbf{3. Using Compactness to Find a Finite Subcover}
+        Since $X$ is \textbf{compact}, the open cover $\mathcal{U}$ must have a \textbf{finite subcover}. That is, there exist a finite number of points $p_1, p_2, \dots, p_k \in X$ such that
+        $$X \subseteq B_{\epsilon_{p_1}}(p_1) \cup B_{\epsilon_{p_2}}(p_2) \cup \dots \cup B_{\epsilon_{p_k}}(p_k) = \bigcup_{i=1}^k B_{\epsilon_{p_i}}(p_i).$$
+
+        \textbf{4. Reaching the Contradiction}
+        By the definition of $\epsilon_{p_i}$, each ball $B_{\epsilon_{p_i}}(p_i)$ contains $x_n$ for only a \textbf{finite number} of indices $n$.
+        The union of a finite number of finite sets is a finite set. Therefore, the finite union
+        $\bigcup_{i=1}^k B_{\epsilon_{p_i}}(p_i)$
+        can contain $x_n$ for only a finite number of indices $n$.
+        However, since this finite union covers all of $X$ (step 3), it must contain \textbf{all} terms of the sequence $\{x_n\}_{n=1}^{\infty}$.
+        Since the sequence $\{x_n\}$ is an infinite set of points, this is a \textbf{contradiction}.
+
+        The initial assumption that $X$ is not complete must be false.
+        Thus, every compact metric space is complete.
+    \end{explanation}      
+    Suppose any open cover of \(Y\) has a finite subcover, then given any sequence \(\left( y^{(n)} \right)_{n=1}^{\infty}  \). Consider 
+    \[
+        \bigcup_{x \in Y} B_Y \left( x, 1 \right),  
+    \] then this is an open cover of \(Y\), and now we know there is a finite subcover
+    \[
+        \bigcup_{i=1}^{k} B_Y \left( x_{i} , 1 \right) 
+    \] of \(Y\) where \(x_i \in Y\) for all \(i\). Now since \(\left( y^{(n)} \right)_{n=1}^{\infty}  \) has infinitely many terms, so we know for some \(i\), we have infinitely many terms of \(\left( y^{(n)} \right)_{n=1}^{\infty} \subseteq B_Y \left( x_i, 1 \right)  \) by Pigeonhole principle. Hence, there are infinitely many terms of \(\left( y^{(n)} \right)_{n=1}^{\infty}  \) are in 
+    \[
+        \left\{ y \in Y: 0 \le d(y, x_i) < \frac{1}{2} \right\} \cup \left\{ y \in Y: \frac{1}{2} \le d(y, x_i) < 1 \right\}.  
+    \]  Thus, again, by Pigeonhold principle we know there are infinitely many terms of \(\left( y^{(n)} \right)_{n=1}^{\infty}  \) are in either one of the above two sets. By repeating split the space into half as what we do above, we know for all \(k \ge 0\), there are infinitely many terms of \(\left( y^{(n)} \right)_{n=1}^{\infty}  \) has the following property: Every two terms of these "infinitely many terms" has distance less than \(\frac{1}{2^k}\). Note that this means we can pick a subsequence of \(\left( y^{(n)} \right)_{n=1}^{\infty}  \) so that it is Cauchy, and since every Cauchy sequence converges in \(Y\) (Since \autoref{clm: compact complete open cover ver}), so we're done.
+    
+    
+\end{proof}
+\begin{corollary} \label{cl: compact nesting then intersection nonempty}
     Let \((X, d)\) be a metric space and let \(K_1, K_2, \dots \) be a sequence of nonempty compact subsets of \(X\) s.t. \(K_{i+1} \subseteq K_i\) for \(i \in \mathbb{N} \), that is, \(K_1 \supseteq K_2 \supseteq K_3 \supseteq \dots  \) for \(i \in \mathbb{N} \), then 
     \[
         \bigcap_{i=1}^{\infty} K_i \neq \varnothing. 
@@ -47,10 +97,10 @@
         Y \setminus Z = V \cap Y
     \] for some open set \(V \subseteq Y\), so note that \((Y \setminus Z) \subseteq V\). Now suppose \(\left\{ U_\alpha  \right\}_{\alpha \in A} \) is an open cover of \(Z\). Hence, we know \(\left\{ U_\alpha  \right\}_{\alpha \in A} \cup \left\{ V \right\}  \) is an open cover of \(Y\) since the former covers \(Z\) and the latter covers \(Y \setminus Z\). Now since \(Y\) is compact, so we know for some \(\alpha _1, \alpha _2, \dots , \alpha _n\), there is 
     \[
-        Y \subseteq \left( \bigcup_{i=1}^{n} U_i \right) \cup V, 
+        Y \subseteq \left( \bigcup_{i=1}^{n} U_{\alpha _i} \right) \cup V, 
     \] and thus we can write
     \[
-        Z \subseteq Y \subseteq \left( \bigcup_{i=1}^{n} U_i  \right) \cup V. 
+        Z \subseteq Y \subseteq \left( \bigcup_{i=1}^{n} U_{\alpha _i}  \right) \cup V. 
     \]  
     However, note that \(Z \cap V = \varnothing \) since
     \[
@@ -58,7 +108,7 @@
     \]
     Hence, we know 
     \[
-        Z \subseteq \bigcup_{i=1}^{n} U_i, 
+        Z \subseteq \bigcup_{i=1}^{n} U_{\alpha _i}, 
     \] and thus for any open cover of \(Z\), we know there exists a finite subcover of \(Z\), and we're done.
 \end{proof}
 \chapter{Continuous functions on metric spaces}
