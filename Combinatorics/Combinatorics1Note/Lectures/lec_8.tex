@@ -1,0 +1,123 @@
+\lecture{8}{26 Sep. 12:20}{}
+Observe that 
+\[
+    \left\vert \frac{1}{\sqrt{5} } \left( \frac{1 - \sqrt{5} }{2}^n \right)  \right\vert < \frac{1}{2} .
+\]
+Hence, \(F_n\) is the integer closed to 
+\[
+    \frac{1}{\sqrt{5} } \left( \frac{1 + \sqrt{5} }{2} \right)^n. 
+\] 
+
+The idea is to encode a sequence of numbers 
+\[
+    a_0, a_1, a_2, \dots 
+\]
+as coefficients in a power series 
+\[
+    A(x) = \sum_{n=0}^{\infty} a_n x^n. 
+\]
+
+\begin{proposition}
+    Let \((a_0, a_1, \dots )\) be a sequence of real numbers. If \(\vert a_n \vert < K^n \) for all \(n \in \mathbb{N} \), then
+    \[
+        \forall x \in \left( -\frac{1}{K}, \frac{1}{K} \right), \text{ we have } A(x) = \sum_{x=0}^{\infty} a_n x^n  
+    \]  converges absolutely.
+\end{proposition}
+
+\(A(x)\) has derivatives of all orders at \(x = 0\), and for all \(n \ge 0\), 
+    \[
+        A^{(n)}(0) = a_n n!.
+    \]  In particular, the values of \(A(x)\) around the origin determine this sequence \((a_n)\) uniquely. We treat \(A(x)\) as a formal power series.  Thus, we can usually eaily verigy results using induction. 
+
+\begin{definition}
+    Given a sequence \((a_0, a_1, \dots )\) of real numbers, the generating function of the sequence is the (formal) power series 
+    \[
+        \sum_{n=1}^{\infty} a_n x^n.  
+    \]
+\end{definition}
+
+\begin{eg}
+    Suppose we have a sequence \((1, 1, 1, \dots )\), then 
+    \[
+        A(x) = \sum_{n=0}^{\infty} x^n = \frac{1}{1-x} 
+    \] converges for \(\vert x \vert < 1 \).  
+\end{eg}
+
+\begin{eg}
+    Suppose we have a sequence \(\left( 0, 1, \frac{1}{2}, \dots  \right) \), then 
+    \[
+        A(x) = \sum_{n=0}^{\infty} \frac{x^n}{n} = -\ln (1 - x) 
+    \] converges for \(\vert x \vert < 1 \).  
+\end{eg}
+
+\begin{eg}
+    Suppose we have a sequence \(\left( 1, 1, \frac{1}{2}, \dots , \frac{1}{n!}, \dots  \right) \), then 
+    \[
+        A(x) = \sum_{n=0}^{\infty} \frac{x^n}{n!} = e^x
+    \] converges for all \(x \in \mathbb{R} \).  
+\end{eg}
+
+\begin{eg}
+    Suppose \(r\) is a fixed number and we have a sequence 
+    \[
+        \left( \binom{r}{0}, \binom{r}{1}, \dots  \right),
+    \]then 
+    \[
+        A(x) = \sum_{n=0}^{\infty} \binom{r}{n} x^n = (1 + x)^r.  
+    \] converges for \(\vert x \vert < 1 \).
+\end{eg}
+
+\begin{remark}
+    The special case:
+    \begin{align*}
+        \frac{1}{(1 - x)^t} &= (1 - x)^{-t} = \sum_{n=0}^{\infty} \binom{-t}{n} (-x)^n = \sum_{n=0}^{\infty} \binom{-t}{n} (-1)^n x^n \\
+        &= \sum_{n=0}^{\infty} \binom{t + n - 1}{n} x^n. 
+    \end{align*}
+\end{remark}
+
+\section{Dictionary for operations}
+\begin{itemize}
+    \item Sum: 
+    \begin{align*}
+        A(x) &\sim (a_0, a_1, \dots ) \\
+        B(x) &\sim (b_0, b_1, \dots ) \\
+        A(x) + B(x) &\sim (a_0 + b_0, a_1 + b_1, \dots )
+    \end{align*}
+    \item Scalar multiplication: 
+    \begin{align*}
+        A(x) &\sim (a_0, a_1, \dots ) \\
+        \lambda A(x) &\sim  (\lambda a_0, \lambda a_1, \dots ) \quad \forall \lambda > 0. 
+    \end{align*}
+    \item Shifting to the right:
+    \begin{align*}
+        (a_0, a_1, \dots ) &\sim \sum_{n=0}^{\infty} a_n x^n \\
+        (0, a_0, a_1, \dots ) &\sim \sum_{n=1}^{\infty} a_{n-1} x^n = x \sum_{n=0}^{\infty} a_n x^n \\
+        A(x) &\to x A(x)  
+    \end{align*}
+    \begin{note}
+        By repeating shifting to the right, we can get 
+        \[
+            x^k A(x) \sim ( \underbrace{0,0, \dots ,0}_{k}, a_0, a_1, \dots  ).  
+        \]
+    \end{note}
+    \item Shifting to the left: 
+    \begin{align*}
+        (a_0, a_1, \dots ) &\sim \sum_{n=0}^{\infty} a_n x^n \\
+        (a_1, a_2 \dots ) &\sim \sum_{n=1}^{\infty} a_n x^{n-1} = \frac{A(x) - a_0}{x}.  
+    \end{align*}
+    \begin{note}
+        By repeating 
+        \[
+            \frac{A(x) - a_0 - a_1 x - \dots - a_{k-1} x^{k-1}}{x^k},
+        \] we can shift to the left by \(k\) terms. 
+    \end{note}
+    \item Substituting \(\lambda x\) for \(x\) with some \(\lambda \in \mathbb{R} \). 
+    \begin{align*}
+        A(\lambda x) &= \sum_{n=0}^{\infty} a_n \left( \lambda x \right)^n = \sum_{n=0}^{\infty} \left( a_n \lambda ^n \right) x^n     
+    \end{align*}
+    and it corresponds to \((a_0, \lambda a_1, \lambda ^2 a_2, \dots )\). 
+\end{itemize}
+
+\begin{eg}
+    Suppose \((1, \lambda , \lambda ^2, \dots )\), then taking \((1, 1, \dots )\) and multiplying by \(\lambda ^n\) we will change \(\frac{1}{1-x}\) to \(\frac{1}{1-\lambda x}\), which means change \((1,1,\dots )\) to \((1, \lambda , \lambda ^2, \dots )\).     
+\end{eg}
