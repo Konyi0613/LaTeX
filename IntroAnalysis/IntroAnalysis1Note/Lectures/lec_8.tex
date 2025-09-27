@@ -111,6 +111,16 @@
         Z \subseteq \bigcup_{i=1}^{n} U_{\alpha _i}, 
     \] and thus for any open cover of \(Z\), we know there exists a finite subcover of \(Z\), and we're done.
 \end{proof}
+
+
+
+
+
+
+
+
+
+
 \chapter{Continuous functions on metric spaces}
 Suppose \((X, d_x)\) and \((Y, d_y)\) are metric space. Let \(f: X \to Y\) be a function from \(X\) to \(Y\). Then we want that if \(x \in X\) is close to \(y \in X\), then, then \(f(x)\in Y\) is close to \(f(y) \in Y\). 
 
@@ -124,18 +134,18 @@ Suppose \((X, d_x)\) and \((Y, d_y)\) are metric space. Let \(f: X \to Y\) be a 
 \begin{definition}[Preimage] \label{def: preimage}
     Let \(f : X \to Y\) be a function from \(X \to Y\) and \(V \subseteq Y\). The preimage (inverse image) of \(V\) is 
     \[
-        f^{-1}(V) = \left\{ x\in X \mid f(x) \in V \right\}.
+        f^{-1}(V) = \left\{ x\in X \mid f(x) \in V \right\} \subseteq X.
     \]    
 \end{definition}
 
 \begin{eg}
     Suppose \(f(x) = x^2\), then what is the preimage of \((1, \infty )\)?  
 \end{eg}
-\begin{explanation}
+\begin{answer}
     \[
         f^{-1}((1, \infty )) = (-\infty , -1) \cup (1, \infty ).
     \]
-\end{explanation}
+\end{answer}
 Now we build an equivalent definition of continuity. If \(f\) is continuous at \(x_0\), then given any \(\varepsilon > 0\), \(\exists \delta > 0\) s.t. 
 \[
     f(x) \in B_Y(f(x_0), \varepsilon ) \quad \text{whereas } x \in B_X(x_0, \delta ).
@@ -146,19 +156,24 @@ Now we build an equivalent definition of continuity. If \(f\) is continuous at \
 \begin{corollary}
     \(f\) is continuous at \(x_0\) if and only if 
     \begin{center}
-        Given any \(\varepsilon > 0\), \(\exists \delta > 0\), we have \(B_X(x_0, \delta ) \subseteq f^{-1}(B_Y(f(x_0), \varepsilon )).\).   
+        Given any \(\varepsilon > 0\), \(\exists \delta > 0\) s.t. \(B_X(x_0, \delta ) \subseteq f^{-1}(B_Y(f(x_0), \varepsilon )).\).   
     \end{center}  
 \end{corollary}
-
+\begin{figure}[H]
+    \centering
+    \incfig{conti}
+    \caption{Continuous function from \((X, d_X)\) to \((Y, d_Y)\)}
+    \label{fig:conti}
+\end{figure}
 \begin{remark} \label{rmk: if f conti then f intersect K conti}
     If \(f: X \to Y\) is continuous and \(K \subseteq X\), then \(f\vert_K : K \to Y\) is continuous.   
 \end{remark}
 \begin{explanation}
     Given any point \(x_0 \in K \subseteq X\). Since \(f\) is continuous at \(x_0\), so \(\forall \varepsilon > 0\), \(\exists \delta > 0\) s.t. 
     \[
-        d\left( f(x), f(x_0) \right) < \varepsilon \quad \text{ if } d_X(x, x_0) < \delta. 
+        d_Y\left( f(x), f(x_0) \right) < \varepsilon \quad \text{ if } d_X(x, x_0) < \delta. 
     \]     
-    If \(z \in K\) and \(d_K(z, x_0) < \delta \), then \(d_Y(f(z), f(x)) <\varepsilon \), so \(f\) is continuous on \(K\).     
+    If \(z \in K\) and \(d_K(z, x_0) < \delta \), then \(d_Y(f(z), f(x_0)) <\varepsilon \) since \(d_K\) is actually \(d_X\) but intersected to \(K\), so \(f\) is continuous on \(K\).     
 \end{explanation}
 
 \begin{theorem} \label{thm: continuous TFAE 1}
@@ -169,7 +184,7 @@ Now we build an equivalent definition of continuity. If \(f\) is continuous at \
         \[
             \lim_{n \to \infty} f \left( x^{(n)} \right) = f(x_0) \text{ in } \left( Y, d_Y \right).   
         \]
-        \item [(c)] For every open set \(V \subseteq Y\) that contains \(f(x_0)\), \(\exists \) a open set \(U \subseteq X\) containing \(x_0\) s.t. \(f(U) \subseteq V\), or equivalently, \(U \subseteq f^{-1}(V)\) .      
+        \item [(c)] For every open set \(V \subseteq Y\) that contains \(f(x_0)\), \(\exists \) an open set \(U \subseteq X\) containing \(x_0\) s.t. \(f(U) \subseteq V\), or equivalently, \(U \subseteq f^{-1}(V)\) .      
     \end{itemize}  
 \end{theorem}
 \begin{proof}[proof of (a) \(\implies \) (b)]
@@ -178,11 +193,11 @@ Now we build an equivalent definition of continuity. If \(f\) is continuous at \
 \begin{proof}[proof of (b) \(\implies \) (c)]
     Let \(f(x_0) \in V \subseteq Y\).
     \begin{claim}
-        There exists an open set \(u\) s.t. \(x_0 \in u \subseteq X\) and \(f(u) \subseteq V\).   
+        There exists an open set \(U\) s.t. \(x_0 \in U \subseteq X\) and \(f(U) \subseteq V\).   
     \end{claim}
     \begin{explanation}
-        If this is not true, then this implies that for every open set \(u\) with \(x_0 \in u\), consider \(B_X \left( x_0, \frac{1}{n} \right) \), \(\exists x_u \in u\) and \(f(x_u) \notin V\), then pick all of this \(x_u\) to be \(\left\{ x^{(n)} \right\}_{n=1}^{\infty}  \), we know \(\forall x^{(n)}\) we have \(f \left( x^{(n)} \right) \notin V \).    
-        Then, \(\left\{ x^{(n)} \right\}_{n=1}^{\infty}  \) is a sequence converges to \(x_0\). By (b), we know \(\lim_{n \to \infty} f \left( x^{(n)} \right) = f(x_0)  \). However, by our choice, \(f \left( x^{(n)} \right) \notin V \), so \(f \left( x^{(n)} \right) \in Y \setminus V \). Since \(V\) is open, so \(Y\setminus V\) is closed. Hence, we must have \(\lim_{n \to \infty} f \left( x^{(n)} \right) = f(x_0) \in Y \setminus V  \), which is a contradiction. 
+        If this is not true, then this implies that for every open set \(U\) with \(x_0 \in U\), consider \(U_n = B_X \left( x_0, \frac{1}{n} \right) \) for all \(n\), then \(\exists x_n \in U_n\) and \(f(x_n) \notin V\), then pick all of this \(x_n\) to be \(\left\{ x^{(n)} \right\}_{n=1}^{\infty}  \) with \(x^{(n)} \in U_n\) for all \(n\), we know \(\forall x^{(n)}\) we have \(f \left( x^{(n)} \right) \notin V \).    
+        Then, \(\left\{ x^{(n)} \right\}_{n=1}^{\infty}  \) is a sequence converges to \(x_0\). By (b), we know \(\lim_{n \to \infty} f \left( x^{(n)} \right) = f(x_0) \in V  \). However, by our choice, \(f \left( x^{(n)} \right) \notin V \), so \(f \left( x^{(n)} \right) \in Y \setminus V \). Since \(V\) is open, so \(Y\setminus V\) is closed. Hence, we must have \(\lim_{n \to \infty} f \left( x^{(n)} \right) = f(x_0) \in Y \setminus V  \), which is a contradiction. 
     \end{explanation}
 \end{proof}
 \begin{proof}[proof of (c) \(\implies \) (a)]
@@ -192,7 +207,7 @@ Now we build an equivalent definition of continuity. If \(f\) is continuous at \
     \] and we're done.
 \end{proof}
 
-\begin{theorem}
+\begin{theorem} \label{thm: continous TFAE2}
     Suppose \(f: X \to Y\), then TFAE 
     \begin{itemize}
         \item [(a)] \(f\) is continuous. 
@@ -200,22 +215,35 @@ Now we build an equivalent definition of continuity. If \(f\) is continuous at \
         \item [(c)] If \(V\) is open in \(Y\), then \(f^{-1}(V)\) is open in \(X\). 
         \item [(d)] Whenever \(F\) is closed in \(Y\), then \(f^{-1}(F)\) is closed in \(X\).         
     \end{itemize}
+    \begin{note}
+        (a) says \(f\) is continuous, so it is a statement for every point in \(X\) and \autoref{thm: continuous TFAE 1} is a theorem for a single \(x_0 \in X\).    
+    \end{note}
 \end{theorem}
 \begin{proof}[(a) \(\iff \) (b)]
     By \autoref{thm: continuous TFAE 1}, we know it is true. 
 \end{proof}
-\begin{proof}[(c) is equivalent to (c) in \autoref{thm: continuous TFAE 1}]
-    For each \(x \in f^{-1}(V)\), we have \(f(x) \in V\), so there exists an open set \(u_x\) s.t. \(x \in u_x \subseteq f^{-1}(V)\). Hence, 
+\begin{proof}[(c) holds iff for every \(x \in X\), (c) in \autoref{thm: continuous TFAE 1} holds]
+    If we have (c) in \autoref{thm: continuous TFAE 1} holding for all \(x \in X\) and we know \(V\) is open in \(Y\), then for each \(x \in f^{-1}(V)\), we have \(f(x) \in V\), so there exists an open set \(u_x\) s.t. \(x \in u_x \subseteq f^{-1}(V)\). Hence, 
     \[
         f^{-1}(V) = \bigcup_{x \in f^{-1}(V)} u_x .  
-    \] Since \(u_x\) is open, so \(f^{-1}(V)\) is open.     
+    \] Since \(u_x\) is open, so \(f^{-1}(V)\) is open.  
+    
+    Now if we have (c), then
+    \begin{center}
+        If \(V\) is open in \(Y\), then \(f^{-1}(V)\) is open in \(X\).    
+    \end{center}
+    Now for all open \(V \subseteq Y\) that contains \(f(x_0)\) for some \(x_0 \in X\) , we know \(f(x_0) \in V\), so \(x_0 \in f^{-1}(V)\), and since \(f^{-1}(V)\) is open in \(X\), so we can just pick \(U = f^{-1}(V)\), and we're done since this proof is valid for all \(x_0 \in X\).     
 \end{proof}
 \begin{proof}[(c) \(\iff \) (d)]
-    If \(F\) is closed in \(Y\), then \(Y \setminus F\) is open in \(Y\), and thus \(F^{-1}(Y \setminus F) \) is open in \(X\), and since \(f^{-1} (Y \setminus F) = X \setminus f^{-1}(F) \) is open, so \(f^{-1}(F) \) is closed.        
+    If \(F\) is closed in \(Y\), then \(Y \setminus F\) is open in \(Y\), and thus \(f^{-1}(Y \setminus F) \) is open in \(X\), and since \(f^{-1} (Y \setminus F) = X \setminus f^{-1}(F) \) is open, so \(f^{-1}(F) \) is closed. This is the proof from (c) to (d), and the proof from (d) to (c) is similar.      
 \end{proof}
 
+\begin{note}
+    \autoref{thm: continous TFAE2} is a stronger version of \autoref{thm: continuous TFAE 1} since it states the version that holding for all \(x\).   
+\end{note}
+
 \begin{remark}
-    If \(f\) is continuous, then the image of an open set on \(f\) may not be open, and the image of a closed set on \(f\) may not be closed.     
+    \autoref{thm: continous TFAE2} tells us that continuity tells us if the image is open/closed, then the preimage is open/closed. However, if \(f\) is continuous, then the image of an open set on \(f\) may not be open, and the image of a closed set on \(f\) may not be closed.     
 \end{remark}
 
 \begin{eg}
@@ -229,7 +257,7 @@ Now we build an equivalent definition of continuity. If \(f\) is continuous at \
 Now if \(f: X \to Y\) and \(g: X \to Z\), then consider
 \[
     (f, g) : X \to Y \times Z \text{ with } x \mapsto (f(x), g(x)),
-\] then \(Y \times Z\) has a natural metric. Note that if \((y_1, z_1) \) and \((y_2, z_2)\) are in \(Y \times Z\), then 
+\] we know \(Y \times Z\) has a natural metric, which is defined as: If \((y_1, z_1) \) and \((y_2, z_2)\) are in \(Y \times Z\), then 
 \[
     d_{Y \times Z}\left( (y_1, z_1), (y_2, z_2) \right) = d_Y(y_1, y_2) + d_Z(z_1, z_2). 
 \]    
@@ -238,16 +266,17 @@ Now if \(f: X \to Y\) and \(g: X \to Z\), then consider
     Consider \(f: X \to Y\) and \(g: X \to Z\) and \((f, g): X \to Y \times Z\), then \(f\) and \(g\) are both continuous if and only if \((f, g)\) is continuous.       
 \end{lemma}
 \begin{proof}
-    Given \(x \in X\), we know \(\lim_{n \to \infty} x^{(n)} = x \in (X, d_X) \) implies 
+    Suppose \(f, g\) are both continuous, then given \(x \in X\), we know \(\lim_{n \to \infty} x^{(n)} = x \in (X, d_X) \) implies 
     \[
-        \lim_{n \to \infty} f \left( x^{(n)} \right) = f(x) \text{ and } \lim_{n \to \infty} g \left( x^{(n)} \right) = x.    
+        \lim_{n \to \infty} f \left( x^{(n)} \right) = f(x) \text{ and } \lim_{n \to \infty} g \left( x^{(n)} \right) = g(x).    
     \] 
     \begin{claim}
         \[
-            \lim_{n \to \infty} (f, g)(x^n) = (f, g)(x). 
+            \lim_{n \to \infty} (f, g) \left( x^{(n)} \right) = (f, g)(x). 
         \]
     \end{claim}
     \begin{explanation}
         Check.
     \end{explanation}
+    The other direction is also easy to prove.
 \end{proof}
