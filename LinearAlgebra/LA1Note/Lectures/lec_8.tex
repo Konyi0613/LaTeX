@@ -1,0 +1,205 @@
+\lecture{8}{26 Sep. 10:20}{}
+\begin{lemma} \label{lm: inj/surj preserve ker im}
+    Consider 
+    % https://q.uiver.app/#q=WzAsNCxbMCwwLCJWXntcXHByaW1lfSJdLFsyLDAsIlYiXSxbNCwwLCJXIl0sWzYsMCwiV157XFxwcmltZX0iXSxbMCwxLCJmIl0sWzEsMiwiVCJdLFsyLDMsImciXV0=
+\[\begin{tikzcd}
+	{V^{\prime}} && V && W && {W^{\prime}}
+	\arrow["f", from=1-1, to=1-3]
+	\arrow["T", from=1-3, to=1-5]
+	\arrow["g", from=1-5, to=1-7]
+\end{tikzcd}\]
+\begin{itemize}
+    \item Suppose \(g\) is injective, then \(\ker \left( g \circ T \right) = \ker T \).   
+    \item Suppose \(f\) is surjective, then \(\Im (T \circ f) = \Im T\). 
+\end{itemize}
+
+\end{lemma}
+
+\begin{definition}[Matrix Equivalence]
+Let $A, B \in M_{m \times n}(\mathbb{F})$. We say that $A$ and $B$ are 
+\emph{equivalent} if there exist invertible matrices 
+$P \in GL_m(\mathbb{F})$ and $Q \in GL_n(\mathbb{F})$ such that
+\[
+    B = P A Q.
+\]
+\end{definition}
+
+\begin{remark}
+Matrix equivalence means that one can obtain $B$ from $A$ by a sequence of
+invertible row and column operations. 
+
+Equivalently, if $A$ represents a linear map 
+$T : \mathbb{F}^n \to \mathbb{F}^m$, then $B$ represents the same linear map 
+with respect to different bases of the domain and codomain.
+\end{remark}
+
+\begin{theorem}[Row Rank Equals Column Rank]
+Let $A \in M_{m \times n}(\mathbb{F})$ be any matrix over a field $\mathbb{F}$. Then
+\[
+\operatorname{row\ rank}(A) = \operatorname{column\ rank}(A).
+\]
+\end{theorem}
+
+\begin{proof}
+We prove this using invertible row and column operations.
+
+\textbf{Step 1: Reduce $A$ to canonical form.} 
+
+It is a standard fact that any matrix $A \in M_{m \times n}(\mathbb{F})$ can be transformed into a block matrix of the form
+\[
+C = 
+\begin{bmatrix}
+I_r & 0 \\
+0 & 0
+\end{bmatrix}_{m \times n},
+\]
+by multiplying on the left and right by invertible matrices $P \in GL_m(\mathbb{F})$ and $Q \in GL_n(\mathbb{F})$:
+\[
+C = P A Q.
+\]
+Here $r = \operatorname{rank}(A)$ and $I_r$ is the $r \times r$ identity matrix. This uses Gaussian elimination (invertible row operations) and invertible column operations.
+
+\textbf{Step 2: Row and column ranks of $C$.}
+
+- The first $r$ rows of $C$ are linearly independent, and the remaining $m-r$ rows are zero. So
+\[
+\operatorname{row\ rank}(C) = r.
+\]
+- The first $r$ columns of $C$ are linearly independent, and the remaining $n-r$ columns are zero. So
+\[
+\operatorname{column\ rank}(C) = r.
+\]
+
+\textbf{Step 3: Equivalence preserves row and column ranks.}
+
+We have $C = P A Q$.  
+
+1. \emph{Left multiplication by $P$ (row operations):}  
+   Multiplying $A$ on the left by invertible $P$ corresponds to invertible row operations. Row operations do not change the linear independence of the rows. Hence
+   \[
+   \operatorname{row\ rank}(PA) = \operatorname{row\ rank}(A).
+   \]
+
+2. \emph{Right multiplication by $Q$ (column operations):}  
+   Each row of $A Q$ is obtained by multiplying the corresponding row of $A$ by $Q$:
+   \[
+   \text{row}_i(AQ) = \text{row}_i(A) \cdot Q.
+   \]
+   Since $Q$ is invertible, this is an invertible linear transformation on $\mathbb{F}^n$, which preserves linear independence of the rows. Therefore
+   \[
+   \operatorname{row\ rank}(AQ) = \operatorname{row\ rank}(A).
+   \]
+\begin{note}
+    \[
+        \sum_{i \in I} \alpha _i \mathrm{row}_i (A) \cdot Q = 0 \iff  \sum_{i \in I} \alpha _i \mathrm{row}_i (A) = 0 
+    \] since \(Q\) is invertible. 
+\end{note}
+
+Combining the above, for $C = P A Q$ we get
+\[
+\operatorname{row\ rank}(C) = \operatorname{row\ rank}(A) = r,
+\]
+and similarly
+\[
+\operatorname{column\ rank}(C) = \operatorname{column\ rank}(A) = r.
+\]
+
+\textbf{Step 4: Conclusion.}
+
+From Step 2 and Step 3, we have
+\[
+\operatorname{row\ rank}(A) = \operatorname{row\ rank}(C) = r = \operatorname{column\ rank}(C) = \operatorname{column\ rank}(A).
+\]
+
+Hence, the row rank of $A$ equals the column rank of $A$.
+\end{proof}
+
+
+\begin{theorem}
+Two matrices $A$ and $B$ of same sizes are equivalent if and only if $\operatorname{rank}(A) = \operatorname{rank}(B)$.
+\end{theorem}
+\begin{proof}
+    Suppose \(A, B\) equivalent, then \(A = PBQ\) for some invertible \(P, Q\). By \autoref{lm: inj/surj preserve ker im}, we know \(\Im (BQ) = \Im B\), which gives \(\rank (BQ) = \rank B\). Also, since \(\ker (P (BQ)) = \ker (BQ)\), so \(\rank (P(BQ)) = \rank (BQ)\) by rank and nullity theorem. Hence, we have \(\rank A = \rank (PBQ) = \rank (BQ) = \rank B\).
+    
+    Now if \(\rank A = \rank B\), then we know 
+    \[
+        PAQ = \begin{pmatrix}
+            I_r &  0 \\
+            0 &  0 \\
+        \end{pmatrix} = P^{\prime} B Q^{\prime}, 
+    \] so \(A = P^{-1} P^{\prime} B Q^{\prime} Q^{-1}  \), which means \(A, B\) are equivalent.  
+\end{proof}
+
+\begin{theorem}
+Let $T: V \to W$ be a linear transformation between finite-dimensional vector spaces over a field $\mathbb{F}$. Let $B = \{v_1, \dots, v_n\}$ be a basis for $V$ and $C = \{w_1, \dots, w_m\}$ be a basis for $W$. Let 
+\[
+A = [T]_{B,C} \in M_{m \times n}(\mathbb{F})
+\] 
+be the matrix of $T$ with respect to the bases $B$ and $C$. Then
+\[
+\operatorname{rank}(A) = \dim(\operatorname{Im}(T)).
+\]
+\end{theorem}
+
+\begin{proof}
+\textbf{Step 1: Express the image of $T$ in terms of the basis.}
+
+The matrix $A$ is given by
+\[
+A = \big[[T(v_1)]_C \; [T(v_2)]_C \; \dots \; [T(v_n)]_C\big],
+\]
+where $[T(v_j)]_C$ denotes the coordinate vector of $T(v_j)$ with respect to $C$.
+
+Since $B$ is a basis for $V$, any vector $v \in V$ can be written as
+\[
+v = c_1 v_1 + c_2 v_2 + \dots + c_n v_n
+\]
+for some scalars $c_1, \dots, c_n \in \mathbb{F}$. By linearity of $T$,
+\[
+T(v) = c_1 T(v_1) + c_2 T(v_2) + \dots + c_n T(v_n).
+\]
+Thus, every vector in $\operatorname{Im}(T)$ is a linear combination of 
+\[
+\{T(v_1), T(v_2), \dots, T(v_n)\},
+\]
+and hence
+\[
+\operatorname{Im}(T) = \operatorname{span}\{T(v_1), T(v_2), \dots, T(v_n)\}.
+\]
+
+\textbf{Step 2: Relate $\operatorname{Im}(T)$ to the column space of $A$.}
+
+The column space of $A$, denoted $\operatorname{Col}(A)$, is
+\[
+\operatorname{Col}(A) = \operatorname{span}\{[T(v_1)]_C, [T(v_2)]_C, \dots, [T(v_n)]_C\}.
+\]
+
+The coordinate mapping $[\cdot]_C : W \to \mathbb{F}^m$ is a linear isomorphism. In particular, it preserves linear independence and spanning sets. Therefore, the map
+\[
+T(v_j) \longmapsto [T(v_j)]_C
+\]
+establishes a linear isomorphism between $\operatorname{Im}(T)$ and $\operatorname{Col}(A)$:
+\[
+\operatorname{Im}(T) \cong \operatorname{Col}(A).
+\]
+
+\textbf{Step 3: Compare dimensions.}
+
+Since isomorphic vector spaces have the same dimension,
+\[
+\dim(\operatorname{Im}(T)) = \dim(\operatorname{Col}(A)).
+\]
+
+By definition, the rank of $A$ is the dimension of its column space:
+\[
+\operatorname{rank}(A) = \dim(\operatorname{Col}(A)).
+\]
+
+Combining these equalities, we obtain
+\[
+\operatorname{rank}(A) = \dim(\operatorname{Im}(T)),
+\]
+as desired. 
+
+This shows that the rank of a matrix representing a linear transformation is independent of the choice of bases $B$ and $C$, since $\dim(\operatorname{Im}(T))$ depends only on $T$ itself.
+\end{proof}
