@@ -1,0 +1,202 @@
+\lecture{9}{30 Sep. 9:10}{}
+\begin{corollary}
+    Let \((X, d_X)\), \((Y, d_Y)\), and \((Z, d_Z)\) be metric spaces. 
+    \begin{itemize}
+        \item [(a)] If \(f:X \to Y\) is continuous at \(x_0 \in X\), \(g: Y \to Z\) is continuous at \(f(x_0)\), then \(g \circ f: X \to Z\) is continuous at \(x_0\).   
+        \item [(b)] If \(f:X \to Y\) and \(g:Y \to Z\) are continuous, then \(g \circ f:  X \to Z\) is continous.   
+    \end{itemize}   
+\end{corollary}
+\begin{proof}[proof of (a)]
+    Fix \(x_0 \in X\). Since \(f\) is continous at \(x_0\), we have 
+    \[
+        \lim_{n \to \infty} x^{(n)} = x_0 \implies \lim_{n \to \infty} f \left( x^{(n)} \right) = f(x_0) \in Y.   
+    \]  
+    Recall \( \left( g \circ f  \right) (x) = g(f(x))\). Since \(g\) is continuous at \(f(x_0) \in Y\). It follows that 
+    \[
+        \lim_{n \to \infty} f \left( x^{(n)} \right) = f(x_0) \implies \lim_{n \to \infty} g \left( f \left( x^{(n)} \right)  \right) = g(f(x_0)).   
+    \]  Note that this means 
+    \[
+        \lim_{n \to \infty} f \left( x^{(n)} \right) = f(x_0) \implies \lim_{n \to \infty} \left( g \circ f \right)\left( x^{(n)} \right) = (g \circ f) (x_0).     
+    \] 
+    Hence, 
+    \[
+        \lim_{n \to \infty} x^{(n)} = x_0 \implies \lim_{n \to \infty} \left( g \circ f \right)\left( x^{(n)} \right) = (g \circ f) (x_0), 
+    \] which means \(g \circ f\) is continuous at \(x_0\).   
+\end{proof}
+
+\section{Continuity and Product Spaces}
+Given two functions \(f: X \to Y\) and \(g: X \to Z\), we can define the pairing \((f, g): X \to Y \times Z\) by 
+\[
+    (f, g)(x) = (f(x), g(x)).
+\]   
+
+\begin{eg}
+    Suppose \(f:\mathbb{R} \to \mathbb{R} \) is defined by \(f(x) = x^2 + 3\) and \(g: \mathbb{R} \to \mathbb{R} \) is defined by \(g(x) = 4x\), then we can define \((f, g): \mathbb{R} \to \mathbb{R} \times \mathbb{R} \) by 
+    \[
+        (f, g)(x) = (x^2 + 3x, 4x).
+    \]  
+\end{eg}
+
+\begin{definition}[Product metric] \label{def: product metric}
+   Let \((Y, d_Y)\) and \((Z, d_Z)\) be metric spaces. Define a metric \(d_{Y \times Z}^1\) on \(Y \times Z\) by 
+   \[
+    d_{Y\times Z}^1 \left( (y_1, z_1), (y_2, z_2) \right) = d_Y(y_1, y_2) + d_Z(z_1, z_2). 
+   \] Also, we can define \(d_{Y \times Z}^{\infty} \) by 
+   \[
+    d_{Y \times Z}^{\infty} \left( (y_1, z_1), (y_2, z_2) \right) = \max \left\{ d_Y (y_1, y_2), d_Z(z_1, z_2) \right\}.  
+   \] Finally, we can define 
+   \[
+    d_{Y \times Z}^2 \left( (y_1, z_1), (y_2, z_2) \right) = \sqrt{\left( d_Y (y_1, y_2) \right)^2 + \left( d_Z(z_1, z_2) \right)^2  }.  
+   \]  
+\end{definition}
+
+\begin{proposition}
+    Let \((Y, d_Y)\) and \((Z, d_Z)\) be metric spaces, then \(d_{Y \times Z}^1, d_{Y \times Z}^2, d_{Y \times Z}^{\infty} \) are metrics on \(Y \times Z\).     
+\end{proposition}
+
+\begin{proof}
+    Here we only prove \(d_{Y \times Z}^1\) is a metric. For \((y_1, z_1), (y_2, z_2), (y_3, z_3)\) in \(Y \times Z\). 
+    \begin{itemize}
+        \item \(d_{Y \times Z}^1 \left( (y_1, z_1), (y_2, z_2) \right) = d_Y (y_1, y_2) + d_Z(z_1, z_2) \ge 0 \). 
+        \item If \(d_{Y \times Z}^1 \left( (y_1, z_1), (y_2, z_2) \right) = 0 \), then \(y_1 = y_2 = z_1 = z_2 = 0\). 
+        \item \(d_{Y \times Z}^1 \left( (y_1, z_1), (y_2, z_2) \right) = d_{Y \times Z}^1 \left( (y_2, z_2), (y_1, z_1) \right)  \). 
+        \item  
+        \begin{align*}
+            d_{Y \times Z}^1 \left( (y_1, z_1), (y_3, z_3) \right) &= d_Y(y_1, y_3) + d_Z(z_1, z_3) \\
+            &\le d_Y(y_1, y_2) + d_Y(y_2, y_3) + d_Z(z_1, z_2) + d_Z(z_2, z_3) \\
+            &= d_{Y \times Z}^1 \left( (y_1, z_1), (y_2, z_2) \right) + d_{Y \times Z}^1 \left( (y_2, z_2), (y_3, z_3) \right).   
+        \end{align*}
+    \end{itemize}   
+\end{proof}
+
+\begin{proposition} \label{prop: compose space converge iff both original space converge}
+    \(\lim_{n \to \infty} (y_n, z_n) = (y, z) \) in \(Y \times Z\) w.r.t.\ \(d^1, d^2, d^{\infty} \) iff 
+    \[
+        \lim_{n \to \infty} y_n = y \text{ in } (Y, d_Y) \text{ and } \lim_{n \to \infty} z_n = z \text{ in } (Z, d_Z),  
+    \]   
+\end{proposition}
+\begin{proof}
+    We prove the case w.r.t.\ \(d^{\infty} \) metrics. Since 
+    \[
+        \lim_{n \to \infty} (y_n, z_n) = (y, z) \iff  \lim_{n \to \infty} d_{Y \times Z}^{\infty} \left( (y_n, z_n), (y, z) \right) = 0 \iff \lim_{n \to \infty} \max \left\{ d_Y(y_n, y), d_Z(z_n, z) \right\} = 0.     
+    \] Also, 
+    \begin{align*}
+        &0 \le d_Y(y_n, y) \le \max \left\{ d_Y(y_n, y), d_Z(z_n, z) \right\} \\
+        &0 \le d_Z(z_n, z) \le \max \left\{ d_Y(y_n, y), d_Z(z_n, z) \right\}. 
+    \end{align*}
+    Hence, by squeeze theorem, we must have \(\lim_{n \to \infty} d_Y(y_n, y) = \lim_{n \to \infty} d_Z(z, z_n)=0  \). 
+    
+    If \(\lim_{n \to \infty} d_Y (y_n, y) = 0 \) and \(\lim_{n \to \infty} d_Z(z_n, z) = 0 \), then 
+    \[
+        \lim_{n \to \infty} d_{Y \times Z}^{\infty} \left( (y_n, z_n), (y, z) \right) = \lim_{n \to \infty} \max \left\{ d_Y(y_n, y), d_Z(z_n, z) \right\} = 0.  
+    \]  
+    Hence, \(\lim_{n \to \infty} (y_n, z_n) = (y, z) \) in \(d_{Y \times Z}^{\infty} \) metrics.  
+\end{proof}
+
+\begin{theorem} \label{thm: f compose g conti if f and g both conti}
+    Let \((Y, d_Y)\) and \((Z, d_Z)\) be metric spaces. On \(Y \times Z\), we have the metric \(d^1, d^2, d^{\infty} \). The map \((f, g): X \to Y \times Z\) is continuous iff \(f: X \to Y\) and \(g: X \to Z\) are both continuous.       
+\end{theorem}
+\begin{proof}
+    If \((f, g)\) is continuous. Take any sequence \(x^{(n)}\) with \(\lim_{n \to \infty} x^{(n)} = x \) in \((X, d_X)\). Then, 
+    \[
+        \lim_{n \to \infty} \left( f ,g \right)\left( x^{(n)} \right) = \left( f ,g \right)(x) \in Y \times Z.    
+    \] Recall that \(\left( f, g \right) \left( x^{(n)} \right) = \left( f \left( x^{(n)} \right), g \left( x^{(n)} \right)   \right)   \). Hence, we have 
+    \[
+        \lim_{n \to \infty} f \left( x^{(n)} \right) = f(x) \in \left( Y, d_Y \right)  \text{ and } \lim_{n \to \infty} g \left( x^{(n)} \right) = g(x) \in (Z, d_Z)
+    \] by \autoref{prop: compose space converge iff both original space converge}. Thus, \(f, g\) are both continous at \(x\).  
+\end{proof}
+
+\begin{lemma}
+    Let \(f: X \to \mathbb{R} \) and \(g: X \to \mathbb{R} \) be functions, and define \((f, g): X \to \mathbb{R}^2 \). We give \(\mathbb{R} ^2\) the Euclidean metric. Then, \(f, g\) are both continuous iff \((f, g)\) is continuous.       
+\end{lemma}
+\begin{proof}
+    By \autoref{thm: f compose g conti if f and g both conti}. Choose \(d^2\) on \(\mathbb{R} \times \mathbb{R} \), then \(d^2 = d_2 = \) Euclidean metric.    
+\end{proof}
+
+\begin{lemma}
+    The following functions are continous. 
+    \begin{itemize}
+        \item \((x, y) \mapsto x + y\) on \(\mathbb{R} ^2\) 
+        \item \((x, y) \mapsto x - y\) on \(\mathbb{R} ^2\) 
+        \item \((x, y) \mapsto x \cdot y\) on \(\mathbb{R} ^2\)
+        \item \((x, y) \mapsto \max \left\{ x, y \right\} \) on \(\mathbb{R} ^2\) 
+        \item \((x, y) \mapsto \frac{x}{y}\) on \(\mathbb{R} ^2 \setminus \left\{ (x, 0) : x \in \mathbb{R}  \right\} \). 
+        \item \(x \mapsto cx\) on \(\mathbb{R} \) for any \(c \in \mathbb{R} \).         
+    \end{itemize}
+\end{lemma}
+\begin{proof}
+    We prove the \((x, y) \mapsto x \cdot y\) case. Define \(M(x, y) = x \cdot y\). Choose \((x_0, y_0) \in \mathbb{R}^2 \). Given \(\varepsilon > 0\), we want to find \(\delta > 0\) s.t. 
+    \[
+        d_2 \left( (x, y), (x_0,y_0) \right) = \sqrt{(x - x_0)^2 + (y - y_0)^2}  < \delta \implies \left\vert M(x, y) - M(x_0, y_0) \right\vert < \varepsilon .  
+    \] We will choose \(\delta \) later. Now suppose we have chosen some appropriate \(\delta \), then we have \(\vert x - x_0 \vert, \vert y - y_0 \vert < \delta  \). Then, 
+    \[
+        \left\vert M(x, y) - M(x_0, y_0) \right\vert = \left\vert xy - x_0 y_0 \right\vert = \left\vert x(y - y_0) + y_0(x - x_0) \right\vert. 
+    \] Now we choose some \(\delta \le 1\). Then since \(\left\vert x - x_0 \right\vert < \delta \le 1\), we have
+    \[
+        \vert x \vert = \left\vert x - x_0 + x_0 \right\vert < \vert x - x_0 \vert + \vert x_0 \vert < 1 + \vert x_0 \vert.
+    \] 
+    Thus, we have 
+    \begin{align*}
+        \left\vert M(x, y) - M(x_0, y_0) \right\vert & \le \vert x_0 \vert  \vert y - y_0 \vert + \vert y_0 \vert \vert x - x_0 \vert  \\
+        & < (1 + \vert x_0 \vert ) \vert y - y_0 \vert + \vert y_0 \vert \vert x - x_0 \vert \\
+        &< (1 + \vert x_0 \vert )\delta + \vert y_0 \vert \delta  \\
+        &= (1 + \vert x_0 \vert + \vert y_0 \vert  ) \delta.   
+    \end{align*}
+    Hence, we can choose 
+    \[
+        \delta = \min \left\{ 1, \frac{\varepsilon }{1 + \vert x_0 \vert + \vert y_0 \vert } \right\},
+    \] and we will have 
+    \[
+        \left\vert M(x, y) - M(x_0, y_0) \right\vert < \varepsilon \text{ whenever } d_2 \left( (x, y), (x_0, y_0) \right) < \delta  .  
+    \] 
+\end{proof}
+\begin{proof}
+    Here we prove the \((x, y) \mapsto \max \left\{ x, y \right\} \) case. Note that 
+    \[
+        \max \left\{ x, y \right\} = \frac{x + y + \vert x - y \vert}{2}.
+    \] 
+    Then, we have 
+    \begin{align*}
+        \left\vert \max \left\{ x, y \right\} - \max \left\{ a, b \right\}   \right\vert &= \left\vert \frac{x + y + \vert x - y \vert}{2} - \frac{a + b + \vert a - b \vert}{2} \right\vert \\
+        &= \frac{1}{2} \left\vert (x - a) + (y - b) + \vert x - y \vert - \vert a - b \vert   \right\vert \\
+        &\le \frac{1}{2} \left( \vert x - a \vert + \vert y - b \vert + \left\vert \vert x - y \vert - \vert a - b \vert  \right\vert  \right)  \\
+        &\le \frac{1}{2} \left( \vert x - a \vert + \vert y - b \vert + \vert (x - y) - (a - b) \vert   \right) \\
+        &= \frac{1}{2} \left( \vert x - a \vert + \vert y - b \vert + \vert (x - a) + (b - y) \vert   \right) \\
+        &\le \vert x - a \vert  + \vert b - y \vert. 
+    \end{align*}
+    Note that if \(d_2 \left( (x, y), (a, b) \right) < \delta  \), then \(\vert x - a \vert < \delta  \) and \(\vert y - b \vert < \delta  \). Hence, for every \(\varepsilon > 0\), we can just pick \(\delta = \frac{\varepsilon}{2}\), and then we can show that 
+    \[
+        \left\vert \max \left\{ x, y \right\} - \max \left\{ a, b \right\}   \right\vert < \varepsilon. 
+    \]    
+\end{proof}
+
+\begin{corollary}
+    Let \((X, d)\) be a metric space, and let \(f, g: X \to \mathbb{R} \) be functions. Let \(c \in \mathbb{R} \). If \(f, g\) are continuous on \(X\), then \(f + g, f - g, f \cdot g, \max \left\{ f, g \right\}, \min \left\{ f, g \right\}, cf  \) are continuous. Also, \(\frac{f}{g}\) is also continuous at \(x_0\) if \(g(x_0) \neq 0\).        
+\end{corollary}
+\begin{proof}
+    For example, we know 
+    \[
+        (f + g)(x) = \mathrm{Add} \circ \left( f, g \right)(x) = \mathrm{Add}(f(x), g(x)) = f(x) + g(x).   
+    \]
+    Since \((f, g)\) is continuous and \(\mathrm{Add} \) is continuous, so the composition function \(\mathrm{Add} \circ (f, g) \) is also continuous.   
+\end{proof}
+
+\section{Continuity and Compactness}
+\begin{theorem} \label{thm: continuous func map compact subset to another compact subset}
+    Let \(f : X \to Y\) be a continuous function from \((X, d_X)\) to \((Y, d_Y)\). Let \(K \subseteq X\) be a compact subset of \(X\). Then
+    \[
+        f(K) = \left\{ f(x) \mid x \in K \right\} 
+    \] is also compact in \(Y\).     
+\end{theorem}
+\begin{proof}
+    Given any sequence \(\left( y^{(n)} \right)_{n=1}^\infty  \) in \(f(K)\), then \(\exists x^{(n)} \in K\) s.t. \(f \left( x^{(n)} \right) = y^{(n)} \). Since \(K\) is compact, then there exists a convergent subsequence \(\left( x^{(n_k)} \right)_{k=1}^{\infty}  \) s.t. \(\lim_{k \to \infty} x^{(n_k)} = x_{\ast} \in K \). Since \(f\) is continuous, so \(\lim_{n \to \infty} f \left( x^{(n_k)} \right) = f \left( x_{\ast}  \right)   \) in \(Y\). Hence, \(\lim_{n \to \infty} y^{(n_k)} = f(x_{\ast} ) \in f(K)\). Thus, \(f(K)\) is compact. 
+\end{proof}
+\begin{proof}[Antoher method]
+    Let \(\left\{ V_\alpha : \alpha \in A \right\} \) be any open cover of \(f(K)\) i.e. \(f(k) \subseteq \bigcup_{\alpha \in A} V_\alpha  \) and \(V_\alpha \) is open in \(Y\). Hence, 
+    \[
+        K \subseteq \bigcup_{\alpha \in A} f^{-1}(V_\alpha ).  
+    \]  Note that since \(f\) is continuous and \(V_\alpha \) is open, so \(f^{-1}(V_\alpha ) \) is open by \autoref{thm: continous TFAE2}. Hence, \(\left\{ f^{-1}(V_\alpha ) : \alpha \in A \right\} \) is an open cover of \(K\). Since \(K\) is compact, then 
+    \[
+        K \subseteq \bigcup_{i=1}^n f^{-1}\left( V_{\alpha _i} \right)   
+    \] Hence, \(f(K) \subseteq \bigcup_{i=1}^{n} V_{\alpha _i} \), which shows \(f(K)\) is compact.        
+\end{proof}
