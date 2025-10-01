@@ -1,0 +1,137 @@
+\lecture{9}{1 Oct. 10:20}{}
+Consider the system 
+\[
+    \begin{dcases}
+        a_{11} x_1 + \dots + a_{1n} x_n = y_1 \\
+        \vdots \\
+        a_{m1} x_1 + \dots + a_{mn} x_n = y_m.
+    \end{dcases}
+\]
+We want to solve \(X\) s.t. \(AX = Y\), where \(A = (a_{ij})_{m \times n}\) and \(Y = (y_{i})_{i=1}^m\). Suppose \(P \in M_{m \times m}(F)\) invertible, then if \(B = PA\), we have \(BX=Z\), which means doing row operations on the system. In this case, we call two systems are equivalent. We also call \(A, B\) are row equivalent. 
+
+Now we talk about the types of elementary row operations: 
+\begin{itemize}
+    \item [(i)] Replace \(i\)-th row with \(c \cdot r_i\) for some \(c \neq 0\). 
+    \item [(ii)] Replace \(r_i\) with \(r_i + c r_j\) for some \(j \neq i\). 
+    \item [(iii)] Interchange \(r_i\) and \(r_j\) for some \(i \neq j\).       
+\end{itemize}
+
+On can use (i) and (ii) in finite steps, making \(A\) into row reduced form(REF) of \(A\), which means   
+\begin{itemize}
+    \item first entry of a non-zero row is \(1\), we called it leading \(1\)
+    \item entries below and above leading \(1\) are \(0\).   
+\end{itemize}
+
+If allowing (iii), we can make \(A\) into RREF(row reduced echelon form), which means REF and all zero rows are at the bottom.
+
+Note that \(AX=Y\) gives \(PAX=PY\), so we can write \(P(A \mid Y) = (PA \mid PY)\). Hence, we can do row operations on \((X \mid Y)\) so that the \(X\) part becomes REF or RREF to solve the system. 
+The system will be like 
+\begin{align*}
+    x_{k_1} + &\dots + 0 + \dots = z_1 \\
+            &x_{k_2} + \dots + 0 = z_2 \\
+    \vdots& 
+\end{align*} 
+Suppose for the first \(n\) columns, there are \(r\) non-zero rows. If there is some \(z_i \neq 0\) for \(i > r\), the system has no solution. If not, there is at least one solution, and there are \(n - r\) free variables. 
+
+In the homogeneous case (i.e. \(y_1 = y_2 = \dots = y_m = 0\)), we find \(\nu (A) = n - r\). In this case, if \(n > m\), there are non-zero solutions to \(AX = 0\). 
+
+\subsubsection{Some consequences: }
+\begin{itemize}
+    \item If \(A \in M_n(F)\), then TFAE 
+    \begin{itemize}
+        \item The system \(AX=0\) has only trivial solution (injective). 
+        \item For any \(Y\), \(AX=Y\) has a (unique) solution (surjective). 
+        \item \(A\) is invertible.     
+    \end{itemize}
+\end{itemize}
+
+If \(P, Q\) are invertible, then \((PQ)^{-1} = Q^{-1} P^{-1}   \). Also, by above mentioned things, we know every invertible matrix is a product of many elementary matrix, that is, \(A = (E_1)^{-1} (E_2)^{-1} \dots (E_m)^{-1}\) since we know 
+\[
+    (E_m \dots E_2 E_1)A = I_m.
+\]   
+
+\begin{prev}
+    If \(\left\{ v_1, \dots , v_n \right\} \) is linearly independent and \(\left\{ w_1, \dots , w_m \right\} \) spans \(V\), then \(n \le m\).     
+\end{prev}
+
+Suppose \(x_1 v_1 + \dots + x_n v_n = 0\), where 
+\[
+    v_i = a_{1i}w_1 + a_{2i}w_2 + \dots + a_{mi} w_m,
+\] then we have 
+\[
+    a_{i1} x_1 + \dots + a_{im} x_n = 0
+\] for all \(1 \le i \le m\). If \(n > m\), then there exists a non-zero solution to this system, which contradicts to the fact that \(x_1 = x_2 = \dots = x_n = 0\).  
+
+\begin{corollary}
+    For \(A \in M_{m \times n}(F)\), we know there exists invertible \(P, Q\) s.t. 
+    \[
+        PAQ = \begin{bmatrix}
+            I_r & 0  \\
+            0 & 0  \\
+        \end{bmatrix}.
+    \]  
+\end{corollary}
+
+\begin{corollary}
+    row rank is equal to col rank.
+\end{corollary}
+
+\begin{question}
+    How to show \(A\) invertible? 
+\end{question}
+\begin{answer}
+    Check RREF of \(A\) is \(I_n\) or not.  
+\end{answer}
+
+\begin{question}
+    How to find \(A^{-1}\)? 
+\end{question}
+\begin{answer}
+    Calculate \((A \mid I_n)\). 
+\end{answer}
+
+\chapter{Dual space}
+Consider a vector space \(V\), and \(V\) is over a field \(F\), then we call 
+\[
+    V^* = \mathcal{L} (V, F).
+\]   
+
+\begin{definition}
+    Suppose \(V\) is a vector space over \(F\) (with basis \(\left\{ 1 \right\} \)), then 
+    \begin{itemize}
+        \item A linear functional \(f\) is a linear map \(f: V \to F\). 
+        \item \(V^* = \mathcal{L} (V, F)\) is called the dual space of \(V\).     
+    \end{itemize}  
+\end{definition}
+
+\begin{eg}
+    Suppose \(V = F^n\), then \(V^* = M_{1 \times n}(F)\).  
+\end{eg}
+Note that Suppose \(f \in V^*\) corresponds to \((a_1, a_2, \dots , a_n)\), then \(f(e_i) = a_i\). 
+
+\begin{eg}
+    Suppose \(V = M_{n \times n}(F)\), then the tract map 
+    \[
+        \mathrm{tr}: M_{n \times n}(F) \to F \quad (a_{ij}) \mapsto \sum_{i=1}^n a_{ii}  
+    \] is in \(V^*\). 
+\end{eg}
+
+\begin{eg}
+    We can define \(E_{pq}^* \in V^*\) by 
+    \[
+        E_{pq}^*((a_{ij})) = a_{pq},
+    \] then \(\left\{ E_{ij}^* \right\} \) is a basis of \(V^*\).   
+\end{eg}
+
+\begin{eg}
+    Suppose
+    \[
+        V = \left\{ \text{continuous function }f: [p, q] \to \mathbb{R}  \right\}, 
+    \] then we can define \(\mathrm{ev}_s \), the evaluation at \(s\), by 
+    \[
+        \mathrm{ev}_s(f) = f(s),
+    \] and we can define \(I: V \to \mathbb{R} \) with 
+    \[
+        I(f) = \int_p^q f(x) \, \mathrm{d} x, 
+    \] then \(\mathrm{ev}_s \) and \(I\) are both elements of \(V^*\).   
+\end{eg}
