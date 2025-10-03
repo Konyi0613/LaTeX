@@ -1,0 +1,83 @@
+\lecture{9}{3 Oct. 12:20}{}
+\section{Recurrence relation}
+\subsection{Linear homogeneous constant-coefficient recurrence relations}
+Suppose 
+\begin{equation} \label{eq: recurrence relation}
+    a_n = \alpha _{k-1} a_{n - 1} + \alpha _{k-2} a_{n-2} + \dots + \alpha _1 a_{n - k + 1} + \alpha _0 a_{n - k}
+\end{equation} holds for all \(n \ge k\) and we have initial conditions \(a_0, a_1, \dots , a_{k - 1}\). Then if we define the generating function: 
+\[
+    A(x) = \sum_{n=0}^{\infty} a_n x^n ,
+\] then we have 
+\begin{align*}
+   \alpha _{k - 1} x A(x) &= \sum_{n=1}^{\infty} \alpha _{k - 1} a_{n - 1} x^n \\
+   \alpha _{k - 2} x^2 A(x) &= \sum_{n=2}^{\infty} \alpha _{k - 2} a_{n - 2} x^n \\
+   &\vdots \\
+   \alpha _{0} x^k A(x) &= \sum_{n=k}^{\infty} \alpha _{0} a_{n - k} x^n, 
+\end{align*}
+so we have 
+\begin{align*}
+    A(x) \left[ 1 - \alpha _{k-1} x - \alpha _{k - 2}x^2 -\dots -\alpha _0 x^k \right] &= \sum_{n=k}^{\infty} (a_n - \alpha _{k-1} a_{n-1} - \dots - \alpha _0 a_{n - k})x^n + R(x)  \\
+    &= R(x),
+\end{align*}
+where \(R(x)\) is a polynomial of degree \(k - 1\) depending on coefficient \(\alpha _i\) and the initial terms \(a_0, a_1, \dots , a_{k-1}\). Hence, we have 
+\[
+    A(x) = \frac{R(x)}{1 - \alpha _{k-1} x - \alpha _{k - 2} x^2 - \dots - \alpha _0 x^k}.
+\]
+If 
+\[
+    1 - \alpha _{k-1} x - \alpha _{k - 2} x^2 - \dots - \alpha _0 x^k = (1 - \lambda_1 x)(1 - \lambda _2 x) \dots (1 - \lambda _k x),
+\]then we have 
+\[
+    A(x) = \frac{A_1}{1 - \lambda _1 x} + \frac{A_2}{1 - \lambda _2 x} + \dots + \frac{A_k}{1 - \lambda _k x}.
+\] for some constants \(A_1, A_2, \dots , A_k\), which means 
+\[
+    a_n = A_1 \lambda _1^n + A_2 \lambda _2^n + \dots + A_k \lambda _k^n
+\] by comparing the \(n\)-th coefficient of \(A(x)\) and R.H.S. 
+
+\begin{definition} \label{def: characteristic polynomial}
+    Given the recurrence relation \autoref{eq: recurrence relation}, then the characteristic polynomial is 
+    \[
+        p(z) = z^k - \alpha _{k-1} z^{k-1} - \alpha _{k - 2} z^{k-2} - \dots - \alpha _1 z - \alpha _0.
+    \]  
+\end{definition}
+
+If we let \(z = \frac{1}{x}\), then multiplying
+    \[
+        1 - \alpha _{k - 1} x - \alpha _{k - 2} x^2 - \dots - \alpha _{k - 1}x^{k - 1} - \alpha _0 x^k
+    \] by \(z^k\), we have 
+    \[
+        z^k - \alpha _{k - 1} z^{k - 1} - \alpha _{k - 2} z^{k - 2} - \dots - \alpha _1 z - \alpha _0.
+    \] Hence, \((1 - \lambda _1 x)(1 - \lambda _2 x) \dots (1 - \lambda _k x)\) becomes \((z - \lambda _1 )(z - \lambda _2) \dots (z - \lambda _k)\) and thus 
+    \[
+        \left\{ \lambda _i: 1\le i \le k \right\} 
+    \] are the roots of \(p(z)\). 
+
+\begin{question}
+    What if there is repeated root?
+\end{question}
+For example, if 
+\[
+    p(z) = (z - \lambda _1)(z - \lambda _2)^2,        
+\] then 
+\[
+    A(x) = \frac{A_1}{1 - \lambda _1 x} + \frac{A_2 + A_3 x}{(1 - \lambda _2 x)^2}.
+\]
+\begin{theorem}
+Suppose a sequence is defined by 
+\[
+    a_n = \alpha _{k - 1} a_{n - 1} + \dots + \alpha _0 a_{n - k} \quad \forall n \ge k        
+\] with initial conditions \(a_0, a_1, \dots , a_{k - 1}\). Let \(\lambda _1, \lambda _2, \dots ,\lambda _k\) be the roots of the characteristic polynomial \(p(z)\).
+\begin{itemize}
+    \item [(1)] If the roots are distinct, then 
+    \[
+        a_n = \sum_{i=1}^{k} A_i \lambda _i^n 
+    \] for constants \(A_1, A_2, \dots , A_k\) determined by \(a_0, \dots , a_{k - 1}\). 
+    \item [(2)] If we have repeated roots, say 
+    \[
+        p(z) = (z - \lambda _1)^{k_1} (z - \lambda _2)^{k_2} \dots (z - x_q)^{k_q},
+    \]then 
+    \[
+        a_n = \sum_{i=1}^{q} \left( \sum_{j=0}^{k_i - 1} C_{ij} n^j  \right) \lambda _i^n.  
+    \]
+\end{itemize}   
+\end{theorem}
