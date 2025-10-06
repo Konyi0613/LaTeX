@@ -1,0 +1,257 @@
+\documentclass[12pt]{article}
+\usepackage[a4paper, margin=1in]{geometry}
+\usepackage{amsmath, amssymb, amsthm}
+% basics
+\usepackage{xeCJK}
+\setCJKmainfont{PingFang TC} % 新細明體
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[hyphens]{url}
+\usepackage[style=alphabetic,maxcitenames=1]{biblatex}
+\usepackage[colorlinks=true,linkcolor=cyan,urlcolor=magenta,citecolor=violet]{hyperref}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{emptypage}
+\usepackage{subcaption}
+\usepackage[usenames,dvipsnames]{xcolor}
+
+
+\usepackage{amsmath, amsfonts, mathtools, amsthm, amssymb, mathrsfs}
+\usepackage{geometry}
+\usepackage{cancel}
+\usepackage{systeme}
+
+\usepackage[inline, shortlabels]{enumitem}
+\usepackage{multicol}
+\setlength\multicolsep{0pt}
+
+\usepackage{caption}
+\captionsetup{belowskip=0pt}
+\geometry{a4paper,left=2.54cm,right=2.54cm,top=2.54cm,bottom=2.54cm}
+
+% for the big braces
+\usepackage{bigdelim}
+
+% correct
+\definecolor{correct}{HTML}{009900}
+\newcommand\correct[2]{\ensuremath{\:}{\color{red}{#1}}\ensuremath{\to }{\color{correct}{#2}}\ensuremath{\:}}
+\newcommand\green[1]{{\color{correct}{#1}}}
+
+% hide parts
+\newcommand\hide[1]{}
+
+% si unitx
+\usepackage{siunitx}
+\sisetup{locale = FR}
+% \renewcommand\vec[1]{\mathbf{#1}}
+\newcommand\mat[1]{\mathbf{#1}}
+
+
+% tikz
+\usepackage{tikz}
+\usetikzlibrary{intersections, angles, quotes, positioning}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.13}
+
+\begin{document}
+
+\begin{center}
+    \Large\textbf{Abstract Algebra I} \\[4pt]
+    \large\textbf{Homework 4} \\[4pt] 
+    \normalsize B13902024 張沂魁 \\
+    \normalsize Due: 8th October 2025
+\end{center}
+
+\bigskip
+
+\begin{enumerate}
+    \item For two groups \( G, H \) with identities \( e_G, e_H \) respectively, define the direct product of \( G \) and \( H \) to be the group whose underlying set is \( G \times H \) and whose binary operation is given by
+    \[
+        (g, h)(g', h') = (gg', hh'), \quad g, g' \in G, \ h, h' \in H.
+    \]
+
+    \begin{enumerate}[label=(\alph*)]
+        \item Let \( p \neq q \) be two prime numbers. Prove that \( \mathbb{Z}/p\mathbb{Z} \times \mathbb{Z}/q\mathbb{Z} \cong \mathbb{Z}/pq\mathbb{Z} \) by constructing an isomorphism explicitly.
+
+        \item Let \( G, H \) be cyclic groups. Prove that \( G \times H \) is cyclic if and only if \( (|G|, |H|) = 1 \).
+
+        \item Deduce that \( S_3 \) is not a direct product of any of its proper subgroups.
+    \end{enumerate}
+    \textbf{Solution:} 
+    \begin{itemize}
+        \item [(a)] Consider a map \(\phi : \mathbb{Z} / pq \mathbb{Z} \to \mathbb{Z} / p\mathbb{Z}  \times \mathbb{Z} / q\mathbb{Z} \) defined by \(\phi \left( [a]_{pq} \right) = \left( [a]_p, [a]_q \right)\) where \([a]_k\) means the equivalence class of \(a\) modulo \(k\). Note that this map is well-defined since for \(a \equiv b \mod{pq}\), we know \(a = b + pq k\) for some integer \(k\), so \(a \equiv b \mod{p}\) and \(a \equiv b \mod{q}\), which means \(\phi \left( [a]_{pq} \right) = \phi \left( [b]_{pq} \right)  \). We claim \(\phi \) is an isomorphism. We first show that \(\phi \) is a homomorphism. 
+        \begin{align*}
+            \phi \left( [a]_{pq} [b]_{pq} \right) &= \phi \left( [ab]_{pq} \right) = \left( [ab]_p, [ab]_q \right) \\ &= \left( [a]_p [b]_p, [a]_q [b]_q \right) = \left( [a]_p, [a]_q \right) \left( [b]_p, [b]_q \right) = \phi \left( [a]_{pq} \right) \phi \left( [b]_{pq} \right).   
+        \end{align*}
+        Now we show that \(\phi \) is bijective. If \(\phi \left( [k_1]_{pq} \right) = \phi \left( [k_2]_{pq} \right)  \), and suppose \(0 \le k_2 < k_1 \le pq - 1\) , then 
+        \[
+            \left( [k_1]_p, [k_1]_q \right) = \left( [k_2]_p, [k_2]_q \right),
+        \] so we know \(k_1 \equiv k_2 \mod{p}\) and \(k_1 \equiv k_2 \mod{q}\). Now since \(p \neq q\) are two prime numbers, so \(pq \mid k_1 - k_2\), but \(0 < k_1 - k_2 < pq\), so it is impossible. Hence, \(\phi \) is injective. Now we show that \(\phi \) is surjective. If not, then since \(\left\vert \mathbb{Z} / pq \mathbb{Z}  \right\vert = \left\vert \mathbb{Z} / p \mathbb{Z}  \right\vert \left\vert \mathbb{Z} / q\mathbb{Z}  \right\vert = \left\vert \mathbb{Z} / p \mathbb{Z} \times \mathbb{Z} / q\mathbb{Z}  \right\vert  \), so by Pigeonhole principle, there exists \(n_1 \not\equiv n_2 \mod{pq}\) s.t. \(\phi \left( [n_1]_{pq} \right) = \phi \left( [n_2]_{pq} \right)  \), but this is impossible since we have shown that \(\phi \) is injective. Thus, \(\phi \) is surjective and thus bijective. Now we know \(\phi \) is bijective and homomorphic, so \(\phi \) is an isomorphism between \(\mathbb{Z} / p \mathbb{Z} \times \mathbb{Z} / q\mathbb{Z} \) and \(\mathbb{Z} / pq\mathbb{Z} \).           
+        
+        \item [(b)] Suppose \(G = \langle g \rangle \) and \(H = \langle h \rangle \), and note that \(\left\vert G \times H \right\vert = \left\vert G \right\vert \left\vert H \right\vert   \). 
+        \begin{itemize}
+            \item [\((\implies )\)] Suppose \(G \times H = \langle (g_1, h_1) \rangle \), then we know
+            \[
+                \left( g_1, h_1 \right)^{\left\vert G \right\vert \left\vert H \right\vert  } = \left( g_1^{\left\vert G \right\vert \left\vert H \right\vert}, h_1^{\left\vert G \right\vert \left\vert H \right\vert} \right) = (e_G, e_H).
+            \] Note that \(o \left( (g_1, h_1) \right) = \left\vert G \right\vert \left\vert H \right\vert   \). Now if \(\gcd \left( \left\vert G \right\vert, \left\vert H \right\vert   \right) = d > 1 \), then 
+            \[
+                \mathrm{lcm}  \left( \left\vert G \right\vert, \left\vert H \right\vert   \right) = \frac{\left\vert G \right\vert \left\vert H \right\vert  }{d} < \left\vert G \right\vert \left\vert H \right\vert.    
+            \]
+            Note that \(o(g_1) = \left\vert G \right\vert \) and \(o(g_2) = \left\vert H \right\vert \) since \(g_1, h_1\) must run through \(G\) and \(H\) respectively in \(\left\{ (g_1, h_1), (g_1, h_1)^2, \dots  \right\} \). Hence, we have 
+            \[
+                \left( g_1, h_1 \right)^{\mathrm{lcm} \left( \left\vert G \right\vert, \left\vert H \right\vert   \right)  } = (e_G, e_H),
+            \] but if \(\gcd \left( \left\vert G \right\vert, \left\vert H \right\vert   \right) > 1 \), then \((g_1, h_1)^{\mathrm{lcm} \left( \vert G \vert, \left\vert H \right\vert   \right)  } = (e_G, e_H)\), and
+            \[
+                \mathrm{lcm} \left( \left\vert G \right\vert, \left\vert H \right\vert   \right) < \left\vert G \right\vert \left\vert H \right\vert = o \left( (g_1, h_1) \right),  
+            \]
+            so this is a contradiction.  
+            \item [\((\impliedby )\)] Suppose \(\gcd \left( \left\vert G \right\vert, \left\vert H \right\vert   \right) = 1 \), then since \((g, h)^{\left\vert G \right\vert \left\vert H \right\vert  } = (e_G, e_H)\), so
+            \[
+                o \left( (g, h) \right) \le \left\vert G \right\vert \left\vert H \right\vert.
+            \] Also, if there exists \(k > 0\) s.t. \((g, h)^k = (e_G, e_H)\), then \(g^k = e_G\) and \(h^k = e_H\), so \(\left\vert H \right\vert \mid k \) and \(\left\vert G \right\vert \mid k \), which means \(\left\vert H \right\vert \left\vert G \right\vert \mid k  \) since \(\gcd \left( \left\vert H \right\vert, \left\vert G \right\vert   \right) = 1 \), so we hvae \(k \ge \left\vert G \right\vert \left\vert H \right\vert \). Hence, we must have \(o \left( (g, h) \right) = \left\vert G \right\vert \left\vert H \right\vert   \). Now if \(\exists \left\vert G \right\vert \left\vert H \right\vert >  i > j \ge 0\) s.t. \((g, h)^i = (g, h)^j\), then \((g, h)^{i - j} = (e_G, e_H)\), but \(\left\vert G \right\vert \left\vert H \right\vert >  i - j > 0\), so it is impossible, and thus \(\left\vert \langle (g, h) \rangle  \right\vert = \left\vert G \right\vert \left\vert H \right\vert  \), and since \(\langle (g, h) \rangle \subseteq G \times H\), so we must have \(G \times H = \langle (g, h) \rangle \), and thus \(G \times H\) is cyclic.         
+        \end{itemize}
+        \item [(c)] Suppose \(S_3\) is a direct product of its proper subgroups, say \(S_3 = A \times B\), then WLOG suppose \(\left\vert A \right\vert \ge \left\vert B \right\vert  \), and we have \(\left\vert A \right\vert = 3 \) and \(\left\vert B \right\vert = 2\) since \(\left\vert S_3 \right\vert = 6 \). Note that this means 
+        \begin{align*}
+            A &= \left\{ (1), (12) \right\}, \left\{ (1), (13) \right\}, \left\{ (1), (23) \right\} \\
+            B &= \left\{ (1), (123), (132) \right\}, 
+        \end{align*} and thus we know \(A, B\) must be cyclic. Also, since \(\gcd(2, 3) = 1\), so \(A \times B = S_3\) must be cyclic by (b), but \(S_3\) is not cyclic, so \(S_3\) is not a direct product of any of its proper subgroups.     
+    \end{itemize}
+    \bigskip
+
+    \item Find the order of the following group:
+    \[
+        G = \langle a, b \mid a^6 = 1, \ b^2 = a^3, \ ba = a^{-1}b \rangle.
+    \]
+    And then show that it is not isomorphic to the group
+    \[
+        H = \langle r, s \mid r^6 = s^2 = 1, \ srs^{-1} = r^{-1} \rangle.
+    \]
+    \textbf{Solution:} We can check that
+    \[
+        G = \left\{ e, a, a^2, a^3, a^4, a^5, b, ab, a^{2} b, a^3 b, a^4 b, a^5 b  \right\} 
+    \]
+    since \(ba = a^{-1} b\) gives \(b a^{k} = a^{-k} b\) and thus all representation of \(a, b\) like \(a^i b^j a^k b^l \dots \) can be reduced to the above \(12\) elements. Hence, the order of \(G\) is \(12\). Also, note that 
+    \[
+        H = \left\{ e, r, r^2, r^3, r^4, r^5, s, sr, sr^2, sr^3, sr^4, sr^5 \right\},
+    \] and since \(o(s) = o\left( r^3 \right) = 2 \) and \(s \neq r^3\) (Otherwise \(r^{-1} = s r s^{-1} = r^7 \), which is impossible.) , and the only element of \(G\) has order \(2\) is \(a^3\), so \(G\) and \(H\) are not isomorphic.            
+
+    \bigskip
+
+    \item The symmetric group \( S_4 \) has a natural action on the set \( T = \{1, 2, 3, 4\} \). For a subgroup \( H \le S_4 \) and \( n \in T \), we define the orbit \( O(n) \) of \( n \) to be the set \( \{ \sigma(n) : \sigma \in H \} \). In this exercise, the \emph{orbit of \( H \)} refers to the set \( \{ O(n) : n \in T \} \).
+
+    \begin{enumerate}[label=(\alph*)]
+        \item Find the orbits of the following subgroups of \( S_4 \) defined by their action on \( T \):
+        \[
+            \langle (12) \rangle, \quad \langle (123) \rangle, \quad V.
+        \]
+        (Recall that \( V \) is the unique Klein 4-group in \( S_4 \), and we saw in class that \( V \trianglelefteq S_4 \).)
+
+        \item Find another proper subgroup of \( S_4 \) with the same set of orbits as that of \( V \).
+
+        \item Prove that the following subgroup of \( S_4 \) is trivial:
+        \[
+            Z(S_4) = \{ \sigma \in S_4 : \tau^{-1} \sigma \tau = \sigma, \ \text{for all } \tau \in S_4 \}.
+        \]
+        (Recall that we encountered such a subgroup in class. It is called the \emph{center} of \( S_4 \), and \( Z(S_4) \trianglelefteq S_4 \). The notation \( Z(G) \) for the center of a group \( G \) is standard.)
+    \end{enumerate}
+    \textbf{Solution:} 
+    \begin{itemize}
+        \item [(a)] 
+        \begin{itemize}
+            \item Case 1: \(H = \langle (12) \rangle = \left\{ (1), (12) \right\} \), then
+            \[
+                O(1) = \left\{ 1, 2 \right\} \quad O(2) = \left\{ 2, 1 \right\} \quad O(3) = \left\{ 3 \right\} \quad O(4) = \left\{ 4 \right\}.    
+            \]
+            Thus, the orbit of \(H\) is \(\left\{ \left\{ 1, 2 \right\}, \left\{ 3 \right\}, \left\{ 4 \right\} \right\} \).
+            \item Case 2: \(H = \langle (123) \rangle = \left\{ (1), (123), (132) \right\} \), then since 
+            \[
+                (123) = \begin{pmatrix}
+                    1 & 2 & 3 & 4  \\
+                    2 & 3 & 1 & 4  \\
+                \end{pmatrix} \quad 
+                (132) = \begin{pmatrix}
+                    1 & 2 & 3 & 4  \\
+                    3 & 1 & 2 & 4  \\
+                \end{pmatrix},
+            \]
+            so we have 
+            \[
+                O(1) = \left\{ 1, 2, 3 \right\} \quad O(2) = \left\{ 2, 3, 1 \right\} \quad O(3) = \left\{ 3, 1, 2 \right\} \quad O(4) = \left\{ 4 \right\}.   
+            \]
+            Thus, the orbit of \(H\) is \(\left\{ \left\{ 1, 2, 3 \right\}, \left\{ 4 \right\}   \right\} \). 
+            \item Case 3: \(H = V = \left\{ (1), (12)(34), (13)(24), (14)(23) \right\} \), then since 
+            \[
+                (12)(34) = \begin{pmatrix}
+                    1 & 2 & 3 & 4  \\
+                    2 & 1 & 4 & 3  \\
+                \end{pmatrix} \quad (13)(24) = \begin{pmatrix}
+                    1 & 2 & 3 & 4  \\
+                    3 & 4 & 1 & 2  \\
+                \end{pmatrix} \quad (14)(23) = \begin{pmatrix}
+                    1 & 2 & 3 & 4  \\
+                    4 & 3 & 2 & 1  \\
+                \end{pmatrix},
+            \] so we have 
+            \[
+                O(1) = O(2) = O(3) - O(4) = \left\{ 1, 2, 3, 4 \right\}, 
+            \] and thus the orbit of \(H\) is \(\left\{ \left\{ 1, 2, 3, 4 \right\}  \right\} \).  
+        \end{itemize}
+        \item [(b)] We want to find some proper subgroup of \(S_4\) other than \(V\) nad has orbit \(\left\{ 1, 2, 3, 4 \right\} \), so we can pick 
+        \[
+            H = \left\{ (1), (1234), (13)(24), (1432) \right\},
+        \] note that this is a group sibce \(\left( (13)(24) \right)^2 = (1) \) and \((1234)(1432) = (1)\). Since 
+        \[
+            (1234) = \begin{pmatrix}
+                    1 & 2 & 3 & 4  \\
+                    2 & 3 & 4 & 1  \\
+                \end{pmatrix} \quad (13)(24) = \begin{pmatrix}
+                    1 & 2 & 3 & 4  \\
+                    3 & 4 & 1 & 2  \\
+                \end{pmatrix} \quad (1432) = \begin{pmatrix}
+                    1 & 2 & 3 & 4  \\
+                    4 & 1 & 2 & 3  \\
+                \end{pmatrix},
+        \]  so \(O(1) = O(2) = O(3) = O(4) = \left\{ \left\{ 1, 2, 3, 4 \right\}  \right\} \).  
+        \item [(c)] We want to show that \(Z(S_4) = \left\{ e \right\} \). If not, then \(\exists \sigma ^{\prime} \in Z(S_4)\) s.t. \(\sigma ^{\prime} (a) = b\) for some \(a \neq b\). However, if we pick \(\tau = (ac)\), then 
+        \[
+            \tau \sigma ^{\prime} (a) = \tau (b) = b \quad \sigma ^{\prime} \tau (a) = \sigma ^{\prime} (c) \neq b
+        \] since \(\sigma ^{\prime} \) is bijective, so \(\tau \sigma ^{\prime} \neq \sigma ^{\prime} \tau \) here, and thus \(\sigma^{\prime} \notin Z(S_4) \). Hence, \(Z(S_4)\) is trivial.      
+    \end{itemize}
+    \bigskip
+
+    \item Let \( G \) be a group and \( H \le G \) a subgroup. For a set \( S \), denote by \( \mathrm{Perm}(S) \) the group of all permutations of \( S \).
+
+    \begin{enumerate}[label=(\alph*)]
+        \item If \( G \) acts on \( S \), show that one has an induced homomorphism \( G \to \mathrm{Perm}(S) \).
+
+        \item Now let \( S = \{ gH : g \in G \} \). Show that the kernel of the induced homomorphism
+        \[
+            G \to \mathrm{Perm}(S)
+        \]
+        is contained in \( H \).
+
+        \item Suppose \( |G|/|H| = n \) and that no nontrivial normal subgroup of \( G \) is contained in \( H \). Prove that \( G \) is isomorphic to a subgroup of \( S_n \).
+    \end{enumerate}
+    \textbf{Solution:} 
+    \begin{itemize}
+        \item [(a)] \(G\) acts on \(S\) means there exists \(\rho :G \times S \to S\) s.t. \(\rho (g, s) = g \cdot s\) with 
+        \[
+            e \cdot s = s \ \forall s \in S \quad \text{and} \quad (g_1 g_2)(s) = g_1(g_2 s) \ \forall g_1, g_2 \in G, s \in S.
+        \]
+        Now we show that \(\Phi : G \to \mathrm{Perm}(S) \) defined by \(\Phi (g) = \pi _g \), where \(\pi _g : S \to S\) is defined by \(\pi _g(s) = g \cdot s\), is a homomorphism between \(G\) and \(\mathrm{Perm}(S) \). We first show that \(\pi _g\) is a permutation on \(S\) for all \(g \in G\), which is equivalent to show \(\pi _g\) is bijective. We first show that \(\pi _g\) is injective. If \(\pi _g(s_1) = \pi _g(s_2)\), then \(g s_1 = g s_2\), so \(g^{-1} g s_1 = g^{-1} g s_2\), which means \(s_1 = s_2\), and thus \(\pi _g\) is injective. Now we show that \(\pi _g\) is surjective. For any \(s \in S\), \(\pi _g \left( g^{-1} s \right) = g \cdot g^{-1} s = s\), so \(\pi _g\) is surjective. Now we show that \(\Phi \) is a homomorphism. Note that for all \(g_1, g_2 \in G\), we have 
+        \[
+            \Phi (g_1 g_2) = \pi _{g_1 g_2} \quad \Phi (g_1) \Phi (g_2) = \pi _{g_1} \pi _{g_2},
+        \] so for all \(s \in S\), we have 
+        \[
+            \Phi (g_1 g_2) (s) = (g_1 g_2) s = g_1 (g_2 s) = g_1 \left(  \Phi (g_2) (s) \right)  = \Phi (g_1) \left( \Phi (g_2) (s) \right) .
+        \] Hence, \(\Phi \) is a homomorphism.  
+        \item [(b)] Note that \(G\) acts on \(S\). Hence, we can use the result of (a). Now if \(k \in \ker \Phi \), then \(\pi _k = e\), which means \(\pi _k (s_i) = s_i\) for all \(s_i \in S\), so \(k \cdot s_i = s_i\) for all \(s_i \in S\). Equivalently, \(k \cdot (gH) = gH\) for all \(g \in G\). Hence, \((kg) H = gH\) for all \(g \in G\). Hence, for all \(g \in G\), \(kg h_1 = g\) for some \(h_1 \in H\), which means \(k = g h_1^{-1} g^{-1}\). Now if we pick \(g = e\), then \(k = h_1^{-1} \in H\). Thus, \(\ker \Phi \subseteq H\).                  
+        \item [(c)] Consider the induced homomorphism in (a), where \(S\) is the \(S\) in (b), we know \(G / \ker \Phi \simeq \mathrm{Im} \Phi \) by first isomorphism theorem. Now since \(\ker \Phi \triangleleft G\) and \(\ker \Phi \subseteq H\) by (b), and by the condition given in the problem, we know no nontrivial normal subgroup of \(G\) is contained in \(H\), so \(\ker \Phi = \left\{ e \right\} \), so \(G / \ker \Phi  = G / \left\{ e \right\} = G\), so we know \(G \simeq \mathrm{Im}\Phi \), where \(\mathrm{Im} \Phi \) is a subgroup of \(S_n\) since \(n = \left\vert S \right\vert \).         
+    \end{itemize}
+\end{enumerate}
+
+\end{document}
