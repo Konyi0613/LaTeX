@@ -118,8 +118,57 @@
 Moreover, either $m(n) = m(n-1)$ or $m(n) = m(n-1) + 1$.
 
 \paragraph{Exercise 3}  Show that the average number of cycles in a permutation of length $n$ is exactly $H_n$, where $H_n = \sum_{k=1}^{n} \frac{1}{k}$ is the $n$th harmonic number.
+\vspace{-1em}
+\paragraph{Solution:} Note that we want to calculate 
+\[
+	\frac{\sum_{k=1}^{n} k \cdot s_{n, k} }{n!}
+\] since \(s_{n, k}\) represents the number of permutation of \(n\) with exactly \(k\) cycles and \(n!\) is the total number of permutations of \(n\). Now since we know 
+\[
+	x(x+1)\dots (x+(n-1)) = x^{\overline{n}} = \sum_{k=0}^n s_{n, k} x^k,
+\] so if we differentiate both side, we have 
+\[
+	\sum_{i=0}^{n-1} \frac{x(x+1)\dots (x+n-1)}{x+i} = \sum_{k=1}^n k s_{n, k} x^{k-1},  
+\] and if we plug \(x=1\) into both sides, we have 
+\[
+	\sum_{i=0}^{n-1} \frac{n!}{1+i} = \sum_{k=1}^n k \cdot s_{n, k},  
+\] so 
+\[
+	\frac{\sum_{k=1}^n k \cdot s_{n,k} }{n!} = \frac{\sum_{i=0}^{n-1} \frac{n!}{1+i} }{n!} = \sum_{i=0}^{n-1} \frac{1}{1+i} = \sum_{i=1}^n \frac{1}{i} = H_n.  
+\]
+
 
 \paragraph{Exercise 4*}  Show that the number of partitions of $n$ into odd parts is equal to the number of partitions of $n$ into distinct parts.
+\vspace{-1em}
+\paragraph{Solution:} We first give the generating function of \((a_n)\), where \(a_n\) is the number of partition of \(n\) into odd parts. Note that it is 
+\[
+	A(x) = \prod _{j \ge 1} \frac{1}{1 - x^{2j - 1}} = \prod _{j \ge 1} \left( 1 + x^{2j - 1} + \left( x^{2j - 1} \right)^2 + \dots \right) 
+\] since for each \(j\), \(\frac{1}{1 - x^{2j - 1}}\) represents the number of parts of size \(2j - 1\), and note that \(2j - 1\) must be odd, so the coefficient of \(x^n\) in \(A(x)\) is just \(a_n\). More precisely, we can contribute \(1\) to the coefficient of \(x^n\) in \(A(x)\) if and only if 
+\[
+	\left( x^{2 j_1 - 1} \right)^{i_1} \cdot \left( x^{2j_2 - 1} \right)^{i_2} \cdots = x^n,
+\] which corresponds to a partition into odd parts: use \(i_p\) many \(2j_p - 1\)s to get a partition of \(n\) for all \(p\), where \(j_1 < j_2 < \dots \).   
+
+Now we talk about the generating function of \((b_n)\), where \(b_n\) is the number of partitions of \(n\) into distinct parts. Note that it is 
+\[
+	B(x) = \prod _{k \ge 1} \left( 1 + x^k \right) 
+\] since we can contribute \(1\) to the coefficient of \(x^n\) in \(B(x)\) if and only if 
+\[
+	x^{k_1} x^{k_2} \dots = x^n
+\] for some \(k_1 < k_2 < \dots \), which corresponds to a parition of \(n\) into distinct parts. Now we show that in fact \(A(x) = B(x)\). Since for all \(j \in \mathbb{N} \), we have 
+\[
+	\frac{1}{1 - x^{2j - 1}} = \left( 1 + x^{2j - 1} \right) \left( 1 + \left( x^{2j - 1} \right)^2  \right) \left( 1 + \left( x^{2j - 1} \right)^{2^2}  \right) \dots = \prod _{p \ge 0} \left( 1 + \left( x^{2j - 1} \right)^{2^p}  \right),   
+\]  
+so in fact 
+\[
+	A(x) = \prod _{j \ge 1} \prod _{p \ge 0} \left( 1 + \left( x^{2j - 1} \right)^{2^p}  \right) = \prod _{j \ge 1} \prod _{p \ge 0} \left( 1 + x^{(2j - 1)2^p} \right), 
+\] but if we define \(f: \mathbb{N} \times (\mathbb{N} \cup \left\{ 0 \right\} ) \to \mathbb{N} \) by \(f(j, p) = (2j - 1)2^p\), we can show that \(f\) is bijective: 
+\begin{itemize}
+	\item Injective: If \(f(j_1, p_1) = f(j_2, p_2)\), then \((2j_1 - 1)2^{p_1} = (2j_2 - 1)2^{p_2}\), but if \(p_1 \neq p_2\), then one side have more \(2\) as its factor than the other side, which is impossible, so \(p_1 = p_2\). However, if \(p_1 = p_2\), then \(2 j_1 - 1 = 2j_2 - 1\), which means \(j_1 = j_2\), so \(f\) is injective. 
+	\item Surjective: For \(n \in \mathbb{N} \), if \(n\) is odd, then \(n = n \cdot 2^0 = f \left( \frac{n+1}{2}, 0 \right) \). If \(2 \mid n\), then \(n = \left( \frac{n}{2} \right) \cdot 2^1 \), and if \(\frac{n}{2}\) is odd, then \(f \left( \frac{\frac{n}{2} + 1}{2}, 1 \right) = n \), and if \(\frac{n}{2}\) is even, we can repeat this step. Since \(n\) has finitely many \(2\) as its factor, so this algorithm stops, and we can conclude that \(f\) is surjective.                    
+\end{itemize} 
+Now we know \(f\) is bijective, so in fact 
+\[
+	A(x) = \prod _{j \ge 1} \prod _{p \ge 0} \left( 1 + x^{(2j - 1)2^p} \right) = \prod _{k \ge 1} \left( 1 + x^k \right) = B(x),
+\] so comparing the coefficient of \(x^n\) in \(A(x)\) and \(B(x)\), we know they are same, and thus the number of partitions of \(n\) into odd parts is equal to the number of partitions of \(n\) into distinct parts.     
 
 \paragraph{Exercise 5}   A group\footnote{In the non-mathematical sense of the word.} of five pirates, called Alice, Bob, Charles, Diana and Erik, have a treasure of $100$ identical gold coins that they need to divide between themselves.
 \begin{itemize}
