@@ -65,6 +65,49 @@ Show that every non-empty path-connected set is connected.
 Show that if $E$ is connected, then the closure $\overline{E}$ of $E$ is also connected.  
 Is the converse true?
 \end{problem}
+\begin{proof}
+    If \(E\) is connected, and suppose by contradiction, \(\overline{E} \) is disconnected, then \(\overline{E} = V \cup W\) and \(V \cap W = \varnothing \) for some non-empty \(V, W\) open in \(\overline{E} \). Hence, we can write \(V = O_1 \cap \overline{E} \) and \(W = O_2 \cap \overline{E} \), where \(O_1, O_2\) are open in \(X\). Now suppose \(A = O_1 \cap E\) and \(B = O_2 \cap E\), then we know \(A, B\) are open in \(E\). 
+    \begin{claim}
+        \(E \subseteq O_1 \cup O_2\). 
+    \end{claim}              
+    \begin{explanation}
+        If \(\exists x \in E\) but \(x \notin O_1 \cup O_2\), then \(x \notin V\) and \(x \notin W\) since 
+        \[
+            \begin{dcases}
+                V = O_1 \cap \overline{E} \\
+                W = O_2 \cap \overline{E} .       
+            \end{dcases}
+        \]    
+        Thus, \(x \notin V \cup W = X\), but \(x \in E \subseteq X\), so it is a contradiction, and thus \(E \subseteq O_1 \cup O_2\).   
+    \end{explanation}
+    Now by this claim, we know
+    \[
+        A \cup B = \left( O_1 \cap E \right) \cup \left( O_2 \cap E \right) = \left( O_1 \cup O_2 \right) \cap E = E.   
+    \]
+    Also, 
+    \begin{align*}
+         A \cap B &= \left( O_1 \cap E \right) \cap \left( O_2 \cap E \right) = O_1 \cap O_2 \cap E \\ & \subseteq V \cap W = \left( O_1 \cap \overline{E}  \right) \cap \left( O_2 \cap \overline{E}  \right)  = \left( O_1 \cap \left( E \cup \partial E \right)   \right) \cap \left( O_2 \cap \left( E \cup \partial E \right)  \right),  
+    \end{align*}
+    and since \(V \cap W = \varnothing \), so \(A \cap B = \varnothing \). Now we show that \(A, B\) are non-empty. If \(O_1 \cap E = \varnothing \), then since \(V\) is non-empty and 
+    \[
+        V = O_1 \cap \overline{E} = O_1 \cap \left( E \cup \partial E \right) = (O_1 \cap E) \cup \left( O_1 \cap \partial E \right),    
+    \] so \(O_1 \cap \partial E \neq \varnothing \), say \(x \in O_1 \cap \partial E\). Then since \(O_1\) is open in \(X\), so there exists \(r > 0\) s.t. \(B_X(x, r) \subseteq O_1\), and since \(x \in \partial E\), so \(B_X(x, r) \cap E \neq \varnothing \), say \(y \in B_X(x, r) \cap E\). Thus, we have
+    \[
+        y \in B_X(x, r) \cap E \subseteq O_1 \cap E,
+    \] but this means \(O_1 \cap E\) is non-empty, which is a contradiciton. Hence, \(O_1 \cap E\) is non-empty, and we can use similar method to prove \(O_2 \cap E\) is non-empty. Now since 
+    \[
+        \begin{dcases}
+            A, B \neq \varnothing \\
+            A \cup B = E \\
+            A \cap B = \varnothing \\
+            A, B \text{ are open in } E,
+        \end{dcases}
+    \]   
+    so \(E\) is connected, which is a contradiction, so \(\overline{E} \) must be connected. 
+    
+    Now we show that the converse may not be true. Suppose \(X = \mathbb{R} \) and \(\overline{E} = [1, 2] \), then we know \(\overline{E} \) is connected since in \(\mathbb{R} \) connected space is equivalent to an interval. However, we know \(E\) may be \((1, 1.5) \cup (1.5, 2)\), and this is disconnected in \(\mathbb{R} \), so this is a counterexample.        
+    
+\end{proof}
 %────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 \begin{problem}[20pts]
@@ -80,6 +123,39 @@ are all closed and connected.
 These sets are known as the \emph{connected components} of $X$.
 You can read a note about equivalence relation in the file at NTU cool.
 \end{problem}
+\begin{proof}
+    We first show that \(\sim \) is an equivalence relation. 
+    \begin{itemize}
+        \item reflexive: Note that for all \(x \in X\), \(\left\{ x \right\} \) is connected since it cannot be cut into two non-empty part, so \(x \sim x\). 
+        \item symmetry: This is trivial since if there exists a connected subset of \(X\) which contains both \(x\) and \(y\), then this connected subset of \(X\) contains \(y\) and \(x\). 
+        \item transitive: If \(x \sim y\) and \(y \sim z\), then we know there exists connected \(E_1, E_2\) s.t. \(E_1\) contains \(x, y\) and \(E_2\) contains \(y, z\). Since \(y \in E_1 \cap E_2\), so \(E_1 \cap E_2\) is non-empty, and thus by Problem 2 we know \(E_1 \cup E_2\) is connected, and since \(x, z \in E_1 \cup E_2\), so \(x \sim z\).                      
+    \end{itemize} 
+    Now if we fix \(x \in X\), and say \([x] = \left\{ y \in X: y \sim x \right\} \), then now we show that \([x]\) is closed and connected. We first show that \([x]\) is connected. If not, then there exists non-empty \(V, W\) s.t. \([x] = V \cup W\) and \(V \cap W = \varnothing \) and \(V, W\) are open in \([x]\). If \(x \in V\), then \(x \notin W\) and since \(W\) is non-empty, we know there exists \(z \neq x\) s.t. \(z \in W\). Since \(z \in W \subseteq [x]\), so there exists connected \(E_z\) s.t. \(x, z \in E_z\). 
+    \begin{claim}
+        \(E_z \subseteq [x]\). 
+    \end{claim}              
+    \begin{explanation}
+        For all \(p \in E_z\), since we know \(x \in E_z\), so \(E_z\) is a connected set containing \(p\) and \(x\), so \(p \sim x\), which means \(p \in [x]\). Hence, \(E_z \subseteq [x]\).         
+    \end{explanation}    
+    Now we know 
+    \[
+        E_z = E_z \cap [x] = E_z \cap (V \cup W) = (E_z \cap V) \cup (E_z \cap W),
+    \] and since \(x \in E_z \cap V\) and \(z \in E_z \cap W\), so \(E_z \cap V\) and \(E_z \cap W\) are non-empty. Also, since \(E_z \subseteq [x]\) and \(V, W\) are open in \([x]\), so \(E_z \cap V\) and \(E_z \cap W\) are open in \(E_z\). Besides, 
+    \[
+        (E_z \cap V) \cap (E_z \cap W) = E_z \cap (V \cap W) = E_z \cap \varnothing = \varnothing,
+    \] so we know \(E_z\) is disconnected since 
+    \[
+        \begin{dcases}
+            (E_z \cap V), (E_z \cap W) \neq \varnothing \\
+            E_z = (E_z \cap V ) \cup (E_z \cup W) \\
+            (E_z \cap V) \cap (E_z \cap W) = \varnothing \\
+            \left( E_z \cap V \right), \left( E_z \cap W \right) \text{ are open in } E_z.  
+        \end{dcases}
+    \] 
+    However, \(E_z\) is connected, so this is a contradiciton. Hence, \([x]\) is connected. 
+    
+    Now we show that \([x]\) is closed. Since \([x]\) is connected and by Problem 4, we know \(\overline{[x]} \) is connected. Note that \(x \in \overline{[x]} \) since \(x \in [x]\) and thus for all \(r > 0\) we have \(x \in B_X(x, r) \cap [x]\). However, this means for all \(y \in \overline{[x]} \), we have \(x, y \in \overline{[x]} \) and \(\overline{[x]} \) is connected, so \(y \sim x\), which means \(y \in [x]\). Hence, \(\overline{[x]} \subseteq [x]\), and thus \([x]\) is closed.             
+\end{proof}
 %────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \begin{problem}[15pts]
     Let $f : S \to T$ be a function from a metric space $S$ to another metric space $T$.  

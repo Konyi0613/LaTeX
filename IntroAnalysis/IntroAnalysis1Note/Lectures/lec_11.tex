@@ -12,7 +12,7 @@
     There are \(3\) cases: 
     \begin{itemize}
         \item Case 1: \(f(a) = f(b)\), then trivial. 
-        \item Case 2: \(f(a) < f(b)\), Since \(E\) is connected and \(f\) is continuous, so \(f(E)\) is connected in \(\mathbb{R} \). Hence, for \(f(a), f(b) \in E\), we know \(\left( f(a), f(b) \right) \subseteq E \) by \autoref{thm: connectedness in R TFAE}, so if \(f(a) < y < f(b)\), then \(\exists c \in E\) s.t. \(f(c) = y\).           
+        \item Case 2: \(f(a) < f(b)\), Since \(E\) is connected and \(f\) is continuous, so \(f(E)\) is connected in \(\mathbb{R} \). Hence, for \(f(a), f(b) \in f(E)\), we know \(\left( f(a), f(b) \right) \subseteq f(E) \) by \autoref{thm: connectedness in R TFAE}, so if \(f(a) < y < f(b)\), then \(\exists c \in E\) s.t. \(f(c) = y\).           
         \item Case 3: \(f(a) > f(b)\), then let \(a^{\prime} = b\) and \(b^{\prime} = a\), then \(f \left( a^{\prime}  \right) < f \left( b^{\prime}  \right)  \) and use the result of Case 2.
     \end{itemize} 
 \end{proof}
@@ -21,7 +21,7 @@ In metric space \((X, d_X)\), we define open ball
 \[
     B_X(x, r) = \left\{ y \mid d_X (y, x) < r \right\},
 \]
-and a set \(u\) is open if any \(x \in u\), \(\exists r_x > 0\) s.t. \(B_X(x, r_x) \subseteq u\), so \(u = \bigcup_{x \in u} B_X(x, r_x) \). Hence, in metric space open sets are in fact union of open balls. We also proved that 
+and a set \(u\) is open if for any \(x \in u\), \(\exists r_x > 0\) s.t. \(B_X(x, r_x) \subseteq u\), so \(u = \bigcup_{x \in u} B_X(x, r_x) \). Hence, in metric space open sets are in fact union of open balls. We also proved that 
 \begin{itemize}
     \item \(\varnothing  \) and \(X\) are open. 
     \item  If \(u_1, \dots , u_n\) are open in \(X\), then \(\bigcap_{i=1}^{n} u_i \) is open in \(X\). 
@@ -39,7 +39,7 @@ Now we want to extend this concept.
 \begin{eg}
     \(X = \left\{ a, b \right\} \) for \(a \neq b\), then 
     \[
-        2^X = \left\{ \varnothing , \left\{ 0 \right\}, \left\{ 1 \right\}, \left\{ 0, 1 \right\}    \right\}. 
+        2^X = \left\{ \varnothing , \left\{ a \right\}, \left\{ b \right\}, \left\{ a, b \right\}    \right\}. 
     \]  
 \end{eg}
 
@@ -75,7 +75,7 @@ Now we want to extend this concept.
     \(X = \left\{ a, b \right\} \) and \(a \neq b\), \(\mathcal{F} = \left\{ \varnothing , \left\{ a \right\}, \left\{ b \right\}, \left\{ a, b \right\}    \right\} \), then \(\left\{ a \right\}, \left\{ a, b \right\}  \) are neighborhoods of \(a\) and \(\left\{ b \right\}, \left\{ a, b \right\}  \) are neighborhoods of \(b\).      
 \end{eg}
 
-\begin{definition}
+\begin{definition}[Interior/Exterior/Boundary point]
     Let \((X, \mathcal{F} )\) be a topological space, and \(E \subseteq X\) be a subset. We say that 
     \begin{itemize}
         \item \(x_0\) is an interior point of \(E\) if \(\exists \) a neighborhood \(V\) of \(x_0\) s.t. \(V \subseteq E\). 
@@ -89,6 +89,9 @@ Now we want to extend this concept.
         X = \mathrm{Int}(E) \cupdot \mathrm{Ext}(E) \cupdot \partial E.  
     \]
 \end{corollary}
+\begin{proof}
+    \todo{DIY}
+\end{proof}
 
 \begin{definition}[Adherent point] \label{def: adherent point}
     We say \(x_0\) is an adherent point of \(E\) if every neighborhood \(V\) of \(x_0\) has a nonempty intersection with \(E\), and we called \(\overline{E} \) the set of all adherent points.     
@@ -102,16 +105,46 @@ Now we want to extend this concept.
     Now we show that \(\overline{E} \subseteq \mathrm{Int}(E) \cup \partial E \). Since \(\overline{E} \subseteq X = \mathrm{Int}(E) \cup \mathrm{Ext}(E) \cup \partial E  \), so we want to show for all \(x_0 \in \overline{E} \), we have \(x_0 \notin \mathrm{Ext}(E) \). By the definition of exterior point, we can easily show this.    
 \end{proof}
 
-\begin{corollary}
-    A set \(F\) is closed if \(\overline{F} = F\). \(\iff \) \(X \setminus F\) is open i.e. \(X \setminus F \subseteq \mathcal{F} \).     
-\end{corollary} 
+\begin{definition*}[Open and Closed Sets]\label{def:open-closed topological space ver}
+    Suppose \((X, \mathcal{F})\) is a topological space. Then:
+    \begin{itemize}
+        \item A set \(O \subseteq X\) is called \emph{open} if \(O \in \mathcal{F}\).
+        \item A set \(F \subseteq X\) is called \emph{closed} if its complement \(X \setminus F\) is open, i.e., \(X \setminus F \in \mathcal{F}\).
+    \end{itemize}
+\end{definition*}
 
-\begin{definition}
-    Let \((X, \mathcal{F} )\)  be a topological space and \(Y \subseteq X\). We define \(\mathcal{F} _Y = \left\{ V \cap Y \mid V \in \mathcal{F}  \right\} \) and call \((Y, \mathcal{F} _Y)\) the topological subspace of \((X, \mathcal{F} )\) included by \(Y\). We can show that \(\mathcal{F} _Y\) is a topology on \(Y\).       
+\begin{corollary}
+    A set \(E \subseteq X\) is open if and only if \(E = \mathrm{Int}(E) \). 
+\end{corollary}
+\begin{proof}
+    \vphantom{text}
+    \begin{itemize}
+        \item [\((\implies )\)] If \(E\) is open, then since 
+        \begin{equation} \label{eq: Int in tp space}
+            \mathrm{Int}(E) = \bigcup\left\{ O \subseteq E : O \in \mathcal{F} \right\}, 
+        \end{equation}
+        we know \(E \subseteq \mathrm{Int}(E) \).  
+        \item [\((\impliedby )\)] By the definition of topological space and \autoref{eq: Int in tp space}, we know \(\mathrm{Int}(E) \) is open, so \(E = \mathrm{Int}(E) \) implies \(E\) is open.    
+    \end{itemize}
+\end{proof}
+
+\begin{corollary}
+    A set \(F \subseteq X\) is closed if and only if \(\overline{F} = F\).
+\end{corollary}
+\begin{proof}
+    If \(F\) is closed, then \(X \setminus F\) is open, so \(X \setminus F = \mathrm{Int}(X \setminus F) \), so 
+    \[
+        F = X \setminus (X \setminus F) = X \setminus \mathrm{Int}(X \setminus F) = X \setminus \mathrm{Ext}(F) = \mathrm{Int}(F) \cup \partial (F) = \overline{F}.    
+    \] 
+    The other direction is similar.  
+\end{proof}
+
+\begin{definition}[Topological subspace]
+    Let \((X, \mathcal{F} )\)  be a topological space and \(Y \subseteq X\). We define \(\mathcal{F} _Y = \left\{ V \cap Y \mid V \in \mathcal{F}  \right\} \) and call \((Y, \mathcal{F} _Y)\) the topological subspace of \((X, \mathcal{F} )\) induced by \(Y\). We can show that \(\mathcal{F} _Y\) is a topology on \(Y\).       
 \end{definition}
 
 \begin{definition}[Continuous map]
-    Let \((X, \mathcal{F} )\) and \((Y, g)\) be topological spaces ane let \(f:X \to  Y\) be a function. We say \(f\) is continuous at \(x_0 \in X\) if every neighborhood \(V \in g\) of \(f(x_0)\), there exists a neighborhood \(u \in \mathcal{F} \) of \(x_0\) s.t. \(u \subseteq f^{-1}(V)\).          
+    Let \((X, \mathcal{F} )\) and \((Y, g)\) be topological spaces ane let \(f:X \to  Y\) be a function. We say \(f\) is continuous at \(x_0 \in X\) if for every neighborhood \(V \in g\) of \(f(x_0)\), there exists a neighborhood \(u \in \mathcal{F} \) of \(x_0\) s.t. \(u \subseteq f^{-1}(V)\).          
 \end{definition}
 
 \begin{definition}[Convergence]
@@ -123,17 +156,17 @@ Now we want to extend this concept.
 \end{remark}
 
 \begin{eg}
-    Let \(X = \left\{ a, b \right\} \) and \(a \neq b\). Consider the trivial topology \(\mathcal{F} = \left\{ \varnothing , X \right\} \). The constant sequence \(\left\{ x^{(n)} \right\}_{n=m}^{\infty}  \) with \(x^{(n)} = a\), then \(\lim_{n \to \infty} x^{(n)} = a \) and \(\lim_{n \to \infty} x^{(n)} = b \).      
+    Let \(X = \left\{ a, b \right\} \) and \(a \neq b\). Consider the trivial topology \(\mathcal{F} = \left\{ \varnothing , X \right\} \). If we have the constant sequence \(\left\{ x^{(n)} \right\}_{n=m}^{\infty}  \) with \(x^{(n)} = a\), then \(\lim_{n \to \infty} x^{(n)} = a \) and \(\lim_{n \to \infty} x^{(n)} = b \).      
 \end{eg}
 
 \begin{explanation}
     Any neighborhood of \(a\) must be \(\left\{ a, b \right\} \), and any neighborhood of \(b\) must also be \(\left\{ a, b \right\} \), so \(\lim_{n \to \infty} x^{(n)} = a \) and \(\lim_{n \to \infty}  x^{(n)} = b\).     
 \end{explanation}
 
-\begin{eg}
+\begin{eg} \label{eg: R setminus u is finite point tp}
     On \(\mathbb{R} \), we consider 
     \[
-        \mathcal{F} = \left\{ \varnothing  \right\} \cup \left\{ u: \mathbb{R} \ u \text{ is finite points} \right\},  
+        \mathcal{F} = \left\{ \varnothing  \right\} \cup \left\{ u: \mathbb{R} \setminus  u \text{ is finite points} \right\},  
     \] then \(\mathcal{F} \) is a topology on \(\mathbb{R} \).   
 \end{eg}
 \begin{explanation}
@@ -141,16 +174,15 @@ Now we want to extend this concept.
     \begin{align*}
         \mathbb{R} \setminus \left( \bigcup_{\alpha } \mathcal{F} _{\alpha }  \right) = \bigcap_{\alpha } \left( \mathbb{R} \setminus \mathcal{F} _{\alpha } \right) \subseteq \mathbb{R} \setminus \mathcal{F}_{\alpha _i}  
     \end{align*}           
-    for some \(\alpha _i\) in the index set. 
+    for some \(\alpha _i\) in the index set, so \(\mathbb{R} \setminus \left( \bigcup_{\alpha } \mathcal{F} _\alpha   \right) \) is also finite points, and we're done. 
 \end{explanation}
 
 \begin{remark}
-    Consider \(\left\{ x^{(n)} \right\}_{n=1}^{\infty}  \) with \(x^{(n)} = n\), then \(\lim_{n \to \infty} x^{(n)} = p \) for any \(p \in \mathbb{R} \).     
+    In the topological space induced by the topology in \autoref{eg: R setminus u is finite point tp}. If we consider \(\left\{ x^{(n)} \right\}_{n=1}^{\infty}  \) with \(x^{(n)} = n\), then \(\lim_{n \to \infty} x^{(n)} = p \) for any \(p \in \mathbb{R} \).     
 \end{remark}
-
-\begin{remark}
-    Any neighborhood \(u\) of 
+\begin{proof}
+    Since any neighborhood \(u\) of \(p\) has
     \[
-        p = \mathbb{R} \setminus \left\{ p_1, \dots , p_k \right\} 
-    \] with \(p_1 < p_2 < \dots < p_k\), we have \(x^{(n)} \in u\) for \(n > p_k\).  
-\end{remark}
+        \mathbb{R} \setminus u = \left\{ p_1, \dots , p_k \right\} 
+    \] with \(p_1 < p_2 < \dots < p_k\), so we have \(x^{(n)} \in u\) for \(n > p_k\).  
+\end{proof}
