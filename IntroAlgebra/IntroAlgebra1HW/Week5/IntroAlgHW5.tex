@@ -1,0 +1,244 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{amsmath,amssymb,amsthm,enumitem}
+\usepackage{geometry}
+\geometry{margin=0.6in}
+\setlength{\parindent}{0pt}
+\usepackage{xeCJK}
+\setCJKmainfont{PingFang TC}
+
+
+\begin{document}
+
+\begin{center}
+    \Large \textbf{Abstract Algebra I} \\[1em]
+    \large \textbf{Homework 5} \\[0.5em]
+    B13902024 張沂魁 \\
+    \textbf{Due: 15th October 2025}
+\end{center}
+
+\bigskip
+
+\begin{enumerate}
+    \item Let $G$ be a finite group that acts on a finite set $S$. We (again) define the orbit of $s \in S$ to be
+    \[
+        O(s) = \{ g \cdot s : g \in G \},
+    \]
+    and the stabilizer of $s$ in $G$ to be
+    \[
+        G_s = \{ g \in G : g \cdot s = s \}.
+    \]
+    \begin{enumerate}[label=(\alph*)]
+        \item Check that for any two distinct elements $s, t \in S$, we either have $O(s) = O(t)$ or $O(s) \cap O(t) = \varnothing$.
+
+        \item Verify that $G_s$ is a subgroup of $G$, and that the map given by
+        \[
+            \{\text{cosets of } G_s \text{ in } G\} \to O(s), \quad gG_s \mapsto g \cdot s
+        \]
+        is a well-defined bijection.
+
+        \item Conclude that $|G_s| \cdot |O(s)| = |G|$. (This is called the \textbf{orbit-stabilizer theorem}.)
+    \end{enumerate}
+    \textbf{Solution:} 
+    \begin{itemize}
+        \item [(a)] For \(s , t \in S\) with \(s \neq t\), if \(O(s) \cap O(t) = \varnothing \), then it is the second case. If \(p \in O(s) \cap O(t)\), then \(p = g_1 s = g_2 t\) for some \(g_1, g_2 \in G\). Hence, we know 
+        \[
+            s = \left( g_1^{-1} g_2 \right) t \in O(t),
+        \] and thus \(O(s) \subseteq O(t)\). Similarly, we know \(O(t) \subseteq O(s)\), and thus \(O(s) = O(t)\).   
+        \item [(b)] We first check that \(G_s\) is a subgroup of \(G\). Since \(G\) acts on \(S\), so \(e \cdot s = s\), and thus \(e \in G_s\), which means \(G_s\) is non-empty. Also, if \(g_1, g_2 \in G_s\), then \(g_1 s = g_2 s = s \), so
+        \[
+            \left( g_1 g_2 \right)s = g_1 \left( g_2 s \right) = g_1 s = s, 
+        \] which means \(g_1 g_2 \in G_s \). Besides, if \(gs = s\), then \(s = g^{-1} g s = g^{-1} (gs) = g^{-1} s\), so \(g^{-1} \in G_s\). By above arguments, \(G_s\) is a subgroup of \(G\).    
+        
+        Now we show that the map given by 
+        \[
+            \Phi : \left\{ \text{cosets of } G_s \text{ in } G \right\} \to O(s), \quad g G_s \mapsto g \cdot s 
+        \] is well-defined. If \(g_1 G_s = g_2 G_s\), then since \(e \in G_s\), so \(g_1 \in g_2 G_s\), so \(g_1 = g_2 g_3\) for some \(g_3 \in G_s\), which means \(g_3 s = s\). Thus,
+        \[
+            g_1 s = g_2 g_3 s = g_2 s,
+        \] so the map \(\Phi \) is well-defined.
+
+        Next, we show that \(\Phi \) is a bijection. If \(g_1 s = g_2 s \), then \(g_2^{-1} g_1 s = s \), so \(g_2 ^{-1} g_1 \in G_s\), and thus 
+        \[
+            g_1 = g_2 \left( g_2^{-1} g_1 \right) \in g_2 G_s. 
+        \] Hence, \(g_1 = g_2 g\) for some \(g \in G_s\), and for all \(g^{\prime} \in G_s\) we have \(g_1 g^{\prime} = g_2 g g^{\prime} \). Now we claim that \(g g^{\prime} \in G_s\). Since 
+        \[
+            g g ^{\prime} s = g s = s, 
+        \] so we proved it. By this, we know \(g_1 g^{\prime} = g_2 g g^{\prime} \in G_s\), which means \(g_1 G_s \subseteq g_2 G_s\). Now since we also have \(g_1^{-1} g_2 s = s\), so we can similrly derive \(g_2 G_s \subseteq g_1 G_s\), and thus \(g_1 G_s = g_2 G_s\), which means \(\Phi \) is injective. Now we show that \(\Phi \) is surjective. For all \(p \in O(s)\), we know \(p = g \cdot s\) for some \(g \in G\), so \(\Phi (g) = g \cdot s = p\), which means \(\Phi \) is surjective, and thus \(\Phi \) is bijective.      
+        \item [(c)] By (b), we know \([G: G_s] = \vert O(s) \vert \), and since \([G: G_s] \cdot \vert G_s \vert = \vert G \vert \), so we have 
+        \[
+            \left\vert G_s \right\vert \cdot \left\vert O(s) \right\vert = \vert G \vert. 
+        \]  
+    \end{itemize}
+
+    \bigskip
+
+    \item Consider the action of $G$ on itself given by $(g, h) \mapsto g^{-1}hg$, called \textbf{conjugation}.  
+    In this case the orbit of $h \in G$ is called the \textbf{conjugacy class} of $h$ and we denote it by
+    \[
+        \mathrm{class}(h) = \{ g^{-1}hg : g \in G \},
+    \]
+    and the stabilizer is called the \textbf{centralizer} of $h$ and is denoted by
+    \[
+        C_G(h) = \{ g \in G : g^{-1}hg = h \}.
+    \]
+    Elements in the same conjugacy class are called \textbf{conjugates} of one another.
+
+    \begin{enumerate}[label=(\alph*)]
+        \item Let $\mathrm{class}(h_1), \dots, \mathrm{class}(h_n)$ be the distinct conjugacy classes of $G$, i.e.
+        \[
+            \bigcup_{i=1}^n \mathrm{class}(h_i) = G.
+        \]
+        Derive the \textbf{class equation}
+        \[
+            |G| = \sum_{i=1}^n \frac{|G|}{|C_G(h_i)|}.
+        \]
+
+        \item Furthermore, suppose for each $i = m + 1, \dots, n$, we have $|\mathrm{class}(h_i)| = 1$, while for $i = 1, \dots, m$, we have $|\mathrm{class}(h_i)| > 1$. Show that
+        \[
+            |G| = |Z(G)| + \sum_{i=1}^m \frac{|G|}{|C_G(h_i)|},
+        \]
+        where $Z(G)$ denotes the \textbf{center} of $G$. (Usually the class equation is written in this second form.)
+
+        \item Let $p$ be a prime, and $n \ge 1$. If $|G| = p^n$, deduce that $Z(G) \ne \{ e \}$.
+    \end{enumerate}
+    \textbf{Solution:} 
+    \begin{itemize}
+        \item [(a)] We first show that for \(i \neq j\), we must have \(\mathrm{class}(h_i) \cap \mathrm{class}(h_j) = \varnothing \). If \(p \in \mathrm{class}(h_i) \cap \mathrm{class}(h_j)  \), then \(p = g_1^{-1} h_i g_1 = g_2^{-1} h_j g_2\), so \(g_2 g_1^{-1} h_1 g_1 g_2^{-1} = h_j\), and thus for all \(q \in \mathrm{class}(h_j) \), we know 
+        \[
+            q = g_3^{-1} h_j g_3 = g_3^{-1} g_2 g_1^{-1} h_i g_1 g_2^{-1} g_3 \in \mathrm{class}(h_i), 
+        \] which shows \(\mathrm{class}(h_j) \subseteq \mathrm{class}(h_i)  \). Similarly, we can show that \(\mathrm{class}(h_i) \subseteq \mathrm{class}(h_j)  \), and thus \(\mathrm{class}(h_i) = \mathrm{class}(h_j)  \), which is a contradiction since \(\mathrm{class}(h_i) \) and \(\mathrm{class}(h_j) \) are distinct conjugacy classes of \(G\). Hence, we know 
+        \[
+            \left\vert G \right\vert = \sum_{i=1}^n \left\vert \mathrm{class}(h_i) \right\vert .  
+        \] 
+        Now we show that \(\left\vert \mathrm{class}(h_i) \right\vert = \frac{\left\vert G \right\vert }{\left\vert C_G(h_i) \right\vert }\) for all \(1 \le i \le n\). Suppose \(G = \left\{ \mathcal{G} _1, \mathcal{G}_2 , \dots , \mathcal{G}_{\vert G \vert }  \right\} \), then we can collect 
+        \[
+            \mathcal{G} _1^{-1} h_i \mathcal{G} _1, \  \mathcal{G} _2^{-1} h_i \mathcal{G} _2, \  \dots , \ \mathcal{G} _{\vert G \vert }^{-1} h_i \mathcal{G} _{\vert G \vert }, 
+        \] we know these are all the elements in \(\mathrm{class}(h_i) \) but contains repeated elements, and we have collected \(\vert G \vert \) things, and we called this collection \(\mathcal{C} \). Now we claim that for every \(p \in \mathcal{C} \), \(p\) is counted \(\left\vert C_G(h_i) \right\vert \) times, and thus \(\left\vert \mathrm{class}(h_i) \right\vert  = \frac{\vert G \vert }{\vert C_G(h_i) \vert } \). If \(p \in \mathcal{C} \), then \(p = g_1^{-1} h_i g_1\) for some \(g_1 \in G\), and we know for all \(g_2 \in C_G(h_i)\), 
+        \[
+            g_1^{-1} g_2^{-1} h_i g_2 g_1 = g_1^{-1} h_i g_1 = p,
+        \] and note that for all distinct \(u, v \in C_G(h_i)\), \(u g_1 \neq v g_1\), so in \(\mathcal{C} \) we counted \(p\) at least \(\left\vert C_G(h_i) \right\vert \) times. Now if we count \(p\) in \(\mathcal{C} \) more than \(\left\vert C_G(h_i) \right\vert \) times, then we know 
+        \[
+            p = g_k^{-1} h_i g_k \text{ with } g_k \in G \quad \forall 1 \le k \le \left\vert C_G(h_i) \right\vert + 1,
+        \] where \(g_j \neq g_k\) for all \(1 \le j < k \le \left\vert C_G(h_i) \right\vert + 1\). Hence, we have 
+        \[
+            g_1^{-1} h_i g_1 = g_k^{-1} h_i g_k \iff g_k g_1^{-1} h_i g_1 g_k^{-1} = h_i
+        \]  for all \(1 \le k \le \left\vert C_G(h_i) \right\vert + 1\). Hence, \(g_1 g_k^{-1} \in C_G(h_i)\). Note that for distinct \(l, m\), \(g_1 g_l^{-1} \neq g_1 g_m^{-1}\), so \( C_G(h_i) \) contains at least \(\left\vert C_G(h_i) \right\vert + 1 \) elements, which is a contradiction, and we're done. Hence, we have shown that \(\left\vert \mathrm{class}(h_i) \right\vert  = \frac{\vert G \vert }{\vert C_G(h_i) \vert }\), and thus 
+        \[
+            \vert G \vert = \sum_{i=1}^n \vert \mathrm{class}(h_i)  \vert = \sum_{i=1}^n \frac{\left\vert G \right\vert }{\left\vert C_G(h_i) \right\vert }. 
+        \]  
+        \item [(b)] Note that
+        \[
+            Z(G) = \left\{ g \in G: gx = xg \quad \forall x \in G \right\}. 
+        \]
+        Suppose \(S = \bigcup_{i=m+1}^n \mathrm{class}(h_i)  \), we will show that \(\vert Z(G) \vert = \vert S \vert  \). For \(n \ge i \ge m + 1\), since \(\vert \mathrm{class}(h_i)  \vert = 1\), so we know \(\frac{\vert G \vert }{\vert C_G(h_i) \vert } = 1\), and this gives \(\vert G \vert = \vert C_G(h_i) \vert  \), which means for all \(g \in G\), we have \(g^{-1} h_i g = h_i\), which gives \(h_i \in Z(G)\). Also, since \(h_i = e^{-1} h_i e \in \mathrm{class}(h_i) \), so \(\mathrm{class}(h_i) = \left\{ h_i \right\}  \) since \(\vert \mathrm{class}(h_i)  \vert = 1 \). Hence, we have 
+        \[
+            S = \bigcup_{i=m+1}^n \mathrm{class}(h_i) = \left\{ h_{m+1}, h_{m+2}, \dots , h_n \right\} \subseteq Z(G).    
+        \]
+        Now if \(g^{\prime} \in Z(G)\), then we know \(g^{\prime} x = x g^{\prime} \) for all \(x \in G\). Also, we know \(g^{\prime} \in \mathrm{class}(h_i) \) for some \(i\) and this \(i\) is unique. Hence, \(g^{\prime} = g^{-1} h_i g\) for some \(g \in G\). Now since \(g^{\prime} g = g g^{\prime}\), 
+        which gives \(g^{-1} g^{\prime} g = g^{\prime} \), so we have \(g^{-1} g^{\prime} g = g^{\prime} = g^{-1} h_i g\), so we have \(g^{\prime} = h_i\). Now since
+        \[
+            u^{-1} h_i u = u^{-1} g^{\prime} u = g^{\prime} \quad \forall u \in G,
+        \] so \(\mathrm{class}(h_i) = \left\{ h_i \right\}  \), which means \(g^{\prime} \in S\). Hence, we have \(Z(G) \subseteq S\), and thus \(\left\vert Z(G) \right\vert = \vert S \vert  \). Hence,
+        \[
+            \vert G \vert = \vert S \vert + \sum_{i=1}^{m} \frac{\vert G \vert }{\vert C_G(h_i) \vert } = \vert Z(G) \vert + \sum_{i=1}^{m} \frac{\vert G \vert }{\vert C_G(h_i) \vert }.   
+        \]     
+        \item [(c)] Suppose by contradiction, \(Z(G) = \left\{ e \right\} \), then we know 
+        \[
+            p^n - 1 = \vert G \vert - 1 = \sum_{i=1}^{m} \frac{\vert G \vert }{\vert C_G(h_i) \vert }  
+        \] by (b), and since \(\vert \mathrm{class}(h_i) \vert  =  \frac{\vert G \vert }{\vert C_G(h_i) \vert } > 1\) for all \(1 \le i \le m\), so
+        \[
+            p \mid \frac{\vert G \vert }{\vert C_G(h_i) \vert } = \frac{p^n}{\vert C_G(h_i) \vert } \quad \forall 1 \le i \le m,
+        \] and thus
+        \[
+            p \mid \sum_{i=1}^m \frac{\vert G \vert }{\vert C_G(h_i) \vert } = p^n - 1, 
+        \] which is a contradiction. Hence, \(Z(G) \neq \left\{ e \right\} \). 
+    \end{itemize}
+
+    \bigskip
+
+    \item The rest of the homework has nothing to do with group actions.
+
+    Let $G$ be a finite group and $H$ a subgroup. The \textbf{index} of $H$ in $G$, denoted $[G : H]$, is the quantity $|G| / |H|$.  
+    For another subgroup $K \le G$, we are interested in questions about $HK = \{ hk : h \in H, k \in K \}$ or $KH$.
+
+    \begin{enumerate}[label=(\alph*)]
+        \item Prove that
+        \[
+            |HK| = \frac{|H||K|}{|H \cap K|}.
+        \]
+
+        \item Prove that
+        \[
+            [G : H \cap K] \le [G : H][G : K],
+        \]
+        with equality if and only if $G = HK$.
+
+        \item Prove that $HK$ is a subgroup of $G$ if and only if $HK = KH$.
+
+        \item Prove that if $[G : H]$ and $[G : K]$ are relatively prime, then $G = HK$.
+    \end{enumerate}
+    (In general, $[G : H]$ is defined to be the number of distinct left cosets of $H$ in $G$, since our current definition does not make sense if $G$ is infinite. Then the problem of interest would be when $H$ is a subgroup of finite index, but we do not go into that here.) \\
+    \textbf{Solution:} 
+    \begin{itemize}
+        \item [(a)] Suppose \(H = \left\{ \mathcal{H} _1, \mathcal{H} _2, \dots , \mathcal{H} _{\vert H \vert } \right\} \) and \(K = \left\{ \mathcal{K} _1 \mathcal{K} _2, \dots , \mathcal{K} _{\vert K \vert } \right\} \), then we can collect all \(\mathcal{H} _i \mathcal{K} _j\) with \(1 \le i \le \vert H \vert \) and \(1 \le j \le \vert K \vert \), then there are \(\vert H \vert \vert K \vert \) things in this collection, and we know we have counted all things of \(HK\) but we have counted some repeated things. Now we claim that each element in \(HK\) is counted exactly \(\vert H \cap K \vert \) times. Suppose \(h_1 k_1 \in HK\) with \(h_1 \in H\) and \(k_1 \in K\), then for all \(p \in H \cap K\), we know 
+        \[
+            h_1 k_1 = h_1 p^{-1} p k_1 = \left( p h_1^{-1} \right)^{-1} \left( p k_1 \right),  
+        \] and \(\left( p h_1^{-1} \right)^{-1} \in H \) and \(p k_1 \in K\). Note that for all \(q \neq p\) and \(q \in H \cap K\), \(q k_1 \neq p k_1\), so \(\left( ph_1^{-1} \right)^{-1} \left( pk_1 \right)  \) and \(\left( q h_1^{-1} \right)^{-1} \left( pk_1 \right)  \) are both counted in the previously mentioned collection. Hence, \(h_1 k_1\) is counted at least \(\vert H \cap K \vert \) times in the collection. Now if \(h_1 k_1\) is counted more than \(\vert H \cap K \vert \) times, then
+        \[
+            h_1 k_1 = h_m k_m \text{ with } h_m \in H, k_m \in K \quad \forall 1 \le m \le \vert H \cap K \vert + 1,
+        \] and \(h_i \neq h_j\) and \(k_i \neq k_j\) for any distinct \(i, j\). Hence, we know 
+        \[
+            h_m^{-1} h_1 = k_m k_1^{-1} \in H \cap K \quad \forall 1 \le m \le \vert H \cap K \vert + 1. 
+        \] Note that \(h_i^{-1} h_1 \neq h_j^{-1} h_1\) for all \(i \neq j\). This means \(H \cap K\) has at least \(\vert H \cap K \vert + 1\) elements, which is a contradiction. Hence, each \(h_1 k_1\) is counted exactly \(\vert H \cap K \vert \) times in the collection, and thus 
+        \[
+            \left\vert HK \right\vert = \frac{\vert H \vert \vert K \vert}{\vert H \cap K \vert }.
+        \]  
+        \item [(b)] Note that 
+        \[
+            \frac{[G:H][G:K]}{[G: H \cap K]} = \frac{\frac{\vert G \vert^2 }{\vert H \vert \vert K \vert }}{\frac{\vert G \vert }{\vert H \cap K \vert }} = \frac{\vert G \vert }{\frac{\vert H \vert \vert K \vert  }{\vert H \cap K \vert }} = \frac{\vert G \vert }{\vert H K \vert },
+        \]
+        and since \(HK \subseteq G\), so \(\frac{\vert G \vert }{\vert HK \vert }\ge 1 \), and the equality holds if and only if \(G = HK\), and thus
+        \[
+            [G:H] [G:K] \ge [G: H \cap K]
+        \] with equality if and only if \(G = HK\). 
+        \item [(c)] \vphantom{text}
+        \begin{itemize}
+            \item [\((\implies )\)] If \(HK\) is a subgroup of \(G\), then for all \(p \in KH\), we know \(p = kh\) with \(k \in K\) and \(h \in H\), ans thus \(h^{-1} k^{-1} \in HK\), and since \(HK\) is a group, so
+            \[
+                p = kh = \left( h^{-1} k^{-1} \right)^{-1} \in HK,
+            \] so \(KH \subseteq HK\). Also, we know 
+            \[
+                \vert HK \vert = \frac{\vert H \vert \vert K \vert }{\vert H \cap K \vert } = \vert KH \vert, 
+            \] so we have \(HK = KH\). 
+            \item [\((\impliedby )\)] If \(HK = KH\), then since \(e \in H\) and \(e \in G\), so \(e = e \cdot e \in HK\), so \(HK\) is non-empty, and suppose \(h_1 k_1, h_2 k_2 \in HK\) with \(h_1, h_2 \in H\) and \(k_1, k_2 \in K\), and also we know \(k_1 h_2 = h_3 k_3\) for some \(h_3 \in H\) and \(k_3 \in K\), so 
+            \[
+                (h_1 k_1) (h_2 k_2) = h_1 (k_1 h_2) k_2 = h_1 h_3 k_3 k_2 \in HK.
+            \] Now if \(h_1 k_1 \in HK\) for \(h_1 \in H\) and \(k_1 \in K\), then 
+            \[
+                \left( h_1 k_1 \right)^{-1} = k_1^{-1} h_1^{-1} \in KH = HK.
+            \]   Thus, \(HK\) is a subgroup of \(G\) since \(HK \subseteq G\).  
+        \end{itemize}
+        \item [(d)] By (b) we know \([G: H \cap K] \le [G: H] [G: K]\), and since \(H \cap K\) is a subgroup of \(G\), so we have  
+        \begin{align*}
+            [G: H \cap K] &= [G: H] [H: H \cap K] \\
+            [G: H \cap K] &= [G: K] [K : H \cap K].
+        \end{align*} 
+        Hence, \([G: H] \mid [G: H \cap K]\) and \([G:K] \mid [G: H \cap K]\), and since \([G:H]\) and \([G:K]\) are relatively prime, so we have 
+        \[
+            [G:H] [G:K] \mid [G: H \cap K],
+        \] so \([G: H] [G:K] \le [G: H \cap K]\), and thus we have 
+        \[
+            [G: H] [G:K] \le [G: H \cap K] \le [G:H] [G:K],
+        \] so \([G:H \cap K] = [G:H] [G:K]\), and by (b) we know this means \(G = HK\).  
+    \end{itemize}
+
+    \bigskip
+
+    \item Let $G$ be an abelian group of order $2n$. If $n$ is odd, prove that there is only one element of order $2$. \\
+    \textbf{Solution:} Suppose \(g \neq h\) with \(g, h \in G\) has \(o(g) = o(h) = 2\), then we know \(g^2 = h^2 = e\), so we know \(S = \left\{ e, g, h, gh \right\} \) is a subgroup of \(G\) since \((gh)^2 = ghgh=g^2h^2=e\) and we can easily check \(S\) satisfies all the other group conditions. Hence, \(\vert G \vert = [G: S] \vert S \vert \), and thus 
+    \[
+        4 = \vert S \vert \mid \vert G \vert = 2(2k + 1) = 4k + 2,
+    \] which is impossible.
+\end{enumerate}
+
+\end{document}
