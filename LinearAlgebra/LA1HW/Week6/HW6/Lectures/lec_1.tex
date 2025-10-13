@@ -82,7 +82,7 @@ Let $W$ be any $n$-dimensional subspace of $V(S; F)$. Show that there exist poin
             \mathcal{J} : W \to W^{* *}, \quad \mathcal{J} (w) (\varphi ) = \varphi (w) \quad \varphi \in W^*
         \] is an isomorphism, so we know there exists \(w \in W\) s.t. \(\mathcal{J} (w) = T\), and since \(T \neq 0\), so \(w \neq 0\). Also, since \(T \in \left( \Span \left\{ L_x : x \in S \right\}  \right)^0 \), so for all \(x \in S\) we have 
         \[
-            0 = T(L_x) = J(w) (L_x) = L_x(w) = w(x),
+            0 = T(L_x) = \mathcal{J} (w) (L_x) = L_x(w) = w(x),
         \] which means \(w\) is the zero function in \(W\), which is a contradiction. Hence, there must exists \(x_1, x_2, \dots , x_n \in S\) s.t. \(\left\{ L_{x_1}, L_{x_2}, \dots , L_{x_n} \right\} \) is linearly independent. 
     \end{explanation} 
     By the claim above, we can pick \(\mathcal{L} = \left\{ L_{x_1}, L_{x_2}, \dots , L_{x_n} \right\} \) s.t. \(\mathcal{L} \) is linearly independent. Now suppose 
@@ -121,4 +121,115 @@ Let $W$ be any $n$-dimensional subspace of $V(S; F)$. Show that there exist poin
     \[
         g_i(y_j) = \delta _{ij}. 
     \]
+\end{proof}
+
+\begin{problem}
+Let $n$ be a positive integer and let $V$ be the space of all polynomial functions over the field of real numbers which have degree at most $n$, i.e., functions of the form
+\[
+f(x) = c_0 + c_1 x + \cdots + c_n x^n.
+\]
+Let $D$ be the differentiation operator on $V$. Find a basis for the null space of the transpose operator $D^{t}$.
+\end{problem}
+\begin{proof}
+    Suppose \(B=\left\{ 1, x, x^2, \dots , x^n \right\} \), then we know \(B\) is a basis of \(V\), and suppose \(B^* = \left\{ f_0, f_1, \dots , f_n \right\} \) is the dual basis of \(B\), then since 
+    \[
+        \left[ D^t \right]_{B^*}^{B^*} = \left( [D]_B^B \right)^t, 
+    \] so we can first find out \([D]_B^B\). Note that 
+    \begin{align*}
+        D(1) &= 0 = 0 \cdot 1 + 0 \cdot x + \dots + 0 \cdot x^n \\
+        D(x) &= 1 = 1 \cdot 1 + 0 \cdot x + \dots + 0 \cdot x^n \\
+        D\left( x^2 \right) &= 2x = 0 \cdot 1 + 2 \cdot x + \dots + 0 \cdot x^n \\
+        &\vdots \\
+        D \left( x^n \right) &= n x^{n-1} = 0 \cdot 1 + 0 \cdot x + \dots + n x^{n-1} + 0 \cdot x^n.
+    \end{align*} 
+    Hence, 
+    \[
+        [D]_B^B = \begin{pmatrix}
+            0 & 1 & 0 & \cdots & 0  \\
+            0 & 0 & 2 & \cdots & 0  \\
+            \vdots & \vdots & \vdots & \cdots & \vdots  \\
+            0 & 0 & 0 & \ddots & n  \\
+            0 & 0 & 0 & \cdots & 0  \\
+        \end{pmatrix},
+    \] and thus 
+    \[
+        \left[ D^t \right]_{B^*}^{B^*} = \left( [D]_B^B \right)^t =
+        \begin{pmatrix}
+            0 & 0 & \cdots & 0 & 0  \\
+            1 & 0 & \cdots & 0 & 0  \\
+            0 & 2 & \cdots & 0 & 0 \\
+            \vdots & \vdots & \vdots & \ddots & \vdots  \\
+            0 & 0 & \cdots & n & 0  \\
+        \end{pmatrix},
+    \] and if \(v = (a_0, a_1, \dots , a_n)^t \in \ker \left[ D^t \right]_{B^*}^{B^*} \), then we know \(\left[ D^t \right]_{B^*}^{B^*}v = 0\), which gives 
+    \begin{align*}
+        1 &\cdot a_0 = 0 \\
+        2 &\cdot a_1 = 0 \\
+        &\vdots \\
+        n &\cdot a_{n-1} = 0.
+    \end{align*} 
+    Hence, we know \(v = (0, 0, \dots , 0, a_n)\). Thus, 
+    \[
+        \ker D^t = \Span \left\{ f_n \right\}, 
+    \] where 
+    \[
+        f_n \left( b_n x^n + b_{n-1} x^{n-1} + \dots + b_1 x + b_0 \right) = b_n \quad \forall b_n x^n + b_{n-1} x^{n-1} + \dots + b_1 x + b_0 \in V. 
+    \]
+\end{proof}
+
+\begin{problem}
+    Let \(V\) be the vector space of \(n \times n\) matrices over the field \(F\). 
+    \begin{itemize}
+        \item [(a)] If \(B\) is a fixed \(n \times n\) matrix, define a function \(f_B\) on \(V\) by \(f_B(A) = \Tr \left( B^t A \right) \). Show that \(f_B\) is a linear functional on \(V\).       
+        \item [(b)] Show that every linear functional \(f\) on \(V\) is of the above form, i.e., is \(f_B\) for some \(B\).     
+        \item [(c)] Show that \(B \to f_B\) is an isomorphism of \(V\) onto \(V^*\).   
+    \end{itemize} 
+\end{problem}
+\begin{proof}
+    \vphantom{text}
+    \begin{itemize}
+        \item [(a)] Since we know \(f_B: V \to F\), so we just need to show that \(f_B\) is linear. Suppose \(P, Q \in V\) and \(\alpha \in F\), then 
+        \begin{align*}
+            f_B \left( \alpha P + Q \right) &= \Tr \left( B^t (\alpha P + Q) \right) \\
+            &= \Tr \left( B^t (\alpha P) + B^t Q\right) \\
+            &= \Tr \left( B^t (\alpha P) \right) + \Tr \left( B^t Q \right) \\
+            &= \alpha \Tr \left( B^t P \right)  + \Tr \left( B^t Q \right) \\
+            &= \alpha f_B(P) + f_B(Q),
+        \end{align*}    
+        so we know \(f_B\) is linear, and we're done. 
+        \item [(b)] Suppose \(E = \left\{ e_{ij} \right\}_{1 \le i, j \le n} \) is the standard basis of \(V\), then if we take dual basis of \(E\), say it is \(E^* = \left\{ e^*_{ij} \right\}_{1 \le i, j \le n} \), then if \(X = (x_{ij})_{n \times n}\), we have \(e^*_{ij}(X) = x_{ij}\). Now if \(f \in V^*\), then we know 
+        \[
+            f = \sum_{1 \le i, j \le n} \beta _{ij} e_{ij}^* 
+        \] for some constants \(\beta _{ij}\)'s. Hence, we know for all \(X = (x_{ij})_{n \times n}\), we have 
+        \[
+            f(X) = \sum_{1 \le i, j \le n} \beta _{ij} x_{ij} = \Tr \left( \begin{pmatrix}
+                \beta _{11} & \beta _{21} & \cdots & \beta _{n1}  \\
+                \beta _{12} & \beta _{22} & \cdots & \beta _{n2}  \\
+                \vdots & \vdots &\ddots  & \vdots  \\
+                \beta _{1n} & \beta _{2n} & \cdots & \beta _{nn}  \\
+            \end{pmatrix} \begin{pmatrix}
+                x_{11}  & x_{12}  & \cdots & x_{1n}  \\
+                x_{21} & x_{22} & \cdots & x_{2n}  \\
+                \vdots & \vdots & \ddots & \vdots  \\
+                x_{n1} & x_{n2} & \cdots & x_{nn}  \\
+            \end{pmatrix} \right) = \Tr (B^t X),
+        \] where 
+        \[
+            B = \begin{pmatrix}
+                    \beta_{11} & \beta_{12} & \cdots & \beta_{1n} \\
+                    \beta_{21} & \beta_{22} & \cdots & \beta_{2n} \\
+                    \vdots & \vdots & \ddots & \vdots \\
+                    \beta_{n1} & \beta_{n2} & \cdots & \beta_{nn}
+                \end{pmatrix}.
+        \]
+        \item [(c)] Suppose \(T\) is the map sending \(B\) to \(f_B\), then we want to show that \(T\) is an isomorphism. We first show that \(T\) is linear. Suppose \(A, B \in V\) and \(\alpha \in F\), then for all \(X \in V\), we have 
+        \begin{align*}
+            T \left( \alpha A + B \right)(X) &= f_{\alpha A + B}(X) \\
+            &= \Tr \left( (\alpha A + B)^t X \right) \\
+            &= \Tr \left( \alpha A^t X + B^t X \right) \\
+            &= \alpha \Tr \left( A^tX \right) + \Tr \left( B^t X \right) \\
+            &= \alpha f_A (X) + f_B(X) = (\alpha T(A) + T(B))(X), 
+        \end{align*}
+        so \(T\) is linear. Now we show that \(T\) is bijective. Since \(\dim V = \dim V^*\), so we just need to show that \(T\) is surjective. By (b), we know for all \(f \in V^*\), \(f = f_B = T(B)\) for some \(B \in V\), so \(T\) is surjective, and we're done.       
+    \end{itemize}
 \end{proof}
