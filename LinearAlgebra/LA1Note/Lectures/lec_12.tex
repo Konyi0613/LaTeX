@@ -1,0 +1,198 @@
+\chapter{Eigenvalue and Eigenvector}
+\lecture{12}{15 Oct. 10:20}{}
+\begin{question}
+    If \(V\) is a vector space and \(\dim V < \infty \), if \(T:V \to V\) is a linear map, then is there a basis of \(V\),
+    \[
+        B = \left\{ v_1, v_2, \dots , v_n \right\} 
+    \] s.t. \(T(v_i) = \lambda _i v_i\) for some \(\lambda _i \in F\) i.e. 
+    \[
+        [T]_B = \begin{pmatrix}
+            \lambda _1 & 0 & \cdots & 0  \\
+            0 & \lambda _2 & \cdots & 0  \\
+            \vdots & \vdots & \ddots & \vdots  \\
+            0 & 0 & \cdots & \lambda _n  \\
+        \end{pmatrix}.
+    \]  
+\end{question}
+
+Note that this question is equivalent to find some linearly independent \(\left\{ v_i \right\}_{i=1}^n \) s.t. 
+\[
+    A \underbrace{\begin{pmatrix}
+        v_1 & v_2 & \cdots & v_n  \\
+    \end{pmatrix}}_{P} = \begin{pmatrix}
+        \lambda _1 v_1 &\lambda _2 v_2 & \cdots &\lambda _n v_n  \\
+    \end{pmatrix} = \underbrace{\begin{pmatrix}
+        v_1 & v_2 & \cdots & v_n  \\
+    \end{pmatrix}}_{P} \begin{pmatrix}
+            \lambda _1 & 0 & \cdots & 0  \\
+            0 & \lambda _2 & \cdots & 0  \\
+            \vdots & \vdots & \ddots & \vdots  \\
+            0 & 0 & \cdots & \lambda _n  \\
+        \end{pmatrix}, 
+\] which means is there invertible \(P\) s.t. \(P^{-1} A P\)?
+
+\begin{question}
+    Why we want to diagonalize a matrix?
+\end{question}
+\begin{answer}
+   If we have \(A = P B P^{-1} \), then \(A^k = P B^k P^{-1}\), and if \(B\) is diagonal, say 
+   \[
+    B = \begin{pmatrix}
+        \lambda _1 & \cdots & 0  \\
+         \vdots & \ddots & \vdots  \\
+         0 & \cdots & \lambda _n  \\
+    \end{pmatrix},
+   \] then 
+   \[
+    B^k = \begin{pmatrix}
+        \lambda _1^k & \cdots & 0  \\
+         \vdots & \ddots & \vdots  \\
+         0 & \cdots & \lambda _n^k  \\
+    \end{pmatrix}, 
+   \] and it is easy to compute.
+\end{answer}
+
+One of the applications of diagonalization is about recurrence relation. If we have a sequence \(\left\{ a_i \right\}_{i=0}^{\infty}  \), where 
+\[
+    a_{k+2} = \alpha a_{k+1} + \beta a_{k},
+\] then suppose \(v_k = (a_k, a_{k+1})^t\), then 
+\[
+    v_k = \begin{pmatrix}
+        0 & 1  \\
+        \alpha  & \beta   \\
+    \end{pmatrix} \begin{pmatrix}
+         a_{k-1} \\
+         a_k \\
+    \end{pmatrix} = A v_{k-1},
+\] so we have \(v_k = A^k v_0\), and thus if we know diagonalization, then we can compute \(A^k\) quickly.
+
+Now we talk about how to find \(\lambda , v\) s.t. \(T(v) = \lambda v\). If \(v = 0\), then it is trivial, so we suppose \(v \neq 0\), and thus it is equivalent to find \(\lambda , v\) s.t. 
+\[
+    (T - \lambda I)(v) = 0.
+\] 
+\begin{definition}[Singular]
+    A matrix or linear operator is singular if it is not invertible.
+\end{definition}    
+
+Thus, we want to find \(\lambda \) s.t. \(T - \lambda I\) is singular since if \(T - \lambda I\) is invertible, then \(v = 0\). 
+
+\begin{definition}[Adjoint of a matrix]
+    If \(A \in M_n(F)\), then we define the adjoint of \(A\) to be \(\mathrm{adj}(A) \in M_n(F) \) where 
+    \[
+      \left( \mathrm{adj}(A)  \right)_{ij} = (-1)^{i+j} \det \left( A \left( j \mid i \right)  \right),    
+    \]  where \(A\left( j \mid i \right) \) is \(A\) deleting its \(j\)-th row and \(i\)-th column.   
+\end{definition}
+ 
+\begin{note}
+    If we look at \(M_2(F)\) and \(M_3(F)\), we can find that 
+    \[
+        A \cdot \mathrm{adj}(A) = \det (A) I.
+    \]  
+    In fact, this is true for square matrices of all sizes.
+\end{note}
+
+\begin{remark} \label{rmk: A invertible iff det A neq 0}
+    \(A\) is invertible iff \(\det (A) \neq 0\).  
+\end{remark}
+\begin{proof}
+    We will later show the proof.
+\end{proof}
+
+We first introduce some good properties:
+\begin{itemize}
+    \item [(1)] Multilinear. 
+    \item [(2)] Alternating. 
+    \item [(3)] \(\det (I_n) = 1\). 
+\end{itemize}
+
+\begin{definition}[Multilinear]
+    Consider a function \(D\) of \(n\) row vectors in \(F^n\) as its input, and the output is \(D(v_1, v_2, \dots , v_n) \in F\), then \(D\) is called multilinear or \(n\)-linear if 
+    \begin{align*}
+        D(u + \alpha w, v_2, \dots , v_n) &= D(u, v_2, \dots , v_n) + \alpha D(w, v_2, \dots , v_n) \\
+        &\vdots \\
+        D(v_1, v_2, \dots , u + \alpha w) &= D(v_1, v_2, \dots , u) + \alpha D(v_1, v_2, \dots , w).
+    \end{align*}      
+\end{definition}
+\begin{eg}
+    If we suppose \(A \in M_n(F)\), and \(r_i\) is the \(i\)-th row of \(A\), where \(r_i = (a_{i1}, a_{i2}, \dots , a_{in} )\), then If we define \(D(A) = a_{a k_1} a_{2 k_2} \dots a_{n k_n}\), then in fact \(D\) is multilinear if we regard \(D\) as a function which takes \(n\) row vectors as its input.         
+\end{eg}
+
+\begin{lemma}
+    If \(D_1, D_2\) are \(n\)-linear, then \(D_1 + \alpha D_2\) is also \(n\)-linear. If \(D\) is \(n\)-linear, then \(D\) is determined by \(D(v_1, \dots , v_n)\) with \(v_i \in \left\{ e_i \right\}_{i=1}^n \). 
+    \begin{note}
+        \(D\) is a function determined by \(n^n\) values since each \(v_i\) has \(n\) choices.
+    \end{note}        
+\end{lemma}
+
+\begin{definition}[Alternating]
+    Suppose \(D\) is \(n\)-linear, then \(D\) is alternating if 
+    \[
+        D(v_1, \dots , v_n) = 0
+    \]  if \(v_i = v_j\) for some \(i \neq j\).  
+\end{definition}
+
+\begin{lemma}
+    If \(D\) is alternating, then 
+    \begin{itemize}
+        \item [(1)]
+        \[
+            D ( \dots , \overbrace{v_i + \alpha v_j}^{i\text{-th position}}, \dots ) = D(\dots, \overbrace{v_i}^{i\text{-th position} }, \dots ). 
+        \]
+        \item [(2)] If \(\left\{ v_1, v_2, \dots , v_n \right\} \) is linearly dependent, then \(D(v_1, v_2, \dots , v_n) = 0\). 
+        \item [(3)]
+        \[
+            D(v_1, \dots , v_i, \dots , v_j, \dots , v_n) = -D(v_1, \dots , v_j, \dots , v_i, \dots , v_n).
+        \]
+    \end{itemize}
+\end{lemma}
+\begin{proof}[proof of (2)]
+    WLOG, say \(v_i = \sum_{j \neq i} \alpha _j v_j \), then 
+    \[
+        D(v_1, \dots , v_n) = D \left( v_1, \dots , \sum_{j \neq i} \alpha _j v_j, \dots , v_n \right) = \sum_{j \neq i} \alpha _j D ( v_1, \dots , \overbrace{v_j}^{i\text{-th position} }, \dots , v_n ) = 0   
+    \] since \(D\) is alternating. 
+    
+\end{proof}
+\begin{proof}[proof of (3)]
+    Since 
+    \begin{align*}
+        0 &= D(\dots , v_i + v_j, \dots , v_i + v_j, \dots ) \\
+        &= D(\dots , v_i, \dots , v_i, \dots ) + D(\dots , v_i, \dots , v_j, \dots ) + D(\dots , v_j, \dots , v_i, \dots ) + D(\dots , v_j, \dots , v_j, \dots ) \\
+        &= D(\dots , v_i, \dots , v_j, \dots ) + D(\dots , v_j, \dots , v_i, \dots ), 
+    \end{align*}
+    so this is true.
+\end{proof}
+
+\begin{proposition}
+    If \(D\) is \(n\)-linear and alternating, then it is determined by 
+    \[
+        D \left( e_{\sigma (1)}, e_{\sigma (2)}, \dots , e_{\sigma (n)} \right), 
+    \] where \(\sigma : \left\{ 1, 2, \dots , n \right\} \to \left\{ 1, 2, \dots , n \right\}  \) is any permutation on \([n]\). 
+\end{proposition}
+
+\begin{remark}
+    In this case, there is at most one \(n\)-linear alternating \(D\) satisfying \(D(e_1, \dots , e_n) = 1\).   
+\end{remark}
+\begin{proof}
+    Since \(D\) is alternating, so swaping \(e_i\) and \(e_j\) just turn the original value to negative. Thus, if \(D(e_1, \dots , e_n) = 1\), then we know 
+    \[
+        D \left( e_{\sigma (1)}, e_{\sigma (2)}, \dots , e_{\sigma (n)} \right) 
+    \] is uniquely defined for all permutation \(\sigma \). Now since \(D\) is determined by \(D \left( e_{\sigma (1)}, e_{\sigma (2)}, \dots , e_{\sigma (n)} \right) \), so \(D\) is uniquely defined.   
+\end{proof}
+
+\subsubsection{Another approach/inductive construction}
+\begin{theorem}
+    There exists a function
+    \[
+        \mathrm{\det }  _n: M_n(F) \to F,
+    \]s.t. \(\det_n \) is \(n\)-linear(on rows) and alternating(on rows) and \(\det \left( I_n \right) = 1 \).   
+\end{theorem}
+We can just define 
+\[
+    \begin{dcases}
+        \mathrm{\det }  _1 (a) = a \\
+        \mathrm{\det }  _n(A) = \sum_{i=1}^n(-1)^{i+j} a_{ij} \det \left( A \left( i \mid j \right)  \right)   
+    \end{dcases}, 
+\]where \(A(i \mid j)\) is \(A\) deleting \(i\)-th row and \(j\)-th column. 
+\begin{note}
+    The definition given above is the expansion along \(j\)-th column. 
+\end{note}   
