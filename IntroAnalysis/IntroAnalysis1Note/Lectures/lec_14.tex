@@ -1,0 +1,140 @@
+\lecture{14}{16 Oct. 10:20}{}
+\begin{lemma}[HW6 P4]
+    Let \((X, \mathcal{F} )\) be a topological space, and \(K \subseteq X\) and \(K\) is compact, then if \(X\) is Hausdorff, then \(K\) is closed.     
+\end{lemma}
+\begin{lemma} \label{lm: d(a, y) for fix a is continuous}
+    Let \((Y, d_Y)\) be a metric space and for any \(a \in Y\), and we have a map \(\varphi :Y \to \mathbb{R} \) defined by \(\varphi (y) = d_Y(a, y)\), then \(\varphi \) is continuous. In fact, 
+    \[
+        \left\vert \varphi (y) - \varphi \left( y^{\prime}  \right)  \right\vert \le d_Y \left( y, y^{\prime}  \right).  
+    \]    
+\end{lemma}
+\begin{proof}
+    Since 
+    \[
+        \varphi (y) = d_Y(a, y) \le d_Y \left( a, y^{\prime}  \right) + d_Y \left( y^{\prime} , y \right) = \varphi \left( y^{\prime}  \right) + d_Y \left( y^{\prime} , y \right),     
+    \]
+    so 
+    \[
+        \left\vert \varphi \left( y \right) - \varphi \left( y^{\prime}  \right)   \right\vert \le d_Y \left( y, y^{\prime}  \right).
+    \]
+    Thus, if given \(\varepsilon > 0\), then choose \(\delta = \varepsilon \), then we know if \(d_Y \left( y, y^{\prime}  \right) < \delta = \varepsilon \), then 
+    \[
+        \left\vert \varphi (y) - \varphi \left( y^{\prime}  \right)  \right\vert \le d_Y \left( y, y^{\prime}  \right) < \delta = \varepsilon, 
+    \] so \(\varphi \) is continuous. 
+\end{proof}
+
+\begin{remark}
+    Suppose \(\lim_{n \to \infty} y_n = y \) in \(Y\), then \(\lim_{n \to \infty} d_Y \left( y_n, a \right) = d_Y \left( y, a \right)   \).
+\end{remark}
+
+\begin{lemma} \label{lm: an converge to a then inf leq lim leq sup}
+    If \(\lim_{n \to \infty} a_n = a \) in \((Y, d_Y)\). Given any \(N \in \mathbb{N} \), then 
+    \[
+        \inf _{m \ge N} a_m \le \lim_{n \to \infty} a_n \le \sup _{m \ge N} a_m. 
+    \]  
+\end{lemma}
+\begin{proof}
+    For any \(K \ge N\), we have 
+    \[
+        \inf _{m \ge N} a_m \le a_K \le \sup _{m \ge N} a_m,
+    \] We know that \(\lim_{K \to \infty} a_K \) exists by Squeeze Theorem, so we have 
+    \[
+        \inf _{m \ge N} a_m  \le \lim_{k \to \infty} a_k \le \sup _{m \ge N} a_m.
+    \] 
+\end{proof}
+
+\begin{theorem}[Reprove \autoref{thm: if Y complete then C(X to Y) complete}]
+    Let \((X, d_X)\) be a metric space, and \((Y, d_Y)\) be a complete metric space. Let \(C(X \to Y)\) be the space of continuous and bounded function. Then \(\left( C(X \to Y), d_\infty  \right) \) is a complete metric space, where 
+    \[
+        d_\infty (f, g) = \sup _{x \in X} d_Y (f(x), g(x)) \text{ for } f, g \in C(X \to Y).
+    \]    
+\end{theorem}
+\begin{proof}
+    Given a Cauchy sequence \(\left\{ f^{(n)} \right\}_{n=1}^{\infty}  \) in \(\left( C(X \to Y), d_\infty  \right) \), then we want to show there exists \(f \in C(X \to Y)\) s.t. \(\lim_{n \to \infty} d_\infty \left( f_n , f \right) = 0  \). i.e. \(f_n \to f\) uniformly by \autoref{prop: on doo converge iff uniformly convergent}. Given \(\varepsilon > 0\), then there exists \(N > 0\) s.t. \(\sup _{x \in X} d_Y (f_n(x), f_m(x)) = d_\infty (f_n, f_m) < \frac{\varepsilon}{2}\) for all \(n, m \ge N\). This implies that \(\left\{ f^{(n)}(x) \right\}_{n=1}^{\infty}  \) is Cauchy in \(Y\) for all \(x \in X\). Since \(Y\) is complete, so \(\lim_{n \to \infty} f^{(n)}(x) \) exists in \(Y\) for all \(x \in X\). Now we define \(f(x) \coloneqq \lim_{n \to \infty} f^{(n)}(x) \) for all \(x \in X\), then for any \(x \in X\), consider \(n \ge N\), we know 
+    \[
+        d_Y \left( f_n(x), f(x) \right) = \lim_{m \to \infty} d_Y \left( f_n(x), f_m(x)  \right) \text{ by \autoref{lm: d(a, y) for fix a is continuous} and } \lim_{m \to \infty} f_m(x) = f(x) \in Y.    
+    \] 
+    By \autoref{lm: an converge to a then inf leq lim leq sup}, we know 
+    \[
+        d_Y \left( f_n(x), f(x) \right) = \lim_{m \to \infty} d_Y \left( f_n(x), f_m(x) \right) \le \sup _{m \ge N} d_Y \left( f_n(x), f_m(x) \right) \le \sup _{m \ge N} d_\infty (f_n, f_m) \le \frac{\varepsilon}{2} < \varepsilon,    
+    \] so \(f_n\) converges uniformly to \(f\), and by \autoref{cl: uniformly convergence preserve continuity} and \autoref{prop: uniformly convergence preserve bounded}, we know that \(f \in C(X \to Y)\), and we're done.                        
+\end{proof}
+
+\begin{eg}
+    If \(Y\) is not complete, then \(\left( C(X \to Y), d_\infty  \right) \) may not be complete.
+\end{eg}
+\begin{explanation}
+    Let \(X = [0, 1]\) with standard metric, and let \(Y = \mathbb{Q} \), then note that \(Y\) is not complete. Let \(r_n \in \mathbb{Q} \) and \(\lim_{n \to \infty} r_n = \sqrt{2}  \). If we define 
+    \[
+        f_n:[0, 1] \to \mathbb{Q}, \quad f_n(x) = r_n \quad \forall x \in [0, 1],
+    \] then 
+    \[
+        d_\infty \left( f_n, f_m \right) = \sup _{x \in [0, 1]} \left\vert f_n(x) - f_m(x) \right\vert = \sup \left\vert r_n - r_m \right\vert.
+    \]
+    Since \(\lim_{n \to \infty} r_n = \sqrt{2}  \), so \(\left\{ r_n \right\}_{n=1}^{\infty}  \) is Cauchy, so \(\left\{ f_n \right\}_{n=1}^{\infty}  \) is Cauchy in \(\left( C(X \to Y), d_\infty  \right) \). Note that \(\lim_{n \to \infty} f_n = f \) but \(f\) is not a function from \([0, 1]\) to \(\mathbb{Q} \) since \(f(x) = \sqrt{2} \) for all \(x \in [0, 1]\).   
+\end{explanation}
+
+\begin{note}
+    I think unifromly convergent is unique, i.e. if \(\left( f_n \right) \) converges to \(f\) unifromly, then \(f\) is unique, but i am not sure.  
+\end{note}
+\todo{End of midterm}
+\section{Series of functions}
+Suppose \((X, d_X)\) is a metric space and \(f^{(n)}:X \to \mathbb{R} \) and \(f:X \to \mathbb{R} \) for all \(n \ge 1\). We define the partial sum of \(\left\{ f^{(n)} \right\}_{n=1}^{\infty}  \) by 
+\[
+    S_N(x) = \sum_{i=1}^N f^{(n)}(x).
+\]  
+
+\begin{definition}
+    Let \((X, d_X)\) be a metric space, and let \(\left\{ f^{(n)} \right\}_{n=1}^{\infty}  \) be a sequence of functions from \(X\) to \(\mathbb{R} \) and let \(f: X \to \mathbb{R} \) be another function. We say that the infinite series \(\sum_{i=1}^{\infty} f^{(i)} \) converges pointwise to \(f\) if 
+    \[
+        \lim_{n \to \infty} S_N(x) = f(x) \text{ pointwise where } S_N(x) = \sum_{i=1}^N f^{(i)}(x),   
+    \]       
+    and we say \(\sum_{i=1}^{\infty} f^{(i)} \) converges to \(f\) uniformly if 
+    \[
+        \lim_{N \to \infty} S_N(x) = f(x) \text{ uniformly.}  
+    \] 
+\end{definition}
+
+\begin{definition}[Sup norm]
+   Let \(f:X \to \mathbb{R} \) be a bounded valued function, then we can define 
+   \[
+    \lVert f \rVert_\infty \coloneqq  \sup _{x \in X} \vert f(x) \vert = d_\infty \left( f, 0 \right). 
+   \]  
+\end{definition}
+
+\begin{theorem}
+    Let \((X, d_X)\) be a metric space, and \(\left( f^{(n)} \right)_{n=1}^{\infty}  \) be a sequence of bounded, real-valued function on \(X\). Suppose \(\sum_{n=1}^{\infty} \left\lVert f^{(n)} \right\rVert  \) converges, then \(\sum_{n=1}^{\infty} f^{(n)} \) converges uniformly on \(X\) to a bounded and continuous, real-valued functions on \(X\).        
+\end{theorem}
+\begin{proof}
+    Let \(S_N(x) = \sum_{i=1}^N f^{(i)}(x) \), then recall that \(\left( C(X \to \mathbb{R} ), d_\infty  \right) \) is a compact metric space. (Since \(\mathbb{R} \) is complete with standard metric). Let \(M_n \coloneqq \left\lVert f^{(n)} \right\rVert _\infty \in \mathbb{R}  \). We know that \(\sum_{n=1}^{\infty} M_n \) converges, then we know \(\sum_{n=1}^{\infty} M_n \) converges, so we can define \(t_N = \sum_{i=1}^N M_i \). Thus, we know \(\left\{ t_n \right\}_{n=1}^{\infty}  \) is Cauchy, so given \(\varepsilon > 0\), we know there exists \(N > 0\) s.t. \(m > n \ge N\) implies 
+    \[
+        \left\vert \sum_{i=n+1}^m M_i  \right\vert  = \left\vert t_m - t_n \right\vert < \varepsilon. 
+    \] 
+    Hence, for all \(m > n \ge N\), 
+    \begin{align*}
+        d_\infty \left( s_m, s_n \right) &= \sup _{x \in X} \left\vert \sum_{i=1}^m f^{(i)}(x) - \sum_{i=1}^n f^{(n)}(x)   \right\vert \\
+        &= \sup _{x \in X} \left\vert \sum_{i=n+1}^m f^{(i)}(x) \right\vert \le \sup _{x \in X} \sum_{i=m+1}^n \left\vert f^{(i)}(x) \right\vert \le \sum_{i=m+1}^n M_i < \varepsilon.    
+    \end{align*}    
+    Thus, \(\left\{ s_n \right\}_{n=1}^{\infty}  \) is Cauchy in \(\left( C(X \to \mathbb{R} ), d_\infty  \right) \), and since \(\mathbb{R} \) is complete, so \(s_n \to f\) in \(C(X \to \mathbb{R} )\) by \autoref{thm: if Y complete then C(X to Y) complete}.       
+\end{proof}
+
+\begin{eg}
+    \vphantom{text}
+    \begin{itemize}
+        \item \(\sum_{n=1}^{\infty} x^n = \frac{x}{1-x} \) pointwise when \(x \in (-1, 1)\). 
+        \item \(\sum_{n=1}^{\infty} x^n = \frac{x}{1-x} \) uniformly when \(x \in [-r, r]\) where \(0 < r < 1\).     
+    \end{itemize}
+\end{eg}
+\begin{explanation}
+    Consider \(S_N(x) = \sum_{i=1}^N x^n \), then 
+    \[
+        s_N(x) - x s_N(x) = x - x^{N+1} \implies s_N(x) = \frac{x - x^{N+1}}{1-x}.
+    \] 
+    When \(\vert x \vert < 1 \), then \(\lim_{N \to \infty} x^{N+1}  = 0\), so 
+    \[
+        \lim_{N \to \infty} s_N(x) = \lim_{N \to \infty} \frac{x - x^{N+1}}{1-x} = \frac{x}{1-x}.  
+    \] 
+    Thus, \(\sum_{i=1}^{\infty} x^i \) converges to \(\frac{x}{1-x}\) pointwise. 
+    
+    Now if \(x \in [-r, r]\) with \(0 < r < 1\), then \(\left\vert x^i \right\vert \le r^i \) for \(x \in [-r, r]\). Thus, \(\left\lVert x^i \right\rVert _\infty \le r^i \), so \(\sum_{i=1}^{\infty} r^i \) converges to \(\frac{r}{1-r}\), and thus \(\sum_{i=1}^{\infty} x^i \) converges uniformly to \(\frac{x}{1-x}\).        
+\end{explanation}
