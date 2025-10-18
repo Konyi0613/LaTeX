@@ -1,0 +1,57 @@
+\lecture{12}{17 Oct. 12:20}{}
+\begin{prev}
+    If \(A_i(x)\) is the generating function for the number of ways of completing Task \(i\) with a budget of size \(n\), then \(\prod _{i=1}^k A_i(x)\) is the generating function for the number of ways of taking a budget of size \(n\) and 
+    \begin{itemize}
+        \item [(1)] splitting it arbitrary into \(k\) parts. 
+        \item [(2)] using the \(i\)-th part to carry out task \(i\). 
+    \end{itemize}      
+    There is one spaecial case \(A(x)^k\), which is the number of ways that carrying a task \(k\) times with total budget of size \(n\). 
+    
+    Note that 
+    \[
+        B(A(x)) = \sum_{k=0}^{\infty} b_n A(x)^k = \sum_{k=0}^{\infty} b_n \left( \sum_{n=0}^{\infty} a_n x^n  \right)^k,   
+    \] and we need \(a_0 = 0\) for this to be well-defined. There is a special case: \(b_n = 1\), which means \(B(x) = \frac{1}{1-x}\), so 
+    \[
+        B(A(x)) = \frac{1}{1-A(x)} =\sum_{k=0}^{\infty} A(x)^k, 
+    \] where the coefficient of \(x^n\) is the number of ways of carrying out a task on arbitrary number of times with a budget of \(n\). 
+    
+    The general case: \(B(A(x)) = \sum_{k=0}^{\infty} b_k A(x)^k \), where \(a_n\) is the number of ways carrying out a task with a budget of \(n\), while \(b_k\) is the number of ways carrying out a second task on a set of \(k\) items. Thus, the coefficient of \(x^n\) in \(B(A(x))\) counts the number of ways to take a budget of \(n\), and 
+    \begin{itemize}
+        \item [(1)] carry out the first task an arbitrary number of times, and 
+        \item [(2)] carry out the second task on the outcomes from (1).
+    \end{itemize}        
+\end{prev}
+
+\begin{eg}[Designing Labubus]
+    We have \(n\) minutes to design new Labubus, and then decide which new models to discard, sell, or sell as premium models.  
+\end{eg}
+\begin{explanation}
+    We have two types of tasks. 
+    \begin{itemize}
+        \item [(1)] \(A(x)\): Designing of new models in \(n\) minutes. 
+        \item [(2)] \(B(x)\): Classification of designs as goodbye/okay/premium.    
+    \end{itemize}
+    Thus, 
+    \[
+        A(x) = \sum_{n=0}^{\infty} a_n x^n, 
+    \] where \(a_n\) is the number of ways of designing a new Labubus in \(n\) minutes. Every minute we can change a different feature or not. Hence, there are \(2^n\) options in \(n\) minutes but cannot have no changes, so \(a_n = 2^n - 1\), where \(a_0 = 0\), so it is well-defined. Note that \(2^n \leftrightarrow \frac{1}{1-2x}\) and \(1 \leftrightarrow \frac{1}{1-x}\), so 
+    \[
+        2^n - 1 \leftrightarrow \frac{1}{1-2x} - \frac{1}{1-x} = A(x) \implies A(x) = \frac{x}{1-3x+2x^2}.
+    \] 
+    
+    Also, we know \(B(x) = \sum_{k=0}^{\infty} b_k x^k \), so \(b_k = 3^k\) and thus \(B(x) = \frac{1}{1 - 3x}\), so 
+    \begin{align*}
+        B(A(x)) &= \frac{1}{1-3A(x)} = 1 + \frac{3x}{1-6x+2x^2} = 1 + \frac{\alpha}{1 - \lambda _1 x} + \frac{\beta}{1 - \lambda _2 x},
+    \end{align*}   
+    we can solve that \(\lambda _{1, 2} = 3 \pm \sqrt{7} \) since \(\lambda _1, \lambda _2\) are the roots of the characteristic polynomial \(z^2 - 6z + 2\). By solving \(\alpha , \beta \), we can get 
+    \[
+        B(A(x)) = 1 + \frac{3}{2 \sqrt{7} } \left( \frac{1}{1 - (3 + \sqrt{7} ) x} - \frac{1}{1 - (3 - \sqrt{7} )x} \right), 
+    \]  
+    so the coefficient of \(x^n\) is 
+    \[
+        f_n \coloneqq \begin{dcases}
+          1  , &\text{ if }  n = 0;\\
+          \frac{3}{2 \sqrt{7} } \left( (3 + \sqrt{7} )^n - (3 - \sqrt{7} )^n \right)   , &\text{ if }  n \ge 1.
+        \end{dcases}
+    \] 
+\end{explanation}
