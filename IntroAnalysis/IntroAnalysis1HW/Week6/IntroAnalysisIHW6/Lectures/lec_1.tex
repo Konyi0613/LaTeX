@@ -1,4 +1,4 @@
-\begin{problem}[20pts]
+ \begin{problem}[20pts]
     \vphantom{text}
     \begin{definition}[Totally ordered set]\label{def:total-order}
 A \emph{totally ordered set} (or \emph{linearly ordered set}) is a pair $(X, \leq)$ consisting of a nonempty set $X$ together with a binary relation $\leq$ on $X$ satisfying the following properties:
@@ -60,7 +60,7 @@ Show that on the real line $\mathbb{R}$ (with the standard ordering $\le$), the 
   
   Now if we have \(\left\{ V_\alpha  \right\}_{\alpha \in A} \), then for all \(x \in \bigcup_{\alpha \in A} V_\alpha  \), we can pick some \(\alpha_0 \in A\) s.t. \(x \in V_{\alpha _0}\) , and we know there exists \(I_{\alpha _0}\) s.t. \(x \in I_{\alpha _0} \subseteq V_{\alpha _0} \subseteq \bigcup_{\alpha \in A} V_\alpha  \) and \(I_{\alpha _0}\) is an interval, so we know \(\bigcup_{\alpha \in A} V_\alpha \in \mathcal{F}  \). 
   
-  By above arguments, we know \((X< \mathcal{F} )\) is a topology. 
+  By above arguments, we know \((X, \mathcal{F} )\) is a topology. 
 \end{proof}
 \begin{proof}[(b)]
   Suppose \(\mathcal{F} ^{\prime} \) is the order topology on \(\mathbb{R} \) and \(\mathcal{F} \) is the standard topology on \(\mathbb{R}  \), then if \(V \in \mathcal{F} ^{\prime} \), then for all \(x \in V\), we know there exists intevral \(I\) s.t. \(x \in I \subseteq V\), then similarly we use the notation in \autoref{rmk: 1a1}, which means \(I = (a, b)\), and this time, if \(I \neq X\), then we know 
@@ -133,6 +133,40 @@ Use this to show that the cofinite topology cannot be derived from any metric (i
 
 \end{enumerate}
 \end{problem}
+
+\begin{proof}[(a)]
+\vphantom{text}
+    \begin{claim}
+        $(X, \mathcal{F})$ is topology.
+    \end{claim}
+    \begin{explanation}
+        \vphantom{text}
+        \begin{itemize}
+            \item It is obvious that $\varnothing \in \mathcal{F}$ and $X = X \setminus \varnothing \in \mathcal{F}$
+            \item If $u_1, u_2, ... u_n \in \mathcal{F}$, $\bigcap_{i=1}^{n}u_i = X \setminus \bigcup_{i=1}^{n} (X \setminus u_i)$, since for all $i \in [n]$, $(X \setminus u_i)$ is finite, $\bigcup_{i=1}^{n} (X \setminus u_i)$ is also finite, so $\bigcap_{i=1}^{n}u_i = X \setminus \bigcup_{i=1}^{n} (X \setminus u_i) \in \mathcal{F}$.
+            \item Given $\{u_i\}_{i \in I} \in F$, $X \setminus \bigcup_{i \in I}u_i = \bigcap_{i \in I} (X \setminus u_i)$, since for all $i \in I$, $(X \setminus u_i)$ is finite, so $\bigcap_{i \in I} (X \setminus u_i)$ is also finite, and hence $\bigcup_{i \in I}u_i \in \mathcal{F}$.
+        \end{itemize}
+    \end{explanation}
+    Then we prove that $(X, \mathcal{F})$ is not Hausdorff and it is compact.
+    \begin{itemize}
+        \item not Hausdorff: Proof by contradiction. \\
+        Suppose it is, then given $x,y \in X, \exists U,V \in \mathcal{F}$ such that $x \in U, y \in V$ and $U \cap V = \varnothing$. \\
+        For such $U$ and $V$, $U \neq \varnothing$ and $V \neq \varnothing$. \\
+        Since $U, V \in \mathcal{F}$, $X \setminus U$ and $X \setminus V$ are finite, and hence $(X \setminus U) \cup (X \setminus V)$ is also finite. Since $U \cap V = \varnothing$, $X \setminus (U \cap V) = (X \setminus U) \cup (X \setminus V) = X$. However, we know $(X \setminus U) \cup (X \setminus V)$ is finite but $X$ is uncountable so it have infinitely many elements. So we get a contradiction.
+        \item Compact:\\
+        Given $\{U_{\alpha} : \alpha \in A\} \subseteq \mathcal{F}$ with $X \subseteq \bigcup_{\alpha \in A} U_{\alpha}$, we need to construct a finite set $F \subseteq A$ such that $X \subseteq \bigcup_{\alpha \in F} U_{\alpha}$. \\
+        We can do the following construction: \\
+        We first find the non-empty member in $\{U_{\alpha}\}_A$, let it $U_1$ and $X \setminus U_1$ is finite set since $U_1 \in \mathcal{F}$, then $\forall x \in X \setminus U_1$, we pick one member $U_x$ in $\{U_{\alpha}\}_A$ such that $x \in U_x$ (since $\{U_{\alpha}\}_A$ is cover so $U_x$ must exist), and collect those $U_x$ to get $V = \{\text{collection of those }U_x\}$, and $V$ is finite large, then we can pick $F = \{U_1\} \cup V$ and it satisfy $X \subseteq \bigcup_{\alpha \in F} U_{\alpha}$, and hence we done.
+    \end{itemize}
+\end{proof}
+\begin{proof}[(b)]
+    \vphantom{text} \\
+    $\{V_i : i\in I\}$ is countable collection of open sets containing $x$, so $x \in \bigcap_{i \in I} V_i$.
+    And we know $X \setminus \bigcap_{i \in I} V_i = \bigcup_{i \in I}(X \setminus V_i)$. \\
+    Since we know $V_i$ is cofinite, so $(X \setminus V_i)$ is finite, and $\bigcup_{i \in I}(X \setminus V_i)$ is the union of countable finite set, so $\bigcup_{i \in I}(X \setminus V_i)$ is also countable.
+    So we know that $\bigcap_{i \in I} V_i$ is the complement of countable set, so it is uncountable, this means $\{x\} \subsetneq \bigcap_{i \in I} V_i$. \\
+    If the cofinite topology are metrizable for some $d$, then for each $x$, $\{B(x, \tfrac{1}{n})\}_{n=1}^{\infty}$ is a countable set of open sets all containing $x$, and from previous proof, we know $\bigcap_{n=1}^{\infty}B(x, \tfrac{1}{n})$ should be uncountable. However, in metric space, $\bigcap_{n=1}^{\infty}B(x, \tfrac{1}{n}) = \{x\}$, so we get a contradiction, and hence the cofinite topology are not metrizable for any $d$.
+\end{proof}
 %────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \begin{problem}[15pts]
     Let $(X, \mathcal{F})$ be a compact topological space.  
@@ -140,6 +174,67 @@ Assume that this space is first countable, which means that for every $x \in X$ 
 Show that every sequence in $X$ has a convergent subsequence
  (see Exercise 1.5.11).
 \end{problem}
+
+\begin{proof}
+  Suppose\(\left\{ x_n \right\}_{n=1}^{\infty}\) is a sequence in \(X\), then we can define
+  \[
+    C_m = \overline{\left\{ x_n : n \ge m \right\} },
+  \]  
+  and we give some claims.
+  \begin{claim} \label{clm: Cm closed}
+    \(C_m\) is closed for all \(m \in \mathbb{N} \). 
+  \end{claim}
+  \begin{explanation}
+    Since 
+    \[
+      C_m = \overline{\left\{ x_n: n \ge m \right\} } = X \setminus \mathrm{Ext}\left( \left\{ x_n: n \ge m \right\}  \right) = X \setminus \mathrm{Int}\left( X \setminus \left\{ x_n: n \ge m \right\}  \right),   
+    \] and 
+    \[
+      \mathrm{Int}\left( X \setminus \left\{ x_n: n \ge m \right\}  \right) = \bigcup_{x \in \mathrm{Int}(X \setminus \left\{ x_n: n \ge m \right\} ) } V_x,  
+    \] where \(V_x\) is a neighborhood of \(x\) s.t. \(V_x \subseteq X \setminus \left\{ x_n: n \ge m \right\} \). Thus, \(\mathrm{Int}\left( X \setminus \left\{ x_n: n \ge m \right\}  \right)  \) is open since it is the union of a collection of open sets, and thus \(C_m\) is closed since it is the complement of an open set.    
+  \end{explanation}
+  \begin{claim} \label{clm: cap Ci neq ems}
+    \(\bigcap_{i=1}^{\infty} C_i \neq \varnothing \). 
+  \end{claim}
+  \begin{explanation}
+    Suppose by contradiction, \(\bigcap_{i=1}^{\infty} C_i = \varnothing  \), then 
+    \[
+      X = X \setminus \bigcap_{i=1}^{\infty} C_i = \bigcup_{i=1}^{\infty} (X \setminus C_i),
+    \] and note that \(X \setminus C_i\) is open for all \(i \in \mathbb{N} \) since \(C_i\) is closed for all \(i \in \mathbb{N} \) by \autoref{clm: Cm closed}. Now since \(X\) is compact, and thus we know there exists \(\alpha _1, \alpha _2, \dots , \alpha _n \in \mathbb{N} \) s.t.
+    \[
+      X \subseteq \bigcup_{i=1}^{n} \left( X \setminus C_{\alpha _i} \right) = X \setminus \left( \bigcap_{i=1}^{n} C_{\alpha _i} \right) .  
+    \]  
+    Thus, \(\bigcap_{i=1}^{n} C_{\alpha _i} = \varnothing  \). However, note that \(C_{i+1} \subseteq C_i \) for all \(i \in \mathbb{N} \), which is trivial by the definition of \(C_i\). Hence, we know \(\varnothing = \bigcap_{i=1}^{n} C_{\alpha _i} = C_{\alpha _n} \). However,
+    \[
+      x_{\alpha _n} \in \left\{ x_k: k \ge \alpha _n \right\} \subseteq C_{\alpha _n},
+    \] so \(C_{\alpha _n}\) is non-empty, which is a contradiction. 
+  \end{explanation}
+  Hence, by \autoref{clm: cap Ci neq ems}, we can pick some \(x^{\prime} \in \bigcap_{i=1}^{\infty} C_i \). Now suppose \(A = \left\{ x_n: n \ge \mathbb{N}  \right\} \), then we have two cases: 
+  \begin{itemize}
+    \item Case 1: \(A\) is a finite set. Then by pigeonhole principle, we know there exists \(e \in A\) s.t. \(e\) appears in \(\left\{ x_n \right\}_{n=1}^{\infty}  \) for infinitely many times. Hence, we can pick a subsequence of \(\left\{ x_n \right\}_{n=1}^{\infty}  \), say \(\left\{ x_{n_i} \right\}_{i=1}^{\infty}  \), and \(x_{n_i} = e\) for all \(i \in \mathbb{N} \). By this pick, we know \(\left\{ x_{n_i} \right\}_{i=1}^{\infty}  \) converges to \(e\), and we're done.          
+    \item Case 2: \(A\) is an infinite set. We first give a claim:
+    \begin{claim} \label{clm: infinitely many terms in V}
+      For any neighborhood of \(x^{\prime} \), say \(V_{x^{\prime} }\), there are infinitely many \(x_n\)'s are contained in \(V_{x^{\prime} }\) i.e. there exists \(\left\{ k_i \right\}_{i=1}^{\infty} \subseteq \mathbb{N}  \) with \(k_i < k_{i+1}\) for all \(i \in \mathbb{N} \) s.t. \(x_{k_i} \in V_{x^{\prime} }\) for all \(i \in \mathbb{N} \).        
+    \end{claim}
+    \begin{explanation}
+      Suppose by contradiction, only for all \(p \in \left\{ p_i \right\}_{i=1}^{n}  \) we have \(x_p \in V_{x^{\prime} }\) and we have \(p_i < p_{i+1}\) for all \(1 \le i \le n\), then we have 
+      \[
+        V_{x^{\prime} } \cap \left\{ x_k: k \ge p_n + 1 \right\} = \varnothing. 
+      \] 
+      However, \(x^{\prime} \in \bigcap_{i=1}^{\infty} C_i \subseteq C_{p_n + 1} \), so we know \(V_{x^{\prime} } \cap \left\{ x_k: k \ge p_n + 1 \right\} \neq \varnothing \) by the definition of \(C_{p_n + 1}\). Hence, we have a contradiction, and we're done.      
+    \end{explanation}
+    Now since \(X\) is first countable, so there exists a countable collection of open sets \(V_1, V_2, \dots \) of neighborhoods of \(x^{\prime} \) s.t. every neighborhood of \(x^{\prime} \) contains one of \(V_n\). Suppose \(U_n \coloneqq \bigcap_{i=1}^{n} V_i \) for all \(n \in \mathbb{N} \), then note that \(\left\{ U_n \right\}_{n=1}^{\infty}  \) is a collection of neighborhood of \(x^{\prime} \), so by \autoref{clm: infinitely many terms in V}, so we know there are infinitely many terms of \(\left\{ x_n \right\}_{n=1}^{\infty}  \) are contained in \(U_k\) for all \(k \in \mathbb{N} \). Now we can construct a convergent subsequence \(\left\{ x_{n_i} \right\}_{i=1}^{\infty}  \) of \(\left\{ x_n \right\}_{n=1}^{\infty}  \) by the following method:
+    \begin{itemize}
+      \item [1.] Choose \(x_{n_1} \in U_1\) for some \(n_1 \in \mathbb{N} \).  
+      \item [2.] Choose some \(n_2  > n_1\) s.t. \(x_{n_2} \in U_2\).   
+      \item [3.] Keep choosing \(n_i > n_{i-1}\) s.t. \(x_{n_i} \in U_i\) for all \(i \in \mathbb{N} \) and \(i > 2\).  
+    \end{itemize} 
+    We know this method is well-defined since for any \(i \in \mathbb{N} \) and \(i \ge 2\), there must exists \(n_i > n_{i-1}\) s.t. \(x_{n_i} \in U_i\), otherwise \(U_i\) contains only finitely many terms of \(\left\{ x_n \right\}_{n=1}^{\infty}  \), which is a contradiction. By this method, we can show that \(\left\{ x_{n_i} \right\}_{i=1}^{\infty}  \) converges to \(x^{\prime} \). For all neighborhood of \(x^{\prime}\), say \(W\), then by first countable property, we know there exists \(i \in \mathbb{N} \) s.t. \(V_i \subseteq W\), so we know \(U_i \subseteq V_i \subseteq W\). Hence, for all \(k \ge i\), we know 
+    \[
+      x_{n_k} \in U_k \subseteq U_i \subseteq V_i \subseteq W,
+    \] and we're done.
+  \end{itemize} 
+\end{proof}
 %────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \begin{problem}[15pts]
     Let $(X,\mathcal{F})$ be a compact topological space and $(Y,\mathcal{G})$ be a Hausdorff topological space. 
@@ -199,6 +294,44 @@ Prove that $f_n \to f$ uniformly on $S$ if, and only if, the following two condi
 By compactness, a finite set of integers, say $A = \{k_1, \dots, k_r\}$, has the property that for each $x \in S$, some $k \in A$ satisfies $|f_k(x) - f(x)| < \delta$.  
 Uniform convergence is an easy consequence of this fact.
 \end{problem}
+
+\begin{proof}
+    \vphantom{text}
+    \begin{itemize}
+        \item [\((\implies )\)]
+            \begin{itemize}
+                \item (i). Since $f_n$ is continuous on $x \in X$ and $f_n \to f$ uniformly, so $f$ is continuous on $x \in X$.
+                \item (ii). Since $f$ is uniformly continuous,
+                \[
+                \forall \varepsilon > 0, \exists N > 0 \text{ such that } \forall x\in X,\forall n \geq N \implies |f_n(x) - f(x)| < \varepsilon 
+                \]
+                Then $\forall \varepsilon > 0$, we can take $m = N$, $\delta = 114514$. $\forall k, k+ n > k+m > m = N$. \\
+                So $\forall f_{k+n}, |f_{k+n}(x) - f(x)| < \varepsilon$ for all $x \in S$. Note that $\delta$ is actually not important here.
+            \end{itemize}
+        \item [\((\impliedby )\)]
+            $\forall \varepsilon >0, \exists m_{\varepsilon} > 0, \delta_{\varepsilon} > 0$ such that $n > m_{\varepsilon}$,
+            \[
+                |f_k(x)-f(x)| < \delta_{\varepsilon} \implies |f_{k+n}(x)-f(x)| < \varepsilon, \forall x \in S, k = 1,2,3,...
+            \]
+            $\forall x_0 \in S$, since $f_n(x_0) \to f(x_0)$ pointwise, $\exists k_{x_0}$ such that $|f_{k_{x_0}}(x_0) - f(x_0)| < \delta_{\varepsilon}$.
+            Since $f_{k_{x_0}}$ and $f$ are both continuous, so $f_{k_{x_0}} - f$ is also continuous on $x_0$, and hence $\exists R_{x_0} > 0$ such that if $B(x_0, x) < R_{x_0}$, then $|f_{k_{x_0}}(x) - f(x)| < \delta_{\varepsilon}$. \\
+            $\forall x_0$, we can get such ball, then we collect those balls to get $I = \{B(x_0, R_{x_0}) : x_0 \in S\}$, by compactness of $S$, exist a finite subset $F = \{x_1, x_2, ... ,x_r\}$ such that $\left\{B(x_i, R_{x_i})\right\}_{i=1}^{r} \subseteq I$ and $ S \subseteq \bigcup_{i=1}^{r} B(x_i, R_{x_i})$. \\
+            For each $x_i$, $\exists k_{x_i}$ such that $|f_{k_{x_i}}(x) - f(x)| < \delta_{\varepsilon}$. Let $A = \{k_{x_1}, k_{x_2}, ..., k_{x_r}\}$, and define $N = \max{A} + m_{\varepsilon} + 1$.
+            \begin{claim}
+                $\forall t \geq N$, $|f_t(x)-f(x)| < \varepsilon$ $\forall x \in S$.
+            \end{claim}
+            \begin{explanation}
+                $\forall x \in S$, $x \in B(x_j, R_{x_j})$ for some $j \in [r]$.\\
+                So $\forall x \in S, |f_{k_{x_j}}(x) - f(x)| < \delta_{\varepsilon}$ for some $j$, by (ii) we know $\forall n > m_{\varepsilon}, |f_{k_{x_j}+n}(x) - f(x)| < \varepsilon$. \\
+                Since 
+                \[t \geq N = \max{A} + m_{\varepsilon} + 1 > k_{x_j} + m_\varepsilon , \forall j \in [r],  t - k_{x_j} > m_\varepsilon
+                \]
+                , and hence $|f_t(x)-f(x)| < \varepsilon, \forall t\geq N$.
+            \end{explanation}
+            Since $\forall t \geq N$, $|f_t(x)-f(x)| < \varepsilon$ $\forall x \in S$, so $f_n$ is uniformly converge to $f$ on $S$ by definition.
+            
+    \end{itemize}
+\end{proof}
 %────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \begin{problem}[15pts]
     The purpose of this exercise is to demonstrate a concrete relationship between continuity and pointwise convergence, and between uniform continuity and uniform convergence. 
