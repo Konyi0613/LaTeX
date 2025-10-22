@@ -1,0 +1,125 @@
+\lecture{12}{22 Oct. 13:20}{}
+\begin{prev}
+    We have learnt that 
+    \[
+        \left\{ \text{Conjugacy classes of } S_n  \right\} = \left\{ \text{cycle types } (1)^{v_1}(2)^{v_2}\dots \text{ with } 1 \cdot v_1 + 2 \cdot v_2 + \dots = n   \right\}.  
+    \]
+    Also, we know 
+    \[
+        \left\vert (1)^{v_1} (2)^{v_2} \dots  \right\vert = \frac{n!}{1^{v_1} v_1 ! 2^{v_2} v_2 ! \dots }. 
+    \]
+    Besides, we have learnt that 
+    \[
+        H \triangleleft G \iff H \text{ is a union of conj classes of } G \text{ i.e. } H = \bigcup_{x \in H} C(x).   
+    \]
+\end{prev}
+
+\begin{definition}[Transpositions]
+    We say a permutation \(\pi \in S_n \) is a transposition iff \(\pi \in (1)^{n-2}(2)\).  
+\end{definition}
+
+\begin{theorem}
+    Every \(\sigma \in S_n\) is a product of transpositions. More specifically, this argument holds with adjacent transpositions. 
+\end{theorem}
+
+\begin{proof}
+    Since \(\sigma \) can be factored into independent cyclic permutations, so we just need to show any cyclic permutation is a product of transpositions. Suppose we have 
+    \[
+        \tau = \begin{pmatrix}
+            a_1 & a_2 & \dots  & a_n  \\
+            a_2 & a_3 & \dots  & a_1  \\
+        \end{pmatrix},
+    \] then we have:
+    \[
+        (a_1 a_2) (a_2 a_3) \dots (a_{n-1} a_n) I_n = \tau .
+    \]
+    Note that we first operate \((a_1 a_2)\), then \((a_2 a_3)\), and so on.
+    
+    Actually, if we do bubble sort on \(\sigma \), then it can becomes \(I_n\), then we can do the inverse operation to make \(I_n\) go back to \(\sigma \), so \(\sigma \) is just the product of adjacent transpositions.     
+\end{proof}
+
+%Ladder Lottery
+%────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\begin{theorem}
+    For \(\sigma \in S_n\), let 
+    \[
+        \mathrm{inv}(\sigma ) = \# \left\{ (i, j) \mid 1 \le i < j \le n, \sigma (i) > \sigma (j) \right\},  
+    \] then 
+    \[
+        \mathrm{inv}(\sigma \tau ) \equiv \mathrm{inv}(\sigma ) + \mathrm{inv}(\tau ) \mod{2} \text{ for } \sigma , \tau \in S_n.   
+    \]
+\end{theorem}
+\begin{proof}
+    If we can show it is true for \(\sigma \) is a general permutation and \(\tau \) is \((i, i+1)\) for all \(1 \le i \le n+1\), then for \(\tau = \tau _1 \tau _2 \dots \tau _l\), we have 
+    \begin{align*}
+        \mathrm{inv}(\sigma \tau ) &\equiv  \mathrm{inv}(\sigma \tau _1 \tau _2 \dots \tau _l) \\
+        &\equiv  \mathrm{inv}(\sigma \tau _1 \dots \tau _{l-1}) + \mathrm{inv}(\tau _l) \equiv \dots \equiv \mathrm{inv}(\sigma ) + \mathrm{inv}(\tau _1) + \mathrm{inv}(\tau _2) + \dots + \mathrm{inv}(\tau _l) \\
+        &\equiv \mathrm{inv}(\sigma ) + \mathrm{inv}(\tau _1 \tau _2 \dots \tau _l) \equiv \mathrm{inv}(\sigma ) + \mathrm{inv}(\tau ).          
+    \end{align*}   
+\end{proof}
+
+Now we can define 
+    \[
+        \sgn : S_n \to \left\{ \pm 1 \right\} \subseteq \mathbb{R} ^{\times }
+    \] by \(\sgn (\sigma ) = (-1)^{\mathrm{inv}(\sigma ) }\). 
+    \begin{theorem}
+        For every \(n \ge 2\), there exists a unique surjective group homomorphism 
+        \[
+            \sgn : S_n \to \left\{ \pm 1 \right\}. 
+        \] 
+    \end{theorem} 
+    \begin{proof}
+        Since 
+        \[
+            \sgn (\sigma \tau ) = (-1)^{\mathrm{inv}(\sigma \tau)  } = (-1)^{\mathrm{inv}(\sigma ) } (-1)^{\mathrm{inv}(\tau ) } = \sgn (\sigma ) \sgn (\tau ),
+        \] so the existence is true. (This uses previous theorem). Now if 
+        \[
+            \varphi : S_n \to \left\{ \pm 1 \right\} 
+        \] is a surjective group homomorphism, then since \(\left\{ \pm 1 \right\} \) is an abelian group, so 
+        \[
+            \varphi (\tau \sigma \tau ^{-1}) = \varphi (\tau ) \varphi (\sigma ) \varphi (\tau )^{-1} = \varphi (\sigma ),
+        \] so conjugates elements are mapped to same sign. Now that transpositions are all conjugate (same cycle types so conjugate), so all transpositions have same sign. If \(\varphi ((ij)) = 1\) for some \(i, j\), then since for all \(\sigma \in S_n\), \(\sigma \) can be written to a product of transpositions, so \(\varphi (\sigma ) = \prod \varphi ((ij)) = 1\), then \(\varphi \) is not surjective, so \(\varphi ((ij)) = -1\). Hence, \(\varphi \) is uniquely defined.         
+    \end{proof}
+
+    \begin{definition}[Alternating group of degree \(n\)]
+        We define 
+        \begin{align*}
+            A_n &= \ker (\sgn ) = \left\{ \sigma \in S_n \mid \sgn (\sigma ) = 1 \right\} \\
+            &= \left\{ \text{all elements expressed as a product of even number of transpositions}  \right\} \\
+            &= \bigcup_{(1-1)v_1 + (2-1)v_2 + \dots \text{ is even} } (1)^{v_1} (2)^{v_2} \dots    
+        \end{align*}
+        since \(\sgn ((a_1 a_2 \dots a_n)) = (-1)^{n-1}\). 
+    \end{definition}
+
+    \begin{proposition}
+        \(\sigma =(1)^{v_1}(2)^{v_2} \dots \) is an even permutation (\(\sigma \in A_n\)) iff \(v_2 + v_4 + \dots \) is even. 
+    \end{proposition}
+    \begin{proof}
+        We know \(\sigma \in A_n\) iff
+        \[
+            (1 - 1) v_1 + (2 - 1)v_2 + \dots \equiv 0 \mod{2} \iff v_2 + 3v_4 + \dots \equiv 0 \mod{2} \iff v_2 + v_4 +\dots \equiv 0 \mod{2}.
+        \]
+    \end{proof}
+
+\begin{definition}[Simple group]
+    A group \(G\) is said to be simple if \(G\) has no proper(\(\left\{ 1 \right\} \) nor \(G\)) normal subgroup.   
+\end{definition}
+\begin{note}
+    \(G \triangleright H\) means \(G / H\) is a subgroup, and we say \(G\) can be described by \(H\) and \(G / H\) (as a semi-direct product).     
+\end{note}
+
+\begin{eg}
+    \(\mathbb{Z} / n \mathbb{Z} \) is simple iff \(n\) is prime.  
+\end{eg}
+
+\begin{eg}
+    \(S_n\) is not a simple group for all \(n \ge 3\) because \(A_n \triangleleft S_n\) is proper and normal.   
+\end{eg}
+
+\begin{eg}
+    \(A_3 \simeq \mathbb{Z} / 3 \mathbb{Z} \) is simple but \(A_4 \triangleleft V_4\) is proper normal, so \(V_4\) is not simple.   
+\end{eg}
+
+\begin{theorem}
+    \(A_n\) is a simple group for all \(n \ge 5\).  
+\end{theorem}
