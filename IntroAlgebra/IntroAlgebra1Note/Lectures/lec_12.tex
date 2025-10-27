@@ -14,6 +14,17 @@
     \]
 \end{prev}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{./Figures/PossibleNormalSubgroup.jpg}
+    \caption{Possible normal subgroups of \(S_3\) and \(S_4\)}
+    \label{fig:PossibleNormalSubgroup}
+\end{figure}
+
+\begin{remark}
+    Since we know \(H\) is a normal subgroup of \(S_n\) iff \(H = \bigcup_{x \in H} C(x) \), where \(C(x)\) is the conjugacy class of \(S_n\), and conjugacy classes of symmetric groups are the sets of permutations of same cycle form, and since the size of a subgroup of \(S_n\) must divide \(\vert S_n \vert = n!\), so we can deduce all normal subgroups of \(S_n\).     
+\end{remark}
+
 \begin{definition}[Transpositions]
     We say a permutation \(\pi \in S_n \) is a transposition iff \(\pi \in (1)^{n-2}(2)\).  
 \end{definition}
@@ -39,6 +50,15 @@
 \end{proof}
 
 %Ladder Lottery
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{./Figures/LadderLottery.jpg}
+    \caption{Ladder Lottery can realize arbitrary permutations}
+    \label{fig:Ladder Lottery}
+\end{figure}
+\begin{remark}
+    In ladder lottery, whenever we meet a bridge, we must go through it no matter we go left or go right, so every bridge is a (adjacent) transposition, and since every permuatation can be decomposed into adjacent transpositions, so ladder lottery can realize all permutations.
+\end{remark}
 %────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \begin{theorem}
     For \(\sigma \in S_n\), let 
@@ -50,12 +70,24 @@
     \]
 \end{theorem}
 \begin{proof}
-    If we can show it is true for \(\sigma \) is a general permutation and \(\tau \) is \((i, i+1)\) for all \(1 \le i \le n+1\), then for \(\tau = \tau _1 \tau _2 \dots \tau _l\), we have 
+    If we can show it is true for \(\sigma \) is a general permutation and \(\tau \) is \((i, i+1)\) for all \(1 \le i \le n\), then for \(\tau = \tau _1 \tau _2 \dots \tau _l\), we have 
     \begin{align*}
         \mathrm{inv}(\sigma \tau ) &\equiv  \mathrm{inv}(\sigma \tau _1 \tau _2 \dots \tau _l) \\
         &\equiv  \mathrm{inv}(\sigma \tau _1 \dots \tau _{l-1}) + \mathrm{inv}(\tau _l) \equiv \dots \equiv \mathrm{inv}(\sigma ) + \mathrm{inv}(\tau _1) + \mathrm{inv}(\tau _2) + \dots + \mathrm{inv}(\tau _l) \\
         &\equiv \mathrm{inv}(\sigma ) + \mathrm{inv}(\tau _1 \tau _2 \dots \tau _l) \equiv \mathrm{inv}(\sigma ) + \mathrm{inv}(\tau ).          
     \end{align*}   
+
+    Now we show that it is true for \(\sigma \) is a general permutation and \(\tau = (i, i+1)\) for some \(1 \le i \le n\).
+    \begin{itemize}
+        \item Case 1: \(\sigma (i) > \sigma (i+1)\), then \(\mathrm{inv}(\sigma \tau ) = \mathrm{inv}(\sigma ) - 1  \) and \(\mathrm{inv}(\tau ) = 1 \), so 
+        \[
+            \mathrm{inv}(\sigma \tau ) \equiv \mathrm{inv}(\sigma ) - 1 \equiv \mathrm{inv}(\sigma ) - \mathrm{inv}(\tau ) \equiv \mathrm{inv}(\sigma ) + \mathrm{inv}(\tau ) \mod{2}.      
+        \]   
+        \item Case 2: \(\sigma (i) < \sigma (i+1)\), then \(\mathrm{inv}(\sigma \tau ) = \mathrm{inv}(\sigma ) + 1  \) and \(\mathrm{inv}(\tau ) = 1 \), so it is true in this case.   
+    \end{itemize}   
+    \begin{note}
+        Here we first operate \(\sigma \) then \(\tau \).  
+    \end{note}
 \end{proof}
 
 Now we can define 
@@ -72,13 +104,31 @@ Now we can define
         Since 
         \[
             \sgn (\sigma \tau ) = (-1)^{\mathrm{inv}(\sigma \tau)  } = (-1)^{\mathrm{inv}(\sigma ) } (-1)^{\mathrm{inv}(\tau ) } = \sgn (\sigma ) \sgn (\tau ),
-        \] so the existence is true. (This uses previous theorem). Now if 
+        \] so the existence is true. (This uses previous theorem, and surjectivity is trivial since transpositions give \(-1\) and composition of transpositions give \(1\)). Now if 
         \[
             \varphi : S_n \to \left\{ \pm 1 \right\} 
         \] is a surjective group homomorphism, then since \(\left\{ \pm 1 \right\} \) is an abelian group, so 
         \[
             \varphi (\tau \sigma \tau ^{-1}) = \varphi (\tau ) \varphi (\sigma ) \varphi (\tau )^{-1} = \varphi (\sigma ),
-        \] so conjugates elements are mapped to same sign. Now that transpositions are all conjugate (same cycle types so conjugate), so all transpositions have same sign. If \(\varphi ((ij)) = 1\) for some \(i, j\), then since for all \(\sigma \in S_n\), \(\sigma \) can be written to a product of transpositions, so \(\varphi (\sigma ) = \prod \varphi ((ij)) = 1\), then \(\varphi \) is not surjective, so \(\varphi ((ij)) = -1\). Hence, \(\varphi \) is uniquely defined.         
+        \] so conjugates elements are mapped to same sign. Now that transpositions are all conjugate (same cycle types so conjugate), so all transpositions have same sign. If \(\varphi ((ij)) = 1\) for some \(i, j\), then since for all \(\sigma \in S_n\), \(\sigma \) can be written to a product of transpositions, so \(\varphi (\sigma ) = \prod \varphi ((ij)) = 1\), then \(\varphi \) is not surjective, so \(\varphi ((ij)) = -1\). Hence, \(\varphi \) is uniquely defined. (See next proposition)        
+    \end{proof}
+
+    \begin{lemma}
+        For a transposition \(t \in S_n\), \(\mathrm{inv}(t) \) is odd.  
+    \end{lemma}
+    \begin{proof}
+        Suppose \(t = (i, i + k)\) for some \(1 \le i \le n\) s.t. \(i + k \le n\) and \(k > 0\), then since \(t(i) = i + k\), so \(t(i) > t(i + j) = i + j\) for all \(1 \le j \le k\). Hence, we know there are \(k\) inverse pairs, also since for all \(i + 1 \le j \le i + k - 1\), we know \(j = t(j) > t(i + k) = i\), so there are \(k - 1\) inverse pairs, and thus there are \(2k - 1\) inverse pairs, and thus \(\mathrm{inv}(t) \) is odd.            
+    \end{proof}
+
+    \begin{proposition}
+        If \(\pi \) can be decomposed into \(c_1 c_2 \dots c_n\) and \(c_1^{\prime} c_2^{\prime} \dots c_m^{\prime} \), where \(c_i\)'s and \(c_i^{\prime} \)'s are transpositions, then \(2 \mid n - m\).      
+    \end{proposition}
+    \begin{proof}
+        If \(2 \nmid n - m\), then since 
+        \[
+            0 \equiv \mathrm{inv}(\pi \pi ^{-1}) \equiv \mathrm{inv}(\pi ) + \mathrm{inv}(\pi ^{-1}) \equiv \sum_{i=1}^n \mathrm{inv}(c_i) + \sum_{i=1}^m \mathrm{inv}(c^{\prime} _{m + 1 - i}) \mod{2},      
+        \]  
+        and since \(\mathrm{inv}(t) \) is odd for all transpositions \(t\), and \(n + m\) is odd, so we know \(\sum_{i=1}^n \mathrm{inv}(c_i) + \sum_{i=1}^m \mathrm{inv}(c^{\prime} _{m + 1 - i})\) is a sum of \(n + m\) of odd numebers, which is the sum of odd numbers many of odds, and it is still an odd, so it is a contradiction. 
     \end{proof}
 
     \begin{definition}[Alternating group of degree \(n\)]
@@ -88,7 +138,7 @@ Now we can define
             &= \left\{ \text{all elements expressed as a product of even number of transpositions}  \right\} \\
             &= \bigcup_{(1-1)v_1 + (2-1)v_2 + \dots \text{ is even} } (1)^{v_1} (2)^{v_2} \dots    
         \end{align*}
-        since \(\sgn ((a_1 a_2 \dots a_n)) = (-1)^{n-1}\). 
+        since \(\sgn ((a_1 a_2 \dots a_n)) = (-1)^{n-1}\) (It is the product of \(n-1\) transpositions). 
     \end{definition}
 
     \begin{proposition}
@@ -111,14 +161,19 @@ Now we can define
 \begin{eg}
     \(\mathbb{Z} / n \mathbb{Z} \) is simple iff \(n\) is prime.  
 \end{eg}
-
+\begin{explanation}
+    If \(\mathbb{Z} / n \mathbb{Z} \) is simple but \(n = ms\) for some \(m, s > 1\) s.t. \(\gcd(m, s) = 1\), then if \(\mathbb{Z} / n \mathbb{Z} = \langle g \rangle \), then  we know \(\langle g^m \rangle \) is a proper normal subgroup of \(\mathbb{Z} / n \mathbb{Z} \), which is a contradiction. Now if \(n\) is a prime, then \(\mathbb{Z} / n \mathbb{Z} \) has no proper subgroup by Lagrange's theorem, so \(\mathbb{Z} / n \mathbb{Z} \) is simple.          
+\end{explanation}
 \begin{eg}
     \(S_n\) is not a simple group for all \(n \ge 3\) because \(A_n \triangleleft S_n\) is proper and normal.   
 \end{eg}
 
 \begin{eg}
-    \(A_3 \simeq \mathbb{Z} / 3 \mathbb{Z} \) is simple but \(A_4 \triangleleft V_4\) is proper normal, so \(V_4\) is not simple.   
+    \(A_3 \simeq \mathbb{Z} / 3 \mathbb{Z} \) is simple but \(V_4 = \left\{ e, (12)(34), (13)(24), (14)(23) \right\}  \triangleleft A_4 = V_4 = A_4 \cup \left\{ \text{permutuations of a cycle of size }4  \right\} \) is proper normal, so \(A_4\) is not simple.   
 \end{eg}
+\begin{explanation}
+    \(V_4\) is the union of some conjugacy classes, so it is normal. 
+\end{explanation}
 
 \begin{theorem}
     \(A_n\) is a simple group for all \(n \ge 5\).  
