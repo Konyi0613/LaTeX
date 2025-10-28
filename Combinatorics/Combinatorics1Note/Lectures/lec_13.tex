@@ -1,0 +1,163 @@
+\lecture{13}{28 Oct. 15:30}{}
+\begin{prev}
+    If \(A_i = \sum_{n=0}^{\infty} a_n^{(i)} x^n \) is the generating function for performing task \(i\) with a budget of \(n\), then \(A(x) = \prod _{i=1}^k A_i(x) \) is the generating function for the number of ways of completing tasks \(1, 2, \dots , k\) with total budget of \(n\).      
+\end{prev}
+
+One of the application is to calculate \(P(x) = \sum_{n=0}^{\infty} p(n) x^n \), where \(p(n)\) is the number of ways of writing \(n\) as an unordered sum of natural numbers. 
+\begin{itemize}
+    \item Task 1: Write a number \(n\) as a sum of \(1\)s, and define \(a_n^{(1)}\) is the number of ways of doint this, then \(A_1(x) = \frac{1}{1-x}\) since the generating function of \(a_n^{(1)}\) is the genrating function of \((1,1,1, \dots )\). 
+    \item Task 2: Write a number \(n\) as a sum of \(2\)s, and define \(a_n^{(2)}\) to be the number of ways of doing this, then we know 
+    \[
+        a_n^{(2)} = \begin{dcases}
+            1, &\text{ if }  2 \mid n;\\
+            0, &\text{ if }  2 \nmid n.
+        \end{dcases},
+    \]so \(\left( a_1^{(2)}, a_2^{(2)}, \dots  \right) = (1, 0, 1, 0, 1, 0, 1, 0, 1, \dots ) \), so \(A_2(x) - \frac{1}{1-x^2}\). 
+    \item Task \(i\), and similarly we can define \(a_n^{(i)}\) and we know 
+    \[
+        a_n^{(i)} = \begin{dcases}
+            1, &\text{ if }  i \mid n;\\
+            0, &\text{ if }  i \nmid n.
+        \end{dcases} ,
+    \] and we know \(A_i(x) = \frac{1}{1 - x^i}\). 
+\end{itemize}   
+Hence, we know 
+\[
+    P(x) = \sum_{n=0}^{\infty} p(n)x^n = \prod_{i=1}^{\infty} A_i(x) = \prod_{i=1}^{\infty} \frac{1}{1-x^i} = \prod _{i=1}^{\infty} \left( 1 + x^i + x^{2i} + x^{3i} + \dots  \right).   
+\]
+
+\begin{eg}
+    How to compute \(p(n, k)\)? 
+\end{eg}
+\begin{explanation}
+    Since we know 
+    \begin{align*}
+        p(n, k) &= \# \text{ of partitions of } n \text{ into } k \text{ non-empty parts} \\
+        &= \# \text{ of partitions of } n \text{ with largest part of size } k,     
+    \end{align*}
+    so we have 
+    \[
+        P_k(x) = \sum_{n=0}^{\infty} p(n, k) x^n = \left( 1 + x^{1 \cdot 1} + x^{2 \cdot 1} + \dots  \right) \left( 1 + x^{1 \cdot 2} + x^{2 \cdot 2} + \dots  \right) \dots \left( x^{1 \cdot k} + x^{2 \cdot k} + \dots  \right),   
+    \] so \(P_k(x) = x^k \prod _{i=1}^k \frac{1}{1 - x^i}\). 
+\end{explanation}
+
+\begin{eg}
+    Suppose \(o(n)\) is the number of partitions of \(n\) into odd parts, then 
+    \[
+        O(x) = \sum_{n=0}^{\infty} o(n) x^n = \prod _{i=1}^{\infty} \frac{1}{1 - x^{2i - 1}}. 
+    \]  
+\end{eg}
+
+\begin{eg}
+    Suppose \(d(n)\) is the number of partitions of \(n\) into distinct parts, then 
+    \[
+        D(x) = \sum_{n=0}^{\infty} d(n) x^n = \prod _{i=1}^{\infty} \left( 1 + x^i \right).  
+    \]  
+\end{eg}
+
+\begin{eg}
+    Suppose \(q(n)\) is the number of self-conjugate partition, then we know \(q(n)\) is equal to number of partitions of \(n\) into distinct odd parts, so 
+    \[
+        Q(x) = \sum_{n=0}^{\infty} q(n)x^n = \prod _{n=1}^{\infty} \left( 1 + x^{2i - 1} \right).  
+    \]   
+\end{eg}
+
+\begin{theorem}
+    For all \(n\), the number of partitions of \(n\) into odd parts is equal to the number of partitions of \(n\) into distinct parts i.e. \(o(n) = d(n)\).    
+\end{theorem}
+\begin{proof}
+    Since we know
+    \begin{align*}
+        O(x) &= \sum_{n=0}^{\infty} o(n) x^n = \prod _{i=1}^{\infty} \frac{1}{1 - x^{2i - 1}} \\
+        &= \frac{\prod _{i=1}^{\infty} \left( 1 - x^{2i} \right) }{\prod _{i=1}^{\infty} \left( 1 - x^i \right) } = \prod _{i=1}^{\infty} \frac{\left( 1 - x^{2i} \right) }{\left( 1 - x^i \right) } = \prod _{i=1}^{\infty} \left( 1 + x^i \right) \\
+        &= D(x) = \sum_{n=0}^{\infty} d(n) x^n, 
+    \end{align*}
+    so this is true.
+\end{proof}
+
+\section{Exponential Generating Functions}
+Generally, generating functions work well when sequences are at most exponential, since if \(\vert a_n \vert \le c \lambda ^n\) for all \(n\), then \(A(x) = \sum_{n=0}^{\infty} a_n x^n \) converges absolutely for \(\vert x \vert < \frac{1}{\lambda } \). However, combinatorial sequences often grows faster, especially when order is included. 
+\begin{eg}
+    \(n! \ge \left( \frac{n}{e} \right)^n \), so \(A(x) = \sum_{n=0}^{\infty} n! x^n \) only converges for \(x = 0\).   
+\end{eg}  
+
+\begin{definition}
+    Given a sequence \(\left( a_n \right)_{n \ge 0} \), its exponential generating function is the (formal) power series \(\hat{A}(x) = \sum_{n=0}^{\infty} a_n \frac{x^n}{n!} \). 
+    \begin{note}
+        If \(\vert a_n \vert \le C \lambda ^n n! \), then \(\hat{A} (x)\) converges absolutely for \(\vert x \vert < \frac{1}{\lambda } \).  
+    \end{note}  
+\end{definition}
+
+\begin{eg}
+    If \(a_n = 1\) for all \(n \in \mathbb{N} \cup \left\{ 0 \right\} \), then we know the exponential generating function of \(\left( a_n \right)_{n \ge 0} \) is 
+    \[
+        \hat{A} (x) = \sum_{n=0}^{\infty} \frac{x^n}{n!} = e^x. 
+    \] 
+\end{eg}
+
+If \((a_n)_{n \ge 0} \leftrightarrow \hat{A} (x) = \sum_{n=0}^{\infty} a_n \frac{x^n}{n!} \) and \((b_n)_{n \ge 0} \leftrightarrow \hat{B} (x) = \sum_{n=0}^{\infty} b_n \frac{x^n}{n!}\), then we have 
+\[
+    \left( \lambda a_n + \mu b_n \right)_{n \ge 0} \leftrightarrow \sum_{n=0}^{\infty} \left( \lambda a_n + \mu b_n \right) \frac{x^n}{n!} = \lambda \hat{A} (x) + \mu \hat{B} (x).   
+\]  
+Also, if we multiplying by \(x\), then 
+\[
+    x \hat{A} (x) = \sum_{n=0}^{\infty} a_n \frac{x^{n+1}}{n!} = \sum_{n=1}^{\infty} a_{n-1} \frac{x^n}{(n-1)!} = \sum_{n=1}^{\infty} n a_{n-1} \frac{x^n}{n!} \leftrightarrow \left( n a_{n-1} \right)_{n \ge 0}.    
+\] 
+If we divide by \(x\), then we have 
+\[
+    \frac{\hat{A} (x) - a_0}{x} = \sum_{n=1}^{\infty} a_n \frac{x^{n-1}}{n!} = \sum_{n=0}^{\infty} a_{n+1} \frac{x^n}{(n+1)!} = \sum_{n=0}^{\infty} \frac{a_{n+1}}{n+1} \frac{x^n}{n!} \leftrightarrow \left( \frac{a_{n+1}}{n+1} \right)_{n \ge 0}.  
+\] 
+\begin{eg}
+    Consider the sequence given by \(a_0 = 1\), and \(\forall n \ge 1\), we have 
+    \[
+        a_{n+1} = (n+1) a_n - n^2 + 1.
+    \]  
+    Let \(\hat{A} (x) = \sum_{n=0}^{\infty} a_n \frac{x^n}{n!} \), then we know 
+    \begin{align*}
+        \hat{A} (x) &= a_0 + \sum_{n=0}^{\infty} a_{n+1} \frac{x^{n+1}}{(n+1)!} \\
+        &= 1 + \sum_{n=0}^{\infty} \left( (n+1) a_n - n^2 + 1 \right) \frac{x^{n+1}}{(n+1)!} \\
+        &= 1 + \sum_{n=0}^{\infty} a_n \frac{x^{n+1}}{n!} - \sum_{n=0}^{\infty} \left( n^2 - 1 \right)\frac{x^{n+1}}{(n+1)!} \\
+        &= 1 + x \hat{A} (x) - \sum_{n=0}^{\infty} (n-1)\frac{x^{n+1}}{n!} \\
+        &= 1 + x \hat{A} (x) - \sum_{n=1}^{\infty} n \frac{x^{n+1}}{n!} + \sum_{n=0}^{\infty} \frac{x^{n+1}}{n!} \\
+        &= 1 + x \hat{A} (x) - x^2 e^x + x e^x,        
+    \end{align*}
+    so we have 
+    \[
+        \hat{A} (x) = \frac{1}{1-x} + xe^x = \sum_{n=0}^{\infty} \left( n! + n \right)\frac{x^n}{n!} = \sum_{n=0}^{\infty} a_n \frac{x^n}{n!} ,  
+    \] so \(a_n = n! + n\). 
+\end{eg}
+
+\subsubsection{Products of exponential generating functions}
+Suppose \((a_n)_{n \ge 0} \leftrightarrow \hat{A} (x)\) and \((b_n)_{n \ge 0} \leftrightarrow \hat{B} (x)\), then 
+\begin{question}
+    How do we interpret \(\hat{A} (x) \hat{B} (x)\) as an exponential generating function? 
+\end{question}  
+
+Note that 
+\[
+    \hat{A} (x) \hat{B} (x) = \sum_{n=0}^{\infty} \left( \sum_{k=0}^n \frac{a_k}{k!} \frac{b_{n-k}}{(n-k)!}  \right) x^n = \sum_{n=0}^{\infty} \left( \sum_{k=0}^n \frac{n!}{k! (n - k)!} a_k b_{n-k}  \right) \frac{x^n}{n!} = \sum_{n=0}^{\infty} \left( \sum_{k=0}^n \binom{n}{k} a_k b_{n-k}  \right) \frac{x^n}{n!} ,  
+\]
+so if we define \(\hat{C} (x) = \hat{A} (x) \hat{B} (x)\) to be the exponential generating function for the sequences \((c_n)_{n \ge 0}\), then 
+\[
+    c_n = \sum_{k=0}^n \binom{n}{k} a_k b_{n-k}. 
+\]  
+Its combinatorial interpretation: Suppose \(a_n\) is the number of ways of doint Task 1 on a set of \(n\) elements, and \(b_n\) is the number of ways of doint Task 2 on a set of \(n\) elements, then \(c_n = \sum_{k=0}^n \binom{n}{k} a_k b_{n-k} \) is the number of ways to take a set \([n]\) of \(n\) elements and 
+\begin{itemize}
+    \item [(1)] Choose a partition \([n] = A \cupdot B\). 
+    \item [(2)] Perform Task 1 on \(A\). 
+    \item [(3)] Perform Task 2 on \(B\).  
+\end{itemize}       
+
+\begin{eg}
+    A professor and TA are grading \(n\) exams. We should divide exams arbitrarily: professor grades his and TA grades hers. Also the professor orders the exams to grade one at a time and decide if a student passes or not, while TA orders her exams and passes everyone.
+\end{eg}
+\begin{explanation}
+    Suppose \(a_n\) is the number of ways professor can grade a set of \(n\) exams, then \(a_n = n! 2^n\), and thus \(\hat{A} (x) = \sum_{n=0}^{\infty} n! 2^n \frac{x^n}{n!} = \sum_{n=0}^{\infty} (2x)^n = \frac{1}{1 - 2x}  \). Also, suppose \(b_n\) is the number of ways TA can grade a set of \(n\) exams, then \(b_n = n!\), so we know 
+    \[
+        \hat{B} (x) = \sum_{n=0}^{\infty} b_n \frac{x^n}{n!} = \sum_{n=0}^{\infty} x^n = \frac{1}{1 - x}, 
+    \] so if \(c_n\) is the number of ways the professor and TA can grade a set of \(n\) exams together, then 
+    \[
+        \hat{C} (x) = \sum_{n=0}^{\infty} c_n x^n = \hat{A} (x) \hat{B} (x) =   \frac{1}{(1-2x)(1-x)} = \frac{2}{1-2x} + \frac{-1}{1-x} = \sum_{n = 0}^{\infty} \left( 2^{n+1} - 1 \right)x^n,  
+    \]  
+     so \(c_n = \left( 2^{n+1} - 1 \right) n! \). 
+\end{explanation}

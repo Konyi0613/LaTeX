@@ -1,0 +1,193 @@
+\lecture{15}{28 Oct. 09:10}{}
+\begin{eg}
+    Suppose 
+    \[
+        f_n(x) = \begin{dcases}
+            0, &\text{ if } x \le 0 \text{ or } x \ge \frac{1}{n}  ;\\
+            4n^2 x, &\text{ if } 0 \le x \le \frac{1}{2n}  ;\\
+            -4 n^2 x + 4n, &\text{ otherwise} \frac{1}{2n} \le x \le \frac{1}{n},
+        \end{dcases}
+    \]
+    then \(\lim_{n \to \infty} f_n(x) = 0 \) pointwise. Also, \(f_n(x)\) is continuous and \(\int _{-\infty }^{\infty } f_n(x) \, \mathrm{d} x = 1 \). However, \(\lim_{n \to \infty} f_n(x) = f(x) = 0 \) for all \(x \in \mathbb{R} \), so 
+    \[
+        \lim_{n \to \infty} \int_{-\infty }^{\infty } f_n(x) \, \mathrm{d} x \neq \int _{-\infty }^{\infty } \lim_{n \to \infty} f_n(x) \, \mathrm{d} x.    
+    \]     
+\end{eg}
+
+\begin{note}
+    The problem is that \(f_n \to f\) only pointwise. 
+\end{note}
+
+Now we quickly review Riemann integral. Assume \(f\) is continuous on \([a, b]\), then we partition the interval \([a, b]\) into subintervals \(I_k = [x_{k-1}, x_k]\) for all \(1 \le k \le n \). On \(I_k\), find the maximum and the minimum of \(f\) on \(I_k\), and let \(M_k = \sup _{x \in I_k} f(x)\) and \(m_k = \inf _{x \in I_k} f(x)\), and use the area of the rectangle with height \(M_k\) and base \(x_k - x_{k-1} = \Delta X_k\), and similarly use the area of the rectangle with height \(m_k\) and base \(x_k - x_{k-1} = \Delta X_k\), then we know 
+\[
+    m_k \cdot \Delta X_k \le \text{The real area of } f \text{ on } I_k \le M_k \cdot \Delta X_k,  
+\] and thus we can define the upper Riemann sum to be \(\sum_{k=1}^n M_k \cdot \Delta X_k \) and the lower Riemann sum to be \(\sum_{k=1}^n m_k \cdot \Delta X_k \). Hence, we know 
+\[
+    \text{Lower Riemann Sum} \le \text{Area} \le \text{Upper Riemann Sum}.   
+\] Also, since upper Riemann sum decreases if one has more partition and lower Riemann sum increases increases if one has more partition, so we can approach the area by having more partition.
+
+\begin{definition} \label{def: upper/lower riemann integral}
+    Let \(f: I \to \mathbb{R} \) be a bounded function on a bounded interval, and let \(p\) be a partition of \(I\), we define the upper Riemann integral \(U(f, p)\) and the lower Riemann sum \(L(f, p)\) by 
+    \[
+        U(f, p) = \sum_{J \in p, J \neq \varnothing } \left( \sup _{x \in J} f(x) \right) \vert J \vert, \quad L(f, p) = \sum_{J \in p, J \neq \varnothing } \left( \inf _{x \in J} f(x) \right) \vert J \vert 
+    \]    
+\end{definition}
+
+\begin{proposition}[From Analysis I]
+    Let \(f:I \to \mathbb{R} \) be a bounded function on a bounded interval \(I\), then we define
+    \begin{align*}
+        \overline{\int _I }f &= \inf \left\{ U(f, p): p \text{ is a partition of } I  \right\} \text{ (upper integral)}  \\
+        \underline{\int _I }f &= \sup \left\{ L(f, p): p \text{ is a partition of } I  \right\} \text{ (lower integral)}, 
+    \end{align*} and we have 
+    \begin{itemize}
+        \item [(1)] \(\underline{\int _I} f \le \overline{\int _I} f  \) 
+        \item [(2)] Suppose \(f \le g\) on \(I\), then we have 
+        \[
+            \underline{\int _I}f \le \underline{\int _I}g, \text{ and } \overline{\int _I}f \le \overline{\int _I}g.   
+        \]
+    \end{itemize}
+\end{proposition}
+
+\begin{definition} \label{def: Riemann integrable}
+    Let \(f:I \to \mathbb{R} \) be a bounded function. We say \(f\) is Riemann integrable on \(I\) if \(\underline{\int _I}f = \overline{\int _I}f \), and we denote it by \(\int _I f\).     
+\end{definition}
+
+\begin{remark}
+    To prove \(f\) is (Riemann) integrable, we need to prove \(\underline{\int _I} f = \overline{\int _I}f  \).  
+\end{remark}
+
+\begin{eg}
+    Suppose \(f: I \to \mathbb{R} \) with \(I = [0, 1]\) and   
+    \[
+        f(x) = \begin{dcases}
+            1, &\text{ if } x \in [0, 1], x \in \mathbb{Q}   ;\\
+            0, &\text{ if } x \in [0, 1], x \notin \mathbb{Q} ,
+        \end{dcases}
+    \] then \(\overline{\int _I} f = 1 \) and \(\underline{\int _I} f = 0\), so \(f\) is not integrable. 
+    \begin{note}
+        \(f(x) = 0\) almost everywhere on \([0, 1]\), and we say \(f\) is Lebesgue integrable and its Lebesgue integral is \(0\). We'll discuss this next semester.    
+    \end{note}   
+\end{eg}
+
+\begin{theorem} \label{thm: uniformly conv preserve Riemann integrable}
+    Let \(f^{(n)}: [a, b] \to \mathbb{R} \) be a sequence of Riemann integrable functions. Suppose \(\lim_{n \to \infty} f^{(n)} = f \) uniformly where \(f: [a, b] \to \mathbb{R} \), then \(f\) is also Riemann integrable and \(\lim_{n \to \infty} \int _I f^{(n)} = \int _I f\). 
+\end{theorem}
+\begin{proof}
+    First, we want to show that  \(\overline{\int _I}f = \underline{\int _I}(f) \), then since \(f_n \to f\) uniformly on \([a, b]\), so given \(\varepsilon > 0\), \(\exists N > 0\) s.t. \(\left\vert f_n(x) - f(x) \right\vert < \varepsilon  \) for all \(n \ge N\) and \(x \in [a, b]\). Thus, we have 
+    \[
+        f_n(x) - \varepsilon < f(x) < f_n(x) + \varepsilon \quad \forall n \ge N \text{ and } x \in [a, b].
+    \]      
+    Hence, we have 
+    \[
+        \underline{\int _I} (f_n - \varepsilon ) \le \underline{\int _I} f, \quad \overline{\int _I} f \le \overline{\int _I} (f_n + \varepsilon ) \quad \forall n \ge N, 
+    \]  which gives 
+    \[
+        \underline{\int _I} f_n - \varepsilon (b - a) \le \underline{\int _I} f, \quad \overline{\int _I} f \le \overline{\int _I} f_n + \varepsilon (b - a) \quad \forall n \ge N.  
+    \] Now since \(f_n\) is Riemann integrable, so \(\underline{\int _I} f_n = \overline{\int _I} f_n = \int _I f_n \). Hence, we have 
+    \[
+        \int_I f_n - \varepsilon (b - a) \le \underline{\int _I} f \le \overline{\int _I} f \le \int _I f_n + \varepsilon (b - a) \quad \forall n \ge N.
+    \] 
+    Hence, 
+    \[
+        \overline{\int _I} f - \underline{\int _I} f \le 2 \varepsilon (b - a) \quad \forall \varepsilon > 0,
+    \] which gives \(\overline{\int _I} f = \underline{\int _I} f \). Hence, \(f\) is Riemann integrable. 
+    
+    Also, we have 
+    \[
+       \int_I f_n - \varepsilon (b - a) \le \int _I f \le \int _I f_n + \varepsilon (b - a) \quad \forall n \ge N,
+    \] so we have 
+    \[
+        \left\vert \int _I f - \int _I f_n \right\vert \le \varepsilon (b - a) \quad \forall n \ge N, 
+    \] which gives \(\lim_{n \to \infty} \int _I f^{(n)} = \int _I f \). 
+\end{proof}
+
+\begin{theorem} \label{thm: converges uniformly preserves lim of sum of Riemann integral}
+    Let \(f^{(n)}: [a, b] \to \mathbb{R} \) be a sequence of Riemann integrable function. Suppose \(\sum_{n=1}^{\infty} f^{(n)}(x) \) converges uniformly, and let \(f(x) \coloneqq \sum_{n=1}^{\infty} f^{(n)}(x) \), then \(f\) is Riemann integrable and 
+    \[
+        \sum_{n=1}^{\infty} \int _I f^{(n)} = \int _I f.
+    \]  
+\end{theorem}
+\begin{proof}
+    Let \(S_k(x) = \sum_{i=1}^k f^{(i)}(x) \), then since \(\sum_{i=1}^{\infty} f^{(i)}(x) \) converges uniformly, so \(\lim_{k \to \infty} S_k(x) = f(x) \) where \(f(x) = \sum_{i=1}^{\infty} f^{(n)}(x) \). Now \(S_k = \sum_{i=1}^k f^{(i)} \) is a sum of Riemann integrable functions, so \(S_k\) is also Riemann integrable. By \autoref{thm: uniformly conv preserve Riemann integrable}, we know \(f\) is Riemann integrable, and \(\lim_{k \to \infty} \int _I S_k = \int _I f \), which means \(\lim_{k \to \infty} \sum_{i=1}^k \int _I f^{(n)} = \int _I f  \) by the linearity of Riemann integral, and thus 
+    \[
+        \sum_{n=1}^{\infty} \int _I f^{(n)} = \int _I f. 
+    \]           
+\end{proof}
+
+\begin{eg}
+    \(\sum_{n=1}^{\infty} x^n = \frac{x}{1-x} \) pointwise for \(x \in (-1, 1)\), and \(\sum_{n=0}^{\infty} x^n = \frac{1}{1-x} \) pointwise for \(x \in (-1, 1)\), but if we fix \(r \in (-1, 1)\), then \(\sum_{n=0}^{\infty} x^n = \frac{1}{1-x} \) uniformly on \([-r, r]\). Now since \(\sum_{n=0}^{\infty} x^n = \frac{1}{1-x} \) uniformly on \([0, r]\) for \(-1 < r < 1\), then by \autoref{thm: converges uniformly preserves lim of sum of Riemann integral}, we have 
+    \begin{align*}
+        &\sum_{n=0}^{\infty} \int _0^r x^n \, \mathrm{d} x = \int _0^r \frac{1}{1-x} \, \mathrm{d} x \\
+        &\implies \sum_{n=0}^{\infty} \frac{r^{n+1}}{n+1} = - \ln (1 - r) + \ln 1 = -\ln (1 - r).    
+    \end{align*}           
+\end{eg}
+
+\section{Uniform Convergence \& Derivatives}
+We talk about two examples to show that uniform convergence does not preserve the value of derivatives at some point.
+\begin{eg}
+    Suppose \(f_n: [0, 2\pi ] \to \mathbb{R} \) and 
+    \[
+        f_n(x) = \frac{\sin (nx)}{\sqrt{n} },
+    \] then \(\lim_{n \to \infty} f_n = 0 \) uniformly since 
+    \[
+        \left\vert f_n(x) \right\vert = \left\vert \frac{\sin (nx)}{\sqrt{n} } \right\vert \le \frac{1}{\sqrt{n} },  
+    \] but its derivative is 
+    \[
+        f_n^{\prime} (x) = \frac{\cos (nx) \cdot n}{\sqrt{n} },
+    \] so \(f_n^{\prime} (0) = \sqrt{n} \), and thus
+    \[
+        \lim_{n \to \infty} f_n^{\prime} (0) = \infty \neq f^{\prime} (0) = 0.
+    \]  
+\end{eg}
+\vspace{48pt}
+
+\begin{eg}
+    Suppose \(f_n(x) = \sqrt{\frac{1}{n^2} + x^2} \), then \(\lim_{n \to \infty} f_n (x) = \vert x \vert  \) uniformly since 
+    \begin{align*}
+        0 \le f_n(x) - \vert x \vert &= \sqrt{\frac{1}{n^2} + x^2} - \vert x \vert = \frac{\left( \sqrt{\frac{1}{n^2} + x^2} - \vert x \vert   \right) \left( \sqrt{\frac{1}{n^2} + x^2} + \vert x \vert    \right)  }{\sqrt{\frac{1}{n^2} + x^2} + \vert x \vert  } \\
+        &= \frac{\frac{1}{n^2}}{\sqrt{\frac{1}{n^2} + x^2} } \le \frac{\frac{1}{n^2}}{\sqrt{\frac{1}{n^2}} } = \frac{1}{n}.
+    \end{align*}
+    Let \(f(x) = \vert x \vert \). We have \(\lim_{n \to \infty} f_n = f \) uniformly, and note that \(f_n(x) = \sqrt{\frac{1}{n^2} + x^2} \) and \(f_n^{\prime} (x) = \frac{x}{\sqrt{\frac{1}{n^2} + x^2} }\). Note that \(f^{\prime} (0)\) does not exists and \(\lim_{n \to \infty} f_n^{\prime} (0) = 0 \), so in this case \(f_n \to f\) uniformly and \(f_n^{\prime} \) exists, but \(f^{\prime} (0)\) doesn't exist.      
+\end{eg}
+
+\begin{theorem} \label{thm: f_n differentiable and f_n prime conti, then if f_n prime to g uni, and for some x0 lim f_n(x_0) exists, then EE f s.t. lim fn equal f uni and f prime is g}
+    Let \([a, b]\) be an interval and for \(n \ge 1\), let \(f_n: [a, b] \to \mathbb{R} \) be a differentiable function whose derivative \(f_n^{\prime} : [a, b] \to  \mathbb{R} \) is continuous. Suppose \(f_n^{\prime}  \to g\) uniformly where \(g:[a, b] \to  \mathbb{R} \). Suppose \(\exists x_0 \in [a, b]\) s.t. \(\lim_{n \to \infty} f_n(x_0) \) exists, then \(\exists \) a differentiable \(f\) s.t. \(\lim_{n \to \infty} f_n = f \) uniformly and \(f^{\prime} = g\).           
+\end{theorem}
+\begin{proof}
+    Since \(f_n^{\prime} \) is continuous and \(f_n^{\prime} \to g\) uniformly, then \(g\) is Riemann integrable since \(f_n^{\prime} \) is Riemann integrable for all \(n \in \mathbb{N} \) and by \autoref{thm: uniformly conv preserve Riemann integrable}. Also, we know 
+    \[
+        \lim_{n \to \infty} \int _{x_0}^x f_n^{\prime} (s) \, \mathrm{d}s = \int _{x_0}^x g(s) \, \mathrm{d} s \text{ uniformly }  \text{ for } x_0, x \in [a, b]    
+    \] by Fundamental theorem of Calculus, so we know \(\lim_{n \to \infty} \left( f_n(x) - f_n(x_0) \right) = \int _{x_0}^x g(s) \, \mathrm{d} s   \) uniformly, which means \(\lim_{n \to \infty} f_n(x) = \lim_{n \to \infty} f_n(x_0) + \int _{x_0}^x g(s) \, \mathrm{d} s  \). Note that this is bacuase 
+    \[
+        \left\vert \int _{x_0}^x \left( f_n^{\prime} - g \right)(s) \, \mathrm{d}s   \right\vert \le \int _{x_0}^x \left\vert f_n^{\prime} (s) - g(s) \right\vert \,  \mathrm{d} s  \le \frac{\varepsilon}{b-a}  \cdot \vert x - x_0 \vert \le \frac{\varepsilon}{b - a} \cdot (b - a) < \varepsilon \quad \forall \varepsilon > 0, n \ge N
+    \] for some \(N \in \mathbb{N} \). 
+\end{proof}
+
+\begin{corollary}
+    Let \([a, b]\) be an interval and for \(n \ge 1\), let \(f_n: [a, b] \to \mathbb{R} \) be a differentiable function whose derivatives \(f_n^{\prime} :[a, b] \to \mathbb{R} \) is continuous. Suppose \(\sum_{n=1}^{\infty} \left\lVert f_n^{\prime}  \right\rVert _\infty \) converges. Suppose also that \(\sum_{n=1}^{\infty} f^{(n)}(x_0) \) converges for some \(x_0 \in [a, b]\), then \(\sum_{n=1}^{\infty} f^{(n)} \) converges uniformly to a differentiable function and 
+    \[
+        \frac{\mathrm{d}}{\mathrm{d}x} \left( \sum_{n=1}^{\infty} f_n  \right) = \sum_{n=1}^{\infty} f_n^{\prime} \text{ for } x \in [a, b].    
+    \]        
+\end{corollary}
+\begin{proof}
+    Suppose \(S_k(x) = \sum_{i=1}^k f_i(x) \) and \(S_k^{\prime} (x) = \sum_{i=1}^k f_i^{\prime} (x) \), then since \(\sum_{i=1}^{\infty} \left\lVert f_n^{\prime}  \right\rVert _{\infty }  \) converges, then by \hyperref[thm: Weierstrass M-test (bounded and conti)]{Weierstrass \(M\)-test} , we know \(\lim_{k \to \infty} S_k^{\prime} = \sum_{i=1}^{\infty} f_i^{\prime}   \) uniformly. We also know that \(S_k(x_0) = \sum_{i=1}^k f_i(x_0) \) converges to \(\sum_{i=1}^{\infty} f_i(x_0) \) by our conditions. Now by \autoref{thm: f_n differentiable and f_n prime conti, then if f_n prime to g uni, and for some x0 lim f_n(x_0) exists, then EE f s.t. lim fn equal f uni and f prime is g} (Suppose \(S_k\) here is \(f_n\) in \autoref{thm: f_n differentiable and f_n prime conti, then if f_n prime to g uni, and for some x0 lim f_n(x_0) exists, then EE f s.t. lim fn equal f uni and f prime is g}), then we know \(\lim_{k \to \infty} S_k = S\) uniformly for some function \(S:[a, b] \to f\) and \(S^{\prime} = \sum_{i=1}^{\infty} f_i^{\prime}  \), which means 
+    \[
+        \sum_{n=1}^{\infty} f_n^{\prime} = \frac{\mathrm{d}}{\mathrm{d}x} S  = \frac{\mathrm{d}}{\mathrm{d}x} \left( \lim_{k \to \infty} S_k  \right) = \frac{\mathrm{d}}{\mathrm{d}x} \left( \sum_{n=1}^{\infty} f_n  \right).   
+    \] 
+    \begin{note}
+        \(\sum_{n=1}^{\infty} \left\lVert f_n^{\prime}  \right\rVert_\infty   \) converges inplies \(f_n^{\prime} \) is bounded for all \(n\), so we can use Weirestrass \(M\)-test.    
+    \end{note}         
+\end{proof}
+
+\begin{eg}
+    \(f(x) = \sum_{n=1}^{\infty} 4^{-n} \cos \left( 32^n \pi x \right)  \)  uniformly, and \(f^{\prime} (x)\) doesn't exist at all. 
+\end{eg}
+\begin{explanation}
+    Since 
+    \[
+        \left\vert 4^{-n} \cos \left( 32^{-n} \pi x \right)  \right\vert \le 4^{-n},
+    \] and \(\sum_{n=1}^{\infty} 4^{-n} \) converges, so \(\sum_{n=1}^{\infty} 4^{-n} \cos \left( 32^{-n} \pi x \right)  \) converges uniformly by Weierstrass \(M\)-test. Also, we know 
+    \[
+        \left( 4^{-n} \cos \left( 32^{-n} \pi x \right)  \right)^{\prime} = -8^n \sin \left( 32^n \pi x \right),  
+    \]  and we will learn that \(f^{\prime} (x)\) does not exist at all from the exercise. 
+\end{explanation}
