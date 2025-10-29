@@ -161,6 +161,16 @@ $$
 \begin{problem}
 Let $A$ be an $n \times n$ matrix over a field, $A \ne 0$. If $r$ is any positive integer between $1$ and $n$, an $r \times r$ \textbf{submatrix} of $A$ is any $r \times r$ matrix obtained by deleting $(n-r)$ rows and $(n-r)$ columns of $A$. The \textbf{determinant rank} of $A$ is the largest positive integer $r$ such that some $r \times r$ submatrix of $A$ has a \textbf{non-zero determinant}. Prove that the determinant rank of $A$ is equal to the \textbf{row rank} of $A$ ($=$ \textbf{column rank} $A$).
 \end{problem}
+\begin{proof}
+    Note that if the determinant rank of \(A\) is larger or equal to \(v\), then this means we can find an \(v \times v\) submatrix of \(A\) s.t. all rows of this submatrix are linearly independent. Suppose \(\rank A = l\), then we can pick at most \(l\) linearly independent rows, so the determinant rank of \(A \le l\). Now if we pick \(l\) linearly independent rows of \(A\), say they are the \(r_1, r_2, \dots , r_l\)-th rows of \(A\), and suppose 
+    \[
+        r_i = (a_{r_i 1 }, a_{r_i 2}, \dots , a_{r_i n}) \quad \forall 1 \le i \le n,
+    \] then consider the matrix \(R = \begin{pmatrix}
+         r_1 \\
+         \vdots \\
+         r_l \\
+    \end{pmatrix}\), we know \(\rank R = l\) since all \(l\) rows of \(R\) are linearly independent. Now since row rank is equal to column rank, so there are \(l\) columns of \(R\) are linearly independent, say they are the \(c_1, c_2, \dots , c_l\)-th columns, then if we pick \(S = (s_{ij})_{l \times l}\) with \(s_{ij} = a_{r_i c_j}\) for all \(1 \le i,j \le l\), we know \(S\) is invertible, and thus the determinant rank of \(A \ge l\). Hence, the determinant rank of \(A\) is equal to the row rank of \(A\).             
+\end{proof}
 
 \begin{problem}
 Let $A$, $B$, $C$, $D$ be commuting $n \times n$ matrices over the field $F$. Show that the determinant of the $2n \times 2n$ matrix
@@ -172,3 +182,97 @@ C & D
 $$
 is $\det (AD - BC)$.
 \end{problem}
+\begin{proof}
+    Note that 
+    \[
+        \begin{pmatrix}
+            A & B  \\
+            C & D  \\
+        \end{pmatrix}\begin{pmatrix}
+            D & -B  \\
+            -C & A  \\
+        \end{pmatrix} = \begin{pmatrix}
+            AD-BC & 0  \\
+            0 & AD-BC  \\
+        \end{pmatrix},
+    \] so we know \(\det \begin{pmatrix}
+        A & B  \\
+        C & D  \\
+    \end{pmatrix} \det \begin{pmatrix}
+        D & -B  \\
+        -C & A  \\
+    \end{pmatrix} = \left( \det (AD-BC) \right)^2 \) by previous exercise. Also, notice that 
+    \[
+        \begin{pmatrix}
+            0 & -I  \\
+            I & 0  \\
+        \end{pmatrix}\begin{pmatrix}
+            A & B  \\
+            C & D  \\
+        \end{pmatrix}\begin{pmatrix}
+            0 & I  \\
+            -I & 0  \\
+        \end{pmatrix} = \begin{pmatrix}
+            D & -C  \\
+            -B & A  \\
+        \end{pmatrix},
+    \] and thus 
+    \[
+        \det \begin{pmatrix}
+            D & -C  \\
+            -B & A  \\
+        \end{pmatrix} = \det \begin{pmatrix}
+            A & B  \\
+            C & D  \\
+        \end{pmatrix} \det \left( \begin{pmatrix}
+            0 & -I  \\
+            I & 0  \\
+        \end{pmatrix} \begin{pmatrix}
+            0 & I  \\
+            -I & 0  \\
+        \end{pmatrix} \right) = \det \begin{pmatrix}
+            A & B  \\
+            C & D  \\
+        \end{pmatrix} \det (I) = \det \begin{pmatrix}
+            A & B  \\
+            C & D  \\
+        \end{pmatrix}.
+    \]
+    Also, since we know 
+    \[
+        \begin{pmatrix}
+            D & -C  \\
+            -B & A  \\
+        \end{pmatrix}^t = \begin{pmatrix}
+            D & -B  \\
+            -C & A  \\
+        \end{pmatrix},
+    \] so we know
+    \[
+        \det \begin{pmatrix}
+            D & -B  \\
+            -C & A  \\
+        \end{pmatrix} = \det \begin{pmatrix}
+            D & -C  \\
+            -B & A  \\
+        \end{pmatrix} = \det \begin{pmatrix}
+            A & B  \\
+            C & D  \\
+        \end{pmatrix},
+    \] so we have 
+    \[
+        \det \begin{pmatrix}
+            A & B  \\
+            C & D  \\
+        \end{pmatrix} \det \begin{pmatrix}
+            D & -B  \\
+            -C & A  \\
+        \end{pmatrix} = \left( \det \begin{pmatrix}
+            A & B  \\
+            C & D  \\
+        \end{pmatrix} \right)^2 = \left( \det (AD-BC) \right)^2,
+    \] so \(\det \begin{pmatrix}
+        A & B  \\
+        C & D  \\
+    \end{pmatrix} = \det (AD - BC)\). 
+\end{proof}

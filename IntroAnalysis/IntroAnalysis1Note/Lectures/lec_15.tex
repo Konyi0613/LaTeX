@@ -47,6 +47,19 @@ Now we quickly review Riemann integral. Assume \(f\) is continuous on \([a, b]\)
         \]
     \end{itemize}
 \end{proposition}
+\begin{proof}
+    \vphantom{text}
+    \begin{itemize}
+        \item [(1)] Since \(\overline{\int _I} f \le \text{real area} \le \overline{\int _I} f  \), so this is true. 
+        \item [(2)] Since we fix any partition \(p\) on \(I\), we have 
+        \[
+            L(f, p) \le L(g, p) \quad U(f, p) \le U(g, p),
+        \] so this is true.
+        \begin{remark}
+            More intuitively, since lower Riemann integral and upper Riemann integral are both approaching the real area (if the function is not weird), so this can be intuitively accepted.
+        \end{remark}
+    \end{itemize}
+\end{proof}
 
 \begin{definition} \label{def: Riemann integrable}
     Let \(f:I \to \mathbb{R} \) be a bounded function. We say \(f\) is Riemann integrable on \(I\) if \(\underline{\int _I}f = \overline{\int _I}f \), and we denote it by \(\int _I f\).     
@@ -108,10 +121,16 @@ Now we quickly review Riemann integral. Assume \(f\) is continuous on \([a, b]\)
     \]  
 \end{theorem}
 \begin{proof}
-    Let \(S_k(x) = \sum_{i=1}^k f^{(i)}(x) \), then since \(\sum_{i=1}^{\infty} f^{(i)}(x) \) converges uniformly, so \(\lim_{k \to \infty} S_k(x) = f(x) \) where \(f(x) = \sum_{i=1}^{\infty} f^{(n)}(x) \). Now \(S_k = \sum_{i=1}^k f^{(i)} \) is a sum of Riemann integrable functions, so \(S_k\) is also Riemann integrable. By \autoref{thm: uniformly conv preserve Riemann integrable}, we know \(f\) is Riemann integrable, and \(\lim_{k \to \infty} \int _I S_k = \int _I f \), which means \(\lim_{k \to \infty} \sum_{i=1}^k \int _I f^{(n)} = \int _I f  \) by the linearity of Riemann integral, and thus 
+    Let \(S_k(x) = \sum_{i=1}^k f^{(i)}(x) \), then since \(\sum_{i=1}^{\infty} f^{(i)}(x) \) converges uniformly, so \(\lim_{k \to \infty} S_k(x) = f(x) \) where \(f(x) = \sum_{i=1}^{\infty} f^{(n)}(x) \). Now \(S_k = \sum_{i=1}^k f^{(i)} \) is a sum of Riemann integrable functions, so \(S_k\) is also Riemann integrable. By \autoref{thm: uniformly conv preserve Riemann integrable}, we know \(f\) is Riemann integrable, and \(\lim_{k \to \infty} \int _I S_k = \int _I f \), which means \(\lim_{k \to \infty} \sum_{i=1}^k \int _I f^{(i)} = \int _I f  \) by the linearity of Riemann integral, and thus 
     \[
         \sum_{n=1}^{\infty} \int _I f^{(n)} = \int _I f. 
-    \]           
+    \] 
+    \begin{note}
+        \[
+            \int _I S_k = \int _I \sum_{i=1}^k f^{(i)} = \sum_{i=1}^k \int _I f^{(i)}  
+        \]
+        for finite \(k\). 
+    \end{note}          
 \end{proof}
 
 \begin{eg}
@@ -139,7 +158,6 @@ We talk about two examples to show that uniform convergence does not preserve th
         \lim_{n \to \infty} f_n^{\prime} (0) = \infty \neq f^{\prime} (0) = 0.
     \]  
 \end{eg}
-\vspace{48pt}
 
 \begin{eg}
     Suppose \(f_n(x) = \sqrt{\frac{1}{n^2} + x^2} \), then \(\lim_{n \to \infty} f_n (x) = \vert x \vert  \) uniformly since 
@@ -157,11 +175,22 @@ We talk about two examples to show that uniform convergence does not preserve th
     Since \(f_n^{\prime} \) is continuous and \(f_n^{\prime} \to g\) uniformly, then \(g\) is Riemann integrable since \(f_n^{\prime} \) is Riemann integrable for all \(n \in \mathbb{N} \) and by \autoref{thm: uniformly conv preserve Riemann integrable}. Also, we know 
     \[
         \lim_{n \to \infty} \int _{x_0}^x f_n^{\prime} (s) \, \mathrm{d}s = \int _{x_0}^x g(s) \, \mathrm{d} s \text{ uniformly }  \text{ for } x_0, x \in [a, b]    
-    \] by Fundamental theorem of Calculus, so we know \(\lim_{n \to \infty} \left( f_n(x) - f_n(x_0) \right) = \int _{x_0}^x g(s) \, \mathrm{d} s   \) uniformly, which means \(\lim_{n \to \infty} f_n(x) = \lim_{n \to \infty} f_n(x_0) + \int _{x_0}^x g(s) \, \mathrm{d} s  \). Note that this is bacuase 
+    \] since
     \[
-        \left\vert \int _{x_0}^x \left( f_n^{\prime} - g \right)(s) \, \mathrm{d}s   \right\vert \le \int _{x_0}^x \left\vert f_n^{\prime} (s) - g(s) \right\vert \,  \mathrm{d} s  \le \frac{\varepsilon}{b-a}  \cdot \vert x - x_0 \vert \le \frac{\varepsilon}{b - a} \cdot (b - a) < \varepsilon \quad \forall \varepsilon > 0, n \ge N
-    \] for some \(N \in \mathbb{N} \). 
+        \left\vert \int _{x_0}^x \left( f_n^{\prime} - g \right)(s) \, \mathrm{d}s   \right\vert \le \int _{x_0}^x \left\vert f_n^{\prime} (s) - g(s) \right\vert \,  \mathrm{d} s  \le \frac{\varepsilon}{b-a}  \cdot \vert x - x_0 \vert \le \frac{\varepsilon}{b - a} \cdot (b - a) = \varepsilon \quad \forall \varepsilon > 0, n \ge N
+    \] for some \(N \in \mathbb{N} \), and Fundamental theorem of Calculus tells us \(\lim_{n \to \infty} \left( f_n(x) - f_n(x_0) \right) = \int _{x_0}^x g(s) \, \mathrm{d} s   \) uniformly, which means \(\lim_{n \to \infty} f_n(x) = \lim_{n \to \infty} f_n(x_0) + \int _{x_0}^x g(s) \, \mathrm{d} s  \) uniformly, and we can let \(f\) to be R.H.S.
 \end{proof}
+
+\begin{remark}
+    Informally, the theorem states that if \(f_n^{\prime} \) converges uniformly and \(f_n(x_0)\) converges for some \(x_0\), then \(f_n\) itself converges uniformly, and moreover
+    \[
+        \frac{\mathrm{d}}{\mathrm{d}x} \left( \lim_{n \to \infty} f_n(x)  \right) = \lim_{n \to \infty} f_n^{\prime} (x).   
+    \]    
+\end{remark}
+
+\begin{remark}
+    We need \(f_n^{\prime} \) to be continuous to ensure that \(f_n^{\prime} \) is Riemann integrable (Note that we have \(f_n^{\prime}([a,b]) \) is bounded and continuous, so \(f_n^{\prime} \) is Riemann integrable). Also, we need continuity to use Fundamental Theorem of Calculus.  
+\end{remark}
 
 \begin{corollary}
     Let \([a, b]\) be an interval and for \(n \ge 1\), let \(f_n: [a, b] \to \mathbb{R} \) be a differentiable function whose derivatives \(f_n^{\prime} :[a, b] \to \mathbb{R} \) is continuous. Suppose \(\sum_{n=1}^{\infty} \left\lVert f_n^{\prime}  \right\rVert _\infty \) converges. Suppose also that \(\sum_{n=1}^{\infty} f^{(n)}(x_0) \) converges for some \(x_0 \in [a, b]\), then \(\sum_{n=1}^{\infty} f^{(n)} \) converges uniformly to a differentiable function and 
@@ -175,7 +204,7 @@ We talk about two examples to show that uniform convergence does not preserve th
         \sum_{n=1}^{\infty} f_n^{\prime} = \frac{\mathrm{d}}{\mathrm{d}x} S  = \frac{\mathrm{d}}{\mathrm{d}x} \left( \lim_{k \to \infty} S_k  \right) = \frac{\mathrm{d}}{\mathrm{d}x} \left( \sum_{n=1}^{\infty} f_n  \right).   
     \] 
     \begin{note}
-        \(\sum_{n=1}^{\infty} \left\lVert f_n^{\prime}  \right\rVert_\infty   \) converges inplies \(f_n^{\prime} \) is bounded for all \(n\), so we can use Weirestrass \(M\)-test.    
+        \(\sum_{n=1}^{\infty} \left\lVert f_n^{\prime}  \right\rVert_\infty   \) converges inplies \(f_n^{\prime} \) is bounded for all \(n\), so we can use Weirestrass \(M\)-test. In fact, \(f_n^{\prime} \) is continuous gives \(f_n^{\prime} \) is bounded since its domain is an bounded interval.  
     \end{note}         
 \end{proof}
 
