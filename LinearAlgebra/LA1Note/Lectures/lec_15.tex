@@ -1,0 +1,150 @@
+\lecture{15}{31 Oct. 10:20}{}
+\begin{definition}
+    Let \(T \in \mathcal{L} (V)\) (or a matrix \(A \in M_n(F)\)). A scalar \(\lambda \in F\) is called an eigenvalue of \(T\) if \(\exists v \neq 0\) s.t. \(Tv = \lambda v\). Equivalently, \(T - \lambda I\) is singular, or \(\det (T - \lambda I) = 0\) or \(\nu (T - \lambda I) > 0\). In this case, \(E(\lambda ) = \ker (T - \lambda I)\) is called the eigenspace and any vector in \(E(\lambda )\) is called an eigenvector (for \(\lambda \)).        
+\end{definition}
+
+\begin{remark}
+    Eigenvalues are also called characteristic values, proper value, spectral value.
+\end{remark}
+
+If \(A \in M_n(F)\) is the matrix representation of \(T\), then 
+\[
+    \det (T - \lambda I) = \det (A - \lambda I) = (-1)^n \det \left( \lambda I - A \right). 
+\]  
+
+\begin{definition}
+    The polynomial \(f(x) = \det \left( xI - A \right) \) is called the characteristic polynomial of \(T\).  
+\end{definition}
+
+\begin{remark}
+    \(f(x)\) does not depend on the choice of matrix representation since if we choose another \(B = P^{-1} A P\), then 
+    \begin{align*}
+        \det \left( xI - B \right) &= \det \left( xI - P^{-1} A P \right) = \det \left( P^{-1} (xI) P - P^{-1} A P \right) \\
+        &= \det \left( P^{-1} \left( xI - A \right) P  \right) = \det \left( P^{-1} \right) \det (xI - A) = \det (P) = \det (xI-A).  
+    \end{align*} 
+\end{remark}
+
+\begin{remark}
+    One can verify that for two similar matrices \(A, B\), we have \(\Tr (A) = \Tr (B)\).  
+\end{remark}
+
+\begin{remark}
+    Note that 
+    \[
+        f(x) = x^n - \Tr (T) x^{n-1} + \dots + (-1)^n \det (T).
+    \] This is because \(x^n\) and \(x^{n-1}\) terms come from \((x-a_{11})(x-a_{22})\dots (x-a_{nn} )\), and by Vieta's theorem, we know the coefficient of \(x^{n-1}\) is \(\Tr (T)\). Also, \(f(0) = \det (-A) = (-1)^n \det (A)\) is trivial.      
+\end{remark}
+
+\begin{theorem}
+    \(\lambda \) is an eigenvalue of \(T\) iff \(\lambda \) is a root of \(f(x)\).      
+\end{theorem}
+
+\section{Diagonalization}
+
+\begin{definition}
+    \(T \in \mathcal{L} (V)\) is called diagonalizable if \(\exists \) matrix representation of \(T\), which is a diagonal matrix. A matrix \(A\) is called diagonalizable if \(A\) is similar to a diagonal matrix.  
+\end{definition}
+
+If 
+\[
+    [T]_B = \begin{pmatrix}
+        \lambda _1 I_1 &  &   \\
+         & \ddots &   \\
+         &  & \lambda _r I_{m_r}  \\
+    \end{pmatrix}
+\] and \(\lambda _i \neq \lambda _j\) for any \(i \neq j\) with 
+\[
+    B = \bigcup_{i=1}^{r} \left\{ v_{i1}, v_{i2}, \dots , v_{i m_i} \right\},  
+\] then \(f(x) = (x - \lambda _1)^{m_1} (x - \lambda _2)^{m_2} \dots (x - \lambda _r)^{m_r}\) splits (by plugging \([T]_B\) into \(\det (xI - A)\)), and we have \(\dim (E(\lambda _i)) = \dim \ker (T - \lambda _i I) = m_i\), which can been seen by observing the rank of matrix \([T]_B - \lambda _i I\). Also, we can observe that \(V = E(\lambda _1) + E(\lambda _2) + \dots + E(\lambda _r)\), so \(\dim V = \sum_{i=1}^r \dim E(\lambda _i) \).
+
+\begin{definition}
+    Suppose \(\lambda \) is an eigenvalue of \(T\) and characteristic polynomial \(f(x) = (x - \lambda )^m g(x)\) with \(g(\lambda ) \neq 0\). The arithmetic multiplicity of \(\lambda \) \(\text{a-mult}(\lambda ) = m\), and the geometric multiplicity \(\text{g-mult}(\lambda ) = \dim (E_\lambda ) = \nu (T - \lambda I) \ge 1 \).      
+\end{definition}
+
+\begin{proposition}
+    \(\text{a-mult}(\lambda ) \ge \text{g-mult}(\lambda ) \). 
+\end{proposition}
+\begin{proof}
+    Let \(\left\{ v_1, \dots , v_e \right\} \) be a basis of \(E(\lambda )\), and extend it to a basis of \(V\), say \(B = \left\{ v_1, \dots , v_e, \dots , v_n\right\} \). Hence, 
+    \[
+        A = [T]_B = \begin{pmatrix}
+            \lambda I_e & B  \\
+            0 & D  \\
+        \end{pmatrix},
+    \] which gives 
+    \[
+        f(x) = \det (xI - A) = (x - \lambda )^e \det (xI - D),
+    \] note that \(\det (xI-D)\) may have \(\lambda \) as a root, so the algebraic multiplicity of \(\lambda \ge \) the geometric multiplicity of \(\lambda \). 
+    \begin{note}
+        If \(A\) is not diagonalizable, then we know \(\det (xI - D)\) may have \(\lambda \) as its root.   
+    \end{note}    
+\end{proof}
+
+\begin{definition}
+    Let \(W_1, W_2, \dots , W_r\) be subspaces of \(V\). We say \(W_i\)'s are linearly independent if \(w_1 + w_2 + \dots + w_r = 0\) for \(w_i \in W_i\), then \(w_i = 0\) for all \(i\).      
+\end{definition}
+
+\begin{proposition} \label{propl: linearly independent of subspace TFAE}
+    Let \(W = W_1 + W_2 + \dots + W_r\), then TFAE:
+    \begin{itemize}
+        \item [(i)] \(W_i\) are linearly independent. 
+        \item [(ii)] Any \(w \in W\) has a unique expression 
+        \[
+            w = \sum_{i=1}^r w_i, \quad \forall w_i \in W_i. 
+        \]
+        \item [(iii)] 
+        \[
+            W_i \cap \left( W_1 + W_2 + \dots + W_{i-1} + W_{i+1} + \dots + W_r \right) = \left\{ 0 \right\}.  
+        \]
+        \item [(iv)] \(\dim W = \sum_{i=1}^r \dim W_i \). 
+    \end{itemize} 
+\end{proposition}
+\begin{proof}[(i) to (ii),(iii),(iv)]
+    \todo{DIY}
+\end{proof}
+\begin{proof}[(ii) to (i)]
+    If \(\sum w_i = 0 \), then since \(\sum 0 = 0 \) and \(0 \in W_i\) for all \(i\), and \(0\) has unique expression, so \(w_i = 0\) for all \(i\).       
+\end{proof}
+\begin{proof}[(iii) to (i)]
+    If \(\sum w_i = 0 \) for \(w_i \in W_i\), then
+    \[
+        -w_i = w_1 + w_2 + \dots + w_{i-1} + w_{i+1} + \dots + w_r \in W_i \cap \left( W_1 + W_2 + \dots + W_{i-1} + W_{i+1} + \dots + W_r \right) = \left\{ 0 \right\} 
+    \] for all \(i\), so \(w_i = 0\) for all \(i\).   
+\end{proof}
+\begin{proof}[(iv) to (i)]
+    If \(\left\{ v_{ij} \right\}_{j=1}^{m_i} \) is a basis of \(W_i\), then \(\left\{ v_{ij} \right\}_{i,j} \) generates \(W\). Also, we know \(\dim W = \sum_{i=1}^r \dim W_i \), so \(\left\{ v_{ij} \right\}_{i,j} \) is a basis of \(W\). Now if \(\sum_{i=1}^r w_i = 0 \), so we have \(\sum_{i,j} \alpha _{ij} v_{ij} = 0 \), and thus \(\alpha _{ij} = 0\) for all \(i, j\). Hence, \(w_i = 0\) for all \(i\).             
+\end{proof}
+
+\begin{proposition}
+    If \(\lambda _1, \lambda _2, \dots , \lambda _r\) are distinct eigenvalues of \(T\), then \(\left\{ E(\lambda _i) \right\}_{i=1}^r \) are linearly independent.   
+\end{proposition}
+\begin{proof}
+    Suppose \(v_1 + v_2 + \dots + v_r = 0\) for \(v_i \in E(\lambda _i)\), then by applying \(T\), we know \(\lambda _1 v_1 + \dots + \lambda _r v_r = 0\), so we have 
+    \[
+        (\lambda _2 - \lambda _1) v_2 + \dots + (\lambda _r - \lambda _1) v_r = 0.
+    \] Hence, by this thought, suppose \(v_1 + \dots + v_m = 0\) for \(v_i \in E(\lambda _i)\) and it is a shortest equality of a non-trivial relation. Then, we can always obtain a shorter non-trivial relation by above method, so it is a contradiction.  
+\end{proof}
+
+\begin{corollary} \label{cl: diagonalizable TFAE}
+    Suppose \(T \in \mathcal{L} (V)\) and has a characteristic polynomial 
+    \[
+        f(x) = \prod _{i=1}^r (x - \lambda _i)^{m_i}
+    \] with \(\lambda _i \neq \lambda _j\) for any \(i \neq j\), then TFAE: 
+    \begin{itemize}
+        \item [(i)] \(T\) is diagonalizable. 
+        \item [(ii)] \(\dim E(\lambda _i) = m_i\) for all \(i\). 
+        \item [(iii)] \(V = \sum_{i=1}^r E(\lambda _i) \) (or any \(v \in V\) is a linear combination of eigenvectors.) 
+        \item [(iv)] \(\dim V = \sum_{i=1}^r \dim E(\lambda _i) \).    
+    \end{itemize}  
+\end{corollary}
+
+\begin{corollary}
+    If the characteristic polynomial of a linear operator has degree \(n\) and has \(n\) distinct roots, then \(T\) is diagonalizable.   
+\end{corollary}
+\begin{proof}
+    By (ii) of \autoref{cl: diagonalizable TFAE}. 
+\end{proof}
+
+\begin{corollary}
+    If \(T^2 = T\), then \(T\) is diagonalizable.  
+\end{corollary}

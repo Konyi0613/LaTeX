@@ -1,0 +1,80 @@
+\lecture{14}{31 Oct. 12:20}{}
+Continuing the last example, here we want to give a combinatorial proof. 
+We can first order the \(n\) exams, and choose the first \(k\) to give to the professor to grade, so there are \(n! 2^k\) options, so there are 
+\[
+    n! \sum_{k=0}^n 2^k = n!(2^{n+1} - 1) 
+\] ways of grading.
+
+Also, we have an alternative method. Since we have \(2^n\) subsets of \(n\) positions, and we have \(2\) choices: to choose this subset to be the pass set or to be the fail set. However, if we pick the empty set, then it has only one method, and we can put \(n\) exams into \(n\) positions, so there are \(n! \left( 2^{n+1} - 1 \right) \) methods. 
+
+\subsubsection{Differentiation}
+Now if we differentiate \(\widetilde{A} (x)\), then we know 
+\[
+    \frac{\mathrm{d}}{\mathrm{d}x} \widetilde{A} (x) = \sum_{n=0}^{\infty} a_n \frac{n x^{n-1}}{n!} = \sum_{n=1}^{\infty} a_n \frac{x^{n-1}}{(n-1)!} = \sum_{n=0}^{\infty} a_{n+1} \frac{x^n}{n!} \leftrightarrow (a_{n+1})_{n \ge 0}.   
+\] Thus, this shift the sequence to the left.
+
+\subsubsection{Integration}
+If we integrate \(\widetilde{A} (x)\), then we have
+\[
+    \int _0^x \widetilde{A} (t) \, \mathrm{d} t = \sum_{n=0}^{\infty} \int _0^x a_n \frac{t^n}{n!} \, \mathrm{d} t = \sum_{n=0}^{\infty} a_n \frac{x^{n+1}}{(n+1) \cdot n!} = \sum_{n=0}^{\infty} a_n \frac{x^{n+1}}{(n+1)!} = \sum_{n=1}^{\infty} a_{n-1} \frac{x^n}{n!} \leftrightarrow (0, a_0, \dots ),     
+\] which is equivalent to shift the sequence to the right. 
+\subsubsection{Bell numbers}
+\begin{eg}[Bell numbers]
+    There are \(n\) different pieces of candy. An unspecified number of children will ring your bell, take a subset of the candy until you run out, then how many ways can the candy be distributed? 
+\end{eg}
+\begin{explanation}
+    Mathematically, we are asking how many ways can a set \([n]\) be partitioned into (indistinguishable) nonempty subsets? Thus, the answer is \[\sum_{k=0}^n S(n, k). \]
+    \begin{note}
+        The problem statements may be a little confusing, so just follow the mathematical version of the problem.
+    \end{note}
+\end{explanation}
+
+\begin{definition}[Bell numbers]
+     We define the bell number to be 
+    \[
+        B(n) \coloneqq \sum_{k=0}^n S(n, k), 
+    \] which is the number of ways to partition \([n]\) into non-empty subsets. 
+\end{definition}
+
+\begin{eg}
+    \(B(0) = 1, B(1) = 1, B(2) = 2, B(3) = 5\). 
+\end{eg}
+
+\begin{theorem}
+    For all \(n \ge 0\), we have 
+    \[
+        B(n+1) = \sum_{k=0}^n \binom{n}{k} B(k). 
+    \] 
+\end{theorem}
+\begin{proof}
+    We can analyze which subset should \(n+1\) belong to, so we can count on the number of other elements that are in the same subset as \(n+1\). If the number of elements that are in the same subset as \(n+1\) is \(k\), then there are 
+    \[
+        \binom{n}{k} B(n-k) = \binom{n}{n-k} B(n-k)
+    \] choices, so there are totally
+    \[
+        \sum_{k=0}^n \binom{n}{n-k} B(n-k) = \sum_{k=0}^n \binom{n}{k} B(k)  
+    \] ways of partitioning \([n+1]\) into non-empty subsets. 
+\end{proof}
+
+Now let \(\hat{B}  (x)\) be the exponential function for \(B(n)\), then 
+\[
+    \hat{B} (x) = \sum_{n=0}^{\infty} B(n) \frac{x^n}{n!}. 
+\]  
+Define
+\[
+    \hat{C} (x) = \sum_{n=0}^{\infty} B(n+1) \frac{x^n}{n!} = \sum_{n=0}^{\infty} \left( \sum_{k=0}^n \binom{n}{k} B(k) \right)  \frac{x^n}{n!} = \sum_{n=0}^{\infty} \left( \sum_{k=0}^n \binom{n}{k} B(k) \cdot 1 \right)  \frac{x^n}{n!},  
+\] then note that this is the convolution: 
+\[
+    \left[ \sum_{n=0}^{\infty} B(n) \frac{x^n}{n!}  \right] \left[ \sum_{n=0}^{\infty} 1 \cdot \frac{x^n}{n!}  \right] = \hat{B} (x) e^x.  
+\]
+Note that \(\hat{C} (x) = \frac{\mathrm{d}}{\mathrm{d}x} \hat{B} (x) \), so if we differentiate it, we have 
+\[
+    \frac{\mathrm{d}}{\mathrm{d}x} \hat{B} (x) = \hat{B} (x) \cdot e^x. 
+\]
+Hence, 
+\[
+    \frac{\frac{\mathrm{d}}{\mathrm{d}x} \hat{B} (x) }{\hat{B} (x)} = e^x \iff \frac{\mathrm{d}}{\mathrm{d}x} \left[ \ln \hat{B} (x) \right] = e^x,  
+\] so we have 
+\[
+    \hat{B} (x) = e^{e^x - 1}.
+\]
