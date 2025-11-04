@@ -1,0 +1,165 @@
+\lecture{15}{4 Nov. 15:30}{}
+\subsubsection{Multiple products}
+Let \(a_n^{(i)}\) be the number of ways of carrying out Task \(i\) on a set of size \(n\), and suppose 
+\[
+    \hat{A} ^{(i)}(x) = \sum_{n=0}^{\infty} a_n^{(i)} \frac{x^n}{n!},
+\]  then for \(\hat{A} (x) = \prod _{i=1}^k \hat{A} ^{(i)}(x) = \sum_{n=0}^{\infty} a_n \frac{x^n}{n!} \), we know \(a_n\) counts the number of ways of partitioning \([n] = S_1 \cupdot S_2 \cupdot \dots \cupdot S_k\) and carrying out Task \(i\) on \(S_i\) for each \(i \in [k]\). Equivalently, 
+\[
+    a_n = \sum_{\substack{l_1, l_2, \dots , l_k \ l_i \ge 0, \sum l_i = n }} \binom{n}{l_1, l_2, \dots , l_k} a_{l_1}^{(i)} a_{l_2}^{(2)} \dots a_{l_k}^{(k)}, \text{ where } \binom{n}{l_1, l_2, \dots , l_k} = \frac{n!}{(l_1)!(l_2)!\dots (l_k)!}. 
+\]  
+\begin{exercise}
+   Let \(a_n\) counts the number of ways of eating \(n\) xiaolongbow. Let 
+   \[
+    \hat{A} (x) = \sum_{n=0}^{\infty} a_n \frac{x^n}{n!}. 
+   \]    
+   Suppose we have \(k\) friends who want to share \(n\) xiaolongbows. What is the exponential generating function of this?  
+\end{exercise}     
+\begin{answer}
+    \(\left[ \hat{A} (x) \right]^k \). 
+\end{answer}
+
+\begin{exercise}
+    Suppose we have \(k\) strangers, what then? 
+\end{exercise}
+
+\subsubsection{Composition of exponential generating function}
+\begin{question}
+    What does \(\hat{B} \left( \hat{A} (x) \right) \) represent? 
+\end{question}
+\[
+    \hat{B} \left( \hat{A} (x) \right) = \sum_{k=0}^{\infty} b_k \frac{\left( \hat{A} (x) \right)^k }{k!} = \sum_{k=0}^{\infty} b_k \frac{\left( \sum_{n=0}^{\infty} a_n \frac{x^n}{n!}  \right)^k }{k!}.   
+\]
+
+Note that if \(a_0 \neq 0\), then it is not well-defined since every \(k\) term contributes to the constant term and thus there is an infinite sum for coefficient. If \(a_0 = 0\), then contribution to \(x^n\) always comes from \(0 \le k \le n\), which is a finite computation, and thus well-defined. 
+
+For special case that \(b_k \equiv 1 \leftrightarrow \hat{B} (x) = e^x\), then 
+\[
+    \hat{B} (\hat{A} (x)) = e^{\hat{A} (x)} = \sum_{k=0}^{\infty} \left[ \frac{\left( \hat{A} (x) \right)^k }{k!} \right].  
+\] 
+As argued previously, \(\left[ \frac{\left( \hat{A} (x) \right)^k }{k!} \right]\) enumerates the number of ways of partitioning \([n]\) into \(k\) non-empty subsets and performing the same task on each. If we summing over \(k\), then it means the partitions of \([n]\) into an arbitrary number of nonempty subsets. 
+\begin{proposition}
+    If \(\hat{A} (x)\) is the exponential generating function for performing a task on a set of size \(n\), with \(a_0 = 0\), then \(e^{\hat{A} (x)}\) is the exponential generating function for the number of ways of partitioning a set of size \(n\) into arbitrarily many non-empty subsets, and performing the task on each.     
+\end{proposition}   
+
+\begin{eg}
+    If the task is making a non-empty set containing all \(n\) elements, then 
+    \[
+        a_n = \begin{dcases}
+            0, &\text{ if }  n = 0;\\
+            1, &\text{ if }  n \ge 1.
+        \end{dcases}
+    \] Hence, we have \(\hat{A} (x) = e^x - 1\), and thus \(e^{\hat{A} (x)} = e^{e^x - 1}\). This is because \(e^{\hat{A} (x)}\) is the exponential generating function of number of ways of taking \([n]\) and partitioning it into arbitralily many non-empty subsets.  
+\end{eg}
+
+\begin{remark}
+    \(e^{e^x}\) is not a sensible generating function since if you expand it, then its \(x^0\) term is 
+    \[
+        \sum_{k=0}^{\infty} \frac{1}{k!}, 
+    \] which is an infinite sum.
+\end{remark}
+
+\begin{eg}
+    There are \(n\) people coming to dinner and we want to seat them at arbitralily many round table. How many ways can we arrange the people around the tables? 
+\end{eg}
+\begin{explanation}
+    What matters is who sits at each table, and the circular under at the table, so we know 
+    \[
+        \sum_{k=0}^n s_{n, k} = n!
+    \] is the answer. Or, we can argue that there is a bijection between \(S_n\) and seating arrangement, since cycles in a permutation can corresponds to tables. Or, for the generating function approach, we can suppose the task is to sit people around a single non-empty table, so \(a_n = \frac{n!}{n} = (n-1)!\). Hence,
+    \[
+        \hat{A} (x) = \sum_{n=1}^{\infty} a_n \frac{x^n}{n!} = \sum_{n=1}^{\infty} (n-1)! \frac{x^n}{n!} = \sum_{n=1}^{\infty} \frac{x^n}{n} = \ln \left( \frac{1}{1-x} \right).   
+    \] Hence, we know \(e^{\hat{A} (x)}\) is the exponential generating function of partitioning \(n\) people into arbitrarily many tables and sitting each table, which is what we want, and 
+    \[
+        e^{\hat{A} (x)} = e^{\ln \left( \frac{1}{1-x} \right)} = \frac{1}{1-x} = \sum_{n=0}^{\infty} x^n = \sum_{n=0}^{\infty} n! \frac{x^n}{n!},  
+    \] so the number is \(n!\). 
+\end{explanation}
+
+\begin{eg}
+    How many ways can we partition \([n]\) into subsets of size \(3, 4,\) and \(7\)?  
+\end{eg}
+\begin{explanation}
+    We can let the individual task to be the number of ways of take \(n\) elements and put them into a single subset of size \(3, 4, 7\), so we know 
+    \[
+        a_n = \begin{dcases}
+            1 , &\text{ if } n = 3,4, \text{ and } 7  ;\\
+            0 , &\text{ otherwise}.
+        \end{dcases}
+    \]  
+    Note that 
+    \[
+        \hat{A} (x) = \frac{x^3}{3!} + \frac{x^4}{4!} + \frac{x^7}{7!}.
+    \]
+    Now we can repeat an arbitrary number of times to partition all elements, so the exponential generating function for this problem is
+    \[
+        e^{\hat{A} (x)} = e^{\frac{x^3}{3!} + \frac{x^4}{4!} + \frac{x^7}{7!}} = e^{\frac{x^3}{3!}} e^{\frac{x^4}{4!}} e^{\frac{x^7}{7!}}.
+    \]
+\end{explanation}
+
+\subsubsection{General Composition}
+Suppose \(a_0 = 0\), then 
+\[
+    \hat{B} \left( \hat{A} (x) \right) = \sum_{k=0}^{\infty} b_k \frac{\left( \hat{A} (x) \right)^k }{k!},  
+\] and we know \(\frac{\hat{A} (x)^k}{k!}\) is the number of ways of splitting \(n\) elements into \(k\) non-empty subsets and performing Task \(1\) on each, and \(b_k\) is the number of performing Task \(2\) on a set of \(k\) subsets. Hence, the coefficient of \(x^n\) of \(\hat{B} \left( \hat{A} (x) \right) \) means the number of ways of taking a set of size \(n\) and 
+\begin{itemize}
+    \item [(1)] Partitioning into arbitrarily many non-empty subsets. 
+    \item [(2)] Performing Task \(1\) (\(\hat{A} \)) on each subset. 
+    \item [(3)] Performing Task \(2\) (\(\hat{B} \)) on the set of subsets. 
+\end{itemize}     
+
+\begin{eg}
+    Seating chart for a wedding, and we want each table has even number of people. Hence, we need to decide 
+    \begin{itemize}
+        \item [(1)] Who sits together at a table?
+        \item [(2)] How do they sit around the table? (Permutation, not just cyclic order, and we want even number of people)
+        \item [(3)] Which table do they sit at?
+    \end{itemize}
+    %────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────picture
+\end{eg}
+\begin{explanation}
+    The first task is to seat \(n\) people around a non-empty table such that there are even number of people:
+    \[
+        a_n = \begin{dcases}
+            0, &\text{ if }  2 \nmid n;\\
+            n!, &\text{ if } 2 \mid n.
+        \end{dcases}
+    \] 
+    Hence, 
+    \[
+        \hat{A} (x) = \sum_{n=1}^{\infty} a_n \frac{x^n}{n!} = \sum_{2 \mid n, n \ge 2} n! \frac{x^n}{n!} = \sum_{2 \mid n, n \ge 2} x^n = \sum_{k=1}^{\infty} x^{2k} = \frac{x^2}{1-x^2}.    
+    \]
+    The second task is to assign groups to tables, so \(b_k = k!\), so 
+    \[
+        \hat{B} (x) = \sum_{k=0}^{\infty} k! \frac{x^k}{k!} = \sum_{k=0}^{\infty} x^k = \frac{1}{1-x}.
+    \] 
+    Hence, the exponential generating function is 
+    \begin{align*}
+        \hat{C} (x) &= \hat{B} \left( \hat{A} (x) \right) = \frac{1}{1 - \hat{A} (x)} \\
+        &= \frac{1}{1 - \frac{x^2}{1 - x^2}} = \frac{1 - x^2}{1 - 2x^2} = 1 + \frac{x^2}{1 - 2x^2} \\
+        &= 1 + x^2 \sum_{k=0}^{\infty} \left( 2x^2 \right)^k = 1 + x^2 \sum_{k=0}^{\infty} 2^k x^{2k}
+        \&= 1 + \sum_{k=0}^{\infty} 2^k x^{2k + 2} = 1+ \sum_{2 \mid n, n \ge 2} 2^{\frac{n}{2} - 1} x^n \\&= 1 + \sum_{2 \mid n, n \ge 0} 2^{\frac{n}{2} - 1} n! \frac{x^n}{n!},       
+    \end{align*}
+    so we know 
+    \[
+        c_n = \begin{dcases}
+            0, &\text{ if } n \text{ odd} ;\\
+            1, &\text{ if } n = 0 ;\\
+            2^{\frac{n}{2} - 1} n!, &\text{ if } n \text{ even and } n \ge 2.
+        \end{dcases}
+    \]
+\end{explanation}
+
+\chapter{Asymptotics}
+\begin{eg}
+\vphantom{text}
+\begin{itemize}
+    \item [(1)] Number of ways of partitioning \(\$ 3n\) between \(5\) people. 
+    \item [(2)] Number of ways of distributing \(n\) distinct artworks between \(5\) people. 
+\end{itemize}
+\end{eg}
+\begin{answer}
+\vphantom{text}
+\begin{itemize}
+    \item [(1)] \(\binom{3n + 4}{5}\). 
+    \item [(2)] \(5^n\).  
+\end{itemize}
+\end{answer}
