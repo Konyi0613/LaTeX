@@ -1,0 +1,202 @@
+\lecture{16}{5 Nov. 10:20}{}
+Suppose \(V\) is a finite dimensional vector space, then fix \(T \in \mathcal{L} (V)\), we have 
+\[
+    a_0 + a_1 T + a_2 T^2 + \dots + a_n T^n \in \mathcal{L} (V),
+\]  which means \(f(T) \in \mathcal{L} (V)\) where \(f(x) = \sum_{k=0}^n a_k x^k \in F[x]\). We call \(V\) is an \(F[x]\)-module. (= "vector space over a ring") What makes the classification (structure theorem) simple. The answer is something like \(F[x], \mathbb{Z} , \dots \), the principal ideal domains(PID). Note that \(F[x], \mathbb{Z} \) are Euclidean domain, which means that there is the degree map 
+\[
+    \deg: F[x] \to \mathbb{Z}_{\ge 0} \text{ or } \deg: \mathbb{Z} \to \mathbb{Z} _{\ge 0} 
+\]   s.t. for any \(a, b \in F[x]\) and \(b \neq 0\), there exists unique \(a = qb + r\) where \(\deg r < \deg b\).   
+
+\section{Minimal polynomial}
+Fix \(T \in \mathcal{L} (V)\). For \(g(x) = b_n x^n + \dots + b_0 \in F[x]\), let \(g(T) = b_n T^n + \dots + b_0 \in \mathcal{L} (V)\). Note that
+\begin{align*}
+    g(x) &= g_1(x) \cdot g_2(x) \implies g(T) = g_1(T) \cdot g_2(T). \\
+    g(x) &= g_1(x) + g_(x) \implies g(T) = g_1(T) + g_2(T). \\
+    \text{If } T(v) &= \lambda v \implies g(T)(v) = g(\lambda )(v). 
+\end{align*}  
+
+\begin{definition}
+    Suppose \(T:V \to V\) is a linear operator, then we define 
+    \begin{align*}
+        \mathrm{Ann}_T(V) &= \left\{ \text{annihilator of } T  \right\} \\
+        &= \left\{ g(x) \in F[x] \mid g(T) = 0 \right\} \\
+        &= \left\{ \text{linear relations of } T^0, T^1, T^2, \dots \in \mathcal{L} (V)  \right\}.    
+    \end{align*}
+\end{definition}
+
+\begin{note}
+    There exists a non-trivial relation among \(T^0, T^1, \dots , T^{n_2}\) since \(\dim \mathcal{L} (V) = n^2\).  
+\end{note}
+
+\begin{proposition}
+    Let \(m(x) = m_T(x)\) be a monic polynomial (leading coefficient is \(1\)) in \(\mathrm{Ann}_T(V) \) with minimal degree. Then, 
+    \[
+        \mathrm{Ann}_T(V) = F[x] \cdot m(x). 
+    \]  
+\end{proposition}
+\begin{proof}
+    For any \(g(x) \in \mathrm{Ann}_T(V) \), we have 
+    \[
+        g(x) = q(x) \cdot m(x) + r(x)
+    \] with \(\deg r < \deg m\). Then, 
+    \[
+        0 = g(T) = q(T) \cdot m(T) + r(T) = r(T).
+    \]
+    Since \(m\) is the "minimal degree" monic polynomial, so \(r(x) = 0\). 
+\end{proof}
+
+\begin{definition}
+    This \(m_T(x)\) is called the minimal polynomial of \(T\).  
+\end{definition}
+
+\begin{eg}
+    Suppose 
+    \[
+        A = \begin{pmatrix}
+            0 &  &  &   \\
+            1 & 0 &  &   \\
+             &  \ddots& \ddots &   \\
+             &  &  1& 0  \\
+        \end{pmatrix},
+    \] then \(m_A(x) = x^n\) since we can found that \(A^n = 0\), so \(m_A(x) \mid x^n\), so \(m_A(x) = x^p\) for some \(p \le n\), and we can find that \(n\) is the minimal \(p\) s.t. \(A^p = 0\).        
+\end{eg}
+
+\begin{eg}
+    Suppose 
+    \[
+        B = \begin{pmatrix}
+            0 &  &  &  & -a_0  \\
+            1 & 0 &  &  & -a_1  \\
+             & 1 & \ddots&  &  -a_2 \\
+             &  & \ddots & 0 & \vdots  \\
+             &  &  & 1 & -a_{n-1}  \\
+        \end{pmatrix},
+    \] then we know \(m_B(x) = f(x) = x^n + a_{n-1}x^{n-1} + \dots + a_0\). 
+    \begin{remark}
+        Check that \(B(e_i) = e_{i+1}\) for \(1 \le i \le n-1\) and \(B(e_n) = \sum_{i=0}^{n-1} -a_i e_{i+1} \), and thus \(f(B) = 0\) since it sends the standard basis to \(0\). Then, we can check that \(\deg m_B(x) \ge n\), and we're done.     
+    \end{remark}
+\end{eg}
+
+\begin{eg}
+    Suppose 
+    \[
+        C = \begin{pmatrix}
+            \lambda _1 I_{m_1} &  &   \\
+             & \ddots &   \\
+             &  & \lambda _r I_{m_r}  \\
+        \end{pmatrix},
+    \] then \(m(x) = m_C(x) = (x - \lambda _1)(x - \lambda _2) \dots (x - \lambda _r)\). This is beacause \(C e_k = \lambda e_k\) for some \(\lambda  = \lambda _1, \dots \lambda _r\), and thus 
+    \[
+        (C - \lambda _1)(C - \lambda _2) \dots (C - \lambda _r)(e_i) = 0
+    \] for all \(i\), and thus we know 
+    \[
+        m_C(x) \mid (x - \lambda _1) \dots (x - \lambda _r).
+    \] Also, we can check that if \(q(C) = 0\), then \((x - \lambda _i) \mid q(x)\) for all \(i\) by observing the matrix of \(q(C)\).    
+\end{eg}
+
+Observe that if \(T\) is diagonalizable with distinct eigenvalues \(\lambda _1, \lambda _2, \dots , \lambda _r\), then 
+\[
+    m_T(x) = \prod _{i=1}^r (x - \lambda _i),
+\] and \(ch_T(x) \in \mathrm{Ann}_T(V) \)(Cayley-Hamilton Theorem). 
+
+\begin{proposition}
+    If \(\lambda \) is some element of \(F\), then  
+    \[
+        \mathrm{ch}_T(\lambda ) = 0 \iff m_T(\lambda ) = 0. 
+    \]
+\end{proposition}
+\begin{proof}
+   \vphantom{text}
+   \begin{itemize}
+    \item [\((\implies )\)] Since there exists \(v \neq 0\) s.t. \(T(v) = \lambda v\), then 
+    \[
+        0 = m_T(T)(v) = m_T(\lambda )(v),
+    \] and since \(v \neq 0\), so \(m_T(\lambda) = 0\).  
+    \item [\((\impliedby )\)] Write \(m_T(x) = (x - \lambda )p(x)\), then \(\exists v\) s.t. \(p(T) (v) \neq 0\), so 
+    \[
+        0 = m_T(T)(v) = (T - \lambda )p(T)(v) = (T - \lambda)w,
+    \] and since \(w \neq 0\), so \(E(\lambda ) \neq \left\{ 0 \right\} \), so \((x - \lambda ) \mid \mathrm{ch}_T(x) \).  
+   \end{itemize}
+\end{proof}
+
+\section{Invariant subspaces}
+\begin{definition}
+    Suppose \(T \in \mathcal{L} (V)\), then a subspace \(W\) is called \(T\)-invariant if \(T(W) \subseteq W\). In this case, \(W\) is also \(g(T)\)-invariant for \(g(x) \in F[x]\). Besides, we know \(T\) induces an operator \(T_W = T \vert_W \in \mathcal{L} (W)\).        
+\end{definition}
+
+\begin{eg}
+    If \(ST=TS\), then \(\ker (S)\) and \(\Im (S)\) are \(T\)-invariant. In particular, \(E(\lambda ) = \ker (T - \lambda )\) is \(T\)-invariant.      
+\end{eg}
+
+\begin{eg}
+    If \(W_1, W_2\) are \(T\)-invariant, then \(W_1 + W_2\) and \(W_1 \cap W_2\) are \(T\)-invariant.     
+\end{eg}
+
+\begin{proposition}
+    Let \(W\) be \(T\)-invariant and \(S = T_W \in \mathcal{L} (W)\), then we have \(\mathrm{ch}_S(x) \mid \mathrm{ch}_T(x)  \) and \(m_S(x) \mid m_T(x)\). 
+\end{proposition}
+\begin{proof}
+    Let \(B = \left\{ w_1, \dots , w_m \right\} \) be a basis of \(W\), and extend it to a basis of \(V\), say 
+    \[
+        \widetilde{B} = \left\{ w_1, \dots , w_m, w_{m+1}, \dots , w_n \right\},
+    \] and suppose \(A = [S]_B\) and \(\widetilde{A} = [T]_{\widetilde{B} }\), then we know 
+    \[
+        \widetilde{A} = \begin{pmatrix}
+            A & C  \\
+            0 & D  \\
+        \end{pmatrix} \implies xI - \widetilde{A} = \begin{pmatrix}
+            xI - A & C  \\
+            0 & xI - D  \\
+        \end{pmatrix},
+    \] so we know \(\det \left( xI - \widetilde{A}  \right) = \det (xI - A) \det (D - xI) \), which gives \(\mathrm{ch}_{\widetilde{A} }(x) = \mathrm{ch}_A(x) \mathrm{ch}_D(x)   \), so we proved the first part.
+    
+    Now since \(m_T(S) = m_T(T_W)\), and \(m_T(T_W)(w) = m_T(T)(w) = 0\) for all \(w \in W\), so \(m_T(T_w) = 0\) and thus \(m_T(S) = 0\), so \(m_S(x) \mid m_T(x)\).      
+\end{proof}
+
+\begin{definition}
+    Let \(W\) be \(T\)-invariant, then  
+    \begin{align*}
+        \mathrm{Ann}_T \left( V / W \right) &= \left\{ f(x) \in F[x] \mid f(T) (v) \in W \quad \forall v \right\}.   
+    \end{align*}  
+    In particular, we know \(m_T(x) \in \mathrm{Ann}_T (V / W) \). 
+\end{definition}
+
+\begin{lemma}
+    Let \(p(x) \in \mathrm{Ann}_T(V / W) \) be the monic polynomial of smallest degree, then 
+    \[
+        \mathrm{Ann}_T(V / W) = F[x] \cdot p(x). 
+    \] 
+\end{lemma}
+\begin{proof}
+    Take \(g \in \mathrm{Ann}_T(V / W) \), then \(g = qp+r\), and 
+    \[
+        g(T)(v) = q(T) p(T)(v) + r(T)(v) \in W \quad \forall v \in V.
+    \] since \(p(T)(v) \in W\) and \(W\) is \(q(T)\)-invariant, then \(r(T)(v) \in W\), so \(r(x) = 0\).      
+\end{proof}
+
+\begin{theorem}
+    \(T\) is diagonalizable if and only if \(m_T(x) = \prod _{i=1}^r (x - \lambda _i)\) with \(\lambda _i \neq \lambda _j\) for all \(i \neq j\).   
+\end{theorem}
+\begin{proof}
+    \vphantom{text}
+    \begin{itemize}
+        \item [\((\implies )\)] We have shown in previous example.
+        \item [\((\impliedby )\)] Suppose \(m_T(x) = \prod (x - \lambda _i)\) for \(\lambda _i \neq \lambda _j\) for all \(i \neq j\), and suppose 
+        \[
+            W = E(\lambda _1) + E(\lambda _2) + \dots + E(\lambda _r),
+        \] then we know \(W \subseteq V\) and \(W\) is \(T\)-invariant. Now if \(W \neq V\), then let 
+        \[
+            \mathrm{Ann}_T(V / W) = F[x] \cdot p(x), 
+        \] and WLOG we can suppose \(p(x) = (x - \lambda _1)q(x)\) since \(m_T(x) \in \mathrm{Ann}_T(V / W) \). Thus, there exists \(v \in V\) s.t. \(q(T)(v) \notin W\). Set 
+        \[
+            g(x) = \frac{m_T(x)}{x - \lambda _1} = (x - \lambda _2) \dots (x - \lambda _r),
+        \] then \(g(x) = (x - \lambda _1) h(x) + g(\lambda _1)\). Note that \(g(\lambda _1) \neq 0\), so if we pick \(u = q(T)(v) \notin W\), then   
+        \[
+            g(T)(u) = h(T)(T - \lambda _1)(u) + g(\lambda _1)(u)
+        \] and \(h(T)(T - \lambda _1)(u) = h(T) p(v) \in W\), and \(g(\lambda _1)(u) \notin W\), and \(g(T)(u) \in E(\lambda _1) \subseteq W\) since 
+        \[
+            (T-\lambda _1)g(T)(u) = (T - \lambda _1)(T -\lambda_2) \dots (T - \lambda _r)(u) = 0,
+        \]
+        so we know this is a contradiction. Hence, \(W = V\), so \(T\) is diagonalizable.  
+    \end{itemize}
+\end{proof}
