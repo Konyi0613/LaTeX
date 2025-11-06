@@ -47,24 +47,28 @@ converges uniformly on $T$.
      \end{explanation}
      Now we define \(S_n(x) = \sum_{k=1}^n (-1)^{k+1} g_k(x) \). We first show that \[\lim_{n \to \infty} S_n = \sum_{k=1}^{\infty} (-1)^{k+1} g_k(x)  \] exists.
      \begin{claim} \label{clm: Sn bounded (wide)}
+        If we fix some \(x \in T\), then 
         \(
-            0 \le \sum_{k=n}^m (-1)^{k+1} g_k(x) \le g_n(x) 
+            -g_n(x) \le \sum_{k=n}^m (-1)^{k+1} g_k(x) \le g_n(x) 
         \) for all \(n,m \in \mathbb{N} \) and \(x \in T\).  
      \end{claim}   
      \begin{explanation}
-        If \(m < n\), then \(\sum_{k=n}^m (-1)^{k+1}g_k(x) = 0 \), so it is true. If \(m \ge n\), then note that
+        If \(m < n\), then \(\sum_{k=n}^m (-1)^{k+1}g_k(x) = 0 \), so it is true by \autoref{clm: gn ge 0}. If \(m \ge n\), then suppose \(n\) is odd, and then we have
         \begin{align*}
             \sum_{k=n}^m (-1)^{k+1} g_k(x) &= g_n(x) - g_{n+1}(x) + \dots + (-1)^{m} g_m(x) \\
              &= g_n(x) - (g_{n+1}(x) - g_{n+2}(x)) - \dots \le g_n(x)
         \end{align*}
-        since \(g_i (x) - g_{i+1}(x) \ge 0\). Also, we can check that
+        since \(g_i (x) - g_{i+1}(x) \ge 0\). Also, we know 
         \begin{align*}
             \sum_{k=n}^m (-1)^{k+1} g_k (x) &= g_n(x) - g_{n+1}(x) + \dots + (-1)^m g_m(x) \\
             &= (g_n(x) - g_{n+1}(x)) + (g_{n+2}(x) - g_{n+3}(x)) + \dots \ge 0,
-        \end{align*}
-        so we're done.
+        \end{align*} 
+        Thus, for odd \(n\), this statement is true. If \(n\) is even, then we can similarly show that 
+        \[
+            \sum_{k=n}^m (-1)^{k+1} g_k(x) \ge - g_n(x) \text{ and }  \sum_{k=n}^m (-1)^{k+1} g_k(x) \le 0,
+        \] so this is also true.
      \end{explanation}
-     Now by \autoref{clm: Sn bounded (wide)} we know \(S_n\) is bounded for all \(n \in \mathbb{N} \), and if we fix \(x_0 \in T\) and suppose 
+     Now by \autoref{clm: Sn bounded (wide)} we know \(\left\{ S_n(x) \right\}_{n=1}^{\infty}  \) is bounded for any fixed \(x \in T\), and if we fix \(x_0 \in T\) and suppose 
      \[
         a_k \coloneqq S_{2k-1}(x_0), \quad b_k \coloneqq S_{2k}(x_0), 
      \] then we can check \((a_k)_{k=1}^{\infty} \) is decreasing and \((b_k)_{k=1}^{\infty} \) is increasing, so they are both convergent since they are monotonic and bounded. Also, we know \((\left\vert a_k - b_k \right\vert)_{k=0}^{\infty} \) converges to \(0\) since 
@@ -76,8 +80,7 @@ converges uniformly on $T$.
      \begin{align*}
         \left\vert \sum_{k=1}^n (-1)^{k+1} g_k(x) - \sum_{k=1}^{\infty} (-1)^{k+1}g_k(x) \right\vert &= \left\vert \sum_{k=n+1}^{\infty} (-1)^{k+1} g_k(x)  \right\vert \\
         &= \left\vert \lim_{m \to \infty} \sum_{k=n+1}^m (-1)^{k+1} g_k(x) \right\vert \\
-        &= \lim_{m \to \infty} \sum_{k=n+1}^m (-1)^{k+1} g_k(x) \\
-        &\le \lim_{m \to \infty} g_{n+1}(x) = g_{n+1}(x) < \varepsilon    
+        &\le \left\vert \lim_{m \to \infty} g_{n+1}(x) \right\vert  = g_{n+1}(x) < \varepsilon    
      \end{align*}   
      for all \(x \in T\) by \autoref{clm: gn ge 0} and \autoref{clm: Sn bounded (wide)}, which means \(\sum_{n=0}^{\infty} (-1)^{n+1} g_n(x) \) converges uniformly on \(T\).   
 \end{proof}
@@ -170,18 +173,9 @@ This illustrates that uniform convergence of $\sum f_n(x)$ along with pointwise 
         \left\vert s_n(x) - g(x) \right\vert &\le (1 - x) x^{n+1} \le \left( 1 - \frac{n+1}{n+2} \right)\left( \frac{n+1}{n+2} \right)^{n+1} \\ &= \frac{1}{n+2} \left( 1 - \frac{1}{n+2} \right)^{n+1} = \frac{1}{(n+2)\left( 1 - \frac{1}{n+2} \right)}\frac{1}{\left( 1 + \frac{1}{-(n+2)} \right)^{-(n+2)} } \\
         &= \frac{1}{n+1}\frac{1}{\left( 1 + \frac{1}{-(n+2)} \right)^{-(n+2)} } \to 0 \cdot \frac{1}{e} = 0 \text{ as } n \to \infty. 
     \end{align*} 
-    Also, suppose 
+    Hence, for all \(\varepsilon > 0\), we can pick some \(N > 0\) s.t. 
     \[
-        p(n) = \left( 1 - \frac{n+1}{n+2} \right)\left( \frac{n+1}{n+2} \right)^{n+1} = \frac{(n+1)^{n+1}}{(n+2)^{n+2}},  
-    \] for \(n \ge 0\), then suppose
-    \[
-        h(n) = \ln (p(n)) = (n+1) \ln (n+1) - (n+2) \ln (n+2),
-    \] we know 
-    \[
-        h^{\prime} (n) = \ln (n+1) + 1 - \ln (n+2) - 1= \ln \left( \frac{n+1}{n+2} \right) < 0,
-    \] which means \(\ln (p(n))\) is decreasing when \(n \ge 0\), which means \(p(n)\) is decreasing when \(n \ge 0\). Hence, for all \(\varepsilon > 0\), we can pick some \(N > 0\) s.t. 
-    \[
-       p(N) = \frac{(N+1)^{N+1}}{(N+2)^{N+2}} < \varepsilon,
+        p(N) = \left( 1 - \frac{N+1}{N+2} \right)\left( \frac{N+1}{N+2} \right)^{N+1} < \varepsilon,
     \] and thus for all \(n \ge N\) we have 
     \[
         \left\vert s_n(x) - g(x) \right\vert \le p(n) \le p(N) < \varepsilon \quad \forall x \in [0,1], 
