@@ -1,0 +1,85 @@
+\lecture{17}{7 Nov. 10:20}{}
+\begin{prev}
+    \(T\) is diagonalizable if and only if 
+    \[
+        \begin{dcases}
+            \mathrm{ch}_T(x) = \prod _{i=1}^r (x - \lambda _i)^{m_i}, \\
+            \dim E(\lambda _i) = m_i \quad \forall i
+        \end{dcases},
+    \] and we've learned that \(m_T(x) = \prod _{i=1}^r (x - \lambda _i)\) for \(\lambda _i \neq \lambda _j\). 
+\end{prev}
+
+\section{Triangulanization and Cayley-Hamilton theorem}
+\begin{definition}
+    We call \(T \in \mathcal{L} (V)\) triangulanizable if \(\exists B = \left\{ v_1, \dots  \right\} \) s.t. 
+    \[
+        [T]_B = \begin{pmatrix}
+            a_1 & \cdots & *  \\
+            \vdots & \ddots & \vdots  \\
+            0 & \cdots & a_n  \\
+        \end{pmatrix},
+    \] i.e. \([T]_B\) is upper triangular. In particular, \(T(v_k) \in \langle v_1, \dots , v_k \rangle \). 
+\end{definition}
+
+\begin{corollary}
+    If \(T\) is triangulanizable, then there exists a chain of \(T\)-invariant subspace \(0=W_0 \subseteq W_1 \subseteq W_2 \subseteq \dots \subseteq W_n = V\) where \(\dim W_k = k\) for all \(k\).    
+\end{corollary}
+
+\begin{corollary}
+    If \(T\) is triangulanizable, and 
+    \[
+       [T]_B = \begin{pmatrix}
+            a_1 & \cdots & *  \\
+            \vdots & \ddots & \vdots  \\
+            0 & \cdots & a_n  \\
+        \end{pmatrix}, 
+    \] then \(\mathrm{ch}_T(x) = \prod _{i=1}^n (x - a_i) \) splits (e.g. This always holds for \(F = \mathbb{C} \)). (And by Cayley-Hamilton we know \(m_T(x)\) splits completely). 
+\end{corollary}
+
+\begin{theorem} \label{thm: minimal polynomial splits, then triangulanizable}
+    Suppose \(m_T(x)\) splits, then \(T\) is triangulanizable.  
+\end{theorem}
+\begin{proof}
+    Use induction (for finding a \(T\)-invariant chain). Suppose we have 
+    \[
+        0 = W_0 \subseteq W_1 \subseteq W_2 \subseteq \dots \subseteq W_k \neq V,
+    \] where \(\dim W_i = i\) for all \(i\). Then, \(\exists v_{k+1} \notin W_{k}\), and thus \(\left\{ v_1, \dots , v_{k+1} \right\} \) is linearly independent. Note that 
+    \[
+        (T - a_{k+1})(v_{k+1}) = \sum_{i=1}^k a_{i, k+1} v_i. 
+    \]   
+\end{proof}
+
+\begin{lemma} \label{lm: mT split, W proper T invariant subspace then exists u notin W s.t. (T-lambda)(u) in W}
+    Suppose \(m_T(x)\) splits. If \(W\) is a \(T\)-invariant proper subspace of \(V\), then \(\exists u \notin W\) (i.e. \(u\) and \(W\) are linearly independent), and \(\lambda \in F\) s.t. \((T - \lambda )(u) \in W\).       
+\end{lemma}
+\begin{proof}
+    Since we have
+    \begin{align*}
+        \mathrm{Ann}_T(V / W) = \left\{ g(x) \in F[x] \mid g(T)(V) \subseteq W \right\} = F[x] \cdot p(x), 
+    \end{align*}
+    and we know \(m_T(x) \in \mathrm{Ann}_T(V / W) \), so \(p(x) = (x - \lambda ) q(x)\) for some \(\lambda = \lambda _i\), where \(\lambda _i\) is an eigenvalue of \(T\) since \(W \neq V\) and \(p(x) \mid m_T(x)\). Hence, there exists \(v \notin W\) s.t. \(u = q(T)(v) \notin W\). Thus, we know 
+    \[
+        (T - \lambda )(u) = (T - \lambda )q(T)(v) = p(T)(v) \in W.
+    \]     
+\end{proof}
+
+\begin{theorem}[Cayley-Hamilton theorem]
+    Let \(f(x) = \mathrm{ch}_T(x) \) be the characteristic polynomial of \(T\), then \(f(T) = 0\).   
+\end{theorem}
+\begin{proof}
+    We consider a matrix \(A = (a_{ij})\), which is a matrix representation of \(T\). We work over the commutative ring \(F[A] = \left\{ \sum_{i=0}^m a_i A^i  \right\} \). Since \(Ae_k = \sum_{i=1}^n a_{ik} e_k \), so if we let
+    \[
+        B = (B_{ij} ) = \begin{pmatrix}
+            A - a_{11} & -a_{21} &  &   \\
+            \vdots &  &  &   \\
+            -a_{1k} & \dots  & A - a_{kk}  & \cdots  \\
+             &  &  &   \\
+        \end{pmatrix},
+    \] we have \(B_{k1} e_1 + \dots + B_{kn} e_n = 0\). If we let \(\mathrm{adj}(B) = (C_{ij}) \), then 
+    \begin{align*}
+        \det B &= C_{11} B_{11} + C_{12} B_{21} + \dots + C_{1n} B_{n1} \\
+        0 &= C_{11} B_{12} + C_{12} B_{22} + \dots + C_{1n} B_{n2} \\
+        & \ \, \vdots
+    \end{align*}
+    We can check that \(\det (e_k) = 0\) for all \(k\), and \(\det (B) = f(A) \), so we're done.   
+\end{proof}

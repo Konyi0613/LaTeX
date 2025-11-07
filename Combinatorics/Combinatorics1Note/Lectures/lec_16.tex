@@ -1,0 +1,118 @@
+\lecture{16}{7 Nov. 12:20}{}
+\begin{prev}
+    Suppose \(a_n\) is the number of ways of performing Task \(2\) on a set of size \(n\) with \(a_0 = 0\), and \(b_n\) is the number of ways of performing Task \(2\) on a set of size \(n\), then \(\hat{B} \left( \hat{A} (x) \right) \) enumerates the number of ways to take a set of size \(n\), and:
+    \begin{itemize}
+        \item [(1)] Partition it into arbitraility many non-empty subset, and 
+        \item [(2)] Perform Task \(1\) on each subset, and 
+        \item [(3)] Perform Task \(2\) on the set of subsets.  
+    \end{itemize}        
+\end{prev}
+
+Now we focus on the growth of a sequence when \(n \to \infty \). 
+\begin{eg}
+    \[
+        a_n = 0.01 n \left( \frac{3 + \sqrt{5} }{2} \right)^n + 10^{100} \left( \frac{3 + \sqrt{5} }{2} \right)^n + 10 \cdot 2^n + 1000 \left( \frac{3 - \sqrt{5} }{2} \right)^n,    
+    \] the first term grows fastest.
+\end{eg} 
+
+\begin{eg}
+    How many arithmetic operations do we need to multiply two \(n \times n\) matrices? 
+\end{eg}
+\begin{answer}
+    \((2n-1)n^2 = 2n^3 - n^2\). 
+\end{answer}
+
+However, actually we have better algorithm! It takes only \(C n^{2.371339}\) times of arithmetic operations (2024).
+
+\begin{definition}
+    Given function \(f, g: \mathbb{N} \to \mathbb{R} \), we say \(f = O(g)\) if \(\exists C \in \mathbb{R} \) and \(n_0 \in \mathbb{N} \) s.t. \(\left\vert f(n) \right\vert \le C \left\vert g(n) \right\vert  \) for all \(n \ge n_0\). 
+\end{definition}
+
+\begin{eg}
+    For any \(k \in \mathbb{N} \), \(\lambda > 1\), \(n^k = O\left( \lambda ^n \right) \).   
+\end{eg}
+
+\begin{definition}
+    We say \(f = \Omega (g)\) iff there exists \(c > 0\) and \(n_0 \in \mathbb{N} \) s.t. \(f(n) \ge c \left\vert g(n) \right\vert \) for all \(n \ge n_0\).     
+\end{definition}
+
+\begin{corollary}
+    \(f = O(g)\) iff \(g = \Omega (f)\) for \(f, g \ge 0\).   
+\end{corollary}
+
+\begin{definition}
+    \(f = o(g)\) iff
+    \[
+        \lim_{n \to \infty} \frac{\left\vert f(n) \right\vert }{\left\vert g(n) \right\vert } = 0.
+    \] 
+\end{definition}
+
+\begin{definition}
+    \(f = \omega (g)\) iff 
+    \[
+        \lim_{n \to \infty} \frac{f(n)}{\left\vert g(n) \right\vert } = +\infty . 
+    \] 
+\end{definition}
+
+\begin{definition}
+    \(f = o(g)\) iff \(g = \omega (f)\) if \(f, g > 0\).   
+\end{definition}
+
+Alternatively, we say \(f \ll g\) iff \(f = o(g)\) and \(f \gg g\) iff \(f = \omega (g)\), but sometimes \(f \ll g\) means \(f = O(g)\) and \(f \gg g\) iff \(f = \Omega (g)\). Also, we say \(f \thickapprox g\) iff 
+\[
+    f(n) = (1 + o(1))g(n) \iff \lim_{n \to \infty} \frac{f(n)}{g(n)} = 1.
+\]         
+
+\begin{eg}[Again]
+   \[
+        a_n = 0.01 n \left( \frac{3 + \sqrt{5} }{2} \right)^n + 10^{100} \left( \frac{3 + \sqrt{5} }{2} \right)^n + 10 \cdot 2^n + 1000 \left( \frac{3 - \sqrt{5} }{2} \right)^n,    
+    \] 
+    then \(a_n = O \left( n \left( \frac{3 + \sqrt{5} }{2} \right)^n  \right) \), which means 
+    \[
+        a_n \thickapprox 0.01n \left( \frac{3 + \sqrt{5} }{2} \right)^n = (0.01 + o(1))n \left( \frac{3 + \sqrt{5} }{2} \right)^n.  
+    \]  
+    Also, we know 
+    \[
+        a_n = 0.01n \left( \frac{3 + \sqrt{5} }{2} \right)^n + O \left( \left( \frac{3+\sqrt{5} }{2} \right)^n  \right).  
+    \]
+\end{eg}
+
+\subsubsection{Asymptotic arithmetic}
+If \(f_1 = O(g_1)\) and \(f_2 = O(g_2)\), then \(f_1 + f_2 = O(g_1 + g_2)\). If \(g_2 = o(g_1)\), then in addition, \(f_1 + f_2 = O(g_1)\). 
+
+If \(f_1 = O(g_1)\) and \(f_2 = O(g_2)\), then \(f_1 f_2 = O(g_1 g_2)\). 
+
+\begin{eg}
+    \[
+        (101n^2 - 57n + 90)(n^2 - 55n + 101) = O(n^2)O(n^2) = O(n^4) = 101n^4 + O(n^3).
+    \]
+\end{eg}
+
+\begin{eg}
+    What is \(\sum_{i=1}^n i^3 \)? 
+\end{eg}
+\begin{explanation}
+    For upper bound, we know 
+    \[
+        \sum_{i=1}^n i^3 \le \sum_{i=1}^n n^3 = n^4, 
+    \] so \(\sum_{i=1}^n i^3 = O(n^4) \). 
+
+    For lower bound, we know 
+    \[
+        \sum_{i=1}^n i^3 \ge \sum_{i= \frac{n}{2}}^n i^3 \ge \sum_{i=\frac{n}{2}}^n \left( \frac{n}{2} \right)^3 \ge \left( \frac{n}{2} \right)^4 = \Omega \left( n^4 \right).      
+    \]
+\end{explanation}
+
+\begin{definition}
+    \(f = \Theta (g)\) iff \(f = O(g)\) and \(f = \Omega (g)\).  
+\end{definition}
+
+\begin{eg}
+    \[
+        f(n) = \begin{dcases}
+            100 \cdot 2^n, &\text{ if } 2 \mid n ;\\
+            \frac{1}{100} 2^n, &\text{ if } 2 \nmid n,
+        \end{dcases}
+    \]
+    then \(f(n) = \Theta \left( 2^n \right) \). 
+\end{eg}
