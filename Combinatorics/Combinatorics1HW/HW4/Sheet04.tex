@@ -1,0 +1,257 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{bbding,combelow,textcomp,amsfonts,amsthm,amsmath,amssymb,graphicx,color,hyperref,etoolbox}
+\usepackage[utf8x]{inputenc}
+\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+
+\usepackage{xeCJK}
+\setCJKmainfont{PingFang TC}
+
+\newtoggle{story}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Customisation options --- update as necessary
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Course details: title, semester, instructors
+
+\newcommand{\courseTitle}{Combinatorics I (Math 7701)}
+\newcommand{\semester}{Fall 2025}
+\newcommand{\instructorA}{Shagnik Das}
+\newcommand{\instructorB}{TA: Lu Yun-Chi}
+
+%% Sheet number
+
+\newcommand{\sheetNumber}{4}
+
+
+%% Submission details
+
+\newcommand{\dueDate}{15:30, Nov 11th, to be submitted on COOL.}
+\newcommand{\lateWarning}{}
+
+
+%% Display irrelevant footnotes?  \toggletrue for yes, \togglefalse for no
+
+\toggletrue{story}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End of customisation options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pdfpagewidth 8.5in
+\pdfpageheight 11in
+\topmargin -1in
+\headheight 0in
+\headsep 0in
+\textheight 8.5in
+\textwidth 6.5in
+\oddsidemargin 0in
+\evensidemargin 0in
+\headheight 77pt
+\headsep 0in
+\footskip .75in
+
+\makeatletter
+\newcommand{\buildtitle}[4]{
+\begin{flushleft}
+{\large
+#1
+\hfill{}
+#2
+\par
+#3
+}
+\end{flushleft}
+\vskip 4pt
+\begin{center}
+{\large\bfseries#4\par}
+\end{center}
+\bigskip
+}
+\makeatother
+
+\renewcommand{\thesection}{\normalsize\arabic{section}}
+
+\renewcommand{\deg}{\textrm{deg}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\ceil}[1]{\left \lceil #1 \right \rceil}
+
+\newcommand{\hint}{\begin{flushright} [Hint at \url{\hintURL}.] \end{flushright}}
+
+\newcommand{\card}[1]{\left| #1 \right|}
+\newcommand{\mb}[1]{\mathbb{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+
+
+\newcommand{\story}[1]{\iftoggle{story}{\footnote{#1}}{}}
+\newcommand{\storymark}[1][42]{\iftoggle{story}{\footnotemark[#1]}{}}
+\newcommand{\storytext}[2][42]{\iftoggle{story}{\footnotetext[#1]{#2}}{}}
+
+\newcommand{\bonus}[2]{\paragraph{Bonus (#1 pt\ifstrequal{#1}{1}{}{s})} #2}
+
+
+\begin{document}
+
+
+\buildtitle{\courseTitle{}}{\semester}{\instructorA{} \hfill \instructorB{}}{Exercise Sheet \sheetNumber{}}
+
+\vspace{-0.2in}
+
+\begin{center}
+
+{\bf Due date: \dueDate{}}
+
+\end{center}
+
+\noindent Working with your partner, you should try to solve all of the exercises below. You should then submit solutions to four of the problems, with each of you writing two, clearly indicating the author of each solution. Note that each problem is worth $10$ points, and starred exercises represent problems that may be a little tougher, should you wish to challenge yourself. In case you have difficulties submitting on COOL, please send your solutions by e-mail.
+
+\paragraph{Exercise 1}  You own a very successful chain of bookstores, and decide that your bookstores should remain open $24$ hours a day, as you anticipate there will be high demand for your books at all hours, day and night.  Due to strict labour regulations, you cannot force your employees to work non-stop, and so you must in fact employ the workers in three disjoint shifts, so everyone only works for one continuous stretch of $8$ hours.  To make things easier administratively, you decide every store should have the shifts from 0000 -- 0800, 0800 -- 1600, 1600 -- 0000, and that everyone will work exactly the same shift every day, so that you only need to make a schedule for a single day. However, the labour regulations do not require that you befriend your workers, so from your perspective they are all indistigushable interchangeable drones, and all that matters is how many people are working at each store during a given shift.
+\begin{itemize}
+	\item[(a)] Given $n$ workers at a single store, how many ways are there of distributing them into the three separate shifts?  What is the generating function for this sequence?
+	\item[(b)] What generating function counts the number of ways to employ a total of $n$ people in some arbitrary finite number\footnote{The number of bookstores is not fixed, but there must always be at least one worker in every store for every shift.} of bookstores, each operating on a three-shift basis?
+	\item[(c)] If $c_n$ denotes the counting sequence in (b), use partial fractions to deduce that there is some absolute constant $\gamma$ such that $| c_n - \frac13 \cdot 2^{n-1} | < \gamma$ for all $n$.
+\end{itemize}
+
+\paragraph{Solution:} \vphantom{text}
+
+\begin{itemize}
+	\item [(a)] Suppose \(a_n\) is the number of methods of distributing \(n\) workers into the three seperate shifts. Hence, 
+\[
+	a_n = \# \left\{ (x, y, z) \mid x,y,z \in \mathbb{N} \cup \left\{ 0 \right\}, x + y + z = n \right\}, 
+\] and thus, we know \(a_n = \binom{n+2}{2} = \binom{n+2}{n}\). Note that 
+\begin{align*}
+	\left( 1-x \right)^{-3} &= \sum_{n=0}^{\infty} \binom{-3}{n} (-x)^n = \sum_{n=0}^{\infty} \frac{(-3)(-3 - 1) \dots (-3 - n + 1)}{n!}(-1)^n x^n \\
+	&= \sum_{n=0}^{\infty} \frac{(3)(3+1)\dots (3+n-1)}{n!} x^n = \sum_{n=0}^{\infty} \binom{n+3-1}{n} x^n = \sum_{n=0}^{\infty} \binom{n+2}{n} x^n.     
+\end{align*}
+Hence, the generating function for \(\left( a_n \right)_{n \ge 0} \) is \(\frac{1}{(1-x)^3}\).
+
+	\item [(b)] Note that \(\left( a_n \right)_{n \ge 0} \) would count the distribution that there is not any worker distributed into some shifts. Hence, we suppose \(b_n\) is the number of methods of distributing \(n\) workers into \(3\) shifts s.t. there is at least one worker distributed in every shift, then we know 
+	\begin{align*}
+		b_n &= \# \left\{ (x, y, z) \mid x, y , z \in \mathbb{N} , x + y + z = n \right\} \\ 
+		&= \# \left\{ (x, y, z) \mid x, y , z \in \mathbb{N}\cup \left\{ 0 \right\}  , x + y + z = n - 3 \right\} \\
+		&= \binom{n-3+2}{2} = \binom{n-1}{2}.
+	\end{align*}
+	Hence, suppose \(B(x)\) is the generating function of \(\left( b_n \right)_{n \ge 0} \), then we know 
+	\begin{align*}
+		B(x) &= \sum_{n=0}^{\infty} \binom{n-1}{2} x^n = \sum_{n=2}^{\infty} \frac{(n-1)(n-2)}{2} x^n = \frac{1}{2} \sum_{n=2}^{\infty} (n-1)(n-2)x^n \\
+		&= \frac{1}{2} \sum_{n=0}^{\infty} (n+1)nx^{n+2} = \frac{x^2}{2} \sum_{n=0}^{\infty} (n+1)n x^n.      
+	\end{align*}
+	Note that 
+	\begin{align*}
+		&\left( \frac{1}{1-x} \right)^{\prime} = \left( \sum_{n=0}^{\infty} x^n  \right)^{\prime} = \sum_{n=1}^{\infty} n x^{n-1} = \sum_{n=0}^{\infty} (n+1) x^n \\
+		&\implies \left( \left( \frac{1}{1-x} \right)^{\prime}   \right)^{\prime} = \sum_{n=1}^{\infty} n(n+1)x^{n-1} = \sum_{n=0}^{\infty} n(n+1)x^{n-1}. 
+	\end{align*}  
+	Hence, we know 
+	\[
+		\frac{2x}{(1-x)^3} = x \left( \left( \frac{1}{1-x} \right)^{\prime}   \right)^{\prime} = \sum_{n=0}^{\infty} n(n+1)x^n. 
+	\]
+	Thus, we have 
+	\[
+		B(x) = \frac{x^2}{2} \sum_{n=0}^{\infty} (n+1)n x^n = \frac{x^2}{2} \cdot \frac{2x}{(1-x)^3} = \frac{x^3}{(1-x)^3}. 
+	\]
+	Now if \(c_n\) is the number of ways of employing a total of \(n\) people in some arbitrary finite number of bookstores with each operating on a three-shift basis, and there must always be at least one worker in every store for every shift, then 
+	\[
+		c_n = \sum_{\substack{k \ge 0, \\ \ell _1, \ell _2, \dots , \ell _k \ge 0, \\ \sum_{i=1}^k \ell _i = n }} b_{\ell _1} b_{\ell _2} \dots b_{\ell _k},
+	\] so if \(C(x)\) is the generating function for \(\left( c_n \right)_{n \ge 0} \), then we know
+	\[
+		C(x) = 1 + B(x) + B(x)^2 + \dots = \frac{1}{1 - B(x)} = \frac{1}{1 - \frac{x^3}{(1-x)^3}} = \frac{(1-x)^3}{(1-x)^3 - x^3},
+	\] and this is the answer.
+	\item [(c)] Since we know 
+	\[
+		C(x) = \frac{(1-x)^3}{(1-x)^3 - x^3} = \frac{1}{2} + \frac{1}{6(1-2x)} + \frac{1-2x}{3(1-x+x^2)},
+	\] so suppose \(D(x)\) is the generating function for \(\left( d_n \right)_{n \ge 0} \) where \(d_n = \frac{1}{3} \cdot 2^{n-1}\), then we know 
+	\[
+		D(x) = \sum_{n=0}^{\infty } \frac{1}{3} 2^{n-1} x^n = \frac{1}{6} \sum_{n=0}^{\infty} (2x)^n = \frac{1}{6} \left( \frac{1}{1-2x} \right).   
+	\]  Hence, suppose \(e_n = c_n - \frac{1}{3} \cdot 2^{n-1} \), then we know \(e_n = c_n - d_n\), and suppose \(E(x)\) is the generating function for \(\left( e_n \right)_{n \ge 0} \), then we know 
+	\begin{align*}
+		E(x) &= C(x) - D(x) = \frac{1}{2} + \frac{1-2x}{3(1-x+x^2)} = \frac{1}{2} + \left( \frac{1}{1-x+x^2} + 2x \left( \frac{1}{1-x+x^2} \right) \right) \\
+		&= \frac{1}{2} + \frac{1}{3}\left( \frac{1+x}{1+x^3} + \frac{2x(1+x)}{1+x^3} \right) = \frac{1}{2} + \frac{1}{3} \left( \frac{1}{1+x^3} + \frac{3x}{1+x^3} + \frac{2x^2}{1+x^3} \right) \\
+		&= \frac{1}{2} + \frac{1}{3}\left( \sum_{n=0}^{\infty} \left( -x^3 \right)^n + 3x \sum_{n=0}^{\infty} \left( -x^3 \right)^n + 2x^2 \sum_{n=0}^{\infty} \left( -x^3 \right)^n       \right).  
+	\end{align*}
+	Hence, we know 
+	\[
+		e_n = \displaystyle \begin{cases}
+			\frac{1}{3} (-1)^{3n} + \frac{1}{2}, &\text{ if } n=0 ;\\
+			\frac{1}{3} (-1)^{3n}, &\text{ if }  3 \mid n \text{ and } n > 0 ;\\
+			(-1)^{3n} \cdot 3, &\text{ if }  n=3k+1, \quad k \ge 0 ;\\
+			(-1)^{3n} \cdot 2, &\text{ if }  n = 3k+2, \quad k \ge 0. 
+		\end{cases}
+	\]
+	Thus, we know
+	\[
+		\vert e_n \vert = \left\vert c_n - \frac{1}{3} \cdot 2^{n-1} \right\vert < 4 \quad \text{for all } n.   
+	\]
+\end{itemize}
+
+
+\paragraph{Exercise 2}  In its present incarnation, the United Nations (UN) consists of 193 member states.  Within the UN is the United Nations Economic and Social Council (ECOSOC), a non-empty subset of the member states of the UN that, unsurprisingly, deals with economic and social matters.
+
+An unnamed citizen,\footnote{This citizen does, in fact, have a name, but it is withheld from this report to protect her or him from any retaliation by McDonalds.} concerned by the sharp rise in the price of McDonalds' ice cream, brings the matter to the attention of the ECOSOC.  The ECOSOC agrees that this is a matter of global significance, and decides to form a further subset, the Working Committee to Investigate McDonalds' Pricing of Ice Cream (WCIMPIC) to, well, investigate McDonalds' pricing of ice cream.\footnote{One must thank the UN for naming their subgroups so well.}
+
+\begin{itemize}
+	\item[(a)] Determine the bivariate generating function $A(x,y)$, where the coefficient of $x^n y^k$ counts the number of ways there could be $n$ countries in the ECOSOC, with $k$ of them also in the WCIMPIC.
+	\item[(b)] For historic reasons, the ECOSOC must always have an even number of members.  However, in order to ensure they can always have a decisive vote, they decide the the WCIMPIC should consist of an odd number of members.  How many ways are there of forming an even ECOSOC containing an odd WCIMPIC?
+\end{itemize}
+
+\paragraph{Exercise 3}  For $n \in \mathbb{N}$, let $p_n$ denote the number of permutations $\sigma$ of $[n]$ such that $\sigma(\sigma(i)) = i$ for all $i \in [n]$, and define $p_0 = 1$. Prove that the recurrence $p_n = p_{n-1} + (n-1)p_{n-2}$ holds for all $n \ge 2$, and find the exponential generating function for the sequence $(p_n)_{n \in \mathbb{N}}$.
+\paragraph{Solution:} For every permutation \(\sigma \) counted by \(p_n\), we know \(\sigma (i) = \sigma ^{-1}(i)\) for all \(i \in [n]\). Hence, if \(\sigma (i) = j\) for some \(i \neq j\), then \(\sigma^{-1} (i) = j\), which means \(\sigma (j) = i\), while the other case is that \(\sigma (i) = i\). Hence, for \(n \ge 2\), we know either \(\sigma (n) = j\) for some \(n \neq j\) or \(\sigma (n) = n\). For the first case, there are \((n-1)p_{n-2}\) such permutations since \(j\) has \(n-1\) choices and by removing \(n\) and \(j\) in the permutation and rename all left number to \(1,2, \dots , n-2\) by their value in ascending order, then it corresponds to a permutation counted by \(p_{n-2}\) since for all left number \(i\), it still has \(\sigma (\sigma (i)) = i\). Note that this correspondence is a bijection. Hence, the number of permutations in this case is \((n-1)p_{n-2}\). For the second case, since removing \(n\) forms a permutation counted by \(p_{n-1}\) and this correspondence is a bijection, so the number of permutations in this case is \(p_{n-1}\). Hence, by sum rule, we have \(p_n = p_{n-1} + (n-1)p_{n-2}\). 
+
+Now suppose \(P(x)\) is the exponential generating function for \(\left( p_n \right)_{n \in \mathbb{N} } \), then we know 
+\begin{align*}
+	P(x) &= \sum_{n=0}^{\infty} p_n \frac{x^n}{n!} = 1 + x + \sum_{n = 2}^{\infty} p_n \frac{x^n}{n!} = 1 + x + \sum_{n=2}^{\infty} \left( p_{n-1} + (n-1)p_{n-2} \right) \frac{x^n}{n!} \\
+	&= 1 + x + \sum_{n=2}^{\infty} p_{n-1} \frac{x^n}{n!} + \sum_{n=2}^{\infty} (n-1)p_{n-2} \frac{x^n}{n!} = 1 + \sum_{n=1}^{\infty} p_{n-1} \frac{x^n}{n!} + \sum_{n=2}^{\infty} (n-1)p_{n-2} \frac{x^n}{n!}.   
+\end{align*} 
+Also, note that 
+\[
+	\int _0^x P(t) \, \mathrm{d}t = \sum_{n=0}^{\infty} \int _0^x p_n \cdot \frac{t^n}{n!} \, \mathrm{d} t = \sum_{n=1}^{\infty} p_{n-1} \cdot \frac{x^n}{n!},    
+\] and 
+\[
+	xP(x) = \sum_{n=1}^{\infty} n p_{n-1} \frac{x^n}{n!} 
+\] gives 
+\begin{align*}
+	\int _0^x t P(t) \mathrm{d} t &= \int _0^x \sum_{n=1}^{\infty} n p_{n-1} \frac{t^n}{n!} = \sum_{n=1}^{\infty} \int _0^x n p_{n-1} \frac{t^n}{n!} \mathrm{d} t \\
+	&= \sum_{n=1}^{\infty} n p_{n-1} \frac{x^{n+1}}{(n+1)!} = \sum_{n=2}^{\infty} (n-1)p_{n-2} \frac{x^n}{n!}.     
+\end{align*}
+Thus, we have 
+\[
+	P(x) = 1 + \int _0^x P(t) \, \mathrm{d} t + \int _0^x tP(t) \, \mathrm{d} t, \quad P(0) = 1.  
+\]
+By differentiating on the both side we have 
+\[
+	P^{\prime} (x) = P(x) + xP(x) \iff \frac{P^{\prime} (x)}{P(x)} = 1+x \iff \frac{\mathrm{d}}{\mathrm{d}x} \ln P(x) = 1+x. 
+\]
+Thus, we have 
+\[
+	\ln P(x) = x + \frac{1}{2} x^2 + C \iff P(x) = e^{x + \frac{1}{2}x^2 + C},
+\] and \(P(0) = 1\) gives \(C = 0\), so \(P(x) = e^{x + \frac{1}{2} x^2}\).
+
+\paragraph{Exercise 4}  There are $n$ people a pool party,\footnote{The kind that involves cue sticks and chalk, not water and swimsuits.\footnotemark}\footnotetext{Although this pool party does not have a dress code, so you could wear your swimsuit should you so desire.} but unfortunately there is only one pool table and only two cues.  You want everyone to play exactly one game, so you have to decide which pairs should play against each other (the order of the players in the pairs doesn't matter), and then prescribe the order in which the $\frac{n}{2}$ games should be played.
+\begin{itemize}
+	\item[(a)] If $(p_n)_{n \ge 0}$ counts the number of ways this can be done, find an explicit formula for $p_n$.\footnote{Note that if $n$ is odd, you cannot split the people into pairs, so $p_n = 0$.}
+	\item[(b)] Find a closed form for the exponential generating function $\hat{P}(x)$ corresponding to $(p_n)_{n \ge 0}$.
+\end{itemize}
+
+\newpage
+
+\paragraph{Exercise 5}   Suppose one wishes to do the following: given\footnote{See Footnote 12 after\footnotemark\;reading the rest of the problem.}\footnotetext{While nothing bad will happen to you if you read it immediately, it will make more sense if you wait.} $n$ children, partition them into two disjoint subsets.  The children in the first subset will receive individual mathematics tuition, with every child having the choice of learning either combinatorics or functional analysis (but not both).  The second (less fortunate) subset will be food.  Of the children in the second subset, two of them will be chosen to have their blood sucked immediately, while the rest will be kept in the freezer for later.\footnote{You might wonder who would wish to do such a thing, for it appears a bit more morbid than the normal hobbies one usually has --- football, pottery, or dumpling making.  The poor protagonist of this story is Count Calcula.  A brilliant combinator from a small town in Hungary,\footnotemark\;he unfortunately developed some vampiric tendencies after being bitten by a bat\footnotemark\;that lived in a convex cave.  During the day he continues to produce some fantastic mathematics and counts items with aplomb, but when night falls he succumbs to his thirst, and must find some blood to drink.}\footnotetext[10]{Which I have been asked not to name, for fear of disrupting their tourism industry.  I have also been asked to highlight the fact that they are home to the second-best ice cream store in the entire country.}\footnotetext[11]{Of the nocturnal flying variety, not the cricketing kind.}\footnotetext[12]{You might also wonder who would give their children to Count Calcula, knowing what fate might befall them.  However, the good people of this town are reasonable people, and Count Calcula is famous for his excellent mathematics.  Knowing that it is easy to make children, but difficult to produce mathematicians, it is nothing less than a civic duty to offer one's offspring to the Count, in hope that they might get tutored.}
+\begin{itemize}
+	\item[(a)] Find the closed form for the exponential generating function $\hat{A}(x)$ that counts the number of ways this can be done.
+	\item[(b)] What is the number of ways of carrying out this procedure when $n = 5$?
+\end{itemize}
+
+
+
+% \paragraph{Exercise 6}  
+
+% \newpage
+
+% \section*{Hints}  The following QR codes contain hints for some of the homework exercises.  You should be able to decode them using any QR code scanner, including this one: \url{https://zxing.org/w/decode.jspx}.
+
+% \paragraph{Exercise ?} Also available at \url{https://i.ibb.co/???????/S??E?.png}.
+
+\begin{center}
+% \includegraphics[scale=0.5]{hints/S??E?.png}
+\end{center}
+
+\end{document}
