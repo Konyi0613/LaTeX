@@ -1,0 +1,326 @@
+\lecture{17}{4 Nov. 9:10}{}
+\section{Real Analytic Functions}
+A function \(f(x)\) that is representable as a power series near a point is called real analytic at that point. 
+\begin{itemize}
+    \item Intuitively: \(f\) can be written as \(\sum_{n=0}^{\infty} c_n(x - a)^n \) in some neighborhood of \(a\). 
+    \item Consequences (later): such an \(f\) is continuous and \(C^{\infty }\) in that neighborhood since no matter how many times you differentiate this \(f\), it remains a power series.     
+\end{itemize} 
+\begin{definition}[Real analytic functions]
+    Let \(E \subseteq \mathbb{R} \) and \(f: E \to \mathbb{R} \). If \(a\) is an interior point of \(E\), we say that \(f\) is real analytic at \(a\) if there exists \(r > 0\) and a power series 
+    \[
+        \sum_{n=0}^{\infty} c_n (x-a)^n 
+    \] centered at \(a\) with radius of convergence \(\ge r\), which converges to \(f(x)\) for all \(x \in (a-r, a+r) \subseteq E\). If \(E\) is open and \(f\) is real analytic at every \(a \in E\), then \(f\) is real analytic on \(E\).               
+\end{definition}
+
+\begin{remark}
+    This power series converges to uniformly automatically by (c) of \autoref{thm: convergence of power series about radius of convergence}. 
+\end{remark}
+
+\begin{remark}
+    Informally, a function is real analytic at \(a\) implies it can be represented as a power series whose radius of convergence is bigger than \(0\).  
+\end{remark}
+
+\begin{eg}
+    Consider the function \(f: \mathbb{R} \setminus \left\{ 1 \right\} \to  \mathbb{R}  \) defined by 
+    \[
+        f(x) \coloneqq \frac{1}{1-x}.
+    \] Show that \(\frac{1}{1-x}\) is real analytic on \(\mathbb{R} \setminus \left\{ 1 \right\} \).  
+\end{eg}
+\begin{explanation}
+    Let \(f(x) = \frac{1}{1-x}\) and fix any \(a \in \mathbb{R} \setminus \left\{ 1 \right\} \). Set \(y = x-a\), so that \(x = a + y\). Then, 
+    \[
+        f(x) = \frac{1}{1 - (a+y)} = \frac{1}{(1-a)-y}=\frac{1}{1-a} \cdot \frac{1}{1 - \frac{y}{1-a}}.
+    \] 
+    Since \(\vert 1 - a \vert > 0 \), we may apply the geometric series expansion: 
+    \[
+        \frac{1}{1 - \frac{y}{1-a}} = \sum_{n=0}^{\infty} \left( \frac{y}{1-a} \right)^n \quad \text{for } \frac{\vert y \vert }{\vert 1-a \vert } < 1 \text{ i.e. } \vert x-a \vert < \vert 1-a \vert.      
+    \]    
+    Hence, 
+    \[
+        \frac{1}{1-x} = \frac{1}{1-a} \sum_{n=0}^{\infty} \left( \frac{y}{1-a} \right)^n = \sum_{n=0}^{\infty} \frac{y^n}{(1-a)^{n+1}} = \sum_{n=0}^{\infty} \frac{(x-a)^n}{(1-a)^{n+1}},  
+    \] for \(\vert x - a \vert < \vert 1 - a \vert  \). Hence, \(f\) is real analytic on \(\mathbb{R} \setminus \left\{ 1 \right\} \).  
+\end{explanation}
+
+\begin{remark}
+    Real analyticity parallels complex analyticity (a topic of complex analysis). In this section we focus on real functions, their power-series convergence, and differentiability properties.
+\end{remark}
+
+From (c), (d) of \autoref{thm: convergence of power series about radius of convergence}, we know if \(f\) is real analytic at \(a\), then \(f\) is continuous and infinitely differentiable in some neighborhood (inside the interval of convergence i.e. \(x \in (a-R, a+R)\)) of \(a\). We now formalize higher-order differentiability.     
+
+\begin{definition}[\(k\)-times differentiability]
+    Let \(E \subseteq \mathbb{R} \) with every point a limit point. A function \(f:E \to \mathbb{R} \) is once differentiable on \(E\) if \(f^{\prime} \) exists on \(E\). For \(k \ge 2\), \(f\) is \(k\)-time differentiable on \(E\) if \(f^{\prime} \) is \((k-1)\)-times differentiable. Recursively define 
+    \[
+        f^{(1)} \coloneqq f^{\prime} , \quad f^{(k)} \coloneqq \left( f^{(k-1)} \right)^{\prime} (k \ge 2), \quad f^{(0)} \coloneqq f.
+    \] We say \(f\) is infinitely differentiable or smooth or \(C^{\infty }\) if \(f\) is \(k\)-times differentiable for every \(k \ge 0\).               
+\end{definition}
+
+\begin{eg}
+    The function \(f(x) \coloneqq \vert x \vert^3 \) is twice differentiable on \(\mathbb{R} \), but not three times differentiable.  
+\end{eg}
+\begin{explanation}
+    We can write 
+    \[
+        f(x) = \begin{dcases}
+            x^3, &x \ge 0, \\
+            (-x)^3 = -x^3, &x < 0.
+        \end{dcases}
+    \]
+    Hence, 
+    \[
+        f^{\prime} (x) = \begin{dcases}
+            3x^2, &x > 0, \\
+            -3x^2, &x < 0.
+        \end{dcases}
+    \]
+    At \(x = 0\), we check 
+    \[
+        \lim_{x \to x^+} \frac{f(x) - f(0)}{x - 0} = \lim_{x \to 0^+} \frac{x^3 - 0 }{x - 0} = 0, \quad \lim_{x \to 0^-} \frac{f(x) - f(0)}{x - 0} = \lim_{x \to 0^-} \frac{-x^3 - 0}{x - 0} = 0,    
+    \] so \(f^{\prime} (0) = 0\). Therefore,
+    \[
+        f^{\prime} (x) = \begin{dcases}
+            3x^2, &x > 0, \\
+            0, &x=0, \\
+            -3x^2, &x<0.
+        \end{dcases}
+    \] 
+    Similarly, we can check 
+    \[
+        f^{\prime\prime} (x) = \begin{dcases}
+            6x, &x > 0, \\
+            0, &x=0, \\
+            -6x, &x<0.
+        \end{dcases}
+    \]
+    Hence, we know \(f^{\prime\prime} (x) = 6 \vert x \vert \), and it can easily shown that \(f^{\prime\prime} (x)\) is not differentiable at \(x = 0\).   
+\end{explanation}
+This section will be extended with further theorems, proofs, and examples as more material is provided. 
+\begin{itemize}
+    \item [(a)] Uniform convergence and termwise differentiation of power series. 
+    \item [(b)] Uniqueness of power-series expansions and radii of convergence.
+\end{itemize}
+
+\begin{proposition}[Differentiability of real analytic functions] \label{prop: differentiability of real analytic functions}
+    Let \(E \subseteq \mathbb{R} \), and \(a\) be an interior point of \(E\), and \(f: E \to \mathbb{R} \) be real analytic at \(a\). Then, there exists \(r > 0\) s.t. 
+    \[
+        f(x) = \sum_{n=0}^{\infty} c_n (x-a)^n, \quad x \in (a-r,a+r). 
+    \]     
+    For every integrer \(k \ge 0\), 
+    \[
+        f^{(k)}(x) = \sum_{n=0}^{\infty} c_{n+k} \frac{(n+k)!}{n!}(x-a)^n, 
+    \] so \(f\) is \(k\)-times differentiable on \((a-r,a+r)\). In particular, evaluating at \(x = a\) gives the coefficient identity 
+    \[
+        c_k = \frac{f^{(k)}(a)}{k!}.
+    \]    
+\end{proposition}
+\begin{proof}
+    Fix \(r > 0\) so that the power series \(\sum_{n=0}^{\infty} c_n (x-a)^n \) converges to \(f(x)\) for all \(x \in (a-r, a+r)\) (We can pick \(r\) to be the radius of convergence). For \(0 < \rho < r\), the series converges uniformly on \([a-\rho , a+\rho ]\) by \hyperref[thm: Weierstrass M-test (bounded and conti)]{Weierstrass M-test}, hence \(f\) is continuous there. Now we do induction on \(k\) to obtain the \(k\)-th derivative formula. 
+    \begin{itemize}
+        \item Base case \(k=0\). Trivial:
+        \[
+            f^{(0)}(x) = f(x) = \sum_{n=0}^{\infty} c_n (x-a)^n. 
+        \]
+        \item Step \(k=1\). Fix \(0<\rho <r\). On \([a-\rho , a+\rho ]\), 
+        \[
+            \sum_{n=1}^{\infty} n c_n (x-a)^{n-1} 
+        \] converges uniformly (again by the M-test), since for \(\vert x-a \vert \le \rho < r\), 
+        \[
+            \left\vert n c_n (x-a)^{n-1} \right\vert \le n \vert c_n \vert \rho ^{n-1},
+        \] and \(\sum_{n \ge 1} n \vert c_n \vert \rho ^{n-1}  \) converges whenever \(\rho < r\) (The radius of convergence remains the same). Therefore we may differentiate termwise to get 
+        \[
+            f^{\prime} (x) = \sum_{n=1}^{\infty} n c_n (x-a)^{n-1} = \sum_{n=0}^{\infty} c_{n+1} (n+1) (x-a)^n.  
+        \]  
+        \item Induction step. Assume for some \(k \ge 1\) that 
+        \[
+            f^{(k)}(x) = \sum_{n=0}^{\infty} c_{n+k} \frac{(n+k)!}{n!} (x-a)^n \text{ for } x \in (a-r,a+r), 
+        \] and that the series on the right converges uniformly on each \([a - \rho , a+ \rho ]\) with \(0 < \rho < r\). Then, for \(\vert x-a \vert < \rho  \), 
+        \[
+            \left\vert \frac{(n+k)!}{n!} c_{n+k} (x-a)^n \right\vert \le \frac{(n+k)!}{n!} \vert c_{n+k} \vert \rho ^n.  
+        \]   
+        Since a power series and all its termwise derivatives share the same radius of convergence \(r\), the series \(\sum_{n=0}^{\infty}  \frac{(n+k+1)!}{n!} \left\vert c_{n+k+1} \right\vert \rho ^n \) converges for \(\rho < r\), hence by the \(M\)-test the differentiated series is uniformly convergent on \([a-\rho , a+\rho ]\).  Therefore, 
+        \begin{align*}
+            f^{(k+1)}(x) &= \sum_{n=0}^{\infty} c_{n+k} \frac{(n+k)!}{n!} n (x-a)^{n-1} \\
+            &= \sum_{n=1}^{\infty} c_{n+k} \frac{(n+k)!}{(n-1)!}(x-a)^{n-1} \\
+            &= \sum_{m=0}^{\infty} c_{m+k+1} \frac{(m+k+1)!}{m!} (x-a)^m   
+        \end{align*}  
+        which is exactly the desired formula with \(k\) replaced by \(k+1\). This completes the induction. Finally, setting \(x=a\) in the \(k\)-th derivative formula gives 
+        \[
+            f^{(k)}(a) = \sum_{n=0}^{\infty} c_{n+k} \frac{(n+k)!}{n!} (a-a)^n = c_k k!, 
+        \] and hence 
+        \[
+            c_k = \frac{f^{(k)}(a)}{k!}. 
+        \]
+    \end{itemize}         
+
+    \begin{remark}
+        Why we can deduce \(\sum_{n=0}^{\infty } \frac{(n+k+1)!}{n!} \vert c_{n+k+1} \vert \rho ^n   \) converges for \(\rho < r\)? The answer is since we know the radius of convergence of \(\sum_{n=0}^{\infty} \frac{(n+k+1)!}{n!} \vert c_{n+k+1} \vert (x-a)^n  \) is equal to that of the radius of convergence of \(\sum_{n=0}^{\infty} \frac{(n+k+1)!}{n!} c_{n+k+1} (x-a)^n\) by definition, and we know the radius of convergence of latter is equal to the radius of convergence of \(f^{(k)}\).
+    \end{remark}
+\end{proof}
+
+\begin{remark}
+    If \(f\) is real analytic on \((a-r, a+r)\), then it admits a convergent Taylor series expansion about \(a\). In particular,
+    \[
+        f(x) = \sum_{k=0}^{\infty} \frac{f^{(k)}(a)}{k!} (x-a)^k, \quad x \in (a-r,a+r). 
+    \]   
+    Thus, the sequence of derivatives \(\left\{ f^{(k)}(a) \right\}_{k=0}^{\infty}  \) completely determines the values of \(f\) on the interval \((a-r,a+r)\).    
+\end{remark}
+
+\begin{corollary}[Analytic to \(C^{\infty }\)]
+    Let \(E\) be open and \(f:E \to \mathbb{R} \) real analytic on \(E\). Then \(f\) is infinitely differentiable on \(E\), and each \(f^{(k)}\) is itself real analytic.      
+\end{corollary}
+\begin{proof}[Proof sketch]
+    \vphantom{text}
+    \begin{itemize}
+        \item [(a)] For any \(a \in E\), \(f\) has an convergent power series on \((a-r, a+r)\). 
+        \item [(b)] \autoref{prop: differentiability of real analytic functions} gives \(f^{(k)}\) via a power series, so \(f^{(k)}\) is analytic at \(a\).    
+        \item [(c)] Since \(a\) can be arbitrary, so \(f\) is \(C^{\infty} \) and every derivative is analytic.   
+    \end{itemize}
+\end{proof}
+
+\begin{eg}
+    Let \(f(x) = \vert x \vert \). Then \(f\) is defined on \(\mathbb{R} \) but it is not analytic on \(\mathbb{R} \).    
+\end{eg}
+\begin{explanation}
+    Fix \(a \neq 0\). If \(a > 0\), then on \((0, \infty) \) we have \(f(x) = x\), so we may write 
+    \[
+        f(x) = x = x + (x-a),
+    \] which holds for all \(x > 0\). Hence, if \(f\) is real analytic at \(a\), then the domain of convergence of the Taylor series about \(a\) (the largest open interval centered at \(a\) contained in \((0, \infty )\)) is 
+    \[
+        (0, 2a) = \left\{ x: \vert x-a \vert < a  \right\}. 
+    \] (Since this formula holds only when \(x>0\)) If \(a < 0\), then on \((-\infty , 0)\) we have \(f(x) = -x\), so we may write 
+    \[
+        f(x) = -x = -a - (x-a),
+    \]  which holds for all \(x<0\). Hence, \(f\) is real analytic at \(a\). Hence, the domain of convergence of the Taylor series about \(a\) (the largest open interval centered at \(a\) contained in \((-00, 0)\)) is
+    \[
+        (2a, 0) = \left\{ x: \vert x-a \vert < \vert a \vert   \right\}.
+    \]
+
+    If \(a=0\), then if \(f(x)\) is real analytic at \(a\), then \(f\) is differentiable at \(a\), which is false, so \(f(x)\) is not real analytic at \(0\). Therefore,  \(f\) is real analytic on \(\mathbb{R} \setminus \left\{ 0 \right\} \). 
+    \begin{itemize}
+        \item [(a)] Real analycity is a local property. 
+        \item [(b)] Failure at one point does not preclude analycity elsewhere.
+    \end{itemize}     
+\end{explanation}
+
+\begin{remark}
+    \(C^{\infty} \) does not implies analytic, one counterexample is in the next example. 
+\end{remark}
+
+\begin{eg}[Bump function]
+\[
+    f(x) = \begin{dcases}
+        e^{-\frac{1}{x^2}}, &x \neq 0 \\
+        0, &x = 0.
+    \end{dcases}
+\]
+\end{eg}
+\begin{explanation}
+Since all derivatives exist and vanish at \(x = 0\) i.e. \(f^{(k)}(0) = 0\). Hence, the Taylor series at \(0\) is 
+\[
+    \sum_{n=0}^{\infty} \frac{f^{(n)}(0)}{n!} x^n = 0. 
+\] But \(f(x) > 0\) for \(x \neq 0\), so the series does not represent \(f\) near \(0\). This means \(f\) can not be analytic at \(0\).  
+
+In the following, we explain why \(f^{(k)}(0) = 0\) for all \(k \in \mathbb{N} \). 
+\begin{claim} \label{clm: bump function clm}
+    For every \(k \in \mathbb{N} \), there exists a polynomial \(P_k(t)\) s.t. 
+    \[
+        f^{(k)}(x) = P_k \left( \frac{1}{x} \right) e^{-\frac{1}{x^2}} \quad \text{for } x\neq 0. 
+    \]  
+\end{claim}  
+\begin{explanation}
+    Let \(t = \frac{1}{x}\) and set \(g(t) = e^{-t^2}\), so that \(f(x) = g(t)\) with \(t = \frac{1}{x}\). Since \(g^{\prime} (t) = -2te^{-t^2}\) and \(\frac{\mathrm{d}t}{\mathrm{d}x} = -\frac{1}{x^2} = -t^2 \), we obtain 
+    \[
+        f^{\prime} (x) = g^{\prime} (t) \frac{\mathrm{d}t}{\mathrm{d}x} = \left( -2te^{-t^2} \right) \left( -t^2 \right) = 2t^3 e^{-t^2} = P_1(t) e^{-t^2} = P_1(t) g(t),   
+    \] where \(P_1(t) = 2t^3\). Thus, the formula holds for \(k=1\). Now assume the formula holds for some \(k \in \mathbb{N} \), i.e. 
+    \[
+        f^{(k)}(x) = P_k(t) g(t), \quad t =\frac{1}{x}.
+    \] Differentiating and using the chain rule, together with \(g^{\prime} (t) = -2t g(t)\) and \(\frac{\mathrm{d}t}{\mathrm{d}x} = -t^2 \), we have 
+    \begin{align*}
+        f^{(k+1)}(x) &= \frac{\mathrm{d}}{\mathrm{d}x} \left( P_k(t) g(t) \right) = \left( P_k^{\prime} (t) g(t) + P_k(t) g^{\prime} (t) \right) \frac{\mathrm{d}t}{\mathrm{d}x} \\
+        &= \left( P_k^{\prime} (t) g(t) - 2t P_k(t) g(t) \right) \left( -t^2 \right) = \left( -t^2 P_k^{\prime} (t) + 2t^3 P_k(t) \right) g(t).      
+    \end{align*}   
+    Hence, 
+    \[
+        f^{(k+1)}(x) = P_{k+1}(t) g(t), \quad \text{where } P_{k+1}(t) \coloneqq -t^2 P_k^{\prime} (t) + 2t^3 P_k(t), 
+    \] and \(P_{k+1}(t)\) is a polynomial whenever \(P_k(t)\) is. This completes the induction.          
+\end{explanation}
+Now we can show \(f^{(k)}(0) = 0\) for all \(k \in \mathbb{N} \). First, note that 
+\[
+    f^{\prime} (0) = \lim_{x \to 0} \frac{f(x) - f(0)}{x - 0} = \lim_{x \to 0} \frac{e^{-\frac{1}{x^2}}}{x}.  
+\]  
+We first compute the right-hand limit. Let \(t = \frac{1}{x}\), so that \(x \to 0^+\) corresponds to \(t \to +\infty \). Then 
+\[
+    \lim_{x \to 0^+} \frac{e^{-\frac{1}{x^2}}}{x} = \lim_{t \to \infty} \frac{t}{e^{t^2}} = \lim_{t \to \infty} \frac{1}{2te^{t^2}} = 0  
+\] by the L'Hopital's rule. Similarly, for the left-hand limit, 
+\[
+    \lim_{x \to 0^-} \frac{e^{-\frac{1}{x^2}}}{x} = \lim_{t \to -\infty} \frac{t}{e^{t^2}} = \lim_{t \to -\infty} \frac{1}{2te^{t^2}} = 0   
+\] again by the L'Hopital's rule. Since both one-sided limits are equal to \(0\), we conclude that \(f^{\prime} (0) = 0\). 
+
+We now show by induction that \(f^{(k)}(0) = 0\) for all \(k \in \mathbb{N} \). For \(k = 1\), we have shown that \(f^{\prime} (0) = 0\). Assume \(f^{(n)}(0) = 0\) for some \(n \ge 1\). By \autoref{clm: bump function clm}, we know 
+\[
+    f^{(n)}(x) = P_n \left( \frac{1}{x} \right) e^{-\frac{1}{x^2}}, 
+\] and by induction we have \(f^{(n)}(0) = 0\). Then, 
+\[
+    f^{(n+1)}(0) = \lim_{x \to 0} \frac{f^{(n)}(0) - f^{(n)}(0)}{x} = \lim_{x \to 0} \frac{P_n \left( \frac{1}{x} \right) e^{-\frac{1}{x^2}} }{x}.  
+\]      
+Similarly suppose \(t = \frac{1}{x}\), and then we have 
+\[
+    \begin{dcases}
+        \lim_{x \to 0^+} \frac{P_n \left( \frac{1}{x} \right) e^{-\frac{1}{x^2}}}{x} = \lim_{t \to \infty} \frac{t P_n(t)}{e^{t^2}} = 0, \\
+        \lim_{x \to 0^-} \frac{P_n \left( \frac{1}{x} \right) e^{-\frac{1}{x^2}}}{x} = \lim_{t \to -\infty} \frac{t P_n(t)}{e^{t^2}} = 0 
+    \end{dcases}
+\] sisnce \(P_n(t)\) is polynomial and \(e^{t^2}\) is a exponential function. By this, we can conclude that \(f^{(n+1)}(0) = 0\), and we're done.    
+\end{explanation}
+
+\begin{corollary}[Taylor's formula] \label{cl: Taylors formula}
+    If \(f\) is real analytic at \(a\) with
+    \[
+        f(x) = \sum_{n=0}^{\infty} c_n (x-a)^n, \quad x \in (a-r, a+r), 
+    \] then for all \(k \ge 0\), 
+    \[
+        f^{(k)}(a) = k! c_k,
+    \] and hence 
+    \[
+        f(x) = \sum_{n=0}^{\infty} \frac{f^{(n)}(x)}{n!} (x-a)^n. 
+    \]
+\end{corollary}
+
+\begin{remark}
+    Taylor's formula applies only to real analytic functions. There exists functions that are \(C^{\infty} \) but not real analytic, whose Taylor series fails to represent the function. For example, 
+    \[
+        f(x) = \begin{dcases}
+            e^{-\frac{1}{x^2}}, &x \neq 0 \\
+            0, &x = 0.
+        \end{dcases}
+    \] 
+\end{remark}
+
+\begin{corollary}
+    If \(f\) is real analytic at \(a\) and admits two power series expansions 
+    \[
+        f(x) = \sum_{n=0}^{\infty} c_n (x-a)^n \text{ and } f(x) = \sum_{n=0}^{\infty} d_n (x-a)^n,    
+    \] then \(c_n = d_n\) for all \(n \ge 0\). 
+\end{corollary}
+\begin{proof}
+    By Taylor's formula, \(f^{(k)}(a) = k! c_k = k! d_k\), and since \(k! \neq 0\), so we can conclude \(c_k = d_k\) for all \(k\).
+\end{proof}
+
+\begin{remark}
+    This means the power series expansion about a given center is unique.
+\end{remark}
+
+\begin{remark}
+    Although the expansion at a fixed point \(a\) is unique, different centers yield distinct series. 
+\end{remark}
+
+\begin{eg}
+    We have shown that 
+    \[
+        \frac{1}{1-x} = \sum_{n=0}^{\infty} \frac{(x-a)^n}{(1-a)^{n+1}}, \quad \text{for } \vert x-a \vert < \vert 1-a \vert.    
+    \]
+    Hence, we have 
+    \begin{align*}
+        &\text{At } a=0: \quad f(x) = \sum_{n=0}^{\infty} x^n, \quad \vert x \vert < 1. \\
+        &\text{At } a = \frac{1}{2}: \quad f(x) = \sum_{n=0}^{\infty} 2^{n+1} \left( x-\frac{1}{2} \right)^n, \quad \left\vert x - \frac{1}{2} \right\vert < \frac{1}{2}.       
+    \end{align*}
+    Note that this means the radius of convergence is related to the choice of \(a\) since the choice of \(a\) affects the coefficient of the power series. 
+\end{eg}

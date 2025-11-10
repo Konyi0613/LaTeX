@@ -1,0 +1,217 @@
+\lecture{18}{6 Nov. 10:20}{}
+\section{Abel's Theorem: Boundary behaviour of power series}
+Let \(f(x) = \sum_{n=0}^{\infty} c_n (x-a)^n \) have radius of convergence \(0 < R < \infty \). Then we know the series converges absolutely for \(\vert x-a \vert < R \) and diverges for \(\vert x-a \vert > R \). However, on the boundary \(\vert x-a \vert = R \), convergence is delicate: the series may converge or diverge. \\
+ \textbf{Key message:} If the series does converge at a boundary point, Abel's theorem guarantees continuity there and identifies the boundary value. 
+ 
+ \begin{theorem}[Abel's theorem] \label{thm: Abel's theorem}
+    Let \(f(x) = \sum_{n=0}^{\infty} c_n (x-a)^n \) be a power series with radius of convergence \(0 < R < \infty \). 
+    \begin{itemize}
+        \item [(i)] If the series converges at \(x = a + R\), then 
+        \[
+            \lim_{x \to a + R: x \in (a-R, a+R)} \sum_{n=0}^{\infty} c_n (x-a)^n = \sum_{n=0}^{\infty} c_n R^n.   
+        \]
+        \item [(ii)] If the series converges at \(x = a - R\), then 
+        \[
+            \lim_{x \to a - R: x \in (a-R, a+R)} \sum_{n=0}^{\infty} c_n (x-a)^n = \sum_{n=0}^{\infty} c_n (-R)^n.   
+        \]
+        In particular, \(f\) is continuous at any boundary point where the series converges. 
+    \end{itemize}  
+ \end{theorem}
+
+ \begin{remark}
+    This theorem is particularly important because in general, for an arbitrary series of functions, convergence at a boundary point does not guarantee continuity there. Abel's theorem ensures that power series behave much more regularly at the endpoints of the interval of convergence.   
+ \end{remark}
+
+ \begin{remark}
+    Abel's theorem tells us if the boundary series \(\sum_{n=0}^{\infty} \sum_{n=0}^{\infty} c_n R^n  \) or \(\sum_{n=0}^{\infty} c_n \left( -R \right)^n  \) converges, then the series is continuous at the boundary points, and the limiting value is exactly substituting \(a+R\) or \(a-R\) into the series. (note the definition of continuity).   
+ \end{remark}
+
+ \begin{eg}[Convergence at endpoint does not imply continuity] 
+    \[
+        f_n(x) \coloneqq \begin{dcases}
+            x^n, &0 \le x < 1, \\
+            0, &x = 1.
+        \end{dcases} \quad 
+        S(x) \coloneqq \sum_{n=1}^{\infty} f_n(x). 
+    \]
+ \end{eg}
+ \begin{explanation}
+    For \(x \in [0, 1)\), we know \(f_n(x) = x^n\) and \(\sum f_n(x) = \frac{x}{1-x} \). At \(x = 1\), each \(f_n(1) = 0\), so \(S(1) = 0\). However, 
+    \[
+        \lim_{x \to 1^-} S(x) = \lim_{x \to 1^-} \frac{x}{1-x} = +\infty .  
+    \]      
+    Hence, we know \(S(x)\) converges at \(x = 1\) but is discontinuous at \(x = 1\).  
+ \end{explanation}
+
+ \begin{lemma}[Summation by parts formula]\label{lm: summation by parts formula}
+    Let \(\left( a_n \right)_{n=0}^{\infty}  \) and \(\left( b_n \right)_{n=0}^{\infty}  \) be real sequences with limits \(A = \lim_{n \to \infty} a_n \) and \(B = \lim_{n \to \infty} b_n\). Assume \(\sum_{n=0}^{\infty} \left( a_{n+1} - a_n\right)b_n  \) converges. Then 
+    \[
+        \sum_{n=0}^{\infty} a_{n+1} \left( b_{n+1} - b_n \right)  
+    \] also converges and 
+    \[
+        \sum_{n=0}^{\infty} \left( a_{n+1} - a_n \right) b_n = AB - a_0 b_0 - \sum_{n=0}^{\infty} a_{n+1} \left( b_{n+1} - b_n \right).     
+    \]
+ \end{lemma}
+\begin{proof}
+    Define the partial sums \(S_N \coloneqq \sum_{n=0}^N \left( a_{n+1} - a_n \right) b_n  \). Then, 
+    \begin{align*}
+        S_N &= \sum_{n=0}^N a_{n+1} b_n - \sum_{n=0}^N a_n b_n = \sum_{n=1}^{N+1} a_n b_{n-1} - \sum_{n=0}^N a_n b_n \\
+        &= -a_0 b_0 + \sum_{n=1}^N a_n \left( b_{n-1} - b_n \right) + a_{N+1}b_N \\
+        &= -a_0 b_0 - \sum_{n=1}^N a_n \left( b_n - b_{n-1} \right) + a_{N+1} b_N \\
+        &= -a_0 b_0 - \sum_{n=1}^N a_n \left( b_n - b_{n-1} \right) + a_{N+1} b_N \\
+        &= - a_0 b_0 - \sum_{n=0}^{N-1} a_{n+1} \left( b_{n+1} - b_n \right) + a_{N+1} b_N.            
+    \end{align*}
+    Taking \(N \to \infty \) and using \(a_{N+1} \to A\) and \(b_N \to B\) gives 
+    \[
+        \sum_{n=0}^{\infty} \left( a_{n+1} - a_n \right)b_n = AB - a_0 b_0 - \sum_{n=0}^{\infty} a_{n+1} \left( b_{n+1} - b_n \right),    
+    \]   
+\end{proof}
+
+\begin{remark}[Analogy with integration by parts]
+    This identity above is the discrete analogue of integration by parts: 
+    \[
+        \int _0^{\infty} f^{\prime} (x) g(x) \, \mathrm{d} x = \left. f(x) g(x) \right\vert_0^{\infty} - \int _0^{\infty} f(x) g^{\prime} (x) \, \mathrm{d} x. 
+    \]
+    Summation by parts transfers difference from \((a_n)\) to \((b_n)\) just as integration by parts transfers derivatives from \(f\) to \(g\).    
+\end{remark}
+
+Now we prove Abel's theorem. 
+\begin{proof}[Proof of Abel's theorem]
+    It sufficies to prove the first assertion, namely that 
+    \[
+        \lim_{\substack{x \to a + R^- \\ x \in (a-R, a+R)}} \sum_{n=0}^{\infty} c_n (x-a)^n = \sum_{n=0}^{\infty} c_n R^n,   
+    \] whenever the series \(\sum_{n=0}^{\infty} c_n R^n \) converges. The corresponding result at \(x = a - R\) follows immediately by replacing \(c_n\) with \((-1)^n c_n\). 
+    
+    We first simplify our notations. Set \(d_n \coloneqq c_n R^n\) and let \(y \coloneqq \frac{x-a}{R}\). Then \((x-a) = Ry\), and 
+    \[
+        c_n (x-a)^n = c_n R^n y^n = d_n y^n.
+    \]   Thus, the assertion above is equivalent to showing that 
+    \[
+        \lim_{\substack{y \to 1^- \\ y \in (-1,1)}} \sum_{n=0}^{\infty} d_n y^n = \sum_{n=0}^{\infty} d_n,   
+    \] whenever the series \(\sum_{n=0}^{\infty} d_n \) converges. 
+    
+    Now let \(D \coloneqq \sum_{n=0}^{\infty} d_n \) and define 
+    \[
+        S_N \coloneqq \left( \sum_{n=0}^{N-1} d_n  \right) - D, \quad \text{such that } S_{n+1} - S_n = d_n \text{ for } n \ge 0.   
+    \] 
+    Choosing \(S_0\) so that \(S_1 - S_0 = d_0\) gives \(S_0 = -D\). Then \(S_N \to 0\) as \(N \to \infty \), and 
+    \[
+        d_n = S_{n+1} - S_n.
+    \]     
+    Hence, for any \(y \in (-1, 1)\), 
+    \[
+        \sum_{n=0}^{\infty} d_n y^n = \sum_{n=0}^{\infty} \left( S_{n+1} - S_n \right) y^n.   
+    \] 
+    Now by \hyperref[lm: summation by parts formula]{Summation by parts formula}. If \(A = \lim_{n \to \infty} a_n \) and \(B = \lim_{n \to \infty} b_n \), and if \(\sum_{n=0}^{\infty} \left( a_{n+1} - a_n \right) b_n  \) converges, then 
+    \[
+        \sum_{n=0}^{\infty} \left( a_{n+1} - a_n \right) b_n = AB - a_0 b_0 - \sum_{n=0}^{\infty} a_{n+1} \left( b_{n+1} - b_n \right).
+    \]    
+    Applying this formula with \(a_n = S_n\) and \(b_n = y^n\), and noting that \(\lim_{n \to \infty} y^n = 0 \) for \(y \in (-1, 1)\), we obtain 
+    \[
+        \sum_{n=0}^{\infty} d_n y^n = -S_0 y^0 - \sum_{n=0}^{\infty} S_{n+1} \left( y^{n+1} - y^n \right).   
+    \]    
+    Since \(S_0 = -D\), this becomes 
+    \[
+        \sum_{n=0}^{\infty} d_n y^n = D - \sum_{n=0}^{\infty} S_{n+1} \left( y^{n+1} - y^n \right).   
+    \] 
+    Thus, to complete the proof, it remains to show that 
+    \[
+        \lim_{\substack{y \to 1^- \\ y \in (-1, 1)}} \sum_{n=0}^{\infty} S_{n+1} \left( y^{n+1} - y^n \right) = 0.   
+    \]
+    \begin{itemize}
+        \item \textbf{Step 1:} Restrict to \(y \in [0, 1)\) since the limit \(y \to 1^-\) is taken from below. 
+        \item \textbf{Step 2:} Estimate by absolute values:
+        \[
+            \left\vert \sum_{n=0}^{\infty} S_{n+1}  \left( y^{n+1} - y^n \right)  \right\vert \le \sum_{n=0}^{\infty} \left\vert S_{n+1} \right\vert \left\vert y^{n+1} - y^n \right\vert = \sum_{n=0}^{\infty} \left\vert S_{n+1} \right\vert \left( y^n - y^{n+1} \right).       
+        \]
+        \item \textbf{Step 3:} Use the squeeze principle: It sufficies to show that 
+        \[
+            \lim_{y \to 1^-} \sum_{n=0}^{\infty} \left\vert S_{n+1} \right\vert \left( y^n - y^{n+1} \right) = 0.    
+        \]
+        \item \textbf{Step 4:} Since \(S_n \to 0\), for any \(\varepsilon > 0\) there exists \(N\) s.t. \(\left\vert S_n \right\vert \le \varepsilon  \) for all \(n > N\). Then 
+        \[
+            \sum_{n=0}^{\infty} \left\vert S_{n+1} \right\vert \left( y^n - y^{n+1} \right) \le \sum_{n=0}^N \left\vert S_{n+1} \right\vert \left( y^n - y^{n+1} \right) + \sum_{n=N+1}^{\infty} \varepsilon \left( y^n - y^{n+1} \right).        
+        \]     
+        \item \textbf{Step 5:} The tail sum telescopes: \(\sum_{n=N+1}^{\infty} \left( y^n - y^{n+1} \right) = y^{N+1}  \). Thus 
+        \[
+            \sum_{n=0}^{\infty} \left\vert S_{n+1} \right\vert \left( y^n - y^{n+1} \right) \le \sum_{n=0}^N \left\vert S_{n+1}  \right\vert \left( y^n - y^{n+1} \right) + \varepsilon y^{N+1}. 
+        \]
+        \item \textbf{Step 6:} Let \(y \to 1^-\). The finite sum \(\sum_{n=0}^N \left\vert S_{n+1} \right\vert \left( y^n - y^{n+1} \right) \to 0  \), abd \(y^{N+1} \to 1\), which gives 
+        \[
+            \limsup_{y \to 1^-} \sum_{n=0}^{\infty} \left\vert S_{n+1} \right\vert \left( y^n - y^{n+1} \right) \le \varepsilon.    
+        \]
+        Since \(\varepsilon > 0\) is arbitrary, the limit is \(0\).  
+    \end{itemize}
+    Hence, 
+    \[
+        \lim_{y \to 1^-} \sum_{n=0}^{\infty} S_{n+1} \left( y^{n+1} - y^n \right) = 0, \quad \text{and therefore } \lim_{y \to 1^-} \sum_{n=0}^{\infty} d_n y^n = D.    
+    \] 
+    Recalling that \(d_n = c_n R^n\), this gives 
+    \[
+        \lim_{x \to a + R^-} \sum_{n=0}^{\infty} c_n (x-a)^n = \sum_{n=0}^{\infty} c_n R^n.   
+    \] 
+    \begin{remark}
+        \(\limsup_{y \to 1^-} \) means taking the limit of \(y\) to \(1^-\) and then take sup, or equivalently 
+        \[
+            \limsup_{y \to 1^-} f(y) = \lim_{\delta \to 0^+} \sup \left\{ f(y) \mid 0 < 1 - y < \delta \right\}. 
+        \]   
+    \end{remark}
+\end{proof}   
+
+\begin{proposition}[The \(p\)-series test]
+    The series 
+    \[
+        \sum_{n=1}^{\infty} \frac{1}{n^p} 
+    \] (conventionally called a \(p\)-series) converges iff \(p > 1\), and diverges for \(0 < p \le 1\).   
+\end{proposition}
+
+\begin{proposition}[Alternating harmonic series]
+    \[
+        \sum_{n=1}^{\infty} \frac{(-1)^n}{n} \text{ converges (conditionally) by the Leibniz criterion.}  
+    \]
+\end{proposition}
+
+Now we talk about some examples. 
+\begin{remark}
+Fix \(a \in \mathbb{R} \) and \(R > 0\). For a power series written as 
+\[
+    \sum_{n=0}^{\infty} c_n (x-a)^n, 
+\] its radius of convergence is 
+\[
+    \rho = \frac{1}{\limsup_{n \to \infty} \left\vert c_n \right\vert^{\frac{1}{n}}  }.
+\] When \(c_n\) contains a factor \(\frac{1}{n}\) or \(\frac{1}{n^2}\), we interpret the series starting at \(n=1\); the \(n=0\) term is arbitrary and does not affect \(\rho \) or endpoint behaviour.
+\end{remark}   
+
+\begin{eg}
+    Consider the series 
+    \[
+        \sum_{n=1}^{\infty} \frac{1}{n^2 R^n} (x-a)^n.
+    \]
+    Here \(c_n = \frac{1}{n^2 R^n}\). Then 
+    \[
+        \limsup_{n \to \infty} \vert c_n \vert^{\frac{1}{n}} = \lim_{n \to \infty} \frac{1}{R} n^{-\frac{2}{n}} = \frac{1}{R}, \quad \implies \rho = R.   
+    \] 
+    At endpoints: 
+    \begin{itemize}
+        \item At \(x = a + R\): \(\sum_{n=1}^{\infty} \frac{1}{n^2} \) converges. 
+        \item At \(x = a - R\): \(\sum_{n=1}^{\infty} \frac{(-1)^n}{n^2} \) converges absolutely.    
+    \end{itemize}
+    Hence, this series converges at both \(x = a \pm R\). Hence, by Abel's theorem, we know this series is continuous at two endpoints. 
+\end{eg}
+
+\begin{eg}
+    Consider the series 
+    \[
+        \sum_{n=0}^{\infty} \frac{1}{R^n} (x-a)^n = \sum_{n=0}^{\infty} \left( \frac{x-a}{R} \right)^n \text{ (geometric)}.    
+    \]
+    Here \(c_n = \frac{1}{R^n}\). Then 
+    \[
+        \limsup_{n \to \infty} \left\vert c_n \right\vert^{\frac{1}{n}} = \frac{1}{R}, \quad \implies \rho = R.  
+    \] 
+    At endpoints:
+    \begin{itemize}
+        \item At \(x = a + R\): \(\sum_{n=0}^{\infty} 1 \) diverges. 
+        \item At \(x = a - R\): \(\sum_{n=0}^{\infty} (-1)^n \) oscillates, hence diverges.    
+    \end{itemize}
+    Hence, it diverges at both \(x = a \pm R\). 
+\end{eg}
