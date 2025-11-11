@@ -20,6 +20,79 @@ A function \(f(x)\) that is representable as a power series near a point is call
     Informally, a function is real analytic at \(a\) implies it can be represented as a power series whose radius of convergence is bigger than \(0\).  
 \end{remark}
 
+\begin{corollary} \label{cl: converges on intervals means analytic}
+    If \(f\) is real analytic at \(a\), and say 
+    \[
+        f(x) = \sum_{n=0}^{\infty} c_n (x - a)^n, 
+    \] converges to \(f(x)\) for all \(x \in (a-r, a+r)\), then \(f\) is real analytic for all \(x \in (a-r, a+r)\) i.e. \(f\) is real analytic on \((a-r,a+r)\).      
+\end{corollary}
+\begin{proof}
+    Let \( x_0 \in (a - r, a + r) \). We will show that \( f \) is analytic at \( x_0 \).
+
+    Since \( |x_0 - a| < r \), for any \( x \) we can write
+    \[
+        x - a = (x - x_0) + (x_0 - a).
+    \]
+    Substituting this into the given series and applying the binomial theorem gives
+    \[
+        (x - a)^n = \big( (x - x_0) + (x_0 - a) \big)^n 
+        = \sum_{m = 0}^{n} \binom{n}{m} (x - x_0)^m (x_0 - a)^{n - m}.
+    \]
+    Hence
+    \[
+        f(x)
+        = \sum_{n = 0}^{\infty} c_n (x - a)^n
+        = \sum_{n = 0}^{\infty} c_n \sum_{m = 0}^{n} 
+            \binom{n}{m} (x - x_0)^m (x_0 - a)^{n - m}.
+    \]
+    We now interchange the order of summation (which will be justified below) to obtain
+    \[
+        f(x) = \sum_{m = 0}^{\infty} 
+        \Bigg( \sum_{n = m}^{\infty} c_n \binom{n}{m} (x_0 - a)^{n - m} \Bigg) (x - x_0)^m.
+    \]
+    Define
+    \[
+        d_m = \sum_{n = m}^{\infty} c_n \binom{n}{m} (x_0 - a)^{n - m}.
+    \]
+    Then
+    \[
+        f(x) = \sum_{m = 0}^{\infty} d_m (x - x_0)^m.
+    \]
+    
+    To justify the interchange of summation, fix a number \( r' \) such that 
+    \( |x_0 - a| < r' < r \).  
+    Since the original series converges for \( |x - a| < r \), there exists \( M > 0 \)
+    such that \( |c_n| r'^n \le M \) for all \( n \).  Hence
+    \[
+        |c_n| \le \frac{M}{r'^n}.
+    \]
+    For each \( m \),
+    \[
+        \big| c_n \binom{n}{m} (x_0 - a)^{n - m} \big|
+        \le \frac{M}{r'^n} \binom{n}{m} |x_0 - a|^{n - m}.
+    \]
+    Since \( \binom{n}{m} \le \frac{n^m}{m!} \) and \( |x_0 - a| / r' < 1 \),
+    we obtain
+    \[
+        \big| c_n \binom{n}{m} (x_0 - a)^{n - m} \big|
+        \le \frac{M}{m!} \, n^m \left( \frac{|x_0 - a|}{r'} \right)^n,
+    \]
+    and the right-hand side defines a convergent series in \( n \)
+    because \( 0 < |x_0 - a| / r' < 1 \).
+    Therefore the inner sum defining \( d_m \) converges absolutely,
+    and interchanging the order of summation is justified.
+
+    Furthermore, from the last inequality it follows that
+    the new series \( \sum_{m=0}^{\infty} d_m (x - x_0)^m \)
+    converges at least for \( |x - x_0| < r - |x_0 - a| \).
+
+    Thus \( f \) can be represented by a convergent power series
+    around \( x_0 \), so \( f \) is analytic at \( x_0 \).
+    Since \( x_0 \) was arbitrary in \( (a - r, a + r) \),
+    \( f \) is analytic on the entire interval.
+\end{proof}
+
+
 \begin{eg}
     Consider the function \(f: \mathbb{R} \setminus \left\{ 1 \right\} \to  \mathbb{R}  \) defined by 
     \[
@@ -243,6 +316,7 @@ In the following, we explain why \(f^{(k)}(0) = 0\) for all \(k \in \mathbb{N} \
         f^{(k+1)}(x) = P_{k+1}(t) g(t), \quad \text{where } P_{k+1}(t) \coloneqq -t^2 P_k^{\prime} (t) + 2t^3 P_k(t), 
     \] and \(P_{k+1}(t)\) is a polynomial whenever \(P_k(t)\) is. This completes the induction.          
 \end{explanation}
+
 Now we can show \(f^{(k)}(0) = 0\) for all \(k \in \mathbb{N} \). First, note that 
 \[
     f^{\prime} (0) = \lim_{x \to 0} \frac{f(x) - f(0)}{x - 0} = \lim_{x \to 0} \frac{e^{-\frac{1}{x^2}}}{x}.  
@@ -324,3 +398,67 @@ Similarly suppose \(t = \frac{1}{x}\), and then we have
     \end{align*}
     Note that this means the radius of convergence is related to the choice of \(a\) since the choice of \(a\) affects the coefficient of the power series. 
 \end{eg}
+
+\begin{theorem} \label{thm: analytic on intervals means converges on interval}
+Let $f$ be real-analytic on the open interval $(a-r, a+r)$. Then the Taylor series
+\[
+\sum_{n=0}^{\infty} \frac{f^{(n)}(a)}{n!} (x-a)^n
+\]
+has radius of convergence $R \ge r$ and converges to $f(x)$ for all $x \in (a-r, a+r)$.
+\end{theorem}
+
+\begin{proof}
+Since $f$ is real-analytic on $(a-r,a+r)$, by definition, for every point $x_0 \in (a-r,a+r)$, there exists some $\rho>0$ and a power series
+\[
+\sum_{n=0}^{\infty} c_n (x-x_0)^n
+\]
+that converges to $f(x)$ for all $x$ with $|x-x_0|<\rho$. In particular, $f$ is infinitely differentiable on $(a-r,a+r)$.
+
+\medskip
+\noindent
+\textbf{Step 1: Cauchy's estimates for derivatives.}  
+
+Fix $0 < r' < r$ and consider the closed interval $[a-r',a+r'] \subset (a-r,a+r)$. By analyticity, there exists a constant $M>0$ such that for all $n \ge 0$,
+\[
+\sup_{x \in [a-r',a+r']} |f^{(n)}(x)| \le M \frac{n!}{(r')^n}.
+\]
+This inequality is a real-analytic analogue of \emph{Cauchy's estimates}, which can be derived, for example, by extending $f$ to a complex-analytic function in a strip of width $r'$ around the real interval and applying the standard Cauchy derivative formula.
+
+\medskip
+\noindent
+\textbf{Step 2: Bound on Taylor coefficients.}  
+
+Let $c_n = \frac{f^{(n)}(a)}{n!}$ be the Taylor coefficients at $a$. Then, using the above estimate,
+\[
+|c_n| = \frac{|f^{(n)}(a)|}{n!} \le \frac{M \, n!/(r')^n}{n!} = M \left(\frac{1}{r'}\right)^n.
+\]
+
+\medskip
+\noindent
+\textbf{Step 3: Ratio (or root) test for radius of convergence.}  
+
+Consider the Taylor series $\sum_{n=0}^{\infty} c_n (x-a)^n$. By the root test,
+\[
+\limsup_{n \to \infty} |c_n|^{1/n} \le \limsup_{n \to \infty} \left( M \left(\frac{1}{r'}\right)^n \right)^{1/n} = \frac{1}{r'}.
+\]
+
+The root test then implies that the series converges absolutely for all $x$ such that
+\[
+|x-a| < \frac{1}{\limsup_{n \to \infty} |c_n|^{1/n}} \ge r'.
+\]
+
+Since $r' \in (0,r)$ is arbitrary, we can take $r' \to r$ and conclude that the radius of convergence $R$ of the Taylor series satisfies
+\[
+R \ge r.
+\]
+
+\medskip
+\noindent
+\textbf{Step 4: Conclusion.}  
+
+Therefore, the Taylor series at $a$ converges for all $x \in (a-r,a+r)$ and has radius of convergence at least $r$.
+\end{proof}
+
+\begin{remark} \label{rmk: analytic equivalent to convergence}
+    By \autoref{cl: converges on intervals means analytic} and \autoref{thm: analytic on intervals means converges on interval}, we know if \(f\) is the function, then the power series of \(f\) centered at \(a\) converges on \((a-r,a+r)\) iff \(f\) is real analytic on \((a-r, a+r)\).    
+\end{remark}

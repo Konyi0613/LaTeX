@@ -36,19 +36,6 @@
     \] then \(\mathrm{ch}_T(x) = \prod _{i=1}^n (x - a_i) \) splits (e.g. This always holds for \(F = \mathbb{C} \)). (And by Cayley-Hamilton we know \(m_T(x)\) splits completely). 
 \end{corollary}
 
-\begin{theorem} \label{thm: minimal polynomial splits, then triangulanizable}
-    Suppose \(m_T(x)\) splits, then \(T\) is triangulanizable.  
-\end{theorem}
-\begin{proof}
-    Use induction (for finding a \(T\)-invariant chain). Suppose we have 
-    \[
-        0 = W_0 \subseteq W_1 \subseteq W_2 \subseteq \dots \subseteq W_k \neq V,
-    \] where \(\dim W_i = i\) for all \(i\). Then, \(\exists v_{k+1} \notin W_{k}\), and thus \(\left\{ v_1, \dots , v_{k+1} \right\} \) is linearly independent. Note that 
-    \[
-        (T - a_{k+1})(v_{k+1}) = \sum_{i=1}^k a_{i, k+1} v_i. 
-    \]   
-\end{proof}
-
 \begin{lemma} \label{lm: mT split, W proper T invariant subspace then exists u notin W s.t. (T-lambda)(u) in W}
     Suppose \(m_T(x)\) splits. If \(W\) is a \(T\)-invariant proper subspace of \(V\), then \(\exists u \notin W\) (i.e. \(u\) and \(W\) are linearly independent), and \(\lambda \in F\) s.t. \((T - \lambda )(u) \in W\).       
 \end{lemma}
@@ -57,10 +44,24 @@
     \begin{align*}
         \mathrm{Ann}_T(V / W) = \left\{ g(x) \in F[x] \mid g(T)(V) \subseteq W \right\} = F[x] \cdot p(x), 
     \end{align*}
-    and we know \(m_T(x) \in \mathrm{Ann}_T(V / W) \), so \(p(x) = (x - \lambda ) q(x)\) for some \(\lambda = \lambda _i\), where \(\lambda _i\) is an eigenvalue of \(T\) since \(W \neq V\) and \(p(x) \mid m_T(x)\). Hence, there exists \(v \notin W\) s.t. \(u = q(T)(v) \notin W\). Thus, we know 
+    and we know \(m_T(x) \in \mathrm{Ann}_T(V / W) \), so \(p(x) = (x - \lambda ) q(x)\) for some \(\lambda \in F\), where \(x - \lambda \mid m_T(x)\) since \(W \neq V\) and \(p(x) \mid m_T(x)\). Hence, there exists \(v \notin W\) s.t. \(u = q(T)(v) \notin W\). Thus, we know 
     \[
         (T - \lambda )(u) = (T - \lambda )q(T)(v) = p(T)(v) \in W.
     \]     
+\end{proof}
+
+
+\begin{theorem} \label{thm: minimal polynomial splits, then triangulanizable}
+    Suppose \(m_T(x)\) splits, then \(T\) is triangulanizable.  
+\end{theorem}
+\begin{proof}
+    Use induction (for finding a \(T\)-invariant chain). Suppose we have 
+    \[
+        0 = W_0 \subseteq W_1 \subseteq W_2 \subseteq \dots \subseteq W_k \neq V,
+    \] where \(\dim W_i = i\) for all \(i\). Then, \(\exists v_{k+1} \notin W_{k}\) and \(\lambda \in F\) s.t.  
+    \[
+        (T - \lambda )(v_{k+1}) = \sum_{i=1}^k a_{i, k+1} v_i 
+    \]by \autoref{lm: mT split, W proper T invariant subspace then exists u notin W s.t. (T-lambda)(u) in W}. Hence, \(T(v_{k+1}) \in \langle v_1, v_2, \dots , v_{k+1} \rangle \) and thus \(\langle v_1, \dots , v_{k+1} \rangle \) is \(T\)-invariant, so we can let \(W_{k+1} = \langle v_1, \dots , v_{k+1}  \rangle \).     
 \end{proof}
 
 \begin{theorem}[Cayley-Hamilton theorem]
@@ -82,4 +83,97 @@
         & \ \, \vdots
     \end{align*}
     We can check that \(\det (e_k) = 0\) for all \(k\), and \(\det (B) = f(A) \), so we're done.   
+\end{proof}
+\begin{proof}[Alternative]
+    First, recall that for any matrix $B \in M_n(\mathbb{C})$, one has
+\[
+B \, \operatorname{adj}(B) = \det(B) I_n.
+\]
+
+\medskip
+
+Take $B = A - xI$, we get
+\[
+(A - xI)\operatorname{adj}(A - xI) = \det(A - xI) I_n = p_A(x) I_n.
+\]
+
+\subsection*{Observation}
+
+Let
+\[
+p_A(x) = a_n x^n + a_{n-1} x^{n-1} + \cdots + a_1 x + a_0.
+\]
+
+Note that
+\[
+A - xI = 
+\begin{pmatrix}
+a_{11} - x & a_{12} & \cdots & a_{1n} \\
+a_{21} & a_{22} - x & \cdots & a_{2n} \\
+\vdots & \vdots & \ddots & \vdots \\
+a_{n1} & a_{n2} & \cdots & a_{nn} - x
+\end{pmatrix}.
+\]
+
+Any minor of $A - xI$ is a polynomial of degree $\leq n-1$.
+Then we can write
+\[
+\operatorname{adj}(A - xI) = B_0 + B_1 x + B_2 x^2 + \cdots + B_{n-1} x^{n-1}.
+\]
+
+For example,
+\[
+\operatorname{adj}
+\begin{pmatrix}
+x^2 - 3x & 2 + 2x & x \\
+3 + x^2 & x & 2x \\
+4x & 3x^2 & 1
+\end{pmatrix}
+= 
+\begin{pmatrix}
+0 & 2 & 0 \\
+3 & 0 & 0 \\
+0 & 0 & 1
+\end{pmatrix}
++ 
+\begin{pmatrix}
+-3 & 2 & 1 \\
+0 & 1 & 2 \\
+4 & 0 & 0
+\end{pmatrix} x
++ 
+\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 3 & 0
+\end{pmatrix} x^2.
+\]
+
+\medskip
+
+Hence,
+\[
+(A - xI)(B_0 + B_1 x + \cdots + B_{n-1} x^{n-1}) = a_n I x^n + a_{n-1} I x^{n-1} + \cdots + a_0 I.
+\]
+
+By comparing coefficients, we get:
+\[
+\begin{cases}
+a_n I = -B_{n-1}, \\
+a_{n-1} I = A B_{n-1} - B_{n-2}, \\
+a_{n-2} I = A B_{n-2} - B_{n-3}, \\
+\quad \vdots \\
+a_0 I = A B_0.
+\end{cases}
+\]
+
+Multiplying each equation successively by appropriate powers of $A$ (First equation multiplies \(A^n\), the second one multiplies \(A^{n-1}\), and so on), we obtain
+\[
+a_n A^n + a_{n-1} A^{n-1} + \cdots + a_0 I = 0.
+\]
+
+Thus,
+\[
+p_A(A) = 0.
+\]
 \end{proof}
