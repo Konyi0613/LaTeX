@@ -1,0 +1,249 @@
+\lecture{17}{11 Nov. 15:30}{}
+\begin{theorem}
+\[
+    \sum_{i=1}^n \binom{i}{3} = \binom{n+1}{4}. 
+\]
+\end{theorem}
+\begin{proof}
+    By induction on \(n\). 
+    \begin{itemize}
+        \item Base case: \(n \le 3\) is trivial. 
+        \item Induction step:
+        \[
+            \sum_{i=1}^n \binom{i}{3} = \sum_{i=1}^{n-1} \binom{i}{3} + \binom{n}{3} = \binom{n}{4} + \binom{n}{3} = \binom{n+1}{4}.  
+        \]
+    \end{itemize} 
+\end{proof}
+
+Now since 
+\[
+    \binom{n}{3} = \frac{i(i-1)(i-2)}{6} = \frac{i^3}{6} + O \left( i^2 \right),
+\] so we have 
+\begin{align*}
+    \sum_{i=1}^n i^3 &= \sum_{i=1}^n 6 \binom{i}{3} + \sum_{i=1}^n \left[ i^3 - 6 \binom{n}{3} \right] = 6 \binom{n+1}{4} + \sum_{i=1}^n O\left(i^2  \right)  \\
+    &=6 \binom{n+1}{4} + O \left( n^3 \right) = \frac{n^4}{4} + O \left( n^3 \right) .     
+\end{align*}
+Suppose 
+\[
+    \sum_{i=1}^n i^3 = \left( C + O(1) \right) n^4
+\] for some constant \(C\), then we could want  
+\[
+    \left( C + O(1) \right)(n+1)^4 = \sum_{i=1}^{n+1} i^3 = \sum_{i=1}^n i^3   + (n+1)^3 = (C + O(1))n^4 + n^3 + O\left( n^2 \right).  
+\] 
+
+\section{Factorial}
+
+\begin{question}
+    How quickly does the factorial \(n!\) goes? 
+\end{question}
+We know 
+\[
+    n! = 1 \times 2 \times 3 \times \dots \times n \begin{dcases}
+        \le n \times n \times \dots \times n = n^n \\
+        \ge 1 \times 1 \times \dots \times 1 = 1 \\
+        \ge 2 \times 2 \times \dots \times 2 = 2^{n-1}.
+    \end{dcases}
+\]
+On the other hand, we have 
+\begin{align*}
+    n! &= 1 \times 2 \times \dots \times \frac{n}{2} \times \left( \frac{n}{2} + 1 \right) \times \dots \times n \\
+    &\begin{dcases}
+        \le \left( \frac{n}{2} \right)^{\frac{n}{2}} \times n^{\frac{n}{2}} = \frac{n^n}{2^{\frac{n}{2}}} = \left( \frac{n}{\sqrt{2} } \right)^n \\
+        \ge 2^{\frac{n}{2} - 1} \times \left( \frac{n}{2} \right)^{\frac{n}{2}} = \frac{n^{\frac{n}{2}}}{2} = \frac{1}{2} \left( \sqrt{n}  \right)^n.    
+    \end{dcases}
+\end{align*}
+
+Also, we know 
+\[
+    \ln \left( n! \right) = \sum_{i=1}^n \ln i = S,  
+\] where 
+\[
+    S \le \int _1^{n+1} \ln t \, \mathrm{d} t = \left[ t \ln t - t \right]_{t=1}^{n+1} = (n+1)\ln (n+1) - n,  
+\] so we know 
+\[
+    n! \le \frac{(n+1)^{n+1}}{e^n},
+\] and
+\begin{align*}
+    (n+1)^{n+1} &= (n+1) (n+1)^n = (n+1)n^n \left( \frac{n+1}{n} \right)^n = (n+1)n^n \left( 1 + \frac{1}{n} \right)^n \le (n+1) n^n e,  
+\end{align*}
+so we have 
+\[
+    n! \le e(n+1) \left( \frac{n}{e} \right)^n. 
+\]
+
+On the other hand, we have 
+\[
+    \ln (n!) \ge \int _1^t \ln t \, \mathrm{d} t = \left[ t \ln t - t \right]_1^n = n \ln n - n + 1,  
+\] so we have 
+\[
+    n! \ge \left( \frac{n}{e} \right)^n e. 
+\]
+%insert picture
+
+Hence, we have 
+\[
+    e \left( \frac{n}{e} \right)^n \le n! \le (n+1)e \left( \frac{n}{e} \right)^n.  
+\]
+
+\subsubsection{Stirling's Approximation}
+\[
+    n! \thickapprox \sqrt{2 \pi n} \left( \frac{n}{e} \right)^n.  
+\]
+
+\section{Binomial coefficients}
+\begin{align*}
+    \binom{n}{k} &= \frac{n(n-1)\dots (n-k+1)}{k!} \le \frac{n^k}{k!}  \\
+    \binom{n}{k} &= \frac{n}{k} \cdot \frac{n-1}{k-1} \dots \frac{n-k+1}{1} \ge \left( \frac{n}{k} \right)^k. 
+\end{align*}
+
+Hence, we know for all \(n \ge k \ge 0\), 
+\[
+    \left( \frac{n}{k} \right)^k \le \binom{n}{k} \le \frac{n^k}{k!}. 
+\] Observe that if \(k = k(n)\) is constant as \(n \to \infty \), then the upper bound is asymptotically tight, i.e. 
+\[
+    \binom{n}{k} \thickapprox \frac{n^k}{k!} \text{ for } k = O(1). 
+\]  
+
+Rigorously, this is because 
+\[
+    \binom{n}{k} = \frac{n(n-1)\dots (n-k+1)}{k!} = \frac{n \cdot n \left( 1 - \frac{1}{n} \right) \cdot \dots \cdot n \left( 1 - \frac{k-1}{n} \right)  }{k!} =  \frac{n^k}{k!} \left( 1 - O\left( \frac{k^2}{n} \right)  \right). 
+\]
+If \(k = \omega (1)\), then 
+\[
+    \binom{n}{k} \le \frac{n^k}{k!} \le \frac{n^k}{\left( \frac{k}{e} \right)^k } = \left( \frac{ne}{k} \right)^k, 
+\] 
+so we have 
+\[
+    \left( \frac{n}{k} \right)^k \le \binom{n}{k} \le \left( \frac{ne}{k} \right)^k.  
+\]
+If \(k = o(n)\), i.e. \(\frac{n}{k} \to \infty \), then \(\left( \frac{ne}{k} \right)^k \) is a good approximation. If \(k = \Theta (n)\), then the approximation is not so good. 
+
+We have 
+\[
+    \binom{n}{k} = \frac{n!}{k! (n-k)!},
+\] and if \(n, k \to \infty \), we may assume \(n - k \to \infty \), otherwise use \(\binom{n}{k} = \binom{n}{n-k} \thickapprox \frac{n^{n-k}}{(n-k)!}\). By Stirling's approximation, 
+\begin{align*}
+    \binom{n}{k} &\thickapprox \frac{\sqrt{2 \pi n} \left( \frac{n}{e} \right)^n  }{\sqrt{2 \pi k} \binom{k}{e}^k \sqrt{2 \pi (n-k)} \left( \frac{n-k}{e} \right)^{n-k}   } \\
+    &= \sqrt{\frac{n}{2 \pi k (n-k)}} \frac{n^n}{k^k (n-k)^{n-k}} = \sqrt{\frac{n}{2 \pi k (n-k)}} \cdot \left( \frac{n}{k} \right)^k \cdot \left( \frac{n}{n-k} \right)^{n-k}.    
+\end{align*}  
+Hence, 
+\begin{align*}
+    \log _2 \binom{n}{k} &\thickapprox \log _2 \left( \sqrt{\frac{n}{2 \pi k (n-k)}}  \right)+ k \log_2 \left( \frac{n}{k} \right) + (n-k) \log _2 \left( \frac{n}{n-k} \right) \\
+    &= \left[ - \frac{k}{n} \log _2 \left( \frac{k}{n} \right) - \left( 1 - \frac{k}{n} \right) \log _2 \left( 1 - \frac{k}{n} \right)    \right]n + o(n) \\
+    &= H \left( \frac{k}{n} \right) n + o(n),  
+\end{align*}
+where 
+\[
+    H(x) = -x \log _2 x - (1-x) \log _2(1-x)
+\] is the binary entrophy function and thus 
+\[
+    \binom{n}{k} = 2^{H\left( \frac{k}{n} \right) n + o(n) }.
+\]
+
+Hence, we know 
+\[
+    \binom{n}{k} \begin{dcases}
+        \thickapprox \frac{n^k}{k!} \text{ for } k = O(1) \\
+        \le \left( \frac{ne}{k} \right)^k \text{ for } \omega (1) = k = o(n)   \\
+        = 2^{H \left( \frac{k}{n} \right) n + o(n) } \text{ for } k = \Theta (n). 
+    \end{dcases}
+\]
+
+\begin{question}
+    How big is the largest binomial coefficient?
+\end{question}
+
+Note that 
+\[
+    \binom{n}{k} \le \binom{n}{\left\lfloor \frac{n}{2} \right\rfloor}
+\] since 
+\[
+    \binom{n}{k+1} = \frac{n!}{(k+1)!(n-k-1)!} = \frac{n-k}{k+1} \frac{n!}{k!(n-k)!} = \frac{n-k}{k+1} \binom{n}{k},
+\] and \(\frac{n-k}{k+1} \le 1\) if \(k > \frac{n}{2}\) and \(\ge 1\) if \(k \le \frac{n}{2}\). 
+
+Hence, 
+\[
+    \binom{n}{\frac{n}{2}} = 2^{H\left( \frac{1}{2} \right)n + o(n) } = 2^{n + o(n)}.
+\]
+Trivially, we know 
+\[
+    \binom{n}{\frac{n}{2}} \le 2^n
+\] since \(\binom{n}{\frac{n}{2}}\) is the number of subsets of \([n]\) of size \(\frac{n}{2}\). Also, 
+\[
+    \binom{n}{\frac{n}{2}} \ge \left( \frac{n}{\left( \frac{n}{2} \right) } \right)^{\frac{n}{2}} = 2^{\frac{n}{2}}, 
+\] so this approximation is very bad. But, 
+\[
+    2^n = \sum_{k=0}^n \binom{n}{k} \le \sum_{k=0}^n \binom{n}{\frac{n}{2}} = (n+1) \binom{n}{\frac{n}{2}},  
+\]
+so we have 
+\[
+    \binom{n}{\frac{n}{2}} \ge \frac{2^n}{n+1}.
+\]
+Thus, 
+\[
+    \frac{2^n}{n+1} \le \binom{n}{\frac{n}{2}} \le 2^n.
+\]
+\begin{question}
+    What is the correct polynomial term?
+\end{question}
+
+Note that 
+\[
+    \binom{n}{\frac{n}{2}} = \frac{n!}{\left( \frac{n}{2} \right)! \left( \frac{n}{2} \right)!  } = 2^n \frac{n!}{\left[ \left( \frac{n}{2} \right)! 2^{\frac{n}{2}}  \right] \left[ \left( \frac{n}{2} \right)! 2^{\frac{n}{2}}  \right]  },
+\]
+and we have 
+\begin{align*}
+    \frac{n!}{\left[ \left( \frac{n}{2} \right)! \cdot 2^{\frac{n}{2}}  \right]^2 } &= \frac{1 \times 2 \times \dots \times n}{\left[ \left( 1 \times 2 \times \dots \times \frac{n}{2} \right) \times \left( 2 \times 2 \times \dots \times 2 \right)   \right]^2 } \\
+    &= \frac{1 \times 3 \times 5 \times \dots \times (n-1) \times 2 \times 4 \times 6 \times \dots \times n}{\left[ 2 \times 4 \times 6 \times \dots \times n \right]^2 } \\
+    &= \frac{1 \times 3 \times 5 \times \dots \times (n-1)}{ 2 \times 4 \times 6 \times \dots \times n },
+\end{align*}
+so 
+\[
+    \binom{n}{\frac{n}{2}} = 2^n R,
+\] where 
+\[
+    R = \frac{1 \times 3 \times 5 \times \dots \times (n-1)}{2 \times 4 \times \dots \times n}.
+\]
+Note that 
+\begin{align*}
+    R^2 &= \frac{1 \times 1 \times 3 \times 3 \times 5 \times 5 \times \dots \times (n-1) \times (n-1)}{2 \times 2 \times 4 \times 4 \times \dots \times n \times n} \\
+    &= \frac{1}{n+1} \times \prod _{i=1}^{\frac{n}{2}} \frac{(2i-1)(2i+1)}{(2i)^2} = \frac{1}{n+1} \times \prod _{i=1}^{\frac{n}{2}} \left( 1 - \frac{1}{(2i)^2} \right) \le \frac{1}{n+1}. 
+\end{align*}
+
+On the other hand, 
+\begin{align*}
+    R^2 &= \frac{1}{2 \times n} \times \prod _{i=1}^{\frac{n}{2} - 1} \frac{(2i+1)^2}{(2i)(2i+2)} = \frac{1}{2n} \prod _{i=1}^{\frac{n}{2} - 1} \left( 1 + \frac{1}{2i(2i+2)} \right) \ge \frac{1}{2n}. 
+\end{align*}
+Hence, 
+\[
+    \frac{1}{2n} \le R^2 \le \frac{1}{n+1},
+\]
+so we have 
+\[
+    \frac{1}{\sqrt{2n} } \le R \le \frac{1}{\sqrt{n+1} },
+\] which means 
+\[
+    \frac{2^n}{\sqrt{2n} } \le \binom{n}{\frac{n}{2}} \le \frac{2^n}{\sqrt{n+1} } \le \frac{2^n}{\sqrt{n} }.
+\]
+Using Stirling: 
+\[
+    \binom{n}{\frac{n}{2}} \thickapprox \frac{\sqrt{2 \pi n} \left( \frac{n}{e} \right)^n  }{\left( \sqrt{2 \pi \frac{n}{2}} \cdot \left( \frac{\frac{n}{2}}{e} \right)^{\frac{n}{2}} \right)^2   } = \frac{2^n}{\sqrt{\frac{2}{\pi } n} }.
+\]
+
+\section{Partition Function}
+Let \(p(n)\) be the number of ways of writing \(n\) as an unordered sum of natural numbers. 
+
+\begin{question}
+    How quickly does \(p(n)\) goes? 
+\end{question}
+For the upper bound, we can instead count ordered sums. 
+%insert pic
+Now since 
+\[
+    p(n) = \sum_{k=1}^n p(n, k), 
+\]
+and the number of ordered partition of \(n\) into \(k\) parts is \(\binom{n-1}{k-1}\). Thus, the number of ordered partitions is 
+\[
+    \sum_{k=1}^n \binom{n-1}{k-1} = 2^{n-1}, 
+\]   
+so \(p(n) \le 2^{n-1}\). 

@@ -1,0 +1,185 @@
+\lecture{19}{11 Nov. 10:20}{}
+\section{Multiplication of Power series}
+\begin{theorem}[Analysis I] \label{thm: double series absolutely conv then can exchange index}
+    Let \(f: \mathbb{N} \times \mathbb{N} \to \mathbb{R} \) be a function such that the double series 
+    \[
+        \sum_{(n, m) \in \mathbb{N} \times \mathbb{N} } f(n, m) 
+    \] 
+    is absolutely convergent, i.e. 
+    \[
+        \sum_{(m, n) \in \mathbb{N} \times \mathbb{N} } \left\vert f(n, m) \right\vert  
+    \] converges. Then 
+    \[
+        \sum_{n=1}^{\infty} \sum_{m=1}^{\infty} f(n, m) = \sum_{m=1}^{\infty} \sum_{n=1}^{\infty} f(n, m).    
+    \]
+    In particular, if \(\sum_{n, m} a_n a_m \) absolutely convergent, then
+    \[
+        \sum_{m} \sum_{n} a_n a_m = \sum_{n} \sum_{m} a_m a_n.    
+    \] 
+\end{theorem}
+
+\begin{theorem}
+    Let \(f: (a-r,a+r) \to \mathbb{R} \) and \(g : (a-r,a+r) \to \mathbb{R} \) be functions analytic on \((a-r,a+r)\), with power series expansions 
+    \[
+        f(x) = \sum_{n=0}^{\infty} c_n (x-a)^n, \quad \text{and } g(x) = \sum_{n=0}^{\infty} d_n (x-a)^n,    
+    \]  then \(f \cdot g : (a-r,a+r) \to \mathbb{R} \) is also analytic on \((a-r, a+r)\), with power series expansion 
+    \[
+        f(x) g(x) = \sum_{n=0}^{\infty} e_n (x-a)^n,
+    \] where 
+    \[
+        e_n = \sum_{m=0}^n c_m d_{n - m}. 
+    \]
+\end{theorem}
+\begin{proof}
+    We need to show that the series 
+    \[\sum_{n=0}^{\infty} e_n (x-a)^n \]
+    converges to \(f(x) g(x)\) for all \(x \in (a-r,a+r)\). 
+    \begin{itemize}
+        \item \textbf{Step 1:} Absolute convergence of \(f\) and \(g\). By our assumption \(f\) and \(g\) are analytic on \((a-r,a+r)\), so \(f(x) = \sum_{n=0}^{\infty} c_n (x-a)^n \) and \(g(x) = \sum_{n=0}^{\infty} d_n(x-a)^n \) convergs absolutely when \(\vert x-a \vert < r \). In particular, for each fixed \(x \in (a-r, a+r)\), the sum 
+        \[
+            C \coloneqq \sum_{n=0}^{\infty} \left\vert c_m (x-a)^m \right\vert \quad \text{and} \quad D\coloneqq \sum_{n=0}^{\infty} \left\vert d_n (x-a)^n \right\vert   
+        \] are finite. 
+        \item \textbf{Step 2:} Bounding the double series. Consider any \(N \ge 0\), the sum 
+        \begin{align*}
+            \sum_{n=0}^N \sum_{m=0}^{\infty} \left\vert c_m (x-a)^m d_n (x-a)^n \right\vert &= \left\vert d_0 \right\vert \left( \sum_{m=0}^{\infty} \left\vert c_m (x-a)^m \right\vert   \right) + \dots + \left\vert d_N (x-a)^N\right\vert \left( \sum_{m=0}^{\infty} \left\vert c_m (x-a)^m \right\vert \right) \\
+            &= \left( \sum_{n=0}^N \left\vert d_n (x-a)^n \right\vert   \right) \cdot \left( \sum_{m=0}^{\infty} \left\vert c_m (x-a)^m \right\vert   \right) \le D \cdot C,  
+        \end{align*}
+        where \(D, C\) are fixed constants independent of \(N\). This implies 
+        \[
+            \sum_{n=0}^{\infty} \sum_{m=0}^{\infty} \left\vert c_m (x-a)^m d_n (x-a)^n \right\vert   
+        \] converges absolutely. By Fubini's theorem, 
+        \[
+            \sum_{m=0}^{\infty} \sum_{n=0}^{\infty} c_m d_n (x-a)^m (x-a)^n = \sum_{n=0}^{\infty} \sum_{m=0}^{\infty} c_m d_n (x-a)^m (x-a)^n.    
+        \] 
+        \item \textbf{Step 3:} First computations of the double series. We compute the sum in two different ways. Note that 
+        \begin{align*}
+            \sum_{n=0}^{\infty} d_n (x-a)^n \sum_{m=0}^{\infty} c_m (x-a)^m = \left( \sum_{n=0}^{\infty} d_n (x-a)^n  \right) f(x) = g(x) f(x).   
+        \end{align*}
+        Also, we have
+        \begin{align*}
+            f(x) g(x) &= \sum_{n=0}^{\infty} \sum_{m=0}^{\infty} c_m (x-a)^m d_n (x-n)^n \\
+            &= \sum_{n=0}^{\infty} d_n (x-a)^n \sum_{m=0}^{\infty} c_m (x-a)^m   
+        \end{align*}
+        \item \textbf{Step 4:} Second computation of the double series. 
+        \begin{align*}
+            f(x) g(x) &= \sum_{n=0}^{\infty} \sum_{m=0}^{\infty} c_m d_n (x-a)^{m+n} = \sum_{m=0}^{\infty} \sum_{n=0}^{\infty} c_m d_n (x-a)^{m+n}    
+        \end{align*}
+        by Fubini's theorem.
+        \item \textbf{Step 5:} Change of variables. Let \(n^{\prime} = m + n\), so 
+        \[
+            f(x) g(x) = \sum_{m=0}^{\infty} \sum_{n^{\prime} = m}^{\infty} c_m d_{n^{\prime} - m} (x-a)^{n^{\prime} },  
+        \] where we adopt the convention \(d_j = 0\) if \(j < 0\). Hence, 
+        \begin{align*}
+            f(x) g(x) &= \sum_{m=0}^{\infty} \sum_{n^{\prime} = m}^{\infty} c_m d_{n^{\prime} - m} (x-a)^{n^{\prime} } + \sum_{m=0}^{\infty} \sum_{n^{\prime} = 0}^{m-1} c_m d_{n^{\prime} - m} (x-a)^{n^{\prime} } \\
+            &= \sum_{m=0}^{\infty} \sum_{n^{\prime} = 0}^{\infty} c_m d_{n^{\prime} - m} (x-a)^{n^{\prime} }    
+        \end{align*}  
+        \item \textbf{Step 6:} Interchanging the order of summation. 
+        \[
+            f(x) g(x) = \sum_{n^{\prime} = 0}^{\infty} \left( \sum_{m=0}^{\infty} c_m d_{n^{\prime} - m}  \right)(x-a)^{n^{\prime} } = \sum_{n^{\prime} = 0}^{\infty} \left( \sum_{m=0}^{n^{\prime} } c_m d_{n^{\prime} - m}  \right) (x-a)^{n^{\prime} }    
+        \]
+    \end{itemize}  
+\end{proof}
+
+\section{The exponential and Logarithm functions}
+\begin{definition}
+    For every real number \(x\), we define 
+    \[
+        \exp (x) \coloneqq \sum_{n=0}^{\infty} \frac{x^n}{n!}. 
+    \] 
+\end{definition}
+
+\begin{theorem}
+    The exponential function satisfies the following properties: 
+    \begin{itemize}
+        \item [(a)] For every \(x \in \mathbb{R} \), \(\sum_{n=0}^{\infty} \frac{x^n}{n!} \) is absolutely convergent. The radius of convergence of \(\sum_{n=0}^{\infty} \frac{x^n}{n!} \) is \(\infty \), so \(\exp (x)\) is analytic on \((-\infty , \infty )\). 
+        \item [(b)] \(\exp (x)\) is differentiable on \(\mathbb{R} \) and \(\left( \exp (x) \right)^{\prime} = \exp (x) \). 
+        \item [(c)] \(\exp \) is continuous on \(\mathbb{R} \) and for every interval \([a, b]\), we have 
+        \[
+            \int _a^b \exp (x) \, \mathrm{d} x = \exp (b) - \exp (c). 
+        \]
+        \item [(d)] For \(x, y \in \mathbb{R} \), we have \(\exp (x + y) = \exp (x) \exp (y)\). 
+        \item [(e)] We have \(\exp (0) = 1\), \(\exp (x) > 0\) for all \(x\) and \(\exp (-x) = \frac{1}{\exp (x)}\). 
+        \item [(f)] \(\exp (x) > \exp (y)\) if \(x > y\).        
+    \end{itemize}
+\end{theorem}
+\begin{proof}[proof of (a)]
+    By ratio test, 
+    \[
+        \lim_{n \to \infty} \left\vert \frac{\frac{x^{n+1}}{(n+1)!}}{\frac{x^n}{n!}} \right\vert = \lim_{n \to \infty} \left\vert \frac{n! x}{(n+1)!} \right\vert = \lim_{n \to \infty} \left\vert \frac{x}{n+1} \right\vert = 0      
+    \] for every \(x \in \mathbb{R} \), so it is absolutely convergent for every \(x \in \mathbb{R} \), and the radius of convergence is \(\infty \) by definition, so \(\exp (x) = \sum_{n=0}^{\infty} \frac{x^n}{n!} \) for all \(x \in \mathbb{R} \) and \(\exp (x)\) is analytic on \(\mathbb{R} \).     
+\end{proof}
+
+\begin{proof}[proof of (b)]
+\begin{align*}
+    \left( \exp (x) \right)^{\prime} &= \frac{\mathrm{d}}{\mathrm{d}x} \left( \sum_{n=0}^{\infty} \frac{x^n}{n!}  \right) = \sum_{n=0}^{\infty} \left( \frac{\mathrm{d}}{\mathrm{d}x} \frac{x^n}{n!}  \right) = \sum_{n=1}^{\infty} \frac{n x^{n-1}}{n!} = \sum_{n=1}^{\infty} \frac{x^{n-1}}{(n-1)!} = \exp (x).     
+\end{align*}
+\end{proof}
+
+\begin{proof}[proof of (c)]
+    Since \(\exp \) is differentiable, so it is continuous.  
+    Since 
+    \[
+        \frac{\mathrm{d}}{\mathrm{d}x} \exp (x) = \exp (x), 
+    \] so by Fundamental Theorem of Calculus, we know 
+    \[
+        \int _a^b \exp (x) \, \mathrm{d} x = \exp (b) - \exp (a). 
+    \]
+\end{proof}
+
+\begin{proof}[proof of (d)]
+    \begin{align*}
+        \exp (x) \exp (y) &= \left( \sum_{m=0}^{\infty} \frac{x^m}{m!}  \right) \left( \sum_{n=0}^{\infty} \frac{y^n}{n!}  \right) \\
+        &= \sum_{k=0}^{\infty} \sum_{m=0}^k \frac{1}{m! (k-m)!} x^m y^{k-m} = \exp (x+y)    
+    \end{align*}
+    by binomial theorem.
+\end{proof}
+
+\begin{proof}[proof of (e)]
+    \(\exp (0)\) is trivial. If \(x > 0\), then 
+    \[
+        \exp (x) = \sum_{n=0}^{\infty} \frac{x^n}{n!} > 1, 
+    \] and since \(\exp (x + (-x)) = \exp (0) = 1\), and thus by (d) we know 
+    \[
+        \exp (x) \exp (-x) = \exp (x + (-x)) = \exp (0) = 1.
+    \]
+\end{proof}
+
+\begin{proof}[proof of (f)]
+    Trivial.
+\end{proof}
+
+\begin{definition}[Euler number]
+    \[
+        e \coloneqq \exp (1) = \sum_{n=0}^{\infty} \frac{1}{n!} = 1 + \frac{1}{1!} + \frac{1}{2!} + \dots  
+    \]
+\end{definition}
+
+\begin{proposition}
+    \[
+        \exp (x) = e^x \quad \forall x \in \mathbb{R} .
+    \]
+\end{proposition}
+
+\begin{proof}
+    If \(n \in \mathbb{Z} \), then \(\exp (n) = e^n\), which can be shown by induction. When \(n = 0\), this is trivial. If \(n > 0\), then 
+    \begin{align*}
+        \exp (n) &= \exp (1 + 1 + \dots + 1) = \exp (1) \exp (1) \dots \exp (1) = \left( \exp (1) \right)^n = e^n, 
+    \end{align*}    
+    so this is true. Now if \(n < 0\), then \(\exp (-n) = e^{-n}\), and thus 
+    \[
+        \exp (n) = \frac{1}{\exp (-n)} = \frac{1}{e^{-n}} = e^n.
+    \] 
+    Next, we show \(\exp \left( \frac{p}{q} \right) = e^{\frac{p}{q}} \) for \(p \in \mathbb{Z} \) and \(q \in \mathbb{N} \). Note that we have 
+    \[
+        \left( \exp \left( \frac{p}{q} \right)  \right)^q = \exp \left( \frac{p}{q} + \dots + \frac{p}{q} \right) = \exp (p) = e^p,  
+    \] so 
+    \[
+        \exp \left( \frac{p}{q} \right) = \left( \exp (p) \right)^{\frac{1}{q}} = \left( e^p \right)^{\frac{1}{q}} = e^{\frac{p}{q}}.   
+    \] Hence, \(\exp (x) = e^x\) for \(x \in \mathbb{Q} \). Now if \(x \in \mathbb{R} \setminus \mathbb{Q} \), then there exists \((x_n) \in \mathbb{Q} \) s.t. \(\lim_{n \to \infty} x_n = x \). Since \(\exp(x) \) is continuous, so 
+    \[
+        \lim_{n \to \infty} \exp (x_n) = \exp(x), 
+    \] and since \(x_n \in \mathbb{Q} \), so \(\lim_{n \to \infty} e^{x_n} = \exp (x) \). Also, since \(e^x\) is continuous, so 
+    \[
+        \lim_{n \to \infty} e^{x_n} = e^x, 
+    \] so combining these two results we have \(\exp (x) = e^x\). 
+\end{proof}

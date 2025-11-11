@@ -1,0 +1,240 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{bbding,combelow,textcomp,amsfonts,amsthm,amsmath,amssymb,graphicx,color,hyperref,etoolbox}
+\usepackage[utf8x]{inputenc}
+\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+
+\usepackage{xeCJK}
+\setCJKmainfont{PingFang TC}
+\usepackage{pdfpages}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{enumitem}
+\usepackage{enumerate}
+
+\pdfpagewidth 8.5in
+\pdfpageheight 11in
+\topmargin -1in
+\headheight 0in
+\headsep 0in
+\textheight 8.5in
+\textwidth 6.5in
+\oddsidemargin 0in
+\evensidemargin 0in
+\headheight 77pt
+\headsep 0in
+\footskip .75in
+
+\makeatletter
+\newcommand{\buildtitle}[4]{
+\begin{flushleft}
+{\large
+#1
+\hfill{}
+#2
+\par
+#3
+}
+\end{flushleft}
+\vskip 4pt
+\begin{center}
+{\large\bfseries#4\par}
+\end{center}
+\bigskip
+}
+\makeatother
+
+\renewcommand{\thesection}{\normalsize\arabic{section}}
+
+\renewcommand{\deg}{\textrm{deg}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\ceil}[1]{\left \lceil #1 \right \rceil}
+
+\newcommand{\hint}{\begin{flushright} [Hint at \url{\hintURL}.] \end{flushright}}
+
+\newcommand{\card}[1]{\left| #1 \right|}
+\newcommand{\mb}[1]{\mathbb{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+
+
+\newcommand{\story}[1]{\iftoggle{story}{\footnote{#1}}{}}
+\newcommand{\storymark}[1][42]{\iftoggle{story}{\footnotemark[#1]}{}}
+\newcommand{\storytext}[2][42]{\iftoggle{story}{\footnotetext[#1]{#2}}{}}
+
+\newcommand{\bonus}[2]{\paragraph{Bonus (#1 pt\ifstrequal{#1}{1}{}{s})} #2}
+
+\begin{document}
+
+\begin{center}
+{\Large Abstract Algebra I}
+
+\vspace{0.5cm}
+
+{\Large Homework 6}
+
+\vspace{0.5cm}
+
+Due: 12th November 2025
+\end{center}
+
+\vspace{1cm}
+
+We begin this exercise sheet with a definition that really should have been introduced alongside the notion of a centralizer. Let $G$ be a group, and $X$ be the set containing all the subgroups of $G$. If $G$ acts by conjugation on $X$, then the subgroup of $G$ fixing $H \in X$ is called the \textit{normalizer of H}, and it is denoted by
+$$ N_G(H) = \{g \in G : g^{-1}Hg = H\}. $$
+Obviously $H$ is normal in $G$ if and only if $N_G(H) = G$.
+
+\paragraph{Exercise 1} Let $G$ be a finite group and $H$ a $p$-subgroup of $G$, i.e., $|H|=p^m$ for some $m \ge 1$.
+\begin{itemize}
+    \item [(a)] Let $H$ act on a finite set $S$ and let $S_0$ denote the subset of $S$ consisting of elements fixed by all $h \in H$, i.e., $h \cdot x = x$. Show that $|S| \equiv |S_0| \pmod{p}$.
+    \item [(b)] Prove that $[N_G(H) : H] \equiv [G : H] \pmod{p}$.
+    \item [(c)] If $p \mid [G : H]$, prove that $N_G(H) \neq H$.
+\end{itemize}
+\paragraph{Solution:} \vphantom{text}
+\begin{itemize}
+    \item [(a)] Since we have
+    \[
+        S_0 = \left\{ x \in S \mid h \cdot x = x \quad \forall h \in H \right\},
+    \]
+    so we have \(x \in S_0\) iff \(O(x) = \left\{ x \right\} \). Hence, we can partition \(S\) into distinct orbits, i.e. 
+    \[
+        S = S_0 \cup \bigcup_{i=1}^{n} O_i, 
+    \] where \(\vert O_i \vert \ge 2 \) for all \(1 \le i \le n\), and by orbit-stabilizer theorem we know 
+    \[
+        2 \le \left\vert O_i \right\vert \mid \vert H \vert = p^m \quad \forall 1 \le i \le n,
+    \] so \(p \mid \vert O_i \vert \) for all \(1 \le i \le n\), and since 
+    \[
+        \vert S \vert = \vert S_0 \vert + \sum_{i=1}^n \vert O_i \vert,  
+    \] so we know \(\vert S \vert \equiv \vert S_0 \vert \mod{p} \). 
+    \item [(b)] If we let \(S = \left\{ gH : g \in G \right\} \), then \(\vert S \vert = \vert G / H \vert  \). Now we can define a group action of \(H\) on \(S\) by 
+    \[
+        h \cdot (gH) = (hg)H,
+    \]
+    then we can similarly define
+    \[
+        S_0 = \left\{ x \in S : h \cdot x = x \quad \forall h \in H \right\} = \left\{ gH \in S : (hg)H = gH \quad \forall h \in H \right\}.  
+    \]
+    Hence, 
+    \begin{align*}
+        gH \in S_0 &\iff hgH = gH \quad \forall h \in H \iff g^{-1} h g H = H \quad\forall h \in H \\ 
+        &\iff g^{-1} h g \in H \quad \forall h \in H \iff g^{-1} H g \subseteq H \iff g^{-1} H g = H.
+    \end{align*}
+    Note that the last step holds since \(H\) is finite and thus \(\left\vert g^{-1} H g  \right\vert = \vert H \vert  \). Now since \(g^{-1} H g = H\) iff \(g \in N_G(H)\), so \(gH \in S_0\) iff \(g \in N_G(H)\). Hence, 
+    \[
+        S_0 = \left\{ gH \in S \mid g \in N_G(H) \right\} = N_G(H) / H. 
+    \]     
+    Now by (a) we know \(\vert S \vert  \equiv \vert S_0 \vert  \mod{p}\), so we know 
+    \[
+        \vert G / H \vert \equiv \left\vert N_G(H) / H \right\vert  \mod{p} \iff [G:H] \equiv \left[ N_G(H) : H \right] \mod{p}. 
+    \]  
+
+    \item [(c)] If \(p \mid [G:H]\), then \([G:H] \equiv 0 \mod{p}\), which means \(\left[ N_G(H) : H \right] \equiv 0 \mod{p} \) by (b). This means
+    \[
+        p \mid \frac{\left\vert N_G(H) \right\vert }{\vert H \vert },
+    \] and since \(e \in N_G(H)\), so \(\vert N_G(H) \vert > 0 \), and thus 
+    \[
+        \vert H \vert < \vert N_G(H) \vert, 
+    \] which means \(N_G(H) \neq H\). 
+\end{itemize}
+
+\paragraph{Exercise 2} If $P$ is a Sylow $p$-subgroup of a finite group $G$, then $$ N_G(N_G(P)) = N_G(P). $$
+\paragraph{Solution:} Note that 
+\[
+    N_G(P) = \left\{ g \in G : g^{-1} P g = P \right\}, \quad N_G \left( N_G(P) \right) = \left\{ g \in G \mid g^{-1} N_G(P) g = N_G(P) \right\}.   
+\]
+We can notice that \(P < N_G(P)\) and similarly \(N_G(P) < N_G(N_G(P))\). Hence, \(N_G(P) \subseteq N_G(N_G(P))\). Now we show that \(N_G(N_G(P)) \subseteq N_G(P)\), and then we can conclude that \(N_G(N_G(P)) = N_G(P)\). Suppose \(\vert P \vert = p^e \), and if \(g \in N_G(N_G(P))\), then \(g^{-1} N_G(P) g = N_G(P) \), so we know \(g^{-1} P g \subseteq N_G(P)\) since \(P < N_G(P)\). Now since \(\left\vert g^{-1} P g  \right\vert = \vert P \vert = p^e  \), so \(P, g^{-1} P g\) are both Sylow \(p\)-subgroups of \(N_G(P)\). By Sylow's theorem, we know \(P\) and \(g^{-1} P g \) are conjugating in \(N_G(P)\), i.e. \(\exists h \in N_G(P)\) s.t. 
+\[
+    g^{-1} P g = h^{-1} P h.  
+\]            
+Hence, we have \(\left( h g^{-1}  \right) P \left( g h^{-1}  \right) = P   \), so \(gh^{-1} \in N_G(P) \) by definition, and thus \(g \in N_G(P)\) since \(h \in N_G(P)\) and \(N_G(P)\) is a group. Hence, we showed that \(N_G \left( N_G(P) \right) \subseteq N_G(P) \), and we're done.     
+\paragraph{Exercise 3} Let $p > q$ be distinct primes, and $G$ a group of order $p^n q$ for $n \ge 1$. Prove that $G$ contains a unique normal subgroup of index $q$.
+\paragraph{Solution:} If \(Q \triangleleft G\) and \([G : Q] = q\), then we know 
+\[
+    p^n q = \vert G \vert = q \vert Q \vert,
+\] which gives \(\vert Q \vert = p^n \), so \(Q\) is a Sylow \(p\)-subgroup fo \(G\). Also, since \(Q \triangleleft G \), so
+\[
+    g^{-1} Q g = Q \quad \forall g \in G.
+\]      
+Now if there is another \(Q^{\prime} \triangleleft G\) and \(\left[ G:Q^{\prime}  \right] = q \), then we know \(Q^{\prime} \) is also a Sylow \(p\)-subgroup of \(G\) and thus by Sylow's theorem we have 
+\[
+    Q^{\prime} = g_1^{-1} Q g_1
+\] for some \(g_1 \in G\), and sicne \(g_1^{-1} Q g_1 = Q \), so \(Q^{-1} = Q \), so such \(Q\) is unique.
+
+Now we show the existence. Since \(q\) is prime, so by Cauchy's theorem, we know there exists \(g \in G\) s.t. \(\mathrm{ord}(g) = q \), so \(\langle g \rangle \) is a subgroup of \(G\) with order \(q\).      
+\paragraph{Exercise 4} Prove that if every Sylow $p$-subgroup of a finite group $G$ is normal for every prime $p$, then $G$ is the direct product of its Sylow $p$-subgroups.
+\paragraph{Solution:} Now suppose \(\vert G \vert = \prod _{i=1}^k p_i ^{a_i}\) where \(p_i\) is a prime for all \(1 \le i \le k\) and \(p_i \neq p_j\) for all \(i \neq j\). Now let \(P_i\) be a Sylow \(p_i\)-subgroup of \(G\), then the problem conditions give \(P_i \triangleleft G\) for all \(1 \le i \le k\). Now we claim that for \(i \neq j\), \(P_i \cap P_j = \left\{ e \right\} \). First note that \(P_i \cap P_j < P_i\) and \(P_i \cap P_j < P_j\), so by Lagrange's theorem, we know 
+\[
+    \vert P_i \cap P_j \vert \mid p_i^{a_i}, \quad \vert P_i \cap P_j \vert \mid p_j^{a_j},
+\] and since \(p_i\) and \(p_j\) are distinct prime, so we know \(P_i \cap P_j = \left\{ e \right\} \). Thus, the claim is true. Now note that we have 
+\[
+    \begin{cases}
+        P_i, P_j \triangleleft G \\
+        P_i \cap P_j = \left\{ e \right\} 
+    \end{cases}, \quad \forall i \neq j,
+\]
+so we know \(P_i P_j \simeq P_i \times P_j\) and \(P_i\) and \(P_j\) commute, which has been proved during lecture. Now we claim that \(S_v = P_1 P_2 \dots P_v\) is a subgroup of \(G\) for all \(1 \le v \le k\). Fix some \(v\) with \(1 \le v \le k\). If \(a, b \in S_v\), we suppose \(a = c_1 c_2 \dots c_v\) and \(b = c_1^{\prime} c_2^{\prime} \dots c_v^{\prime} \) where \(c_i, c_i^{\prime} \in P_i\) for all \(1 \le i \le v\). Thus we know 
+    \[
+        ab = c_1 c_1^{\prime} c_2 c_2^{\prime} \dots c_v c_v^{\prime} \in S_v
+    \] since \(P_i\) and \(P_j\) commute for distinct \(i, j\). Besides, if \(a = c_1 c_2 \dots c_v \in S_v\) with \(c_i \in P_i\) for all \(1 \le i \le v\), then 
+    \[
+        a^{-1} = c_v^{-1} c_{v-1}^{-1} \dots c_1^{-1} = c_1^{-1} c_2^{-1} \dots c_v^{-1} \in S_v,      
+    \] so we're done. Since this proof is true for all \(1 \le v \le k\), so we're done. Now since for \(H, K < G\), we have 
+    \[
+        \vert HK \vert = \frac{\vert H \vert \vert K \vert}{\vert H \cap K \vert },
+    \] so it sufficies to show that \(\vert S_v \vert = \vert P_1 \vert \vert P_2 \vert \dots \vert P_v \vert   \) for all \(1 \le v \le k\) . We prove it by induction. 
+    \begin{itemize}
+        \item Base case: \(\vert S_1 \vert = \vert P_1 \vert  \) is trivial. 
+        \item Now suppose \(\vert S_{v-1} \vert = \vert P_1 \vert \dots \vert P_{v-1} \vert   \) for some \(v > 1\), then we know 
+        \[
+            \left\vert S_v \right\vert = \vert S_{v-1} P_v \vert = \frac{\vert S_{v-1} \vert \vert P_v \vert  }{\left\vert S_{v-1} \cap P_v \right\vert } = \frac{\vert P_1 \vert \dots \vert P_v \vert  }{\left\vert S_{v-1} \cap P_v \right\vert}.
+        \]
+        Now we show that \(\vert S_{v-1} \cap P_v \vert = 1\). Since \(S_{v-1} \cap P_v < S_{v-1}\) and \(S_{v-1} \cap P_v < P_v\), so 
+        \[
+            \vert S_{v-1} \cap P_v \vert \mid \gcd \left( \vert S_{v-1} \vert, \vert P_v \vert   \right) = 1,
+        \] which means \(\vert S_{v-1} \cap P_v \vert = 1 \). Hence, we know 
+        \[
+            \vert S_v \vert = \vert P_1 \vert \vert P_2 \vert \dots \vert P_v \vert,    
+        \] and we're done.
+    \end{itemize}     
+     Hence, pick \(v = k\), we have 
+        \[
+            \vert S_k \vert = \vert P_1 \vert \dots \vert P_k \vert = \vert G \vert, 
+        \] and since \(S_k \subseteq G\), so we know \(S_k = G\), which means \(G = P_1 P_2 \dots P_k\). Now we define a map 
+        \[
+            \varphi : G \to P_1 \times P_2 \times \dots \times P_k, \quad \varphi (g) = (c_1, c_2, \dots, c_k ), \text{ where } g = c_1 c_2 \dots c_k \text{ with } c_i \in P_i. 
+        \] 
+        We first show that this map is well-defined. Since \(\left\vert G \right\vert = \vert P_1 \dots P_k \vert  \), so we know if \(g \in G\) has 
+        \[
+            g = c_1 c_2 \dots c_k = c_1^{\prime} c_2^{\prime} \dots c_k^{\prime} 
+        \] with \(c_i, c_i^{\prime} \in P_i\) for all \(1 \le i \le k\), then \(c_i = c_i^{\prime} \) for all \(1 \le i \le k\). Hence, \(\varphi \) is well-defined. Now we show \(\varphi \) is an isomorphism. Since 
+        \[
+            \vert G \vert = \vert P_1 \times P_2 \times \dots \times P_k \vert,  
+        \] and \(\varphi \) is surjective (for \(d = (c_1, \dots , c_k) \in P_1 \times P_2 \times \dots \times P_k\), so \(\varphi (c_1 c_2 \dots c_k) = d\)). Hence, \(\varphi \) is injective. Now we show that it is an homomorphism: If \(g = c_1 \dots c_k\) anbd \(h = c_1^{\prime} \dots c_k^{\prime} \) with \(c_i, c_i^{\prime} \in P_i\) for all \(1 \le i \le k\). Then, 
+        \begin{align*}
+            \varphi (gh) &= \varphi \left( c_1 \dots c_k c_1^{\prime} \dots c_k^{\prime}  \right) = \varphi \left( c_1 c_1^{\prime} c_2 c_2^{\prime} \dots c_k c_k^{\prime}  \right) = \left( c_1 c_1^{\prime} , c_2 c_2^{\prime} , \dots , c_k c_k^{\prime}   \right) \\
+            &= \left( c_1, c_2, \dots , c_k \right) \cdot \left( c_1^{\prime} , c_2^{\prime} , \dots , c_k^{\prime}  \right) = \varphi (g) \varphi (h),  
+        \end{align*}             
+        so we're done.
+    Hence, we know 
+    \[
+        G \simeq P_1 \times P_2 \times \dots \times P_k.
+    \]                      
+\paragraph{Exercise 5} Prove that groups of order 30 and 105 are not simple.
+\paragraph{Solution:} 
+\begin{itemize}
+    \item Suppose \(G\) is a group of size \(30\), then since \(30 = 2 \times 3 \times 5\), so if \(n_2, n_3, n_5\) are the number of Sylow \(2,3,5\)-subgroups, respectively, we have 
+    \begin{align*}
+        n_2 &\equiv 1 \mod{2} \\
+        n_3 &\equiv 1 \mod{3} \\
+        n_5 &\equiv 1 \mod{5},
+    \end{align*}
+    and since if we define a group action by conjugacy, then by orbit-stabilizer theorem we know 
+    \[
+        n_2 \mid 30, \quad n_3 \mid 30, \quad n_5 \mid 30,
+    \] and thus \(n_2 = 1, 3, 5, 15\) and \(n_3 = 1, 10\) and \(n_5 = 1, 6\). If either \(n_2, n_3, n_5 = 1\), then the Sylow \(2,3,5\)-subgroup is unique and by Sylow's theorem we know this group is normal in \(G\), and thus \(G\) is not simple. Now suppose \(n_2, n_3, n_5 > 1\). Note that for distinct Sylow \(3\)-subgroup of \(G\), say \(P_1, P_2\), we claim that \(P_1 \cap P_2 = \left\{ 1 \right\} \). If \(x \neq e\) and \(x \in P_1 \cap P_2\), then since \(\mathrm{ord}(x) > 1 \) and \(\langle x \rangle \) is a subgroup of \(P_1\) and \(P_2\), so \(\mathrm{ord}(x) = 3 \), and since \(\langle x \rangle \subseteq P_1 \cap P_2\), so \(P_1 \cap P_2 = P_1\) and \(P_1 \cap P_2 = P_2\) (\(\vert P_1 \vert = \vert P_2 \vert = 3 = \vert \langle x \rangle  \vert = \left\vert P_1 \cap P_2 \right\vert \) ). This means \(P_1 = P_2\), which is a contradiction. Hence, \(P_1 \cap P_2 = \left\{ 1 \right\} \). Similar argument can be used on Sylow \(5\)-subgroup. Hence, \(G\) has \(10 (3 - 1)\) elements of order \(3\) and \(6 (5 - 1)\) elements of order \(5\), which means \(G\) has at least 
+    \[
+        10(3-1) + 6(5-1) = 20 + 24 = 44 > 30
+    \] elements, which is impossible, so \(G\) is not simple. 
+    \item Since \(105 = 3 \times 5 \times 7\), so identical arguments of the case of group of size \(30\) can be stated here, which shows groups of size \(105\) is not simple.                                  
+\end{itemize}
+
+\end{document}
