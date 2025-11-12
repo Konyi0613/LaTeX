@@ -1,0 +1,127 @@
+\chapter{Decompositions of spaces}
+\lecture{18}{12 Nov. 10:20}{}
+\section{Direct Sums}
+\begin{prev}
+    Let \(W_1, \dots , W_r\) be subspaces of \(V\). They are called linearly independent if \(\sum w_i = 0 \) with \(w_i \in W_i\) for all \(i\) iff \(w_i = 0\) for all \(i\).     
+
+    Let \(W = W_1 + \dots + W_r\), then TFAE: 
+    \begin{itemize}
+        \item [(i)] \(W_i\)'s are linearly independent. 
+        \item [(ii)] Any \(w \in W\) has a unique expression \(w = \sum_{i=1}^r w_i \) where \(w_i \in W_i\). 
+        \item [(iii)] 
+        \[
+            W_i \cap \left[ W_1 + W_2 + \dots + W_{i-1} + W_{i+1} + \dots + W_r \right] = \left\{ 0 \right\}.   
+        \]
+        \item [(iv)] \(\dim W = \sum_{i=1}^r \dim W_i \). 
+        \item [(v)] If \(\left\{ v_{ij} \right\}_{j=1}^{m_i} \) is a basis of \(W_i\), then \(\left\{ v_{ij} \right\}_{i, j} \) is a basis of \(W\).     
+    \end{itemize} 
+\end{prev}   
+In this case, we write 
+\[
+    W = W_1 \oplus W_2 \oplus \dots \oplus W_r,
+\] and call it the direct sum. 
+\begin{eg}
+    Let \(T \in \mathcal{L} (V)\) with eigenvalues \(\lambda _1, \dots , \lambda _r\) with \(\lambda _i \neq \lambda _j\). Then, 
+    \[
+        W = E(\lambda _1) \oplus E(\lambda _2) \oplus \dots \oplus E(\lambda _r).
+    \] 
+\end{eg}
+
+\section{Projections and idempotent decompositions}
+\begin{definition}
+    An operator \(P \in \mathcal{L} (V)\) is called a projection if \(P^2 = P\).  
+\end{definition}
+
+\begin{remark}
+    Note that if \(P\) is a projection, then suppose \(W_1 = \Im P\) and \(W_2 = \ker P\), then \(V = W_1 \oplus W_2\). Suppose \(v = v_1 + v_2\) with \(v_i \in W_i\), then \(Pv = Pv_1 + Pv_2 = v_1\). (Since \(v_1 \in \Im (P)\), we have \(v_1 = Pu\) for some \(u\), so \(Pv_1 = P^2u = Pu = v_1\).) Moreover, \(W_i\)'s are \(P\)-invariant with \(P \vert_{W_1} = \mathrm{id} \), \(P\vert_{W_2} = 0\). \(1-P\) is a projection since \((1-P)^2 = 1-2P+P^2 = 1-2P+P=1-P\). In this case, we say \(P\) is a projection/idempotent onto \(W_1\) and along \(W_2\).     
+\end{remark} 
+
+\begin{theorem}[Idempotent decomposition]
+    Suppose \(P_i \in \mathcal{L} (V)\) satisfying \(1 = \sum_{i=1}^r P_i \) and \(P_i P_j = 0\) for all \(i \neq j\) . Let \(V_i = \Im (P_i)\), then \(V = \bigoplus_{i=1}^r V_i\), and \(P_1\) is the projection onto \(V_1\) along \(V_2 \oplus \dots \oplus V_r\).        
+\end{theorem}
+
+\begin{proof}
+    We first show that \(P_i\) is a projection for all \(i\). WLOG, suppose \(i = 1\), then 
+    \[
+        P_1^2 = P_1 \left( 1 - P_2 - P_3 - \dots - P_r \right) = P_1. 
+    \]   
+    Given any \(v \in V\), then 
+    \[
+        v = \sum_{i=1}^r v_i  
+    \] where we suppose \(v_i \in V_i\). Note that if \(u \in V_j\), then \(u \in \ker P_i\) for \(i \neq j\). Thus, 
+    \[
+        P_i v = P_i \sum_{j=1}^r v_j = P_i v_i + \sum_{j \neq i} P_i v_j = P_i v_i = v_i.  
+    \] Thus, this prove the uniqueness.
+\end{proof}
+
+\begin{theorem}
+    Suppose \(V = \bigoplus_{i=1}^r V_i\). Let \(P_i\) be the projection onto \(V_i\) along \(V_1 + \dots + V_{i-1} + V_{i+1} + \dots + V_r\), then \(\sum_{i} P_i = 1 \) and \(P_i P_j = 0\) for all \(i \neq j\).       
+\end{theorem}
+\begin{proof}
+    Explicitly, for any \(v \in V\), write its unique expression 
+    \[
+        v = \sum_{i=1}^r v_i, \quad v_i \in V_i. 
+    \] Then, \(P_i v = v_i\). Hence, 
+    we have \(v = \sum v_i = \sum P_i v  \) and 
+    \[
+        P_i P_j (v_1 + \dots + v_r) = P_i \left( \sum_{l=1}^r P_j v_l  \right) = P_i P_j(v_j) = P_i (v_j) = 0.
+    \]  
+\end{proof}
+
+\section{\(T\)-invariant decomposition}
+\begin{proposition}
+    Suppose \(V = \bigoplus V_i\) and \(T_i \in \mathcal{L} (V_i)\). Define a map 
+\[
+    T: V \to V, \quad \sum v_i \mapsto \sum T_i (v_i),  
+\] then 
+\begin{itemize}
+    \item [(i)] \(T \in \mathcal{L} (V)\)
+    \item [(ii)] \(V_i\) is \(T\)-invariant 
+    \item [(iii)] Suppose \(1 = \sum P_i \) is the corresponding idempotenet decomposition. Then \(T P_i = P_i T = T_i\).    
+\end{itemize}
+\end{proposition}
+
+\begin{proof}
+    Check 
+    \[
+        T(v + \alpha w) = Tv + \alpha T(w).
+    \]
+    Now if \(v \in V_i\), then the unique expression of \(v\) in \(V\) is \(v = \sum_{j=1}^r v_j \) with \(v_i = v\) and \(v_j = 0\) for all \(j \neq i\). So \(T(v) = T_i(v_i) \in V_i\). Hence, \(V_i\) is \(T\)-invariant.       
+    
+    %pf of (iii)
+\end{proof}
+
+\begin{proposition}
+    Let \(V = \bigoplus_{i=1}^r V_i\), corresponding to \(1 = \sum_{i=1}^r P_i \). Let \(T \in \mathcal{L} (V)\). Suppose \(T P_i = P_i T\), then 
+    \begin{itemize}
+        \item [(i)] \(V_i\) is \(T\)-invariant. 
+        \item [(ii)] Let \(T_i = T\vert_{V_i}\), then \(T = \bigoplus T_i\).    
+    \end{itemize}   
+\end{proposition}
+\begin{proof}
+    For \(u \in V_i\), we have \(u = P_i u\) and \(Tu = TP_i u = P_i (Tu)\), so \(Tu \in V_i = \Im P_i\). For any \(v \in V\), we know 
+    \[
+        Tv = \sum T_i v_i 
+    \] if \(v = \sum v_i \) where \(v_i \in V_i\) since 
+    \[
+        Tv = T \left( \sum P_i v  \right) = \sum T(P_i v) = \sum T v_i = \sum T_i v_i.    
+    \]      
+    In this case, we write \(T = \bigoplus T_i\) and if \(B_i = \left\{ v_{ij} \right\}_{j=1}^{m_i} \) is an ordered basis of \(V_i\), and \(B = \left\{ v_{ij} \right\}_{i, j} \) is an ordered basis of \(V\).      
+\end{proof}
+
+\begin{eg}
+    Let \(T \in \mathcal{L} (V)\), and let \(f(x) = \mathrm{ch}_T(x) \) be its characteristic polynomial. Suppose \(f(x) = g(x) \cdot h(x)\) with \(g(x)\) and \(h(x)\) coprime, then 
+    \[
+        1 = p(x) g(x) + q(x) h(x)
+    \] for some \(p, q\). Thus, 
+    \[
+        1 = p(T) g(T) + g(T) h(T),
+    \] and let \(P = p(T) g(T)\) and \(Q = g(T) h(T)\), then \(PT=TP\) and \(QT=TQ\). Also, \(PQ=0\). Note that \(PQ=0\) since 
+    \[
+        PQ= p(T)q(T) f(T) = 0
+    \] by Cayley-Hamilton theorem. Thus, we know this gives an idempotenet decomposition.      
+\end{eg}
+
+\begin{remark}
+    \(\Im P = \ker Q\), and \(\Im Q = \ker P\). If we let \(W_1 = \Im P\) and \(W_2 = \Im Q\), we will see the characteristic polynomial of \(T\vert_{W_1} = h(x)\) and \(T \vert_{W_2} = g(x)\).      
+\end{remark}
