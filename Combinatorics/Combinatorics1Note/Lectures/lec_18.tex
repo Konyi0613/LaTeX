@@ -1,0 +1,101 @@
+\lecture{18}{14 Nov. 12:20}{}
+\begin{prev}
+\[
+    e \left( \frac{n}{e} \right)^n \le n! \le (n+1) \left( \frac{n}{2} \right)^n, \quad n! \thickapprox \sqrt{2\pi n}\left( \frac{n}{e} \right)^n \text{[Stirling]}.     
+\]
+Also, 
+\[
+    \binom{n}{k} \begin{dcases}
+        \thickapprox \frac{n^k}{k!}, &\text{when } k = O(1). \\
+        \le \left( \frac{ne}{k} \right)^k, &\text{for all }k,\text{ tight for } \omega (1) = k = o\left( \sqrt{n}  \right). \\
+        = 2^{\left( H\left( \frac{k}{n} \right) + o(1)  \right)n }, &\text{for } k = \Omega (n),     
+    \end{dcases}
+\]
+where \(H(x) = -x \log _2(x) - (1-x)\log _2(1-x)\).   
+\end{prev}
+
+Now we continue to talk about Partition asymptotics. We know 
+\begin{align*}
+    p(n) &= \# \text{ of ways of writing } n \text{ as an unordered sum of positive integers} \\
+    &\le \# \text{ of ways of writing } n \text{ as an ordered sum of positive integers} \\
+    &= \sum_{k=1}^n \binom{n-1}{k-1} = 2^{n-1}.   
+\end{align*}
+
+\subsubsection{Generating functions}
+\[
+    P(x) = \sum_{n=0}^{\infty} p(n) x^n = \prod _{j=1}^{\infty} \left( 1 + x^{1 \cdot j} + x^{2 \cdot j} + \dots \right) = \prod _{j=1}^{\infty} \frac{1}{1 - x^j}.   
+\]
+Now we build a bijection. If \(\lambda \vdash n\), with \(i_j\) picks of size \(j\), we choose \(x^{i_j \cdot j}\) term from the \(j\)-th factor. Hence, 
+\[
+    \prod _{j=1}^{\infty} \frac{1}{1-x^j} = \sum_{k \ge 0} p(k) x^k \ge p(n) x^n
+\] for all \(x \ge 0\). Hence, 
+\[
+    p(n) \le \frac{\left( \prod_{j=1}^{\infty} \frac{1}{1-x} \right) }{x^n},
+\], and thus 
+\begin{align*}
+    \ln \left( p(n) \right) &\le -n \ln x - \sum_{j=1}^{\infty} \ln \left( 1 - x^j \right) \\
+    &= -n \ln x + \sum_{j=1}^{\infty} \sum_{\ell =1}^{\infty} \frac{(x^j)^{\ell } }{\ell } \quad \text{by Taylor series} \\
+    &= -n \ln x + \sum_{\ell =1}^{\infty} \frac{1}{\ell } \cdot \sum_{j=1}^{\infty} \left( x^{\ell }  \right)^j = -n \ln x + \sum_{\ell =1}^{\infty} \frac{1}{\ell } \cdot \frac{x^{\ell } }{1 - x^{\ell } }.          
+\end{align*} 
+
+Note that 
+\[
+    1 - x^{\ell} = (1-x) \left( 1 + x + x^2 + \dots + x^{\ell -1} \right) \ge (1-x) \ell x^{\ell -1} \quad \text{for } 0 < x < 1.  
+\]
+Hence, 
+\begin{align*}
+    \ln \left( p(n) \right) &\le -n \ln x + \sum_{\ell =1}^{\infty} \frac{1}{\ell } \frac{x^{\ell } }{(1-x)\cdot \ell x^{\ell -1}} \\
+    &= -n \ln x + \frac{x}{1-x} \sum_{\ell =1}^{\infty} \frac{1}{\ell ^2} \\
+    &= -n \ln x + \frac{\pi ^2}{6} \frac{x}{1-x} = n \ln \frac{1}{x} + \frac{\pi ^2}{6} \cdot \frac{x}{1-x}  \text{ for all } x \in (0,1). 
+\end{align*}
+
+Let \(u = \frac{x}{1-x}\), then 
+\[
+    \frac{1}{x} = 1 + \frac{1}{u} \implies \ln \left( p(n) \right) \le n \ln \left( 1 + \frac{1}{u} \right) + \frac{\pi ^2}{6} u \le \frac{n}{u} + \frac{\pi ^2}{6} u, 
+\] 
+where the last inequality is because 
+\[
+    \ln \left( 1 + \frac{1}{u} \right) \le \frac{1}{u}. 
+\]
+
+Now we want to find where the maximum of \(\frac{n}{u} + \frac{\pi ^2}{6} u\) occurs, so suppose 
+\[
+    \frac{\mathrm{d}}{\mathrm{d}u} \left( \frac{n}{u} + \frac{\pi ^2}{6} u \right)  = 0, 
+\] we can check the maximum occurs at \(u = \frac{\sqrt{6n}}{\pi }\), so 
+\[
+    \ln \left( p(n) \right) \le \frac{n}{u} + \frac{\pi ^2}{6} u \le (\pi \sqrt{n} )/\sqrt{6} + \frac{\pi }{\sqrt{6} } \sqrt{n} = \frac{2\pi }{\sqrt{6} } \sqrt{n},   
+\] which means 
+\[
+    p(n) \le e^{\frac{2\pi }{\sqrt{6} } \sqrt{n} }.
+\]
+
+For the lower bound: Recall \(p(n, k)\) is the number of unordered partitions into \(k\) parts, and the number of ordered partitions into \(k\) parts is \(\binom{n-1}{k-1}\). Hence, 
+\[
+    p(n) \ge p(n, k) \le \binom{n-1}{k-1}.
+\]
+
+Notice that 
+\[
+    \binom{n-1}{k-1} \le p(n, k) k!
+\]
+since each unordered partition into \(k\) parts is counted \(\le k!\) times in \(\binom{n-1}{k-1}\). Hence, 
+\[
+    p(n) \ge p(n, k) \ge \frac{\binom{n-1}{k-1}}{k!} \quad \forall k \ge 1.
+\] 
+Hence, we want to choose \(k\) to maximize R.H.S. to get a better lower bound. Note that 
+\[
+    \frac{g(k+1)}{g(k)} = \frac{\frac{\binom{n-1}{k}}{(k+1)!}}{\frac{\binom{n-1}{k-1}}{k!}} = \frac{\binom{n-1}{k}}{\binom{n-1}{k-1}} \cdot \frac{k!}{(k+1)!} = \frac{n-k}{k} \cdot \frac{1}{k+1} \thickapprox \frac{n}{k^2}.
+\] 
+At the optimal \(k\), we expect
+\[
+    \frac{g(k+1)}{g(k)} \thickapprox 1,
+\] so \(k \thickapprox \sqrt{n} \), and thus we can swt \(k = \left\lfloor \sqrt{n}  \right\rfloor\). Hence, 
+\begin{align*}
+    p(n) \ge g \left( \left\lfloor \sqrt{n}  \right\rfloor \right) = \frac{\binom{n-1}{\left\lfloor \sqrt{n}  \right\rfloor - 1}}{\left( \left\lfloor \sqrt{n}  \right\rfloor \right)! } \ge \frac{\left( \frac{n-1}{\left\lfloor \sqrt{n}  \right\rfloor - 1} \right)^{\left\lfloor \sqrt{n}  \right\rfloor - 1} }{\left( \frac{\left\lfloor \sqrt{n}  \right\rfloor}{e} \right)^{\left\lfloor \sqrt{n}  \right\rfloor} } \thickapprox C^{\sqrt{n} }. 
+\end{align*}  
+
+\begin{theorem}[Hardy-Ramanujan, 1918]
+    \[
+        p(n) \thickapprox \frac{1}{4\sqrt{3} } \frac{1}{n} e^{\frac{2\pi }{\sqrt{6} } \sqrt{n} }.
+    \]
+\end{theorem}
