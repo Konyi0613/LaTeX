@@ -1,0 +1,264 @@
+\begin{problem}
+Let $A$ be the $4 \times 4$ real matrix
+$$
+A =
+\begin{bmatrix}
+1 & 1 & 0 & 0 \\
+-1 & -1 & 0 & 0 \\
+-2 & -2 & 2 & 1 \\
+1 & 1 & -1 & 0
+\end{bmatrix}.
+$$
+Show that the characteristic polynomial for $A$ is $x^2(x-1)^2$ and that it is also the minimal polynomial.
+\end{problem}
+\begin{proof}
+    For the characteristic polynomial,
+    \begin{align*}
+        \mathrm{ch}_A(x) &= \det (xI-A) = \det \begin{pmatrix}
+            x-1 & -1 & 0 & 0  \\
+            1 & x+1 & 0 & 0  \\
+            2 & 2 & x-2 & -1  \\
+            -1 & -1 & 1 & x  \\
+        \end{pmatrix} \\
+        &= (x-1) \det \begin{pmatrix}
+            x+1 & 0 & 0  \\
+            2 & x-2 & -1  \\
+            -1 & 1 & x  \\
+        \end{pmatrix} + \det \begin{pmatrix}
+            1 & 0 & 0  \\
+            2 & x-2 & -1  \\
+            -1 & 1 & x  \\
+        \end{pmatrix} \\
+        &= (x-1)(x+1) \det \begin{pmatrix}
+            x-2 & -1  \\
+            1 & x  \\
+        \end{pmatrix} + \det \begin{pmatrix}
+            x-2 & -1  \\
+            1 & x  \\
+        \end{pmatrix} \\
+        &= (x-1)(x+1) \left( (x-2)x + 1 \right) + (x-2)x + 1 \\
+        &= \left( (x-1)(x+1) + 1 \right) \left( (x-2)x + 1 \right) = x^2 (x-1)^2.
+    \end{align*}
+    Now by Cayley-Hamilton theorem, we know \(m_A(x) \mid x^2(x-1)^2\), and we know \(x(x-1) \mid m_A(x)\). 
+    \begin{itemize}
+        \item Case 1: \(x^2 - x\). \(\left( A^2 - A \right)_{11} = 1 + (-1) - 1 = - 1 \neq 0 \), so \(x^2 - x\) is not the minimal polynomial. 
+        \item Case 2: \(x^2(x-1)\). Since 
+        \[
+            A^2 = \begin{pmatrix}
+                 &  &  &   \\
+                 &  &  &   \\
+                -3 & -3 & 3& 2  \\
+                 &  &  &   \\
+            \end{pmatrix} \implies 
+            A^2(A-I) = \begin{pmatrix}
+                 &  &  &   \\
+                 &  &  &   \\
+                3 & -3 & 3 & 2  \\
+                 &  &  &   \\
+            \end{pmatrix} \begin{pmatrix}
+                0 &  &  &   \\
+                -1 &  &  &   \\
+                -2 &  &  &   \\
+                1 &  &  &   \\
+            \end{pmatrix} = \begin{pmatrix}
+                 &  &  &   \\
+                 &  &  &   \\
+                -1 &  &  &   \\
+                 &  &  &   \\
+            \end{pmatrix},
+        \] so \(A^2(A-I) \neq 0\), and thus \(x^2(x-1)\) is not the minimal polynomial.
+    \item Case 3: \(x(x-1)^2\). Since 
+    \[
+        (A-I)^2 = \begin{pmatrix}
+            -1 &  &  &   \\
+            2 &  &  &   \\
+            1 &  &  &   \\
+            0 &  &  &   \\
+        \end{pmatrix} \implies A(A-I)^2 = \begin{pmatrix}
+            1 & 1 & 0 & 0  \\
+             &  &  &   \\
+             &  &  &   \\
+             &  &  &   \\
+        \end{pmatrix} \begin{pmatrix}
+            -1 &  &  &   \\
+            2 &  &  &   \\
+            1 &  &  &   \\
+            0 &  &  &   \\
+        \end{pmatrix} = \begin{pmatrix}
+            1 &  &  &   \\
+             &  &  &   \\
+             &  &  &   \\
+             &  &  &   \\
+        \end{pmatrix},
+    \] so \(A(A-I)^2 \neq 0\).  
+    \end{itemize} 
+    Hence, we know \(m_A(x) = x^2(x-1)^2 =\mathrm{ch}_A(x) \). 
+\end{proof}
+
+\begin{problem}
+Let
+$$
+A =
+\begin{bmatrix}
+0 & 1 & 0 \\
+2 & -2 & 2 \\
+2 & -3 & 2
+\end{bmatrix}.
+$$
+Is $A$ similar over the field of real numbers to a triangular matrix? If so, find such a triangular matrix.
+\end{problem}
+\begin{proof}
+    Since we know 
+    \[
+        \mathrm{ch}_A(x) = \det \begin{pmatrix}
+            x & -1 & 0  \\
+            -2 & x+2 & -2  \\
+            -2 & 3 & x-2  \\
+        \end{pmatrix} = x^3,
+    \] and \(m_A(x) \mid \mathrm{ch}_A(x) \), so \(m_A(x)\) must split, and thus \(A\) is triangulanizable. Now since the only eigenvalue of \(A\) is \(0\), so we can pick some \(w_1\) in \(\ker A\) first. Let's pick 
+    \[
+        w_1 = \begin{pmatrix}
+             1 \\
+             0 \\
+             -1 \\
+        \end{pmatrix} \implies Aw_1 = \begin{pmatrix}
+             0 \\
+             0 \\
+             0 \\
+        \end{pmatrix}.
+    \] 
+    Now we want to pick some \(w_2\) s.t. \(Aw_2 \in \langle w_1, w_2 \rangle \), so we can pick 
+    \[
+        w_2 = \begin{pmatrix}
+             0 \\
+             1 \\
+             1 \\
+        \end{pmatrix} \implies Aw_2 = \begin{pmatrix}
+             1 \\
+             0 \\
+             -1 \\
+        \end{pmatrix} = 1 \cdot w_1 + 0 \cdot w_2.
+    \]
+    Now we can pick third vector \(w_3\) to be any vector which cannot be represented as the linear combination of \(w_1\) and \(w_2\), suppose we pick 
+    \[
+        W_3 = \begin{pmatrix}
+             0 \\
+             0 \\
+             1 \\
+        \end{pmatrix} \implies Aw_3 = \begin{pmatrix}
+             0 \\
+             2 \\
+             2 \\
+        \end{pmatrix} = 0 \cdot w_1 + 2 \cdot w_2 + 0 \cdot w_3,
+    \]
+    so we know \(b = \left\{ w_1, w_2, w_3 \right\} \) is a basis of \(\mathbb{R} ^3\), and 
+    \[
+        [A]_b = \begin{pmatrix}
+            0 & 1 & 0  \\
+            0 & 0 & 2  \\
+            0 & 0 & 0  \\
+        \end{pmatrix}.
+    \]            
+\end{proof}
+
+\begin{problem}
+    Let $T$ be a diagonalizable linear operator on the $n$-dimensional vector space $V$, and let $W$ be a subspace which is \textbf{invariant} under $T$. Prove that the restriction operator $T_W$ is diagonalizable.
+\end{problem}
+\begin{proof}
+    Since we have shown that \(m_{T_W}(x) \mid m_T(x)\), and since \(T\) is diagonalizable, so 
+    \[m_T(x) = \prod _{i=1}^r (x - \lambda _i)\] 
+    where \(\lambda _i \neq \lambda _j\) for distinct \(i, j\), so we know 
+    \[
+        m_{T_W}(x) = \prod _{k=1}^{r^{\prime} } \left( x - \lambda _{a_k} \right), 
+    \] for some \(\left\{ a_k \right\}_{k=1}^{r^{\prime} } \subseteq [r] \). Thus, \(T_W\) is diagonalizable.      
+\end{proof}
+
+\begin{problem}
+    Let \(T\) be a linear operator on \(V\). If every subspace of \(V\) is invariant under \(T\),
+then \(T\) is a scalar multiple of the identity operator.
+\end{problem}
+\begin{proof}
+    For all \(x \in V\), we know \(\langle x \rangle \) is a subspace of \(V\) and thus \(T\)-invariant. Thus, \(Tx = c_x x\) for some constant \(c_x\). Now for \(\lambda x \in V\), we know 
+    \[
+       \lambda c_x x = \lambda T(x) = T (\lambda x) = c^{\prime} \lambda x,
+    \] so \(c_x = c^{\prime} \), and thus for all \(v \in \langle x \rangle \), \(Tv = c_x x\) for a fixed constant \(c_x\). Now if \(y \notin \langle x \rangle \), then \(T(y) = c_y y\), and if \(c_y \neq c_x\), then 
+    \[
+        c_{x+y} (x + y) = T(x + y) = T(x) + T(y) = c_x x + c_y y,
+    \]
+    which gives 
+    \[
+        \left( c_{x+y} - c_x \right) x + (c_{x+y} - c_y) y =0,
+    \]
+    but since \(\left\{ x, y \right\} \) is linearly independent, so \(c_x = c_y = c_{x+y}\). Hence, if we pick a basis \(B\) of \(V\), then we know 
+    \[
+        T (v_i) = c v_i
+    \] for a fixed \(c\) for all \(v_i \in V\) since we can do the same arguments as above. Hence, for all \(v \in V\), since it can be written as a linear combination of \(B\), and we have shown that \(T(v_i) = cv_i\) for all \(v_i \in B\) and \(T(\lambda v_i) = c (\lambda v_i)\), so we know \(T\) must be a scalar multiple of the identity operator.                     
+\end{proof}
+
+\begin{problem}
+    Let $V$ be the space of $n \times n$ matrices over $F$. Let $A$ be a fixed $n \times n$ matrix over $F$. Let $T$ and $U$ be the linear operators on $V$ defined by
+\begin{align*}
+T(B) &= AB \\
+U(B) &= AB - BA.
+\end{align*}
+
+\noindent (a) True or false? If $A$ is diagonalizable (over $F$), then $T$ is diagonalizable. \\
+(b) True or false? If $A$ is diagonalizable, then $U$ is diagonalizable.
+\end{problem}
+\begin{proof}
+    \vphantom{text}
+    \begin{itemize}
+        \item [(a)] True. Suppose \(m_A(x) = a_m x^m + a_{m-1} x^{m-1} + \dots + a_0 \), then 
+        \[
+            m_A(T)(B) = \left( a_m T^m + a_{m-1} T^{m-1} + \dots + a_0 I \right)(B),
+        \] and note that \(T^i(B) = A^i B\), so 
+        \begin{align*}
+            m_A(T)(B) &= a_m T^m B + a_{m-1} T^{m-1} B + \dots + a_0 B
+            \\&= a_m A^m B + a_{m-1} A^{m-1} B + \dots + a_0 B 
+            \\&= \left( a_m A^m + a_{m-1} A^{m-1} + \dots + a_0 \right)B = m_A(A)(B) = 0.
+        \end{align*}
+        Hence, \(m_T(x) \mid m_A(x)\), and thus if \(A\) is diagonalizable, then \(m_A(x)\) has all distinct roots, and thus \(m_T(x)\) has all distinct roots, which means \(T\) is diagonalizable.    
+        \item [(b)] True. If \(A\) is diagonalizable, then suppose \(P^{-1} A P = D = \diag [d_1, d_2, \dots , d_n]\), and suppose \(b = \left\{ E^{p,q} \right\}_{1 \le p, q \le n} \) is the standard basis of \(V\), i.e. \(E^{p,q}\) is a matrix with \((p, q)\)-entry equal \(1\) and all the other entries \(0\) for all \(p, q\). Then, note that \(\beta ^{\prime} = \left\{ P E^{p, q} P^{-1}\right\}_{1 \le p,q \le n} \) is a basis of \(V\) since 
+        \begin{itemize}
+            \item If 
+            \[
+                \sum_{p, q} \alpha _{p, q} \left( P E^{p, q} P^{-1} \right) = 0,
+            \] then 
+            \[
+                0 = \sum_{p, q} P (\alpha _{p, q} E^{p, q}) P^{-1} = P \left( \sum_{p,q} \alpha _{p, q} E^{p,q}  \right) P^{-1}, 
+            \] which gives 
+            \[
+                0 = P^{-1} 0 P = P^{-1} P \left( \sum_{p,q} \alpha _{p, q} E^{p,q}  \right) P^{-1} P = \sum_{p,q} \alpha _{p, q} E^{p,q},
+            \] so \(\alpha _{p, q} = 0\) for all \(p, q\) since \(\left\{ E^{p,q} \right\}_{1 \le p, q \le n} \) is a basis of \(V\). Hence, \(\beta ^{\prime} \) is linearly independent. 
+            \item Now since for any \(M \in V\), \(P^{-1} M P\) can be represented as a linear combination of \(b\), say 
+            \[
+                P^{-1} M P = \sum_{p,q} s _{p,q} E^{p,q},  
+            \] so 
+            \[
+                M = P \sum_{p,q} s _{p,q} E^{p,q} P^{-1} = \sum_{p, q} s_{p, q} P E^{p,q} P^{-1}, 
+            \] so \(M\) is a linear combination of \(\beta ^{\prime} \), and thus \(\beta ^{\prime} \) spans \(V\).   
+        \end{itemize}
+        Now note that 
+        \begin{align*}
+            U \left( PE^{p, q} P^{-1} \right) &= APE^{p,q} P^{-1} - PE^{p,q} P^{-1} A \\
+            &= \left( PP^{-1} \right) APE^{p,q} P^{-1} - PE^{p,q} P^{-1} A \left( PP^{-1} \right) \\
+            &= PDE^{p,q} P^{-1} - PE^{p,q}DP^{-1} \\
+            &= P \left( DE^{p,q} - E^{p,q}D \right) P^{-1}. 
+        \end{align*}
+        Also, we have 
+        \[
+            \left( DE^{p,q} - E^{p,q}D \right)_{ij}  = \sum_{k=1}^n D_{ik} E_{kj}^{p,q} - \sum_{k=1}^n E_{ik}^{p,q} D_{kj} = \begin{dcases}
+                d_p - d_q, &\text{ if } (i,j) = (p,q);\\
+                0, &\text{ otherwise} .
+            \end{dcases}   
+        \]
+        Thus, 
+        \[
+           \left( DE^{p,q} - E^{p,q}D \right)_{ij} = (d_p - d_q) E^{p,q},
+        \]
+        which gives 
+        \[
+            U \left( PE^{p,q}P^{-1} \right) = (d_p - d_q) PE^{p,q}P^{-1}, 
+        \] so we know \([U]_{\beta ^{\prime} }\) is diagonal and thus \(U\) is diagonalizable.  
+    \end{itemize}
+\end{proof}
