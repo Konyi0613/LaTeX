@@ -1,0 +1,157 @@
+\lecture{19}{18 Nov. 15:30}{}
+When we calculated the lower bound of \(p(n)\), we say 
+\begin{align*}
+    p(n) &\ge p(n, k) \ge \frac{\binom{n-1}{k-1}}{k!} = \frac{\frac{k}{n} \binom{n}{k}}{k!} \ge \frac{(\frac{k}{n}) (n-k)^k}{(k!)^2} = \frac{k}{n} \cdot \frac{n^k \left( 1 - \frac{k}{n} \right)^k }{(k!)^2} \\
+    &\ge \frac{k}{n} \cdot \frac{n^k \left( 1 - \frac{k}{n} \right)^k }{\left[ \left( \frac{k}{e} \right)^k (k+1)  \right]^2 } \ge \frac{k}{n(k+1)^2} \cdot \left( \frac{ne^2}{k^2} \right)^k \underbrace{\left( 1 - \frac{k}{n} \right)^k}_{\to e^{-1}} \gtrsim \left( \frac{1}{e} + o(1) \right) \frac{1}{n^{\frac{3}{2}}} e^{2 + o(1) \sqrt{n} } 
+\end{align*} 
+
+\chapter{Partially ordered sets}
+\section{Inclusion-exclusion principle}
+Recall the sum rule. If \(S\) can be partitioned as \(S = S_1 \cupdot S_2 \cupdot \dots \cupdot S_n \), then \(\vert S \vert = \sum_{i=1}^n \vert S_i \vert   \). 
+
+\begin{eg}
+    Suppose \(46\) friends go out to dinner to celebrate the end of yet another Combinatorics lecture. \(27\) people eat pork xiaolongbaos and \(16\) peoples eat vegetarian xiaolongbaos. Then, how many prople doesn't eat any xiaolongbaos at all?  
+\end{eg}
+\begin{explanation}
+    Draw a Venn-diagram, then we know the information is not enough to solve this problem since we don't know how many people eat both pork and vegetarian xiaolongbaos, so the answer is not unique. 
+
+    Now we suppose \(5\) people ate both types of xiaolongbaos. Let 
+    \begin{align*}
+        F &= \left\{ \text{friends}  \right\} \\
+        X &= \left\{ \text{xiaolongbao eaters}  \right\} \\
+        H &= \left\{ \text{xiaolongbao non-eaters}  \right\} \\
+        P &= \left\{ \text{pork xiaolongbaos eaters}  \right\} \\ 
+        V &= \left\{ \text{vegetarian xiaolongbaos eaters}  \right\} \\
+        B &= \left\{ \text{eaten of both}  \right\},    
+    \end{align*} 
+    then we're interested in \(\vert H \vert \). By sum rule, we know \(\vert F \vert = \vert X \vert + \vert H \vert   \), so \(\vert H \vert = \vert F \vert - \vert X \vert = 46 - \vert X \vert   \). Note that \(X = P \cup V\), and this is not a disjoint union, so we cannot apply the sum rule directly. However, \(X = P \cupdot \left( V \setminus (V \cap P) \right) = P \cupdot \left( V \setminus B \right) \) is a disjoint union. Hence, \(\vert X \vert = \vert P \vert + \vert V \setminus B \vert   \). But \(V = (V \setminus B) \cupdot B\), so by sum rule we have \(\vert V \vert = \vert V \setminus B \vert + \vert B \vert   \). Hence, \(\vert V \setminus B \vert = \vert V \vert - \vert B \vert = 16 - 5 = 11\), which gives \(\vert X \vert = \vert P \vert + \vert V \setminus B \vert = 27 + 11 = 38   \). Hence, \(\vert H \vert = \vert F \vert - \vert X \vert = 46 - 38 = 8  \).   
+\end{explanation}
+
+\begin{theorem}
+    If \(A, B\) are two sets, then 
+    \[
+        \left\vert A \cup B \right\vert = \vert A \vert + \vert B \vert - \vert A \cap B \vert \le \vert A \vert + \vert B \vert.      
+    \] 
+\end{theorem}
+\begin{proof}
+    Since \(A = A \cupdot (B \setminus A)\) and \(B = (B \setminus A) \cupdot (A \cap B)\). Hence, by sum rule, we have 
+    \[
+        \left\vert B \setminus A \right\vert = \vert B \vert - \vert A \cap B \vert, \quad \text{ and } \vert A \cup B \vert = \vert A \vert + \vert B \setminus A \vert = \vert A \vert + \vert B \vert - \vert A \cap B \vert.       
+    \]  
+\end{proof}
+\newpage
+\begin{theorem}[Inclusion-Exclusion]
+    Let \(S\) be a finite set, with subsets \(A_1, A_2, \dots , A_n \subseteq S\). Then 
+    \[
+        \underbrace{\left\vert S \setminus \bigcup_{i=1}^{n} A_i  \right\vert}_{\substack{\text{\# of elements} \\ \text{not in any } A_i}} = \sum_{I \subseteq [n]}  (-1)^{\vert I \vert } \left\vert \bigcap_{i \in I} A_i  \right\vert.
+    \]  
+    Note that \(\bigcap_{i \in \varnothing } A_i = S \). 
+\end{theorem}
+\begin{proof}
+    The first choice is induction. The second choice is to count how often an element is counted. Note that we have an identity: 
+    \[
+        \prod _{i=1}^n \left( 1 + x_i \right) = \sum_{I \subseteq [n]} \prod _{i \in I} x_i,  
+    \] where \(\prod _{i \in \varnothing } x_i = 1\). 
+    \begin{definition}
+        The characteristic function \(f_i\) for \(A_i\) is the function 
+        \[
+            f_i : S \to \left\{ 0, 1 \right\}, \quad f_i(s) = \begin{dcases}
+                1, &\text{ if }  s \in A_i;\\
+                0, &\text{ if }  s \notin A_i.
+            \end{dcases} 
+        \]  
+    \end{definition}
+    Then, for any \(s \in S\), 
+        \[
+            \prod _{i=1}^n \left( 1 - f_i(s) \right) = \begin{dcases}
+               1 , &\text{ if }  s \in S \setminus \left( \bigcup_{i=1}^{r} A_i  \right) ;\\
+               0  , &\text{ if } s \in \bigcup_{i=1}^{n} A_i .
+            \end{dcases} 
+        \] 
+        Hence, 
+        \[
+            \left\vert S \setminus \left( \bigcup_{i=1}^{n} A_i  \right)  \right\vert = \sum_{s \in S} \prod _{i=1}^n \left( 1 - f_i(s) \right).  
+        \]
+        Applying the identity: 
+        \begin{align*}
+            \left\vert S \setminus \left( \bigcup_{i=1}^n A_i  \right)   \right\vert &= \sum_{s \in S} \prod _{i=1}^n \left( 1 - f_i(s) \right) = \sum_{s \in S} \sum_{I \subseteq [n]} \prod _{i \in I} \left( -f_i(s) \right) \\
+            &= \sum_{I \subseteq [n]} (-1)^{\vert I \vert } \sum_{s \in S} \prod _{i \in I} f_i(s) = \sum_{I \subseteq [n]} (-1)^{\vert I \vert } \left\vert \bigcap_{i \in I} A_i  \right\vert       
+        \end{align*}
+        since we know \(\prod _{i \in I} f_i(s) = 1\) iff \(s \in \bigcap_{i \in I} A_i \), otherwise it is equal to \(0\).   
+\end{proof}
+
+\begin{corollary}
+\[
+    \left\vert \bigcup_{i=1}^{n} A_i  \right\vert = \sum_{\substack{I \subseteq [n] \\ I \neq \varnothing }} (-1)^{\vert I \vert + 1 } \left\vert \bigcap_{i \in I} A_i  \right\vert   
+\]
+\end{corollary}
+\begin{proof}
+Note that 
+\[
+    S = \left( \bigcup_{i=1}^{n} A_i  \right) \cupdot \left( S \setminus \bigcup_{i=1}^{n} A_i  \right),  
+\] so by sum rule we have 
+\[
+    \left\vert \bigcup_{i=1}^n A_i  \right\vert = \vert S \vert - \left\vert S \setminus  \bigcup_{i=1}^{n} A_i  \right\vert,   
+\] which means 
+\begin{align*}
+   \left\vert \bigcup_{i=1}^n A_i  \right\vert &= \vert S \vert - \left( \sum_{I \in [n]} (-1)^{\vert I \vert } \left\vert \bigcap_{i \in I} A_i  \right\vert  \right) = \vert S \vert - \left( (-1)^{\vert \varnothing  \vert } \left\vert \bigcap_{i \in \varnothing } A_i  \right\vert + \sum_{\substack{I \subseteq [n] \\ I \neq \varnothing }} (-1)^{\vert I \vert } \left\vert \bigcap_{i \in I} A_i  \right\vert    \right) \\
+   &= \sum_{\substack{I \subseteq [n] \\ I \neq \varnothing }} (-1)^{\vert I \vert + 1 } \left\vert \bigcap_{i \in I} A_i  \right\vert.     
+\end{align*}
+\end{proof}
+
+\begin{eg}[Derrangements]
+    A professor wants to return \(46\) midterms to his \(46\) students. He shuffles the exams uniformly at random and goes one to every student. Then, 
+    \[
+        \mathbb{P} (\text{somebody gets their own exam} ) = ? 
+    \]  
+\end{eg}
+\begin{explanation}
+    We do a warm-up first: 
+    \[
+        \mathbb{P} \left( \text{student } \# i \text{ gets his own exam}  \right) = \frac{1}{46}. 
+    \]
+    Now we can map the distribution of exams to permutations of \([46]\). Student \(i\) gets exam \(\pi (i)\), where \(\pi \in S_{46}\). Hence, we can define 
+    \[
+        A_i = \left\{ \# \text{ method s.t. student } \# i \text{ gets own exam}   \right\} = \left\{ \pi : \pi (i) = i \right\}.  
+    \]
+    We want to find \(\left\vert \bigcup_{i=1}^{46} A_i  \right\vert \). Hence, we know 
+    \[
+        \left\vert \bigcup_{i=1}^{46} A_i  \right\vert = \sum_{\substack{I \subseteq [46] \\ I \neq \varnothing }} (-1)^{\vert I \vert + 1 } \left\vert \bigcap_{i \in I} A_i  \right\vert,
+    \] where 
+    \[
+        \left\vert \bigcap_{i \in I} A_i  \right\vert = \left( 46 - \vert I \vert  \right)!  
+    \] since \(\bigcap_{i \in I} A_i\) counts the number of methods s.t. \(\pi (i) = i\) for all \(i \in I\). Hence, 
+    \[
+        \left\vert \bigcup_{i=1}^{46} A_i  \right\vert = \sum_{\substack{I \subseteq [46] \\ I \neq \varnothing }} (-1)^{\vert I \vert + 1} \left( 46 - \vert I \vert  \right) ! ,   
+    \]        
+    so 
+    \[
+        \mathbb{P} \left( \text{somebody gets their own exam}  \right) = \frac{\left\vert \bigcup_{i=1}^{46} A_i  \right\vert }{46!} = \sum_{\substack{I \subseteq [46] \\ I \neq \varnothing }} \frac{(-1)^{\vert I \vert + 1} \left( 46 - \vert I \vert  \right)! }{46!}.  
+    \]
+    Note that our summands only depend on the size of \(I\) but not \(I\) itself. Hence, we can simplify the answer: 
+    \begin{align*}
+        \mathbb{P} \left( \text{somebody gets their own exam}  \right) &= \sum_{k=1}^{46} \sum_{\substack{I \subseteq [46] \ \vert I \vert = k }} (-1)^{k+1} \frac{(46-k)!}{46!} \\
+        &= \sum_{k=1}^{46} \binom{46}{k} (-1)^{k+1} \frac{(46-k)!}{46!} = \sum_{k=1}^{46} \frac{(-1)^{k+1} }{k!}. 
+    \end{align*}
+\end{explanation}
+Hence, if we generalize this problem to be calculating 
+\[
+    \mathbb{P} \left( \pi \text{ has no fixed point}  \right), 
+\]
+then we can give a definition:
+\begin{definition}
+    \(\pi \in S_n\) is a derrangement if \(\pi (i) \neq i\) for all \(i \in [n]\).  
+\end{definition}
+Hence, if we define \(A_i = \left\{ \pi : \pi (i) = i \right\} \), then 
+\[
+    \mathbb{P} \left( \pi \text{ is an derrangement}  \right) = \frac{\left\vert S_n \setminus  \left( \bigcup_{i=1}^{n} A_i  \right)  \right\vert }{n!} = \frac{1}{n!} \sum_{I \subseteq [n]} (-1)^{\vert I \vert } \left\vert \bigcap_{i=1}^{n} A_i  \right\vert = \frac{1}{n!} \sum_{k=0}^n \binom{n}{k} (-1)^k (n-k)! = \sum_{k=0}^n \frac{(-1)^k}{k!}.    
+\] 
+Hence, 
+\[
+    \lim_{n \to \infty} \mathbb{P} \left( \pi \in S_n \text{ is a derrangement}  \right) = \sum_{k=0}^{\infty} \frac{(-1)^k}{k!} = e^{-1} = \frac{1}{e},  
+\]
+which gives 
+\[
+    \mathbb{P} \left( \pi \text{ is not a derrangement}  \right) \to 1 - \frac{1}{e}. 
+\]
+There is a fact that the number of derrangements is the integer closest to \(\frac{n!}{e}\). 

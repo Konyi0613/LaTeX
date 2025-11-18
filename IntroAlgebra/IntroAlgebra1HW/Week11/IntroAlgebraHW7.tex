@@ -1,8 +1,10 @@
 \documentclass[a4paper,12pt]{article}
 \usepackage{bbding,combelow,textcomp,amsfonts,amsthm,amsmath,amssymb,graphicx,color,hyperref,etoolbox}
+\usepackage{booktabs}
 \usepackage[utf8x]{inputenc}
 \usepackage[lined,boxed,commentsnumbered]{algorithm2e}
 \usepackage{enumitem}
+\usepackage{float}
 \usepackage{xeCJK}
 \setCJKmainfont{PingFang TC}
 \usepackage{pdfpages}
@@ -45,10 +47,13 @@
 \makeatother
 
 \renewcommand{\thesection}{\normalsize\arabic{section}}
+\renewcommand{\Im}{\mathrm{Im}}
 
 \renewcommand{\deg}{\textrm{deg}}
 \newcommand{\eps}{\varepsilon}
 \newcommand{\ceil}[1]{\left \lceil #1 \right \rceil}
+\DeclareMathOperator{\sgn}{sgn}
+
 
 \newcommand{\hint}{\begin{flushright} [Hint at \url{\hintURL}.] \end{flushright}}
 
@@ -83,6 +88,58 @@ For a finite group $G$ and a prime $p$ dividing $|G|$, let $n_p(G)$ denote the n
 
 \item Is it possible that $n_3(G)>1$?
 \end{enumerate}
+\paragraph{Solution: }
+\begin{itemize}
+    \item [(i)] Note that \(24 = 2^3 \cdot 3\), and we know \(n_2(G) \equiv 1 \mod{2}\), so there are at least \(3\) Sylow \(2\)-subgroup of \(G\). Suppose they are \(P_1, P_2, P_3\), and let \(P = \left\{ P_1, P_2, P_3 \right\} \), then consider
+    \[
+        \varphi : G \to S_3, \quad g \mapsto \varphi _g, \quad \text{where } \varphi _g (P_i) = g P_i g^{-1} \quad \forall i = 1,2,3. 
+    \]
+    Note that \(\varphi \) is a homomorphism, and 
+    \[
+        \ker \varphi = \left\{ g \in G : \varphi _g = 1 \right\} = \left\{ g \in G : g P_i g^{-1} = P_i \quad \forall i = 1,2,3 \right\} = \bigcap_{i=1}^{3} N_G(P_i).   
+    \]
+    Now if we define a group action of \(G\) on \(P\) by \(g \cdot P_i = g P_i g^{-1}\), then 
+    \begin{align*}
+        \mathrm{Stab}(P_i) &= \left\{ g \in G : g \cdot P_i = P_i \right\} = \left\{ g \in G: gP_i g^{-1} = P_i \right\} = N_G(P_i) \\
+        \mathrm{Orb}(P_i) &= \left\{ g \cdot P_i : g \in G \right\} = \left\{ g P_i g^{-1} : g \in G \right\} = P.      
+    \end{align*}
+    Hence, by orbit-stabilizer theorem, we know 
+    \[
+        \left\vert N_G(P_i) \right\vert = \left\vert \mathrm{Stab}(P_i)  \right\vert = \frac{\vert G \vert }{\vert P \vert } = 8,
+    \] and note that 
+    \[
+        P_i \subseteq N_G(P_i), \quad \text{and }  \vert P_i \vert = \vert N_G(P_i) \vert,  
+    \]so we know \(P_i = N_G(P_i)\). Hence, \(\ker \varphi = \bigcap_{i=1}^{3} N_G(P_i) = \bigcap_{i=1}^{3} P_i \). Note that \(\mathrm{Im} \varphi < S_3\), so by Lagrange's theorem: 
+    \begin{itemize}
+        \item Case 1: \(\vert \mathrm{Im}  \varphi  \vert = 1, 2, 3\), then by first isomorphism theorem, 
+        \[
+            \vert \ker \varphi  \vert = \frac{\vert G \vert }{\vert \mathrm{Im}  \varphi  \vert } \ge 8, 
+        \] but \(\ker \varphi = \bigcap_{i=1}^{3} P_i \), and \(\vert P_i \vert = 8\) for all \(i = 1,2,3\). Hence, \(P_1 = P_2 = P_3\), otherwise \(\vert \ker \varphi  \vert < 8\). However, \(P_1, P_2, P_3\) are pairwise distinct, so this case is impossible.      
+        \item Case 2: \(\vert \Im \varphi \vert = 6 \), then \(\vert \ker \varphi  \vert = \frac{24}{6} = 4 \), and thus \(\ker \varphi \) is a normal subgroup of \(G\) of order \(4\), and this is the only possible case, so we're done.   
+    \end{itemize}   
+    \item [(ii)] Consider \(S_4\), then we know \(\vert S_4 \vert = 24 \), and note that 
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{c|c}
+            \toprule
+                cycle types & \(S_4\)   \\
+            \midrule
+                \((1)^4\)  & \(1\)   \\
+                \((2)(1)^2\)  & \(6\)   \\
+                \((3)(1)\)  & \(8\)   \\
+                \((4)\)  & \(6\)   \\
+                \((2)(2)\)  &  \(3\)  \\
+            \bottomrule
+        \end{tabular}
+        \caption{The number of permutations of \([4]\) of different cycle types}
+    \end{table}
+    If \(n_2(S_4) = 1\), then there exists a normal subgroup of \(S_4\) of order \(8\), but we can see from the above table that it is impossible such normal subgroup of \(S_4\) exists since normal subgroups of \(S_4\) are union of permutations of same cycle types. Hence, \(n_2(S_4) > 1\). However, we know 
+    \[
+        \left\{ (1)(2)(3)(4), (123), (132) \right\} \text{ and } \left\{ (1)(2)(3)(4), (124), (142) \right\}   
+    \] are both Sylow \(3\)-subgroups of \(S_4\), so it is possible that \(n_3(G) > 1\).   
+\end{itemize}
+
+
 \paragraph{Exercise 2} Let $m$ be an odd integer and $G$ be a group of order $2m$.  
 Consider the action of $G$ on itself via left multiplication; this induces a group homomorphism 
 \[
@@ -101,8 +158,35 @@ $\{e,h\}g_1,\dots,\{e,h\}g_m$.  Now consider $\pi(h)$.)}
 
 \item Deduce that $G$ has a normal subgroup of order $m$.
 \end{enumerate}
+\paragraph{Solution:} 
+\begin{itemize}
+    \item [(i)] Let \(P \in \mathrm{Syl}_2(G) \), and suppose \(P = \left\{ e, h \right\} \), then since we know \(\sgn \circ \pi (e) = +1\), so we just need to show that there exists some \(x \in G\) s.t. \(\sgn \circ \pi (e) = -1\). Now we claim that \(\sgn \circ \pi (h) = -1\), and we're done. Note that 
+    \[
+        G = P g_0 \cup P g_1 \cup \dots \cup P g_{m-1},
+    \] where \(g_0, g_1, \dots , g_{m-1} \in G\) and we let \(g_0 = e\). This is because \([G:P] = \frac{\vert G \vert }{\vert P \vert } = \frac{2m}{2} = m\), so we can write \(G\) into union of \(m\) right cosets of \(P\). Hence, we know
+    \[
+        G = \bigcup_{i=0}^{m-1} \left\{ e g_i, h g_i \right\},  
+    \] and if we define \(\pi (h) = \pi _h\), then 
+    \[
+        \pi _h (g_i) = h g_i, \quad \text{and } \pi _h(h g_i) = h^2 g_i = g_i. 
+    \]       
+    Thus, \(\pi _h\) swaps \(g_i\) and \(h g_i\) for all \(i\), i.e. 
+    \[
+        \pi (h) = (g_0 \quad hg_0) (g_1 \quad hg_1) \dots (g_{m-1} \quad h g_{m-1}).
+    \]
+    Note that \(m\) is odd, so we know \(\sgn \circ \pi(h) = -1\), and we're done.      
+    \item [(ii)] Let \(\varphi = \sgn \circ \pi \), then \(\varphi \) is a homomorphism and \(\vert \Im \varphi  \vert = 2 \) since \(\varphi \) is surjective, and by first isomorphism theorem we know 
+    \[
+        \vert \ker \phi  \vert = \frac{\vert G \vert }{\vert \Im \varphi  \vert } = \frac{2m}{2} = m, 
+    \] and \(\ker \varphi \trianglelefteq G\), so we're done. 
+\end{itemize}
+
 
 For the next two questions, the following fact will be helpful (try to prove it on your own): If $N$ is a normal subgroup of a group $G$ and a Sylow $p$-subgroup $P$ of $N$ is normal in $N$, then $P$ is normal in $G$.
+\paragraph{Proof of this fact:} For all \(g \in G\), we have \(\left\vert g P g^{-1} \right\vert = \vert G \vert  \), and \(g P g^{-1} \subseteq g N g^{-1} = N\) since \(N \trianglelefteq G\), so \(g P g^{-1} \in \mathrm{Syl}_p(N) \). Now since \(P \trianglelefteq N\), so we know the Sylow \(p\)-subgroup of \(N\) is unique, and thus 
+\[
+    gPg^{-1} = P \quad \forall g \in G \implies P \trianglelefteq G.
+\]        
 \paragraph{Exercise 3} et $G$ be a group of order $105$.
 
 \begin{enumerate}[label=(\roman*)]
@@ -112,6 +196,33 @@ For the next two questions, the following fact will be helpful (try to prove it 
 
 \item Prove that $n_5(G)=n_7(G)=1$.
 \end{enumerate}
+
+\paragraph{Solution:}
+\begin{itemize}
+    \item [(i)] Consider \(n_5(G), n_7(G)\), then since \(n_5(G) \equiv 1 \mod{5}\) and thus \(n_5(G) \mid \frac{\vert G \vert }{5}\), so we know \(n_5(G) \in \left\{ 1, 21 \right\} \), and similarly we can derive \(n_7(G) \in \left\{ 1, 15 \right\} \). Note that for distinct Sylow \(5\)-subgroup of \(G\), say \(P, Q\), then \(P \cap Q = \left\{ 1 \right\} \) since \(\left\vert P \cap Q \right\vert \mid 5 \), and this statement holds also for Sylow \(7\)-subgroups. Now if \(n_7(G) = 15\) and \(n_5(G) = 21\), then there are at least \((6 - 1)15 + (5-1)21 > 105\) elements are in \(G\), so either \(n_5(G)\) or \(n_7(G)\) is equal to \(1\). WLOG, suppose \(n_5(G) = 1\) (if \(n_7(G) = 1\), then it can be proved similarly.), and suppose \(P \in \mathrm{Syl}_5(G) \) and \(Q \in \mathrm{Syl}_7(G) \). Then, \(P \trianglelefteq G\) and \(Q < G\) and \(P \cap Q = \left\{ e \right\}  \). Note that \(PQ < G\) and 
+    \[
+        \vert PQ \vert = \frac{\vert P \vert \cdot \vert Q \vert }{\vert P \cap Q \vert } = 5 \cdot 7 = 35.
+    \]
+    Consider \(G / P\), then \(\vert G / P \vert = \frac{105}{5} = 21 \). Note that \(n_7 (G / P) \equiv 1 \mod{7}\) and this gives \(n_7(G / P) \mid \frac{21}{7} = 3\), so we know \(n_7(G) = 1\). Say \(S \in \mathrm{Syl}_7(G / P) \), then \(S \trianglelefteq G / P\). Suppose \(\pi : G \to G / P\) is the map that \(\pi (g) = gP\), then suppose \(P^{\prime} = \pi ^{-1}(S)\) is the preimage of \(S\) under \(\pi \). Then, we have 
+    \[
+        \left\vert P^{\prime}  \right\vert = \vert S \vert \vert P \vert = 7 \cdot 5 = 35 
+    \] since \(g_1 P = gP\) if and only if \(g_1 = gp\) for some \(p \in P\), and thus we have \(\vert P \vert \) choices for \(g_1\). Now we show that \(P^{\prime} \trianglelefteq G\) and then since \(\left\vert P^{\prime}  \right\vert = 35\), so we're done. We first show that \(P^{\prime} < G\): If \(x, y \in P^{\prime} \), then \(\pi (xy) = (xy)P = (xP)(yP) = \pi (x) \pi (y) \in S\) since \(P \trianglelefteq G\). Also, if \(x \in P^{\prime} \), then \(\pi \left( x^{-1} \right) = x^{-1} P = (xP)^{-1} \in S \). Thus, \(P^{\prime} < G\). Now we show that \(P^{\prime} \trianglelefteq G\): Suppose \(g \in G\) and \(p^{\prime} \in P^{\prime} \), then 
+    \[
+        \pi \left( g p^{\prime} g^{-1} \right) = \pi (g) \pi \left( p^{\prime}  \right) \pi \left( g^{-1} \right) \in S   
+    \] since \(\pi \left( p^{\prime}  \right) \in S \) and \(S \trianglelefteq G / P\). Hence, \(g p^{\prime} g^{-1} \in P^{\prime} \), and thus \(g P^{\prime} g^{-1} = P^{\prime} \) for all \(g \in G\), and we're done.                               
+    \item [(ii)] Suppose \(H \trianglelefteq G\) and \(\vert H \vert = 35 \). By (i), we know such \(H\) exists. Thus, we know \(n_5(H) = n_7(H) = 1\) by Sylow's theorem.  Hence, suppose \(P_5 \in \mathrm{Syl}_5(H) \) and \(P_7 \in \mathrm{Syl}_7(H) \), then \(P_5 \trianglelefteq H\) and \(P_7 \trianglelefteq H\). Also, \(P_5 \cap P_7 = \left\{ e \right\} \). Hence, 
+    \[
+        \left\vert P_5 P_7 \right\vert = \frac{\vert P_5 \vert \cdot \vert P_7 \vert  }{\vert P_5 \cap P_7 \vert } = 5 \cdot 7 = 35. 
+    \]
+    However, \(P_5 P_7 \subseteq H\) and \(\vert H \vert = 35 \). Hence, 
+    \[
+        H = P_5 P_7 \simeq P_5 \times P_7 \simeq C_5 \times C_7 \simeq C_{35} 
+    \]
+    since \(P_5, P_7 \trianglelefteq H\) and \(5, 7\) are prime (so \(P_5, P_7\) are cyclic) and \(\mathrm{gcd}(5, 7) = 1 \) (so \(C_5 \times C_7 \simeq C_{35} \)). Hence, \(H\) is cyclic.    
+    \item [(iii)] Continuing (ii). Since \(P_5 \trianglelefteq H\) and \(P_7 \trianglelefteq H\), and \(H \trianglelefteq G\), so by the fact mentioned before this problem, we know \(P_5 \trianglelefteq G\) and \(P_7 \trianglelefteq G\). Also, \(P_5, P_7\) are the Sylow \(5\)-subgroup and the Sylow \(7\)-subgroup of \(G\), respectively. Hence, \(n_5(G) = n_7(G) = 1\) since \(P_5, P_7 \trianglelefteq G\).           
+\end{itemize}
+
+
 \paragraph{Exercise 4} More generally, let $G$ be a group of order $pqr$, where $p,q,r$ are distinct primes and $p<q<r$.  
 We want to show that $n_r(G)=1$.
 
@@ -124,6 +235,18 @@ Show that $G/Q$ has a normal subgroup of order $r$.
 
 \item Deduce that $G$ has a normal subgroup of order $qr$ and conclude that $n_r(G)=1$.
 \end{enumerate}
+\paragraph{Solution:} 
+\begin{itemize}
+    \item [(i)] Since \(n_r(G) \equiv 1 \mod{r}\) and \(n_r(G) \mid \frac{pqr}{r} = pq\), so \(n_r(G) \in \left\{ 1, p, q, pq \right\} \). Since \(n_r(G) > 1\), and \(n_r(G) \equiv 1 \mod{r}\), and \(p, q < r\), so the only possibility is \(n_r(G) = pq\). Hence, \(\mathrm{Syl}_r(G) \) contributes \(pq(r-1)\) elements of order \(>1\). Now if \(n_q(G) > 1\), then since \(n_q(G) \equiv 1\mod{q}\) and \(n_q(G) \mid \frac{pqr}{q} = pr\), so \(n_q(G) \in \left\{ p, r, pr \right\} \). Since \(q > p\), so \(p \not\equiv 1 \mod{q}\), so \(n_q(G) \ge r\). Hence, \(\mathrm{Syl}_q(G) \) contributes at least \(r(q-1) = rq - r\) elements of order \(>1\). Also, \(n_p(G) \ge 1\), so \(\mathrm{Syl}_p(G) \) contributes at least \(p-1\) elements of order \(>1\). Hence, \(G\) has at least 
+    \[
+        pq(r-1) + r(q-1) + p-1 + 1 = pqr -pq + rq - r + p = pqr + (q-1)(r - p) > pqr
+    \]
+    elements, which is impossible. Hence, \(n_q(G) = 1\). 
+    \item [(ii)]
+    \item [(iii)]
+\end{itemize}
+
+
 \paragraph{Exercise 5} Let $R$ be a commutative ring.  
 We say an element $x\in R$ is a \emph{zero divisor} if there is some nonzero element $y\in R$ such that $xy=0$.  
 If a ring has no nonzero zero divisors, we say the ring is an \emph{integral domain}, or sometimes just \emph{domain} for short.
