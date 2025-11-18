@@ -97,6 +97,31 @@ Conclude that $n! e$ is not an integer for every $n \ge 3$.
 Deduce from this that $e$ is irrational.  
 \textit{(Hint: prove by contradiction.)} 
 \end{problem}
+\begin{proof}
+    For \(n \ge 3\), we know 
+    \[
+        (n+k)! = (n+k)(n+k-1)\dots (n+1) n! > 2^k
+    \] for all \(k = 1,2,3,\dots \) since \(n + i > 2\) for all \(1 \le i \le k\). Hence, 
+    \[
+        \sum_{k=1}^{\infty} \frac{1}{(n+k)!} < \sum_{k=1}^{\infty} \frac{1}{2^k n!} = \frac{1}{n!} \sum_{k=1}^{\infty} \frac{1}{2^k} = \frac{1}{n!} \left( \frac{\frac{1}{2}}{1 - \frac{1}{2}} \right) = \frac{1}{n!},    
+    \] and since \(\frac{1}{(n+k)!} > 0\) for all \(k = 1,2,3,\dots \), so 
+    \[
+        0 < \sum_{k=1}^{\infty} \frac{1}{(n+k)!} < \frac{1}{n!}. 
+    \]  
+    Thus, we know 
+    \begin{align*}
+        n! e &= n! \left( 1 + \frac{1}{1!} + \frac{1}{2!} + \dots  \right) = n! \left( 1 + \frac{1}{1!} + \dots + \frac{1}{n!} + \sum_{k=1}^{\infty} \frac{1}{(n+k)!}  \right) \\
+        &< n!  \left( 1 + \frac{1}{1!} + \dots + \frac{1}{n!} + \frac{1}{n!} \right) = n! \sum_{m=0}^n \frac{1}{m!} + 1.  
+    \end{align*}
+    Also, we know 
+    \begin{align*}
+        n! e = n! \sum_{m=0}^{\infty} \frac{1}{m!} > n! \sum_{m=0}^n \frac{1}{m!},  
+    \end{align*}
+    so 
+    \[
+        n! \sum_{m=0}^n \frac{1}{m!} < n! e < n! \sum_{m=0}^n \frac{1}{m!} + 1,  
+    \] which means \(n! e\) is not an integer. Now if \(e\) is rational, then \(e = \frac{q}{p}\) for some \(q \in \mathbb{Z} \) and \(p \in \mathbb{N} \), so \(n! e = \frac{n! q}{p}\), and if we pick \(n = \max \left\{ 3, p \right\} \), then we know \(\frac{n! q}{p}\) is an integer since \(p \mid n!\), but \(\frac{n! q}{p} = n! e\) is not an integer, so it is a contradiction, and thus \(e\) is irrational.            
+\end{proof}
 
 \begin{problem}[10pts \textbf{Exercise 4.5.6}]
 Prove that the natural logarithm function $\ln x$ is real analytic on $(0,+\infty)$.  
@@ -120,11 +145,40 @@ $$ without using the L'Hopital's rule.
 \noindent
 \textit{(Hint: $e^x \ge \sum_{k=0}^{m+1} \frac{x^k}{k!}$ for $x>0$.)}
 \end{problem}
+\begin{proof}
+    Note that for \(x > 0\), 
+    \[
+        e^x = \sum_{k=0}^{\infty} \frac{x^k}{k!} > \sum_{k=0}^{m+1} \frac{x^k}{k!}.  
+    \] 
+    Thus, 
+    \[
+        \frac{e^x}{x^m} \ge \left( \sum_{k=0}^m \frac{1}{x^{m-k} k!}  \right) + \frac{x}{(m+1)!} > \frac{x}{(m+1)!}.
+    \]
+    Since \(\lim_{x \to +\infty} \frac{x}{(m+1)!} = +\infty  \), so \(\lim_{m \to +\infty} \frac{e^x}{x^m} = +\infty  \).  
+
+\end{proof}
 
 \begin{problem}[10pts \textbf{Exercise 4.5.9}]
 Let $P(x)$ be a polynomial, and let $c>0$.  
-Show that there exists a real number $N > 0$ such that $e^x > |P(x)|$ for all $x > N$; 
+Show that there exists a real number $N > 0$ such that $e^{cx} > |P(x)|$ for all $x > N$; 
 thus an exponentially growing function, no matter how small the growth rate $c$, 
 will eventually overtake any given polynomial $P(x)$, no matter how large.  
 \textit{(Hint: use Exercise 4.5.8.)}
 \end{problem}
+\begin{proof}
+    If \(P(x)\) is a constant polynomial, then there exists \(N > 0\) s.t. \(x > N\) implies \(e^{cx} > \vert P(x) \vert \) since \(e^{cx}\) is strictly increasing and has no upper bound. Now suppose \(P(x) = a_m x^m + \dots + a_1 x + a_0\) for some \(m \ge 1\), then by Problem 6 we know for all \(m \in \mathbb{N} \) we have  
+    \[
+        \lim_{cx \to \infty} \frac{e^{cx}}{c^m x^m} = \infty, 
+    \] so for all \(i = 1,2, \dots , m\), there exists \(N_i > 0\) s.t. \(cx \ge N_i\) implies 
+    \[
+        \frac{e^{cx}}{c^i x^i} > (m+1) \left\vert \frac{a_i}{c^i} \right\vert \iff e^{cx} > (m+1) \vert a_i \vert x^i.
+    \]       
+    Also, we know there exists \(N_0 > 0\) s.t. \(x > N_0 \) implies \(e^{cx} > (m + 1) \vert a_0 \vert \) since \(e^{cx}\) is strictly increasing and has no upper bound.  
+    Hence, we know \(x > \max \left\{ N_0, \left\lceil \frac{N_1}{c} \right\rceil, \left\lceil \frac{N_2}{c} \right\rceil, \dots , \left\lceil \frac{N_m}{c} \right\rceil    \right\} \) implies 
+    \[
+        (m+1) \cdot e^{cx} > \sum_{i=0}^m (m+1) \vert a_i \vert x^i = (m+1) \left\vert P(x) \right\vert,
+    \] which means 
+    \[
+        e^{cx} > \vert P(x) \vert, 
+    \] so we're done.
+\end{proof}
