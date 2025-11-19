@@ -1,0 +1,123 @@
+\chapter{Jordan Form}
+\lecture{20}{19 Nov. 10:20}{}
+\section{Congruence (Chinese Remainder Theorem)}
+Suppose \(n\) is a positive integer, then we called \(\mathbb{Z} / (n)\) to be its remainder classes. 
+\[
+    \mathbb{Z} / (105) \simeq \mathbb{Z} / (3) \times \mathbb{Z} / (5) \times \mathbb{Z} / (7)
+\]  
+is the Chinese remainder theorem for positive integers. 
+
+Now we extend it to polynomial rings. Let \(T \in \mathcal{L} (V)\). Suppose \(f(x) \in F[x]\) is monic s.t. \(f(T) = 0\). Suppose \(f(x) = g_1(x) \dots g_r(x)\) s.t. \(g_i, g_j\) are coprime for all \(i \neq j\), i.e. \(\exists p(x), q(x)\) s.t. \[p(x) g_i(x) + q(x) g_j(x) = 1.\]
+Let 
+\[h_i = g_1 \dots g_{i-1} g_{i+1}\dots g_r = \frac{f}{g_i},\]
+then 
+\begin{proposition}
+    \vphantom{text}
+    \begin{itemize}
+    \item [(i)] \(\Im (h_i(T)) = \ker (g_i(T))\). 
+    \item [(ii)] Let \(V_i\) be the subspace \(\ker (g_i(T))\), then \(V = \bigoplus V_i\) is a \(T\)-invariant decomposition.     
+\end{itemize}   
+\end{proposition}  
+\begin{proof}[proof of (i)]
+    Since \(h_i\)'s are pairwises coprime, so there exists \(\xi_i(x) \in F[x]\) s.t.
+    \[
+        \sum_{i} \xi _i(x) h_i(x) = 1. 
+    \]  
+    Hence, \(1 = \sum_{i} P_i \) where \(P_i = \left( \xi _i h_i \right)(T) \). We can check this is an idempotent decomposition: 
+    \[
+        P_i P_j = \left( \xi _i \frac{f}{g_i} \xi _j \frac{f}{g_j} \right) (T) = \left( \xi _i \xi _j \frac{f}{g_i g_j} f \right)(T) = 0  
+    \] since \(f(T) = 0\). So letting \(W_i = P_i(V)\), then \(V = \bigoplus W_i\) and it is a \(T\)-invariant decomposition. Now note that \(W_i = \Im \left( h_i \xi _i \right)(T) \subseteq \Im (h_i(T)) \subseteq \ker (g_i(T)) \). Note that the last \(\subseteq \) holds cine \(g_i(T)h_i(T)(v) = f(v) = 0\) for all \(v \in V\). Now we need to check \(\ker g_i(T) \subseteq \Im \xi _i h_i (T)\). Suppose \(v \in \ker g_i(T)\). We have 
+    \[
+        v = \sum_{j} \left( \xi _j h_j \right)(T)(v). 
+    \]
+    For \(j = i\), \(\left( \xi _i h_i \right)(T)(v) \in W_i \), which is what we want. For \(j \neq i\), 
+    \[
+       \left( \xi _j h_j \right)(T)(v)  = \left( \xi _j \frac{f}{g_i g_j} g_i \right)(T)(v) = 0 
+    \] since \(v \in \ker (g_i(T))\). Hence, 
+    \[
+        v = \left( \xi _i h_i \right)(T)(v) \in W_i = \Im \xi _i h_i(T). 
+    \]            
+\end{proof}  
+\begin{proof}[proof of (ii)]
+    It follows from (i) since we can show \(\Im P_i = \ker (g_i(T))\). Note that 
+    \[
+        \Im P_i \subseteq \Im h_i(T) = \ker g_i(T) \subseteq \Im \xi _i h_i(T) = \Im P_i,
+    \] 
+    so \(\Im P_i = \ker (g_i(T))\) and we have shown that \(V = \bigoplus \Im P_i\), so we're done.  
+\end{proof}
+
+\subsubsection{Canonical cases}
+We first take \(f(x)\) to be the minimal polynomial of \(T\), and suppose 
+\[
+    f(x) = p_1(x)^{m_1} \dots p_r(x)^{m_r}
+\]  
+is a prime decomposition, i.e. every \(p_i\) monic and irreducible and \(p_i \neq p_j\) for each \(i \neq j\). Then, we have \(V = \bigoplus V_i\) where \(V_i = \ker \left( p_i(T)^{m_i} \right) \). This is the primitive decomposition theorem.    
+
+Similarly, take \(f(x) = \mathrm{ch}_T(x) \), and write \(f(x) = p_1(x)^{m_1} \dots p_r(x)^{m_r}\), which is a prime decomposition of \(f\), suppose \(g_i(x) = p_i(x)^{m_i}\), then 
+\begin{proposition}
+    Let \(V_i = \ker \left( g_i(T) \right) \), then \(\dim V_i = \mathrm{deg} g_i(x)\). In fact, letting \(T_i = T \vert_{V_i}\), then 
+    \[
+        \mathrm{ch}_{T_i}(x) = g_i(x).  
+    \]  
+\end{proposition}   
+\begin{remark}
+    Today, we only consider 
+    \[
+        f(x) = \prod _{i=1}^r (x - \lambda _i)^{m_i},
+    \]
+    where \(p_i(x) = x - \lambda _i\) and \(g_i(x) = (x-\lambda _i)^{m_i}\).  
+\end{remark}
+\begin{proof}
+    We know \(g_i(T_i)=0\), so the minimal polynomial \(m_i(x)\) of \(T_i = (x - \lambda _i)^{\alpha _i}\). Let \(\mathrm{ch}_i(x) = \mathrm{ch}_{T_i}(x)   \), then since \(\mathrm{ch}_i(x) \) and \(m_i(x)\) have the same roots, so \(\mathrm{ch}_i(x) = (x-\lambda _i)^{b _i} \). Note that \(b_i = m_i\) since \(T = \bigoplus T_i\), which means 
+    \[
+        \prod _{i=1}^r \left( x - \lambda _i \right)^{m_i}  = \mathrm{ch}_T(x) = \prod _{i=1}^r \mathrm{ch}_i(x) = \prod _{i=1}^r \left( x - \lambda _i \right)^{b_i}.  
+    \] 
+    Hence, \(\mathrm{ch}_i(x) = (x-\lambda _i)^{m_i} = g_i(x)\). Hence, \(\dim V_i = \deg \mathrm{ch}_i(x) = \deg g_i(x)  \).  
+\end{proof}
+
+\subsubsection{Nilpotent operators}
+We obtain: Suppose characteristic polynomial of \(T \in \mathcal{L} (V)\) with
+\[
+    f(x) = \prod _{i=1}^r (x - \lambda _i)^{m_i},
+\] 
+then \(V = \bigoplus V_i\) and \(T = \bigoplus T_i\) with \(\mathrm{ch}_{T_i}(x) = (x - \lambda _i)^{m_i} \).
+
+\begin{definition}
+    \(T \in \mathcal{L} (V)\) is called nilpotent (or order \(m\)) if \(T^m = 0\) and \(T^{m-1} \neq 0\) for some \(m \ge 1\).   
+\end{definition}
+
+Now let 
+\[
+    N = J_d(\textcolor{red}{0}) = \begin{pmatrix}
+        \textcolor{red}{0} &  &  & 0  \\
+         1 &  \textcolor{red}{0} & &   \\
+         &  \ddots& \textcolor{red}{\ddots}  &   \\
+         0&  & 1 & \textcolor{red}{0}  \\
+    \end{pmatrix} \in M_d(F) = \text{ companion matrix of } x^d, 
+\]
+then 
+\begin{theorem}
+    Suppose \(T\) is nilpotent. There is a unique sequence 
+    \[
+        d_1 \ge d_2 \ge \dots \ge d_r \quad (>0)
+    \] s.t. 
+    \[
+        [T]_B = \begin{pmatrix}
+            J_{d_1}(0) &  & 0  \\
+             & \ddots &   \\
+            0 &  & J_{d_r}(0)  \\
+        \end{pmatrix} = J_{d_1}(0) \oplus \dots \oplus J_{d_r}(0).
+    \]
+\end{theorem}
+
+Observation: If \(A \sim J_{d_1}(0) \oplus \dots \) and write \(\nu \left( A^k \right) = \delta _1 + \dots + \delta _k \), then 
+\[
+    \# J_k(0) = \delta _k - \delta _{k-1}.
+\]  
+Proof: Suppose 
+\[
+    A \sim \underbrace{\dots }_{a: \text{size} >k } \underbrace{J_k(0) \oplus \dots }_{b:\text{size}=k  } \underbrace{\dots }_{c:\text{size}<k },
+\] and suppose the rank of \(A\) is \(m = \delta _1 + \dots + \delta _{k-1}\), then 
+\[
+    \nu \left( A^{k-1} \right) = (k-1)(a+b) + m, \quad \nu \left( A^k \right) = k(a+b) + m, \quad \delta _k = a+b, \quad \nu \left( A^{k+1} \right) = (k+1)a+kb+m,   
+\] and \(\delta _{k+1} = a\). 
