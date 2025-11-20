@@ -1,0 +1,120 @@
+\chapter{All-pairs distances problem}
+\lecture{1}{13 Nov.}{}
+\begin{problem}
+\vphantom{text}
+\begin{itemize}
+  \item Input: an edge-weighted directed graph \(G\) with \(V(G)=\left\{ 1, 2, \dots , n \right\} \) that \textcolor{red}{has no cycle of negative weight.} 
+  \item Output: \textcolor{red}{\(d_G(i, j)\)} for all vertices \(i\) and \(j\) of \(G\).     
+\end{itemize}
+\end{problem}
+
+\begin{remark}
+  Here we suppose \(G\) has no negative cycle to simplify the problem. 
+\end{remark}
+
+The Naive algorithm is to solve \(n\) single-source distances problems directly. Hence, the time complexity for using different algorithm is:
+\begin{itemize}
+  \item General edge weights: Bellman-Ford's algorithm takes \(O\left( mn^2 \right) \) time, which can be \(\Theta \left( n^4 \right) \) when \(m = \Theta \left( n^2 \right) \). 
+  \item Acyclic: Lawler's algorithm takes \(O(mn)\) time. 
+  \item Non-negative edge weights: Dijkstra's takes \(O \left( mn + n^2 \log n \right) \) time.    
+\end{itemize}
+
+However, naive method takes a lot of time to compute unnecessary things, so it takes a lot of times.
+
+\section{A DP algorithm}
+
+\begin{definition}
+  Let \(w_k(i, j)\) be the length of a shortest \((i, j)\)-path having at most \(k\) edges. Let it be \(\infty \) if such a path does not exist.
+\end{definition}
+
+We have 
+  \begin{align*}
+    w_1(i, j) &= w(ij) \text{ if } (i, j) \text{ if a edge, otherwise } w_1(i, j) = \infty. \\
+    w_{n-1}(i, j) &= d_G(i, j) \text{ since a shortest path has at most } n-1 \text{ edges (note that there is not negative cycle)}.    
+  \end{align*}  
+Hence, we have 
+\[
+  w_{2k} (i, j) = \min _{1 \le t \le n} w_k(i, t) + w_k(t, j) \text{ for all } k \ge 1. 
+\]
+Also, note that even if \(k \ge \frac{n}{2}\) this recurrence relation is still correct, so we can just compute \(w_1(i, j)\) then \(w_2(i, j)\) then \(w_4(i, j)\) and so on, and after \(O\left( \log n \right) \) rounds we can get the answer. 
+
+Now we analyze the time complexity. For each \((i, j)\)-pair, we need \(O(\log n)\) rounds, where each round takes \(O(n)\) times, so each \((i, j)\)-pair takes \(O(n \log n)\) times. Note that we have \(O \left( n^2 \right) \) \((i, j)\)-pairs, so it takes totally \(O\left( n^3 \log n \right) \) times. This is pretty slow, but in general a little bit faster than doing Bellman-Ford's algorithm for \(n\) times. 
+
+\section{Floyd and Warshall's DP algorithm}
+\begin{definition}
+  Let \(d_k(i, j)\) be the length of any shortest \((i, j)\)-path whose \textcolor{red}{internal indices are at most \(k\)}. If there is no such a path, then let \(d_k(i, j) = \infty \).   
+\end{definition}
+\begin{figure}[H]
+  \centering
+  \incfig{internalnode}
+  \caption{Internal Nodes}
+  \label{fig:internal node}
+\end{figure}
+Thus, we have 
+\[
+  d_0(i, j) = w(ij), \quad d_n(i, j) = d_G(i, j).
+\]
+Hence, we can define a recurrence relation: 
+\[
+  \begin{dcases}
+    d_0(i, j) = w(i, j) \\
+    d_{k+1}(i, j) = \min \left\{ d_k(i, j), d_k(i, k+1) + d_k(k+1, j) \right\}.
+  \end{dcases}
+\]
+Note that it corresponds to two cases: walk through \(k+1\) or not. If not, then it corresponds to \(d_k(i, j)\). If so, then it corresponds to \(d_k(i, k+1) + d_k(k+1, j)\) since excluding \(k+1\) and seperate this path into two parts, then internal nodes in each part can have indices of at most \(k\). 
+
+Now we analyze the time complexity of Floyd and Warshall's DP algorithm: Fix \((i, j)\), then it takes \(O(n)\) time to compute from \(d_0(i, j)\) to \(d_{n}(i, j)\), and since we have \(O \left( n^2 \right) \) \((i, j)\)-pairs, so it take totally \(O \left( n^3 \right) \) time. 
+
+\section{Johnson's reweighting technique}
+As previously seen, if \(G\) is a non-negative weighted graph, then running Dijkstra's algorithm for \(n\) times needs \(O(mn + n \log n)\) time. Now Johnson gives a method to reweight \(w\) into \(\hat{w} \) s.t. 
+\begin{itemize}
+  \item \(\hat{w} \) is non-negative
+  \item any shortest \((i, j)\)-path of \(G\) w.r.t. \(\hat{w} \) is a shortest \((i, j)\)-path of \(G\) w.r.t. \(w\).       
+\end{itemize}    
+
+The idea of reweighting is to 
+\begin{itemize}
+  \item Assign a weight \(h(i)\) to each vertex \(i\) of \(G\). 
+  \item Let \(\hat{w} (i, j) = w(i, j) + h(i) - h(j)\). 
+  \item Then, for any \((i, j)\)-path \(P\), we have 
+  \[
+    \hat{w} (P) = w(P) + h(i) - h(j).
+  \]
+  \item Hence, \(P\) is a shortest \((i,j)\)-path of \(G\) w.r.t. \(\hat{w} \) if and only if \(P\) is a shortest \((i, j)\)-path of \(G\) w.r.t. \(w\).        
+\end{itemize}
+\begin{remark}
+  The challenge is to find a vertex weight \(h\) s.t. the resulting adjusted edge weight \(\hat{w} \) is non-negative. If \(\hat{w} \) is non-negative, then we can apply Dijkstra's algorithm to obtain all-pairs shortest path trees in \(O \left( mn + n^2 \log n \right) \) time.   
+\end{remark}
+
+\begin{algorithm}[H]
+  \DontPrintSemicolon{}
+  \caption{Johnson's Technique}
+  Let \(H\) be obtained from \(G\) by adding a new vertex \(0\) and adding a weight-\(0\) edge from vertex \(0\) to each vertex \(i\) of \(G\). \\
+  \(H\) has no negative cycle if and only if \(G\) has no negative cycle. \\
+  Let \(h(i)\) be the distance from vertex \(0\) to vertex \(i\) in \(H\). That is, \(h(i) = d_H(0, i)\). \\
+  The vertex weight function \(h\) can be obtained by Bellman-Ford in \(O(mn)\) time.  
+\end{algorithm}
+
+\begin{remark}
+  \(H\) has no negative cycle if and only if \(G\) has no negative cycle since \(G\) is directed and vertex \(0\) has only out degree, so any cycle in \(H\) and \(G\) is induced by \(\left\{ 1,2,\dots ,n \right\} \), which does not include \(0\).        
+\end{remark}
+
+\begin{remark}
+  \(d_H(0, i) \le 0\) and \(d_H(0, i) < 0\) if there is a path of negative weight from \(j\) to \(i\) for some \(j > 0\) since we can go from \(0\) to \(j\) first, then go from \(j\) to \(i\).         
+\end{remark}
+
+\begin{theorem}
+  \(\hat{w} (i, j) \ge 0\) for all \(i, j \in [n]\).  
+\end{theorem}
+\begin{proof}
+  Since 
+  \[
+    \hat{w} (i, j) = w(i, j) + h(i) - h(j) = w(i, j) + d_H(0, i) - d_H(0, j),
+  \]
+  and note that \(d_H(0, i) + w(i, j)\) is the shortest distance of a path from \(0\) and go through \(i\) to \(j\), which is \(\ge\) the distance from \(0\) to \(j\), which is \(d_H(0, j)\). Hence, we have 
+  \[
+    d_H(0, i) + w(i, j) - d_H(0, j) \ge 0.
+  \]       
+\end{proof}
+
+Now we analyze the time complexity of Johnson's algorithm for general edge weights: We first obtain \(h\) by doing one time Bellman-Ford's algorithm, which takes \(O(mn)\) time. Then, we run Dijkstra's algorithm for all vertex \(i\) of \(G\), which takes totally \(O\left( mn + n^2 \log n \right) \) time. Note that to here we just store \(n\) shortest path tree, and we have to obtain the real distance by running through all \(n\) tree, which takes \(O(n) \cdot n = O \left( n^2 \right) \) time since a tree has \(n-1\) edges. Hence, it totally take \(O\left( mn + n^2 \log n \right) \) time for Johnson's technique.       
