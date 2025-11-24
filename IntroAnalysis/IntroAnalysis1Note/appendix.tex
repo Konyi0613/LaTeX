@@ -206,6 +206,92 @@ Then:
 \end{itemize}
 \end{theorem}
 
+\section{Composition of real analytic functions is analytic}
+\begin{theorem}
+    Suppose \(f, g : \mathbb{R} \to \mathbb{R} \) are both real analytic, then \(g(f(x))\) is also real analytic.  
+\end{theorem}
+\begin{proof}
+    
+Let \(c\) be any point in the domain of \(g\circ f\); so \(c\) is in the domain of \(f\) and \(f(c)\) is in the domain of \(g\).  Expand \(f\) and \(g\) as power series, converging absolutely on closed disks/intervals:
+
+\[
+f(x) = \sum_{m \ge 0} a_m (x - c)^m, 
+\qquad |x - c| \le R, 
+\qquad \sum_{m \ge 0} |a_m|R^m < \infty,
+\]
+
+\[
+g(y) = \sum_{n \ge 0} b_n (y - f(c))^n,
+\qquad |y - f(c)| \le S,
+\qquad \sum_{n \ge 0} |b_n|S^n < \infty.
+\]
+
+Since \(f\) is continuous (meaning \(f(x) \to f(c) = a_0\) when \(x \to c\)), there is some \(r \le R\) such that \(\lvert f(x) - f(c)\rvert \le S\) whenever \(\lvert x - c\rvert \le r\).  Thus both power series are absolutely convergent for \(\lvert x - c\rvert \le r\), and in particular:
+
+\[
+g(f(x)) = \sum_{n \ge 0} b_n \Bigl( \sum_{m \ge 1} a_m (x - c)^m \Bigr)^n.
+\]
+
+However, to validly rearrange terms we need a stronger bound.  Notice:
+
+\[
+\sum_{m \ge 1} |a_m| |x - c|^m
+\;\le\;
+|x - c| \sum_{m \ge 1} |a_m| R^{m-1}
+\;=\; M\,|x - c|,
+\]
+
+where
+
+\[
+M = \frac1R \sum_{m \ge 1} |a_m| R^m \;\le\;\frac1R \sum_{m \ge 0} |a_m| R^m < \infty.
+\]
+
+Take \(r = \min\{S / M,\, R\}\).  Then for \(\lvert x - c\rvert \le r\):
+
+\[
+\sum_{m \ge 1} |a_m| |x - c|^m
+\;\le\; M |x - c| \;\le\; M r \;\le\; S.
+\]
+
+So:
+
+\[
+\sum_{n \ge 0} |b_n| \Bigl( \sum_{m \ge 1} |a_m| |x - c|^m \Bigr)^n
+\;\le\;
+\sum_{n \ge 0} |b_n| S^n
+< \infty.
+\]
+
+Hence the nested sums converge absolutely, and we may rearrange terms freely.  We can expand
+
+\[
+g(f(x)) = \sum_{n \ge 0} b_n (x - c)^n \Bigl( \sum_{m \ge 1} a_m (x - c)^{m-1} \Bigr)^n
+\]
+
+\[
+= b_0 + b_1 (x - c) \bigl(a_1 + a_2(x - c) + a_3(x - c)^2 + \cdots \bigr)
+\]
+
+\[
+\quad + b_2 (x - c)^2 \bigl(a_1 + a_2 (x - c) + \cdots \bigr)^2
+\;+\; b_3 (x - c)^3 \bigl(a_1 + a_2 (x - c) + \cdots \bigr)^3 + \cdots
+\]
+
+Collecting like powers of \((x-c)\), one obtains
+
+\[
+g(f(x)) = \sum_{p \ge 0} (x - c)^p 
+\sum_{\substack{n \ge 0 \\ n \le p}} b_n
+\sum_{\substack{k_1, k_2, k_3, \dots \ge 0 \\ k_1 + 2k_2 + 3k_3 + \cdots = p \\ k_1 + k_2 + k_3 + \cdots = n}}
+\frac{n!}{k_1!\,k_2!\,k_3!\cdots} 
+a_1^{k_1} a_2^{k_2} a_3^{k_3} \cdots.
+\]
+
+This shows \(g(f(x))\) has a convergent power series in \((x-c)\), so it is analytic at \(c\).
+
+\end{proof}
+
 
 %────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
