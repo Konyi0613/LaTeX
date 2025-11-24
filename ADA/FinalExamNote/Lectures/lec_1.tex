@@ -117,4 +117,71 @@ The idea of reweighting is to
   \]       
 \end{proof}
 
-Now we analyze the time complexity of Johnson's algorithm for general edge weights: We first obtain \(h\) by doing one time Bellman-Ford's algorithm, which takes \(O(mn)\) time. Then, we run Dijkstra's algorithm for all vertex \(i\) of \(G\), which takes totally \(O\left( mn + n^2 \log n \right) \) time. Note that to here we just store \(n\) shortest path tree, and we have to obtain the real distance by running through all \(n\) tree, which takes \(O(n) \cdot n = O \left( n^2 \right) \) time since a tree has \(n-1\) edges. Hence, it totally take \(O\left( mn + n^2 \log n \right) \) time for Johnson's technique.       
+Now we analyze the time complexity of Johnson's algorithm for general edge weights: We first obtain \(h\) by doing one time Bellman-Ford's algorithm, which takes \(O(mn)\) time. Then, we run Dijkstra's algorithm for all vertex \(i\) of \(G\), which takes totally \(O\left( mn + n^2 \log n \right) \) time. Note that to here we just store \(n\) shortest path tree, and we have to obtain the real distance by running through all \(n\) tree, which takes \(O(n) \cdot n = O \left( n^2 \right) \) time since a tree has \(n-1\) edges. Hence, it totally take \(O\left( mn + n^2 \log n \right) \) time for Johnson's technique.      
+
+\chapter{Maximum flow}
+\begin{problem}[The maximum flow problem]
+\vphantom{text}
+\begin{itemize}
+  \item Input: A directed graph \(G\) with edge capacity \(c:E(G) \to \mathbb{R} ^+\) and two vertices, the source \(s\) and the sink \(t\). 
+  \item Output: An \((s,t)\)-flow with maximum (flow) value.     
+\end{itemize}
+\end{problem}
+
+\begin{remark}
+  For convenience, we allow \(G\) has multiple/parallel edges, though merging multiple edges and increase the capacity to get an equivalent graph is not forbbiden.  
+\end{remark}
+
+\begin{remark}
+  An \((s,t)\)-flow is a function \(f: E(G) \to \mathbb{R} ^+ \cup \left\{ 0 \right\} \) satisfying 
+  \begin{itemize}
+    \item capacity constraint: \(f(uv) \le c(uv)\) for each edge \(uv\) of \(G\). 
+    \item conservation law: 
+    \[
+      \sum_{uv \in E(G)} f(uv) = \sum_{vw \in E(G)} f(vw)  
+    \] for each vertex \(v\) of \(G\) other than \(s\) and \(t\).    
+  \end{itemize}  
+  The value of an \((s,t)\)-flow \(f\) is 
+  \[
+    \sum_{sv \in E(G)} f(sv) - \sum_{us \in E(G)} f(us).  
+  \]  
+\end{remark}
+\begin{figure}[H]
+  \centering
+  \incfig{maxf}
+  \caption{The maximum flow problem}
+  \label{fig:maxf}
+\end{figure}
+\newpage
+
+\section{Ford-Fulkerson's algorithm}
+\begin{intuition}
+  Reduce the mainum \((s, t)\)-flow problem to the reachability problems for a sequence of graph \(R\).  
+\end{intuition}
+
+\begin{definition}[Residual graph]
+  The residual graph \(R(f)\) with respect to a flow \(f\) of \(G\) with \(V(R(f)) = V(G)\) is defined as follows for each edge \(uv\) of \(G\): 
+  \begin{itemize}
+    \item If \(f(uv) < c(fg)\), then let \(R(f)\) have an edge \(\textcolor{red}{uv}\) with capacity \(c(uv) - f(uv)\). 
+    \item If \(f(uv) > 0\), then let \(R(f)\) have an edge \(\textcolor{blue}{vu}\) with capacity \(f(uv)\).        
+  \end{itemize}      
+\end{definition}
+
+\begin{corollary}
+  \(R(f)\) is a graph with capacity of every edge positive, just like \(G\).  
+\end{corollary}
+
+\begin{remark}
+  Even if \(G\) has only one \(uv\) edge, \(R(f)\) may have \(2\) \(uv\) edges if \(f(uv) < c(uv)\) and \(f(vu) > 0\).       
+\end{remark}
+
+\begin{theorem}
+  For any \((s, t)\)-flow \(f\) of \(G\), we have the following statements: 
+  \begin{itemize}
+    \item [(1)] If \(d_{R(f)}(s, t) = \infty \), then \(f\) is a maximum \((s, t)\)-flow of \(G\). 
+    \item [(2)] If \(d_{R(f)}(s, t) < \infty \) and \(g\) is an \((s, t)\)-flow of the residual graph \(R(f)\), then \(f + g\) remains an \((s, t)\)-flow of \(G\), where 
+    \[
+      (f + g)(uv) = f(uv) + g(uv) - g(vu)
+    \] for each edge \(uv\) of \(G\).  
+  \end{itemize}   
+\end{theorem}

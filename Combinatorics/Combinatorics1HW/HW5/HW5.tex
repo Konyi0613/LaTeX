@@ -1,0 +1,286 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{bbding,combelow,textcomp,amsfonts,amsthm,amsmath,amssymb,graphicx,color,hyperref,etoolbox}
+\usepackage[utf8x]{inputenc}
+\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+
+\usepackage{xeCJK}
+\setCJKmainfont{PingFang TC}
+
+\newtoggle{story}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Customisation options --- update as necessary
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Course details: title, semester, instructors
+
+\newcommand{\courseTitle}{Combinatorics I (Math 7701)}
+\newcommand{\semester}{Fall 2025}
+\newcommand{\instructorA}{Shagnik Das}
+\newcommand{\instructorB}{TA: Lu Yun-Chi}
+
+%% Sheet number
+
+\newcommand{\sheetNumber}{5}
+
+
+%% Submission details
+
+\newcommand{\dueDate}{15:30, Nov 25th, to be submitted on COOL.}
+\newcommand{\lateWarning}{}
+
+
+%% Display irrelevant footnotes?  \toggletrue for yes, \togglefalse for no
+
+\toggletrue{story}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End of customisation options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pdfpagewidth 8.5in
+\pdfpageheight 11in
+\topmargin -1in
+\headheight 0in
+\headsep 0in
+\textheight 8.5in
+\textwidth 6.5in
+\oddsidemargin 0in
+\evensidemargin 0in
+\headheight 77pt
+\headsep 0in
+\footskip .75in
+
+\makeatletter
+\newcommand{\buildtitle}[4]{
+\begin{flushleft}
+{\large
+#1
+\hfill{}
+#2
+\par
+#3
+}
+\end{flushleft}
+\vskip 4pt
+\begin{center}
+{\large\bfseries#4\par}
+\end{center}
+\bigskip
+}
+\makeatother
+
+\renewcommand{\thesection}{\normalsize\arabic{section}}
+
+\renewcommand{\deg}{\textrm{deg}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\ceil}[1]{\left \lceil #1 \right \rceil}
+
+\newcommand{\hint}{\begin{flushright} [Hint at \url{\hintURL}.] \end{flushright}}
+
+\newcommand{\card}[1]{\left| #1 \right|}
+\newcommand{\mb}[1]{\mathbb{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+
+
+\newcommand{\story}[1]{\iftoggle{story}{\footnote{#1}}{}}
+\newcommand{\storymark}[1][42]{\iftoggle{story}{\footnotemark[#1]}{}}
+\newcommand{\storytext}[2][42]{\iftoggle{story}{\footnotetext[#1]{#2}}{}}
+
+\newcommand{\bonus}[2]{\paragraph{Bonus (#1 pt\ifstrequal{#1}{1}{}{s})} #2}
+
+
+\begin{document}
+
+
+\buildtitle{\courseTitle{}}{\semester}{\instructorA{} \hfill \instructorB{}}{Exercise Sheet \sheetNumber{}}
+
+\vspace{-0.2in}
+
+\begin{center}
+
+{\bf Due date: \dueDate{}}
+
+\end{center}
+
+\noindent Working with your partner, you should try to solve all of the exercises below. You should then submit solutions to four of the problems, with each of you writing two, clearly indicating the author of each solution. Note that each problem is worth $10$ points, and starred exercises represent problems that may be a little tougher, should you wish to challenge yourself. In case you have difficulties submitting on COOL, please send your solutions by e-mail.
+
+\paragraph{Exercise 1}   Let $\pi(n) = \card{ \{ p \in [n] : p \textrm{ is prime}\}}$ be the prime number function, counting the number of primes in $[n]$.  In this exercise you will determine the order of magnitude of $\pi(n)$.\footnote{You are asked to show $\pi(n) = \Theta \left( \frac{n}{\ln n} \right)$.  However, more is known.  The distribution of the prime numbers has long been central to number theory.  Indeed, it was around 1800 that the legendary Legendre conjectured $\pi(n) \approx \frac{n}{\ln n - 1.08366}$.  A similar conjecture was made by Gauss around the same time (when he was no older than 16).  A few years later, Dirichlet offered the $\mathrm{Li}(n)$ approximation mentioned in the bonus problem.
+
+In 1850, Chebyshev proved that $\frac{n}{\ln n}$ was the correct order of magnitude, and in 1896, Hadamard and de la Vall\'ee Poussin independently extended the work of Riemann and proved the Prime Number Theory, which gives the asymptotics of $\pi(n)$.  As conjectured, $\pi(n) \sim \frac{n}{\ln n}$.  These proofs all made use of complex analysis.
+
+Since then, several other proofs have been found.  Around 1950, Selberg and Erd\H{o}s found elementary (i.e. not using analysis) proofs.  (There was a rather bitter dispute between the two regarding who should get credit for the result.)  The simplest proof currently known is due to Newman, although this also uses some complex analysis.}
+\begin{itemize}
+	\item[(a)] Show that for every $m \in \mathbb{N}$ and every prime $p \in [m+1, 2m]$, $p | \binom{2m}{m}$.
+	\item[(b)] Deduce $\pi(n) = O \left( \frac{n}{\ln n} \right)$.
+	\item[(c)] Show that if $p^k$ is a prime power such that $p^k | \binom{2m}{m}$, then $p^k \le 2m$.
+	\item[(d)] Deduce $\pi(n) = \Omega \left( \frac{n}{\ln n} \right)$.
+\end{itemize}
+\paragraph{Solution: (張沂魁)}
+\begin{itemize}
+	\item [(a)] Since \(p \mid \prod _{k=0}^{m-1} (2m - k)\) and \(p \nmid m!\), and since 
+	\[
+		\binom{2m}{m} = \frac{\prod _{k=0}^{m-1} (2m - k)}{m!} \in \mathbb{Z} ,
+	\] so we have \(p \mid \binom{2m}{m}\). 
+	\item [(b)] Suppose 
+	\[
+		\pi ^{\prime} (i) = \# \left\{ p: p \text{ is prime}, 2^i + 1 \le p \le 2^{i+1}  \right\}, 
+	\] then we know
+	\[
+		\pi (n) \le \sum_{i=0}^{\left\lfloor \log _2(n) \right\rfloor} \pi ^{\prime} (i) 
+	\]
+	since \([1, n] \subseteq \bigcup_{i=0}^{\left\lfloor \log _2(n) \right\rfloor} [2^i + 1, 2^{i+1}]\). Also, note that for all \(m \in \mathbb{N} \)  
+	\[
+		\prod _{\substack{p \text{ is prime} \\ p \in [m+1, 2m] }} p \mid \binom{2m}{m}
+	\]
+	by (a), so 
+	\[
+		\prod _{\substack{p \text{ is prime} \\ p \in [m+1, 2m] }} p \le \binom{2m}{m}.
+	\]
+	Now since \(\binom{2m}{m}\) counts the number of subsets of \([2m]\) of size \(m\), so \(\binom{2m}{m} \le 2^{2m}\) because \(2^{2m}\) counts the number of subsets of \([2m]\). Hence, we have 
+	\[
+		\prod _{\substack{p \text{ is prime} \\ p \in [m+1, 2m] }} p \le \binom{2m}{m} \le 2^{2m} = 4^m,
+	\] and if we take \(\ln \) on the both sides, for all \(m \ge 1\) we have 
+	\begin{align*}
+		&\sum _{\substack{p \text{ is prime} \\ p \in [m+1, 2m] }} \ln p \le m \ln 4 \implies \# \left\{ p: p \text{ is prime}, p \in [m+1, 2m]  \right\} \cdot \ln (m+1) \le m \ln 4 \\
+		&\implies \# \left\{ p: p \text{ is prime}, p \in [m+1, 2m] \right\} \le  \frac{m \ln 4}{\ln (m+1)} \le \frac{m \ln 4}{\ln m} = O \left( \frac{m}{\ln m} \right) \\
+		&\implies \# \left\{ p: p \text{ is prime}, p \in [m+1, 2m]  \right\} = O\left( \frac{m}{\ln m} \right).    
+	\end{align*}       
+	Hence, we know \(\pi ^{\prime} (i) = O \left( \frac{2^i}{\ln 2^i} \right) = O \left( \frac{2^i}{\ln 2 i} \right) = O \left( \frac{2^i}{i} \right)   \) for all \(i \ge 1\). This gives 
+	\begin{align*}
+		\pi (n) &\le \sum_{i=0}^{\left\lfloor \log _2(n) \right\rfloor} \pi ^{\prime} (i) = 1 + \sum_{i=1}^{\left\lfloor \log _2(n) \right\rfloor} O \left( \frac{2^i}{i} \right) = O \left( \sum_{i=1}^{\left\lfloor \log _2(n) \right\rfloor} \frac{2^i}{i} \right) \\
+		&=O \left( \left( \sum_{i=1}^{\left\lfloor \log _2(n) \right\rfloor} \left( \frac{3}{4} \right)^{\left\lfloor \log _2(n)  \right\rfloor - i}   \right) \frac{2^{\left\lfloor \log _2(n) \right\rfloor}}{\left\lfloor \log _2(n) \right\rfloor}  \right)   
+	\end{align*} 
+	where the last equality holds since 
+	\[
+		\frac{2^i}{i} = \frac{1}{2} \cdot \frac{2^{i+1}}{i+1} \cdot \frac{i+1}{i} = \frac{1}{2} \left( \frac{2^{i+1}}{i+1} \right) \left( 1 + \frac{1}{i} \right) \le \frac{1}{2} \left( \frac{2^{i+1}}{i+1} \right) \left( 1 + \frac{1}{i} \right) \frac{3}{2} = \frac{3}{4} \left( \frac{2^{i+1}}{i+1} \right)
+	\]
+	for all \(i \ge 1\). Note that 
+	\begin{align*}
+		O \left( \left( \sum_{i=1}^{\left\lfloor \log _2(n) \right\rfloor} \left( \frac{3}{4} \right)^{\left\lfloor \log _2(n)  \right\rfloor - i}   \right) \frac{2^{\left\lfloor \log _2(n) \right\rfloor}}{\left\lfloor \log _2(n) \right\rfloor}  \right) &= O \left( 4 \left( 1 - \left( \frac{3}{4} \right)^{\left\lfloor \log _2(n) \right\rfloor}  \right) \cdot \frac{2^{\left\lfloor \log _2 (n) \right\rfloor}}{\left\lfloor \log _2(n) \right\rfloor}  \right) \\
+		&= O \left( \frac{2^{\left\lfloor \log _2 (n) \right\rfloor}}{\left\lfloor \log _2(n) \right\rfloor}  \right) = O \left( \frac{2^{\log _2(n)}}{\log _2(n)} \right) = O \left( \frac{n}{\frac{\ln n}{\ln 2}} \right) \\
+		&= O \left( \frac{n}{\ln n} \right).     
+	\end{align*}
+	Hence, \(\pi (n) = O \left( \frac{n}{\ln n} \right) \). 
+	\item [(c)] We define \(\nu _p(x) = k\) for \(x \in \mathbb{N} \) if 
+	\[
+		p^k \mid x \text{ but } p^{k+1} \nmid x. 
+	\]
+	Thus, we know 
+	\[
+		\nu _p \left( n! \right) = \sum_{i \ge 1} \left\lfloor \frac{n}{p^i} \right\rfloor.  
+	\]
+	This gives 
+	\[
+		\nu _p \left( \binom{2m}{m} \right) = \nu _p \left( \frac{(2m)!}{m!m!} \right) = \nu _p ((2m)!) - 2 \nu _p (m!) = \sum_{i \ge 1} \left\lfloor \frac{2m}{p^i} \right\rfloor - 2 \left\lfloor \frac{m}{p^i} \right\rfloor.
+	\]
+	Now we define \(f(x) = \left\lfloor 2x \right\rfloor - 2\left\lfloor x \right\rfloor\), then 
+	\[
+		f(x) = \begin{cases}
+			0, &\text{ if } \left\{ x \right\} < \frac{1}{2}  ;\\
+			1, &\text{ if } \left\{ x \right\} \ge \frac{1}{2}
+		\end{cases} \text{ where } \left\{ x \right\} \text{ is the fractional part of } x.   
+	\] 
+	Note that if \(1 > \frac{2m}{p^i}\), then we have \(1 > \frac{2m}{p^i} > \frac{m}{p^i}\) and thus 
+	\[
+		f \left( \frac{m}{p^i} \right) = 0 - 0 = 0. 
+	\]
+	Hence, \(f \left( \frac{m}{p^i} \right) = 1\) only if \(\frac{2m}{p^i} \ge 1\). Now suppose \(L\) is the maximal integer s.t. 
+	\[p^{L+1} \ge 2m \ge p^L,\]
+	 then for all positive integer \(i \le L\), we have \(\frac{2m}{p^i} \ge 1\), while for all positive integer \(j > L\) we have \(\frac{2m}{p^j} < 1\). Hence, 
+	 \[
+		\nu _p \left( \binom{2m}{m} \right) = \sum_{i \ge 1} \left\lfloor \frac{2m}{p^i} \right\rfloor - 2 \left\lfloor \frac{m}{p^i} \right\rfloor \le L.  
+	 \]        
+	 Now since \(p^k \mid \binom{2m}{m}\), so 
+	 \[
+		k \le \nu _p \left( \binom{2m}{m} \right) \le L, 
+	 \] 
+	 which means \(p^k \le p^L \le 2m\), and we're done. 
+	\item [(d)] If 
+	\[
+		\binom{2m}{m} = p_1^{\alpha _1} p_2^{\alpha _2} \dots p_k^{\alpha _k}
+	\] is the prime decomposition of \(\binom{2m}{m}\), then we know \(p_i^{\alpha _i} \le 2m\) by (c), and thus 
+	\[
+		\binom{2m}{m} \le (2m)^k \le (2m)^{\pi (2m)}.
+	\]
+	Note that 
+	\[
+		2^{2m} = \sum_{k=0}^{2m} \binom{2m}{k} < (2m + 1) \binom{2m}{m} 
+	\] since 
+	\[
+		\frac{\binom{2m}{s}}{\binom{2m}{s-1}} = \frac{2m - s + 1}{s} \begin{cases}
+			\ge 1, &\text{ if } s \le m ;\\
+			< 1, &\text{ if } s \ge m + 1.
+		\end{cases},
+	\] so we have 
+	\[
+		\frac{2^{2m}}{2m+1} < \binom{2m}{m} \le (2m)^{\pi (2m)},
+	\]
+	and if we take \(\ln \) on both sides, we have 
+	\[
+		(2m) \ln 2 - \ln (2m+1) < \pi (2m) \cdot \ln (2m),
+	\] which means 
+	\begin{align*}
+		\pi (2m) &> \frac{(2m)\ln 2 - \ln (2m+1)}{\ln (2m)} = \frac{2m}{\ln (2m)} \cdot \ln 2 - \log _{2m} (2m + 1) 
+		\\ &> \frac{2m}{\ln (2m)} \cdot \ln 2 - 2 = \Omega \left( \frac{2m}{\ln (2m)} \right).
+	\end{align*}
+	Hence, for all \(n \in \mathbb{N} \), if \(n = 2m\) for some \(m\), then 
+	\[
+		\pi (n) = \pi (2m) = \Omega \left( \frac{2m}{\ln (2m)} \right) = \Omega \left( \frac{n}{\ln n} \right),  
+	\]   
+	while for \(n = 2m + 1\) for some \(m \), then 
+	\begin{align*}
+		\pi (n) &= \pi (2m + 1) \ge \pi (2m) = \Omega \left( \frac{2m}{\ln (2m)} \right) \\  &= \Omega \left( \frac{2m}{\ln (2m+1)} \right) = \Omega \left( \frac{2m + 1}{\ln (2m + 1)} \right) = \Omega \left( \frac{n}{\ln n} \right) 
+	\end{align*}  
+	Hence,
+	\[
+		\pi (n) = \Omega \left( \frac{n}{\ln n} \right). 
+	\]
+\end{itemize}
+
+\paragraph{Bonus (0 points)}  Define $\mathrm{Li}(x) = \int_2^x \frac{dt}{\ln t}$.  Prove that $\card{\pi(n) - \mathrm{Li}(n)} = O \left( n^\frac12 \ln n \right)$.
+
+\paragraph{Exercise 2*}  Let $p_{od}(n)$ denote the number of partitions of $n$ into odd, distinct parts; that is, $(\lambda_1, \lambda_2, \hdots, \lambda_k) \vdash n$ with $\lambda_i \in 2 \mathbb{N} + 1$ for all $i$ and $\lambda_1 > \lambda_2 > \hdots > \lambda_k \ge 1$. Show that there are positive constants $c, C$ such that for sufficiently large $n$ we have
+\[ e^{c\sqrt{n}} \le p_{od}(n) \le e^{C\sqrt{n}}. \]
+
+\paragraph{Exercise 3}  When studying the twelvefold ways of counting, we determined that the number of surjective divisions of $n$ distinct items into $r$ distinct parts is $r! S(n,r)$, where $S(n,r)$ is the Stirling number of the second kind.  Use the Inclusion-Exclusion Principle to find an expression for $r! S(n,r)$ not involving the Stirling numbers.
+\paragraph{Solution: (張沂魁)} Note that 
+\[
+	r! S(n, r) = \# \left\{ \text{division of } [n] \text{ into } r \text{ non-empty ordered parts}    \right\}.
+\]
+Hence, 
+\[
+	r! S(n, r) = \# \left\{ f:[n] \to [r] \mid f \text{ is surjective}   \right\}. 
+\]
+Suppose 
+\[
+	A_i = \left\{ f:[n] \to [r] \mid \nexists j \in [n] \text{ s.t. } f(j) = i  \right\} 
+\] for all \(i \in [r]\), then 
+\begin{align*}
+	r! S(n, r) &= \left\vert \left( \left\{ f: [n] \to [r] \right\}  \right) \setminus \left( \bigcup_{i=1}^{r} A_i  \right)   \right\vert = \sum_{I \subseteq [r]} (-1)^{\vert I \vert } \cdot \left\vert \bigcap_{i \in I} A_i  \right\vert \\
+	&= \sum_{I \subseteq [r]} (-1)^{\vert I \vert } \left( r - \vert I \vert  \right)^n = \sum_{k=0}^r \binom{r}{k} \cdot (-1)^k \cdot (r - k)^n  
+\end{align*}
+by the Inclusion-Exclusion Principle. 
+
+\paragraph{Exercise 4}  Someone is planning a round-the-world trip that involves visiting $2n$ cities, with two cities from each of $n$ different countries.  She can choose a city to start and end the journey in, with the other $2n-1$ cities being visited exactly once. However, she has the restriction that the two cities from each country should not be visited consecutively.\footnote{For example, suppose $n = 3$ and the $2n$ cities are $\{$Berlin, Frankfurt, Taipei, Kaohsiung, New York, Los Angeles$\}$.  Berlin $\rightarrow$ Taipei $\rightarrow$ Los Angeles $\rightarrow$ Kaohsiung $\rightarrow$ Frankfurt $\rightarrow$ New York $\rightarrow$ Berlin is acceptable, but Berlin $\rightarrow$ Kaohsiung $\rightarrow$ Los Angeles $\rightarrow$ Taipei $\rightarrow$ New York $\rightarrow$ Frankfurt $\rightarrow$ Berlin is not, as the final flight is a domestic one.} How many different trips are possible?
+
+\paragraph{Exercise 5}  Suppose we have finite sets $A_1, A_2, \hdots, A_r$.  Prove that when $k_0$ is even,
+\[ \card{\cup_{i=1}^r A_i} \ge \sum_{k = 1}^{k_0} (-1)^{k+1} \sum_{I \in \binom{[r]}{k}} \card{\cap_{i \in I} A_i}, \]
+and when $k_0$ is odd,
+\[ \card{\cup_{i=1}^r A_i} \le \sum_{k = 1}^{k_0} (-1)^{k+1} \sum_{I \in \binom{[r]}{k}} \card{\cap_{i \in I} A_i}. \]
+That is, the partial sums in the Inclusion-Exclusion Principle alternate between upper and lower bounds on the size of the union.
+
+% \paragraph{Exercise 6}  
+
+% \newpage
+
+% \section*{Hints}  The following QR codes contain hints for some of the homework exercises.  You should be able to decode them using any QR code scanner, including this one: \url{https://zxing.org/w/decode.jspx}.
+
+% \paragraph{Exercise ?} Also available at \url{https://i.ibb.co/???????/S??E?.png}.
+
+\begin{center}
+% \includegraphics[scale=0.5]{hints/S??E?.png}
+\end{center}
+
+\end{document}
