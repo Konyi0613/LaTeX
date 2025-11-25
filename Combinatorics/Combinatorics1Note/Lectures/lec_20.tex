@@ -1,0 +1,166 @@
+\lecture{20}{25 Nov. 15:30}{}
+\begin{eg}
+    \(100\) people boarding a plane with \(100\) seats, and the first person takes a random seat, while everyone else takes their seat if the seat is free, otherwise a randome empty seat is taken. Then, what is the probability that the final passenger is in his own seat?  
+\end{eg}
+\begin{explanation}
+    If we consider the sequence if random choices, the process ends when 
+    \begin{itemize}
+        \item we choose \(\# 1\), choosing the loop and guaranteeing everyone else gets their own seat, or 
+        \item we choose \(\# 100\), so every one in between gets their own seat, but the last passenger will not.   
+    \end{itemize}
+    Any other choice: we will have a random choice again later. By symmetry, equally likely to choose \(\# 1\) or \(\# 100\) each time, so 
+    \[
+        \mathbb{P} \left( \text{last passenger gets own seat}  \right) = \frac{1}{2}. 
+    \]  
+\end{explanation}
+
+\subsubsection{Application} 
+Stack of \(30\) assignments to grade, and cycle through them, abd give \(100 \%\) to every \(k\)-th problem. To be fair, we need \(k\) to be relatively prime to \(30\).
+
+\begin{question}
+    How many choices for \(k\) are there?
+\end{question}
+Define \(S = [30]\) and \(A_d = \left\{ x \in S : d \mid x \right\} \), then we want 
+\[
+    \left\vert S \setminus (A_2 \cup A_3 \cup A_5) \right\vert, 
+\]  
+which can be derived by Inclusion-Exclusion:
+\[
+    \vert S \vert - \vert A_2 \vert - \vert A_3 \vert - \vert A_5 \vert + \vert A_2 \cap A_3 \vert + \vert A_3 \cap A_5 \vert + \vert A_2 \cap A_5 \vert - \vert A_2 \cap A_3 \cap A_5 \vert.        
+\]
+Observe that 
+\[
+    A_d = \left\lfloor \frac{30}{d} \right\rfloor,
+\] and if \(p, q\) are coprime, then 
+\[
+    A_p \cap A_q = A_{pq}.
+\] 
+Hence, by induction, if \(d_1, d_2, \dots , d_n\) are pairwise coprime, then 
+\[
+    A_{d_1} \cap A_{d_2} \cap \dots \cap A_{d_n} = A_{d_1 d_2 \dots d_n}.
+\] 
+Thus, 
+\begin{align*}
+   &\vert S \vert - \vert A_2 \vert - \vert A_3 \vert - \vert A_5 \vert + \vert A_2 \cap A_3 \vert + \vert A_3 \cap A_5 \vert + \vert A_2 \cap A_5 \vert - \vert A_2 \cap A_3 \cap A_5 \vert \\
+   &= 30 - \frac{30}{2} - \frac{30}{3} - \frac{30}{5} + \frac{30}{6} + \frac{30}{15} + \frac{30}{10} - \frac{30}{30} = 8.
+\end{align*}
+
+\begin{definition}[Euler Totient Function]
+    Given \(n \in \mathbb{N} \), we define 
+    \[
+        \varphi (n) = \left\vert \left\{ r \in [n] : \gcd(r, n) =1 \right\}  \right\vert 
+    \] 
+\end{definition}
+
+\begin{question}
+    What is \(\varphi (n)\)? 
+\end{question}
+If \(n\) is prime, then \(\varphi (n) = n - 1\). If \(n = p^k\) is a prime power, then 
+\[
+    \varphi (n) = p^k - p^{k-1}.
+\] 
+For the general case, \(n = p_1^{k_1} p_2^{k_2} \dots p_s^{k_s}\) where \(p_1, p_2, \dots , p_s\) are the distinct prime factors of \(n\) and \(k_i \in \mathbb{N} \) for all \(i\). Let \(S = [n]\) and \(A_d = \left\{ x \in [n] : d \mid x \right\} \), then 
+\[
+    \varphi (n) = \left\vert S \setminus \bigcup_{i=1}^{s} A_{p_s}  \right\vert,
+\]      
+so by Inclusion-Exclusion principle, 
+\begin{align*}
+    \varphi (n) &= \sum_{I \subseteq [s]} (-1)^{\vert I \vert } \left\vert \bigcap_{i \in I} A_{p_i}  \right\vert = \underbrace{n}_{I = \varnothing } + \sum_{\substack{I \subseteq [s] \\ I \neq \varnothing }} (-1)^{\vert I \vert } \left\vert A_{\prod _{i \in I} p_i} \right\vert = n + \sum_{\substack{I \subseteq [s] \\ I \neq \varnothing }} (-1)^{\vert I \vert } \frac{n}{\prod _{i \in I} p_i} \\
+    &= n \left( \sum_{I \subseteq [s]}  \frac{(-1)^{\vert I \vert }}{\prod _{i \in I} p_i} \right) = n \left( \sum_{I \subseteq [s]} \prod _{i \in I} \left( -\frac{1}{p_i} \right)   \right) = n \prod _{i=1}^s \left( 1 - \frac{1}{p_i} \right).      
+\end{align*}
+
+\begin{corollary}
+    \[
+        \varphi (mn) = \varphi (m) \varphi (n)
+    \]
+    if and only if \(m\) and \(n\) are coprime.  
+\end{corollary}
+
+\section{Partially ordered sets (Posets)}
+\begin{eg}
+    Ranking items on a member. If 
+    \[
+        \text{stinky tofu} < \text{anything else} < \text{xiaolongbao},   
+    \]
+    then 
+    \[
+        \text{beef noodle soup} ? \text{scallion pancakes}.  
+    \]
+    If items come all at once, we don't want there to be a dish and a better dish, because every one would take from the better dish. If a banquet, where one dish is served at a time, maybe we want each dish to be better than the previous.
+\end{eg}
+
+\begin{definition}
+    A partially ordered set (poset) is a set \(P\) together with a binary relation \(\le \subseteq P \times P\) that is 
+    \begin{itemize}
+        \item reflexive: \(x \le x\) \(\forall x \in P\). 
+        \item anti-symmetric: If \(x \le y\) and \(y \le x\), then \(x = y\). 
+        \item transitive: If \(x \le y\) and \(y \le z\), then \(x \le z\).        
+    \end{itemize}   
+\end{definition}
+
+\begin{definition}
+    Two elements \(x, y \in P\) are comparable if \(x \le y\) or \(y \le x\), and incomparable otherwise.   
+\end{definition}
+
+We can represent a finite poset via a Hasse diagram: If \(x \le y\), we draw \(x\) below \(y\). If \(x \le y\) and \(\nexists z\) s.t. \(x < z < y\), i.e. \(x \le z \le y\) but \(z \neq x, y\), then we draw an edge between \(x\) and \(y\). 
+
+\begin{definition}
+    A chain is a subset \(C \subseteq P\) where every pair is comparable. 
+\end{definition}
+
+\begin{definition}
+    An antichain is a subset \(A \subseteq P\) where no two distinct elements are comparable. 
+\end{definition}
+
+\begin{eg}
+    \vphantom{text}
+    \begin{itemize}
+        \item \(\mathbb{N} , \mathbb{Q} , \mathbb{R} \) with their usual ordering. 
+        \item \((\mathbb{C} , \le)\) where \(x \le y\) if \(x = y\) or \(\vert x \vert < \vert y \vert  \). In particular, circles around the origin are antichains. 
+        \item (Boolean poset) \(P = 2^{[n]}\) and \(a \le b\) iff \(a \subseteq b\).
+        \item (Divisibility poset) \(P = [n]\) or \(\mathbb{N} \), and \(a \le b\) iff \(a \mid b\).         
+    \end{itemize}
+\end{eg}
+
+\begin{question}
+    What is the biggest chain in these posets? (maximal of largest cardinality)
+\end{question}
+\begin{answer}
+    \vphantom{text}
+    \begin{itemize}
+        \item \(\mathbb{N} , \mathbb{Q} , \mathbb{R} \) respectively are chains. 
+        \item Choose one complex number of each modules. (e.g. \(\left\{ x \in \mathbb{R} , x \ge 0 \right\} \))
+        \item Cannot have the sets of the same cardinality, so we can pick 
+        \[
+            \varnothing , \left\{ 1 \right\}, \left\{ 1,2 \right\}, \left\{ 1,2,3 \right\}, \dots , \left\{ 1,2,\dots ,n \right\}.    
+        \]
+        \item Powers of \(2\): \(1, 2, 2^2, \dots , 2^{\left\lfloor \log _2(n) \right\rfloor}\). Since we want 
+        \[
+            c_0 \mid c_1 \mid c_2 \mid \dots \mid c_s
+        \]  
+        and \(c_1 \ge 2 c_0\) and \(c_2 \ge 2 c_1\) and so on.   
+    \end{itemize}
+\end{answer}
+
+\begin{question}
+    What are the largest antichain?
+\end{question}
+\begin{answer}
+    \vphantom{text}
+    \begin{itemize}
+        \item Single elements, because every pair is comparable. 
+        \item Circles of fixed radius/modules. 
+        \item Consider \(\binom{[n]}{k}\), then since any two distinct sets of same size are incomparable, so for all \(1 \le k \le n\) this is true, and the better \(k\) is \(\left\lfloor \frac{n}{2} \right\rfloor\). However, can do better? For example, if \(n\) is odd, then  
+        \[
+            A = \binom{[n-1]}{\frac{n+1}{2}} \cup \left\{ S \subseteq [n] : n \in S, \vert S \vert = \frac{n-1}{2} \right\}.  
+        \]
+        Then
+        \[
+            \vert A \vert = \binom{n-1}{\frac{n+1}{2}} + \binom{n-1}{\frac{n-3}{2}} < \binom{n}{\frac{n+1}{2}} = \binom{n-1}{\frac{n+1}{2}} + \binom{n-1}{\frac{n-1}{2}}. 
+        \]
+    \end{itemize}
+\end{answer}
+
+\begin{theorem}[Sperner 1928]
+    The size of the largest antichain in \(\left( 2^{[n]}, \subseteq  \right) \) is \(\binom{n}{\left\lfloor \frac{n}{2} \right\rfloor}\).  
+\end{theorem}

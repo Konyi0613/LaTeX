@@ -1,0 +1,222 @@
+\lecture{23}{25 Nov. 09:10}{}
+On \(C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\), we can use \(L^2\) norm to define a metric on \(C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\): 
+\[
+    d_2(f, g) = \lVert f - g \rVert_2, 
+\]  
+but this metric is not complete. Let 
+\[
+    f_n(x) = \begin{dcases}
+        0, &\text{ if } 0 \le x \le \frac{1}{2} - \frac{1}{n};\\
+        \frac{n}{2} \left( x - \left( \frac{1}{2} - \frac{1}{n} \right)  \right) , &\text{ if } \frac{1}{2} - \frac{1}{n} \le x \le \frac{1}{2} + \frac{1}{n};\\
+         1, &\text{ if } \frac{1}{2} + \frac{1}{n} \le x \le 1
+    \end{dcases}
+\]
+and we can let 
+\[
+    g_n(x) = \begin{dcases}
+        f_n(x), &\text{ if } -1 \le x \le 0 ;\\
+        -f_n(x), &\text{ if } 0 \le x \le 1,
+    \end{dcases}
+\]
+then \(g_n\) becomes periodic, and then we can rescale the \(g_n\) to make it \(1\)-periodic, and then we know \(\left( g_n \right) \subseteq C(\mathbb{R} / \mathbb{Z} , \mathbb{C} ) \) and for some \(g \notin C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\) we have \(\lim_{n \to \infty} d_2 (g_n, g) = 0 \), but \(g(x) \notin C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\) (note that \(\left( g_n \right) \) is Cauchy but not convergent in \(C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\)), so we can conclude \(\left( C(\mathbb{R} / \mathbb{Z} , \mathbb{C} ), d_2 \right) \) is not complete. 
+
+\section{Trigonometric polynomials}
+\begin{definition}
+    For each \(n \in \mathbb{Z} \), define the function \(e_n \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\) by 
+    \[
+        e_n(x) = e^{2\pi i n x},
+    \]  then we know \(e_n(x + 1) = e_n(x)\) for all \(x \in \mathbb{R} \). Sometimes we call \(e_n\) the character of frequency \(n\).    
+\end{definition}
+
+\begin{definition}
+    A function \(f \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\) is called trigonometric polynomial if it can be written in the form 
+    \[
+        f(x) = \sum_{n = -N}^N c_n e_n(x) 
+    \] 
+    for some integer \(N \ge 0\). 
+\end{definition}
+
+\begin{remark}
+\begin{align*}
+    \cos (2 \pi n x) &= \frac{e^{2 \pi i n x} + e^{-2 \pi i n x}}{2} = \frac{e_n(x) + e_{-n}(x)}{2} \\
+    \sin (2 \pi n x) &= \frac{e^{2 \pi i n x} - e^{-2 \pi i n x}}{2i} = \frac{e_n(x) - e_{-n(x)}}{2i},
+\end{align*}
+so the (complex) linear combination of \(\cos (2\pi nx)\) and \(\sin (2\pi nx)\) is also a trigonometric polynomial. 
+\end{remark}
+
+\begin{lemma}
+    Let \(n, m \in \mathbb{Z} \), then 
+    \[
+        \langle e_n, e_m \rangle = \delta _{nm} = \begin{dcases}
+            1, &\text{ if }  n = m;\\
+            0, &\text{ if }  n \neq m.
+        \end{dcases}
+    \] 
+\end{lemma}
+\begin{proof}
+    Since 
+    \begin{align*}
+        \langle e_n, e_m \rangle &= \int _0^1 e_n(x) \overline{e_m(x)} \, \mathrm{d} x = \int _0^1 e^{2 \pi i n x} \overline{e^{2 \pi i m x}} \, \mathrm{d} x = \int _0^1 e^{2 \pi i n x} e^{-2 \pi i m x} \, \mathrm{d} x \\
+        &= \int _0^1 e^{2 \pi i x (n - m)} \, \mathrm{d} x,       
+    \end{align*}
+    and then 
+    \begin{itemize}
+        \item Case 1: \(n = m\), then 
+        \[
+            \langle e_n, e_m \rangle = \int _0^1 e^0 \, \mathrm{d} x = \int _0^1 1 \, \mathrm{d} x= 1.   
+        \]
+        \item Case 2: \(n \neq m\), then 
+        \[
+            \langle e_n, e_m \rangle = \frac{e^{2 \pi i x(n-m)}}{2 \pi i (n - m)} \left. \right]_0^1 = \frac{1 - 1}{2 \pi i (n - m)} = 0 
+        \]
+        since for \(n - m \in \mathbb{Z} \) we have \(e^{2 \pi i (n - m)} = 1\).  
+    \end{itemize}
+\end{proof}
+
+\begin{corollary}
+    Let \(f = \sum_{n=-N}^N c_n e_n \), then \(c_n = \langle f, e_n \rangle \) and 
+    \[
+        \lVert f \rVert_2^2 = \sum_{n = -N}^N \vert c_n \vert^2   
+    \]  
+\end{corollary}
+\begin{proof}
+    Since 
+    \[
+        \langle f, e_n \rangle = \langle \sum_{k=-N}^N c_k e_k, e_n  \rangle = \sum_{k=-N}^{N} c_k \langle e_k, e_n \rangle = c_n \langle e_n, e_n \rangle = c_n,     
+    \]
+    so 
+    \begin{align*}
+        \lVert f \rVert_2^2 &= \langle f, f \rangle = \langle \sum_{k=-N}^N c_k e_k, \sum_{\ell = -N}^N c_{\ell } e_{\ell }   \rangle \\
+        &= \sum_{\ell = -N}^N \sum_{k = -N}^N c_k \overline{c_{\ell }} \langle e_k, e_{\ell }  \rangle = \sum_{\ell = -N}^N \sum_{k = -N}^N c_k \overline{c_{\ell } } \delta _{k \ell } = \sum_{\ell = -N}^N c_{\ell } \overline{c_{\ell }} = \sum_{\ell = -N}^{N} \vert c_{\ell } \vert^2.           
+    \end{align*}
+\end{proof}
+
+Later, we'll show that if \(f \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\), then 
+\[
+    \lVert f \rVert_2^2 = \sum_{n \in \mathbb{Z} } \vert \langle f, e_n \rangle  \vert^2.   
+\] 
+
+\section{Periodic convolutions}
+We want to prove the following theorem:
+\begin{theorem}
+    Let \(f \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\), and let \(\varepsilon > 0\), then \(\exists \) a trigonometric polynomial \(P\) s.t. 
+    \[
+        \lVert f - P \rVert_{\infty } < \varepsilon. 
+    \]    
+\end{theorem}
+
+\begin{definition}
+    Let \(f, g \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\), then we define their periodic convolution \(f * g: \mathbb{R} \to \mathbb{C} \) by
+    \[
+        (f * g)(x) = \int _0^1 f(y) g(x - y) \, \mathrm{d} y. 
+    \]  
+\end{definition}
+
+\begin{lemma}
+    Let \(f, g, h \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\), then 
+    \begin{itemize}
+        \item (Closure) \(f * g \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\). 
+        \item (Commutativity) \(f * g = g * f\). 
+        \item (Bilinearity) \((f + g) * h = f * h + g * h\) and \(f * (g + h) = f * g + f * h\) and 
+        \[
+            (cf) * g = f * (cg) = c(f * g).
+        \]
+    \end{itemize} 
+\end{lemma}
+\begin{proof}
+    We have the following properties: For \(F \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\), 
+ \begin{itemize}
+    \item \(F\) is uniformly bounded and uniformly continuous. 
+    \item \(\int _a^{a+1} F(x) \, \mathrm{d} x=\int _0^1 F(x) \, \mathrm{d} x  \) for any \(a \in \mathbb{R} \).  
+ \end{itemize}
+
+ Given \(\varepsilon > 0\), \(\exists \delta > 0\) s.t. \(\vert x - y \vert < \delta  \) implies \(\vert F(x) - F(y) \vert < \varepsilon\). 
+ \begin{itemize}
+    \item [(1)] \(F\) is uniformly continuous on \([0, 2]\). Given \(\varepsilon > 0\), \(\exists \delta _0 > 0\) s.t. 
+    \[
+        \vert F(u) - F(v) \vert < \varepsilon \text{ if } \vert u - v \vert < \delta _0 \text{ where } u, v \in [0, 2].    
+    \]
+    \item [(2)] Choose \(\delta = \min \left\{ \delta _0, \frac{1}{2} \right\} \), then we want to show 
+    \[
+        \vert F(x) - F(y) \vert < \varepsilon  \text{ for all } x,y \in \mathbb{R}.  
+    \]
+    Since there exists \(n \in \mathbb{Z} \) s.t. \(n \le x < n + 1\), and WLOG we may assume \(x \le y\), then 
+    \[
+        \vert x - y \vert = y - x < \delta \le \frac{1}{2} \iff y < x + \frac{1}{2} < n + 2, 
+    \]    
+    and thus \(n \le x, y \le n + 2\). Now \(0 \le x - n \le y - n \le 2\). Let \(u = x - n\) and \(v = y - n\), then \(0 \le u \le v \le 2\), and 
+    \[
+        \vert u - v \vert = \vert x - y \vert < \delta \implies \vert F(u) - F(v) \vert < \varepsilon \implies \vert F(u) - F(v) \vert = \vert F(x-n) - F(y-n) \vert = \vert F(x) - F(y) \vert < \varepsilon       
+    \]     
+    since \(F\) is \(1\)-periodic.   
+ \end{itemize}  
+
+ Now consider
+\[
+    (f * g)(x) = \int _0^1 f(y) g(x - y) \, \mathrm{d} x, 
+\]  
+then since \(f\) is uniforly bounded and \(g\) is uniformly continuous, so given \(\varepsilon > 0\) there exists \(M > 0\) s.t. \(\vert f(y) \vert \le M \) and \(\delta > 0\) s.t. 
+\[
+    \vert s - t \vert < \delta \implies \vert g(s) - g(t) \vert < \frac{\varepsilon}{M}.  
+\]      
+Also, we have 
+\[
+    (f * g)(x) - (f * g)(x_0) = \int _0^1 f(y) \left( g(x-y) - g(x_0 - y) \right) \, \mathrm{d} y,  
+\]
+so if \(\vert x - x_0 \vert < \delta  \), then 
+\[
+    \vert (x-y) - (x_0 - y) \vert = \vert x - x_0 \vert < \delta,  
+\] which gives 
+\[
+    \vert g(x - y) - g(x_0 - y) \vert < \frac{\varepsilon}{M}. 
+\]
+Thus, 
+\[
+    \left\vert (f * g)(x) - (f * g)(x_0) \right\vert \le \int _0^1 \vert f(y) \vert \vert g(x-y) - g(x_0 - y) \vert \, \mathrm{d} y \le \int _0^1 M \cdot \frac{\varepsilon}{M} \, \mathrm{d} y = \varepsilon.     
+\]
+Thus, \(f * g\) is continuous. 
+
+
+
+
+Since 
+\begin{align*}
+    (f * g)(x) &= \int _0^1 f(y) g(x - y) \, \mathrm{d} y = \int _x^{x-1} f(x - z) g(z) \, -(\mathrm{d} z) = \int _{x-1}^x f(x-z) g(z) \, \mathrm{d} z \\
+    &= \int _0^1 f(x-z) g(z) \, \mathrm{d} x = \int _0^1 g(z) f(x-z) \, \mathrm{d} z = (g * f)(x),     
+\end{align*}
+so we're done.
+\end{proof}
+
+ 
+
+
+
+\begin{theorem}
+    Recall that \(e_n(x) = e^{2 \pi i n x}\), then for any \(f \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\), we have 
+    \[
+        f * e_n = \hat{f}(n) e_n
+    \]
+    where
+    \[
+        \hat{f} (n) = \int _0^1 f(y) e^{-2 \pi i n y} \, \mathrm{d} y = \langle f, e_n \rangle.
+    \]
+\end{theorem}
+\begin{proof}
+    \begin{align*}
+        (f * e_n)(x) &= \int _0^1 f(y) e_n(x-y) \, \mathrm{d} y = \int _0^1 f(y) e^{2\pi in (x-y)} \, \mathrm{d} y \\
+        &= \int _0^1 f(y) e^{2 \pi i n x} \cdot e^{2 \pi i n y} \, \mathrm{d} y = \left( \int _0^1 f(y) e^{-2 \pi i n y} \, \mathrm{d} y  \right) e^{2 \pi i n x} = \hat{f} (n) e_n(x).    
+    \end{align*}
+\end{proof}
+
+\begin{theorem}
+    Let \(P = \sum_{n=-N}^N c_n e_n \), then 
+    \[
+        (f * P)(x) = \sum_{n=-N}^N c_n \hat{f} (n) e_n. 
+    \] 
+\end{theorem}
+\begin{proof}
+    \begin{align*}
+        (f * P)(x) &= \left( f * \left( \sum_{n=-N}^N c_n e_n  \right)  \right)(x) = \sum_{n=-N}^N c_n (f * e_n)(x) \\
+        &= \sum_{n=-N}^N c_n \hat{f} (n) e_n.   
+    \end{align*}
+\end{proof}
