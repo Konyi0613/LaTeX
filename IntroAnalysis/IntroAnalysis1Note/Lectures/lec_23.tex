@@ -3,24 +3,17 @@ On \(C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\), we can use \(L^2\) norm to defi
 \[
     d_2(f, g) = \lVert f - g \rVert_2, 
 \]  
-but this metric is not complete. Let 
-\[
-    f_n(x) = \begin{dcases}
-        0, &\text{ if } 0 \le x \le \frac{1}{2} - \frac{1}{n};\\
-        \frac{n}{2} \left( x - \left( \frac{1}{2} - \frac{1}{n} \right)  \right) , &\text{ if } \frac{1}{2} - \frac{1}{n} \le x \le \frac{1}{2} + \frac{1}{n};\\
-         1, &\text{ if } \frac{1}{2} + \frac{1}{n} \le x \le 1
-    \end{dcases}
-\]
-and we can let 
-\[
-    g_n(x) = \begin{dcases}
-        f_n(x), &\text{ if } -1 \le x \le 0 ;\\
-        -f_n(x), &\text{ if } 0 \le x \le 1,
-    \end{dcases}
-\]
-then \(g_n\) becomes periodic, and then we can rescale the \(g_n\) to make it \(1\)-periodic, and then we know \(\left( g_n \right) \subseteq C(\mathbb{R} / \mathbb{Z} , \mathbb{C} ) \) and for some \(g \notin C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\) we have \(\lim_{n \to \infty} d_2 (g_n, g) = 0 \), but \(g(x) \notin C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\) (note that \(\left( g_n \right) \) is Cauchy but not convergent in \(C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\)), so we can conclude \(\left( C(\mathbb{R} / \mathbb{Z} , \mathbb{C} ), d_2 \right) \) is not complete. 
+but this metric is not complete. See \autoref{sec: L2 norm metric}. 
 
 \section{Trigonometric polynomials}
+
+In the preceding section we introduced an inner product on the space \(C(\mathbb{R} /\mathbb{Z} , \mathbb{C} )\) 
+of continuous \(1\)-periodic complex-valued functions. We now use this inner
+product to develop the theory of trigonometric polynomials, which play for
+Fourier series the same role that ordinary polynomials play for power series.
+The basic building blocks will be the complex exponentials \(e^{2 \pi i n x}\), also called
+characters.
+
 \begin{definition}
     For each \(n \in \mathbb{Z} \), define the function \(e_n \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\) by 
     \[
@@ -112,7 +105,95 @@ We want to prove the following theorem:
     \]  
 \end{definition}
 
-\begin{lemma}
+We first show the below two propositions, which will be useful later.
+\begin{proposition} \label{prop: 1-periodic and continuous implies bounded and uniformly continuous}
+    For \(F \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\). Viewing \(F\) a \(1\)-periodic continuous function, then \(F\) is bounded and uniformly continuous.
+\end{proposition}
+\begin{proof}
+    We have shown boundedness in \autoref{lm: properties for C(R/Z, C)}. Now we show \(F\) is uniformly continuous. 
+    \begin{itemize}
+        \item Step 1: Uniform continuity on \([0, 2]\). Since \(F\) is continuous on the compact interval \([0, 2]\), it is uniformly continuous there. Thus, for every \(\varepsilon > 0\) there exists \(\delta _0 > 0\) s.t. 
+        \begin{equation} \label{eq: uniform continuity on [0, 2]}
+            u, v \in [0, 2], \ \vert u - v \vert < \delta _0 \implies \left\vert F(u) - F(v) \right\vert < \varepsilon. 
+        \end{equation}
+        Now we can define \(\delta = \min \left\{ \delta _0, \frac{1}{2} \right\} \), then \autoref{eq: uniform continuity on [0, 2]} remains valid with \(\delta \) in place of \(\delta _0\):
+        \[
+            u, v \in [0, 2], \ \vert u - v \vert < \delta \implies \left\vert F(u) - F(v) \right\vert < \varepsilon. 
+        \]   
+        \item Step 2: Extend uniform continuity to all of \(\mathbb{R} \). Let \(\varepsilon > 0\) to be fixed and choose \(\delta\) as above. Take any \(x, y \in \mathbb{R} \). We must show that 
+        \[
+            \vert F(x) - F(y) \vert < \varepsilon. 
+        \]
+        \begin{claim}
+            There exists an integer \(n\) s.t. 
+            \[
+                x, y \in [n, n+2].
+            \]
+        \end{claim}
+        \begin{explanation}
+            WLOG, assume \(x \le y\), then choose \(n \in \mathbb{Z} \) s.t. \(n \le x < n + 1\). Since \(\vert x - y \vert = y - x < \frac{1}{2} \), 
+            \[
+                y < x + \frac{1}{2} < (n + 1) + \frac{1}{2} = n + \frac{3}{2} < n + 2.
+            \]
+            Thus, \(x, y \in [n, n+2]\).     
+        \end{explanation}
+        Define \(u \coloneqq x - n\) and \(v \coloneqq y - n\), then \(u, v \in [0, 2]\) and 
+        \[
+            \vert u - v \vert = \vert x - y \vert < \delta.   
+        \] 
+        Hence, we know \(\vert F(u) - F(v) \vert < \varepsilon \). Now by the \(1\)-periodicity of \(F\), we know 
+        \[
+            F(x) = F(u), \quad F(y) = F(v),
+        \]   
+        so 
+        \[
+            \vert F(x) - F(y) \vert = \vert F(u) - F(v) \vert < \varepsilon.  
+        \]
+    \end{itemize}  
+\end{proof}
+
+\begin{proposition} \label{prop: 1-periodic and integrable implies int on any length-1 intevral gives same value}
+    Let \(F : \mathbb{R} \to \mathbb{C} \) be a \(1\)-periodic integrable function, then for any \(a \in \mathbb{R} \) we have 
+    \[
+        \int _a^{a+1} F(x) \, \mathrm{d} x=\int _0^1 F(x) \, \mathrm{d} x \text{ for any }  a \in \mathbb{R} .
+    \]
+\end{proposition}
+\begin{proof}
+    Fix \(a \in \mathbb{R} \). Choose \(n \in \mathbb{Z} \) s.t. \(n \le a < n+1\) and set \(r \coloneqq a - n \in [0, 1)\). Then 
+    \[
+        \int _a^{a+1} F(x) \, \mathrm{d} x = \int _{n+r}^{n+1+r} F(x) \, \mathrm{d} x.  
+    \]
+    Make the change of variables \(x = t + n\), so \(\mathrm{d} x = \mathrm{d} t  \) and 
+    \[
+        \int _{n+r}^{n+1+r} F(x) \, \mathrm{d} x = \int _r^{r+1} F(t + n) \, \mathrm{d} t.  
+    \]     
+    Now since \(F(t + n) = F(t)\) for all \(t\), so 
+    \[
+        \int _r^{r+1} F(t + n) \, \mathrm{d} t = \int _r^{r+1} F(t) \, \mathrm{d} t.   
+    \]  
+    We now show that 
+    \[
+        \int _r^{r+1} F(t) \, \mathrm{d} t = \int _0^1 F(t) \, \mathrm{d} t \quad (0 \le r < 1).  
+    \]
+    Note that 
+    \[
+        \int _r^{r+1} F(t) \, \mathrm{d} t = \int _r^1 F(t) \, \mathrm{d} t + \int _1^{r+1} F(t) \, \mathrm{d} t,   
+    \]
+    and in the second term, substitute \(t = s + 1\), so 
+    \[
+        \int _1^{r+1} F(t) \, \mathrm{d} t = \int _0^r F(s + 1) \, \mathrm{d} s = \int _0^r F(s) \, \mathrm{d} s.   
+    \] 
+    Hence, 
+    \[
+        \int _r^{r+1} F(t) \, \mathrm{d} t = \int _r^1 F(t) \, \mathrm{d} t + \int _0^r F(t) \, \mathrm{d} t = \int _0^1 F(t) \, \mathrm{d} t.    
+    \]
+    Thus, we are done.
+\end{proof}
+
+We now list the key algebraic properties of periodic convolution. They resemble the properties of usual convolution, except that periodicity must be checked carefully.
+
+
+\begin{lemma} \label{lm: properties for periodic convolution}
     Let \(f, g, h \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\), then 
     \begin{itemize}
         \item (Closure) \(f * g \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\). 
@@ -123,39 +204,12 @@ We want to prove the following theorem:
         \]
     \end{itemize} 
 \end{lemma}
-\begin{proof}
-    We have the following properties: For \(F \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\), 
- \begin{itemize}
-    \item \(F\) is uniformly bounded and uniformly continuous. 
-    \item \(\int _a^{a+1} F(x) \, \mathrm{d} x=\int _0^1 F(x) \, \mathrm{d} x  \) for any \(a \in \mathbb{R} \).  
- \end{itemize}
-
- Given \(\varepsilon > 0\), \(\exists \delta > 0\) s.t. \(\vert x - y \vert < \delta  \) implies \(\vert F(x) - F(y) \vert < \varepsilon\). 
- \begin{itemize}
-    \item [(1)] \(F\) is uniformly continuous on \([0, 2]\). Given \(\varepsilon > 0\), \(\exists \delta _0 > 0\) s.t. 
-    \[
-        \vert F(u) - F(v) \vert < \varepsilon \text{ if } \vert u - v \vert < \delta _0 \text{ where } u, v \in [0, 2].    
-    \]
-    \item [(2)] Choose \(\delta = \min \left\{ \delta _0, \frac{1}{2} \right\} \), then we want to show 
-    \[
-        \vert F(x) - F(y) \vert < \varepsilon  \text{ for all } x,y \in \mathbb{R}.  
-    \]
-    Since there exists \(n \in \mathbb{Z} \) s.t. \(n \le x < n + 1\), and WLOG we may assume \(x \le y\), then 
-    \[
-        \vert x - y \vert = y - x < \delta \le \frac{1}{2} \iff y < x + \frac{1}{2} < n + 2, 
-    \]    
-    and thus \(n \le x, y \le n + 2\). Now \(0 \le x - n \le y - n \le 2\). Let \(u = x - n\) and \(v = y - n\), then \(0 \le u \le v \le 2\), and 
-    \[
-        \vert u - v \vert = \vert x - y \vert < \delta \implies \vert F(u) - F(v) \vert < \varepsilon \implies \vert F(u) - F(v) \vert = \vert F(x-n) - F(y-n) \vert = \vert F(x) - F(y) \vert < \varepsilon       
-    \]     
-    since \(F\) is \(1\)-periodic.   
- \end{itemize}  
-
+\begin{proof}[proof of (a)]
  Now consider
 \[
-    (f * g)(x) = \int _0^1 f(y) g(x - y) \, \mathrm{d} x, 
+    (f * g)(x) = \int _0^1 f(y) g(x - y) \, \mathrm{d} y, 
 \]  
-then since \(f\) is uniforly bounded and \(g\) is uniformly continuous, so given \(\varepsilon > 0\) there exists \(M > 0\) s.t. \(\vert f(y) \vert \le M \) and \(\delta > 0\) s.t. 
+then since \(f\) is bounded and \(g\) is uniformly continuous, so given \(\varepsilon > 0\) there exists \(M > 0\) s.t. \(\vert f(y) \vert \le M \) and \(\delta > 0\) s.t. 
 \[
     \vert s - t \vert < \delta \implies \vert g(s) - g(t) \vert < \frac{\varepsilon}{M}.  
 \]      
@@ -174,15 +228,17 @@ Thus,
 \[
     \left\vert (f * g)(x) - (f * g)(x_0) \right\vert \le \int _0^1 \vert f(y) \vert \vert g(x-y) - g(x_0 - y) \vert \, \mathrm{d} y \le \int _0^1 M \cdot \frac{\varepsilon}{M} \, \mathrm{d} y = \varepsilon.     
 \]
-Thus, \(f * g\) is continuous. 
+Thus, \(f * g\) is continuous. Also, since \(g(x + 1 - y) = g(x - y)\), so 
+\[
+    (f * g)(x + 1) = \int _0^1 f(y) g(x + 1 - y) \, \mathrm{d} y = \int _0^1 f(y) g(x - y) \, \mathrm{d} y = (f * g)(x).  
+\]
+\end{proof}
 
-
-
-
-Since 
+\begin{proof}[proof of (b)]
+    Since 
 \begin{align*}
-    (f * g)(x) &= \int _0^1 f(y) g(x - y) \, \mathrm{d} y = \int _x^{x-1} f(x - z) g(z) \, -(\mathrm{d} z) = \int _{x-1}^x f(x-z) g(z) \, \mathrm{d} z \\
-    &= \int _0^1 f(x-z) g(z) \, \mathrm{d} x = \int _0^1 g(z) f(x-z) \, \mathrm{d} z = (g * f)(x),     
+    (f * g)(x) &= \int _0^1 f(y) g(x - y) \, \mathrm{d} y = -\int _x^{x-1} f(x - z) g(z) \, (\mathrm{d} z) = \int _{x-1}^x f(x-z) g(z) \, \mathrm{d} z \\
+    &= \int _0^1 f(x-z) g(z) \, \mathrm{d} z = \int _0^1 g(z) f(x-z) \, \mathrm{d} z = (g * f)(x),     
 \end{align*}
 so we're done.
 \end{proof}
@@ -204,7 +260,7 @@ so we're done.
 \begin{proof}
     \begin{align*}
         (f * e_n)(x) &= \int _0^1 f(y) e_n(x-y) \, \mathrm{d} y = \int _0^1 f(y) e^{2\pi in (x-y)} \, \mathrm{d} y \\
-        &= \int _0^1 f(y) e^{2 \pi i n x} \cdot e^{2 \pi i n y} \, \mathrm{d} y = \left( \int _0^1 f(y) e^{-2 \pi i n y} \, \mathrm{d} y  \right) e^{2 \pi i n x} = \hat{f} (n) e_n(x).    
+        &= \int _0^1 f(y) e^{2 \pi i n x} \cdot e^{-2 \pi i n y} \, \mathrm{d} y = \left( \int _0^1 f(y) e^{-2 \pi i n y} \, \mathrm{d} y  \right) e^{2 \pi i n x} = \hat{f} (n) e_n(x).    
     \end{align*}
 \end{proof}
 
