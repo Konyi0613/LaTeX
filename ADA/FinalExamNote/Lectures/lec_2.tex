@@ -1,0 +1,75 @@
+\section{Edmonds and Karp's theorem}
+Now we introduce the first polynomial time algorithm for maximal flow problem.
+
+\begin{theorem}[Edmonds and Karp, JACM 1972]
+  If one makes sure that the augmenting \(s t\)-path \(P\) in \(R(f)\) is an \(s t\)-path in \(R(f)\) having a \textcolor{red}{minimum number of edges}, then the time complexity of Ford-Fulkerson's algorithm is \(O\left( m^2n \right) \).     
+\end{theorem}
+
+\begin{remark}
+  If we ensure we use the \(s t\)-path of least number of edges in each round, then we can make sure the algorithm terminates within \(mn\) rounds.   
+\end{remark}
+
+\begin{remark}
+  We do not assume \(G\) has integer capacities under this circumstance. 
+\end{remark}
+
+From now on, we assume we pick the shortest \(s t\)-path in each round. We need two observations to prove the theorem: 現邊 and 遞增觀察. 
+\begin{lemma}[現邊觀察]
+    If in some round the residual graph \(R(f + g)\) has some edge \(uv\) where \(uv\) does not exist in \(R(f)\), then 
+    \[
+        d_{R(f)}^{\star} (s, u) = d_{R(f)}^{\star} (s, v) + 1,
+    \]    
+    where \(d_{R(f)}^{\star} (s, w)\) for a vertex \(w\) is the distance of \(s\) to \(w\) in the \textcolor{red}{unweighted version} of \(R(f)\).     
+\end{lemma}
+\begin{proof}
+    If \(R(f)\) has no \(uv\) this edge, but \(R(f + g)\) has \(uv\) this edge, then the only possibility is the unweighted shortest \(s t\)-path \(P\) of \(R(f)\) go through \(vu\) this edge. The reason is as follows: 
+    
+    Since \(uv\) is not in \(R(f)\), so \(P\) does not go through \(uv\). If \(P\) does not go through \(vu\), then \(g(uv) = g(vu) = 0\) no matter it is an forward residual arc or an reverse residual arc, and thus 
+    \begin{align*}
+        (f + g)(uv) &= f(uv) + g_f(uv) - g_r(vu) = f(uv) \\
+        (f + g)(vu) &= f(vu) + g_f(vu) - g_r(uv) = f(vu).
+    \end{align*}     
+    Since \(R(f)\) does not have \(uv\), and \(f + g\) and \(f\) share same flow value between \(u\) and \(v\), so it is impossible that \(R(f + g)\) contains \(uv\), which is a contradiction. Now that \(vu\) is in \(P\), which is an unweighted shortest \(s t\)-path of \(R(f)\), so the path is like 
+    \[
+        s \to \dots \to v \to u \to \dots \to t,
+    \]            
+    and thus 
+    \[
+        d_{R(f)}^{\star} (s, u) = d_{R(f)}^{\star} (s, v) + 1.
+    \]
+\end{proof}
+
+\begin{lemma}[遞增觀察]
+    Let the augmenting path \(P\) be an \(s t\)-path whose number of edges is minimized in the residual graph \(R(f)\). Let \(g\) be the saturating flow for \(R(f)\) corresponding to \(P\). For each vertex \(v\) of \(G\), we have 
+    \[
+        d_{R(f)}^{\star} (s, v) \le d_{R(f + g)}^{\star} (s, v).
+    \]        
+\end{lemma}
+\begin{proof}
+    Assume for contradiction that there is a vertex \(v\) of \(G\) with 
+    \begin{equation} \label{eq: v violates the observation}
+        d_{R(f)}^{\star}(s, v) > d_{R(f + g)}^{\star} (s, v).
+    \end{equation}  
+    Thus, \(d_{R(f+g)}^{\star} (s, v) \neq \infty \). Let \(v\) be such a vertex closest to \(s\) in the unweighted version of \(R(f + g)\). We know \(v \neq s\) since 
+    \[
+        d_{R(f)}^{\star} (s, s) = 0 = d_{R(f, g)}^{\star} (s, s).
+    \]     
+    Let \(Q\) be an unweighted shortest \(sv\)-path of \(R(f + g)\). Let \(uv\) be the last edge of \(Q\). (Note that \(u\) could be \(s\).) We have 
+    \begin{equation} \label{eq: u is the last vertex in Q}
+        d_{R(f)}^{\star} (s, u) \le d_{R(f + g)}^{\star} (s, u)
+    \end{equation}
+    since we suppose \(v\) is the vertex closest to \(s\) in \(R(f + g)\)  which violates the assumption in the lemma and \(d_{R(f+g)}^{\star} (u) + 1 = d_{R(f+g)}^{\star} (v)\). 
+    \begin{itemize}
+        \item Case 1: \(\textcolor{blue}{uv \subseteq R(f)}\), then we know 
+        \[
+            d_{R(f)}^{\star} (s, v) \textcolor{blue}{\le} d_{R(f)}^{\star} (s, u) + 1 \le d_{R(f+g)}^{\star} (s, u) + 1 = d_{R(f+g)}^{\star} (s, v),
+        \]
+        which contradicts to \autoref{eq: v violates the observation}. 
+        \item Case 2: \(uv \not\subseteq R(f)\), then since \(uv \subseteq R(f+g)\), so by 現邊觀察 we have 
+        \[
+            d_{R(f)}^{\star} (s, v) = d_{R(f)}^{\star} (s, u) - 1 \le d_{R(f+g)}^{\star} (s, u) - 1 = d_{R(f+g)}^{\star} (s, v) - 2,
+        \]
+        which contradicts to \autoref{eq: u is the last vertex in Q}. 
+    \end{itemize} 
+    Hence, it is impossible that such \(v\) exists.        
+\end{proof}

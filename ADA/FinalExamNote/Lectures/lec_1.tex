@@ -156,13 +156,13 @@ Now we analyze the time complexity of Johnson's algorithm for general edge weigh
 
 \section{Ford-Fulkerson's algorithm}
 \begin{intuition}
-  Reduce the mainum \((s, t)\)-flow problem to the reachability problems for a sequence of graph \(R\).  
+  Reduce the maximum \((s, t)\)-flow problem to the reachability problems for a sequence of graph \(R\).  
 \end{intuition}
 
 \begin{definition}[Residual graph]
   The residual graph \(R(f)\) with respect to a flow \(f\) of \(G\) with \(V(R(f)) = V(G)\) is defined as follows for each edge \(uv\) of \(G\): 
   \begin{itemize}
-    \item If \(f(uv) < c(fg)\), then let \(R(f)\) have an edge \(\textcolor{red}{uv}\) with capacity \(c(uv) - f(uv)\). 
+    \item If \(f(uv) < c_f(g)\), then let \(R(f)\) have an edge \(\textcolor{red}{uv}\) with capacity \(c(uv) - f(uv)\). 
     \item If \(f(uv) > 0\), then let \(R(f)\) have an edge \(\textcolor{blue}{vu}\) with capacity \(f(uv)\).        
   \end{itemize}      
 \end{definition}
@@ -184,4 +184,220 @@ Now we analyze the time complexity of Johnson's algorithm for general edge weigh
       (f + g)(uv) = f(uv) + g(uv) - g(vu)
     \] for each edge \(uv\) of \(G\).  
   \end{itemize}   
+  \begin{remark}
+    In (2), the \(g(uv)\) and \(g(vu)\) corresponds to the edges on \(R(f)\) and formed by \(uv\) in \(G\) and we give the flow value to this \(uv, vu\) pairs. For \(vu\) in \(G\), it may also form a \(uv, vu\) pairs in \(R(f)\), and these two cases should be handled seperately.         
+  \end{remark}
 \end{theorem}
+\begin{proof}[proof of (1)]
+  If \(d_{R(f)} (s, t) = \infty \), and there exists \(f^{\prime} \) s.t. \(\left\vert f^{\prime}  \right\vert > \vert f \vert  \), i.e. \(f\) is not a maximum \((s, t)\)-flow. Then, we define 
+  \[
+    h(uv) \coloneqq f^{\prime} (uv) - f(uv) \text{ for all } uv \in E(G). 
+  \]     
+  Note that for all \(v \neq s, t\) we have 
+  \begin{align*}
+    \sum_{x} h(xv) &= \sum_{x} f^{\prime} (xv) - f(xv) = \sum_{x} f^{\prime} (xv) - \sum_{x} f(xv) = \sum_{x} f^{\prime} (vx) - \sum_{x} f(vx) \\
+    &= \sum_{x} f^{\prime} (vx) - f(vx) = \sum_{x} h(vx).        
+  \end{align*} 
+  Also, we have 
+  \begin{align*}
+    \vert h \vert &= \sum_{x} h(sx) - h(xs) = \sum_{x} f^{\prime} (sx) - f(sx) - (f^{\prime} (xs) - f(xs))
+    \\ &= \sum_{x} f^{\prime} (sx) - f^{\prime} (xs) - \sum_{x} f(sx) - f(xs)= \left\vert f^{\prime}  \right\vert - \vert f \vert > 0.     
+  \end{align*}
+  Now we convert \(h\) to a \((s, t)\)-flow on \(R(f)\). Note that 
+  \begin{itemize}
+    \item If \(h(uv) \ge 0\), then 
+    \[
+      0 \le h(uv) = f^{\prime} (uv) - f(uv) \le c_f(uv) - f(uv),
+    \]
+    so \(h(uv)\) fits within the foward residual capacity of \(uv\) if \(h(uv) \ge 0\). 
+    \item If \(h(uv) < 0\), then 
+    \[
+      0 < -h(uv) = f(uv) - f^{\prime} (uv) \le f(uv),
+    \]
+    so \(-h(uv)\) fits within the reverse residual capacity on arc \(vu\) if \(h(uv) < 0\).  
+  \end{itemize}  
+  Now we construct a new graph \(R(f)^{\prime} \) by 
+  \begin{itemize}
+    \item [(1)] If \(f(uv) < c_f(g)\), then let \(R^{\prime} (f)\) have an edge \(\textcolor{red}{uv}\) with capacity \(c_f(uv) - f(uv)\). If \(f(uv) = c_f(g)\), then have an edge \(\textcolor{red}{uv}\) with capacity \(0\).   
+    \item [(2)] If \(f(uv) > 0\), then let \(R^{\prime} (f)\) have an edge \(\textcolor{blue}{vu}\) with capacity \(f(uv)\). If \(f(uv) = 0\), then have an edge \(\textcolor{blue}{vu}\) with capacity \(0\).        
+  \end{itemize}        
+  Hence, for every vertices \(u, v \in V(R^{\prime} (f))\), there is a forward residual arc \(uv\), which is formed by \(uv\) in (1), and a reverse residual arc \(uv\) formed by \(vu\) in (2). We can define \(g\) on \(R^{\prime} (f)\) by 
+  \[
+    \begin{dcases}
+      g(uv) = g_f(uv) = \max \left\{ h(uv), 0 \right\} \text{ on the forward residual arcs } uv. \\
+      g(vu) = g_r(vu) = \max \left\{ -h(uv), 0 \right\} \text{ on the reverse residual arcs } vu.    
+    \end{dcases}
+  \]  
+  Then, we claim that \(g\) is a flow of \(R^{\prime} (f)\) with flow value \(> 0\). Note that \(R^{\prime} (f)\) is in fact an expansion of \(R(f)\), but add some edges with capacity \(0\), and anything else is not changed. 
+  \begin{itemize}
+    \item Capacity constraint: If the forward residual arc \(uv\) exists in \(R(f)\), then we know 
+    \[c_{R^{\prime} (f)}(uv) = c_f(uv) - f(uv) > 0.\]  
+    If \(g_f(uv) = 0\), then \(g_f(uv) < c_{R^{\prime} (f)}(uv)\), and if \(g_f(uv) = h(uv)\), then \(h(uv) > 0\) and thus  
+    \[
+      g_f(uv) = h(uv) \le c_f(uv) - f(uv) = c_{R^{\prime}(f) }(uv)
+    \] by the arguments of \(h\) above. 
+    Hence, if the forward residual arc \(uv\) exists in \(R(f)\), then \(g_f(uv) \le c_{R^{\prime} (f)} (uv)\). Now if the forward residual arc \(uv\) does not exist in \(R(f)\), then \(c_{R^{\prime} (f)}(uv) = 0\) and \(c_f(uv) = f(uv)\), so we have 
+    \[
+      h(uv) = f^{\prime} (uv) - f(uv) \le c(uv) - f(uv) = f(uv) - f(uv) = 0,
+    \]        
+    so we must have 
+    \[
+      g_f(uv) = \max \left\{ h(uv), 0 \right\} = 0, 
+    \]
+    and thus in this case \(g_f(uv) \le c_{R^{\prime} (f)}(uv)\).
+    
+    Now we discuss the reverse residual arc. If the reverse residual arc \(vu\) exists in \(R(f)\), then 
+    \[
+      c_{R^{\prime} (f)}(vu) = f(uv) > 0.
+    \]  
+    Now if \(g_r(vu) = 0\), then \(g_r(vu) \le c_{R^{\prime} (f)}(vu)\). If \(g_r(vu) = -h(uv)\), then \(h(uv) < 0\), and thus 
+    \[
+      g_r(vu) = -h(uv) \le f(uv) = c_{R^{\prime} (f)}(vu)
+    \]    
+    by the above arguments about \(h\). Now if the reverse residual arc \(vu\) does not exist in \(R(f)\), then \(f(uv) = 0\) and \(c_{R^{\prime} (f)} (vu) = 0\). Hence, 
+    \[
+      h(uv) = f^{\prime} (uv) - f(uv) = f^{\prime} (uv) \ge 0,
+    \]      
+    so 
+    \[
+      g_r(vu) = \max \left\{ -h(uv), 0 \right\} = 0,
+    \]
+    and thus \(g_r(vu) \le c_{R^{\prime} (f)}(vu)\). Hence, we have shown that the capacity constraint is always correct. 
+    \item Conservation law: For \(u \neq s, t\), we know 
+    \begin{align*}
+      &\sum_{x} g_f(ux) + g_r(ux) - \sum_{x} g_f(xu) + g_r(xu) 
+      \\ &= \sum_{x} \max \left\{ h(ux), 0 \right\} + \max \left\{ -h(xu), 0 \right\} - \max \left\{ h(xu), 0 \right\} - \max \left\{ -h(ux), 0 \right\}     
+    \end{align*}
+    and we can observe that 
+    \[
+      \max \left\{ h(ux), 0 \right\} + \max \left\{ -h(xu), 0 \right\} - \max \left\{ h(xu), 0 \right\} - \max \left\{ -h(ux), 0 \right\} = h(ux) - h(xu)
+    \]
+    no matter what the sign of \(h(ux)\) and \(h(xu)\) is. Hence, 
+    \[
+      \sum_{x} g_f(ux) + g_r(ux) - \sum_{x} g_f(xu) + g_r(xu) = \sum_{x} h(ux) - h(xu) = 0. 
+    \] 
+    Also, 
+    \begin{align*}
+      \vert g \vert &= \sum_{x} g_f(sx) + g_r(sx) - g_f(xs) - g_r(xs) \\
+      &= \sum_{x} \max \left\{ h(sx), 0 \right\} + \max \left\{ -h(xs), 0 \right\} - \max \left\{ h(xs), 0 \right\} - \max \left\{ -h(sx), 0 \right\} \\
+      &= \sum_{x} h(sx) - h(xs) = \vert h \vert > 0         
+    \end{align*}
+    by similar arguments.
+  \end{itemize}
+  Hence, we know \(g\) is a flow with flow value \( > 0\) on \(R^{\prime} (f)\). Also, notice that if the forward residual edge \(uv\) does not exist in \(R(f)\), then \(g_r(uv) = 0\), while the reverse residual edge \(vu\) does not exist in \(R(f)\) implies \(g_r(vu) = 0\). Hence, if we define 
+  \[
+    g^{\prime} (uv) \coloneqq \begin{dcases}
+      g_f(uv), &\text{ if } uv \text{ exists in } R(f) \text{ as a forward residual arc};\\
+      g_r(uv), &\text{ if } uv \text{ exists in } R(f) \text{ as a reverse residual arc}.
+    \end{dcases}
+  \]
+  Then, \(g^{\prime} \) is a flow in \(R(f)\) and \(\left\vert g^{\prime}  \right\vert = \vert g \vert > 0 \). 
+  
+  Now we claim that if a positive flow exists in \(R(f)\), then \(s\) and \(t\) are reachable. Actually, for any multi-directed graph \(G^{\prime} \), if \(p\) is a \((s, t)\)-flow of \(G^{\prime} \) and \(\vert p \vert > 0 \), then \(s\) and \(t\) are reachable. We prove the general case. For all \(e_1, e_2, \dots , e_k\) are parallel edges between \(u\) and \(v\), then we define 
+  \[
+    p^{\prime} (uv) = p(e_1) + p(e_2) + \dots + p(e_k).
+  \]              
+  Hence, we have 
+  \[
+    \sum_{x} p^{\prime} (ux) = \sum_{x} p^{\prime} (xu) \text{ for all } u \neq s, t \text{ and } \vert p \vert = \sum_{x} p^{\prime} (sx) - \sum_{x} p^{\prime} (xs).    
+  \]
+  Now if \(s\) and \(t\) are not reachable, then consider 
+  \[
+    S = \left\{ v \in V(G^{\prime} ) \mid \text{there is a directed } sv \text{ path made only of arcs } e \text{ with } p(e)>0    \right\}. 
+  \]
+  Hence, \(t \neq S\) and \(s \in S\). First, note that no positive edge leave \(S\), otherwise the endpoint of this point should be in \(S\), which is a contradiction. Now since 
+  \[
+    \sum_{x \in S}  \left( \sum_{y} p^{\prime} (xy) - \sum_{y} p^{\prime} (yx)   \right) = \vert p \vert + \sum_{x \in S \setminus \left\{ s \right\} } 0 = \vert p \vert > 0    
+  \]      
+  and we know 
+  \[
+     \sum_{x \in S}  \left( \sum_{y} p^{\prime} (xy) - \sum_{y} p^{\prime} (yx)   \right) = \sum_{\substack{u \in S \\ v \notin S}} p^{\prime} (uv) - \sum_{\substack{u \notin S \\ v \in S}} p^{\prime} (uv)  
+  \]
+  since 
+  \[
+    \sum_{\substack{x \in S \\ y \in S}} p^{\prime} (xy) - \sum_{\substack{x \in S \\ y \in S}} p^{\prime} (yx) = 0 \text{ (these are two same things)} 
+  \]
+  However, we know there is no positive edge leaves \(S\), so 
+  \[
+    \sum_{\substack{u \in S \mathbb{V}  \notin S}} p^{\prime} (uv) = 0,
+  \] 
+  and thus
+  \[
+    0 < \vert p \vert = \sum_{x \in S}  \left( \sum_{y} p^{\prime} (xy) - \sum_{y} p^{\prime} (yx)   \right) = \sum_{\substack{u \in S \\ v \notin S}} p^{\prime} (uv) - \sum_{\substack{u \notin S \\ v \in S}} p^{\prime} (uv) = - \sum_{\substack{u \notin S \\ v \in S}} p^{\prime} (uv) \le 0,
+  \]
+  which is a contradiction. Hence, \(s\) and \(t\) are reachable.
+  
+  Now from this claim, we know \(d_{R(f)}(s, t) < \infty \), which is a contradiction, so \(f\) is a maximum flow. 
+\end{proof}
+
+\begin{proof}[proof of (2)]
+  \vphantom{text}
+  \begin{itemize}
+    \item Capacity constraint: We want to show \((f + g)(uv) \le c_f(uv)\). Note that 
+    \begin{align*}
+      (f + g)(uv) &= f(uv) + g(uv) - g(vu) \le f(uv) + (c_f(uv) - f(uv)) - g(vu) 
+      \\ &= c_f(uv) - g(vu) \le c_f(uv).
+    \end{align*}
+    Hence, this is true. 
+    \item Conservation law: For \(v \neq s, t\), we have 
+    \begin{align*}
+      \sum_{x} (f + g)(vx) - \sum_{x} (f+g)(xv) &= \sum_{x} f(vx) + g_f(vx) - g_r(xv) - \left( f(xv) + g_f(xv) - g_r(vx) \right) \\
+      &= \sum_{x} g_f(vx) + g_r(vx) - g_r(xv) - g_f(xv) = 0      
+    \end{align*}
+    since
+    \[
+      \sum_{x} f(vx) - f(xv) = 0 
+    \]
+    and \(g\) is a flow on \(R(f)\).  
+  \end{itemize}
+\end{proof}
+
+\begin{algorithm}
+  \DontPrintSemicolon{}
+  \caption{Ford-Fulkerson's algorithm}
+  \SetKwInput{KwSetup}{Setup}
+  \KwSetup{Let \(f(uv) = 0\) for each edge \(uv\) of \(G\). Repeat the following steps until \(R(f)\) does not contain an \(s t\)-path.}
+  Obtain an \(s t\)-path \(P\) of \(R(f)\). Let \(q\) be the minimum capacity of the edges of \(P\) in \(R(f)\). \\
+  Obtain an \(s t\)-flow \(g\) of \(R(f)\) by letting \(g(uv) = q\) for each edge \(uv\) of \(P\) and \(g(uv) = 0\) for all other edges \(uv\) of \(G\). \\
+  Let \(f = f + g\).                 
+\end{algorithm}
+
+Initially, \(f\) is a legal \(s t\)-flow. In each round, \(g\) is a legal \(s t\)-flow of \(R(f)\) (Easy to check). Then, by previous lemma, we know \(f + g\) is also a legal flow of \(G\), so the algorithm seems correct. However, will the algorithm terminate?
+
+We claim that when all edge capacities are integers, then Ford-Fulkerson's algorithm terminates. Note that \(q \ge 1\) since \(R(f)\) has all edges' capacities \(>0\) and all edges' capacities are integers. Also, 
+\begin{align*}
+  \vert f + g \vert &= \sum_{x} (f + g)(sx) - (f + g)(xs) \\
+  &= \sum_{x} f(sx) + g_f(sx) - g_r(xs) - (f(xs) + g_f(xs) - g_r(sx)) \\
+  &= \left( \sum_{x} f(sx) - f(xs)  \right) + \sum_{x} g_f(sx) + g_r(sx) - g_f(xs) - g_r(xs) \\
+  &= \vert f \vert + \vert g \vert = \vert f \vert + q \ge \vert f \vert + 1,         
+\end{align*}   
+so \(\vert f + g  \vert \) is strictly increasing in each round. Hence, if \(G\) is a finite graph, then Ford-Fulkerson's algorithm must terminate.
+
+Now we analyze the time complexity. In each round, searching an \(s t\)-path takes \(O(\vert E \vert )\) times, where \(E\) is the set of edges of \(G\). Then, suppose the sum of capacity of all edges are \(C\), then we need \(O(C)\) round since after each round \(\vert f \vert \) increases at least \(1\) and \(\vert f \vert \le C \) for all flow \(f\) of \(G\). Hence, it takes \(O(\vert E \vert C)\) times. 
+
+\begin{question}
+  Is this algorithm polynomial time or exponential time?
+\end{question}
+
+\begin{definition}
+  An algorithm is polynomial time only if its running time is bounded by a polynomial in the size of the input encoding, i.e. 
+  \[
+    T(\text{algorithm}) = (\text{size of the input encoding}) ^{O(1)}.
+  \]
+  Also, we can similarly define exponential time, and linear time, e.t.c.
+\end{definition}
+
+If \(C = O(1)\), then the size of input encoding is \(O(\vert E \vert  \cdot 1) = O(1)\), and thus the time complexity \(O(\vert E \vert C) = O(\vert E \vert )\) is linear time.    
+
+If \(C\) has no restriction, then the space complexity for storing all edges' capacities is \(O(\vert E \vert  \log C)\) (we need \(O(\log C)\) bits to store the capacity of an edge). Hence, 
+\[
+  O(\vert E \vert C) \neq O(\vert E \vert  \log C)^{O(1)}, 
+\] 
+so Ford-Fulkerson's algorithm is not polynomial time.
+
+\begin{question}
+  What about when the capacity is not integers?
+\end{question}
+\begin{answer}
+  Then Ford-Fulkerson's algorithm may not stop, and although the flow value converges, but the limit value is not the maximum flow value.
+\end{answer}
