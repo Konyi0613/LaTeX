@@ -1,7 +1,7 @@
-\section{Edmonds and Karp's theorem}
+\section{Edmonds and Karp's algorithm}
 Now we introduce the first polynomial time algorithm for maximal flow problem.
 
-\begin{theorem}[Edmonds and Karp, JACM 1972]
+\begin{theorem}[Edmonds and Karp, JACM 1972] \label{thm: Edmonds and Karp}
   If one makes sure that the augmenting \(s t\)-path \(P\) in \(R(f)\) is an \(s t\)-path in \(R(f)\) having a \textcolor{red}{minimum number of edges}, then the time complexity of Ford-Fulkerson's algorithm is \(O\left( m^2n \right) \).     
 \end{theorem}
 
@@ -72,4 +72,30 @@ From now on, we assume we pick the shortest \(s t\)-path in each round. We need 
         which contradicts to \autoref{eq: u is the last vertex in Q}. 
     \end{itemize} 
     Hence, it is impossible that such \(v\) exists.        
+\end{proof}
+
+Now we prove \autoref{thm: Edmonds and Karp}. 
+
+\begin{proof}[proof of \autoref{thm: Edmonds and Karp}]
+    Since each round takes \(O(m)\) time (BFS), we prove the theorem by showing that Edmond-Karp's algorithm halts in \(O(mn)\) rounds. 
+    \begin{claim}
+        Each round saturates at least one edge of the \(O(m)\) edges of \(G \cup G^r\), causing them to disappear in the residual graph of the next round.  
+    \end{claim}
+    \begin{explanation}
+        Suppose in \(R(f)\), the saturating flow is \(g\) and the corresponding path of minimal number of edges is \(P\), then if \(uv \in P\) and \(c_{R(f)}(uv) = \min_{e \in P} c_{R(f)}(e)\), we claim that \(uv \notin R(f + g)\). Suppose \(c_{R(f)}(uv) = q\), then we have two cases:
+        \begin{itemize}
+            \item Case 1: \(uv\) is a forward residual arc. Then \(q = c_G(uv) - f(uv)\), and thus 
+            \[
+                (f + g)(uv) = f(uv) + g_f(uv) - g_r(vu) = f(uv) + q - 0 = f(uv) + c_G(uv) - f(uv) = c_G(uv).
+            \]
+            Hence, the forward residual arc \(uv\) will not appear in \(R(f+g)\).  
+            \item Case 2: \(uv\) is a reverse residual arc. Then, \(q = f(vu)\). Hence, 
+            \[
+                (f + g)(vu) = f(vu) + g_f(vu) - g_r(uv) = f(vu) + 0 - q = f(vu) - f(vu) = 0,
+            \]
+            so the reverse residual arc \(uv\) will not appear in \(R(f + g)\).  
+        \end{itemize}  
+        Thus, in each round at least one edge of \(P\) will disappear in next round.      
+    \end{explanation} 
+    Hence, it sufficies to show that each edge \(uv\) of \(G \cup G^r\) disappears \(O(n)\) times in residual graphs through out the algorithm.   
 \end{proof}
