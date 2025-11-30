@@ -97,5 +97,190 @@ Now we prove \autoref{thm: Edmonds and Karp}.
         \end{itemize}  
         Thus, in each round at least one edge of \(P\) will disappear in next round.      
     \end{explanation} 
-    Hence, it sufficies to show that each edge \(uv\) of \(G \cup G^r\) disappears \(O(n)\) times in residual graphs through out the algorithm.   
+    Hence, it sufficies to show that each edge \(uv\) of \(G \cup G^r\) disappears \(O(n)\) times in residual graphs through out the algorithm. Suppose that an edge \(uv\) of \(G \cup G^r\) is not in \(R(f)\) and 
+    \begin{itemize}
+        \item appears in \(R(f + g)\) then 
+        \item disappears in \(R(f + g + \dots + g^{\prime} + h)\) for the first time after \(R(f + g)\),   
+    \end{itemize}     
+    where \(g^{\prime} \) could be \(g\). The saturating flow \(h\) of \(R(f + g + \dots + g^{\prime} )\) corresponding to the augmenting unweighted shortest \(s t\)-path \(P\) saturates \(uv\). Thus, \(uv \in E(P)\). We have 
+    \begin{align*}
+        d_{R(f)}^{\star} (s, u) &= d_{R(f)}^{\star} (s, v) + 1 \quad \text{ by 現邊觀察} \\
+        &\le d_{R(f+g+\dots +g^{\prime} )}^{\star} (s, v) + 1 \quad \text{ by 遞增觀察} \\
+        &= d_{R(f+g+\dots +g^{\prime} )}(s, u) + 2 \quad \text{ by } uv \in E(P).   
+    \end{align*}        
+    By \(d_{H}^{\star} (s, u) \in \left\{ 0, 1, \dots , n-1, \infty \right\}  \) for any residual graph \(H\), \(uv\) can appear and disappear \(O(n)\) times in residual graphs throughout the algorithm. Thus, the algorithm halts in \(O(mn)\) rounds, and thus runs in \(O \left( m^2 n \right) \) time.     
 \end{proof}
+
+\section{An Application: Bipartite Matching}
+\begin{definition}
+    A graph \(G\) is bipartite if there are disjoint vertex subsets \(U\) and \(V\) of \(G\) with \(U \cup V = V(G)\) s.t. each edge of \(G\) is between a vertex in \(U\) and a vertex in \(V\).        
+\end{definition}
+
+\begin{definition}
+    An edge subset \(M\) of \(G\) is a matching of \(G\) if \(M = \varnothing \) or the minimal subgraph \(H\) of \(G\) with edge \(E(H) = M\) has the maximum degree \(1\).        
+\end{definition}
+
+\begin{problem}[Maximum matching of bipartite graph]
+    \vphantom{text} \\
+    Input: An undirected bipartite graph \(G\). \\
+    Output: A matching \(M \subseteq E(G)\) with maximum \(\vert M \vert \).   
+\end{problem}
+
+Actually, we can convert this problem to the maximum flow problem. Let \(G(s, t)\) be the unit-capacity graph obtained from \(G\) by adding 
+\begin{itemize}
+    \item new vertices \(s\) and \(t\). 
+    \item new edges \(su\) for all \(u \in U\) and 
+    \item new edges \(vt\) for all \(v \in V\).      
+\end{itemize}  
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{./Figures/Screenshot from 2025-11-28 23-41-16.png}
+    \caption{Converted graph}
+    \label{fig:converted graph in bipartite matching}
+\end{figure}
+Then, we have:
+\begin{theorem}
+    \(G\) has a maximum matching with \(k\) edges if and only if \(G(s, t)\) has a maximum flow with value \(k\).    
+\end{theorem}
+\begin{proof}
+    We first prove a lemma: 
+    \begin{lemma}
+        If \(G\) is a graph with capacity all integer, then \(G\) has an integral maximum flow.   
+    \end{lemma}
+    \begin{proof}
+        Note that in this case the maixmum flow made by Ford-Fulkerson's (or Edmonds-Karp's) algorithm is an integral flow.
+    \end{proof}
+    If \(G\) has a maximum matching with \(k\) edges, then we can gives these \(k\) edges flow value \(1\) and other edges from \(U\) to \(V\) \(0\), then in this case the flow value is \(k\). Now if this flow is not a maximal flow, then there exists a flow of flow value at least \(k + 1\), and by lemma, there exists an integral flow with flow value at least \(k + 1\), but this means there exists at least \(k + 1\) edges from \(U\) to \(V\) is of flow value \(1\), which means there exists \(u \in U\) or \(v \in V\) with \(2\) edges incident to them of flow value \(1\), but this is impossible since each vertex in \(U\) has \(1\) in-degree and each vertex in \(V\) has \(1\) out-degree. Hence, maximum flow value is \(k\). 
+    
+    Now if \(G(s, t)\) has a maximum flow with flow value \(k\), then by lemma \(G(s, t)\)  exists an integral flow with value \(k\). Hence, in this integral flow, \(s\) has \(k\) out-degree with flow value \(1\), i.e. there exists \(k\) vertices of \(U\) has an out-degree of value \(1\), and note that any vertex of \(V\) won't have \(2\) in-degree edges with flow value \(1\), so by collecting the edges from \(U\) to \(V\) whose flow value is \(1\), this collection is a matching, and if this matching is not maximum, then there exists a maximum mathcing with \(k\) edges, and thus \(G(s, t)\) has a maximum flow with value \(k + 1\), but we know the maximum flow value is \(k\), so it is maximum matching.
+\end{proof}
+
+\chapter{Nearest Points}
+\begin{problem}
+    \vphantom{text} \\
+    Input: \(n\) points in the plane. \\
+    Output: Two points whose distance is minimized. 
+\end{problem}
+
+\begin{remark}
+    Without lose of generality, we suppose \(n = 2^k\). 
+\end{remark}
+
+The Naive algorithm takes \(O\left( n^2 \right) \) times, which solve 老大問題 on the \(O\left( n^2 \right) \) point pairs' distances.  
+
+\begin{algorithm}[H]
+    \caption{A smart \(O(n\log n)\) algorithm}
+    \KwData{\(n\) points \(p[1], p[2], \dots , p[n]\)}
+    Sort \(\left\{ p[i] \right\}_{i=1}^n \) by their \(y\)-coordinates in descending order. \\
+    Use minimum selection to find the middle \(x\)-coordinate of \(\left\{ p[i] \right\}_{i=1}^{n} \), say \(m\). \\
+    Collect the \(p[i]\)'s with \(p[i].x \le m\) to be \(L\) and the part \(p[i].y > m\) to be \(R\). \\
+    Divide and conquer on \(L, R\) to find the minimum distance among \(L\) and \(R\), say they are \(d_l\) and \(d_r\), respectively. \\
+    Suppose \(d = \min \left\{ d_l, d_r \right\} \), then collect \(\left\{ m[i] \right\}_{i=1}^{n_m} \) where \(m - d \le p[m[i]].x \le m + d\) by searching through \(\left\{ p[i] \right\}_{i=1}^n \), so we have \(p[m[i]].y \ge p[m[i+1]].y\) for all \(i\). \\
+    For each \(m[i]\), find \[d[i] = \min _{\substack{\max \{i-8, 1\}\le j \le \min \{i+8, n_m\} \\ j \neq i}} d(p[m[j]], p[m[i]]).\] \\
+    Return 
+    \[
+        \min \left\{ \min _{1 \le i \le n_m} d[i], d_l, d_r \right\}. 
+    \]       
+\end{algorithm}
+
+We first explain the correctness. In step 4, if we find out \(d_l\) and \(d_r\), then the minimum distance may be \(d_l, d_r\), or \(\min _{l \in L, r \in R} d(l, r)\). Hence, we need to compute \(\min _{l \in L, r \in R} d(l, r)\). Note that for each \(p[i] \in L\), suppose \(p[i] = (x[i], y[i])\), then we just need to check the distance between \(p[i]\) and all points in \([m, m + d] \times [y[i] - d, y[i] + d]\). This area is a \(d \times 2d\) box in \(R\). Note that if we partition this box into \(2\) \(d \times d\) subboxes, then in each subbox, there must be at most \(4\) points, otherwise if there are \(5\) points in a subbox, then by pigeonhole principle there must be two points have distance less than \(d\), which is impossible. In the implementation, we just need to find the \(8\) points above and below \(p[m[i]]\) for each \(i\), then we can make sure we have checked all the candidates for being the minimum distance pairs, where this pair is crossing between \(L\) and \(R\). (See \autoref{fig:nearestpoint})
+
+Now since minimum selction takes \(O(n)\) time, and in each round the worst case is that all points are between \(x = m - d\) and \(x = m + d\), in this case, since each point takes \(O(1)\) time to check, so we need \(O(n)\) time in each round, and since the divide and conquer's time is 
+\[
+    T(n) = 2 T\left( \frac{n}{2} \right) + O(n), 
+\]    
+so \(T(n) = O(n \log n)\) by master's theorem. Also, the sorting in the beginning takes \(O(n \log n)\) time, so the final time complexity is \(O(n \log n)\).  
+
+\begin{figure}[H]
+    \centering
+    \incfig{nearestpoint}
+    \caption{The nearest point box}
+    \label{fig:nearestpoint}
+\end{figure}  
+
+\chapter{Convex Hull}
+\begin{problem}
+    \vphantom{text} \\
+    Input: \(n\) points in the plane. \\
+    Output: A minimum convex polygon that contains all the points.  
+\end{problem}
+
+\begin{algorithm}[H]
+    \caption{Naive Algorithm}
+    Let \(l\) be the point with minimal \(x\)-coordinate, which must be on the convex hull. \\
+    Link every points with \(l\), then the point \(x\) with the maximal slope \(m_{xl}\) must be on the convex hull. \\
+    Rotate the plane so that \(x\) becomes new \(l\), and repeat this step until we rotate back to the first \(l\).  
+\end{algorithm}
+
+Note that this algorithm takes \(O\left( n^2 \right) \) time since each round takes \(O(n)\) time, and we need \(O(n)\) rounds.
+
+\section{An \(O(n \log n)\) algorithm for convex hull}
+\begin{algorithm}[H]
+    \caption{The \(O(n\log n)\) algorithm for convex hull}
+    First find \(l\), which is the point with minimal \(x\)-coordinate. \\
+    Sort other \(n-1\) points by the slope of the line incident by that point and \(l\) in ascending order. We call the sorted points \(p_1, p_2, \dots , p_n\), where \(p_1 = l\).   \\
+    Let \(C_3 = \left\{ p_1, p_2, p_3 \right\} \). \\
+    \For(){\(i=4\) to \(n\)}{
+        Use \(C_{i-1}\) to calculate \(C_i\).  
+    } 
+    The answer is \(C_n\). 
+\end{algorithm}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{./Figures/Screenshot from 2025-11-29 20-03-24.png}
+    \caption{From \(C_{i-1}\) to \(C_i\)}
+    \label{fig:from ci-1 to ci}
+\end{figure}
+
+Here 囧\(i\) is the set of points which is on \(C_{i-1}\) but not on \(C_i\), and note that summing up all 囧\(i\) will not exceed \(n\) since each point will be "wrapped" at most once. 
+
+\begin{remark}
+    Note that we record the points on the convex hull starting from \(i\) and clockwise in each round, so that we in each round, if we have \(C_{i-1}\), we follow this order to calculate the slope of the line incident to \(p_i\) and \(x\) where \(x\) is the point on \(C_{i-1}\), and note that this slope initially is positive and will increase first, and then at some point become negative and keep increasing (but remain negative), but at some point if the slope decrease or become positive, then we can end calculating. Note that we only calculate \(O(1 + \text{囧}i)\) times.         
+\end{remark}
+
+\section{An application: Farthest pair of points in \(O(n \log n)\) time}
+\begin{problem}
+    \vphantom{text} \\
+    Input: \(n\) points in the plane. \\
+    Output: Two points whose distance is maximized. 
+\end{problem}
+
+The naive algorithm takes \(O\left( n^2 \right) \) time, but in fact we can use convext hull to design an \(O(n \log n)\) time algorithm. 
+
+\begin{theorem}
+    The farthest two points must be both on convex hull.
+\end{theorem}
+
+Now if for any point \(p\) on the convex hull \(C\) , we can find the point \(q\) on \(C\) s.t. 
+\[
+    d(p, q) = \max _{\substack{s \in C \\ s \neq p}} d(p, s)
+\] 
+in \(O(\log n)\) time, then we can find the point pair with maximum distance in \(O(n \log n)\) time (find convex hull also takes \(O(n\log n)\) time so the total time complexity is \(O(n\log n)\)). 
+
+Note that fix \(p \in C\), then if \(C\) is 
+\[
+    p = m_1 \to m_2 \to \dots \to m_k \to m_1 = p,
+\] 
+then the sequence \(\left\{ d(p, m_i) \right\}_{i=2}^k \) is bitonic. 
+
+\begin{definition}
+    A bitonic sequence \(A[1], A[2], \dots , A[n]\) is an integer sequence s.t. 
+    \[
+        A[1] \le A[2] \le \dots \le A[k] \ge A[k+1] \ge \dots \ge A[n]
+    \] for some \(k\). 
+\end{definition}
+
+\begin{theorem}
+    If \(\left\{ A[i] \right\}_{i=1}^n \) is a bitonic sequence, then we can find 
+    \[
+        \argmax_{1 \le j \le n} A[j] 
+    \] in \(O(\log n)\) time. 
+\end{theorem}
+\begin{proof}
+    We can use binary search, and observe if at some term it is increasing or decreasing to decide we should go left or right in the next step.
+\end{proof}
+
+Hence, by this theorem, we can find 
+\[
+    \argmax_{2 \le i \le k} d(p, m_i) 
+\] in \(O(\log k)\) time for every \(p \in C\), and note that \(k \le n\) since \(k\) is the size of \(C\), and hence it takes \(O(\log n)\) time to find the maximum distance between a fixed point and any other point on \(C\), and we're done.       
