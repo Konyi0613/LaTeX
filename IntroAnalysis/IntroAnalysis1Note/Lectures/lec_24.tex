@@ -1,0 +1,172 @@
+\lecture{24}{2 Dec. 10:20}{}
+Our goal is to prove 
+\begin{theorem}[Weiertrass Approximation Theorem by trigonometric polynomial]
+    Let \(f \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\) be continuous \(1\)-periodic function, and let \(\varepsilon > 0\). Then there exists a trigonometric polynomial \(P \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\) s.t. 
+    \[
+        \lVert f - P \rVert_\infty \le \varepsilon \text{ where } \vert f - P \vert_\infty = \sup _{x \in [0, 1]} \vert f(x) - P(x) \vert.
+    \]    
+    This implies the set of trigonometric polynomial is dense in \(C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\) w.r.t. \(\lVert \cdot \rVert_\infty  \).  
+\end{theorem}
+
+\begin{definition}
+    Let \(\varepsilon > 0\) and \(0 < \delta < \frac{1}{2}\). A function \(f \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\) is a periodic \((\varepsilon , \delta )\) approximation to the identity if the following two conditions holds:
+    \begin{itemize}
+        \item [(a)] \(f(x) \ge 0\) for all \(x \in \mathbb{R} \) and \(\int _0^1 f(x) \, \mathrm{d} x = 1 \). 
+        \item [(b)] For all \(\delta \le \vert x \vert \le 1 - \delta  \), one has \(f(x) < \varepsilon \).     
+    \end{itemize}
+\end{definition}
+
+%fig
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{./Figures/IMG_0770.jpg}
+    \caption{A \((\varepsilon , \delta )\) approximation to the identity}
+    \label{fig: A veps delta approximation to the identity}
+\end{figure}
+
+\begin{lemma}[Periodic approximation to the identity]
+    Let \(\varepsilon > 0\) and \(0 < \delta < \frac{1}{2}\). Then there exists a trigonometric polynomial \(P\) which is a periodic \((\varepsilon , \delta )\) approximation to the identity, that is, \(P \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\), \(P(x) \ge 0\) for all \(x \in \mathbb{R} \), and \(\int _0^1 P(x) \, \mathrm{d} x = 1  \), and \(P(x) < \varepsilon \) for all \(\delta \le \vert x \vert \le 1 - \delta  \).         
+\end{lemma}
+\begin{proof}
+    If we can prove the below claim, then we can show this lemma.
+    \begin{claim}
+        We can choose \(N\) large enough s.t.
+        \[
+            F_N(x) = \frac{1}{N} \left\vert \sum_{k=0}^{N-1} e_k(x)  \right\vert^2 \text{ where } e_k(x) = e^{2 \pi i k x}  
+        \] 
+        and we can pick \(P\) to be this \(F_N(x)\) with enough large \(N\).  
+    \end{claim}
+    The geometric meaning is that 
+    \[
+        \left\{ e_0(x), \dots , e_{N - 1}(x) \right\} 
+    \]
+    is an orthonormal set w.r.t. \(L_2\)-inner product, which has been shown before. Now 
+    \[
+        v(x) = \frac{1}{\sqrt{N} } \sum_{i=0}^{N-1} e_i(x) 
+    \]
+    is a unit vector under \(L_2\)-inner product, so we know 
+    \[
+        \int _0^1 \frac{1}{N} \left\vert \sum_{k=0}^{N-1} e_k(x)  \right\vert^2 \, \mathrm{d} x = \int _0^1 v(x) \overline{v(x)} \, \mathrm{d} x = \lVert v(x) \rVert_2^2 = 1.     
+    \]   
+    \begin{claim}
+        \[
+            F_N(x) = \sum_{n=-N}^N \left( 1 - \frac{\vert n \vert }{N} \right) e_n(x) \text{ where } e_n(x) = e^{2 \pi i n x}.   
+        \]
+    \end{claim}
+    \begin{explanation}
+        Note that 
+        \[
+           F_N(x) = \sum_{n=-(N-1)}^{N-1} \left( 1 - \frac{\vert n \vert }{N} \right) e_n(x). 
+        \]
+        Recall that 
+        \begin{align*}
+            F_N(x) &= \frac{1}{N} \left\vert \sum_{k=0}^{N-1} e_k(x)  \right\vert^2 = \frac{1}{N} \left( \sum_{k=0}^{N-1} e_k(x)  \right) \overline{\left( \sum_{\ell = 0}^{N - 1} e_{\ell }(x)  \right) } = \frac{1}{N} \left( \sum_{k=0}^{N-1} e_k(x)  \right) \left( \sum_{\ell = 0}^{N - 1} \overline{e_{\ell }(x)} \right)  \\
+            &= \frac{1}{N} \sum_{k=0}^{N - 1} \sum_{\ell = 0}^{N - 1} e_k(x) \overline{e_{\ell}(x) } = \frac{1}{N} \sum_{k=0}^{N - 1} \sum_{\ell = 0}^{N - 1} e_{k - \ell }(x).        
+        \end{align*}
+        Note that
+        \[
+            \begin{dcases}
+                0 \le k \le N - 1 \\
+                0 \le \ell \le N - 1
+            \end{dcases} \implies -(N - 1) \le k - \ell \le N - 1.
+        \]
+        Now fix \(m = k - \ell \), then we can count that there are \(N - \vert m \vert \) \((k_1, \ell_1 )\) pairs s.t. \(k_1 - \ell _1 = m\). Hence, we know 
+        \[
+            F_N(x) = \frac{1}{N} \sum_{k=0}^{N - 1} \sum_{\ell = 0}^{n - 1} e_{k - \ell }(x) = \frac{1}{N} \sum_{m = -(N-1)}^{N-1} (N - \vert m \vert ) e_m(x) = \sum_{m = -(N-1)}^{N - 1} \left( 1 - \frac{\vert m \vert}{N} \right)e_m(x).      
+        \]   
+    \end{explanation}
+
+    Now we already know \(F_N(x) \ge 0\) and \(\int _0^1 F_N(x) \, \mathrm{d} x = 1\), and we know \(F_N(x)\) is a trigonometric polynomial, so \(F_N(x) \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\).   
+    
+    Now we simplify \(F_N\) Note that if \(x \notin \mathbb{Z} \), then  
+    \begin{align*}
+        \sum_{k=0}^{N - 1} e_k(x) &= \sum_{k=0}^{N - 1} e^{2 \pi i k x} = \sum_{k=0}^{N - 1} \left( e^{2 \pi i x} \right)^k = \frac{e^{2\pi i N x} - 1}{e^{2 \pi i x} - 1} \\
+        &= \frac{e^{\pi i N x} \left( e^{\pi i N x} - e^{-\pi i N x} \right) }{e^{\pi i x} \left( e^{\pi i x} - e^{- \pi i x} \right) } = e^{\pi i (N - 1) x} \frac{\sin (\pi N x)}{\sin (\pi x)}   
+    \end{align*} 
+    Thus, we have 
+    \[
+        F_N(x) = \frac{1}{N} \left\vert \sum_{k=0}^{N - 1} e_k(x)  \right\vert^2 = \frac{1}{N} \frac{\sin ^2 (\pi N x)}{\sin^2 (\pi x)} \text{ if } x \notin \mathbb{Z} . 
+    \]
+    Hence, we know 
+    \[
+        F_N(x) = \begin{dcases}
+            N, &\text{ if } x \in \mathbb{Z}  ;\\
+            \frac{1}{N} \frac{\sin ^2(\pi N x)}{\sin ^2 (\pi x)}, &\text{ if }  x \notin \mathbb{Z} .
+        \end{dcases}
+    \]
+    Fix \(0 < \delta < \frac{1}{2}\) and \(\delta \le \vert x \vert \le \frac{1}{2} \), then 
+    \[
+        \pi \delta \le \pi \vert x \vert \le \frac{\pi}{2},
+    \] 
+    then we know 
+    \[
+        \left\vert \sin (\pi x) \right\vert \ge \sin (\pi \delta ). 
+    \]
+    Hence, 
+    \[
+        \left\vert \frac{1}{\sin (\pi x)} \right\vert^2 \le \frac{1}{\sin ^2 (\pi \delta )}, 
+    \]
+    and since \(\left\vert \sin ^2 (\pi N x) \right\vert \le 1 \), so  
+    \begin{align*}
+        F_N(x) &= \frac{1}{N} \left\vert \frac{\sin  (\pi N x)}{\sin  (\pi x)} \right\vert^2 \le \frac{1}{N} \frac{1}{\sin ^2 (\pi \delta )} \text{ where } \delta \le \vert x \vert \le \frac{1}{2} \le 1 - \delta.  
+    \end{align*}
+    Hence, we can pick \(N\) large enough so that 
+    \[
+        \frac{1}{N} \frac{1}{\sin ^2 (\pi \delta )} < \varepsilon,
+    \] 
+    and we're done. 
+\end{proof}
+
+Now we can prove the main theorem.
+\begin{theorem}[Weiertrass Approximation Theorem by trigonometric polynomial]
+    Let \(f \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\) be continuous \(1\)-periodic function, and let \(\varepsilon > 0\). Then there exists a trigonometric polynomial \(P \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\) s.t. 
+    \[
+        \lVert f - P \rVert_\infty \le \varepsilon \text{ where } \vert f - P \vert_\infty = \sup _{x \in [0, 1]} \vert f(x) - P(x) \vert.
+    \]    
+    This implies the set of trigonometric polynomial is dense in \(C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\) w.r.t. \(\lVert \cdot \rVert_\infty  \).  
+\end{theorem}
+\begin{proof}
+    Let \(f \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\). We know that \(\exists M > 0\) s.t. \(\vert f(x) \vert \le M \). Also, \(f\) is uniformly continuous, so there exists \(\delta > 0\) s.t. 
+    \[
+        \vert x - y \vert < \delta \implies \left\vert f(x) - f(y) \right\vert < \frac{\varepsilon}{4}.  
+    \]     
+    Let \(P\) be a trigonometric polynomial which is a \(\left( \frac{\varepsilon }{4M}, \delta  \right) \) approximation to the identity. By definition we know \(P(x) \ge 0\) for \(x \in \mathbb{R} \) and \(\int _0^1 P(x) \, \mathrm{d} x = 1 \) and 
+    \[
+        P(x) < \frac{\varepsilon }{4M} \text{ when } \delta \le \vert x \vert \le 1 - \delta.
+    \]      
+    Then, \(f * p\) is a trigonometric polynomial. This is because 
+    \[
+        P = \sum_{k = -N}^N c_k e_k,
+    \] 
+    and 
+    \begin{align*}
+        f * P &= f * \left( \sum_{k=-N}^N c_k e_k  \right) = \sum_{k=-N}^N c_k \left( f * e_k \right) \\
+        &= \sum_{k = -N}^N c_k \hat{f}(k) e_k     
+    \end{align*}
+    which is definitely a trigonometric polynomial.  Also, 
+    \begin{align*}
+        \left\vert f(x) - (f * P)(x) \right\vert &= \left\vert f(x) - \int_0^1 f(x - y) P(y) \, \mathrm{d} y  \right\vert \\
+        &= \left\vert \int _0^1 \left( f(x) - f(x - y) \right)P(y) \, \mathrm{d} y   \right\vert \\
+        &\le \int _0^1 \left\vert f(x) - f(x - y) \right\vert P(y) \, \mathrm{d} y    
+    \end{align*}
+    since \(P(y) \ge 0\) for all \(x \in \mathbb{R} \). Also, we have 
+    \begin{align*}
+        \int _0^{\delta } \left\vert f(x) - f(x - y) \right\vert P(y) \, \mathrm{d} y &\le \frac{\varepsilon }{4} \int _0^{\delta } P(y) \, \mathrm{d} y \le \frac{\varepsilon}{4} \\
+        \int _{1 - \delta }^1 \left\vert f(x) - f(x - y) \right\vert P(y) \, \mathrm{d} y &\le \int_{1 - \delta }^1 P(y) \, \mathrm{d} y \le \frac{\varepsilon}{4}.
+    \end{align*} 
+    On \([\delta , 1 - \delta ]\), we use \(\left\vert f(x) - f(x - y) \right\vert \le 2M \) and \(P(y) < \frac{\varepsilon}{4}\), so 
+    \[
+        \int _\delta ^{1 - \delta } \left\vert f(x) - f(x - y) \right\vert P(y) \, \mathrm{d} y \le 2M \frac{\varepsilon }{4M} = \frac{\varepsilon}{2}.
+    \]
+    Hence, 
+    \[
+        \left\vert f(x) - (f * P)(x) \right\vert < \varepsilon,
+    \]
+    and we can pick \(G = f * P\), which is a trigonometric polynomial, so that 
+    \[
+        \vert f(x) - G(x) \vert < \varepsilon  
+    \] for all \(x \in [0, 1]\), and thus we know 
+    \[
+        \sup_{x \in [0, 1]} \vert f(x) - G(x) \vert \le \varepsilon. 
+    \]
+\end{proof}

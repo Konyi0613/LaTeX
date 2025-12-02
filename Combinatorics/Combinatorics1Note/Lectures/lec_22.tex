@@ -1,0 +1,208 @@
+\lecture{22}{2 Dec. 15:30}{}
+\begin{definition}
+    Let \((P, \le)\) be a finite poset. The height of \(P\), \(h(P)\) is the size of the largest chain in \(P\). The width of \(P\), \(w(P)\), is the size of the largest antichain in \(P\).       
+\end{definition}
+
+\begin{theorem}
+    Let \((P, \le)\) be a finite poset. Then, 
+    \begin{align*}
+        \text{(Mirsky)} \quad  h(P) &= \text{size of smallest antichain partition } P = A_1 \cupdot A_2 \cupdot \dots \cupdot A_h \\
+        \text{(Dilworth)} \quad w(P) &= \text{size of smallest chain partition } P = C_1 \cupdot C_2 \cupdot \dots \cupdot C_w. 
+    \end{align*} 
+\end{theorem}
+\begin{proof}[proof of Mirsky]
+    We do induction on \(h(P)\).
+    \begin{itemize}
+        \item Base case: \(h(P) = 1\), then \(P\) must be an antichain since any two elements of \(P\) are incomparable, so \(h = 1\), and we're done. 
+        \item Induction step: (\(h(P) \ge 2\)) Let \(M\) be the set of maximal elements in \(P\), i.e. 
+        \[
+            M = \left\{ x \in P: \nexists y \in P \setminus \left\{ x \right\} \text{ s.t. } x \le y   \right\}. 
+        \]
+        \begin{claim}
+            \vphantom{text}
+            \begin{itemize}
+                \item [(i)] \(M\) is an antichain. 
+                \item [(ii)] Every maximum chain in \(P\) intersects \(M\).   
+            \end{itemize}
+        \end{claim}
+        \begin{explanation}
+            \vphantom{text}
+            \begin{itemize}
+                \item [(i)] If \(x_1, x_2 \in M\) and \(x_1 \le x_2\), then \(x_1 \notin M\) by definition.    
+                \item [(ii)] If \(C\) is a chain, then we can write 
+                \[
+                    C = \left\{ c_1, c_2, \dots , c_t \right\} \text{ with } c_1 \le c_2 \le \dots \le c_t.  
+                \]
+                If \(c_t \notin M\), then by definition, there exists \(y \neq c_t\) s.t. \(y \ge c_t\), and thus 
+                \[
+                    c_1 \le c_2 \le \dots \le c_t \le y
+                \] is a larger chain. Hence, every maximum chain in \(P\) intersects \(M\).  
+            \end{itemize}
+        \end{explanation}
+        Now let \(P^{\prime} = P \setminus M\), then \(h \left( P^{\prime}  \right) \le h(P) - 1 \). By the induction hypothesis, we have an antichain partition 
+        \[
+            P^{\prime} = A_1 \cup A_2 \cup \dots \cup A_{h(P) - 1},
+        \]  
+        then \(P = A_1 \cup A_2 \cup \dots \cup A_{h(P) - 1} \cup M\) is an antichain partition of \(P\).  
+    \end{itemize} 
+\end{proof}
+
+\begin{proof}[proof of Dilworth]
+    We prove by induction on \(w(P)\). 
+    \begin{itemize}
+        \item Base case: \(w(P) = 1\). In this case, \(P\) is itself a chain, so \(P = P\) is the smallest chain partition, and we're done. 
+        \item Induction step: \((w(P) \ge 2)\) If there exists a chain \(C\) that intersecting the maximum antichain, then we can proceed as before:
+        \begin{itemize}
+            \item Let \(P^{\prime} = P \setminus C\). 
+            \item \(w \left( P^{\prime}  \right) \le w(P) - 1 \). 
+            \item By induction hypothesis there exists a chain partition \(P^{\prime} = C_1 \cup C_2 \cup \dots \cup C_{w(P) - 1}\) and thus 
+            \[
+                P = C_1 \cup C_2 \cup \dots \cup C_{w(P) - 1} \cup C
+            \]
+            finish the proof.
+        \end{itemize}
+        \item Otherwise, let \(C \subseteq P\) be a maximum chain. Then, there must be a maximum antichain 
+        \[
+            A = \left\{ a_1, a_2, \dots , a_w \right\} \subseteq P 
+        \] 
+        that is disjoint from \(C\). Define 
+        \begin{align*}
+            P^+ &= \left\{ x \in P: x \ge a_i \text{ for some } a_i  \right\} \\
+            P^- &= \left\{ x \in P: x \le a_i \text{ for some } a_i  \right\}.  
+        \end{align*}
+         \begin{claim}
+            \vphantom{text}
+            \begin{itemize}
+                \item [(i)] \(P^+ \cap P^- = A \)
+                \item [(ii)] \(P^+ \cup P^- = P\) 
+                \item [(iii)] \(P^-, P^+ \subsetneq P\).   
+            \end{itemize}
+         \end{claim}
+        \begin{explanation}
+            Since for all \(i\), we know \(a_i \le a_i\), so \(a_i \in P^+\) and \(a_i \in P^-\), and thus \(A \subseteq P^+ \cap P^-\). Now if \(z \in P^+ \cap P^-\) but \(z \notin A\), then there exists \(i, j\) s.t. \(z \ge a_i\) and \(z \le a_j\). By transitivity, \(a_i \le z \le a_j\) gives \(a_i \le a_j\). However, \(A\) is an antichain, so \(a_i = a_j\), but the anti-symmetry gives \(z = a_i \in A\), which is a impossible. Hence, \(z \in A\). This proves (i).  
+
+            Now we show (ii). If \(P^+ \cup P^- \neq P\), then there exists \(z \in P\) s.t. \(z \notin P^+\) and \(z \notin P^-\), then \(z\) is incomparable to everything in \(A\), so \(A \cup \left\{ z \right\} \) is a larger antichain, which is a contradiction. 
+
+            Now we show (iii). We argue that \(C \cap \left( P^+ \setminus A \right) \) and \(C \cap \left( P^- \setminus A \right) \) are both non-empty. Let \(C = \left\{ c_1 \le c_2 \le \dots \le c_t \right\} \). If \(c_t \in P^-\), then there exists \(a_i \in A\) s.t. \(c_t \le a_i\), but \(c_t \neq a_i\) because \(C \cap A = \varnothing \). Thus, 
+            \[
+                c_1 \le c_2 \le \dots \le c_t \le a_i
+            \]             
+            is a larger chain, which is a contradiction. Hence, \(c_t \in P^+ \setminus A\) since \(P^+ \cup P^- = P\), and this shows \(P^- \neq P\). Similarly, \(c_1 \in P^- \setminus A\) and thus \(P^+ \neq P\).     
+        \end{explanation}
+        By induction, we fixed a chain decompositions:
+        \begin{align*}
+            P^+ &= C_1^+ \cup C_2^+ \cup \dots \cup C_w^+ \\
+            P^- &= C_1^- \cup C_2^- \cup \dots \cup C_w^-.
+        \end{align*}
+        Relabeling the chains if needed, we may assume \(C_i^-\) ends at \(a_i\) and \(C_i^+\) starts at \(a_i\). Hence, 
+        \[
+            C_i = C_i^- \cup C_i^+ 
+        \]    
+        is a chain, and then 
+        \[
+            P = C_1 \cup C_2 \cup \dots \cup C_w
+        \]
+        is a chain partition.
+    \end{itemize} 
+\end{proof}
+
+\begin{remark}
+    It is not true in general that every maximum chain intersects every maximal antichain. Note that the difference between maximum and maximal: 
+    \begin{itemize}
+        \item maximum means largest in size. 
+        \item maximal means is not contained in a large ...
+    \end{itemize}
+\end{remark}
+
+\begin{eg}
+    \(\left( 2^{[3]}, \subseteq  \right) \), and \(C = \left\{ \varnothing , \left\{ 1 \right\}, \left\{ 1, 2 \right\}, \left\{ 1,2,3 \right\}    \right\} \) does not intersected \(A = \left\{ \left\{ 2 \right\}, \left\{ 1, 3 \right\}   \right\} \).   
+\end{eg}
+
+\subsubsection{Application}
+\begin{definition}
+    A monotone subsequence that is either increasing or decreasing.
+\end{definition}
+
+\begin{question}
+    Given a sequence of \(m\) real numbers where \(m \ge 1\), then how large a 
+    \begin{itemize}
+        \item [(i)] increasing subsequence 
+        \item [(ii)] decreasing subsequence 
+        \item [(iii)] monotone subsequence
+    \end{itemize}  
+    are guaranteed to find?
+\end{question}
+
+For (i), any number is an increasing subsequence, and if original sequence is decreasing, then cannot find larger. As for 2, cannot find a decreasing subsequence of length larger than \(1\) if the original sequence is increasing. As for (iii), the below theorem tells us the answer is \(\sqrt{m} \). 
+
+\begin{theorem}[Erdos-Szekeres, 1935]
+    If \(m \ge (r - 1)(s - 1) + 1\), then any sequence of \(m\) real numbers contains an increasing subsequence of length \(r\) or a decreasing subsequence of length \(s\).   
+\end{theorem}
+
+\begin{proof}[Corollary of Dilworth/Mirsky]
+    Let \(x_1, x_2, \dots , x_m\) be our sequence, then we define 
+    \[
+        P = \left\{ (i, x_i) : i \in [m] \right\} 
+    \] where \((i, x_i) \le (j, x_j)\) iff \(i \le j\) and \(x_i \le x_j\). We can observe that the chain in this poset is equivalent to an increasing subsequence, and the antichain is equivalent to an (strictly) decreasing subsequence. By Mirsky, we have an antichain partition 
+    \[
+        P = A_1 \cup A_2 \cup \dots \cup A_{h(P)}.
+    \]  
+    If \(h(P) \ge r\), we have a chain of length \(\ge r\), and then we have an increasing subsequence of length \(\ge r\). Otherwise \(h(P) \le r - 1\), so by averaging, some \(A_i\) has 
+    \[
+        \vert A_i \vert \ge \frac{m}{r-1} > s-1,
+    \]    
+    so \(\vert A_i \vert \ge s \), which means there is a decreasing subsequence of length \(s\).   
+\end{proof}
+ 
+ \begin{remark}
+    \((r - 1)(s - 1) + 1\) is best possible. For \(m = (r - 1)(s - 1)\), then consider 
+    \[
+        \begin{array}{cccc}
+            (r - 1)(s - 2) + 1, & (r - 1)(s - 2) + 2, & \dots  & (r - 1)(s - 1),  \\
+            (r - 1)(s - 3) + 1, & (r - 1)(s - 3) + 2, & \dots  & (r - 1)(s - 2),  \\
+            \vdots &  &  &   \\
+            (r - 1) + 1, & (r - 1) + 2, & \dots  & (r - 1) \cdot 2,  \\
+            1, & 2, & \cdots & (r - 1),  \\
+        \end{array}
+    \] 
+    and if we read this from top to down then from left to right, we find this sequence's largest decreasing subsequence is of size \(s - 1\) and the largest increasing subsequence is of size \(r - 1\).  
+\end{remark}
+
+\section{Mobius Inversion}
+\begin{eg}
+    Let \(a_1, a_2, \dots \) be a sequence of real numbers. Let \(s_1, s_2, \dots \) be the sequence of cummulative sums: 
+    \[
+        s_n = \sum_{i \le n} a_i. 
+    \]
+    Then, given \(s_1, s_2, \dots \), can we recover \(a_1, a_2, \dots \)?  
+\end{eg}
+\begin{explanation}
+    Yes. Since 
+    \[
+        s_n - s_{n-1} = \sum_{i \le n} a_i - \sum_{i \le n - 1} a_i = a_n.  
+    \]
+\end{explanation}
+
+\begin{eg}
+    Suppose we have a function \(f: 2^{[n]} \to \mathbb{R} \). Define \(g(S) = \sum_{T \subseteq S} f(T) \), then given \(g\) can we recover \(f\)?   
+\end{eg}
+\begin{explanation}
+    Yes. \(f(S) = \sum_{T \subseteq S} g(T) (-1)^{\vert S \setminus T \vert } \). 
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{./Figures/IMG_0772.jpg}
+    \end{figure} 
+    Since 
+    \begin{align*}
+        \sum_{T \subseteq S} g(T)(-1)^{\vert S \setminus T \vert} &= \sum_{T \subseteq S} \left( \sum_{S^{\prime}  \subseteq T} f \left( S^{\prime}  \right)   \right) (-1)^{\left\vert S \setminus T \right\vert } \\
+        &= \sum_{S^{\prime} \subseteq S} f \left( S^{\prime}  \right) \sum_{S^{\prime} \subseteq T \subseteq S} (-1)^{\vert S \setminus T \vert },
+    \end{align*}
+    and 
+    \begin{align*}
+        \sum_{S^{\prime} \subseteq T \subseteq S} (-1)^{\vert S \setminus T \vert } &= \sum_{T^{\prime} \subseteq S \setminus S^{\prime} } (-1)^{\vert (S \setminus S^{\prime} ) \setminus T^{\prime}  \vert } = \prod _{x \in S \setminus S^{\prime} } (1 + (-1)) \\
+        &= \begin{dcases}
+            0, &\text{ if } S \setminus S^{\prime} \neq \varnothing  ;\\
+            1, &\text{ if } S^{\prime} = S.
+        \end{dcases}  
+    \end{align*}
+\end{explanation}
