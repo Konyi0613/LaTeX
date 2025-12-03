@@ -76,9 +76,9 @@ Our goal is to prove
         \]   
     \end{explanation}
 
-    Now we already know \(F_N(x) \ge 0\) and \(\int _0^1 F_N(x) \, \mathrm{d} x = 1\), and we know \(F_N(x)\) is a trigonometric polynomial, so \(F_N(x) \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\).   
+    Now we already know \(F_N(x) \ge 0\) for all \(x \in \mathbb{R} \) and \(\int _0^1 F_N(x) \, \mathrm{d} x = 1\), and we know \(F_N(x)\) is a trigonometric polynomial, so \(F_N(x) \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\).   
     
-    Now we simplify \(F_N\) Note that if \(x \notin \mathbb{Z} \), then  
+    Now we simplify \(F_N\). Note that if \(x \notin \mathbb{Z} \), then  
     \begin{align*}
         \sum_{k=0}^{N - 1} e_k(x) &= \sum_{k=0}^{N - 1} e^{2 \pi i k x} = \sum_{k=0}^{N - 1} \left( e^{2 \pi i x} \right)^k = \frac{e^{2\pi i N x} - 1}{e^{2 \pi i x} - 1} \\
         &= \frac{e^{\pi i N x} \left( e^{\pi i N x} - e^{-\pi i N x} \right) }{e^{\pi i x} \left( e^{\pi i x} - e^{- \pi i x} \right) } = e^{\pi i (N - 1) x} \frac{\sin (\pi N x)}{\sin (\pi x)}   
@@ -114,7 +114,16 @@ Our goal is to prove
     \[
         \frac{1}{N} \frac{1}{\sin ^2 (\pi \delta )} < \varepsilon,
     \] 
-    and we're done. 
+    and we're done.
+    \begin{remark}
+        It seems that we only prove the case for \(\delta \le \vert x \vert \le \frac{1}{2} \) but not \(\frac{1}{2} \le \vert x \vert \le 1 - \delta  \), but in fact since the period of \(F_N\) is \(1\), so by the below figure, we can just prove the case \(\delta \le \vert x \vert \le \frac{1}{2} \) and extend to \(\delta \le x \le 1 - \delta \). 
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=0.55\textwidth]{./Figures/IMG_1647.png}
+            \caption{The black segments are the parts we have already proved, while \(F_N\) on the red segements is in fact same as the part of the leftmost black segment.}
+            \label{fig:periodic approximation to the identity}
+        \end{figure}     
+    \end{remark} 
 \end{proof}
 
 Now we can prove the main theorem.
@@ -134,27 +143,27 @@ Now we can prove the main theorem.
     \[
         P(x) < \frac{\varepsilon }{4M} \text{ when } \delta \le \vert x \vert \le 1 - \delta.
     \]      
-    Then, \(f * p\) is a trigonometric polynomial. This is because 
+    Then, \(f * P\) is a trigonometric polynomial. This is because 
     \[
         P = \sum_{k = -N}^N c_k e_k,
     \] 
     and 
     \begin{align*}
         f * P &= f * \left( \sum_{k=-N}^N c_k e_k  \right) = \sum_{k=-N}^N c_k \left( f * e_k \right) \\
-        &= \sum_{k = -N}^N c_k \hat{f}(k) e_k     
+        &= \sum_{k = -N}^N c_k \hat{f}(k) e_k,     
     \end{align*}
-    which is definitely a trigonometric polynomial.  Also, 
+    which is definitely a trigonometric polynomial. Also, 
     \begin{align*}
         \left\vert f(x) - (f * P)(x) \right\vert &= \left\vert f(x) - \int_0^1 f(x - y) P(y) \, \mathrm{d} y  \right\vert \\
         &= \left\vert \int _0^1 \left( f(x) - f(x - y) \right)P(y) \, \mathrm{d} y   \right\vert \\
-        &\le \int _0^1 \left\vert f(x) - f(x - y) \right\vert P(y) \, \mathrm{d} y    
+        &\le \int _0^1 \left\vert f(x) - f(x - y) \right\vert \vert P(y) \vert  \, \mathrm{d} y = \int _0^1 \vert f(x) - f(y) \vert P(y) \, \mathrm{d} y.      
     \end{align*}
     since \(P(y) \ge 0\) for all \(x \in \mathbb{R} \). Also, we have 
     \begin{align*}
         \int _0^{\delta } \left\vert f(x) - f(x - y) \right\vert P(y) \, \mathrm{d} y &\le \frac{\varepsilon }{4} \int _0^{\delta } P(y) \, \mathrm{d} y \le \frac{\varepsilon}{4} \\
-        \int _{1 - \delta }^1 \left\vert f(x) - f(x - y) \right\vert P(y) \, \mathrm{d} y &\le \int_{1 - \delta }^1 P(y) \, \mathrm{d} y \le \frac{\varepsilon}{4}.
+        \int _{1 - \delta }^1 \left\vert f(x) - f(x - y) \right\vert P(y) \, \mathrm{d} y &\le \frac{\varepsilon}{4} \int_{1 - \delta }^1 P(y) \, \mathrm{d} y \le \frac{\varepsilon}{4}.
     \end{align*} 
-    On \([\delta , 1 - \delta ]\), we use \(\left\vert f(x) - f(x - y) \right\vert \le 2M \) and \(P(y) < \frac{\varepsilon}{4}\), so 
+    On \([\delta , 1 - \delta ]\), we use \(\left\vert f(x) - f(x - y) \right\vert \le 2M \) and \(P(y) < \frac{\varepsilon}{4M}\), so 
     \[
         \int _\delta ^{1 - \delta } \left\vert f(x) - f(x - y) \right\vert P(y) \, \mathrm{d} y \le 2M \frac{\varepsilon }{4M} = \frac{\varepsilon}{2}.
     \]
@@ -162,7 +171,7 @@ Now we can prove the main theorem.
     \[
         \left\vert f(x) - (f * P)(x) \right\vert < \varepsilon,
     \]
-    and we can pick \(G = f * P\), which is a trigonometric polynomial, so that 
+    and we can pick \(G = f * P\), which is a trigonometric polynomial, and that 
     \[
         \vert f(x) - G(x) \vert < \varepsilon  
     \] for all \(x \in [0, 1]\), and thus we know 

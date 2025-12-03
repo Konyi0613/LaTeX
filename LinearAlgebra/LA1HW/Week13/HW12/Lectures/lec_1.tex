@@ -88,11 +88,96 @@ A = \begin{pmatrix}
 $$
 Find the Jordan form for $A$.
 \end{problem*}
+\begin{proof}
+    Note that \(\mathrm{ch}_A(x) = (x - 2)^5 (x + 1) \), and since 
+    \[
+        A - 2I = \begin{pmatrix}
+            0 & 0 & 0 & 0 & 0 &  0 \\
+            1 & 0 & 0 & 0 & 0 & 0  \\
+            -1 & 0 & 0 & 0 & 0 & 0  \\
+            0 & 1 & 0 & 0 & 0 & 0  \\
+            1 & 1 & 1 & 1 & 0 & 0  \\
+            0 & 0 & 0 & 0 & 1 & -3  \\
+        \end{pmatrix},
+    \] 
+    so we know \(\rank (A - 2I) = 4\), and thus \(\dim \ker (A - 2I) = 2\). Also, we have 
+    \[
+        (A - 2I)^2 = \begin{pmatrix}
+            0 & 0 & 0 & 0 & 0 & 0  \\
+            0 & 0 & 0 & 0 & 0 & 0  \\
+            0 & 0 & 0 & 0 & 0 & 0  \\
+            1 & 0 & 0 & 0 & 0 & 0  \\
+            0 & 1 & 0 & 0 & 0 & 0  \\
+            1 & 1 & 1 & 1 & -3 & 9  \\
+        \end{pmatrix},
+    \] so \(\rank (A - 2I)^2 = 3\), and thus \(\dim \ker (A - 2I)^2 = 3\). Now we know there are two Jordan blocks with characteristic value \(2\) and there is one Jordan block with characteristic value \(2\) and of size larger than \(2\), and since the sum of the size of these two Jordan blocks with characteristic value \(2\) is \(5\), so we know the sizes of these two Jordan blocks are \(1\) and \(4\), and since the sum of size of the Jordan block with characteristic value \(1\) is \(1\), so we know the Jordan form of \(A\) is 
+    \[
+        \left( \begin{array}{cccc|c|c}
+             2 & 1 & 0 & 0 & 0 & 0  \\
+             0 & 2 & 1 & 0 & 0 & 0  \\
+             0 & 0 & 2 & 1 & 0 & 0  \\
+             0 & 0 & 0 & 2 & 0 & 0  \\
+             \hline 
+             0 & 0 & 0 & 0 & 2 & 0  \\
+             \hline 
+             0 & 0 & 0 & 0 & 0 & 1  \\
+        \end{array} \right).
+    \]         
+\end{proof}
 
 \begin{problem*}
 \textbf{10.} Let $n$ be a positive integer, $n \ge 2$, and let $N$ be an $n \times n$ matrix over the field $F$ such that $N^n = 0$ but $N^{n-1} \ne 0$. Prove that $N$ has no square root, i.e., that there is no $n \times n$ matrix $A$ such that $A^2 = N$.
 \end{problem*}
+\begin{proof}
+    If \(A^2 = N\), then \(A^{2n} = N^n = 0\) and \(A^{2n - 2} = N^{n - 1} \neq 0\), so 
+    \[
+        m_A(x) \mid x^{2n} \text{ but } m_A(x) \nmid x^{2n - 2}, 
+    \]   
+    so \(m_A(x) \in \left\{ x^{2n - 1}, x^{2n} \right\} \). Hence, \(\deg m_A(x) \ge 2n - 1\), but \(m_A(x) \mid \mathrm{ch}_A(x) \), so
+    \[
+        n = \deg \mathrm{ch}_A(x) \ge \deg m_A(x) \ge 2n - 1,
+    \] but this gives \(1 \ge n\), so this is impossible.   
+\end{proof}
 
 \begin{problem*}
 \textbf{13.} If $N$ is a $k \times k$ elementary nilpotent matrix, i.e., $N^k = 0$ but $N^{k-1} \ne 0$, show that $N^t$ is similar to $N$. Now use the Jordan form to prove that every complex $n \times n$ matrix is similar to its transpose.
 \end{problem*}
+\begin{proof}
+    Note that 
+    \[
+        \left( N^k \right)^t = (N^t)^k \quad \forall k \ge 0. 
+    \]
+    Hence, \(\left( N^t \right)^k = 0 \) and \(\left( N^t \right)^{k-1} \neq 0 \). Note that since \(N^k = 0\) and \(N^{k-1} \neq 0\), so \(m_N(x) = x^k\), and thus if \(J_N\) is the Jordan form of \(N\), then \(J_N\)'s largest Jordan block has size \(k\), which means \(J_N\) has exactly one Jordan block. Also, we have similar argument on \(N^t\), so \(N\) and \(N^t\) has same Jordan form, and thus 
+    \[
+        N \sim J_N \sim N^t.
+    \]             
+     Now for every complex \(n \times n\) matrix \(A\), since \(\mathbb{C} \) is algebraically closed, so the Jordan form of \(A\) exists, say it is \(J_A\), then we know 
+     \[
+        J_A = \bigoplus_{i=1}^k \bigoplus_{j=1}^{r_i} J_{s_j}(\lambda _i),
+     \]  where \(k\) is the number of characteristic value of \(A\), and \(r_i\) is the number of Jordan block with characteristic value \(\lambda _i\), and \(s_j\) is the size of the Jordan block. Note that for all \(i, j\), \(J_{s_j}(\lambda _i) - \lambda _i I\) is a \(s_j \times s_j\) elementary nilpotent matrix, so 
+     \begin{align*}
+        J_{s_j}(\lambda _i) - \lambda_i I &= Q^{-1} (J_{s_j}(\lambda _i) - \lambda _i I)^t Q = Q^{-1} J_{s_j}(\lambda _i)^t Q - \lambda _i Q^{-1} I Q =  Q^{-1} J_{s_j}(\lambda _i)^t Q - \lambda _i I,
+     \end{align*}       
+     for some \(Q\) and thus 
+     \[
+        J_{s_j}(\lambda _i)^t = Q^{-1} J_{s_j}(\lambda _i) Q,
+     \] which shows 
+     \[
+        J_{s_j}(\lambda _i) \sim J_{s_j}(\lambda _i)^t.
+     \]
+     Hence, we know 
+     \[
+        J_A = \bigoplus_{i=1}^k \bigoplus_{j=1}^{r_i} J_{s_j}(\lambda _i) \sim \bigoplus_{i=1}^k \bigoplus_{j=1}^{r_i} J_{s_j}(\lambda _i)^t = J_A^t,
+     \]
+     so 
+     \[
+        J_A^t = R^{-1} J_A R
+     \] for some \(R\). Now if \(A = P^{-1} J_A P\) for some \(P\), then 
+     \[
+        A^t = P^t J_A^t \left( P^{-1} \right)^t = P^t R^{-1} J_A R \left( P^{-1} \right)^t,  
+     \]   
+     which shows 
+     \[
+        A^t \sim J_A \sim A,
+     \] and we're done.
+\end{proof}
