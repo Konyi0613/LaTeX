@@ -1,0 +1,321 @@
+\chapter{Some Types of Balanced Search Trees}
+\lecture{3}{27 Nov. 14:20}{}
+\section{Red-Black Tree}
+\begin{definition}[Binary search tree]
+    A binarty tree is a binary search tree iff its in-order traversal is an increasing sequence.
+\end{definition}
+\begin{definition}[Red-Black Tree]
+    A binary search tree is a red-black tree if its root is black, and any path from leaves to the root has same number of black nodes, and any two red nodes are not adjacent on the tree. 
+\end{definition}
+
+\section{B-Tree}
+\begin{definition}[B-tree of order \(t \ge 2\)]
+    \vphantom{text}
+    \begin{itemize}
+        \item Each non-root internal node has at least \(t\) children. 
+        \item Each internal children has at most \(2t\) children. 
+        \item Each internal node has one more children than key. 
+        \item All leaf nodes are at the same level. 
+        \item The in-order traversal yields an increasing sequence of the keys. 
+    \end{itemize} 
+\end{definition}
+
+\begin{definition}[2-3-4 tree]
+    A 2-3-4 tree is exactly a B-tree of order \(2\): The first condition can be simplified as \textcolor{red}{Each \st{non-root} internal node has at least \(2\) children.} 
+\end{definition}
+
+We mainly focus on 2-3 tree:
+\begin{definition}[2-3 tree]
+    A 2-3 tree is a 2-3-4 tree such that 
+    \begin{itemize}
+        \item Each internal node has at most \(3\)-children. (An internal node having \(1\) or \(4\) children may appear temporarily during the insertion precess.) 
+    \end{itemize}
+\end{definition}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{./Figures/Screenshot from 2025-12-04 19-07-59.png}
+    \caption{The number of key of node \(x\) in a 2-3 tree}
+    \label{fig:2-tree key num}
+\end{figure}
+
+\begin{corollary}
+    If the tree has \(n\) nodes, then the membership query time is \(O(\log n)\).  
+\end{corollary}
+
+\begin{theorem}
+    We can insert a key into a 2-3 tree in \(O(\log n)\) time. 
+\end{theorem}
+\begin{proof}
+    We can first insert the key into a leaf, then whenever a node is full, i.e. has \(3\) keys or equivalently \(4\) children (if it is an internal node), then we split this node into \(2\) part, and raise the key in the middle to one layer up, and keep doing this until some ancestor node has only two keys or the height of the tree increases by \(1\). 
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{./Figures/Screenshot from 2025-12-04 19-12-24.png}
+        \caption{Insertion of 2-3 tree}
+        \label{fig:2-3 tree insertion}
+    \end{figure}     
+
+    \begin{remark}
+        Thus in the process of insertion there may appear some trees with nodes of \(3\) keys, but after the insertion finishing, such nodes do not exist. 
+    \end{remark}
+\end{proof}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{./Figures/Screenshot from 2025-12-04 19-24-28.png}
+    \caption{Insetion in different cases}
+    \label{fig:insertion case}
+\end{figure}
+
+\begin{theorem}
+    We can delete a node in \(O(\log n)\) time.  
+\end{theorem}
+\begin{proof}
+    We first find the key \(k\), which is the key we want to delete. If \(k\) is on the leaf, then we finish the first step. If not, then we know \(k\) is between two leaves \(l\) and \(r\), and thus we can spend \(O(\log n)\) time to find the position of \(k\), and we can use the rightmost key on \(l\) or leftmost key on \(r\) to replace \(k\), and then we have to fix the tree if it does not satisfy the definition of 2-3 tree.   
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.6\textwidth]{./Figures/Screenshot from 2025-12-04 19-52-17.png}
+        \caption{Find \(k\) in the treee}
+        \label{fig:find k}
+    \end{figure}   
+    Now suppose we replace \(k\) by the key on the node \(x\), i.e. \(x\) is one of \(l, r\), then if \(x\) originally has two keys, then the deletion is finished (because one key is left and it is still  a legal 2-3 tree). Now if \(x\) has \(0\) key, then we spread the empty node above by 
+    \begin{itemize}
+        \item borrow keys from neighbors first. 
+        \item if it does not work (neighbors not exist or they have only one key), then we look at its parent and adjust some keys in itself, its neighbor, and its parent. 
+    \end{itemize}          
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{./Figures/Screenshot from 2025-12-04 19-56-59.png}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{./Figures/Screenshot from 2025-12-04 19-57-08.png}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{./Figures/Screenshot from 2025-12-04 19-57-18.png}
+    \end{figure}
+
+    \begin{remark}
+        A case is ommited in the slides, which is that: Suppose \(p\) is the parrent of \(c_l\) and \(c_r\), and \(c_l\) and \(p\) has one child, while \(c_r\) has \(0\) keys now, then we can move the key in \(p\) into \(c_r\), then we spread the empty node one layer up, and then we can continue the recursion.         
+    \end{remark}
+\end{proof}
+
+\begin{corollary}
+    2-3 tree is a data structure for representing a set of at most \(n\) distinct numbers: 
+    \begin{itemize}
+        \item \(O(n)\) space. 
+        \item \(O(1)\) time for initialization. 
+        \item \(O(\log n)\) time for membership query. 
+        \item \(O(\log n)\) time for insertion. 
+        \item \(O(\log n)\) time for deletion.     
+    \end{itemize} 
+\end{corollary}
+
+\begin{theorem}
+    We can reduce a 2-3 tree to a red-black tree and a red-black tree to a 2-3 tree in \(O(n)\) time. 
+\end{theorem}
+\begin{proof}
+Consider the following construction:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{./Figures/Screenshot from 2025-12-04 20-05-11.png}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{./Figures/Screenshot from 2025-12-04 20-05-41.png}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.83\textwidth]{./Figures/Screenshot from 2025-12-04 20-12-07.png}
+\end{figure}
+\end{proof}
+
+\chapter{Hash Function}
+\begin{eg}
+    Suppose that we want to represent an initially empty set \(S\) of at most \(n\) numbers such that each element of \(S\) is positive integer no more than \(n\). We would like to support the following operations on \(S\) for any given integer \(i\) with \(1 \le i \le n\): 
+    \begin{itemize}
+        \item membership: determining whether \(i\) belongs to \(S\). 
+        \item insertion: inserting \(i\) into \(S\). 
+        \item deletion: deleting \(i\) from \(S\).    
+    \end{itemize}       
+\end{eg}
+\begin{proof}[Attempt \(\# 1\)]
+    Maintaining \(S\) using a search tree having height \(O(\log n)\) like \(B\)-tree, red-black tree, or AVL-tree: 
+    \begin{itemize}
+        \item Space: \(O(n)\). 
+        \item Time: 
+        \begin{itemize}
+            \item \(O(1)\) time for initialization. 
+            \item \(O(\log n)\) time for membership query. 
+            \item \(O(\log n)\) time for insertion. 
+            \item \(O(\log n)\) time for deletion.    
+        \end{itemize}
+    \end{itemize}   
+\end{proof}
+\begin{proof}[Attempt \(\# 2\)]
+    Keep all the elements of \(S\) in an unordered array \(A[1\dots n]\). 
+    \begin{itemize}
+        \item Space: \(O(n)\). 
+        \item Time: 
+        \begin{itemize}
+            \item creation and initialization: \(O(1)\). 
+            \item membership: \(O(n)\) (linear search). 
+            \item insertion: \(O(1)\). 
+            \item deletion: \(O(n)\).    
+        \end{itemize}
+    \end{itemize}  
+\end{proof}
+\begin{proof}[Attempt \(\# 3\)]
+    Keep all the elements of \(S\) in an \textcolor{red}{sorted} array \(B[1\dots n]\). 
+    \begin{itemize}
+        \item Space: \(O(n)\). 
+        \item Time: 
+        \begin{itemize}
+            \item creation and initialization: \(O(1)\). 
+            \item membership: \(O(\log n)\) (binary search). 
+            \item insertion: \(O(n)\). 
+            \item deletion: \(O(n)\).    
+        \end{itemize}
+    \end{itemize}  
+\end{proof}
+\begin{proof}[Attempt \(\# 4\)]
+    Keep all the elements of \(S\) in a binary array \(C[1\dots n]\). Specifically, for each \(j = 1,\dots ,n\), we maintain the condition that \(C[j] = 1\) holds if and only if \(S\) contains element \(j\). 
+    \begin{itemize}
+        \item Space: \(O(n)\). 
+        \item Time: 
+        \begin{itemize}
+            \item creation and initialization: \(O(n)\). 
+            \item membership: \(O(1)\) (direct look-up). 
+            \item insertion: \(O(1)\). 
+            \item deletion: \(O(1)\).    
+        \end{itemize}
+    \end{itemize}        
+\end{proof}
+
+Now if our problem becomes 
+\begin{eg}
+    Suppose that we want to represent an initially empty set \(S\) of at most \(n\) numbers such that each element of \(S\) is positive integer no more than \(\textcolor{green}{m}\) (with \(\textcolor{green}{m} \ge n\)). We would like to support the following operations on \(S\) for any given integer \(i\) with \(1 \le i \le m\): 
+    \begin{itemize}
+        \item membership: determining whether \(i\) belongs to \(S\). 
+        \item insertion: inserting \(i\) into \(S\). 
+        \item deletion: deleting \(i\) from \(S\).    
+    \end{itemize} 
+\end{eg}
+Then, if there is a function \(H:[m] \to [n]\) where for all \(x \in [n]\), there exists \(O(1)\) distinct \(k \in [m]\) s.t. \(H(k)\) has the same value, then we can still use \(O(n)\) space to implement Attempt \# 4.
+\begin{remark}
+    It is easy to achieve this assumption when \(m = O(n)\) (use modulo function), but for \(m = \omega (n)\), it is impossible.  
+\end{remark}      
+
+\section{Randomized Algorithm and Communication Complexity}
+\begin{problem}
+\vphantom{text}
+\begin{itemize}
+    \item Input: two \(n \times n\) matrices \(A\) and \(B\). 
+    \item Output: determining whether \(A = B\). 
+\end{itemize}
+\end{problem}
+
+\begin{remark}
+    The time complexity is \(\Theta \left( n^2 \right) \), but here we care the communication complexity: Imagine that \(A\) and \(B\) are at two different planet far from each other, so transmitting numbers is expensive, and thus we want the complexity of the data transmitted to be as low as possible, and other computations taken in each planet is not that important. Hence, we can finish under \(O\left( n^2 \right) \) communication complexity, and now we are curious about whether we can reduce the communication complexity to \(o \left( n^2 \right) \) if we permit small percentage of error. After all, interstellar communication has not low percentage of error. 
+\end{remark}
+
+\begin{algorithm}[H]
+    \caption{Fingerprinting Approach}
+    Choose an \(n\)-element column vector \(r\), where each element of \(r\) is either \(0\) or \(1\) independently and equally likely. \\
+    Compare \(Ar\) and \(Br\), and output whether they are identical.       
+\end{algorithm}
+
+\begin{remark}
+    As a matter of fact, \(0\) and \(1\) can be any two distinct numbers, and the commmucation complexity is \(O(n)\) since we just need to transmit \(r\) and \(Ar\) from planet \(A\) to planet \(B\).    
+\end{remark}
+
+\begin{theorem}
+    \begin{align*}
+        \Pr(Ar = Br \mid A = B) &= 1 \\
+        \Pr(Ar = Br \mid A \neq B) &\le 0.5. 
+    \end{align*}
+\end{theorem}
+\begin{proof}
+    The first equation is trivial. Now we show the second one. Let \(C = A - B\), then we want to show 
+    \[
+        \Pr(Cr = 0^n \mid C \neq 0^{n \times n}) \le 0.5. 
+    \] 
+    Assuming \(C \neq 0^{n \times n}\), then there is a row \(i\) of \(C\) whose nonzero elements are \(C_{i, j_1}, C_{i, j_2}, \dots , C_{i, j_{\ell } }\) for all \(\ell \ge 1\). Thus, 
+    \[
+        \Pr \left( Cr = 0 \right) \le \Pr \left( \sum_{k=1}^\ell C_{i, j_k} r_{j_k} = 0  \right),   
+    \]     
+    so we can just show 
+    \[
+        Pr \left( \sum_{k=1}^\ell C_{i, j_k} r_{j_k} = 0  \right) \le 0.5.
+    \]
+    Note that 
+    \[
+        \Pr \left( \sum_{k=1}^\ell C_{i, j_k} r_{j_k} = 0  \right) = \sum_{\substack{(r_{j_1}, r_{j_2}, \dots , r_{j_{\ell - 1}}) \\ \text{determined} }} \Pr \left( \sum_{k=1}^\ell C_{i, j_k} r_{j_k} = 0  \right) \cdot \frac{1}{2^{j_{\ell } - 1}},   
+    \]
+    and since for each determined \((r_{j_1}, \dots , r_{j_{\ell } - 1})\) pair, we know 
+    \[
+        \Pr \left( \sum_{k=1}^\ell C_{i, j_k} r_{j_k} = 0  \right) \le 0.5,
+    \] which is because \(C_{i, j_{\ell } } \neq 0\), and this shows 
+    \[
+        \Pr \left( \sum_{k=1}^\ell C_{i, j_k} r_{j_k} = 0  \right) = \sum_{\substack{(r_{j_1}, r_{j_2}, \dots , r_{j_{\ell - 1}}) \\ \text{determined} }} \Pr \left( \sum_{k=1}^\ell C_{i, j_k} r_{j_k} = 0  \right) \cdot \frac{1}{2^{j_{\ell } - 1}} \le \sum_{\substack{(r_{j_1}, r_{j_2}, \dots , r_{j_{\ell - 1}}) \\ \text{determined} }} \frac{0.5}{2^{j_{\ell } - 1 }} = 0.5,
+    \] 
+    and we're done.
+\end{proof}
+
+\begin{question}
+    Is the error rate \(0.5\) to high? 
+\end{question}
+\begin{answer}
+    If we repeat this algorithm \(t = O(1)\) times, then we can maintain the communication complexity at \(O(tn) = O(n)\) with the error rate not more than 
+    \[
+        \frac{1}{2^t}.
+    \]  
+\end{answer}
+
+\begin{problem}
+    \vphantom{text}
+    \begin{itemize}
+        \item Input: three \(n \times n\) matrices \(A, B, C\). 
+        \item Output: determing whether \(AB = C\).   
+    \end{itemize}
+\end{problem}
+\begin{answer}
+    Use last algorithm to give \(t = O(1)\) distinct \(r\) and check 
+    \[
+        ABr = Cr,
+    \]
+    then we can reduce the time complexity of this problem to \(O \left( n^2 \right) \) with error rate at most \(\frac{1}{2^t}\).  
+\end{answer}
+
+\begin{problem}
+    \vphantom{text}
+    \begin{itemize}
+        \item Input: Degree \(n\) polynomial \(A(x)\) and \(B(x)\) and a degree \(2n\) polynomial \(C(x)\). 
+        \item Output: Determine whether the product \(P(x)\) of \(A(x)\) and \(B(x)\) is equal to \(C(x)\).         
+    \end{itemize}
+\end{problem}
+
+\begin{remark}
+    By the definition of multiplication of polynomials, we need \(O \left( n^2 \right) \) time. If using Fast Fourier Transform, then we can compute within \(O(n \log n)\) time. Also, we need \(O(n)\) time to check whether \(P(x) = C(x)\).    
+\end{remark}
+
+\begin{algorithm}[H]
+    \caption{隨機指紋術(again)}
+    Let \(R\) consist of arbitrary \(4n\) distinct numbers. Choose a number \(r\) from \(R\) uniformly at random. Evaluate 
+    \[
+        A(r) \cdot B(r) = C(r)
+    \]    
+    in \(O(n)\) time. Report whether the equality holds. 
+\end{algorithm}
+
+\begin{theorem}
+    \begin{align*}
+        \Pr \left( A(r) B(r) = C(r) \mid A(x) B(x) = C(x) \right) &= 1 \\
+        \Pr \left( A(r) B(r) = C(r) \mid A(x) B(x) \neq C(x) \right) &\le 0.5    
+    \end{align*}
+\end{theorem}
+\begin{proof}
+    Let \(D(x) = A(x) B(x) - C(x)\). If \(D(x) \neq 0\), then its degree is at most \(2n\), and thus \(D(x)\) has at most \(2n\) roots. Now that \(r\) is chosen out of \(4n\) numbers, then the probability of \(D(r) = 0\) is not more than \(0.5\), so we're done.        
+\end{proof}
