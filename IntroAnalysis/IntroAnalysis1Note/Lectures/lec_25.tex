@@ -1,0 +1,202 @@
+\lecture{25}{4 Dec. 10:20}{}
+\section{The Fourier and Plancherel Theorems}
+\begin{theorem}[Fourier's theorem]
+    For any \(f \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\), the series 
+    \[
+        \sum_{n \in \mathbb{Z} } \hat{f} (n) e_n 
+    \]
+    converges to \(f\) in \(L^2\) metric where \(\hat{f} (n) = \langle f, e_n \rangle = \int _0^1 f(x) e^{-2\pi i n x} \, \mathrm{d} x \). In other words, 
+    \[
+        \lim_{N \to \infty} \left\lVert f - \sum_{n = -N}^N \hat{f} (n) e_n  \right\rVert_{2} = 0  
+    \]
+\end{theorem}
+\begin{proof}
+    Let \(\varepsilon > 0\), then by \autoref{thm: weierstrass approximation thm by trigonometric polynomial}, there exists a trigonometric polynomial 
+    \[P = \sum_{n = -N_0}^{N_0} c_n e_n(x) \] s.t. 
+    \[
+        \sup _{x \in [0, 1]} \vert P(x) - f(x) \vert  = \lVert P - f \rVert_\infty < \varepsilon. 
+    \]  
+    We know \(\lVert g \rVert_2 \le \lVert g \rVert_{\infty }  \) if \(g\) is continuous on \([0, 1]\). Hence, 
+    \[
+        \lVert f - P \rVert_2 \le \lVert f - P \rVert_\infty < \varepsilon.  
+    \]   
+    Now if \(N \ge N_0\), let
+    \[
+        F_N \coloneqq \sum_{n = -N}^N \hat{f} (n) e_n(x). 
+    \] 
+    For any integer \(m\) with \(\vert m \vert \le N\), we have 
+    \begin{align*}
+        \langle f - F_N, e_m \rangle &= \langle f, e_m \rangle - \langle F_N, e_m \rangle = \langle f, e_m \rangle -  \langle \sum_{n = -N}^N \hat{f} (n) e_n, e_m  \rangle \\
+        &= \hat{f} (m) - \sum_{n=-N}^N \hat{f} (n) \langle e_n, e_m \rangle = \hat{f} (m) - \hat{f} (m) = 0.       
+    \end{align*}  
+    Hence, we know \(f - F_N\) is orthogonal to \(S_N\), where \(S_N = \mathrm{span} \left\{ e_n \right\}_{n = -N}^N  \). Now for \(N \ge N_0\), we know both \(P\) and \(F_N\) lies in \(S_N\). Hence, we know 
+    \[
+        P - F_N = \sum_{\vert m \vert \le N} d_m e_m \in S_N
+    \]       
+    for suitable coefficients \(d_m\). Now since \(f - F_N\) is orthogonal to \(S_N\), so 
+    \[
+        \langle f - F_N, P - F_N \rangle = 0. 
+    \]     
+    Now since we know 
+    \begin{align*}
+        \lVert f - P \rVert_2^2 = \lVert f - F_N + F_N - P \rVert_2^2 = \lVert f - F_N \rVert_2^2 + \lVert F_N - P \rVert_2^2    
+    \end{align*}
+    by Pythagoras' theorem, so we know 
+    \[
+        \lVert f - F_N \rVert_2 \le \lVert f - P \rVert_2 \le \lVert f - P \rVert_\infty < \varepsilon.  
+    \]
+    Note that this is true for all \(N \ge N_0\), so we know 
+    \[
+        0 = \lim_{N \to \infty} \left\lVert f - F_N \right\rVert_2 = \lim_{N \to \infty} \left\lVert f - \sum_{n = -N}^N \hat{f} (n) e_n  \right\rVert_2.
+    \] 
+
+\end{proof}
+
+\begin{remark}
+        The geometric meaning: \(S_N = \mathrm{span} \left\{ e_n \right\}_{n = -N}^N  \) where \(e_n(x) = e^{2 \pi i n x}\). Note that \(\left\{ e_n \right\}_{n = -N}^N \) is an orthonormal set in \(L^2([0, 1])\) with the inner product 
+        \[
+            \langle f, g \rangle = \int _0^1 f(x) \overline{g(x)} \, \mathrm{d} x.   
+        \] 
+        Now consider the orthogonal projection of \(f\) to \(S_N\), which is 
+        \[
+            \widetilde{f} = \sum_{n = -N}^N \langle f, e_n \rangle e_n,  
+        \]     
+        then we know \(\langle f - \widetilde{f} , \widetilde{f}  \rangle = 0 \) (orthogonal projection and its complement). Hence, 
+        \[
+            \lVert f \rVert^2 = \lVert f - \widetilde{f}  \rVert^2 + \lVert \widetilde{f}  \rVert^2.
+        \] 
+        Moreover, for any given \(g \in S_N\), we know 
+        \[
+            \lVert \widetilde{f} - f \rVert_2 \le \lVert g - f \rVert_2.  
+        \] 
+        By \autoref{thm: weierstrass approximation thm by trigonometric polynomial}, we know there exists trigonometric polynomial \(P\) s.t. 
+        \[
+            \lVert f - P \rVert_\infty \le \varepsilon, 
+        \]   
+        and thus 
+        \[
+            \lVert \widetilde{f} - f \rVert_2 \le \lVert P - f \rVert_2 \le \lVert P - f \rVert_\infty \le \varepsilon .  
+        \]
+\end{remark}
+
+\begin{theorem}
+    If \(f \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\) and suppose that the Fourier coefficients of \(f\) satisfy 
+    \[
+        \sum_{n = -\infty }^{\infty} \left\vert \hat{f} (n) \right\vert = \sum_{n \in \mathbb{Z} } \left\vert \hat{f} (n) \right\vert < \infty,    
+    \]  
+    Then, 
+    \[
+        \sum_{n=-\infty }^{\infty} \hat{f} (n) e_n 
+    \]
+    converges uniformly to \(f\), i.e. 
+    \[
+        \lim_{N \to \infty} \left\lVert f - \sum_{n = -N}^N \hat{f} (n) e_n  \right\rVert_\infty  = 0.
+    \] 
+\end{theorem}
+\begin{proof}
+    Let \(F_N \coloneqq \sum_{n = -N}^N \hat{f} (n) e_n \), then 
+    \[
+        \sum_{n = -N}^N \left\vert \hat{f} (n) e_n(x) \right\vert = \sum_{n = -N}^N \left\vert \hat{f} (n) e^{2 \pi i n x} \right\vert = \sum_{n = -N}^N \left\vert \hat{f} (n) \right\vert .     
+    \] 
+    By assumption, 
+    \[
+        \sum_{n = -N}^N \left\vert \hat{f} (n) \right\vert < \infty,  
+    \]
+    so by Weierstrass \(M\)-test, we know \(\left\{ F_N \right\}_{N=1}^{\infty}   \) converges uniformly to a continuous function \(F \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\). Hence, we know 
+    \[
+        \lim_{N \to \infty} \lVert F - F_N \rVert_\infty = 0. \implies \lim_{N \to \infty} \left\lVert F - F_N \right\rVert_2 = 0.    
+    \]
+    From Fourier theorem, we also know 
+    \[
+        \lim_{N \to \infty} \left\lVert f - F_N \right\rVert_2 = 0,  
+    \]
+    so by 
+    \[
+        \lVert f - F \rVert_2 \le \lVert f - F_N \rVert_2 + \lVert F_N - F \rVert_2  
+    \]
+    we take \(N \to \infty \) then we know 
+    \[
+        \lVert f - F \rVert_2 = 0. 
+    \]
+    Now since \(f, F \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\), so we have \(f = F\) by the property of norm, which means \(F_N \to f\) uniformly.   
+
+\end{proof}
+
+\begin{theorem}[Plancherel theorem] \label{thm: Plancherel theorem}
+    For any \(f \in C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\), the series \(\sum_{n=-\infty}^{\infty} \left\vert \hat{f} (n) \right\vert^2  \) is absolutely convergent and moreover 
+    \[
+        \lVert f \rVert_2^2 = \sum_{n = -\infty }^{\infty} \left\vert \hat{f} (n) \right\vert^2.   
+    \]  
+    In particular, 
+    \[
+        \lim_{n \to \infty} \hat{f} (n) = 0 \text{ and } \lim_{n \to -\infty} \hat{f} (n) = 0,  
+    \]
+    which implies 
+    \[
+        \lim_{n \to \infty} \int _0^1 f(x) \cos (2 \pi n x) \, \mathrm{d} x = 0 \text{ and } \lim_{n \to \infty} \int_0^1 f(x) \sin (2 \pi n x) \, \mathrm{d} x = 0.     
+    \]
+\end{theorem}
+\begin{proof}
+    By Fourier's theorem, given any \(\varepsilon > 0\), there exists \(N_0 > 0\) s.t. 
+    \[
+        \left\lVert f - \sum_{n = -N}^N \hat{f} (n) e_n  \right\rVert < \varepsilon \text{ for all } N \ge N_9 
+    \]  
+    Now suppose 
+    \[
+        S_N = \sum_{n = -N}^N \hat{f} (n) e_n, 
+    \]
+    then 
+    \[
+        \lVert S_N \rVert_2 = \lVert S_N - f + f \rVert_2 \le \lVert S_N - f \rVert_2 + \lVert f \rVert_2 < \varepsilon + \lVert f \rVert_2.     
+    \]
+    Also, 
+    \[
+        \lVert f \rVert_2 = \lVert f - S_N + S_N \rVert_2 \le \lVert f - S_N \rVert_2 + \lVert S_N \rVert_2 < \varepsilon + \lVert S_N \rVert_2,     
+    \]
+    so we know
+    \[
+        \lVert f \rVert_2 - \varepsilon < \lVert S_N \rVert_2.  
+    \] 
+    Thus, 
+    \[
+        \lVert f \rVert_2 - \varepsilon < \lVert S_N \rVert_2 < \lVert f \rVert_2 + \varepsilon,   
+    \]
+    so 
+    \[
+        \left\vert \lVert S_N \rVert_2 - \lVert f \rVert_2   \right\vert < \varepsilon \text{ for } N \ge N_0.  
+    \]
+    Hence, 
+    \[
+        \lim_{N \to \infty} \lVert S_N \rVert_2 = \lVert f \rVert_2 \implies \sum_{n \in \mathbb{Z} } \left\vert \hat{f} (n) \right\vert^2 = \lVert f \rVert_2^2.      
+    \]
+    A fundamental fact from Calculus is that 
+    \begin{lemma}
+        If \(\sum_{n \in \mathbb{Z} } \vert a_n \vert^2 < \infty   \), then \(\lim_{n \to \infty} a_n = \lim_{n \to -\infty} a_n = 0  \).
+    \end{lemma}
+    Hence, by this lemma we know 
+    \[
+        \lim_{n \to \infty} \hat{f} (n) = \lim_{n \to -\infty} \hat{f} (n) = 0.
+    \]
+    Hence, we know the real part and the imaginary part of \(\hat{f} (n)\) converges to \(0\) as \(n\) approaches infty, i.e. 
+    \[
+       \lim_{n \to \infty} \int _0^1 f(x) \cos (2 \pi n x) \, \mathrm{d} x = 0 \text{ and } \lim_{n \to \infty} \int_0^1 f(x) \sin (2 \pi n x) \, \mathrm{d} x = 0.   
+    \]   
+\end{proof}
+
+\begin{eg}
+    Let \(f(x) = \left\vert x - \frac{1}{2} \right\vert \) for \(x \in [0, 1]\), then we can extend \(f\) to a function in \(C(\mathbb{R} / \mathbb{Z} , \mathbb{C} )\). Also, 
+    \[
+        \lVert f \rVert_2^2 = \int _0^1 \left( x - \frac{1}{2} \right)^2 \, \mathrm{d} x = \frac{u^3}{3} \left.  \right]_{-\frac{1}{2}}^{\frac{1}{2}} = \frac{1}{12}.  
+    \]    
+    Also, by a bunch of calculation, we know 
+    \[
+        \hat{f} (0) = \frac{1}{4}, \text{ and } \hat{f} (n) = \begin{dcases}
+            0, &\text{ if }  n \neq 0 \text{ even} ;\\
+            \frac{1}{\pi ^2 n^2}, &\text{ if } n \text{ odd}.
+        \end{dcases} 
+    \]
+    Hence, we can check that 
+    \[
+        \lVert f \rVert_2^2 = \sum_{n = -\infty }^{\infty } \left\vert \hat{f} (n) \right\vert^2.   
+    \]
+\end{eg}
