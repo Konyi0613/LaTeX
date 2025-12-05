@@ -1,0 +1,127 @@
+\lecture{23}{5 Dec. 12:20}{}
+\begin{definition}
+    A poset \((P, \le)\) is locally finite if for every \(x, y \in P\), the interval 
+    \[
+        [x, y] = \left\{ z \in P: x \le z \le y \right\} 
+    \]  
+    is finite.
+\end{definition}
+
+\begin{eg}
+    For \((\mathbb{N}, \le ), (\mathbb{Z} , \le), \left( 2^{[n]}, \subseteq  \right), \left( \mathbb{N} , \cdot \mid \cdot  \right)  \), then they are all locally finite. 
+\end{eg}
+
+\begin{definition}
+    Given a locally finite poset \((P, \le)\), the incidence algebra is the set of functions 
+    \[
+        \left\{ f: P ^2 \to \mathbb{R} \text{ s.t. } f(x, y) = 0 \quad \forall x \not\le y  \right\}. 
+    \] 
+\end{definition}
+
+\begin{remark}
+    We can think of the incidence algebra as the space of functions on the non-empty intervals \([x, y]\). 
+\end{remark}
+
+\begin{theorem}
+    The incidence algebra is equipped with operations: 
+    \begin{itemize}
+        \item (pointwise) sums: \(\forall f, g \in I(P)\), 
+        \[
+            (f + g)(x, y) = f(x, y) + g(x, y). 
+        \]
+        \item scalar multiplication: \(\forall f \in I(P), \lambda \in \mathbb{R} \), 
+        \[
+            (\lambda f)(x, y) = \lambda f(x, y). 
+        \]
+        \item multiplication (convolution): \(\forall f, g \in I(P)\), 
+        \[
+            (f * g)(x, y) = \sum_{z \in [x, y]} f(x, z) g(z, y).
+        \]
+    \end{itemize}
+\end{theorem}
+
+\begin{remark}
+    Let \(<\) be a linear extension of \((P, \le)\) is a total ordering of \(P\), i.e. \(\forall x \neq y\), \(x < y\) or \(y < x\), and if \(x \le y\) but \(x \neq y\), then \(x < y\).          
+\end{remark}
+
+\begin{proposition}
+    We can write \(f \in I(P)\) as a matrix whose rows/columns are indexed by \(P\), and the corresponding matrix is upper triangular.
+\end{proposition}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{./Figures/IMG_0838.jpg}
+    \caption{An example of \(\left( 2^{[3]}, \subseteq  \right) \)}
+\end{figure}
+
+With this correspondence, 
+\[
+    M_{f * g} = M_f M_g.
+\]
+Thus, the multiplication (convolution) is not necessarily commutative, i.e. 
+\[
+    f * g \neq g * f,
+\]
+but it is associative, i.e. 
+\[
+    (f * g) * h = f * (g * h).
+\]
+\subsubsection{Identity}
+There is an identity: the delta function 
+\[
+    \delta (x, y) = \begin{dcases}
+        1, &\text{ if }  x = y;\\
+        0, &\text{ if }  x \neq y.
+    \end{dcases},
+\]
+then \(M_{\delta } = I_P\).
+
+\subsubsection{Inverses}
+For every \(f \in I(P)\), there is a unique inverse \(f^{-1} \in I(P)\) s.t. 
+\[
+    f * f^{-1} = \delta = f^{-1} * f \iff f(x, x) \neq 0 \quad \forall x \in P.
+\] 
+We can define it recursively: 
+\[
+    f^{-1} (x, x) = \frac{1}{f(x, x)}.
+\]
+Then, 
+\[
+    1 = \delta (x, x) = \left( f * f^{-1} \right)(x) = f(x, x) f^{-1} (x, x). 
+\]
+What about \(f^{-1}(x, y)\) for \(x \le y\) but \(x \neq y\)? Suppose we have already define \(f^{-1}(z, y)\) for all \(x < z \le y\), then 
+\begin{align*}
+    0 &= \delta (x, y) = \left( f * f^{-1} \right)(x, y) = \sum_{z \in [x, y]} f(x, z) f^{-1} (z, y) \\
+    &= f(x, x) f^{-1}(x, y) + \sum_{x < z \le y} f(x, z) f^{-1}(z, y),   
+\end{align*}     
+so we can define 
+\[
+    f^{-1}(x, y) = \frac{- \sum_{x < z \le y} f(x, z) f^{-1}(z, y)}{f(x, x)}.
+\]
+
+\begin{definition}
+    The zeta function \(\zeta _P\) of a locally finite poset \(P\) is 
+    \[
+        \zeta _P (x, y) = \begin{dcases}
+            1, &\text{ if } x \le y ;\\
+            0, &\text{ if } x \not\le y.
+        \end{dcases},
+    \]  
+    i.e. \(\zeta _P \equiv 1\) on the non-empty intervals. 
+\end{definition}
+
+\begin{definition}
+    Given a locally finite poset \((P, \le)\), the mobius function \(\mu _P\) is the inverse of the zeta function:
+    \[
+      \mu _P = \zeta _P^{-1}.  
+    \] 
+\end{definition}
+
+Observe that since \(\zeta _P (x, x) = 1 \neq 0\) for all \(x \in P\), so \(\mu _P = \zeta _P^{-1}\) exists: 
+\[
+    \mu _P (x, x) = \frac{1}{\zeta _P (x, x)} = 1 \quad \forall x \in P
+\]  
+and for all \(x < y\) we have 
+\[
+    \mu _P (x, y) = - \sum_{x < z \le y} \mu _P (x, y) = - \sum_{x \le z < y} \mu _P (x, z) . 
+\] 
