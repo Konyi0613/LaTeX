@@ -1,0 +1,220 @@
+\lecture{24}{9 Dec. 15:30}{}
+\begin{proposition}
+    Let \(P\) be a locally finite poset. Then, \(\forall x, y \in P\) and \(k \in \mathbb{N} \cup \left\{ 0 \right\} \), 
+    \[
+        \left( \zeta _P - \delta  \right)^k (x, y) = \left\vert \left\{ x, y \text{ chain of length } k, x = x_0 \lneq x_1 \lneq x_2 \lneq \dots \lneq x_k = y  \right\}  \right\vert.  
+    \]   
+    Note that the multiplication of function here is the convolution.
+\end{proposition}
+\begin{proof}
+    We do induction on \(k\). 
+    \begin{itemize}
+        \item Base case: \(k = 0\). 
+        \[
+            \left( \zeta _P - \delta  \right)^0 (x, y) = \delta (x, y) = \begin{dcases}
+                1, &\text{ if }  y = x;\\
+                0, &\text{ if }  y \neq x.
+            \end{dcases} 
+        \]
+        \item Induction step: \(k \ge 1\). We split the \(x, y\) chains of length \(k\) based on the element \(x_{k - 1}\). By induction, the number of \(x, x_{k - 1}\) chains of length \(k - 1\) is 
+        \[
+            \left( \zeta _P - \delta  \right)^{k - 1}(x, x_{k-1}). 
+        \]
+        We can add \(y\) to get an \(x, y\) chain of length \(k\) if and only if \(x_{k-1} \lneq y\), which occurs if and only if \(\left( \zeta _p - \delta  \right)(x_{k-1}, y) = 1 \). Thus, the number of \(x, y\) chain of length \(k\) whose second last element is \(x_{k-1}\) is 
+        \[
+            \left( \zeta _P - \delta  \right)^{k-1}(x, x_{k-1}) \left( \zeta _P - \delta  \right)(x_{k-1}, y).  
+        \]        
+        By sum rule, the number of \(x, y\) chain of length \(k\) is 
+        \begin{align*}
+            \sum_{x_{k-1} \in P} \left( \zeta _P - \delta  \right)^{k-1} (x, x_{k-1}) (\zeta _p - \delta )(x_{k-1}, y) &= \sum_{x_{k-1} \in [x, y]} \left( \zeta _p - \delta  \right)^{k-1} (x, x_{k-1}) \left( \zeta _P - \delta  \right)(x_{k-1}, y) \\
+            &= \left( (\zeta _P - \delta )^{k-1} * \left( \zeta _P - \delta  \right)  \right)(x, y) = \left( \zeta _P - \delta  \right)^k (x, y).       
+        \end{align*}  
+    \end{itemize} 
+\end{proof}
+
+\begin{eg}
+    For \((P, \le) = (\mathbb{N} , \le)\), then
+    \[
+        \mu _P(x, y) = \begin{dcases}
+            1, &\text{ if }  x = y;\\
+            -1, &\text{ if } y = x + 1 ;\\
+            0, &\text{ otherwise} .
+        \end{dcases}.
+    \]
+\end{eg}
+\begin{explanation}
+    Do induction on \(y - x\). 
+    \begin{itemize}
+        \item Base case: \(y < x\), then \(\mu _p(x, y) = 0\), and if \(y = x\), then \(\mu _P(x, x) = 1\). 
+        \item Induction step: (\(y \ge x + 1\)) Then 
+        \[
+            \mu _P(x, y) = 0 \sum_{x \le z < y} \mu _P(x,z) = \begin{dcases}
+                -1, &\text{ if } y = x + 1 ;\\
+                -(1 + (-1) + 0 + \dots + 0) = 0, &\text{ if } y \ge x + 2.
+            \end{dcases} 
+        \]
+    \end{itemize} 
+\end{explanation}
+
+\begin{eg}
+    If \((P, \le) = \left( 2^{[n]}, \subseteq  \right) \), then 
+    \[
+        \mu _P (S, T) = \begin{dcases}
+            (-1)^{\vert T \setminus S \vert }, &\text{ if }  S \subseteq T; \\
+            0, &\text{ otherwise} .
+        \end{dcases}
+    \] 
+\end{eg}
+\begin{explanation}
+    If \(S \subsetneq T\), then \(\mu _P(S, T) = 0\). Then we can do induction on \(\vert T \setminus S \vert \). 
+    \begin{itemize}
+        \item Base case: \(T = S\). Then, \(\mu _P(S, T) = (-1)^0 = 1\). 
+        \item Induction step: \(S \subsetneq T\), then 
+        \begin{align*}
+            \mu _P(S, T) &= - \sum_{\substack{R \in [S, T] \\ R \neq T}} \mu _P(S, R) = - \sum_{S \subseteq R \subsetneq T} (-1)^{\left\vert R \setminus S \right\vert } = -\sum_{I \subsetneq T \setminus S} (-1)^{\vert I \vert } \\
+            &= -\sum_{k=0}^{\vert T \setminus S \vert - 1 } \binom{\vert T \setminus S \vert }{k}(-1)^k = - \left[ \sum_{k=0}^{\vert T \setminus S \vert } \binom{\vert T \setminus S \vert }{k}(-1)^k - \binom{\vert T \setminus S \vert }{\vert T \setminus S \vert } (-1)^{\vert T \setminus S \vert } \right] \\
+            &= - \left[ \left( 1 + (-1) \right)^{\vert T \setminus S \vert } - (-1)^{\vert T \setminus S \vert } \right] = (-1)^{\vert T \setminus S \vert }.
+        \end{align*}
+    \end{itemize}   
+\end{explanation}
+
+\begin{eg}
+    If \((P, \le) = (\mathbb{N} , \cdot \mid \cdot)\), then what is \(\mu \)?  
+\end{eg}
+\begin{explanation}
+    Given a natural number \(n \in \mathbb{N} \), let \(p(n)\) be the number of distinct prime divisors of \(n\). For example, 
+    \[
+        p(2) = 1, p(3) = 1, p(4) = 1, p(6) = 2.
+    \]   
+    We say \(n\) is squarefree if it is not divisible by any square, i.e. in its prime factorization \(n = p_1^{k_1} p_2^{k_2} \dots p_{\ell }^{k_{\ell }} \) for distinct primes \(p_1, p_2, \dots , p_{\ell }\), we have 
+    \[
+        k_1 = k_2 = \dots = k_{\ell } = 1.
+    \]   
+    We claim that 
+    \[
+        \mu _P(x, y) = \begin{dcases}
+            1, &\text{ if } y = x ;\\
+            (-1)^{p\left( \frac{y}{x} \right) }, &\text{ if } x \mid y \text{ and } \frac{y}{x} \text{ is squarefree} ;\\
+            0, &\text{ otherwise} .
+        \end{dcases}
+    \]
+    If \(x \nmid y\), then \(\mu _P(x, y) = 0\). If \(x \mid y\), then we do induction on \(\frac{y}{x}\). 
+    \begin{itemize}
+        \item Base case: \(y = x\), then \(\mu _P(x, y) = 1\). 
+        \item Induction step: Consider the prime factorization 
+        \[
+            \frac{y}{x} = p_1^{k_1} p_2^{k_2} \dots p_{\ell }^{k_{\ell } } \text{ for } \ell = p \left( \frac{y}{x} \right).  
+        \]
+        Thus, 
+        \begin{align*}
+            \mu _P(x, y) &= - \sum_{x \le z \lneq y} \mu _P(x, z) = -\sum_{\substack{x \mid z, z \mid y \\ z \neq y \\ \frac{z}{x} \text{ squarefree} }} \mu _P(x, z).  
+        \end{align*}
+        Note that such \(z\) is of the form 
+        \[
+            z = x \prod _{i \in I} p_i, \text{ where } I \subseteq [\ell ] \text{ and } I \neq [\ell ]  
+        \] 
+        If \(\frac{y}{x}\) is not squarefree: 
+        \begin{align*}
+            \mu _P(x, y) &= - \sum_{\substack{x \le z \lneq y \\ \frac{z}{x} \text{ squarefree} }} \mu _P(x, z) = -\sum_{I \subseteq [\ell ]} \mu _P (x, x \prod _{i \in I} p_i) \\
+            &= - \sum_{I \subseteq [\ell ]} (-1)^{\vert I \vert } = - (1 + (-1))^{\ell } = 0.  
+        \end{align*} 
+        If \(\frac{y}{x}\) is squarefree, then 
+        \begin{align*}
+            \mu _P(x, y) &= - \sum_{\substack{I \subseteq [\ell ] \\ I \neq [\ell ]}} (-1)^{\vert I \vert } = -\left[ (1 + (-1))^{\ell } - (-1)^{\ell } \right] = (-1)^{\ell } = (-1)^{p \left( \frac{y}{x} \right) }. 
+        \end{align*} 
+        \begin{remark}
+            If \(x \mid y\) and \(\frac{y}{x}\) squarefree with \(\frac{y}{x} = p_1 p_2 \dots p_{\ell }\), then there is a poset isomorphism between \(\left( [x, y], \cdot \mid \cdot \right) \) and \(\left( 2^{[\ell] }, \subseteq  \right) \) by 
+            \[
+                z \mapsto x \prod _{i \in I} p_i.
+            \]     
+        \end{remark}
+    \end{itemize}    
+\end{explanation}
+
+\begin{theorem}[Mobius inversion formula]
+    Let \((P, \le)\) be a locally finite poset with a minimum element \(x_0 \in P\), i.e. \(x_0 \le x\) for all \(x \in P\). Suppose we have \(f: P \to \mathbb{R} \) and define 
+    \[
+        g(y) = \sum_{x \le y} f(x), 
+    \]    
+    then for every \(y \in P\), 
+    \[
+        f(y) = \sum_{x \le y} g(x) \mu _P(x, y). 
+    \] 
+\end{theorem}
+\begin{proof}
+    Define \(\widetilde{f} , \widetilde{g} \in I(P)\), where 
+    \[
+        \widetilde{f} (x, y) = \begin{dcases}
+            f(y), &\text{ if } x \le y ;\\
+            0, &\text{ if } x \nleq y.
+        \end{dcases}
+    \] 
+    and 
+    \[
+        \widetilde{g} (x, y) = \sum_{z \in [x, y]} f(z). 
+    \]
+    Observe that 
+    \[
+        g(y) = \sum_{x \le y} f(x) = \widetilde{g} (x_0, y ). 
+    \]
+    Note that 
+    \begin{align*}
+        \widetilde{g} (x, y) &= \sum_{z \in [x, y]} f(z) = \sum_{z \in [x, y]} \widetilde{f} (x, z) = \sum_{z \in [x, y]} \widetilde{f} (x, z) \cdot 1 = \sum_{z \in [x, y]} \widetilde{f} (x, z) \zeta _P(z, y) = \left( \widetilde{f} * \zeta _P \right)(x, y).    
+    \end{align*}
+    Thus, \(\hat{g} = \hat{f} * \zeta _P\), and thus 
+    \begin{align*}
+        \widetilde{g} * \mu _P &= \left( \widetilde{f} * \zeta _P \right) * \mu _p = \widetilde{f} * \left( \zeta _P * \mu _P \right) = \widetilde{f} * \delta = \widetilde{f}.  
+    \end{align*} 
+    Thus, 
+    \begin{align*}
+        f(y) &= \widetilde{f} (x_0, y) = (\widetilde{g} * \mu _P)(x_0, y) = \sum_{x \in [x_0, y]} \widetilde{g} (x_0, x) \mu _P(x, y) = \sum_{x \in [x_0, y]} g(x) \mu _P(x, y). 
+    \end{align*}
+\end{proof}
+
+\begin{corollary}
+    In \((\mathbb{N}, \le )\), if \(g(y) = \sum_{x \le y} f(x) \), then 
+    \[
+        f(y) = \sum_{x \le y} g(x) \cdot \mu _P(x, y) = g(y) - g(y-1). 
+    \]  
+\end{corollary}
+
+\begin{corollary}
+    In \(\left( 2^{[n]}, \subseteq  \right) \), if \(g(T) = \sum_{S \subseteq T} f(S) \), then 
+    \[
+        f(T) = \sum_{S \subseteq T} g(S) \mu _P(S, T) = \sum_{S \subseteq T} g(S) (-1)^{\vert T \setminus S \vert }. 
+    \]  
+\end{corollary}
+
+\begin{corollary}
+    In \((\mathbb{N} , \cdot \mid \cdot)\), if 
+    \[
+        g(n) = \sum_{d \mid n} f(d), 
+    \] 
+    then 
+    \[
+        f(n) = \sum_{d \mid n} g(d) \mu _P(d, n) = \sum_{\substack{d \mid n \\ \frac{n}{d} \text{ squarefree} }} g(d) (-1)^{p \left( \frac{n}{d} \right) }.  
+    \]
+\end{corollary}
+
+\subsubsection{Application 1} For any \(n\), 
+\[
+    n = \sum_{d \mid n} \varphi (d), 
+\] 
+where \(\varphi \) is the Euler Totient function. By mobius inversion, 
+\[
+    \varphi (n) = \sum_{d \mid n} d \cdot \mu _P(d, n) = \sum_{\substack{d \mid n \\ \frac{n}{d} \text{ squarefree} }} d \cdot (-1)^{p \left( \frac{n}{d} \right) }.  
+\] 
+If \(n = p_1^{k_1} \dots p_{\ell }^{k_{\ell } }\), then we need 
+\[
+    \frac{n}{d} = \prod _{i \in I} p_i \text{ for some } I \subseteq [\ell ] \iff d = \frac{n}{\prod _{i \in I} p_i} \text{ for some } I \subseteq [\ell ],  
+\] 
+so 
+\[
+    \varphi (n) = \sum_{I \subseteq [\ell ]} \frac{n}{\prod _{i \in I} p_i} (-1)^{\vert I \vert } = n \sum_{I \subseteq [\ell ]} \prod _{i \in I} \left( -\frac{1}{p_i} \right) = n \prod _{i=1}^{\ell } \left( 1 - \frac{1}{p_i} \right).    
+\]
+
+\subsubsection{Application 2: Inclusion-Exclusion}
+Set \(X\), subsets \(A_1, A_2, \dots , A_n \subseteq X\), then 
+\[
+    \left\vert X \setminus \left( \bigcup_{i=1}^{n} A_i  \right)  \right\vert = \sum_{I \subseteq [n]} (-1)^{\vert I \vert } \left\vert \bigcap_{i \in I} A_i  \right\vert.
+\] 
