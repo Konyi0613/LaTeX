@@ -1,0 +1,139 @@
+\chapter{P and NP}
+\lecture{4}{4 Dec. 14:20}{}
+\begin{problem}
+    If the solution of a problem can be verified quickly, then can we find the solution quickly, too?
+\end{problem}
+
+\begin{definition}
+    \vphantom{text}
+    \begin{itemize}
+        \item P (Polynomial time): The problems that can be solved in polynomial time. e.g. sorting.
+        \item NP (Nondeterministic Polynomial time): The problems that can be verified whether a solution is true or not in polynomial time. e.g. sudoku, traveling salesman problem.
+    \end{itemize}
+\end{definition}
+
+\begin{remark}
+    We call P the class of all problems that can be solved in polynomial time, while NP consists of the problems that can be solved in non-deterministic polynomial time. 
+\end{remark}
+
+\begin{figure}[h]
+\centering
+\begin{minipage}[t]{0.45\textwidth}
+    \includegraphics[width=\linewidth]{./Figures/Screenshot from 2025-12-11 21-43-19.png}
+    \caption{Deterministic algorithm}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+    \includegraphics[width=\linewidth]{./Figures/Screenshot from 2025-12-11 21-43-30.png}
+    \caption{Non-deterministic algorithm}
+\end{minipage}
+\end{figure}
+
+\begin{algorithm}[H]
+    \caption{Non-deterministic sort}
+    \For(){\(i = 1\) to \(n\)}{
+        \For(){\(j = 1\) to \(n - 1\)}{
+            Non-deterministically, either exchange \(A[j]\) and \(A[j + 1]\) or do nothing.  
+        }
+    }
+\end{algorithm}
+
+\begin{remark}
+    This is not a random algorithm.
+\end{remark}
+
+\begin{problem}[Vertex Cover Problem]
+    \vphantom{text}
+    \begin{itemize}
+        \item Input: A graph \(G\) and an integer \(k\). 
+        \item Output: Determine whether \(G\) admits a set of at most \(k\) vertices that cover all edges of \(G\).     
+    \end{itemize}
+\end{problem}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{./Figures/Screenshot from 2025-12-11 21-56-40.png}
+    \caption{Vertex Cover Problem}
+    \label{fig:vertex cover problem}
+\end{figure}
+
+\begin{algorithm}[H]
+    \caption{A non-deterministic algorithm for vertex cover problem}
+    Let \(S = \varnothing \). \\
+    For each \(x \in V(G)\), insert \(x\) non-deterministically into \(S\). \\
+    If \(\vert S \vert \le k\) and \(S\) is a vertex cover of \(G\), then output yes. Otherwise, output no.       
+\end{algorithm}
+
+\begin{remark}[The standard of correctness of a non-deterministic algorithm]
+    If the correct answer is yes, then there is a computation path of the algorithm that leads to yes. If the correct answer is no, then all computation paths of the algorithm lead to no.
+\end{remark}
+
+\begin{definition}
+    We say that a non-deterministic algorithm \(N\) runs in polynomial time if for any input \(x\) of \(N\), any computation on \(x\) takes time polynomial in the size of \(x\).
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.3\textwidth]{./Figures/Screenshot from 2025-12-11 22-05-05.png}
+    \end{figure}     
+\end{definition}
+
+\begin{theorem}
+    P \(\subseteq\) NP.
+\end{theorem}
+
+\begin{theorem}
+    Each NP problem can be solved in (deterministic) exponential time.
+\end{theorem}
+
+\begin{remark}
+    If P\(=\)NP, then each non-deterministic polynomial time algorithm has a deterministic version that runs in polynomial time. Thus, 
+    \begin{itemize}
+        \item If P\(=\)NP, then all hardest problems in NP can be solved by polynomial time (deterministic) algorithm. 
+        \item If P\(\neq \)NP, then there is a hardest problem in NP that cannot be solved by any polynomial time (deterministic) algorithm.  
+    \end{itemize} 
+\end{remark}
+
+\begin{definition}
+    A decision (i.e. yes-no) problem \(\prod \) is polynomial time verifiable if there is a deterministic polynomial time algorithm \(V\) s.t. the following statement holds for each instance \(x\) of \(\prod \): 
+    \begin{itemize}
+        \item \(x\) is a YES-instance of \(\prod \) if and only if there is a certificate \(y\) with \(\vert y \vert \le \vert x \vert^{O(1)}  \) s.t. \(V(x, y) = \) "Yes".     
+    \end{itemize}    
+\end{definition}
+
+\begin{theorem} \label{thm: NP def}
+    A problem \(\prod \) is NP if and only if \(\prod \) is polynomial-time verifiable.  
+\end{theorem}
+
+Thus, we have two equivalent definition for NP:
+\begin{itemize}
+    \item One if based on the computational power of Non-deterministic Turing Machine (NTM), which emphasize the ability to generate/guess the solution in polynomial time. 
+    \item The other one is based on the correctness of the verifier, which emphasize the ability to verify a purported solution.
+\end{itemize}
+
+\begin{remark}
+    NTM is a non-deterministic algorithm with \(O(1)\) degree of nondeterminism, where degree of nondeterminism is the maximal branch number of below figure.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.6\textwidth]{./Figures/Screenshot from 2025-12-11 22-30-42.png}
+    \end{figure}
+\end{remark}
+
+\begin{corollary}
+    A language \(L \in \)NP iff there exists a NTM \(M\) deciding \(L\) in polynomial time, so \(L\) is the set of all Yes-instance, and for all \(y \notin L\), \(y\) is a No-instance.   
+\end{corollary}
+
+\begin{corollary}
+    A language \(L \in NP\) iff there exists a deterministic verifier \(V\) and a polynomial \(p\) s.t. 
+    \[
+        L = \left\{ x \mid \exists y, \ \vert y \vert \le p \left( \vert x \vert  \right) \text{ and } V(x, y) = 1    \right\}, 
+    \]   
+    where \(y\) is called the certificate of \(x\).  
+\end{corollary}
+
+Now we prove the equivalence of two definition of NP (\autoref{thm: NP def}). 
+\begin{proof}
+    \vphantom{text}
+    \begin{itemize}
+        \item [\((\implies )\)] Suppose we have a verifier \(V\) and its corresponding polynomial \(p\), then we can construct a NTM \(M\) decides the language. Suppose the length of the input \(x\) is \(n\). We first non-deterministically choose a string \(y\) of length at most \(p(n)\), then we call \(V(x, y)\). If \(V(x, y) = 1\), then \(M\) accept, otherwise \(M\) reject. Note that \(M\) decides the language since \(M\) accept the input \(x\) iff \(y\) s.t. \(V(x, y) = 1\) exists. Also, select \(y\) takes \(O(p(n))\) time and verify \(V(x, y)\) takes polynomial time, so the total time is still polynomial.            
+        \item  Now if we have a NTM \(M\) decides \(L\) in polynomial time, then we want to construct a polynomial verifier \(V\). In this case, the certificate is the path on \(M\) from beginning configuration to accept configuration, and we can verify this path by simulating it, we know this takes polynomial time.    
+    \end{itemize}
+\end{proof}
