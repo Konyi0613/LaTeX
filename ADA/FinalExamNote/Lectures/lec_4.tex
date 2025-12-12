@@ -137,3 +137,249 @@ Now we prove the equivalence of two definition of NP (\autoref{thm: NP def}).
         \item  Now if we have a NTM \(M\) decides \(L\) in polynomial time, then we want to construct a polynomial verifier \(V\). In this case, the certificate is the path on \(M\) from beginning configuration to accept configuration, and we can verify this path by simulating it, we know this takes polynomial time.    
     \end{itemize}
 \end{proof}
+
+\section{NP-completeness and NP-hardness}
+Note that if a problem is an NP problem, then it is highly likely a very difficult problem. Also, if we say a problem is NP-hard, then this problem is \textcolor{red}{at least as hard as} all the problems in NP.
+\begin{definition}
+    A problem \(X\) is NP-hard if the following condition holds: If \(X\) can be solved in (deterministic) polynomial time, then all problems in NP can be solved in (deterministic) polynomial time.   
+\end{definition}
+
+\begin{remark}
+    This does not rule out that the possibility that \(X\) ias an unsolvable problem, i.e. a problem that cannot be solved by any algorithm (like Halting Problem). 
+\end{remark}
+
+\begin{definition}
+    A problem is NP-complete if it is an NP-hard problem that is also in NP.
+\end{definition}
+
+\begin{remark}
+    Thus, an NP-complete problem is one of the \textcolor{red}{hardest} problems in the class NP. That is, an NP-complete problem is a hardness representative of the class NP.
+\end{remark}
+
+\begin{remark}
+    Suppose \(X\) is an NP-complete problem. 
+    \begin{itemize}
+        \item If one proves that \(X\) can be solved by a polynomial-time algorithm, then P\(=\)NP. 
+        \item If one proves that \(X\) cannot be solved by any polynomial-time algorithm, then P\(\neq \)NP.    
+    \end{itemize} 
+\end{remark}
+
+\begin{problem}[Satisfiability]
+    \vphantom{text}
+    \begin{itemize}
+        \item Input: A boolean formula with variables. 
+        \item Output: Whether there is a truth assignment for the variables that satisfies the input boolean formula.
+    \end{itemize}
+\end{problem}
+
+\begin{remark}
+    SAT is the first know NP-complete problem.
+\end{remark}
+
+\begin{corollary}
+    \vphantom{text}
+    \begin{itemize}
+        \item If one proves that SAT can be solved by a polynomial-time algorithm, then P\(=\)NP. 
+        \item If one proves that SAT cannot be solved by any polynomial-time algorithm, then P\(\neq \)NP.    
+    \end{itemize} 
+\end{corollary}
+
+\section{Polynomial-time reduction}
+\begin{definition}
+    Problem \(A\) can be reduced (in polynomial time) to problem \(B\) if the following condition holds: 
+    \begin{itemize}
+        \item If problem \(B\) has a polynomial-time algorithm, then so does problem \(A\).  
+    \end{itemize}  
+\end{definition}
+
+\begin{remark}
+    We also call this condition as problem \(B\) can be reduced from problem \(A\).  
+\end{remark}
+
+\section{Example for reduction}
+\begin{problem}[Hamiltonian Cycle]
+    \vphantom{text}
+    \begin{itemize}
+        \item An undirected graph \(G\). 
+        \item Whether or not \(G\) contains a simple cycle that contains all vertices of \(G\).   
+    \end{itemize}
+\end{problem}
+
+\begin{problem}[Hamiltonian Path]
+    \vphantom{text}
+    \begin{itemize}
+        \item An undirected graph \(G\) and two vertices \(s, t\) of \(G\). 
+        \item Whether or not \(G\) contains a simple \(st\)-path that contains all vertices of \(G\).   
+    \end{itemize}
+\end{problem}
+
+\begin{corollary}
+    Hamiltonian cycle problem can be reduced to Hamitonian path problem.
+\end{corollary}
+\begin{proof}
+    Let \(G\) be an input instance for the Hamiltonian Cycle problem. Suppose that the Hamiltonian Path Problem has a polynomial-time algorithm \(B\), then we can design a polynomial-time algorithm \(A\) for the Hamiltonian cycle problem: \\
+    \begin{algorithm}[H]
+        \caption{Finding Hamiltonian Cycle}
+        Run \(B(G, s, t)\) for each edge \(st\) of \(G\). If all iterations return no, then answer no. Otherwise, answer yes.    
+    \end{algorithm}  
+    Note that \(G\) has a Hamiltonian cycle iff there exists \(s, t\) s.t. an \(s t\)-Hamiltonian path exists and \(s, t\) are adjacent.    
+\end{proof}
+
+\begin{remark}
+    Since Hamiltonian Cycle is one of the Karp's 21 NP-complete problems, so the Hamiltonian Path problem is also NP-complete.
+\end{remark}
+
+\begin{problem}[Longest Path Problem]
+    \vphantom{text}
+    \begin{itemize}
+        \item A graph \(G\) and two vertices \(u\) and \(v\) of \(G\). 
+        \item A longest simple \(uv\)-path of \(G\).      
+    \end{itemize}
+\end{problem}
+
+\begin{remark}
+    The problem is in NP since for given \(u, v\), we can non-deterministically select a list of non-repeatitive vertices of \(G\) starting from \(u\) and ending at \(v\), then we can check whether this list form a simple \(uv\)-path in polynomial time.     
+\end{remark}
+
+\begin{corollary}
+    We can reduce the Hamiltonian Path Problem to Longest Path Problem in polynomial time, so Longest Path Problem is also NP-complete.
+\end{corollary}
+\begin{proof}
+    Suppose \((G, u, v)\) is an input instance for the Hamiltonian Path problem. Suppose that the Longest Path Problem has a polynomial-time algorithm \(B\), then we can just run \(B(G, u, v)\) to check whether the longest simple \(uv\)-path passes all vertices of \(G\). If yes, then return yes, otherwise return no.     
+\end{proof}
+
+\begin{problem}[Vertex Cover Problem]
+    \vphantom{text}
+    \begin{itemize}
+        \item Input: A graph \(G\) and an integer \(k\). 
+        \item Output: Determine whether \(G\) admits a set of at most \(k\) vertices that cover all edges of \(G\).   
+    \end{itemize}
+\end{problem}
+
+\begin{remark}
+    Vertex Cover Problem is one of Karp's \(21\) NP-complete problem.
+\end{remark}
+
+\begin{problem}[Independent Set/Stable Set]
+    \vphantom{text}
+    \begin{itemize}
+        \item A graph \(G\) and an integer \(k\). 
+        \item Determine whether \(G\) contains a subset \(S\) of \(V(G)\) with \(\vert S \vert \ge k \) any two vertices in \(S\) are not adjacent in \(G\).        
+    \end{itemize}
+\end{problem}
+
+\begin{lemma}
+    For each subset \(S\) of \(V(G)\), \(S\) is a vertex cover of \(G\) if and only if \(V(G) \setminus S\) is an independent set of \(G\).      
+\end{lemma}
+\begin{proof}
+    If \(S\) is a vertex cover of \(G\), then any edge of \(G\) has at least one endpoint in \(S\). Equivalently, for eny edge of \(G\), at most one endpoint is in \(V(G) \setminus S\), so \(V(G) \setminus S\) is an independent set. 
+    
+    If \(V(G) \setminus S\) is an independent set, then we can use similar argument to show \(S\) is a vertex cover.  
+\end{proof}
+
+\begin{theorem}
+    We can reduce Independent Set Problem to Vertex Cover Problem.
+\end{theorem}
+\begin{proof}
+    Let \((G, k)\) be an input instance for the independent set problem. Suppose that the Vertex Cover Problem has a polynomial-time algorithm \(B\), then we can run \(B(G, \vert V(G) \vert - k )\) to check whether there is a vertex cover of at most \(\vert V(G) \vert - k \) vertices. If yes, then there is an independent set of at least \(k\) vertices, so we output yes, otherwise we output no.     
+\end{proof}
+
+\section{A less obvious example}
+\begin{definition*}
+    If \(x\) is a boolean variable 
+    \begin{definition}
+        \(x\) and \(\overline{x} \) are literals. 
+    \end{definition} 
+
+    \begin{definition}
+        If \(y_1, y_2, \dots , y_m\) are literals, then 
+        \[
+            y_1 \vee y_2 \vee \dots \vee y_m
+        \] 
+        is a clause.
+    \end{definition}
+
+    \begin{definition}
+        If \(C_1, C_2, \dots , C_n\) are clauses, then 
+        \[
+            C_1 \wedge C_2 \wedge \dots \wedge C_n
+        \] 
+        is a CNF (conjunctive normal form).
+    \end{definition}
+    
+    \begin{definition}
+        A \(k\)-CNF is a CNF each of whose clause has at most \(k\) literals.  
+    \end{definition}
+
+    \begin{remark}
+        Each boolean formula has an equivalent CNF.
+    \end{remark}
+\end{definition*}
+
+\begin{problem}[\(K\)-SAT]
+    \vphantom{text}
+    \begin{itemize}
+        \item Input: A \(k\)-CNF \(\phi \). 
+        \item Output: Determine whether \(\phi \) is satisfiable.   
+    \end{itemize}
+\end{problem}
+
+\begin{eg}
+    \[
+        \phi = \left( x \vee y \vee \overline{z}  \right) \wedge \left( \overline{x} \vee z \vee w \right) \wedge (x \vee w)  
+    \]
+    is a YES-instance of \(3\)-SAT, while 
+    \[
+        \phi = \left( x \vee \overline{y} \right) \wedge \left( \overline{x} \vee y \right) \wedge \left( \overline{x} \vee \overline{y} \right) \wedge (x \vee y)   
+    \] 
+    is a NO-instance of \(2\)-SAT. 
+\end{eg}
+
+\begin{definition}
+    We define the graph \(G(\phi )\) for a \(3\)-CNF \(\phi = C_1 \wedge C_2 \wedge \dots \wedge C_n\) by: 
+    \begin{itemize}
+        \item For each \(C_i = \alpha \vee \beta \vee \gamma \), we construct a triangle on three new vertices \(\alpha , \beta , \gamma \). 
+        \item For any two vertices \(x\) and \(\overline{x} \) of the same variable \(x\) that are complement to each other, we add an edge \(x \overline{x} \) between them.      
+    \end{itemize} 
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.6\textwidth]{./Figures/Screenshot from 2025-12-12 10-39-28.png}
+        \caption{\(G(\phi )\) for \(\phi = \left( x \vee y \vee z \right) \wedge \left( \overline{x} \vee \overline{y} \vee \overline{z}  \right) \wedge \left( \overline{x} \vee y \vee z \right)\).}
+    \end{figure} 
+\end{definition}
+
+\begin{lemma}
+    The \(3\)-CNF \(\phi = C_1 \wedge C_2 \wedge \dots \wedge C_n\) is satisfiable if and only if the graph \(G(\phi )\) has an independent set of size \(n\).    
+\end{lemma}
+\begin{proof}
+    \vphantom{text}
+    \begin{itemize}
+        \item [\((\implies )\)] If a truth assignment \(T\) satisfies \(\phi \), then \(T\) satisfies at least one literal in each clause. We choose an arbitrary one satisfied literal from each triangle. The chosen vertices have to be pairwise non-adjacent in \(G(\phi )\) since all vertices are chosen from different triangle and if \(x\) is true, then \(\overline{x} \) cannot be true.      
+        \item [\((\impliedby )\)] Let \(S\) be an independent set of \(G(\phi )\) of size \(n\). Each triangle has exactly one vertex in \(S\). For each literal \(\alpha \in S\), we assign \(T(\alpha )\) to be true and \(T(\overline{\alpha } )\) to be false, then \(T\) is a truth assignment that satisfies \(\phi \).        
+    \end{itemize}
+\end{proof}
+
+\begin{theorem}
+    We can reduce \(3\)SAT to Independent Set problem.  
+\end{theorem}
+\begin{proof}
+    If \(\phi \) is an input instance for the \(3\)SAT problem, and independent set problem has a polynomial-time algorithm \(B\), then we can run \(B(G(\phi ), n)\) and report the answer obtained.     
+\end{proof}
+
+\section{Unsolved problem}
+There are two famous problem such that we don't know they are NP or NP-complete.
+\begin{problem}[Factorization]
+    Factorize a non-prime \(N\) into product of two factors. 
+\end{problem}
+
+\begin{problem}[Graph Isomorphism]
+    Determine whether a matrix \(A\) is an adjacency matrix of a graph \(G\).  
+\end{problem}
+
+\begin{remark}
+    Subgraph isomorphism problem
+    \begin{itemize}
+        \item Determine if a input matrix \(A\) is an adjacency matrix of a subgraph of the input graph \(G\). 
+    \end{itemize}
+    is NP-complete. (Reduce from Hamiltonian cycle)
+\end{remark}
