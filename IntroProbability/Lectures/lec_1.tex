@@ -1,0 +1,209 @@
+\chapter{Combinatorial Analysis}
+\lecture{1}{24 Feb.}{}
+\begin{definition}[Gerolamo Cardano (1501-1576) Basic Probability Model]
+\hfill 
+\begin{itemize}
+    \item Sample space: set of all possible outcomes. 
+    \item Event: \(E \subseteq S\), the set of outcomes we are interested in. 
+    \item Probability: \(\mathbb{P} (E) \in [0, 1]\).  
+\end{itemize}
+\end{definition}
+
+\begin{remark}
+    In (finite) uniform model, 
+    \[
+        \mathbb{P} (E) = \frac{\vert E \vert }{\vert S \vert }.
+    \]
+\end{remark}
+
+\begin{eg}
+    Rolling a (fair) die, then what is the probability of getting a six?
+\end{eg}
+
+\begin{explanation}
+    \(S = \left\{ 1, 2, 3, 4, 5, 6 \right\}, E = \left\{ 6 \right\}  \), then \(\mathbb{P} (E) = \frac{\vert E \vert }{\vert S \vert } = \frac{1}{6}\).  
+\end{explanation}
+
+\begin{eg}
+    If we roll a fair die, then what is the probability of rolling a prime?
+\end{eg}
+\begin{explanation}
+    \(S = \left\{ 1, 2, 3, 4, 5, 6 \right\}, E = \left\{ 2, 3, 5 \right\}  \), then \(\mathbb{P} (E) = \frac{\vert E \vert }{\vert S \vert } = \frac{3}{6} = \frac{1}{2}\).  
+\end{explanation}
+
+\begin{eg}
+    Standard deck of \(52\) cards. Draw a random card, then what is the probability of getting an ace? 
+\end{eg}
+\begin{answer}
+    \(\frac{1}{13}\). 
+\end{answer}
+
+\begin{eg}
+    Roll two fair dice, what is the probability of the sum being \(7\)? 
+\end{eg}
+\begin{explanation}
+    \[
+        S = \left\{ (1, 1), (1, 2), \dots , (1, 6), (2, 1), (2, 2), \dots , (6, 6) \right\}, 
+    \]
+    and 
+    \[
+        E = \left\{ (1, 6), (2, 5), (3, 4), (4, 3), (5, 2), (6, 1) \right\}, 
+    \]
+    so \(\mathbb{P} (E)  = \frac{\vert E \vert }{\vert S \vert } = \frac{6}{36} = \frac{1}{6}\). 
+\end{explanation}
+
+\section{Counting Rule}
+
+\begin{theorem}[Counting Rule]
+    If a set \(S\) is a disjoint union 
+    \[
+        S = S_1 \cupdot S_2 \cupdot \dots \cupdot S_n,
+    \] i.e. \(S_i \cap S_j = \varnothing \) for all \(i \neq j\), then 
+    \[
+        \vert S \vert = \sum_{i=1}^n \vert S_i \vert.   
+    \]  
+\end{theorem}
+
+\begin{eg}
+    Roll two fair dice. What is the probability of having at least one odd number?
+\end{eg}
+\begin{explanation}
+    \(E = \left\{ \text{at least one odd roll}  \right\} \), then \(E = E_1 \cup E_2\) where \(E_1 = \left\{ \text{first die is odd}  \right\} \) and \(E_2 = \left\{ \text{second die is odd}  \right\} \). However, \(E_1 \cap E_2 \neq \varnothing \). Thus, instead, we define \(E_1^{\prime} = \left\{ \text{first die is odd}  \right\} \) and \(E_2^{\prime} = \left\{ \text{first die is even and second die is odd}  \right\} \), then we know 
+    \[
+        E = E_1^{\prime} \cupdot E_2^{\prime}, 
+    \]       
+    so we have \(\vert E \vert = \left\vert E_1^{\prime}  \right\vert + \left\vert E_2^{\prime}  \right\vert   \), and \(S = \left\{ (x, y) : x, y \in [6] \right\} \), and we know 
+    \[
+        E_1^{\prime} = \left\{ (x, y) \mid x_1 \in \left\{ 1, 3, 5 \right\}, y \in \left[ 6 \right]  \right\} 
+    \]  
+    and 
+    \[
+        E_2^{\prime} = \left\{ (x, y) \mid x \in \left\{ 2, 4, 6 \right\}, y \in \left\{ 1, 3, 5 \right\}   \right\}, 
+    \]
+    which gives \(\left\vert E_1^{\prime}  \right\vert = 18 \) and \(\left\vert E_2^{\prime}  \right\vert = 9 \), and thus 
+    \[
+        \mathbb{P} (E) = \frac{\vert E \vert }{\vert S \vert } = \frac{18 + 9}{36} = \frac{3}{4}.
+    \]  
+\end{explanation}
+
+\begin{theorem}[Product Rule]
+    If a set \(S\) is the Cartesian product of sets \(S_1, S_2, \dots , S_n\), i.e. 
+    \[
+        S = S_1 \times S_2 \times \dots \times S_n = \left\{ (a_1, a_2, \dots , a_n): \forall i \in [n], a_i \in S_i \right\}, 
+    \]  
+    then \(\vert S \vert = \vert S_1 \vert \times \vert S_2 \vert \times \dots \vert S_n \vert = \prod _{i=1}^n \vert S_i \vert     \).
+\end{theorem}
+
+\begin{remark}
+    Informally, if a big chain can be broken into a sequence of smaller choice, then the total number of options is the product of the number of options for each small choice.
+\end{remark}
+
+\begin{eg}
+    Roll two fair dice. What is the probability that the sum is odd?
+\end{eg}
+\begin{explanation}
+    \(S = \left\{ (x, y) \mid x, y \in \left[ 6 \right]  \right\} \). Also, we know 
+    \[
+        E = \left\{ \text{sum is odd}  \right\} = \left\{ \text{exactly one die is odd and the other is even}  \right\} = E_1 \cupdot E_2,  
+    \] 
+    where \(E_1 = \left\{ \text{first is odd and second is even}  \right\} \) and \(E_2 = \left\{ \text{first is even and second is odd}  \right\} \). Note that 
+    \[
+        E_1 = \left\{ 1, 3, 5 \right\} \times \left\{ 2, 4, 6 \right\} \text{ and } E_2 = \left\{ 2, 4, 6 \right\} \times \left\{ 1, 3, 5 \right\},     
+    \]  
+    so \(\vert E_1 \vert = \vert E_2 \vert = 9  \). By the sum rule, we know \(\vert E \vert = \vert E_1 \vert + \vert E_2 \vert = 9 + 9 = 18  \), and so 
+    \[
+        \mathbb{P} (E) = \frac{\vert E \vert }{\vert S \vert } = \frac{18}{36} = \frac{1}{2}.
+    \]  
+\end{explanation}
+
+\begin{theorem}[Advanced Product Rule]
+    If we are making a series of \(n\) choices, and for the \(i\)-th choice, we always have \(k_i\) options available, then the total number of options is
+    \[
+        k_1 \times k_2 \times \dots \times k_n = \prod _{i=1}^n k_i.
+    \]  
+\end{theorem}
+
+\begin{eg}
+    Roll two fair dice. What is the probability that the sum is odd?
+\end{eg}
+\begin{explanation}
+    We know \(S = \left\{ (x, y) : x, y \in [6] \right\} \), and \(E = \left\{ (x, y) \in S: 2 \nmid x+ y \right\} \). 
+    \begin{itemize}
+        \item First question: Which roll is odd? 
+        \item Second question: What is the first roll? How many options? 
+        \item Third question: What is the second roll? How many options?
+    \end{itemize}  
+    For the first question, we have \(2\) options, the first and the second. For the second question, we know there are \(3\) options since we need the first die to be even or odd, and similarly we know the second roll also has \(3\) options. Hence, \( \vert E \vert = 2 \times 3 \times 3 = 18\), and thus \(\mathbb{P} (E) = \frac{1}{2}\) since \(\vert S \vert = 36 \).  
+\end{explanation}
+
+\subsection{Permutations}
+\begin{claim}
+    There are
+    \[
+        n! = n \times (n - 1) \times (n - 2) \times \dots \times 1
+    \]
+    ways to order \(n\) distinct elements. 
+\end{claim}
+\begin{explanation}
+    Use the advanced product rule. For the first option, we have \(n\) choices, and the second has \(n - 1\) options, and so on.  
+\end{explanation}
+
+\subsection{Combinations}
+\begin{question}
+    How many subsets of size \(r\) are there of an \(n\) -element set? 
+\end{question}
+
+\begin{definition}
+    The binomial coefficient \(\binom{n}{r}\), "\(n\) choose \(r\)" counts the number of \(r\)-element subsets of an \(n\)-element set.   
+\end{definition}
+
+\begin{claim}
+    \(\forall 0 \le r \le n\), we have 
+    \[
+        \binom{n}{r} = \frac{n!}{r!(n-r)!}.
+    \] 
+\end{claim}
+\begin{explanation}
+    We count the number of ways of ordering all \(n\) items in two different ways. (Double counting)
+    \begin{itemize}
+        \item First method: Direct permutation, which has \(n!\) ways. 
+        \item Second method: 
+        \begin{itemize}
+            \item Step 1: Choose which elements will be in the front \(r\), which has \(\binom{n}{r}\) elements.  
+            \item Step 2: Order these \(r\) elements, which has \(r!\) methods. 
+            \item Step 3: Order the remaining \(n-r\) elements, which has \((n-r)!\) methods.   
+        \end{itemize}
+        Thus, by advanced product rule, we know 
+        \[
+            n! = \binom{n}{r} r! (n-r)! \implies \binom{n}{r} = \frac{n!}{r!(n-r)!}.
+        \]
+    \end{itemize} 
+\end{explanation}
+
+\begin{observation}
+    For all \(0 \le r \le n\), 
+    \[
+        \binom{n}{r} = \binom{n}{n - r}.
+    \] 
+\end{observation}
+\begin{proof}
+    \begin{align*}
+        \binom{n}{n-r} &= \frac{n!}{(n-r)!(n-(n-r))!} = \frac{n!}{(n-r)!r!} = \binom{n}{r}.
+    \end{align*}
+\end{proof}
+
+\begin{observation}
+    Choosing a subset of \(r\) elements is equivalent to choose the \(n - r\) elements that don't go in the subset. In fact, it means \(\binom{n}{r} = \binom{n}{n-r}\).  
+\end{observation}
+
+\begin{proposition}[Pascal's identity]
+    \(\forall 1 \le r \le n\),
+    \[
+        \binom{n + 1}{r} = \binom{n}{r} + \binom{n}{r - 1}.
+    \] 
+\end{proposition}
+\begin{proof}
+    \[
+        \binom{n}{r} + \binom{n}{r+1} = \frac{n!}{r!(n-r)!} + \frac{n!}{(r+1)!(n-(r+1))!} = \frac{(n+1)!}{r!(n+1-r)!}.
+    \]
+\end{proof}

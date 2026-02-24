@@ -1,0 +1,130 @@
+\chapter{Sorting Algorithm}
+\lecture{1}{24 Feb.}{}
+\begin{problem}
+    Given \(n\) distinct numbers \(a_1, a_2, \dots , a_n\), sort them in increasing order.  
+    \begin{itemize}
+        \item Input: \(n\) distinct numbers \(a_1, a_2, \dots , a_n\). 
+        \item Output: a permutation \(\pi \in S_n\) s.t. 
+        \[
+            a_{\pi (1)} < a_{\pi (2)} < \dots < a_{\pi (n)}.
+        \]
+    \end{itemize}
+\end{problem}
+
+\begin{observation}
+    Given \(x, y\), is \(x<y\)?  
+\end{observation}
+
+\begin{remark}
+    When analyzing an algorithm, we consider the worst-case input and count operations, where operations are defined according to context.
+\end{remark}
+
+\begin{algorithm}[H]
+    \caption{Brute force}
+
+    Go through all \(\pi \in S_n\) one by one and test each permutation to see if it is correct.  
+\end{algorithm}
+
+\begin{remark}
+    For running time, testing a permutation takes \(\le n - 1\) comparisons, and there are \(n!\) possible permutations, so 
+    \[
+        \# \text{ of comparisons} \le n!(n - 1). 
+    \]  
+\end{remark}
+
+\begin{question}
+    What is efficient? How does the running time scale as the input size \(n\) increases? Ideally, the running time should be polynomial \(O \left( n^c \right) \) for some \(c \in \mathbb{R} \).   
+\end{question}
+
+\begin{algorithm}[H]
+    \caption{Insertion Sort}
+    Maintain a sorted partial list, add one element at a time until the entire list is sorted.
+\end{algorithm}
+
+%picture
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.4\textwidth]{./Figures/InsertionSort.png}
+    \caption{Insertion sort}
+\end{figure}
+
+\begin{algorithm}[H]
+    \caption{Binary insertion sort}
+    \DontPrintSemicolon{}
+    \Comment*[l]{As before, we maintain a sorted prefix.}
+    Insert \(a_i\) into sorted list \(a_1 < a_2 < \dots < a_{i-2} < a_{i-1}\).
+    Compare \(a_i\) to the middle element. If similar, insert into the first half. If bigger, insert into the second half. 
+    \Comment*{Either way reduce number of possible positions by half each time} 
+\end{algorithm}
+
+\begin{remark}
+    Thus, we can insert in \(\thickapprox \log _2 i\) many comparisons each time, and thus in total we need \(O(n \log _2 n)\) comparisons.  
+\end{remark}
+
+\begin{algorithm}[H]
+    \DontPrintSemicolon
+    \caption{Merge Sort}
+    \Comment*[l]{Recursive algorithm}
+    Split the list into two equal halves.
+
+    Sort each half.
+
+    Merge the two sorted lists into one. \Comment*[r]{Compare the head of two list, remove the smaller one from original list then put it in the back of a new list, which is empty initially, and repeat this comparison step.}
+\end{algorithm}
+
+\begin{remark}
+    Number of comparison to merge \(\le n - 1\). 
+\end{remark}
+
+%picture
+\begin{figure}[H]
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/Merging.png}
+        \caption{Merging}
+    \end{subfigure}
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Figures/MergeSortEG.png}
+        \caption{An example of merge sort}
+    \end{subfigure}
+\end{figure}
+
+\begin{remark}
+    Running time: Let \(T(n)\) be the worst case running time for merge sort on a list of \(n\) numbers. Then \(T(1) = 0\), and we know 
+    \[
+        T(n) \le \underbrace{T \left( \lfloor \frac{n}{2} \rfloor \right)}_{\substack{\text{sorting the} \\ \text{first half}}} + \underbrace{T \left( \lceil \frac{n}{2} \rceil  \right)}_{\substack{\text{sorting the} \\ \text{second half}  }} + \underbrace{n - 1 }_{\text{merge} }.
+    \]   
+    Now suppose \(n = 2^k\), \(k \in \mathbb{N} \), then
+    \[
+        \begin{dcases}
+            T(1) = 0 \\
+            T \left( 2^k \right) = 2 T\left( 2^{k-1} \right) + 2^k - 1 \text{ for } k \ge 1.   
+        \end{dcases}
+    \]
+    Thus, 
+    \begin{align*}
+        T\left( 2^k \right) &= 2 T \left( 2^{k-1} \right) + 2^k - 1 \\
+        &= 2 \left[ 2 T \left( 2^{k-2} \right) + 2^{k-1} - 1  \right] + 2^k - 1 \\
+        &= \dots = 2^i T \left( 2^{k-i} \right) + i 2^k - \left( 2^i - 1 \right),     
+    \end{align*}  
+    and if we let \(i = k\), then 
+    \[
+        T\left( 2^k \right) = 2^k T(1) + k 2^k - 2^k + 1 = k2^k - 2^k + 1 = n \log _2 n - n + 1. 
+    \] 
+    Thus, \(T(n) \le n \log _2 n - n + 1\) when \(n = 2^k\).  
+\end{remark}
+
+\begin{question}[Lower bounds]
+    Can we do better?
+\end{question}
+\begin{answer}
+    No, but to prove this, we need to show that any other algorithm, no matter how weird, takes as long.
+\end{answer}
+
+\begin{question}
+    Suppose we have an algorithm \(A\) for sorting \(n\) numbers. Now can we lower-bound its runtime?  
+\end{question}
+
+\subsubsection{Information Theory approach}
+Each comparison gives \(\le 1\) bit of information. At the end, we get the information of the permutation to sort the numbers, and since there are \(n!\) possible permutations, so the number of time needed is \(\ge \log _2 n!\).   

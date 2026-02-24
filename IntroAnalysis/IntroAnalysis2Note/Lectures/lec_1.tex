@@ -1,0 +1,254 @@
+\chapter{Several Variable Differential Calculus}
+\lecture{1}{24 Feb.}{}
+
+In this chapter, we want to approximate non-linear functions by linear maps. If we consider 
+\[
+    f: \mathbb{R} ^n \to \mathbb{R} ^m \quad f(\underbrace{x_1, x_2, \dots , x_n}_{x}) = \left( f_1(x), f_2(x), \dots , f_m(x) \right), 
+\]
+where \(f_i : \mathbb{R} ^n \to \mathbb{R} \) for all \(i\). Now given a real-valued function \(F: \mathbb{R} ^n \to \mathbb{R} \). We know that near a point \(x_0 \in \mathbb{R} ^n\) we can approximate \(F(x)\) in the following way: 
+\[
+    F(x) \thickapprox F(x_0) + \nabla F(x) \cdot (x - x_0)
+\]     
+where 
+\[
+    \nabla F(x_0) = \left( \frac{\partial F(x_0)}{\partial x_1}, \frac{\partial F(x_0)}{\partial x_2}, \dots , \frac{\partial F(x_0)}{\partial x_n}    \right) \in \mathbb{R} ^n \text{ with } x_0 = (x_1, x_2, \dots , x_n)
+\]
+and thus 
+\begin{align*}
+    \nabla F(x_0) \cdot (x - x_0) &= \left\langle \frac{\partial F(x_0)}{\partial x_1}, \frac{\partial F(x_0)}{\partial x_2}, \dots , \frac{\partial F(x_0)}{\partial x_n} \right\rangle \cdot \langle x_1, x_2, \dots , x_n \rangle \\
+    &= \sum_{i=1}^n \frac{\partial F(x_0)}{\partial x_i} x_i.   
+\end{align*}
+Hence, 
+\begin{align*}
+    f(x) &= \begin{pmatrix}
+         f_1(x) \\
+         f_2(x) \\
+         \vdots \\
+         f_n(x) \\
+    \end{pmatrix} \thickapprox \begin{pmatrix}
+         f_1(x_0) + \nabla f_1(x) (x - x_0) \\
+         f_2(x_0) + \nabla f_2(x) (x - x_0) \\
+         \vdots \\
+         f_n(x_0) + \nabla f_n(x) (x - x_0) \\
+    \end{pmatrix},
+\end{align*}
+which gives 
+\[
+    f(x) - f(x_0) \thickapprox \begin{pmatrix}
+        \nabla f_1(x) (x - x_0)  \\
+        \nabla f_2(x) (x - x_0) \\
+        \vdots \\
+        \nabla f_n(x) (x - x_0) \\
+    \end{pmatrix} = \begin{pmatrix}
+         \nabla f_1(x) \\
+         \nabla f_2(x) \\
+         \vdots \\
+         \nabla f_n(x) \\
+    \end{pmatrix} \cdot \underbrace{(x - x_0)}_{\text{column vector}}.
+\]
+\newpage
+\section{Linear Transformation}
+\begin{definition}[Row vectors]
+    Let \(n \ge 1\) be an integer. We refer to elements of \(\mathbb{R} ^n\) an \(n\)-dimensional row vectors. A typical row vector is \(x = (x_1, x_2, \dots , x_n )\) which we abbreviate as \((x_i)_{1 \le i \le m}\). The components \(x_1, x_2, \dots , x_n\) are real numbers. If \(x\) and \(y\) are two row vectors in \(\mathbb{R} ^n\), we can define vector sum by 
+    \[
+        x + y = (x_1, x_2, \dots , x_n) + (y_1, y_2, \dots , y_n) \coloneqq (x_1 + y_1, x_2 + y_2, \dots , x_n + y_n).
+    \]    
+    If \(c \in \mathbb{R} \) is any real number, we define scalar multiplications by 
+    \[
+        c x = c (x_1, x_2, \dots , x_n) = (cx_1, cx_2, \dots , cx_n).
+    \] 
+\end{definition}
+
+\begin{remark}
+    \hfill
+    \begin{itemize}
+        \item [(1)] \(- x \coloneqq (-1) \cdot x = (-x_1, -x_2, \dots , -x_n)\). 
+        \item [(2)] zero vector is denoted by \(0\), i.e. \((0, 0, \dots , 0)\).   
+    \end{itemize}
+\end{remark}
+
+\begin{lemma}[\(\mathbb{R} ^n\) is a vector space]
+    Let \(x, y, z\) be vectors in \(\mathbb{R} ^n\), and let \(c, d \in \mathbb{R} \). Then the following properties hold: 
+    \begin{itemize}
+        \item [(a)] \(x + y = y + x\). 
+        \item [(b)] \((x + y) + z = x + (y + z)\). 
+        \item [(c)] \(x + 0 = 0 + x = x\). 
+        \item [(d)] \(x + (-x) = (-x) + x = 0\). 
+        \item [(e)] \((c \cdot d) x = c \cdot (dx)\).
+        \item [(f)] \(c(x + y) = cx + cy\).
+        \item [(g)] \((c + d)x = cx + dx\). 
+        \item [(h)] \(1x = x\).        
+    \end{itemize}   
+\end{lemma}
+
+\begin{definition}
+    Let \(x = (x_1, x_2, \dots , x_n)\) be row vector. Its transpose is the \(n\)-dimensional column vector 
+    \[
+        x^T = \begin{pmatrix}
+             x_1 \\
+             \vdots \\
+             x_n \\
+        \end{pmatrix}.
+    \]  
+\end{definition}
+
+\begin{definition}
+    The standard basis of \(\mathbb{R} ^n\) consists of \(e_1, e_2, \dots , e_n\), where \(e_j\) has \(1\) in the \(j\)-th position and \(0\) elsewhere: 
+    \[
+        e_j = (0, \dots , 0, \underbrace{1}_{j\text{-th}}, 0, \dots , 0).
+    \]      
+    Every row vector
+    \[
+        x = (x_1, x_2, \dots , x_n) = \sum_{j=1}^n x_j e_j. 
+    \]
+    Similarly, 
+    \[
+        x^T = \begin{pmatrix}
+             x_1 \\
+             \vdots \\
+             x_n \\
+        \end{pmatrix}= \sum_{j=1}^n x_j e_j^T.
+    \]
+\end{definition}
+
+\begin{definition}[Linear transformation]
+    A linear transformation \(T: \mathbb{R} ^n \to \mathbb{R} ^m\) is any function from one Euclidean space to another that satisfies the following two properties:
+    \begin{itemize}
+        \item [(a)] Additivity: For \(x, y \in \mathbb{R} ^n\), \(T(x + y) = T(x) + T(y)\). 
+        \item [(b)] Homogenity: For \(x \in \mathbb{R} ^n\) and all scalars \(c \in \mathbb{R} \), \(T(cx) = cT(x)\).     
+    \end{itemize} 
+\end{definition}
+
+\begin{remark}
+    This definition is equivalent to the following: 
+    \[
+        T(c_1 v_1 + \dots + c_k v_k) = c_1 T(v_1) + \dots + c_k T(v_k)
+    \]
+    where \(v_1, \dots , v_k \in \mathbb{R} ^n\) and \(c_1, c_2, \dots , c_n \in \mathbb{R} \).  
+\end{remark}
+
+\begin{definition}
+    Let \(m, n \ge 1\) be integers. An \(m \times n\) ordered matrix is an ordered rectangular array of real numbers 
+    \[
+        A = (a_{ij})_{\substack{1 \le i \le m \\ 1 \le j \le n}} = \begin{pmatrix}
+            a_{11} & a_{12} & \cdots & a_{1n}  \\
+            a_{21} & a_{22} & \cdots & a_{2n}  \\
+            \vdots & \vdots & \ddots &  \vdots \\
+            a_{m1} & a_{m2}  & \cdots & a_{mn}  \\
+        \end{pmatrix}
+    \]  
+    consisting of \(m\) rows and \(n\) columns, where 
+    \begin{itemize}
+        \item [(a)] The entry \(a_{ij}\) denote the number in the \(i\)-th row and \(j\)-th column. 
+        \item [(b)] We denote the set of all \(m \times n\) matrices by \(\mathbb{R} ^{m \times n}\). 
+        \item [(c)] In particular, a row vector is a \(1 \times n\) matrix, a column vector is a \(n \times 1\) vector.       
+    \end{itemize}
+\end{definition}
+
+\begin{definition}[Matrix multiplication]
+    Given an \(m \times n\) matrix \(A = (a_{ij})_{\substack{1 \le i \le m \\ 1 \le j \le n}}\) and an \(n \times p\) matrix \(B = (b_{jk})_{\substack{1 \le j \le n \\ 1 \le k \le p}}\), we define \(AB\) to be the \(m \times p\) matrix \((c_{ik})_{\substack{1 \le i \le m \\ 1 \le k \le p}}\) where 
+    \[
+        c_{ik} = \sum_{j=1}^n a_{ij} b_{jk}. 
+    \]    
+\end{definition}
+
+\begin{definition}[Matrix-vector multiplication]
+    Let \(A = (a_{ij}) \in \mathbb{R} ^{m \times n}\) and \(x = \begin{pmatrix}
+         x_1 \\
+         \vdots \\
+         x_n \\
+    \end{pmatrix} \in \mathbb{R} ^n\) be a column vector. We define 
+    \[
+        Ax = \begin{pmatrix}
+            a_{11} & a_{12} & \cdots & a_{1n}  \\
+            a_{21} & a_{22} & \cdots & a_{2n}  \\
+            \vdots & \vdots & \ddots &  \vdots \\
+            a_{m1} & a_{m2}  & \cdots & a_{mn}  \\
+        \end{pmatrix} \begin{pmatrix}
+             x_1 \\
+             x_2 \\
+             \vdots \\
+             x_n \\
+        \end{pmatrix} = \begin{pmatrix}
+             a_{11} x_1 + a_{12} x_2 + \dots + a_{1n} x_n \\
+             a_{21} x_1 + a_{22} x_2 + \dots + a_{2n} x_n \\
+             \vdots \\
+             a_{n1} x_1 + a_{n2} x_2 + \dots + a_{nn} x_n \\
+        \end{pmatrix}
+    \]
+\end{definition}
+
+\begin{remark}
+    In our class, we just treat \(\mathbb{R} ^n, \mathbb{R} ^m\) as column vector spaces, and \(L_A(x) = Ax\) is a \(m \times 1\) column vector.  
+\end{remark}
+
+\begin{theorem}
+    Let \(A\) be a \(m \times n\) matrix, then \(L_A(x) = A x\) is a linear transformation from \(\mathbb{R} ^n\) to \(\mathbb{R} ^m\).     
+\end{theorem}
+\begin{proof}
+    \todo{DIY}
+\end{proof}
+
+\begin{proposition}
+    Let \(T: \mathbb{R} ^n \to \mathbb{R} ^m\) be a linear transformation. For each \(j = 1, 2, \dots, n\), let \(e_j\) denote the \(j\)-th standard basis vector in \(\mathbb{R} ^n\) and write \(T(e_j) = \begin{pmatrix}
+         a_{1j} \\
+         a_{2j} \\
+         \vdots \\
+         a_{mj} \\
+    \end{pmatrix}\). Define the matrix \(A = (a_{ij})\), then \(T(x) = Ax\).       
+\end{proposition}
+\begin{proof}
+    Let \(x = \begin{pmatrix}
+         x_1 \\
+         \vdots \\
+         x_n \\
+    \end{pmatrix}\). We can write \(x = \sum_{j=1}^n x_j e_j \), then we know 
+    \begin{align*}
+        T(x) &= T \left( \sum_{j=1}^n x_j e_j  \right) = \sum_{j=1}^n x_j T(e_j) = \sum_{j=1}^n x_j \begin{pmatrix}
+             a_{1j} \\
+             \vdots \\
+             a_{mj} \\
+        \end{pmatrix} = Ax.  
+    \end{align*}  
+\end{proof}
+
+\begin{lemma}
+    Let \(A\) be a \(m \times n\) matrix and let \(B\) be a \(n \times p\) matrix. Then \(L_A \circ L_B = L_(AB)\).   
+\end{lemma}
+\begin{proof}
+    It suffices to show that \((L_A \circ L_B)(x) = L_{AB}(x)\) for \(x \in \mathbb{R} ^p\), and the rest is easy.  
+\end{proof}
+
+\begin{prev}
+    \(f : E \to \mathbb{R} \) where \(E\) is a subset of \(\mathbb{R}\), then 
+    \[
+        f^{\prime} (x_0) = \lim_{\substack{x \to x_0 \\ x \in E \setminus \left\{ x_0 \right\} }} \frac{f(x) - f(x_0)}{x - x_0}. 
+    \]  
+    Suppose now \(f: E \subseteq \mathbb{R} ^n \to \mathbb{R} ^m\), we can't define 
+    \[
+        f^{\prime} (x) = \lim_{\substack{x \to x_0 \\ x \in E \setminus \left\{ x_0 \right\} }} \frac{f(x) - f(x_0)}{x - x_0}
+    \] 
+    since the denominator and the numerator are vectors in \(\mathbb{R} ^n\) and \(\mathbb{R} ^m\).   
+\end{prev}
+
+\begin{lemma}
+    Let \(E \subseteq \mathbb{R} \), let \(f: E \to \mathbb{R} \) be a function and let \(L \in \mathbb{R} \) and \(x_0\) be a limit point of \(E\). Then the following two statements are equivalent:
+    \begin{itemize}
+        \item [(a)] \(f\) is differentiable at \(x_0\) and \(f^{\prime} (x_0) = L\). 
+        \item [(b)] \(\lim_{\substack{x \to x_0 \\ x \in E \setminus \left\{ x_0 \right\} }}     \frac{\left\vert f(x) - f(x_0) - L(x - x_0) \right\vert }{\vert x - x_0 \vert } = 0\).    
+    \end{itemize}     
+\end{lemma}
+\begin{proof}
+    Note that 
+    \[
+        \frac{f(x) - f(x_0)}{x - x_0} = L + \frac{f(x) - f(x_0) - L(x - x_0)}{x - x_0} \text{ if } x \neq x_0,
+    \]
+    so we have 
+    \[
+       \frac{f(x) - f(x_0)}{x - x_0} - L = \frac{f(x) - f(x_0) - L(x - x_0)}{x - x_0} \text{ if } x \neq x_0, 
+    \]
+    and thus 
+    \[
+       0 = \lim_{\substack{x \to x_0 \\ x \in E \setminus \left\{ x_0 \right\} }} \left\vert \frac{f(x) - f(x_0)}{x - x_0} - L \right\vert  = \lim_{\substack{x \to x_0 \\ x \in E \setminus \left\{ x_0 \right\} }} \left\vert \frac{f(x) - f(x_0) - L(x - x_0)}{x - x_0} \right\vert. 
+    \]
+\end{proof}
