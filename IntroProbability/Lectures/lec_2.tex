@@ -1,0 +1,161 @@
+\lecture{2}{26 Feb.}{}
+\begin{proof}[Another proof for Pascal's identity]
+    Since we know 
+    \[
+        \binom{n}{r} = \# \text{ of subsets of size } r \text{ from a set of size } n \text{, say } [n] = \left\{ 1,2, \dots , n \right\}.    
+    \]
+    Let \(S = \binom{[n]}{r}\) be the set of these subsets. 
+    \begin{notation}
+        For any set \(X\), 
+        \[
+            \binom{X}{r} = \left\{ Y \subseteq X, \vert Y \vert = r \right\},  
+        \] 
+        so \(\left\vert \binom{X}{r} \right\vert = \binom{\vert X \vert }{r} \). 
+    \end{notation} 
+
+    Let
+    \[
+        S_1 = \left\{ y \in \binom{[n]}{r}: n \notin Y \right\} \text{ and } S_2 = \left\{ y \in \binom{[n]}{r} : n \in Y \right\},   
+    \]
+    then \(S = S_1 \cupdot S_2\), and thus \(\vert S \vert = \vert S_1 \vert + \vert S_2 \vert   \). Now since \(\vert S_1 \vert = \binom{n - 1}{r} \) and \(\vert S_2 \vert = \binom{n - 1}{r - 1} \), so we know 
+    \[
+        \binom{n}{r} = \vert S \vert = \vert S_1 \vert + \vert S_2 \vert = \binom{n - 1}{r} + \binom{n - 1}{r - 1}.
+    \]    
+\end{proof}
+
+\begin{remark}
+    Pascal's identity gives a recursive formula for computing \(\binom{n}{r}\), which is much simpler than \(\binom{n}{r} = \frac{n!}{r! (n-r)!}\).  
+\end{remark}
+
+\begin{theorem}[Binomial Theorem]
+    For any integer \(n > 0\) and any \(x, y \in \mathbb{R} \), 
+    \[
+        (x + y)^n = \sum_{r=0}^n \binom{n}{r} x^r y^{n-r}. 
+    \]  
+\end{theorem}
+\begin{proof}
+    Note that 
+    \[
+        (x+y)^n = \underbrace{(x+y)(x+y)\dots (x+y)}_{n \text{ times}}.
+    \]
+    Each monomial comes from choosing one term from each factor(\(x\) or \(y\)), taken the from \(x^r y^{n-r}\), where \(r\) is the number of factors from which we choose \(x\), \(0 \le r \le n\). Note that the coefficient of \(x^r y^{n-r}\) is \(\binom{n}{r}\) for all \(r\), so 
+    \[
+        (x+y)^n = \sum_{r=0}^n \binom{n}{r} x^r y^{n-r}.
+    \]       
+\end{proof}
+
+\begin{corollary}
+    Total number of subsets of an \(n\)-element set is \(2^n\).  
+\end{corollary}
+\begin{proof}
+    Apply the product rule, for each of the elements, ask if it is in the subset or not. We know there are \(2\) options per question, so the product rule gives \(2^n\) subsets.  
+\end{proof}
+
+\begin{proof}[Another proof]
+    Let \(S\) be the set of all subsets. Then for \(0 \le r \le n\), let \(S_r \subseteq S\) be the subsets of those subsets of size \(r\). Then, 
+    \[
+        S = S_0 \cupdot S_1 \cupdot \dots \cupdot S_n,
+    \]   
+    and by sum rule we know 
+    \[
+        \vert S \vert = \sum_{r=0}^n \vert S_r \vert = \sum_{r=0}^n \binom{n}{r} = \sum_{r=0}^n \binom{n}{r} 1^r 1^{n-r} (1 + 1)^n = 2^n .    
+    \]
+\end{proof}
+
+\begin{corollary}
+    Let \(X\) be an \(n\)-element set, \(n \ge 1\), then the number of even-sized subsets of \(X\) is equal to the number of odd-sized subsets of \(X\).     
+\end{corollary}
+\begin{proof}[An approach for odd \(n\) and even \(r\)]
+    \begin{align*}
+        \# \text{ of even-sized subsets} &= \sum_{\substack{r \text{ even} \\ 0 \le r \le n }} \binom{n}{r} = \sum_{\substack{r \text{ even} \\ 0 \le r \le n }}  \binom{n}{n-r}.  
+    \end{align*}
+    Now if \(n\) is odd and \(r\) even, then \(n - r\) is odd, so 
+    \[
+       \sum_{\substack{r \text{ even} \\ 0 \le r \le n }}  \binom{n}{n-r} = \sum_{\substack{r \text{ odd} \\ 0 \le r \le n }}  \binom{n}{r}. 
+    \]   
+\end{proof}
+\begin{proof}
+    Want to show 
+    \[
+        \sum_{r \text{ even}} \binom{n}{r} - \sum_{r \text{ odd} } \binom{n}{r} = 0,  
+    \]
+    i.e. 
+    \[
+        \sum_{r=0}^n \binom{n}{r} (-1)^r = 0. 
+    \]
+    Note that 
+    \[
+        \sum_{r=0}^n \binom{n}{r} (-1)^r = \sum_{r=0}^n \binom{n}{r} (-1)^r 1^{n-r} = (1 + (-1))^n = 0. 
+    \]
+\end{proof}
+
+\begin{eg}
+    In poker, we are dealt a hand of five cards from a standard deck. What is the probability of getting a full house (three-of-a-kind and a pair)?
+\end{eg}
+\begin{explanation}
+    The sample space is the subsets of \(5\) cards frorm deck. If \(D\) means the deck of cards, then \(S = \binom{D}{5}\) and \(\vert S \vert = \binom{52}{5} \). Also, we know \(E = \left\{ \text{full houses}  \right\} = \left\{ \text{triple} + \text{pair}   \right\} \), so we can first choose the triple then choose the pair, and for triple and pair, we have to choose suits and values. Thus, we have \(13 \times \binom{4}{3}\) options for the triple and \(12 \times \binom{4}{2}\) options for the pair. Thus, number of full houses is \(13 \times \binom{4}{3}\times  12 \times \binom{4}{2}\), and thus 
+    \[
+        \mathbb{P} (\text{full houses} ) = \frac{13 \times \binom{4}{3} \times 12 \times \binom{4}{2}}{\binom{52}{5}}.
+    \]     
+\end{explanation}
+
+\subsection{Choosing with repetition}
+\begin{prev}
+    \begin{align*}
+        \binom{n}{r} &= \# \text{ of subsets of size } r \text{ of a set of size }n \\
+        &= \# \text{ of ways of choosing } r \text{ items out of } n \text{ without order and without repetition}.     
+    \end{align*}
+\end{prev}
+
+\begin{question}
+    What if repetition is allowed? How many ways can we choose \(r\) items out of \(n\), with repitition but without order?  
+\end{question}
+
+Let \(x_i\) be the number of times the \(i\)-th element is chosen, then we want to count the number of \((x_1, x_2, \dots , x_n)\) pairs satisfying 
+\[
+    x_i \ge 0, \quad x_i \in \mathbb{Z}, \quad \sum_{i=1}^n x_i = r. 
+\]   
+
+We can use a method call \textbf{stars and bars drawing} to count the number of such pairs. We represent our choices with stars, and use bars to separate the different elements. For example, \((1,0,2,0,0)\), which is a possible pair, and it corresponds to 
+\[
+    * || ** | |,
+\]   
+and every possible pair corresponds to a diagram like this, and it is a bijection, while there are \(r\) stars and \(n - 1\) bars in each diagram, so there are \(\binom{n + r - 1}{n - 1}\) possible pairs.
+
+\begin{eg}
+    There is a probability course with \(77\) students. Professor chooses \(60\) students to pass. How many options does the professor have.  
+\end{eg}
+\begin{answer}
+    \(\binom{77}{60}\). 
+\end{answer}
+
+\begin{eg}
+    What if the professor instead needs to assign grades to the students. Professor decides to distributes \(4500\) points between the \(77\) students. How many ways are there of doing this?  
+\end{eg}
+\begin{explanation}
+    Let \(x_i\) be the number of points to student \(i\), then \(x_i \ge 0\) and \(\sum_{i=1}^{77} x_i = 4500 \). Thus, the number of solutions is \(\binom{4576}{4500}\).     
+\end{explanation}
+
+\begin{eg}
+    What if every student should receive at least \(10\) points? 
+\end{eg}
+\begin{explanation}
+    Now we have a restriction of \(x_i \ge 10\) for all \(i\), so we can define \(y_i = x_i - 10\) for all \(i\), and thus we want \(y_i \ge 0\) for all \(i\) and 
+    \[
+        \sum_{i=1}^{77} y_i = \sum_{i=1}^{77} (x_i - 10) = 3730,  
+    \]      
+    which means the number of ways of distribution is \(\binom{3806}{3730}\). 
+
+\end{explanation}
+
+\chapter{Axiom of Probability}
+Suppose we roll a fair die \(100\) times and are interested in the sum of the rolls. 
+\begin{question}
+    What is the sample space?
+\end{question} 
+
+We have to define the definition of sample space first. 
+
+\begin{prev}
+    The sample space is a set \(S\) of all possible outcomes, and sometimes denoted by \(\Omega \), and the events is a subset \(E \subseteq S\).   
+\end{prev}

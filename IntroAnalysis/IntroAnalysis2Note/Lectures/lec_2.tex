@@ -1,0 +1,416 @@
+\lecture{2}{26 Feb.}{}
+\begin{definition}[Differentiability]
+    Let \(E\) be a subset of \(\mathbb{R} ^n\), let \(f: E \to \mathbb{R} ^m\) be a function, and let \(x_0\) be a limit point of \(E\). Let \(L: \mathbb{R} ^n \to \mathbb{R} ^m\) be a linear transformation. We say \(f\) is differentiable at \(x_0\) with derivative \(L\) if 
+    \[
+        \lim_{\substack{x \to x_0 \\ x \in E \setminus \left\{ x_0 \right\} }} \frac{\left\lVert f(x) - f(x_0) - L(x - x_0) \right\rVert }{\left\lVert x - x_0 \right\rVert } = 0,
+    \]         
+    or equivalently, given \(\varepsilon > 0\), \(\exists \delta > 0\) s.t. for all \(x \in E\) satisfying \(0 < \lVert x - x_0 \rVert < \delta  \), we have 
+    \[
+       \frac{\left\lVert f(x) - f(x_0) - L(x - x_0) \right\rVert }{\left\lVert x - x_0 \right\rVert } < \varepsilon. 
+    \]    
+\end{definition}
+
+\begin{remark}
+    \(\lVert f(x) - f(x_0) - L(x - x_0) \rVert \) is the length of a vector in \(\mathbb{R} ^m\) and \(\lVert x - x_0 \rVert \) is the length of a vector in \(\mathbb{R} ^n\).    
+\end{remark}
+
+\begin{remark}
+    \(x_0\) is a limit point of \(E \subseteq \mathbb{R} ^n\) if for any \(r > 0\), \(B(x_0, r) \cap \left( E \setminus \left\{ x_0 \right\}  \right) \neq \varnothing  \). That is, for every \(r > 0\), \(\exists x \in E\) s.t. \(0 < \lVert x - x_0 \rVert < r \).       
+\end{remark}
+
+\begin{eg}
+Suppose \(f: \mathbb{R} ^n \to \mathbb{R} ^n\) has 
+    \[
+        f(x) = \begin{dcases}
+            0, &\text{ if } x \in E = \left\{ (x_1, x_2, \dots , x_n) \mid x_n \ge 0 \right\}  ;\\
+            x, &\text{ if } x \in \mathbb{R} ^n \setminus E
+        \end{dcases}
+    \]
+then \(f\) is differentiable on \(E\) and \(f^{\prime} (x) = 0\) and \(f\) is not differentiable on \(\mathbb{R} ^n\) at \(0\).      
+\end{eg}
+
+\begin{remark} \label{rmk: interior point differentiable}
+    Recall that \(x_0\) is said to be an interior point of \(E \subseteq \mathbb{R} ^n\) if there exists \(r > 0\) s.t. 
+    \[
+        B(x_0, r) = \left\{ x \in \mathbb{R} ^n : \lVert x - x_0 \rVert < r  \right\} \subseteq E. 
+    \]   If \(x_0\) is an interior point of \(E\), then \(f\) is differentiable at \(x_0\) is equivalent to 
+    \[
+        \lim_{h \to 0} \frac{\left\lVert f(x_0+h) - f(x_0) - L(h) \right\rVert }{\lVert h \rVert } = 0 
+    \]    
+    since if \(\lVert h \rVert < r \), then \(x_0 + h \in B(x_0, r)\), which gives \(x_0 + h \in E\), and thus \(f(x_0 + h)\) is well-defined.      
+\end{remark}
+
+\begin{remark}
+    Here \(\lVert \cdot \rVert \) denoted the standard Euclidean norm on \(\mathbb{R} ^n\) (and on \(\mathbb{R} ^m\)):
+    \[
+        \lVert (x_1, x_2, \dots , x_n) \rVert = \left( x_1^2 + x_2^2 + \dots + x_n^2 \right)^{\frac{1}{2}}. 
+    \]  
+\end{remark}
+
+\begin{eg}
+    Let \(f: \mathbb{R} ^2 \to \mathbb{R} ^2\) be given by 
+    \[
+        f(x, y) = \left( x^2, y^2 \right), 
+    \] 
+    let \(x_0 = (1, 2)\), and let \(L: \mathbb{R} ^2 \to \mathbb{R} ^2\) be the linear map 
+    \[
+        L(x, y) = (2x, 4y).
+    \]  
+    We claim that \(f\) is differentiable at \(x_0\) with derivative \(L\).   
+\end{eg}
+
+\begin{explanation}
+    By definition, \(f\) is differentiable at \(x_0\) with derivative \(L\) if and only if 
+    \[
+        \lim_{h \to 0} \frac{\left\lVert f(x_0 + h) - f(x_0) - L(h) \right\rVert }{\lVert h \rVert } = 0, 
+    \]   
+    where \(h = (a, b)\). Thus, we know the above equation becomes
+    \[
+        \frac{\left\lVert f(1+a, 2+b) - f(1, 2) - L(a, b) \right\rVert }{\lVert (a, b) \rVert } = \frac{\sqrt{a^4 + b^4} }{\sqrt{a^2 + b^2} },
+    \] 
+    and since 
+    \[
+        0 \le \frac{\sqrt{a^4 + b^4} }{\sqrt{a^2 + b^2} } \le \sqrt{a^2 + b^2}, 
+    \]
+    so by the Squeeze Theorem, we have 
+    \[
+        \lim_{(a, b) \to (0, 0)} \frac{\sqrt{a^4 + b^4} }{\sqrt{a^2 + b^2} } = 0, 
+    \]
+    and we're done.
+\end{explanation}
+
+\begin{lemma}[Uniqueness of derivative] \label{lm: uniqueness of derivatives}
+    Let \(E\) be a subset of \(\mathbb{R} ^n\), and let \(f: E \to \mathbb{R} ^n\) be a function, and let \(x_0 \in E\) be an interior point of \(E\). Suppose \(L_1, L_2 : \mathbb{R} ^n \to \mathbb{R} ^m\) are linear transformations s.t. \(f\) is differentiable at \(x_0\) with derivative \(L_1\) and also differentiable at \(x_0\) with  derivative \(L_2\). Then \(L_1 = L_2\).           
+\end{lemma}
+\begin{proof}
+    Since \(x_0\) is an interior point. By \autoref{rmk: interior point differentiable}, we have 
+    \[
+        \lim_{h \to 0} \frac{\left\lVert f(x_0 + h) - f(x_0) - L_1(h) \right\rVert }{\lVert h \rVert } = 0 \text{ and } \lim_{h \to 0} \frac{\left\lVert f(x_0 + h) - f(x_0) - L_2(h) \right\rVert }{\lVert h \rVert } = 0. 
+    \]
+    Thus, 
+    \begin{align*}
+        0 &\le \frac{\left\lVert L_1(h) - L_2(h) \right\rVert }{\lVert h \rVert } = \frac{\left\lVert L_1(h) - f(x_0 + h) + f(x_0) + f(x_0 + h) - f(x_0) - L_2(h) \right\rVert }{\left\lVert h \right\rVert } \\
+        &\le \frac{\left\lVert L_1(h) - f(x_0 + h) + f(x_0) \right\rVert }{\lVert h \rVert } + \frac{\left\lVert f(x_0 + h) + f(x_0) - L_2(h) \right\rVert }{\lVert h \rVert }.
+    \end{align*} 
+    Thus, by squeeze theorem, we know 
+    \[
+        \lim_{h \to 0} \frac{\lVert L_1(h) - L_2(h) \rVert }{\lVert h \rVert } = 0.
+    \] 
+    Now take \(v \in \mathbb{R} ^n \setminus \left\{ 0 \right\} \), and let \(h = tv\), so 
+    \[
+        \lim_{t \to 0} \frac{\lVert L_1(tv) - L_2(tv) \rVert }{\lVert tv \rVert } = 0.
+    \]  
+    That is,
+    \[
+        \lim_{t \to 0} \frac{\vert t \vert \left\lVert L_1(v) - L_2(v) \right\rVert  }{\vert t \vert \lVert v \rVert  } = 0. 
+    \]
+    Hence, we have 
+    \[
+        \lim_{t \to 0} \frac{\left\lVert L_1(v) - L_2(v) \right\rVert }{\lVert v \rVert } = 0, 
+    \]
+    and since \(v \neq 0\), so we know \(L_1(v) = L_2(v)\), and since \(v\) can be arbitrary non-zero vector in \(\mathbb{R} ^n \setminus \left\{ 0 \right\} \), so \(L_1 = L_2\). (\(L_1(0) = L_2(0) = 0\))     
+\end{proof}
+
+\begin{remark}
+    Because of \autoref{lm: uniqueness of derivatives}, the derivative of \(f\) at interior points \(x_0\) is unique, and thus we may safely write it as \(f^{\prime} (x_0)\) or \(Df(x_0)\). Thus \(f^{\prime} (x_0)\) is the unique linear transformation \(f^{\prime} : \mathbb{R} ^n \to \mathbb{R} ^m\) such that 
+    \[
+        \lim_{\substack{x \to x_0 \ x \neq x_0}} \frac{\left\lVert f(x) - (f(x_0) + f^{\prime} (x_0) (x - x_0)) \right\rVert }{\lVert x - x_0 \rVert } = 0.
+    \]       
+    Informally, this condition means that near \(x_0\), the function \(f\) can be approximated by its linearization: 
+    \[
+        f(x) \thickapprox  f(x_0) + f^{\prime} (x_0) (x - x_0). 
+    \]  
+    This approximation is sometimes referred to as Newton's approximation in higher dimension.
+\end{remark}
+
+\begin{remark}
+    A useful consequence of \autoref{lm: uniqueness of derivatives} is the following: If two functions \(f\) and \(g\) satisfy \(f(x) = g(x)\) for all \(x \in E\), and both are differentiable at an interior point \(x_0\), then their derivatives coincide at \(x_0\), i.e. \(f^{\prime} (x_0) = g^{\prime} (x_0)\). This will be important in later arguments, where one extends functions to larger domains or modifies them on sets of measure zero.       
+\end{remark}
+
+\begin{remark}
+    As we have emphasized, \autoref{lm: uniqueness of derivatives} guarantees the uniqueness of the derivative only at interior points of the domain \(E\). If \(x_0\) is instead a boundary point of \(E\), the derivative may fail to be uniquely determined.    
+\end{remark}
+
+\section{Partial and Directional Derivatives}
+
+We now begin to relate the concept of differentiability to the more classical notions of partial and directional derivatives. Directional derivatives describe how \(f\) changes when we move from a point \(x_0\) in a fixed direction \(v\).   
+
+\begin{definition}[Directional derivative]
+    Let \(E \subseteq \mathbb{R} ^n\), let \(f : E \to \mathbb{R} ^m\) be a function, let \(x_0\) be an interior point of \(E\) and let \(v \in \mathbb{R} ^n\). If the limit
+    \[
+        \lim_{\substack{t \to 0, t > 0 \\ x_0 + tv \in E}} \frac{f(x_0 + tv) - f(x_0)}{t} = \lim_{\substack{t \to 0^+ \\ x_0 + tv \in E}} \frac{f(x_0 + tv) - f(x_0)}{t} 
+    \]     
+    exists, then we say \(f\) is differentiable in the direction \(v\) at \(x_0\). This limit is called the directional derivative of \(f\) at \(x_0\) in the direction \(v\), and we denote it by 
+    \[
+        D_v f(x_0) \coloneqq \lim_{t \to 0^+} \frac{f(x_0 + tv) - f(x_0)}{t} \in \mathbb{R} ^m.
+    \]   
+\end{definition}
+
+\begin{remark}
+    Under this definition, 
+    \[
+        D_{-v}f(x_0) = \lim_{t \to 0^+} \frac{f(x_0 + t(-v)) - f(x_0)}{t} = \lim_{t \to 0^+} \frac{f(x_0 - tv) - f(x_0)}{t}.
+    \]
+    In usual definition, one define 
+    \[
+        D_v f(x_0) = \lim_{t \to 0} \frac{f(x_0 + tv) - f(x_0)}{t}. 
+    \]
+    This usual definition implies that 
+    \[
+        D_v f(x_0) = -D_{-v} f(x_0)
+    \]
+    since 
+    \begin{align*}
+       D_v f(x_0) &= \lim_{t \to 0^+} \frac{f(x_0 + tv) - f(x_0)}{t} = \lim_{t \to 0^-} \frac{f(x_0 + tv) - f(x_0)}{t} \\
+       &= \lim_{s \to 0^+} = \frac{f(x_0 + (-s) v) - f(x_0)}{(-s)} = -\lim_{s \to 0^+} \frac{f(x_0 - sv) - f(x_0)}{s} = -(D_{-v}f(x_0)).     
+    \end{align*}
+\end{remark}
+
+\begin{remark}
+    This definition should be compared with the definition of differentiability. Here we divide by the scalar \(t\) rather than by a vector, so the expression always makes sense algebraically. The directional derivative \(D_v f(x_0)\) is a vector in \(\mathbb{R} ^m\).   
+\end{remark}
+
+\begin{remark}
+It is sometimes possible to define directional derivatives at boundary points of \(E\), provided that the vector \(v\)  points inward toward the domain. However, we shall restrict attention to interior points in what follows.
+\end{remark}
+
+\begin{lemma} \label{lm: directional derivative another form}
+    Let \(E \subseteq \mathbb{R} ^n\), let \(f : E \to \mathbb{R} ^m\), let \(x_0 \in \mathrm{Int}(E) \) and \(v \in \mathbb{R} ^n\). If \(f\) is differentiable at \(x_0\), then \(f\) is differentiable in the direction \(v\) at \(x_0\), and 
+    \[
+        D_v f(x_0) = f^{\prime} (x_0)(v).
+    \]         
+\end{lemma}
+\begin{proof}
+    Since \(x_0 \in \mathrm{Int}(E) \) and \(f\) is differentiable at \(x_0\), so 
+    \[
+        \lim_{h \to 0} \frac{\left\lVert f(x_0 + h) - f(x_0) - f^{\prime} (x_0) (h) \right\rVert }{\lVert h \rVert } = 0. 
+    \]   
+    Note that for \(t \neq 0\), we have 
+    \[
+        \frac{f(x_0 + tv) - f(x_0)}{t} = \frac{f(x_0 + tv) - f(x_0) - f^{\prime} (x_0)(tv)}{t} + f^{\prime} (x_0)(v),
+    \] 
+    so 
+    \[
+       \frac{f(x_0 + tv) - f(x_0)}{t} - f^{\prime} (x_0)(v) = \frac{f(x_0 + tv) - f(x_0) - f^{\prime} (x_0)(tv)}{t}. 
+    \]
+    Now we show that 
+    \[
+        \lim_{t \to 0^+} \frac{f(x_0 + tv) - f(x_0) - f^{\prime} (x_0)(tv)}{t} = 0. 
+    \]
+    Recall that \(f\) is differentiable at \(x_0\) and \(x_0 \in \mathrm{Int}(E) \), so 
+    \[
+        \lim_{h \to 0} \frac{\left\lVert f(x_0 + h) - f(x_0) - f^{\prime} (x_0)(h) \right\rVert }{\lVert h \rVert } = 0. 
+    \]  
+    Let \(h = tv\) when \(v \neq 0\), then 
+    \[
+        \lim_{t \to 0^+} \frac{\left\lVert f(x_0 + tv) - f(x_0) - f^{\prime} (x_0)(tv) \right\rVert }{\lVert tv \rVert } = 0 \implies \lim_{t \to 0^+} \frac{\left\lVert f(x_0 + tv) - f(x_0) - f^{\prime} (x_0)(tv) \right\rVert }{\vert t \vert  } = 0, 
+    \]   
+    which is equivalent to 
+    \[
+        \lim_{t \to 0^+} \frac{f(x_0 + tv) - f(x_0) - f^{\prime} (x_0) (tv)}{t} = 0, 
+    \]
+    (since the numerator should tend to \(0\) so the limit will exist), so we know 
+    \[
+        \lim_{t \to 0^+} \frac{f(x_0 + tv) - f(x_0)}{t} - f^{\prime} (x_0)(v) = 0, 
+    \]
+    i.e. 
+    \[
+       \lim_{t \to 0^+} \frac{f(x_0 + tv) - f(x_0)}{t} = f^{\prime} (x_0)(v). 
+    \]
+\end{proof}
+
+\begin{remark}
+    One consequence of this lemma is that total differentiability implies directional differentiability. However, the converse is not true: the existence of all directional derivatives does not guarantee differentiability.
+\end{remark}
+
+\begin{definition}[Partial Derivative]
+    Let \(E \subseteq \mathbb{R} ^n\), let \(f: E \to \mathbb{R} ^m\), and let \(x_0 \in \mathrm{Int}(E) \), and let \(1 \le j \le n\). The partial derivative of \(f\) with respect to the variable \(x_j\) at \(x_0\), denoted \(\frac{\partial f}{\partial x_j}(x_0) \), is defined by 
+    \[
+       \frac{\partial f}{\partial x_j}(x_0) \coloneqq \lim_{t \to 0, t \neq 0} \frac{f(x_0 + t e_j) - f(x_0)}{t}
+    \]        
+    provided the limit exists.
+\end{definition}
+
+\begin{remark}
+    If \(f = \begin{pmatrix}
+         f_1 \\
+         \vdots \\
+         f_m \\
+    \end{pmatrix}\), then differentiation is componentwise: 
+    \[
+        \frac{\partial f}{\partial x_j} (x_0) = \begin{pmatrix}
+             \frac{\partial f_1}{\partial x_j}(x_0)  \\
+             \vdots \\
+             \frac{\partial f_m}{\partial x_j} (x_0)  \\
+        \end{pmatrix}. 
+    \] 
+    We say that \(f\) is continuously differentiable if all partial derivatives exist and are continuous. 
+\end{remark}
+
+\begin{remark}
+    If \(f\) is differentiable at \(x_0\), then 
+    \[
+        \frac{\partial f(x_0)}{\partial x_j} = D_{e_j}f(x_0) = f^{\prime} (x_0) (e_j). 
+    \]  
+\end{remark}
+
+\begin{remark}
+    If \(f\) is differentiable at \(x_0\), then   
+    \[
+        D_v f(x_0) = f^{\prime} (x_0)(v) = f^{\prime} (x_0) \left( \sum_{j=1}^n v_j e_j  \right) = \sum_{j=1}^n v_j f^{\prime} (x_0)(e_j) = \sum_{j=1}^n v_j \frac{\partial f(x_0)}{\partial x_j}.    
+    \]
+\end{remark}
+
+\begin{theorem} \label{thm: if f continuously differentiable then f differentiable}
+    Let \(E \subseteq \mathbb{R} ^n\), let \(f : E \to \mathbb{R} ^m\), \(F \subseteq E\), and let \(x_0 \in \mathrm{Int}(F) \). If all partial derivative \(\frac{\partial f}{\partial x_j} \) exists on \(F\) and are continuous at \(x_0\), then \(f\) is differentiable at \(x_0\), and 
+    \[
+        f^{\prime} (x_0)(v) = \sum_{j=1}^n v_j \frac{\partial f}{\partial x_j}(x_0) 
+    \]         
+    for all \(v \in \mathbb{R} ^n\). 
+\end{theorem}
+
+\begin{proof}
+    Define a linear map \(L: \mathbb{R} ^n \to \mathbb{R} ^m\) by 
+    \[
+        L(v) \coloneqq \sum_{j=1}^n v_j \frac{\partial f}{\partial x_j}(x_0). 
+    \]
+    We prove that \(f\) is differentiable at \(x_0\) with derivative \(L\). It suffices to show that for any \(\varepsilon > 0\), \(\exists \delta >0\) s.t. 
+    \[
+        \left\lVert f(x) - f(x_0) - L(x - x_0) \right\rVert < \varepsilon \lVert x - x_0 \rVert \text{ whenever } x \in F \text{ and } \lVert x - x_0 \rVert < \delta    
+    \] 
+    Since \(x_0 \in \mathrm{Int}(F) \), \(\exists r > 0\) s.t. \(B(x_0, r) \subseteq F\). Because each partial derivative \(\frac{\partial f_i}{\partial x_j} \) is continuous at \(x_0\), for every pair \((i, j)\) there exists \(\delta _{ij} > 0\) s.t. 
+    \[
+        \left\vert \frac{\partial f_i}{\partial x_j}(x) - \frac{\partial f_i}{\partial x_j}(x_0) \right\vert < \frac{\varepsilon}{nm} \text{ whenever } \lVert x - x_0 \rVert < \delta _{ij}.    
+    \] 
+    Let \(\delta \coloneqq \min \left\{ r, \delta _{ij} : 1 \le i \le m, 1 \le j \le n \right\} \). Now fix \(x \in F\) with \(\lVert x - x_0 \rVert < \delta \) and write 
+    \[
+        x - x_0 = \sum_{j=1}^n v_j e_j, \text{ so } x = x_0 + \sum_{j=1}^n v_j e_j.   
+    \]            
+    Then 
+    \[
+        \lVert x - x_0 \rVert = \sqrt{v_1^2 + v_2^2 + \dots + v_n^2}, \quad \vert v_j \vert \le \lVert x - x_0 \rVert,    
+    \]
+    Write \(f = (f_1, f_2, \dots , f_m)\). To estimate \(f(x) - f(x_0)\), we vary the coordinates one at a time. Consider 
+    \begin{align*}
+        x^{(0)} &= x_0, \\
+        x^{(j)} &= x_0 + \sum_{k=1}^{j} v_k e_k \text{ for } j = 1,2,\dots ,n.     
+    \end{align*} 
+    Thus, \(x^{(n)} = x\) and 
+    \[
+        f(x) - f(x_0) = \sum_{j=1}^n \left( f \left( x^{(j)} \right) - f \left( x^{(j-1)} \right)   \right) = \sum_{j=1}^n \sum_{i=1}^m \left( f_i \left( x^{(j)} \right) - f_i \left( x^{(j-1)} \right)   \right)e_i.    
+    \] 
+    Fix \(j\) and consider the \(j\)-th increment. For each component \(f_i\), define 
+    \[
+        \varphi _i^j(t) = f_i \left( x^{(j-1)} + t v_j e_j \right), \quad 0 \le t \le 1. 
+    \]   
+    Then 
+    \[
+        f_i \left( x^{(j)} \right) - f_i \left( x^{(j-1)} \right) = \varphi _i^j(1) - \varphi _i^j(0).  
+    \]
+    Since \(f_i\) has continuous partial derivatives, \(\varphi _i^j\) is differentiable. By MVT, there exists \(t_j \in (0, 1)\) s.t. 
+    \[
+        \varphi _i^j(1) - \varphi _i^j(0) = \varphi _i^{j\prime} (t_j).
+    \]   
+    By the chain rule, 
+    \[
+        \varphi _i^{j\prime}(t) = \nabla f_i \left( x^{(j-1)} + tv_j e_j \right) \cdot (v_j e_j) = \frac{\partial f_i}{\partial x_j} \left( x^{(j-1)} + tv_j e_j \right)v_j.    
+    \]
+    Hence, 
+    \[
+        f_i \left( x^{(j)} \right) - f_i \left( x^{(j-1)} \right) = \frac{\partial f_i}{\partial x_j} \left( \xi_j \right) v_j,    
+    \]
+    where 
+    \[
+        \xi_j = x^{(j-1)} + t_j v_j e_j.
+    \]
+    Subtracting \(\frac{\partial f_i}{\partial x_j} (x_0) v_j \), we obtain
+    \[
+        \left\vert f_i \left( x^{(j)} \right) - f_i \left( x^{(j-1)} \right) - \frac{\partial f_i}{\partial x_j}(x_0)v_j    \right\vert = \left\vert \frac{\partial f_i}{\partial x_j} \left( \xi_j \right) - \frac{\partial f_i}{\partial x_j}(x_0)    \right\vert  \vert v_j \vert. 
+    \] 
+    Because \(\left\lVert \xi _j - x_0 \right\rVert < \delta  \), continuity of partial derivatives yields,
+    \[
+       \left\vert f_i \left( x^{(j)} \right) - f_i \left( x^{(j-1)} \right) - \frac{\partial f_i}{\partial x_j}(x_0)v_j    \right\vert < \frac{\varepsilon }{nm} \vert v_j \vert.  
+    \] 
+    Summing over \(i = 1, 2,\dots , m\) and using \(\lVert u \rVert \le \sum_{i} \vert u_i \vert   \), we conclude 
+    \begin{align*}
+        &\left\lVert f \left( x^{(j)} \right) - f \left( x^{(j-1)} \right) - \frac{\partial f}{\partial x_j} (x_0) v_j    \right\rVert = \left\lVert \sum_{i=1}^m \left( f \left( x^{(j)} \right) - f \left( x^{(j-1)} \right) - \frac{\partial f}{\partial x_j} (x_0) v_j  \right) e_i   \right\rVert \\
+        &\le \sum_{i=1}^m \left\vert f \left( x^{(j)} \right) - f \left( x^{(j-1)} \right) - \frac{\partial f}{\partial x_j} (x_0) v_j \right\vert \le m \frac{\varepsilon }{nm} \vert v_j \vert = \frac{\varepsilon}{n} \vert v_j \vert \le \frac{\varepsilon}{n} \lVert x - x_0 \rVert.     
+    \end{align*}
+    Finally, summing over \(j = 1,2,\dots ,n\) and applying the triangle inequality, 
+    \begin{align*}
+        &\left\lVert f(x) - f(x_0) - \sum_{j=1}^n \frac{\partial f}{\partial x_j} (x_0) v_j   \right\rVert = \left\lVert \sum_{j=1}^n \left( f \left( x^{(j)} \right) - f \left( x^{(j-1)} \right) - \frac{\partial f}{\partial x_j} (x_0) v_j    \right)   \right\rVert \\
+        &\le \sum_{j=1}^n \left\lVert \left( f \left( x^{(j)} \right) - f \left( x^{(j-1)} \right) - \frac{\partial f}{\partial x_j} (x_0) v_j    \right) \right\rVert  \le \sum_{j=1}^n \frac{\varepsilon }{n} \lVert x - x_0 \rVert = \varepsilon \lVert x - x_0 \rVert.     
+    \end{align*} 
+    Since \(L(x - x_0) = \sum_{j=1}^n v_j \frac{\partial f}{\partial x_j} (x_0)  \), so we have 
+    \[
+        \lVert f(x) - f(x_0) - L(x - x_0) \rVert \le \varepsilon \lVert x - x_0 \rVert,
+    \] 
+    and we're done.
+\end{proof}
+
+\begin{remark}
+    From \autoref{thm: if f continuously differentiable then f differentiable} and \autoref{lm: directional derivative another form} we conclude the following important fact:
+    
+    If the partial derivatives of a function \(f: E \to \mathbb{R} ^m\) exist and are continuous on a set \(F \subseteq E\), then at every interior point \(x_0\) of \(F\) all directional derivatives exist, and they are given by 
+    \[
+        D_{(v_1, v_2, \dots , v_n)} f(x_0) = \sum_{j=1}^n v_j \frac{\partial f}{\partial x_j}(x_0).  
+    \]    
+    \begin{itemize}
+        \item The scalar-valued case. If \(f: E \to \mathbb{R} \) is real-valued, we define the gradient of \(f\) at \(x_0\) to be the row vector 
+        \[
+            \nabla f(x_0) \coloneqq \left( \frac{\partial f}{\partial x_1}(x_0), \dots , \frac{\partial f}{\partial x_n}(x_0)   \right). 
+        \]
+        Whenever \(x_0\) lies in the interior of a region where the partial derivatives exist and are continuous, the directional derivative takes the familiar form 
+        \[
+            D_v f(x_0) = v \cdot \nabla f(x_0).
+        \]
+        \item The vector-valued case. Now let \(f: E \to \mathbb{R} ^m\) be vector-valued, say 
+        \[
+            f = \begin{pmatrix}
+                 f_1 \\
+                 \vdots \\
+                 f_m \\
+            \end{pmatrix}.
+        \]
+        If \(x_0\) lies in the interior of a region where all partial derivatives exist and are continuous, then 
+        \[
+            f^{\prime} (x_0) (v_1, v_2, \dots , v_n) = \sum_{j=1}^n v_j \frac{\partial f}{\partial x_j} (x_0).  
+        \] 
+        Writing this componentwise, 
+        \[
+            f^{\prime} (x_0)(v_1, \dots , v_n) = \sum_{j=1}^n v_j \begin{pmatrix}
+                 \frac{\partial f_1}{\partial x_j} (x_0)  \\
+                  \vdots \\
+                  \frac{\partial f_m}{\partial x_j} (x_0) \\
+            \end{pmatrix} = \begin{pmatrix}
+                 \sum_{j=1}^n v_j \frac{\partial f_1}{\partial x_j} (x_0)   \\
+                \vdots \\
+                 \sum_{j=1}^n v_j \frac{\partial f_m}{\partial x_j} (x_0) \\
+            \end{pmatrix} = \begin{pmatrix}
+                 \nabla f_1(x_0) \cdot v  \\
+                 \vdots \\
+                 \nabla f_m(x_0) \cdot v \\
+            \end{pmatrix} = \begin{pmatrix}
+                 \nabla f_1(x_0) \\
+                 \vdots \\
+                 \nabla f_m(x_0) \\
+            \end{pmatrix}v
+        \]
+        \item The derivative matrix (Jacobian matrix). We therefore define the derivative matrix (or Jacobian matrix) of \(f\) at \(x_0\) by 
+        \[
+            Df(x_0) \coloneqq \left( \frac{\partial f_i}{\partial x_j}(x_0)  \right)_{\substack{1 \le i \le m \\ 1 \le j \le n}}. 
+        \]
+        Explicitly, 
+        \[
+            D f(x_0) = \begin{pmatrix}
+                \frac{\partial f_1}{\partial x_1} (x_0) & \cdots & \frac{\partial f_1}{\partial x_n} (x_0)  \\
+                \vdots & \ddots & \vdots  \\
+                \frac{\partial f_m}{\partial x_1} (x_0) & \cdots & \frac{\partial f_m}{\partial x_n} (x_0)  \\
+            \end{pmatrix}.
+        \]
+        With this notation, the derivative acts by matrix multiplication: 
+        \[
+            D_v f(x_0) = f^{\prime} (x_0) v = D f(x_0) v.
+        \]
+    \end{itemize}
+\end{remark}
