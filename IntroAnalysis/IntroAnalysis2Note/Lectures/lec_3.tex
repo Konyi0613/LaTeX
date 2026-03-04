@@ -1,0 +1,296 @@
+\lecture{3}{3 March.}{}
+\begin{lemma} \label{lm: chain rule}
+    Let \(E \subseteq \mathbb{R} ^n\) and let \(f = (f_1, f_2, \dots , f_m) : E \to \mathbb{R} ^m\). Fix \(1 \le i \le m\) and \(1 \le j \le n\). Let \(z \in E\), \(v \in \mathbb{R} \) and define \(\phi _i^j (t) = f_i (z + t v e_j)\) for \(0 \le t \le 1\). Assume that for some \(t_0 \in (0, 1)\), \(\exists \rho > 0\) s.t. 
+    \[
+        z + (t_0 + s)v e_j \in E \quad \text{for all } \vert s \vert < \rho,  
+    \]
+    and that the partial derivative \(\frac{\partial f_i}{\partial x_j} \) exists at \(p = z + t_0 v e_j\). Then, \(\phi _i^j\) is differentiable at \(t_0\) and 
+    \[
+        \left( \phi _i^j \right)^{\prime} (t_0) = \frac{\partial f_i(p)}{\partial x_j}(v).  
+    \]              
+\end{lemma}
+\begin{proof}
+    Note that 
+    \begin{align*}
+        \left( \phi _i^j \right)^{\prime}(t_0) &= \lim_{h \to 0} \frac{\phi _i^j(t_0 + h) - \phi _i^j (t_0) }{h} = \lim_{h \to 0} \frac{f_i(z + (t_0 + h)ve_j) - f_i(z + t_0 v e_j)}{h} \\
+        &= \lim_{h \to 0} \frac{f_i(p + hve_j) - f_i(p)}{h}.  
+    \end{align*}
+    Now if \(v = 0\), then this limit is equal to \(0\). Now if \(v \neq 0\), then 
+    \begin{align*}
+        \lim_{h \to 0} \frac{f_i(p + hve_j) - f_i(p)}{h} &= \lim_{h \to 0} \frac{f_i(p + hve_j) - f_i(p)}{vh} \cdot v = \lim_{s \to 0} \frac{f_i(p + se_j) - f_i(p)}{s} \cdot v = \frac{\partial f_i(p)}{\partial x} \cdot v.   
+    \end{align*}  
+\end{proof}
+
+\begin{eg}
+    Let \(f : \mathbb{R} ^2 \to \mathbb{R} ^2\) be defined by \(f(x, y) = (x^2 + xy, y^2)\), then 
+    \begin{align*}
+        Df(x, y) = \begin{pmatrix}
+            \frac{\partial}{\partial x} (x^2 + xy)  & \frac{\partial}{\partial y} (x^2 + xy)   \\
+            \frac{\partial}{\partial x}(y^2)  & \frac{\partial}{\partial y} (y^2)  \\
+        \end{pmatrix} = \begin{pmatrix}
+            2x + y & x  \\
+            0 & 2y  \\
+        \end{pmatrix}.
+    \end{align*}  
+    Thus, 
+    \[
+        D_{(v, w)}f(x, y) = \begin{pmatrix}
+            2x + y & x  \\
+            0 & 2y  \\
+        \end{pmatrix} \begin{pmatrix}
+             v \\
+             w \\
+        \end{pmatrix} = \begin{pmatrix}
+             (2x + y)v + xw \\
+             2yw \\
+        \end{pmatrix}.
+    \]
+\end{eg}
+
+\section{Chain Rule}
+
+If \(f : X \to Y\) and \(g: Y \to Z\), then their composition \(g \circ f : X \to Z\) is defined by \((g \circ f)(x) = g(f(x))\). We want to show that 
+\[
+    D(g \circ f)(x) = (Dg(f(x))) \cdot (Df(x))
+\]    
+under suitable conditions. 
+
+\begin{definition}
+    Let \(A = \left( a_{ij} \right) \in \mathbb{R} ^{n \times n} \) be square matrix. The trace of \(A\), denoted \(\Tr (A)\), is defined by \(\Tr (A) = \sum_{i=1}^n a_{in} \). Let \(M = (m_{ij})\) be an \(r \times s\) matrix. We may regard \(M\) as an element of \(\mathbb{R} ^{r \times s}\). We can define its Frobenius norm by 
+    \[
+        \lVert M \rVert_F = \left( \sum_{i=1}^r \sum_{j=1}^s m_{ij}^2   \right)^{\frac{1}{2}},  
+    \]       
+    which can be written as \(\lVert M \rVert_F = \left( \Tr \left( MM^t  \right) \right)^{\frac{1}{2}}  \). 
+\end{definition}
+
+\begin{theorem}
+    Let \(A \in \mathbb{R} ^{m \times n}\) and \(B \in \mathbb{R} ^{n \times p}\). Define the Frobenius norm by 
+    \[
+        \lVert M \rVert_F = \sqrt{\Tr \left( MM^t \right) } = \left( \sum_{i=1}^r \sum_{j=1}^s m_{ij}^2   \right)^{\frac{1}{2}}   
+    \]  
+    with \(M \in \mathbb{R} ^{r \times s}\). Then, 
+    \[
+        \lVert AB \rVert_F \le \lVert A \rVert_F \lVert B \rVert_F.   
+    \] 
+    In particular, for any column vector \(v \in \mathbb{R} ^n\), we have 
+    \[
+        \lVert Av \rVert \le \lVert A \rVert_F \lVert v \rVert,   
+    \] 
+    and the linear map \(x \mapsto Ax\) is continuous on \(\mathbb{R} ^n\). 
+\end{theorem}
+\begin{proof}
+    Note that 
+    \[
+        (AB)_{ik} = \sum_{j=1}^n a_{ij} b_{jk}, 
+    \]
+    so 
+    \[
+        \left\vert (AB)_{ik} \right\vert = \left\vert \sum_{j=1}^n a_{ij} b_{jk}  \right\vert \le \left( \sum_{j=1}^n a_{ij}^2  \right)^{\frac{1}{2}} \left( \sum_{j=1}^n b_{jk}^2  \right)^{\frac{1}{2}}.    
+    \]
+    Hence, we have 
+    \begin{align*}
+        \lVert AB \rVert_F^2 &= \sum_{i} \sum_{k} (AB)_{ik}^2 \le \sum_{i} \sum_{k} \left( \sum_{j=1}^n a_{ij}^2  \right) \left( \sum_{j=1}^n b_{jk}^2  \right) = \lVert A \rVert_F^2 \lVert B \rVert_F^2.         
+    \end{align*}
+    For the second part, since we have 
+    \[
+        \lVert Av \rVert_F \le \lVert A \rVert_F \lVert v \rVert_F,   
+    \]
+    and we know for column vector, Frobenius norm coincides with the Euclidean norm, so we're done.
+
+    Finally, for \(x, x_0 \in \mathbb{R} ^n\), we know \(Ax - Ax_0 = A(x - x_0)\), and thus 
+    \[
+        0 \le \lVert Ax - Ax_0 \rVert = \lVert A(x - x_0) \rVert \le \lVert A \rVert_F \lVert x - x_0 \rVert,    
+    \]  
+    and if \(x \to x_0\), we know 
+    \[
+        \lVert A \rVert_F \lVert x - x_0 \rVert \to 0  
+    \] 
+    since \(\lVert A \rVert_F \) is a constant, and thus \(\lVert A(x - x_0) \rVert \) also converges to \(0\), which shows the map \(x \mapsto Ax\) is linear.    
+\end{proof}
+
+\begin{theorem}
+    Let \(E \subseteq \mathbb{R} ^n\), let \(f : E \to \mathbb{R} ^m\), and let \(x_0\) be an interior point of \(E\). If \(f\) is differentiable at \(x_0\), then \(f\) is continuous at \(x_0\).        
+\end{theorem}
+
+\begin{proof}
+    If \(f\) is differentiable at \(x_0\), then there exists \(L: \mathbb{R} ^n \to \mathbb{R} ^m\) s.t. 
+    \[
+        \lim_{x \to x_0} \frac{\lVert f(x) - f(x_0) - L(x - x_0) \rVert }{\lVert x - x_0 \rVert } = 0. 
+    \]   
+    Thus,
+    \[
+        \lim_{x \to x_0} \lVert f(x) - f(x_0) - L(x - x_0) \rVert = \lim_{x \to x_0} \frac{\lVert f(x) - f(x_0) - L(x - x_0) \rVert }{\lVert x - x_0 \rVert } \lim_{x \to x_0} \lVert x - x_0 \rVert = 0.    
+    \]
+    Hence, we know
+    \begin{align*}
+        \lVert f(x) - f(x_0) \rVert &= \lVert f(x) - f(x_0) - L(x - x_0) + L(x - x_0) \rVert \\
+        &\le \lVert f(x) - f(x_0) - L(x - x_0) \rVert + \lVert L(x - x_0) \rVert    
+    \end{align*}
+    and the former converges to \(0\) as \(x \to x_0\), while the latter also converges to \(0\) as \(x \to x_0\) since \(L\) is continuous.      
+\end{proof}
+
+\begin{theorem}[Chain Rule]
+    Let \(E \subseteq \mathbb{R} ^n\), let \(F \subseteq \mathbb{R} ^m\), and let \(f: E \to F\) and \(g: F \to \mathbb{R} ^p\). Let \(x_0 \in \mathrm{Int}(E) \). Suppose \(f\) is differentiable at \(x_0\), that \(f(x_0)\) lies in the interior of \(F\), and that \(g\) is differentiable at \(f(x_0)\). Then, \(g \circ f : E \to \mathbb{R} ^p\) is differentiable at \(x_0\), and
+    \[
+        \left( g \circ f \right)^{\prime} (x_0) = g^{\prime} (f(x_0)) \cdot f^{\prime} (x_0) 
+    \]             
+\end{theorem}
+
+\begin{proof}
+    Set \(y_0 = f(x_0)\) and denote the derivatives by \(A = f^{\prime} (x_0) : \mathbb{R} ^n \to \mathbb{R} ^m\), \(B : g^{\prime} (f(x_0)) = g^{\prime} (y_0): \mathbb{R} ^m \to \mathbb{R} ^p\). Since \(g\) is differentiable at \(y_0\), define \(\eta : \mathbb{R} ^m \to \mathbb{R} ^p\) by 
+    \[
+        \eta (k) = \begin{dcases}
+            \frac{g(y_0 + k) - g(y_0) - B(k)}{\lVert k \rVert }, &\text{ if } k \neq 0 ;\\
+            0, &\text{ if } k = 0.
+        \end{dcases}
+    \]      
+    Note that \(\lim_{k \to 0} \eta (k) = 0\) since \(g\) is differentiable at \(y_0\), so \(\eta \) is continuous at \(0\). Moreover, we have 
+    \[
+        g(y_0 + k) - g(y_0) - Bk = \eta (k) \lVert k \rVert \quad \text{true for all }k. 
+    \] 
+    Since \(x_0 \in \mathrm{Int}(E) \), \(x_0 + h \in E\) for small enough \(\lVert h \rVert \). Note that 
+    \begin{align*}
+        \left( g \circ f \right)(x_0 + h) - g(f(x_0)) &= g(f(x_0 + h)) - g(f(x_0)) = g(f(x_0) + (f(x_0 + h) - f(x_0))) - g(f(x_0)) \\
+        &= B(f(x_0 + h) - f(x_0)) + \eta \left( f(x_0 + h) - f(x_0) \right) \cdot \lVert f(x_0 + h) - f(x_0) \rVert,   
+    \end{align*}
+    so we have 
+    \[
+        (g \circ f)(x_0 + h) - g(f(x_0)) - BAh = B(f(x_0 + h) - f(x_0) - Ah) + \eta \left( f(x_0 + h) - f(x_0) \right) \cdot \lVert f(x_0 + h) - f(x_0) \rVert. 
+    \]    
+    Now since 
+    \[
+        \lim_{h \to 0} \frac{\lVert f(x_0 + h) - f(x_0) - Ah \rVert }{\lVert h \rVert } = 0, 
+    \]
+    so 
+    \begin{align*}
+        \frac{\lVert B(f(x_0 + h) - f(x_0) - Ah) \rVert }{\lVert h \rVert } &\le \frac{\lVert B \rVert_F \lVert f(x_0 + h) - f(x_0) - A h \rVert  }{\lVert h \rVert } 
+    \end{align*} 
+    implies 
+    \[
+        \lim_{h \to 0} \frac{\lVert B(f(x_0 + h) - f(x_0) - Ah) \rVert }{\lVert h \rVert } = 0.  
+    \]
+    Now we claim that 
+    \[
+        \lim_{h \to 0} \frac{\eta \left( f(x_0 + h) - f(x_0) \right) \cdot \lVert f(x_0 + h) - f(x_0) \rVert}{\lVert h \rVert } = 0. 
+    \]
+    Note that 
+    \[
+       \frac{\eta \left( f(x_0 + h) - f(x_0) \right) \cdot \lVert f(x_0 + h) - f(x_0) \rVert}{\lVert h \rVert } = \eta \left( f(x_0 + h) - f(x_0) \right) \frac{ \lVert f(x_0 + h) - f(x_0) \rVert}{\lVert h \rVert }. 
+    \]
+    Now since \(\eta \) is continuous at \(0\), so
+    \[
+        \lim_{h \to 0} \eta (f(x_0 + h) - f(x_0)) = \eta (0) = 0. 
+    \]  
+    Also, 
+    \begin{align*}
+        \frac{\lVert f(x_0 + h) - f(x_0) \rVert }{\lVert h \rVert } &= \frac{\lVert f(x_0 + h) - f(x_0) - f^{\prime} (x_0)(h) + f^{\prime} (x_0)(h) \rVert }{\lVert h \rVert } \\
+        &\le \frac{\lVert f(x_0 + h) - f(x_0) - f^{\prime} (x_0)(h) \rVert + \lVert f^{\prime} (x_0)(h) \rVert  }{\lVert h \rVert } \\ 
+        &\le \frac{\lVert f(x_0 + h) - f(x_0) - f^{\prime} (x_0)(h) \rVert }{\lVert h \rVert } + \frac{\lVert h \rVert \lVert f^{\prime} (x_0) \rVert_F  }{\lVert h \rVert } \\
+        &\to \lVert A \rVert_F \text{ as } h \to 0. 
+    \end{align*}
+    Thus, 
+    \[
+        \lim_{h \to 0} \frac{\lVert (g \circ f)(x_0 + h) - g(f(x_0)) - BAh \rVert }{\lVert h \rVert } = 0. 
+    \]
+\end{proof}
+
+\begin{corollary}
+We may express the chain rule in matrix form.
+    \[
+        D(g \circ f)(x_0) = Dg(f(x_0)) Df(x_0).
+    \]
+\end{corollary}
+
+\begin{remark}
+    We prove the chain rule of linear transformations in the last theorem, and earlier we have found that in fact the linear transformation \(f^{\prime} (x_0)\) is the Jacobian matrix \(Df(x_0)\), so we can write the matrix form of the chain rule, i.e. the chain rule on Jacobian matrix.  
+\end{remark}
+
+\begin{eg}
+    Let \(f, g : \mathbb{R} ^n \to \mathbb{R} \) be differentiable functions. Recall that 
+    \[
+        \nabla f = \left( \frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \dots , \frac{\partial f}{\partial x_n}    \right), \quad \nabla g = \left( \frac{\partial g}{\partial x_1}, \frac{\partial g}{\partial x_2}, \dots , \frac{\partial g}{\partial x_n}    \right), 
+    \]  
+    and 
+    \[
+        \nabla f = \sum_{i=1}^n \frac{\partial f}{\partial x_i} e_i,  
+    \]
+    then we have 
+    \begin{align*}
+        \nabla (fg) &= \sum_{i=1}^n \frac{\partial }{\partial x_i} (fg) e_i = \sum_{i=1}^n \left( \frac{\partial f}{\partial x_i} g + f \frac{\partial g}{\partial x_i}    \right)e_i = g \nabla f + f \nabla g    
+    \end{align*}
+    by ordinary product rule(前微後不微加上前不微後微).
+\end{eg}
+
+\begin{eg}
+    Consider \(f : \mathbb{R} ^{n \times n} \to \mathbb{R} ^{n \times n}\) defined by 
+    \[
+        f(A) = A^t A,
+    \] 
+    then \(Df(A) = ?\) 
+\end{eg}
+\begin{explanation}
+We use two methods to solve this problem.
+    \begin{description}
+        \item [Method 1: Direct Expansion (Using the Definition)] To find the derivative of \(f\) at \(A\), we apply a small matrix perturbation \(H \in \mathbb{R} ^{n \times n}\) and expand \(f(A + H)\):
+        \begin{align*}
+            f(A+H) &= (A+H)^t(A+H) = \left( A^t + H^t \right)(A + H) = A^t A + A^t H + H^t A + H^t H. 
+        \end{align*}
+        Hence, we have 
+        \[
+            f(A + H) - f(A) = \left( A^t H + H^t A \right) + H^t H. 
+        \]
+        Hence, we may choose \(L: \mathbb{R} ^{n \times n} \to \mathbb{R} ^{n \times n}\) by 
+        \[
+            L(H) = A^t H + H^t A.
+        \]
+        Thus, we have 
+        \begin{align*}
+            \lim_{H \to 0} \frac{\left\lVert f(A + H) - f(A) - L(H) \right\rVert }{\lVert H \rVert } &= \lim_{H \to 0} \frac{\left\lVert H^t H \right\rVert }{\lVert H \rVert } \le \lim_{H \to 0} \frac{\left\lVert H^t \right\rVert \left\lVert H \right\rVert  }{\left\lVert H \right\rVert } = \lim_{H \to 0} \left\lVert H^t \right\rVert = 0.
+        \end{align*}
+        \item [Method 2: Decomposition and the Chain Rule]
+        We can deconstruct \(f\) into 
+% https://q.uiver.app/#q=WzAsMyxbMCwwLCJBIl0sWzIsMCwiXFxsZWZ0KEFedCwgQVxccmlnaHQpIl0sWzQsMCwiQV50IEEiXSxbMCwxLCJcXFBoaSIsMCx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6Im1hcHMgdG8ifX19XSxbMSwyLCJcXFBzaSIsMCx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6Im1hcHMgdG8ifX19XV0=
+\[\begin{tikzcd}[column sep=tiny]
+	A && {\left(A^t, A\right)} && {A^t A}
+	\arrow["\Phi", maps to, from=1-1, to=1-3]
+	\arrow["\Psi", maps to, from=1-3, to=1-5]
+\end{tikzcd}\]
+
+Note that 
+\[
+    \Phi (A + h) - \Phi (A) - \left( H^t, H \right) = 0, 
+\]
+so 
+\[
+    \lim_{\lVert H \rVert  \to 0} \frac{\left\lVert \Phi (A + H) - \Phi (A) - \left( H^t, H \right)  \right\rVert }{\lVert H \rVert } = 0. 
+\]
+Thus, \(\Phi (A)^{\prime} (H) = \left( H^t, H \right) \). Also, we can check \(\Psi ^{\prime} (B, C)(K, L) = KC + BL\), i.e.
+\begin{align*}
+   \lim_{(K, L) \to (0, 0)} \frac{\left\lVert \Psi (B + K, C + L) - \Psi (B, C) - (KC + BL) \right\rVert }{\lVert (K, L) \rVert } = 0.  
+\end{align*}
+Note that 
+\[
+    \Psi (B + K, C + L) - \Psi (B, C) - (KC + BL)= KL.
+\]
+and
+\[
+    \left\lVert (K, L) \right\rVert = \sqrt{\left\lVert K \right\rVert^2 + \left\lVert L \right\rVert^2  } \ge \frac{\lVert K \rVert + \lVert L \rVert  }{\sqrt{2} }.  
+\]
+Thus, 
+\begin{align*}
+   \frac{\left\lVert \Psi (B + K, C + L) - \Psi (B, C) - (KC + BL) \right\rVert }{\lVert (K, L) \rVert } &\le \sqrt{2} \frac{\lVert KL \rVert }{\lVert K \rVert + \lVert L \rVert  } \le \sqrt{2} \frac{\lVert K \rVert \lVert L \rVert  }{\lVert K \rVert + \lVert L \rVert  } \\
+   &\le \sqrt{2} \frac{\lVert K \rVert \lVert L \rVert  }{\lVert L \rVert } = \sqrt{2} \lVert K \rVert.   
+\end{align*}
+This shows 
+\[
+   0 \le \lim_{(K, L) \to (0, 0)} \frac{\left\lVert \Psi (B + K, C + L) - \Psi (B, C) - (KC + BL) \right\rVert }{\lVert (K, L) \rVert } \le \lim_{(K, L) \to (0, 0)} \sqrt{2} \lVert K \rVert  = 0. 
+\]
+
+By chain rule, we know 
+\begin{align*}
+    f^{\prime} (A)(H) &= \Psi ^{\prime} (\Phi (A)) \left( \Phi ^{\prime} (A)(H) \right) = H^t A + A^t H. 
+\end{align*}  
+    \end{description}
+    
+
+\end{explanation}
