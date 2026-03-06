@@ -1,0 +1,70 @@
+\lecture{4}{5 March.}{}
+\section{Clairaut's theorem}
+\begin{definition}
+    Let \(E \subseteq \mathbb{R} ^n\) be open and let \(f: E \to \mathbb{R} ^n\). We say \(f\) is twice continuously differentiable on \(E\) if 
+    \begin{itemize}
+        \item [(1)] \(f\) is continuously differentiable on \(E\), i.e. \(\frac{\partial f}{\partial x_i} \) are continuous on \(E\)    
+        \item [(2)] for each \(j = 1, 2, \dots , n\), the partial derivative \(\frac{\partial f}{\partial x_j} : E \to \mathbb{R} ^m\) is continuously differentiable on \(E\).  
+    \end{itemize}    
+\end{definition}
+
+\begin{theorem}
+    Let \(E\) be an open set in \(\mathbb{R} ^n\), and let \(f: E \to \mathbb{R} ^m\) be twice continuously differentiable on \(E\). Then, for all \(1 \le i, j \le n\) and all \(x_0 \in E\)
+    \[
+        \frac{\partial^2 f}{\partial x_i \partial x_j} = \frac{\partial^2 f }{\partial x_j \partial x_i}.  
+    \]      
+\end{theorem}
+
+\begin{proof}
+    Since \(f = (f_1, f_2, \dots , f_m)\) where \(f_i : E \to \mathbb{R} \), we may just assume \(f: E \to \mathbb{R} \). We may also assume \(x_0 = 0\). The \(i = j\) case is trivial. Given any \(\varepsilon > 0\), \(\exists \delta _0 > 0\) s.t. 
+    \[
+        \left\vert \frac{\partial ^2 f(x)}{\partial x_i \partial x_j} - \frac{\partial ^2 f(0)}{\partial x_i \partial x_j} \right\vert < \varepsilon  \text{ and } \left\vert \frac{\partial ^2 f(x)}{\partial x_j \partial x_i} - \frac{\partial ^2 f(0)}{\partial x_j \partial x_i} \right\vert < \varepsilon 
+    \] whenevery \(\lVert x \rVert \le 2 \delta _0 \) since the second order derivative is continuous at \(0\). Fix \(\delta \in (0, \delta _0)\). Consider the square in the \((x_i, x_j)\)-plane with vertices \(0, \delta e_i, \delta e_j, \delta e_i + \delta e_j\) and define the second finite difference 
+    \[
+        X \coloneqq f(\delta e_i + \delta e_j) - f(\delta e_i) - f(\delta e_j) + f(0).
+    \]          
+    Define 
+    \[
+        \phi (t) \coloneqq f(t e_i + \delta e_j) - f(t e_i), \quad t \in [0, \delta ].
+    \]
+    Then, \(X = \phi (\delta ) - \phi (0)\). By MVT, \(\exists c_i \in (0, \delta )\) s.t. 
+    \[
+        X = \delta \phi ^{\prime} (c_i) = \delta \left[ \frac{\partial f}{\partial x_i} (c_i e_i + \delta e_j) - \frac{\partial f}{\partial x_i} (c_i e_i)    \right]. 
+    \]  
+    Now consider
+    \[
+        g(s) \coloneqq \frac{\partial f}{\partial x_i} (c_i e_i + s e_j), \quad s \in [0, \delta ].
+    \]
+    Then 
+    \[
+        g(\delta ) - g(0) = \frac{\partial f}{\partial x_i} (c_i e_i + \delta e_j) - \frac{\partial f}{\partial x_i} (c_i e_i). 
+    \]
+    Applying MVT one more time, then we know there exists \(c_j \in (0, \delta )\) s.t. 
+    \[
+        g(\delta ) - g(0) = g^{\prime} (c_j) \delta = \delta \frac{\partial^2 f}{\partial x_j \partial x_i} (c_i e_i + c_j e_j).
+    \] 
+    Substituting into the expression for \(X\) gives 
+    \[
+        X = \delta ^2 \frac{\partial^2 f}{\partial x_j x_i} (\xi), \quad \xi = c_i e_i + c_j e_j. 
+    \]
+    Since \(\lVert \xi  \rVert = \sqrt{c_i^2 + c_j^2} < \delta \sqrt{2} < 2 \delta _0   \), continuity implies 
+    \[
+        \left\vert \frac{X}{\delta ^2} - \frac{\partial^2 f}{\partial x_j \partial x_i}(0)  \right\vert \le \varepsilon. 
+    \]
+    If we write \(X\) as 
+    \[
+        X = f(\delta e_i + \delta e_j) - f(\delta e_j) - f(\delta e_i) + f(0)
+    \] 
+    and define 
+    \[
+        \psi (s) \coloneqq f(\delta e_i + s e_j) - f(s e_j), \quad s \in [0, \delta ].
+    \]
+    Then, we can use similar method to show 
+    \[
+        \left\vert \frac{X}{\delta ^2} - \frac{\partial^2 f }{\partial x_i \partial x_j} (0) \right\vert \le \varepsilon. 
+    \]
+    Thus, by triangle inequality, we know 
+    \[
+       \left\vert \frac{\partial^2 f }{\partial x_j \partial x_i} (0) - \frac{\partial^2 f }{\partial x_i \partial x_j} (0) \right\vert \le 2 \varepsilon 
+    \] for any \(\varepsilon > 0\), and we're done. 
+\end{proof}

@@ -1,0 +1,139 @@
+\lecture{4}{5 March.}{}
+\begin{eg}
+    We will hike if it doesn't rain and there is no earthquake. Otherwise we will stay in the city and eat food and get fat. Now if 
+    \[
+        \mathbb{P} (\text{rain} ) = 60\%, \quad \mathbb{P} (\text{earthquake})=5\%, \quad \mathbb{P} (\text{rainy earthquake} ) = 17\%.
+    \]
+    What is \(\mathbb{P} (\text{fat} )\)? 
+\end{eg}
+\begin{explanation}
+    If \(E=\)rain and \(F=\)earthquake, then 
+    \[
+        \mathbb{P} (E) = 60 \%, \quad \mathbb{P} (F) = 5 \%, \quad \mathbb{P} (E \cap F) = 1\%.
+    \]  
+    Thus, 
+    \[
+        \mathbb{P} (E \cup F) = \mathbb{P} (E) + \mathbb{P} (F) - \mathbb{P} (E \cap F) = 64 \%.
+    \]
+    \begin{remark}
+        Even if we don't know \(\mathbb{P} (E \cap F)\), we could have said 
+        \[
+             \mathbb{P} (E) = 60 \% \le \mathbb{P} (E \cup F) \le 65 \% = \mathbb{P} (E) + \mathbb{P} (F).
+        \] 
+    \end{remark}
+\end{explanation}
+
+\begin{proposition}
+    Given any three events \(E, F, G\) in a probability space \((S, \mathbb{P} )\), 
+    \[
+        \mathbb{P} (E \cup F \cup G) = \mathbb{P} (E) + \mathbb{P} (F) + \mathbb{P} (G) - \mathbb{P} (E \cap F) - \mathbb{P} (F \cap G) - \mathbb{P} (E \cap G) + \mathbb{P} (E \cap F \cap G).
+    \]   
+\end{proposition}
+
+\begin{proof}
+    \begin{align*}
+        \mathbb{P} (E \cup F \cup G) &= \mathbb{P} ((E \cup F) \cup G) = \mathbb{P} (E \cup F) + \mathbb{P} (G) - \mathbb{P} ((E \cup F) \cap G) \\
+        &= \mathbb{P} (E) + \mathbb{P} (F) - \mathbb{P} (E \cap F) + \mathbb{P} (G) - \mathbb{P} ((E \cap G) \cup (F \cap G)) \\
+        &= \mathbb{P} (E) + \mathbb{P} (F) - \mathbb{P} (E \cap F) + \mathbb{P} (G) - \left( \mathbb{P} (E \cap G) + \mathbb{P} (F \cap G) - \mathbb{P} (E \cap F \cap G)  \right) \\
+        &= \mathbb{P} (E) + \mathbb{P} (F) + \mathbb{P} (G) - \mathbb{P} (E \cap F) - \mathbb{P} (F \cap G) - \mathbb{P} (E \cap G) + \mathbb{P} (E \cap F \cap G). 
+    \end{align*}
+\end{proof}
+
+\begin{eg}
+    Rolling a \(60\)-sided die, numbered \(1\) to \(60\), and is fair. We win if rolling a multiple of \(2, 3, 5\), then \(\mathbb{P} (\text{win} )=\)?     
+\end{eg}
+
+\begin{explanation}
+    We know \(S=[60]\) with uniform probability. If \(E \subseteq S\), then \(\mathbb{P} (E) = \frac{\vert E \vert }{60}\). Suppose
+    \[
+        W = \left\{ \text{win number}  \right\} = \left\{ x \in S: x \text{ is divisible by } 2,3,5  \right\},  
+    \]    
+    and given \(k \in \mathbb{N} \), let 
+    \[
+        E_k = \left\{ x \in S: x \text{ is divisible by } k  \right\}, 
+    \] 
+    then \(W = E_2 \cup E_3 \cup E_5\). Note that 
+    \[
+        \mathbb{P} (E_2) = \frac{30}{60} = \frac{1}{2}, \quad \mathbb{P} (E_3) = \frac{20}{60} = \frac{1}{3}, \quad \mathbb{P} (E_5) = \frac{12}{60} = \frac{1}{5}.
+    \] 
+    Thus, we can compute \(\mathbb{P} (W)\) by 
+    \[
+        \mathbb{P} (W) = \mathbb{P} (E_2) + \mathbb{P} (E_3) + \mathbb{P} (E_5) - \mathbb{P} (E_2 \cap E_3) - \mathbb{P} (E_3 \cap E_5) - \mathbb{P} (E_2 \cap E_5) + \mathbb{P} (E_2 \cap E_3 \cap E_5),
+    \] 
+    and note that if \(k\) and \(l\) are relatively prime, then \(E_k \cap E_l = E_{kl}\). Thus,
+    \[
+        \mathbb{P} (W) = \frac{1}{2} + \frac{1}{3} + \frac{1}{5} - \frac{1}{6} - \frac{1}{10} - \frac{1}{15} + \frac{1}{30} = \frac{22}{30}.
+    \]   
+\end{explanation}
+
+\begin{theorem}
+    Let \((S, \mathbb{P} )\) be a probability space, and let \(E_1, E_2, \dots , E_n\) be arbitrary events (\(E_i \subseteq S\)). Then, 
+    \[
+        \mathbb{P} \left( \bigcup_{i=1}^{n} E_i  \right) = \sum_{i=1}^n (-1)^{r+1} \sum_{1 \le i_1 < i_2 < \dots < i_r \le n} \mathbb{P} (E_1 \cap E_2 \cap \dots \cap E_r) = \sum_{I \subseteq [n] \setminus \varnothing } (-1)^{\vert I \vert + 1 } \mathbb{P} \left( \bigcap_{i \in I} E_i  \right) .   
+    \]  
+\end{theorem}
+
+\begin{proof}
+    Define
+    \[
+        F_I = \left( \bigcap_{i \in I} E_i  \right) \cap \left( \bigcap_{i \notin I} E_i^C  \right) \text{ for all } I \subseteq [n]. 
+    \] 
+    Observe
+    \[
+        E_1 \cup E_2 \cup \dots \cup E_n = \bigcup_{\substack{I \subseteq [n] \\ I \neq \varnothing }} F_I. 
+    \]
+    Now since \(F_I \cap F_J = \varnothing \) for \(I, J \subseteq [n]\) where \(I, J\) are distinct. Thus, 
+    \[
+        \mathbb{P} \left( \bigcup_{i=1}^{n} E_i  \right) = \mathbb{P} \left( \bigcup_{\substack{I \subseteq [n] \\ I \neq \varnothing }} F_I \right) = \sum_{\substack{I \subseteq [n] \\ I \neq \varnothing }} \mathbb{P} (F_I).  
+    \]
+    Furthermore, for any \(I \subseteq [n]\),
+    \[
+        \bigcap_{i \in I} E_i = \bigcup_{\substack{J \subseteq [n] \\ I \subseteq J}} F_J.
+    \] 
+    Thus, 
+    \[
+        \mathbb{P} \left( \bigcap_{i \in I} E_j  \right) = \sum_{I \subseteq J \subseteq [n]} \mathbb{P} (F_J).  
+    \]
+    This gives 
+    \begin{align*}
+        \sum_{\varnothing \neq I \subseteq [n]} (-1)^{\vert I \vert + 1} \mathbb{P} \left( \bigcap_{i \in I} E_i  \right) &= \sum_{\varnothing \neq I \subseteq [n]} (-1)^{\vert I \vert + 1} \sum_{I \subseteq J \subseteq [n]} \mathbb{P} (F_J) = \sum_{\varnothing \neq J \subseteq [n]} \mathbb{P} (F_J) \left[ \sum_{\varnothing \neq I \subseteq J} (-1)^{\vert I \vert + 1}  \right] \\
+        &= \sum_{\varnothing \neq J \subseteq [n]} \mathbb{P} (F_J) = \mathbb{P} \left( \bigcup_{i=1}^{n} E_i  \right).       
+    \end{align*}
+
+    \begin{remark}
+        For fixed \(J \subseteq [n]\), 
+        \[
+            \sum_{\varnothing \neq I \subseteq J} (-1)^{\vert I \vert + 1} = 1 
+        \] 
+        since 
+        \[
+            \sum_{I \subseteq J} (-1)^{\vert I \vert + 1} = \sum_{r = 0}^{\vert J \vert} \binom{\vert J \vert }{r} (-1)^{r + 1} = (-1) \sum_{r=0}^{\vert J \vert } \binom{\vert J \vert }{r} (-1)^r 1^{\vert J \vert - r} = 0.   
+        \]
+    \end{remark}
+\end{proof}
+
+\begin{eg}
+    If there is a party, and everyone brings a hat. If now everyone put their hats together and then randomly gets back one, and we want to compute the probability of somebody gets his hat. 
+\end{eg}
+\begin{explanation}
+    Now if \(S = S_n\) and \(\mathbb{P} \) is uniform and \(E\) is the set of events that somebody gets their hat. Let 
+    \[
+        E_i = \left\{ \text{person } i \text{ gets his hat}   \right\} = \left\{ \pi \in S_n: \pi (i) = i \right\}.  
+    \]
+    Then, \(E = \bigcup_{i=1}^{n} E_i \). Thus, by inclusion-exclusion principle, 
+    \[
+        \mathbb{P} (E) = \mathbb{P} \left( \bigcup_{i=1}^{n} E_i  \right) = \sum_{\varnothing \neq I \subseteq [n]} (-1)^{\vert I \vert + 1} \mathbb{P} \left( \bigcap_{i \in I} E_i  \right).  
+    \] 
+    Note that \(\bigcap_{i \in I} E_i \) is the set of events that all people in \(I\) gets their hats, so 
+    \[
+        \left\vert \bigcap_{i \in I} E_i  \right\vert = (n - \vert I \vert )!
+    \]  
+    Hence, since \(\mathbb{P} \) is uniform, 
+    \[
+        \mathbb{P} (E) = \sum_{\varnothing \neq I \subseteq [n]}(-1)^{\vert I \vert + 1} \frac{(n - \vert I \vert )!}{n!} = \sum_{r=1}^n \binom{n}{r} (-1)^{r+1} \frac{(n-r)!}{n!} = \sum_{r=1}^n \frac{(-1)^{r+1}}{r!} .  
+    \] 
+    Hence,
+    \begin{align*}
+        \mathbb{P} \left( \text{nobody gets their hat}  \right) = 1 - \sum_{r=1}^n \frac{(-1)^{r+1}}{r!} = \sum_{r=0}^n \frac{(-1)^r}{r!} \to \frac{1}{e} \text{ as } n \to \infty .    
+    \end{align*}
+\end{explanation}
