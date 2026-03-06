@@ -1,9 +1,146 @@
 \lecture{4}{5 March.}{}
-\section{Clairaut's theorem}
+If \(T: \mathbb{R} ^n \to \mathbb{R} ^m\) is linear, then \(T^{\prime} (x) = T\) for every \(x\). This is because for every \(x\) 
+\[
+  \lim_{h \to 0} \frac{\lVert T(x + h) - T(x) - T(h) \rVert }{\lVert h \rVert } = 0.   
+\]
+Hence, for any differentiable \(f: E \to \mathbb{R} ^n\), the composition \(Tf\) is differentiable and 
+\[
+    (Tf)^{\prime} (x_0) = T^{\prime} (f(x_0)) \circ f^{\prime} (x_0) = T \circ f^{\prime} (x_0) = T(f^{\prime} (x_0)).
+\]     
+This generalizes the familiar one-variable rule \((cf)^{\prime} = cf^{\prime} \). 
+
+Another useful special case of the chain rule is the following. If \(f: \mathbb{R} ^n \to \mathbb{R} ^m\) is differentiable and \(x_j : \mathbb{R} \to \mathbb{R} \) are differentiable functions for \(j = 1,2,\dots ,n\), then 
+\[
+    \frac{\mathrm{d}}{\mathrm{d}t} f(x_1(t), x_2(t), \dots , x_n(t)) = \sum_{j=1}^n x_j^{\prime} (t) \frac{\partial f}{\partial x_j} (x_1(t), x_2(t), \dots , x_n(t))   
+\]   
+since we can suppose \(f = (f_1, f_2, \dots , f_m)\) and \(g(t) = (x_1(t), x_2(t), \dots , x_n(t))^t\) and thus 
+\begin{align*}
+    \frac{\mathrm{d}}{\mathrm{d}t} f(x_1(t), x_2(t), \dots , x_n(t)) &= \frac{\mathrm{d}}{\mathrm{d}t} f \circ g(t) = f^{\prime} (g(t)) \circ g^{\prime} (t) \\ &= \begin{pmatrix}
+        \frac{\partial f_1}{\partial x_1} (g(t))  & \frac{\partial f_1}{\partial x_2} (g(t)) & \cdots & \frac{\partial f_1}{\partial x_n} (g(t))  \\
+         & \vdots &  &   \\
+        \frac{\partial f_m}{\partial x_1} (g(t)) & \frac{\partial f_m}{\partial x_2} (g(t)) & \dots & \frac{\partial f_m}{\partial x_n} (g(t))  \\
+    \end{pmatrix} \begin{pmatrix}
+         x_1^{\prime} (t) \\
+         \vdots \\
+         x_n^{\prime} (t) \\
+    \end{pmatrix} \\
+    &= \begin{pmatrix}
+         \sum_{i=1}^n \frac{\partial f_1}{\partial x_i} (g(t)) x_i^{\prime} (t)   \\
+         \vdots \\
+         \sum_{i=1}^n \frac{\partial f_m}{\partial x_i} (g(t)) x_i^{\prime} (t)  
+    \end{pmatrix} = \sum_{i=1}^n x_i^{\prime} (t) \begin{pmatrix}
+             \frac{\partial f_1}{\partial x_i} (g(t))  \\
+              \vdots\\
+              \frac{\partial f_m}{\partial x_i} (g(t)) \\
+         \end{pmatrix} \\
+         &= \sum_{i=1}^n x_i^{\prime} (t) \frac{\partial f}{\partial x_i} (g(t)) = \sum_{i=1}^n x_i^{\prime} (t) \frac{\partial f}{\partial x_i} (x_1(t), x_2(t), \dots , x_n(t)).    
+\end{align*}
+
+The Mean Value Theorem for functions \(f: \mathbb{R} \to \mathbb{R} \) asserts that 
+\[
+    f(y) - f(x) = f^{\prime} (z) (y - z)
+\] 
+where \(z \in [x, y]\). We begin by extending this statement to real-valued functions defined on open subsets of \(\mathbb{R} ^n\). 
+
+\begin{theorem}[Mean Value Theorem for Real-Valued Functions] \label{thm: MVT for real valued func}
+    Let \(V\) be open in \(\mathbb{R} ^n\) and suppose that \(f: V \to \mathbb{R} \) is differentiable on \(V\). Given \(a, x \in V\), write \(L(x; a)\) for the (closed) line segment joining \(a\) to \(x\), namely 
+    \[
+        L(x ; a) \coloneqq \left\{ a + t(x - a) : 0 \le t \le 1 \right\}. 
+    \]       
+    Assume that \(L(x; a) \subseteq V\). Then there exists \(c \in (x; a)\) such that 
+    \[
+        f(x) - f(a) = \nabla f(c) \cdot (x - a).
+    \]  
+\end{theorem} 
+
+\begin{proof}
+   Suppose \(g(t) \coloneqq a + t(x - a)\) for \(t \in \mathbb{R} \). Then, \(g: \mathbb{R} \to \mathbb{R} ^n\) is differentiable and 
+   \[
+    Dg(t) = x - a \quad \forall t \in \mathbb{R}.
+   \]   
+   Since \(V\) is open and the compact segment \(L(x;a) = \left\{ g(t) : t \in [0, 1] \right\} \) is contained in \(V\), there exists \(\delta > 0\) s.t. 
+   \[
+    g(t) \in V \quad \text{for all } t \in I_\delta = (-\delta , 1 + \delta ). 
+   \]    
+   Hence, \(f \circ g : I_\delta \to \mathbb{R}\) is well-defined and differentiable. By the chain rule, for each \(t \in I_\delta \) we have 
+   \[
+    D(f \circ g)(t) = Df(g(t)) D(g(t)) = Df(g(t))(x-a).
+   \]  
+   Because \(f\) is real-valued, the differential \(Df(y)\) may be identified with the gradient by 
+   \[
+    Df(y)(h) = \nabla f(y) \cdot h, y \in V, h \in \mathbb{R} ^n.
+   \]  
+   Therefore the above equation becomes
+   \[
+    (f \circ g)^{\prime} (t) = \nabla f(g(t)) \cdot (x - a), t \in I_\delta.
+   \]
+   Now apply the one-dimensional MVT to \(f \circ g\) on \([0, 1]\). There exists \(t_0 \in (0, 1)\) such that 
+   \[
+    (f \circ g)(1) - (f \circ g)(0) = (f \circ g)(0)^{\prime} (t_0).
+   \]   
+   Since \((f \circ g)(1) = f(x)\) and \((f \circ g)(0) = f(a)\), we obtain 
+   \[
+    f(x) - f(a) = \nabla f(g(t_0)) \cdot ( x - a).
+   \]  
+   We can set \(c\coloneqq g(t_0) \in L(x;a)\), and we're done. 
+\end{proof}
+
+The conclusion of \autoref{thm: MVT for real valued func} relies essentially on the fact that \(f\) is real-valued. The following remark shows that no analogous statement can hold in general for vector-valued functions, even when the domain is one-dimensional. 
+
+\begin{remark}
+    The function \(f(t) = (\cos t, \sin t)\) is differentiable on \(\mathbb{R} \) and satisfies \(f(w \pi ) = f(0)\), but there is no \(c \in \mathbb{R} \) s.t. \(Df(c) = (0, 0)\).     
+\end{remark}
+
+Now we want to extend the MVT above to \(f: \mathbb{R} ^n \to \mathbb{R} ^m\) with \(m > 1\), one can recover a valid statement by testing against linear functionals on \(\mathbb{R} ^m\). Equivalently, we take the dot product with an arbitrary vector \(a \in \mathbb{R} ^m\) and apply the real-valued mean value theorem to the scalar function \(t \mapsto a \cdot f(x + tu)\). This yields the following useful generalization.     
+
+In the following statement, we let 
+\[
+    L(x; y) = \left\{ tx + (1 - t)y: 0 \le t \le 1 \right\}. 
+\]
+
+\begin{theorem}[Mean-Value Theorem] \label{thm: MVT}
+    Let \(S\) be an open subset of \(\mathbb{R} ^n\) and assume that \(f: S \to \mathbb{R} ^m\) is differentiable at each point of \(S\). Let \(x\) and \(y\) be two points in \(S\) s.t. \(L(x;y) \subseteq S\). Then for every vector \(a \in \mathbb{R} ^m\) there is a point \(z \in L(x; y)\) s.t. 
+    \[
+        a \cdot \left\{ f(y) - f(x) \right\} = a \cdot \left\{ f^{\prime} (z) (y - x) \right\}.  
+    \]           
+\end{theorem}
+\begin{proof}
+    Let \(u = y - x\). Since \(S\) is open and \(L(x; y) \subseteq S\), there is a \(\delta > 0\) s.t. 
+    \[
+        x + tu \in S \text{ for all real } t \in (-\delta , 1+\delta ).
+    \]
+    Let \(a\) be a fixed vector in \(\mathbb{R} ^m\) and define the real-valued function \(F\) on \((-\delta , 1 + \delta )\) by 
+    \[
+        F(t) = a \cdot f(x + tu).
+    \]
+    Then \(F\) is differentiable on \((-\delta , 1 + \delta )\) since \(F = T \circ f\) where \(T(x) = a \cdot x\) is a linear map, and note that 
+    \[
+        F^{\prime} (t) = a \cdot f^{\prime} (x + tu) = a \cdot \left\{ f^{\prime} (x + tu)(u) \right\}. 
+    \]            
+    By the usual MVT for real-valued functions, we have 
+    \[
+        F(1) - F(0) = F^{\prime} (\theta ) \text{ for some } \theta \text{ with } 0 < \theta < 1.  
+    \]
+    Now
+    \[
+        F^{\prime} (\theta ) = a \cdot \left\{ f^{\prime} (x + \theta u)(u) \right\} = a \cdot \left\{ f^{\prime} (z) (y - x) \right\},  
+    \]
+    where \(z = x + \theta u \in L(x; y)\). But 
+    \[
+        F(1) - F(0) = a \cdot \left\{ f(y) - f(x) \right\}, 
+    \] 
+    so we're done.
+\end{proof}
+
+\begin{remark}
+    If \(S\) is convex, then \(L(x; y) \subseteq S\) for all \(x, y \in S\), so \autoref{thm: MVT} holds for all \(x\) and \(y\) ion \(S\).       
+\end{remark}
+
+\section{Double Derivatives and Clairaut's theorem}
 \begin{definition}
-    Let \(E \subseteq \mathbb{R} ^n\) be open and let \(f: E \to \mathbb{R} ^n\). We say \(f\) is twice continuously differentiable on \(E\) if 
+    Let \(E \subseteq \mathbb{R} ^n\) be open and let \(f: E \to \mathbb{R} ^m\). We say \(f\) is twice continuously differentiable on \(E\) if 
     \begin{itemize}
-        \item [(1)] \(f\) is continuously differentiable on \(E\), i.e. \(\frac{\partial f}{\partial x_i} \) are continuous on \(E\)    
+        \item [(1)] \(f\) is continuously differentiable on \(E\), i.e. \(\frac{\partial f}{\partial x_i} \) exists and are continuous on \(E\)    
         \item [(2)] for each \(j = 1, 2, \dots , n\), the partial derivative \(\frac{\partial f}{\partial x_j} : E \to \mathbb{R} ^m\) is continuously differentiable on \(E\).  
     \end{itemize}    
 \end{definition}
