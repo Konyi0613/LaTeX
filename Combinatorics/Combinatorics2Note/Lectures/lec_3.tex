@@ -1,0 +1,85 @@
+\lecture{3}{6 March.}{}
+
+If we modify \autoref{alg: find component} so that we take the shortest element in \(Q\), then we call this algorithm \textbf{Breadth-first search}. 
+
+If we modify \autoref{alg: find component} so that we take the newest element in \(Q\), then we call this algorithm \textbf{Depth-first search}. 
+
+\section{Minimum weight spanning tree}
+\begin{theorem}[Cayley]
+    The complete graph \(K_n\) has \(n^{n-2}\) spanning trees.  
+\end{theorem}
+
+We want to find the most efficient/cheapest spanning tree. 
+
+\begin{problem}[Mininimum spanning tree]
+    \hfill 
+    \begin{itemize}
+        \item Input: Complete graph \(K_n\) and a weight function \(w: E(K_n) \to \mathbb{R} _{\ge 0}\)
+        \item Output: A spanning tree \(T\) of \(K_n\) minimizing \(\sum_{e \in E(T)} w(e) \).     
+    \end{itemize}
+\end{problem}
+
+\begin{eg}
+    If \(G\) is an \(n\)-vertex graph (not necessary complete). Define 
+    \[
+        w(e) = \begin{dcases}
+            0, &\text{ if } e \in E(G) ;\\
+            1, &\text{ if } e \notin E(G) .
+        \end{dcases}
+    \] 
+    Then \(G\) is connected if and only if there exists a tree of weight \(0\).  
+\end{eg}
+
+\begin{algorithm}[H] \label{alg: Kruskal}
+    \caption{Kruskal's algorithm(Theoretical way)}
+    \DontPrintSemicolon
+    \Comment*[l]{Maintain \(F\), and let \(F = \varnothing \) initially.}
+    Order the edges by weight, say \(e_1, e_2, \dots , e_m\). 
+
+    \For(){each \(i\) s.t. \(1 \le i \le m\)}{
+        \If(){\(F + e_i\) contributes a cycle} {
+            do nothing.
+        } 
+        \Else() {
+            add \(e_i\) to \(F\).  
+        }
+    }  
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \caption{Kruskal's algorithm(Implementation way)}
+    \DontPrintSemicolon
+    \Comment*[l]{Maintain \(F\), and let \(F = \varnothing \) initially, and \(C_v\) is the component containing \(v\) for all \(v \in V(G)\), where \(C_v = \left\{ v \right\} \) initially for all \(v \in V(G)\).}
+    Order the edges by weight, say \(e_1, e_2, \dots , e_m\). 
+
+    \For(){each \(i\) s.t. \(1 \le i \le m\)}{
+        Let \(e_i = (u, v)\). 
+        \If(){\(C_u = C_v\)} {
+            do nothing.
+        } 
+        \Else() {
+            add \(e_i\) to \(F\).
+
+            Merge \(C_u\) and \(C_v\).    
+        }
+    }  
+\end{algorithm}
+
+\begin{claim}
+    At the end of the Kruskal's algorithm, \(F\) is a minimum spanning tree. 
+\end{claim}
+
+\begin{explanation}
+    We have to show \(F\) is a spanning tree and \(F\) is minimal. 
+
+    We first show \(F\) is a spanning tree. It suffices to show \(F\) has no cycles and connected. Note that in this algorithm we make sure every adds of an edge into \(F\) would not contribute a cycle, so the final \(F\) must has no cycle. Now we show \(F\) is connected. If not, then we have connected components. Since \(G\) is connected, there will be edges between components. Thus the algorithm would have added the first edge between these components. Now since \(F\) covers all \(n\) vertices (since it is connected), and has no cycle, so it is a spanning tree.   
+
+    Now let \(T_k\) be the tree from Kruscal's algorithm. Let \(T_{\text{min} }\) be a minimum spanning tree that maximizes \(\left\vert E(T_k) \cap E(T_{\text{min} }) \right\vert \). If \(\left\vert E(T_k) \cap E(T_{\text{min} }) \right\vert = n - 1 \), then \(T_k\) is a minimum spanning tree. Otherwise, consider the first edge (i.e. \(e_v\) with minimal \(v\)) in \(T_k \Delta T_{\text{min} }\), say \(e_i\).
+    \begin{claim}
+        \(e_i \in T_k\).
+    \end{claim}        
+    \begin{explanation}
+        If \(e_i \in T_{\text{min}}\), then in the \(i\)-th step of Kruskal algorithm, we would have added \(e_i\) to \(T_k\). (For \(e_1, e_2, \dots , e_{i-1}\), each edge is either in both tree or not in any of both, so \(e_i\) can be added to \(T_k\) in the algorithm since it will not contribute to a cycle (since \(T_{\text{min} }\) has no cycle)). Thus, \(e_i \in T_k\).  
+    \end{explanation}      
+    Consider \(T_{\text{min} } + e_i\), which creates a cycle \(C\). Thus, \(C\) must contain an edge \(e_j\) with \(j > i\) (because all edges \(e_j\) with \(j < i\) are common to both trees, and \(C \nsubseteq T_k\)). Let \(T^{\prime} = T_{\min } + e_i - e_j\), then \(T^{\prime} \) is a spanning tree with smaller weight sum, which is a contradiction.      
+\end{explanation}
