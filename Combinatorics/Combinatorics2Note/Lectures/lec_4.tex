@@ -1,0 +1,98 @@
+\lecture{4}{10 March.}{}
+\subsubsection{Running time of Kruskal's algorithm}
+First, sorting all edges by weight takes \(O(m \log _2 m)\) steps. Then, iterate through all eedges, if \(c_u = c_v\), do nothing, and this steps take \(O(1)\) steps. If not, then add edges and update components, which takes \(O(n)\) steps, and will run this case \(n - 1\) times. Thus, the total time:
+\[
+    O(m \log _2 m) + O(m) + O\left( n^2 \right) = O(m \log _2 m + n^2) = \begin{dcases}
+        O(m \log m), &\text{ if } m = \Omega \left( \frac{n^2}{\log n} \right)  ;\\
+        O\left( n^2 \right) , &\text{ if } O\left( \frac{n^2}{\log n} \right).
+    \end{dcases} 
+\]    
+With more improvement, 
+\[
+    O(m \log m) \text{ for all } m. 
+\]
+
+\chapter{Dijkstra's Algorithm}
+\subsubsection{Drawbacks of trees as networks}
+\begin{itemize}
+    \item [(1)] Unique path between any two vertices, which could be unnecessarily long. 
+    \item [(2)] No redundancy/robustness: removing any one edge/vertex disconnects the network.
+\end{itemize}
+
+\begin{question}
+    Given a network \(G = (V, E)\) and weights \(w : E \to \mathbb{R} _{\ge 0} \cup \left\{ \infty \right\} \), and given two vertices \(u, v \in V\), how do we find the cheapest path from \(u\) to \(v\)?     
+\end{question}
+
+\begin{observation}
+    We may assume \(G\) is complete. If an edge \(\left\{ x, y \right\} \) is missing, add it with \(\infty \) weight.   
+\end{observation}
+
+\begin{lemma}
+    If \(P\) is a cheapest path from \(u\) to \(v\), then for any \(x, y \in P\), \(P[x, y]\) is a shortest path from \(x\) to \(y\).       
+\end{lemma}
+
+\begin{algorithm}[H]
+    \caption{Dijkstra's algorithm}
+    \KwData{A complete graph \(G=(V, E)\).}
+    \KwResult{For any vertex \(x\), the cheapest graph from \(u\) to \(x\).}
+    \SetKwInput{KwIdea}{Idea}
+    \KwIdea{Keep a set \(W\) of vertices which we have already found the cheapest path from \(u\). For other vertices, keep track of a tentative cheapest path, i.e. the cheapest path we have found so far.}
+    \(W \gets \left\{ u \right\} \), \(t(u) = 0\), \(\text{prev}(u) = \varnothing\). 
+
+    For any \(x \in V \setminus \left\{ u \right\} \), \(t(x) = w(\left\{ u, x \right\} )\), \(\text{prev}(x) = u \). 
+
+    \While(){\(W \neq V\)}{
+        Let \(y = \argmin_{x \in V\setminus W} t(x) \), i.e. \(t(y)\) minimizes \(t(x)\) for all \(x \notin W\). 
+
+        Add \(y\) to \(W\). 
+
+        \For(){every \(x \notin W \cup \left\{ y \right\} \)} {
+            \If(){\(t(x) > t(y) + w(\left\{ y,x \right\} )\)}{
+                \(t(x) \gets t(y) + w(\left\{ y, x \right\} )\), \(\text{prev}(x) = y\).  
+            }
+        }      
+    }   
+
+    Cheapest path from \(x\) to \(u\) is \(x, \text{prev}(x), \text{prev}(\text{prev}(x)), \dots , u\) with cost \(t(x)\).       
+\end{algorithm}
+
+\begin{theorem}
+    Dijkstra's algorithm terminates after \(n - 1\) rounds and returns shortest path. 
+\end{theorem}
+
+\begin{proof}
+    Each round adds a new vertex to \(W\), which never gets removed, so after \(n - 1\) rounds, \(W = V\). For correctness, we can do induction on the number of rounds: 
+    \begin{claim}
+        At the beginning of the \(i\)-th iterartion:
+        \begin{itemize}
+            \item [(a)] \(\vert W \vert = i \). 
+            \item [(b)] for every \(x \in V\), the vertices \(x, \text{prev}(x), \text{prev}(\text{prev}(x) ), \dots , u  \) form a path from \(x\) to \(u\) of weight \(t(x)\), where all vertices except \(x\) lie in \(W\). 
+            \item [(c)] for any vertex \(z \in V \setminus W\) with \(t(z) = \min \left\{ t(x) : x \in V\setminus W \right\} \), \(t(z)\) is the minimum cost of a \(uz\)-path.
+            \item [(d)] For every \(y \in V \setminus W\) and \(v \in W\), 
+            \[
+                t(y) \le t(v) + w(\left\{ v, y \right\}).
+            \]
+        \end{itemize} 
+    \end{claim}   
+    \begin{explanation}
+        \hfill
+        \begin{itemize}
+            \item Base case: \(i = 1\), (a), (b), (d) are obvious. For (c), suppose not, then if \(z\) minimize \(t(\cdot)\) but there is a cheaper \(uz\)-path, say 
+            \[
+                u \to x \to \dots \to z \in P,
+            \]
+            then 
+            \begin{align*}
+                w(P) = w(\left\{ u, x \right\} ) + w(\left\{ x, \dots \right\} ) + \dots \ge w(\left\{ u, x \right\} ) = t(x) \ge t(z),
+            \end{align*}
+            which is a contradiction. 
+            \item Induction step: (a) is obvious. 
+            
+            Now we show (b). If we didn't update \(t(x), \text{prev}(x) \) in the \(i\)-th iteration, then this is true by induction. If we did update, then \(\text{prev}(x) = v_0 \) where \(v_0\) is the vertex added to \(W\) in the \(i\)-th iteration, and \(t(x) = t(v_0) + w(\left\{ v_0, x \right\} ) =\) weight of path \(u \to \dots \to v_0 \to x\), and \(u\) to \(\text{prev}(v_0) \) all in \(W\) by induction, and \(v_0\) was added to \(W\) in the \(i\)-th iteration. 
+            
+            Now we show (c). Suppose not, then \(\exists z \in V\setminus W\) minimizing \(t(z)\) but \(t(z) > d(z, u)\). Consider the cheapest path from \(z\) to \(u\).                  
+        \end{itemize}
+    \end{explanation}
+
+    This implies the correctness: for any \(x\), at the iteration when we add \(x\) to \(W\), (c) implies we have the correct path for \(x\) and we never change it subsequently.    
+\end{proof}

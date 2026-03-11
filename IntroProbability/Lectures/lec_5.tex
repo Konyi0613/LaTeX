@@ -1,0 +1,163 @@
+\newpage
+\lecture{5}{10 March.}{}
+\begin{proposition}[Union bound]
+    Let \(E_1, E_2, \dots , E_n\) be events in a probability space. Then, 
+    \[
+        \mathbb{P} \left( \bigcup_{i=1}^{n} E_i  \right) \le \sum_{i=1}^n \mathbb{P} (E_i).  
+    \] 
+\end{proposition}
+
+\begin{proof}
+    Let \(F_i = E_i \setminus \bigcup_{j < i} E_j \), then \(\bigcup_{j=1}^{i} F_j = \bigcup_{j=1}^{i} E_j  \).(Since \(F_j \subseteq E_j\) for all \(j\), we have \(\bigcup_{j=1}^{i} F_j \subseteq \bigcup_{j=1}^{i} E_j  \). If \(x \in \bigcup_{j=1}^{i} E_j \), let \(j_0\) be the smallest index s.t. \(x \in E_{j_0}\), then \(x \in F_{j_0} = E_{j_0} \setminus \bigcup_{\ell < j_0} E_{\ell } \), so \(x \in \bigcup_{j=1}^{i} F_j \).) Note that \(F_j\)'s are pairwise disjoint. 
+    Thus,
+    \[
+        \mathbb{P} \left( \bigcup_{i=1}^{n} E_i  \right) = \mathbb{P} \left( \bigcup_{i=1}^{n} F_i  \right) = \sum_{i=1}^n \mathbb{P} (F_i) \le \sum_{i=1}^n \mathbb{P} (E_i)  
+    \]          
+    by the axiom of probability.
+\end{proof}
+
+\begin{eg}
+    Let \(\pi \in S_n\) be a uniformly random permutation. Let \(E_i\) be the event that \(\left\{ \pi (i) = i \right\} \), then 
+    \[
+        \mathbb{P} (\bigcup_{i=1}^{n} E_i ) \le \sum_{i=1}^n \mathbb{P} (E_i) = \sum_{i=1}^n \frac{1}{n} = 1.  
+    \]   
+\end{eg}
+
+\begin{theorem}[Bonferroni]
+    Let \(E_1, E_2, \dots , E_n\) be events in a probability space \((S, \mathbb{P} )\). Let \(1 \le t \le n\). Then 
+    \[
+        \mathbb{P} \left( \bigcup_{i=1}^{n} E_i  \right)
+        \left\{ \begin{array}{c}
+             \textcolor{blue}{\le} \\
+             \textcolor{red}{\ge} \\
+        \end{array} \right\} 
+        \sum_{i=1}^t (-1)^{r+1} \sum_{1 \le i_1 < i_2 < \dots < i_r \le n} \mathbb{P} (E_{i_1} \cap E_{i_2} \cap \dots \cap E_{i_r}) \text{ if } t \text{ is } \begin{dcases}
+            \textcolor{blue}{\text{odd}} \\
+            \textcolor{red}{\text{even}}  
+        \end{dcases}.  
+    \]   
+\end{theorem}
+
+\begin{proof}
+    We induct on \(t\). 
+    \begin{itemize}
+        \item Base case: \(t = 1\), which can be proved by union bound. 
+        \item Induction step: As before, we have \(\bigcup_{i=1}^{n} E_i = \bigcup_{i=1}^{n} F_i\), where \(F_i = E_i \setminus \bigcup_{j < i} E_j \). Then 
+        \begin{align*}
+            \mathbb{P} \left( \bigcup_{i=1}^{n} E_i  \right) &= \mathbb{P} \left( \bigcup_{i=1}^{n} F_i  \right) = \sum_{i=1}^n \mathbb{P} (F_i) = \sum_{i=1}^n \mathbb{P}\left( E_i \setminus \bigcup_{j < i} E_j  \right) \\ &= \sum_{i=1}^n \left[ \mathbb{P} (E_i) - \mathbb{P} \left( E_i \cap \left( \bigcup_{j < i} E_j  \right)  \right)  \right] \\
+            &= \sum_{i=1}^n \mathbb{P} (E_i) - \sum_{i=1}^n \mathbb{P} \left( E_i \cap \left( \bigcup_{j < i} E_j  \right)  \right) \\
+            &= \sum_{i=1}^n \mathbb{P} (E_i) - \sum_{i=1}^n \mathbb{P} \left( \bigcup_{j < i} (E_i \cap E_j)  \right).              
+        \end{align*}
+        We use the induction hypothesis for \(t\) to bound \(\mathbb{P} \left( \bigcup_{j < i} (E_i \cap E_j)  \right) \). 
+
+        If \(t\) is odd, then 
+        \begin{align*}
+            \mathbb{P} \left( \bigcup_{j < i} (E_i \cap E_j)  \right) &\le \sum_{r=1}^t (-1)^{r+1} \sum_{j_1 < j_2 < \dots < j_r < i} \mathbb{P} \left( \bigcap_{i=1}^{r} (E_{i} \cap E_{j_{r} })  \right) \\
+            &= \sum_{i=1}^t (-1)^{r + 1} \mathbb{P} (E_{j_1} \cap E_{j_2} \cap \dots \cap E_{j_r} \cap E_i).     
+        \end{align*} 
+        Thus, 
+        \begin{align*}
+            \sum_{i=1}^n \mathbb{P} \left( \bigcup_{j < i} (E_i \cap E_j)  \right) &\le \sum_{i=1}^n \sum_{r=1}^t (-1)^{r + 1} \sum_{1 \le j_1 < j_2 < \dots < j_r < i} \mathbb{P} \left( E_{j_1} \cap E_{j_2} \cap \dots \cap E_{j_r} \cap E_i \right) \\
+            &= \sum_{r=2}^{t + 1} (-1)^r \sum_{1 \le j_1 < j_2 < \dots < j_r \le n} \mathbb{P} (E_{j_1} \cap \dots \cap E_{j_r}).        
+        \end{align*}  
+        Thus, 
+        \begin{align*}
+            \mathbb{P} \left( \bigcup_{i=1}^{n} E_i  \right) &= \sum_{i=1}^n \mathbb{P} (E_i) - \sum_{i=1}^n \mathbb{P} \left( \bigcup_{j < i} (E_j \cap E_i)  \right) \\
+            &\ge \sum_{i=1}^n \mathbb{P} (E_i) - \sum_{r=2}^{t + 1} (-1)^r \sum_{1 \le j_1 < j_2 < \dots < j_r \le n} \mathbb{P} (E_{j_1} \cap \dots \cap E_{j_r}) \\
+            &= \sum_{i=1}^t (-1)^{r + 1} \sum_{1 \le i_1 < \dots < i_r \le n} \mathbb{P} (E_{i_1} \cap E_{i_2} \cap \dots \cap E_{i_r}).         
+        \end{align*}
+    \end{itemize} 
+
+    If \(t\) is even, then we can prove similarly. 
+\end{proof}
+
+\begin{eg}
+    Let \(E_i\) be as before, then 
+    \begin{align*}
+        \mathbb{P} \left( \bigcup_{i=1}^{n} E_i  \right) &\ge \sum_{i=1}^n \mathbb{P} (E_i) - \sum_{1 \le i < j \le n} \mathbb{P} (E_1 \cap E_j) = \sum_{i=1}^n \frac{1}{n} - \sum_{1 \le i < j \le n}\frac{1}{n(n-1)} \\
+        &= 1 - \binom{n}{2} \frac{1}{n(n-1)} = 1 - \frac{1}{2} = \frac{1}{2}.     
+    \end{align*} 
+\end{eg}
+
+\chapter{Continuity of Probability}
+\begin{definition}
+    Given a probability space \((S, \mathbb{P} )\), we say a sequence of events \(E_1, E_2, \dots \) is increasing if \(E_1 \subseteq E_2 \subseteq \dots \) and is decreasing if \(E_1 \supseteq E_2 \supseteq \dots \).    
+\end{definition}
+
+\begin{definition}
+    Let \(E_1 \subseteq E_2 \subseteq \dots \) be an increasing sequence of events in a probability space. Then we define the limit \(\lim_{n \to \infty} E_n = \bigcup_{n=1}^{\infty} E_n  \). (Note that \(\bigcup_{i=1}^{n} E_i = E_n \).) If \(E_1 \supseteq E_2 \supseteq \dots \) is a decreasing sequence of events, then we define \(\lim_{n \to \infty} E_n = \bigcap_{n=1}^{\infty} E_n  \). (Note that \(E_n = \bigcap_{i=1}^{n} E_i \).)  
+\end{definition}
+
+\begin{remark}
+    If \(E_1, E_2, \dots \)
+    \begin{itemize}
+        \item is increasing, then 
+        \[
+            E_1 \subseteq E_2 \subseteq \dots \subseteq E_n \subseteq \dots \subseteq \lim_{n \to \infty} E_n. 
+        \]
+        \item is decreasing, then 
+        \[
+            E_1 \supseteq E_2 \supseteq \dots \supseteq E_n \supseteq \dots \supseteq \lim_{n \to \infty} E_n. 
+        \]
+    \end{itemize} 
+\end{remark}
+
+\begin{proposition}
+    If \(E_1, E_2, \dots \) is an increasing or decreasing sequence of events in a probability space \((S, \mathbb{P} )\), then 
+    \[
+        \mathbb{P} \left( \lim_{n \to \infty} E_n  \right) = \lim_{n \to \infty} \mathbb{P} (E_n),  
+    \]  
+    i.e. probability is continuous.
+\end{proposition}
+
+\begin{proof}
+    We first show the increasing case. For each \(n\), let \(F_n = E_n \setminus \bigcup_{i=1}^{n-1}E_i \). Then, for any \(n\), 
+    \[
+        \bigcup_{i=1}^{n} F_i = \bigcup_{i=1}^{n} E_i = E_n.  
+    \]   
+    Also,
+    \[
+        \bigcup_{n=1}^{\infty} F_n = \bigcup_{n=1}^{\infty} E_n = \lim_{n \to \infty} E_n.   
+    \]
+    Thus,
+    \begin{align*}
+       \mathbb{P} (\lim_{n \to \infty} E_n ) &= \mathbb{P} \left( \bigcup_{n=1}^{\infty} E_n  \right) = \mathbb{P} \left( \bigcup_{n=1}^{\infty} F_n  \right) = \sum_{n=1}^{\infty} \mathbb{P} (F_n) = \lim_{n \to \infty} \sum_{i=1}^n \mathbb{P} (F_i) = \lim_{n \to \infty} \mathbb{P} \left( \bigcup_{i=1}^{n} F_i  \right) \\
+       &= \lim_{n \to \infty} \mathbb{P} \left( \bigcup_{i=1}^{n} E_i  \right) = \lim_{n \to \infty} \mathbb{P} (E_n).    
+    \end{align*} 
+
+    Now we show the decreasing case. If \(E_1 \supseteq E_2 \supseteq \dots \) is decreasing, then 
+    \[
+        E_1^C \subseteq E_2^C \subseteq \dots \text{ is increasing.} 
+    \] 
+    Thus, 
+    \[
+        \lim_{n \to \infty} \mathbb{P} \left( E_n^C \right) = \mathbb{P} \left( \lim_{n \to \infty} E_n^C  \right) = \mathbb{P} \left( \bigcup_{i=1}^{n} E_n^C  \right) = \mathbb{P} \left( \left( \bigcap_{n=1}^{\infty} E_n \right)^C   \right) = 1 - \mathbb{P} \left( \bigcap_{n=1}^{\infty} E_n  \right).      
+    \]
+    Also, 
+    \[
+        \lim_{n \to \infty} \mathbb{P} \left( E_n^C \right) = \lim_{n \to \infty} 1 - \mathbb{P} (E_n),   
+    \]
+    so 
+    \[
+        \lim_{n \to \infty} 1 - \mathbb{P} (E_n) = 1 - \mathbb{P} \left(  \bigcap_{n=1}^{\infty} E_n \right) \implies \lim_{n \to \infty} \mathbb{P} (E_n) = \mathbb{P} \left( \bigcap_{n=1}^{\infty} E_n  \right).    
+    \]
+\end{proof}
+
+\begin{definition}
+    Given any infinite sequence of events \(E_1, E_2, E_3, \dots \) in a probability space \((S, \mathbb{P} )\), we define:
+    \[
+        \limsup_{n \to \infty} E_n = \lim_{n \to \infty} \bigcup_{i=n}^{\infty} E_i = \bigcap_{n=1}^{\infty} \left( \bigcup_{i=n}^{\infty} E_i  \right).     
+    \]
+    Notice the sequence \(\bigcup_{i=n}^{\infty} E_i \) for \(n \in \mathbb{N} \) is decreasing in \(n\). Also, we define
+    \[
+        \liminf_{n \to \infty} E_n = \lim_{n \to \infty} \bigcap_{i=n}^{\infty} E_i = \bigcup_{n=1}^{\infty} \left( \bigcap_{i=n}^{\infty} E_i  \right).    
+    \]  
+\end{definition}
+
+\begin{remark}
+    \(\limsup_{n \to \infty} E_n \) means infinitely many of the events \(E_n\) occurs, while \(\liminf_{n \to \infty} E_n \) means only finitely many of the events do not occur.
+\end{remark}
+
+\begin{theorem}[The first Borel-Cantelli Lemma]
+    Let \((S, \mathbb{P} )\) be a probability space, and let \(E_1, E_2, \dots \) be a sequence of events. If \(\sum_{n=1}^{\infty} \mathbb{P} (E_n) < \infty  \), then \(\mathbb{P} \left( \limsup_{n \to \infty} E_n  \right) = 0 \).    
+\end{theorem}

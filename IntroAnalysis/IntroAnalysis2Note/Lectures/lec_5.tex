@@ -1,0 +1,144 @@
+\lecture{5}{10 March.}{}
+\section{The Contraction Mapping Theorem}
+
+\begin{definition}
+    Let \((X, d)\) be a metric, and let \(f: X \to X\) be a map. We say \(f\) is a contraction if 
+    \[
+        d(f(x), f(y)) \le d(x, y) \quad \text{for all } x, y \in X. 
+    \]   
+    We say \(f\) is a strict contraction if there exists a constant \(0 < c < 1\) s.t. 
+    \[
+        d(f(x), f(y)) \le cd(x, y) \quad \text{for all } x,y \in X.
+    \]
+    We call \(c\) a contraction constant of \(f\).    
+\end{definition}
+
+\begin{eg}
+    Suppose \(f: \mathbb{R} \to \mathbb{R} \), 
+    \begin{itemize}
+        \item [(a)] if \(f(x) = x + 1\), then 
+        \[
+            f(x) - f(y) = (x + 1) - (y + 1) = x - y \implies \vert f(x) - f(y) \vert = \vert x - y \vert,  
+        \]
+        so \(f\) is a contraction but not a strict contraction. 
+        \item [(b)] if \(f(x) = \frac{x}{2}\), then 
+        \[
+            \vert f(x) - f(y) \vert = \frac{\vert x - y \vert }{2}, 
+        \]
+        so \(f\) is a strict contraction. 
+    \end{itemize} 
+\end{eg}
+
+\begin{eg}
+    Suppose \(f: [0, 1] \to [0, 1]\) and \(f(x) = x - x^2\), then \(f^{\prime} (x) = 1 - 2x\), so 
+    \[
+        \vert f^{\prime} (x) \vert \le 1 \quad \text{on } [0, 1].  
+    \]
+    By MVT, 
+    \[
+        f(x) - f(y) = f^{\prime} (c) (x - y) \text{ for all } x,y \in [0, 1] \text{ for some } c \in (x, y).  
+    \]   
+    Now since \(\vert f^{\prime} (c) \vert \le 1 \), so we know \(f\) is a contraction. But \(f\) is not a strict contraction. Suppose it is a strict contraction, then 
+    \[
+        \vert f(x) \vert = \vert f(x) - f(0) \vert \le c \vert x \vert \text{ for some } 0 < c < 1 \text{ for all } x \in [0, 1].    
+    \]
+    However, 
+    \[
+        \lim_{x \to 0} \frac{f(x) - f(0)}{x - 0} = f^{\prime} (0) = 1,
+    \]  
+    which is impossible.
+\end{eg}
+
+\begin{definition}
+    Let \(f: X \to X\) be a map and let \(x \in X\). We say that \(x\) is a fixed point of \(f\) if \(f(x) = x\).      
+\end{definition}
+
+\begin{remark}
+    Not every contraction has a fixed point.
+\end{remark}
+
+\begin{remark}
+    Suppose \(X \subseteq \mathbb{R} \). The existence of a fixed point \(x\) s.t. \(f(x) = x\) means that the graph of \(y = f(x)\) intersect with \(y = x\).    
+\end{remark}
+
+\begin{eg}
+    In \(\mathbb{R} ^n\), \(\mathbb{R} ^n\) is complete with the standard metric 
+    \[
+        d(x, y) = \lVert x - y \rVert = \sqrt{\sum_{i=1}^n (x_i - y_i)^2 } \text{ with } x = (x_1, x_2, \dots , x_n), \ y = (y_1, y_2, \dots , y_n).   
+    \]  
+\end{eg}
+
+\begin{remark}
+    Recall that 
+    \begin{itemize}
+        \item Any closed subset of a complete metric space is also a complete metric space. 
+        \item Any closed set in \(\mathbb{R} ^n\) is complete. In particular, a closed ball 
+        \[
+            \overline{B(x_0, r)} = \left\{ y : \lVert y - x_0 \rVert \le r  \right\}  
+        \] 
+        is complete.
+    \end{itemize}
+\end{remark}
+
+\begin{theorem}
+    Let \((X, d)\) be a metric space and \(f:X \to X\) be a strict contractor. Then \(f\) have at most one fixed point. Moreover, if we also assume \(X\) is non-empty and complete, then \(f\) has exactly one fixed point.     
+\end{theorem}
+
+\begin{proof}
+    Suppose \(x\) and \(y\) are fixed points of a strict contractor \(f\). Then, \(f(x) = x\) and \(f(y) = y\), and \(\exists 0 < c < 1\) s.t. 
+    \[
+        d(x, y) = d(f(x), f(y)) \le c d(x, y),
+    \]      
+    so \(0 \le (1 - c) d(x, y) \le 0\), which shows \(x = y\).
+
+    Now we assume \(X\) is non-empty and complete. Choose any point \(x_0 \in X\). Consider the sequence \(x_1 = f(x_0), x_2 = f(x_1), \dots\). For \(n \ge 1\), we have 
+    \[
+        d(x_{n+1}, x_n) = d(f(x_n), f(x_{n-1})) \le c d(x_n, x_{n-1}) \le  \dots \le c^n d(x_1, x_0).
+    \]     
+    This shows \(\left\{ x_n \right\}_{n=0}^{\infty } \) is a Cauchy sequence. Now since \(X\) is complete, so \(\lim_{n \to \infty} x_n = x^* \) for some \(x^* \in X\). Now we claim \(f(x^*) = x^*\). By triangle inequality and \(f(x_{n-1}) = x_n\), 
+    \begin{align*}
+        d(x^*, f(x^*)) &\le d(x^*, f(x_n)) + d(f(x_n), f(x^*)) \le d(x^*, x_{n-1}) + c d(x_n, x^*) \\
+        &\le d(x^*, x_{n-1}) + d(x_n, x^*) \le d(x_{n-1}, x_n) \to 0.
+    \end{align*}    
+\end{proof}
+
+\begin{lemma}
+    Let \(B(0, r)\) be an open ball in \(\mathbb{R} ^n\), and let \(g: B(0, r) \to \mathbb{R} ^n\) be a map with \(g(0) = 0\) and 
+    \[
+        \lVert g(x) - g(y) \rVert \le \frac{1}{2} \lVert x - y \rVert \text{ for all } x, y \in B(0, r). 
+    \]    
+    Then, the function \(f: B(0, r) \to \mathbb{R} ^n\) defined by \(f(x) = x + g(x)\) is one to one and the image of \(f(B(0, r))\) contains the ball \(B \left( 0, \frac{r}{2} \right) \).    
+\end{lemma}
+
+\begin{proof}
+    First, we show that \(f\) is one to one. Suppose \(f(x) = f(y)\), then 
+    \[
+        x + g(x) = y + g(y) \iff x - y = g(y) - g(x) \iff \lVert x - y \rVert = \lVert g(x) - g(y) \rVert \le \frac{1}{2} \lVert x - y \rVert,
+    \]  
+    so \(x = y\). 
+
+    Now we show \(B \left( 0, \frac{r}{2} \right) \subseteq f(B(0, r)) \). It suffices to show that for any \(y \in B\left( 0, \frac{r}{2} \right) \), \(\exists x \in B(0, r)\) s.t. \(f(x) = y\), or equivalently, \(x = y - g(x)\). Define \(F(x) = y - g(x)\), then we want to show that for any \(y \in B \left( 0, \frac{r}{2} \right) \), \(\exists x \in B(0, r)\) s.t. \(F(x) = x\). Now \(y \in B\left( 0, \frac{r}{2} \right) \), then \(\exists \varepsilon > 0\) s.t. \(2 \lVert y \rVert \le r - \varepsilon\). 
+    \begin{claim}
+        \(F : \overline{B(0, r - \varepsilon )} \to  \overline{B(0, r - \varepsilon)}  \) is a strict contraction.
+    \end{claim}
+    \begin{explanation}
+        We know 
+        \[
+            \lVert F(x) \rVert \le \lVert y \rVert + \lVert g(x) \rVert \le \frac{r - \varepsilon}{2} + \lVert g(x) \rVert.    
+        \]
+        Since \(g(0) = 0\), so 
+        \[
+            \lVert g(x) \rVert = \lVert g(x) - g(0) \rVert \le \frac{1}{2} \lVert x - 0 \rVert \le \frac{r - \varepsilon}{2}.   
+        \] 
+        Thus, 
+        \[
+            \lVert F(x) \rVert \le \frac{r - \varepsilon}{2} + \frac{r - \varepsilon}{2} = r - \varepsilon. 
+        \]
+        Thus, \(F(x) \in \overline{B(0, r - \varepsilon)} \). Also, 
+        \[
+            \lVert F(x_1) - F(x_2) \rVert = \lVert g(x_1) - g(x_2) \rVert \le \frac{1}{2} \lVert x_2 - x_1 \rVert.   
+        \] 
+        Thus, \(F\) is a strict contraction. 
+    \end{explanation} 
+    Now since closed ball is non-empty and complete, so by previous theorem, \(F\) has a fixed point. 
+\end{proof}
