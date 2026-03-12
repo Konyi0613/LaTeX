@@ -1,0 +1,307 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{bbding,combelow,textcomp,amsfonts,amsthm,amsmath,amssymb,graphicx,color,hyperref,etoolbox}
+\usepackage{amsmath, mathtools}
+\usepackage[utf8x]{inputenc}
+\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+\usepackage{comment}
+
+\newtoggle{story}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Customisation options --- update as necessary
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Course details: title, semester, instructors
+
+\newcommand{\courseTitle}{Introduction to Probability Theory (Math 2502)}
+\newcommand{\semester}{Spring 2026}
+\newcommand{\instructorA}{Shagnik Das}
+\newcommand{\instructorB}{}
+
+%% Sheet number
+
+\newcommand{\sheetNumber}{1}
+
+
+%% Submission details
+
+\newcommand{\dueDate}{13:00, Mar 17th.}
+\newcommand{\lateWarning}{Submissions that are late will receive no credit.}
+
+
+%% Display irrelevant footnotes?  \toggletrue for yes, \togglefalse for no
+
+\toggletrue{story}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End of customisation options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pdfpagewidth 8.5in
+\pdfpageheight 11in
+\topmargin -1in
+\headheight 0in
+\headsep 0in
+\textheight 8.5in
+\textwidth 6.5in
+\oddsidemargin 0in
+\evensidemargin 0in
+\headheight 77pt
+\headsep 0in
+\footskip .75in
+
+\makeatletter
+\newcommand{\buildtitle}[4]{
+\begin{flushleft}
+{\large
+#1
+\hfill{}
+#2
+\par
+#3
+}
+\end{flushleft}
+\vskip 4pt
+\begin{center}
+{\large\bfseries#4\par}
+\end{center}
+\bigskip
+}
+\makeatother
+
+\renewcommand{\thesection}{\normalsize\arabic{section}}
+
+\renewcommand{\deg}{\textrm{deg}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\ceil}[1]{\left \lceil #1 \right \rceil}
+
+\newcommand{\hint}{\begin{flushright} [Hint at \url{\hintURL}.] \end{flushright}}
+
+\newcommand{\card}[1]{\left| #1 \right|}
+\newcommand{\mb}[1]{\mathbb{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+
+
+\newcommand{\story}[1]{\iftoggle{story}{\footnote{#1}}{}}
+\newcommand{\storymark}[1][42]{\iftoggle{story}{\footnotemark[#1]}{}}
+\newcommand{\storytext}[2][42]{\iftoggle{story}{\footnotetext[#1]{#2}}{}}
+
+\newcommand{\bonus}[2]{\paragraph{Bonus (#1 pt\ifstrequal{#1}{1}{}{s})} #2}
+
+
+\begin{document}
+
+
+\buildtitle{\courseTitle{}}{\semester}{\instructorA{} \hfill \instructorB{}}{Exercise Sheet \sheetNumber{}}
+
+\vspace{-0.2in}
+
+\begin{center}
+
+{\bf Due date: \dueDate \\ \lateWarning}
+
+\end{center}
+
+\noindent You should try to solve all of the exercises below --- each problem is worth $10$ points. Make sure to clearly justify your answers, defining everything precisely and stating any results you are using. You should then submit your solutions in Gradescope on NTU COOL, either as a typed PDF or a clear scan of your handwritten answers, and should indicate where in the file the solutions to each exercise are. If you have difficulties with Gradescope, please send your solutions by e-mail.
+
+\paragraph{Exercise 1}  A local baseball league features $10$ teams, who play each other every weekend across $5$ different stadia. How many ways are there of scheduling each weekend's matches if:
+\begin{itemize}
+	\item[(a)] all that matters is which teams are paired against each other, and not wherethey play (e.g. Team A vs Team B, Team C vs Team D, and so on)?
+	\item[(b)] we also say where each game is played (e.g. Team A vs Team B at Stadium 3, Team C vs Team D at Stadium 1, and so on)?
+	\item[(c)] in addition to specifying the stadium, we also say which team bats first in each game?
+\end{itemize}
+
+\paragraph{Solution:} 
+Suppose the \(10\) players are \(P_1, P_2, \dots , P_{10}\) and let \(P = \left\{ P_i : 1 \le i \le 10  \right\} \), and the the \(5\) stadia be \(S_1, S_2, \dots , S_5\) and \(S = \left\{ S_i : 1 \le i \le 5 \right\} \).    
+\begin{itemize}
+	\item [(a)]  We can first choose \(2\) people \(P_{i_1}, P_{i_2}\) from \(P\) to have the first match. Then, choose \(2\) people \(P_{i_3}, P_{i_4}\) from \(P \setminus \left\{ P_{i_1}, P_{i_2} \right\} \) to have the second match. Then, choose \(2\) people \(P_{i_5}, P_{i_6}\) from \(P \setminus \left\{ P_{i_1}, P_{i_2}, P_{i_3}, P_{i_4} \right\} \) to have the third match. Then, choose \(2\) people \(P_{i_7}, P_{i_8}\) from \(P \setminus \left\{ P_{i_1}, P_{i_2}, P_{i_3}, P_{i_4}, P_{i_5}, P_{i_6} \right\} \) to have the fourth match. Then, choose \(2\) people \(P_{i_9}, P_{i_{10}}\) from \(P \setminus \left\{ P_{i_1}, P_{i_2}, P_{i_3}, P_{i_4}, P_{i_5}, P_{i_6}, P_{i_7}, P_{i_8} \right\} \) to have the fifth match. Thus, by advanced product rule, there are 
+	\[
+		\binom{10}{2} \binom{8}{2} \binom{6}{2} \binom{4}{2} \binom{2}{2}
+	\]
+	ways to do such \(5\) choices. However, the order of these choices does not matter, i.e. \(\left\{ P_i, P_j \right\} \) is chosen in which choice is not important because we just care about who play in each match but not the order of each match, so the answer is 
+	\[
+		\binom{10}{2} \binom{8}{2} \binom{6}{2} \binom{4}{2} \binom{2}{2} \frac{1}{5!} = 945.
+	\] 
+	\item [(b)] We can do the same \(5\) choices as in (a), but this time we put the two players chosen in the \(i\)-th choices to play in \(S_i\), so the order matters in this case, i.e. the answer is 
+	\[
+		\binom{10}{2} \binom{8}{2} \binom{6}{2} \binom{4}{2} \binom{2}{2} = 113400.
+	\]
+	\item [(c)] For each legal match scheduling in (b), each match has \(2\) options for who bats first and thus by advanced product rule, there are \(2^5\) ways for arranging who bats first in the \(5\) matches, and since there are \(113400\) legal match scheduling in (b), so the answer of this problem is 
+	\[
+		113400 \times 2^5 = 362800.
+	\]
+\end{itemize}
+
+\newpage
+
+\paragraph{Exercise 2}  Prove the Inclusion--Exclusion Formula using induction on $n$: for any events $E_1, E_2, \hdots, E_n$ in a probability space $(S, \mb P)$, we have
+\[ \mb{P} \left( \bigcup_{i=1}^n E_i \right) = \sum_{r=1}^n (-1)^{r+1} \sum_{1 \le i_1 < i_2 < \hdots < i_r \le n} \mb{P} \left( E_{i_1} \cap E_{i_2} \cap \hdots \cap E_{i_r} \right).\]
+
+\paragraph{Solution:}
+
+\begin{itemize}
+	\item Base case: For \(n = 1\), the equality we want to show is 
+	\[
+		\mathbb{P} (E_1) = (-1)^{1 + 1} \mathbb{P} (E_1) = E_1,
+	\]
+	which is trivial. 
+	\item Now suppose for \(n = k - 1\) the equality is correct for some \(k \ge 2\). Then,
+	\begin{align*}
+		\mathbb{P} \left( \bigcup_{i=1}^{k} E_i  \right) &= \mathbb{P} \left(\bigcup_{i=1}^{k-1} E_i \cup E_k  \right) = \mathbb{P} \left( \bigcup_{i=1}^{k-1} E_i  \right) + \mathbb{P} (E_k) - \mathbb{P} \left( \left( \bigcup_{i=1}^{k-1} E_i  \right) \cap E_k  \right) \\
+		&= \mathbb{P} \left( \bigcup_{i=1}^{k-1} E_i  \right) + \mathbb{P} (E_k) - \mathbb{P} \left( \bigcup_{i=1}^{k-1} (E_i \cap E_k)  \right)   \\
+		&= \sum_{r=1}^{k-1} (-1)^{r+1} \sum_{1 \le i_1 < \dots < i_r \le k - 1} \mathbb{P} (E_{i_1} \cap \dots \cap E_{i_r}) \\ &+ \mathbb{P} (E_k) - \sum_{r=1}^{k-1} (-1)^{r+1} \sum_{1 \le i_1 < \dots < i_r \le k - 1} \mathbb{P} (E_{i_1} \cap \dots \cap E_{i_r} \cap E_k) \\
+		&= \sum_{r=1}^{k-1} (-1)^{r+1} \sum_{1 \le i_1 < \dots < i_r \le k - 1} \mathbb{P} (E_{i_1} \cap \dots \cap E_{i_r}) \\
+		&+ \sum_{r=1}^k (-1)^{r+1} \sum_{1 \le i_1 < \dots < i_r = k} \mathbb{P} (E_{i_1} \cap \dots \cap E_{i_r}) \\
+		&= \sum_{r=1}^{k-1} (-1)^{r+1} \left( \sum_{1 \le i_1 < \dots < i_r \le k-1} \mathbb{P} (E_{i_1} \cap \dots \cap E_{i_r}) + \sum_{1 \le i_1 < \dots < i_r = k} \mathbb{P} (E_{i_1} \cap \dots \cap E_{i_r}) \right) \\
+		&+ (-1)^{k+1} \mathbb{P} (E_1 \cap E_2 \cap \dots \cap E_k) \\
+		&= \sum_{r=1}^{k-1} (-1)^{r+1} \sum_{1 \le i_1 < \dots < i_r \le k} \mathbb{P} (E_{i_1} \cap \dots \cap E_{i_r}) + (-1)^{k+1} \mathbb{P} (E_1 \cap E_2 \cap \dots \cap E_k) \\
+		&= \sum_{r=1}^k (-1)^{r+1} \sum_{1 \le i_1 < \dots < i_r \le k} \mathbb{P} (E_{i_1} \cap \dots \cap E_{i_r}).             
+	\end{align*}
+\end{itemize}
+
+\paragraph{Exercise 3}  Fischer Random is a variant of chess, where a player's pieces --- a king, a queen, two rooks, two bishops, and two knights --- are placed in a random position along the back row, subject to the following two rules:
+\begin{enumerate}
+	\item The bishops must be on opposite-coloured squares.
+	\item The king must be between the two rooks.
+\end{enumerate}
+
+\begin{comment}
+	\begin{center}
+	\includegraphics{Fischer.png}
+	\end{center}
+\end{comment}
+
+
+\begin{enumerate}
+	\item[(a)] If the $8$ pieces are placed uniformly at random along the back row, what is the probability that this forms a legal Fischer Random starting position?
+	\item[(b)] What is the probability that the queen is between the two rooks in a random Fischer Random starting position?
+\end{enumerate}
+
+\paragraph{Solution:}
+\begin{itemize}
+	\item [(a)] Suppose the sample space is \(S = \left\{ \text{ways of placing } 8 \text{ pieces along the back row}   \right\} \). Then, 
+	\[
+		\vert S \vert = \frac{8!}{2!2!2!} = 5040 
+	\]
+	since we can first randomly place \(8\) pieces by regarding each piece as different object, then there are \(8!\) ways of doing so. Now since the order of two knights, two rooks, and two bishops do not matter, so we can divide \(8!\) by \(2!2!2!\) to get \(\vert S \vert \). Now suppose
+	\[
+		E = \left\{ \text{ways of placing Fischer Random}  \right\}, 
+	\]
+	then we can compute \(\vert E \vert \) by first placing two bishops in the back row, so there are \(4 \times 4\) ways since two bishops must be in grids of different colors and there are \(2\) colors in the chessboard, which means for each color of the grid, there is exactly \(1\) bishop in the grid of that color, so for each color of grid we have \(4\) choices. Next, we can choose a grid of the left \(6\) grids to put the queen in, so there are \(6\) choices. Then, we can put two knights in the left \(5\) grids, which has \(5\) choices. Finally, we have \(3\) grids left, say they are \(g_1, g_2, g_3\) from left to right, then we can put two rooks in \(g_1\) and \(g_3\) and put the king in \(g_2\), so there are \(1\) way to do so. Now by advanced product rule, we have 
+	\[
+		\left( 4 \times 4 \right) \times 6 \times \binom{5}{2} \times 1 = 960 
+	\]              
+	ways of placing Fischer Random. Thus, \(\mathbb{P} (E) = \frac{960}{5040} \thickapprox 0.19\). 
+	\item [(b)] To compute the number of Fischer Random with the queen between two rooks, we can first put bishops in the back row, which has \(4 \times 4\) choices by the same argument in (a). Then, we put knights in the \(5\) grids left in the back row, which has \(\binom{5}{2}\) choices. Now suppose the left \(4\) grids are \(g_1, g_2, g_3, g_4\) from left to right, then we can put two rooks in \(g_1, g_4\), and we can either put the king in \(g_2\) and the queen in \(g_3\) or the king in \(g_3\) and the queen in \(g_2\), so we have \(2\) choices, so 
+	\[
+		\vert \left\{ \text{Fischer Random with queen between the rooks}  \right\}  \vert = (4 \times 4) \times \binom{5}{2} \times 2 = 320. 
+	\]
+	In this problem, the sample space is \(E = \left\{ \text{Fischer Random}  \right\} \), and thus the probability that the queen is between the two rooks in a random Fischer Random is 
+	\[
+		\frac{\vert \left\{ \text{Fischer Random with queen between the rooks} \right\}  \vert }{\vert E \vert } = \frac{320}{960} = \frac{1}{3}.
+	\] 
+\end{itemize}
+
+\newpage
+
+\paragraph{Exercise 4}  Four mathematics professors apply for research grants to the National Science and Technology Council (NSTC). The NSTC has a total budget of \$1,800,000 to distribute between the professors, subject to the following rules:
+\begin{enumerate}
+	\item Each professor should receive a non-negative integer number of dollars.
+	\item The maximum amount any one professor can receive is \$700,000.
+\end{enumerate}
+Among all legal distributions of the budget, the NSTC chooses one uniformly at random.
+
+If any of the professors receives a grant of \$676,767 or more, they will have enough resources to produce such outstanding work that they will win the Fields Medal. What is the probability that at least one of the professors will win the Fields Medal?
+
+\paragraph{Solution:} We first show the cardinality version of inclusion-exclusion principle: Suppose \(E_1, E_2, \dots , E_n\) are discrete events of finite uniform probability space \((S, \mathbb{P})\) for all \(1 \le i \le n\), then 
+\[
+	\vert E_1 \cup E_2 \cup \dots \cup E_n \vert = \sum_{r=1}^n (-1)^{r+1} \sum_{1 \le i_1 < i_2 < \dots < i_r \le n} \vert E_{i_1} \cap E_{i_2} \cap \dots \cap E_{i_r} \vert.   
+\]
+This can be directly proved by the original Inclusion-exclusion principle:
+\[
+	\mathbb{P} (E_1 \cup \dots \cup E_n) = \sum_{r=1}^n (-1)^{r+1} \sum_{1 \le i_1 < \dots < i_r \le n} \mathbb{P} (E_{i_1} \cap \dots \cap E_{i_r}),  
+\]    
+and by 
+\[
+	\mathbb{P} (E_1 \cup \dots \cup E_n) = \frac{\vert E_1 \cup \dots \cup E_n \vert }{\vert S \vert } \text{ and } \mathbb{P} (E_1 \cap \dots \cap E_{i_r}) = \frac{\vert E_{i_1} \cap \dots \cap E_{i_r} \vert }{\vert S \vert }, 
+\] 
+so 
+\[
+	\frac{\vert E_1 \cup \dots \cup E_n \vert }{\vert S \vert } = \sum_{r=1}^n (-1)^{r+1} \sum_{1 \le i_1 < \dots < i_r \le n} \frac{\vert E_{i_1} \cap \dots \cap E_{i_r} \vert }{\vert S \vert },
+\] i.e. 
+\[
+	\vert E_1 \cup E_2 \cup \dots \cup E_n \vert = \sum_{r=1}^n (-1)^{r+1} \sum_{1 \le i_1 < i_2 < \dots < i_r \le n} \vert E_{i_1} \cap E_{i_2} \cap \dots \cap E_{i_r} \vert.
+\]
+
+Now we can start to solve the problem. We can describe the distribution of money by a \(4\)-tuple \((a_1, a_2, a_3, a_4)\), where \(a_i\) is the amount of money given to the \(i\)-th professor. The sample space is 
+\[
+	S = \left\{ (a_1, a_2, a_3, a_4) : 0 \le a_i \le 700000 \quad \forall 1 \le i \le 4, a_1 + a_2 + a_3 + a_4 = 1800000   \right\}. 
+\]  
+If we define
+\[
+	F_i = \left\{ (a_1, a_2, a_3, a_4) : 0 \le a_j \text{ for all } j, a_i \ge 700001, a_1 + a_2 + a_3 + a_4 = 1800000   \right\}, 
+\]
+and
+\[
+	S^{\prime} = \left\{ (a_1, a_2, a_3, a_4) : 0 \le a_j \text{ for all } j, a_1 + a_2 + a_3 + a_4 = 1800000    \right\}, 
+\]
+then we know 
+\[
+	\vert S \vert = \vert S^{\prime} \vert - \vert F_1 \cup F_2 \cup F_3 \cup F_4 \vert.   
+\]
+Note that \(\vert S^{\prime}  \vert = \binom{1800003}{3} \), and by Inclusion-exclusion principle, 
+\begin{align*}
+	\vert F_1 \cup F_2 \cup F_3 \cup F_4 \vert &= \sum_{r=1}^4 (-1)^{r+1} \sum_{1 \le i_1 < \dots < i_r \le 4}  \vert F_1 \cap \dots \cap F_r \vert = \sum_{r=1}^4 (-1)^{r+1} \binom{4}{r} \vert F_1 \cap \dots \cap F_r \vert \\
+	&= 4 \binom{1100002}{3} - 6 \binom{400001}{3} 
+\end{align*}
+since for each \((i_1, i_2, \dots , i_r)\) pair, \(\vert F_{i_1} \cap F_{i_2} \cap \dots F_{i_r} \vert \) are same, and for \(\vert F_1 \vert \), we can let \(a_1 = 700001 + b_1\), so that
+\begin{align*}
+	\vert F_1 \vert &= \vert \left\{ (b_1, a_2, a_3, a_4): 0 \le a_j \text{ for all } 2 \le j \le 4 \text{ and } 0 \le b_1, b_1 + a_2 + a_3 + a_4 = 1099999    \right\} \vert \\
+	&= \binom{1100002}{3}, 
+\end{align*}      
+while for \(\vert F_1 \cap F_2 \vert \), we can let \(a_1 = 700001 + b_1\) and \(a_2 = 700001 + b_2\), so that    
+\begin{align*}
+	\vert F_1 \cap F_2 \vert &= \vert \left\{ (b_1, b_2, a_3, a_4): 0 \le b_1, b_2, a_3, a_4, b_1 + b_2 + a_3 + a_4 = 399998 \right\}  \vert = \binom{400001}{3}. 
+\end{align*} 
+Note that it is impossible to have \(3\) or more professors to get more than \(700000\) dollars since the budget is \(1800000\).   
+Hence, 
+\[
+	\vert S \vert = \binom{1800003}{3} - 4 \binom{1100002}{3} + 6 \binom{400001}{3}. 
+\]
+Now if we define 
+\[
+	E_i = \left\{ (a_1, a_2, a_3, a_4): 0 \le a_j \text{ for all } j, a_i \ge 676767, a_1 + a_2 + a_3 + a_4 = 1800000 \right\}, 
+\]
+then 
+\[
+	\vert E \vert \coloneqq \vert \left\{ \text{someone gets Field's medal}  \right\} \vert  = \vert E_1 \cup E_2 \cup E_3 \cup E_4 \vert - \vert F_1 \cup F_2 \cup F_3 \cup F_4 \vert.   
+\]
+We can use similar method to compute \(\vert E_1 \cup E_2 \cup E_3 \cup E_4  \vert \), so by Inclusion-exclusion principle
+\begin{align*}
+	\vert E_1 \cup E_2 \cup E_3 \cup E_4  \vert &= \sum_{r=1}^4 (-1)^{r+1} \sum_{1 \le i_1 < \dots < i_r \le 4} \vert E_{i_1} \cap E_{i_2} \cap \dots \cap E_{i_r} \vert \\
+	&= \sum_{r=1} (-1)^{r+1} \binom{4}{r} \vert E_1 \cap E_2 \cap \dots \cap E_r \vert \\ 
+	&= 4 \binom{1123236}{3} - 6 \binom{446469}{3}.   
+\end{align*}
+
+Thus, 
+\[
+	\vert E \vert = \left( 4 \binom{1123236}{3} - 6 \binom{446469}{3} \right) - \left( 4 \binom{1100002}{3} - 6 \binom{400001}{3} \right),  
+\]
+which shows 
+\begin{align*}
+	\mathbb{P} (\text{someone gets Fields medal} ) &= \frac{\vert E \vert }{\vert S \vert } = \frac{\left( 4 \binom{1123236}{3} - 6 \binom{446469}{3} \right) - \left( 4 \binom{1100002}{3} - 6 \binom{400001}{3} \right)}{\binom{1800003}{3} - 4 \binom{1100002}{3} + 6 \binom{400001}{3}} \\
+	&\thickapprox 0.218.
+\end{align*}
+
+% \newpage
+
+% \section*{Hints}  The following QR codes contain hints for some of the homework exercises.  You should be able to decode them using any QR code scanner, including this one: \url{https://zxing.org/w/decode.jspx}.
+
+% \paragraph{Exercise ?} Also available at \url{https://i.ibb.co/???????/S??E?.png}.
+
+\begin{center}
+% \includegraphics[scale=0.5]{Hints/S??E?.png}
+\end{center}
+
+\end{document}
