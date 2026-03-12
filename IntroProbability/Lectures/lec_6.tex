@@ -1,0 +1,169 @@
+\lecture{6}{12 March.}{}
+\begin{eg}
+    Now the restaurant runs a promotion. If the customer toss a lucky coin and gets \(8\) heads in a row, then he/she can eat for free, then 
+    \[
+        \mathbb{P} \left( \text{customer } i \text{ eat for free}   \right) = \frac{1}{2^8}. 
+    \]  
+    Now the \(i\)-th customer gets free food if they toss \(i\) heads in a row, and suppose 
+    \[
+        E_i = \left\{ i\text{-th customer gets free food}  \right\}, 
+    \]   
+    then \(\mathbb{P} (E_i) = \frac{1}{2^i}\). Thus,
+    \[
+        \sum_{i=1}^{\infty} \mathbb{P} (E_i) = \sum_{i=1}^{\infty} \frac{1}{2^i} = 1 < \infty .  
+    \] 
+    Thus, \(\mathbb{P} (\limsup_{n \to \infty} E_n ) = 0.\) This means almost certainly, only finitely many customers get free food. 
+\end{eg}
+
+\begin{eg}
+    There are four coins, which we toss \(n\) times. Let \(H_n\) be the number of heads. Let \(E_n\) be the events that 
+    \[
+        H_n > \left( \frac{1}{2} + \varepsilon \right)n, \text{ for some } \varepsilon > 0.   
+    \]   
+    We know \(S = \left\{ H, T \right\}^n \) and 
+    \begin{align*}
+        E_n \subseteq S &= \left\{ w \in \left\{ H, T \right\}^n : w \text{ has } \ge \left( \frac{1}{2} + \varepsilon \right)n \text{ heads}     \right\} \\
+        &= \bigcup_{r = \left( \frac{1}{2} + \varepsilon \right)n } F_r, \text{ where } F_r = \left\{ w: w \text{ has exactly } r \text{ heads}   \right\},    
+    \end{align*} 
+    so 
+    \[
+        \mathbb{P} (E_n) = \sum_{r = \left( \frac{1}{2} + \varepsilon \right)n } \mathbb{P} (F_r). 
+    \]
+    Note that 
+    \[
+        \mathbb{P} (F_r) = \frac{\vert F_r \vert }{\vert S_n \vert },
+    \] where \(\vert S_n \vert = 2^n \) and \(\vert F_r \vert = \binom{n}{r} \). Thus,
+    \[
+        \mathbb{P} (F_r) = \frac{\binom{n}{r}}{2^n},
+    \]  
+    and thus 
+    \[
+        \mathbb{P} (E_n) = \sum_{r = \left( \frac{1}{2} + \varepsilon \right)n } \frac{\binom{n}{r}}{2^n} = 2^{-n} \sum_{r = \left( \frac{1}{2} + \varepsilon \right)n }^n \binom{n}{r}. 
+    \]
+    \begin{definition}[The binary entropy function]
+        \(H(x) = - x \log_2 x - (1 - x) \log _2(1 - x)\) for \(0 \le x \le 1\).  
+    \end{definition}
+    We use the fact that for \(\varepsilon > 0\), 
+    \[
+        \sum_{r = \left( \frac{1}{2} + \varepsilon \right)n }^n \binom{n}{r} \thickapprox 2^{H\left( \frac{1}{2} + \varepsilon \right)n } \text{ and } H(x) \le 1 \text{ with equality only when } x=\frac{1}{2}.   
+    \]
+    Thus, we can let \(H\left( \frac{1}{2} + \varepsilon \right) = 1 - \delta  \) where \(\delta > 0\), then 
+    \[
+        \mathbb{P} (E_n) \lesssim 2^{-n} 2^{(1 - \delta) n} = 2^{-\delta n},
+    \]
+    so 
+    \[
+        \sum_{n=1}^{\infty} \mathbb{P} (E_n) \lesssim \sum_{n=1}^{\infty} 2^{\delta n} < \infty \text{ since } 2^{-\delta } < 1.   
+    \]
+    Thus, by First Borrel-Cantelli lemma, \(\mathbb{P} (\limsup_{n \to \infty} E_n ) = 0\), i.e. 
+    \[
+        \mathbb{P} \left( \exists N \text{ s.t. } \forall n \ge N, \text{ number of heads} < \left( \frac{1}{2} + \varepsilon \right)n    \right) = 1. 
+    \]   
+    Let 
+    \[
+        h_n = \frac{\text{number of heads in } n \text{ toses} }{n},
+    \]
+    we showed that for any \(\varepsilon > 0\) with probability \(1\), there is some \(N\) s.t. if \(n \ge N\), then \(h_n \le \frac{1}{2} + \varepsilon\), so 
+    \[
+        \limsup_{n \to \infty} h_n \le \frac{1}{2}.
+    \]     
+    By symmetry, we can show that for 
+    \[
+        t_n = \frac{\text{number of tails in } n \text{ toses} }{n}, 
+    \]
+    \(\limsup_{n \to \infty} t_n \le \frac{1}{2} \). Since \(h_n + t_n = 1\), and \(\limsup_{n \to \infty} t_n \le \frac{1}{2} \) gives \(\liminf_{n \to \infty} h_n \ge \frac{1}{2} \), so \(\lim_{n \to \infty} h_n = \frac{1}{2} \).     
+\end{eg}
+
+\chapter{Conditional Probabilities and Independence}
+\begin{definition}
+    Let \((S, \mathbb{P} )\) be a probability space, and let \(F \subseteq S\) be an event with \(\mathbb{P} (F) > 0\). The conditional probability of an event \(E\) given \(F\) is 
+    \[
+        \mathbb{P} (E \mid F) = \frac{\mathbb{P} (E \cap F)}{\mathbb{P} (F)}.
+    \]     
+\end{definition}
+
+\begin{proposition}
+    \hfill
+    \begin{itemize}
+        \item [(1)] \(0 \le \mathbb{P} (E \mid F) \le 1\) for every \(E \subseteq S\). 
+        \item [(2)] \(\mathbb{P} (F \mid F) = 1\).   
+        \item [(3)] If \(E\) and \(F\) are disjoint, i.e. \(E \cap F = \varnothing\), then
+        \[
+            \mathbb{P} (E \mid F) = \frac{\mathbb{P} (\varnothing )}{\mathbb{P} (F)} = 0.
+        \]
+        \item [(4)] \(\mathbb{P} (E \cap F) = \mathbb{P} (E \mid F) \mathbb{P} (F)\). 
+        \item [(5)] If \(E_1, E_2, E_3, \dots \) are mutually exclusive, then 
+        \[
+            \mathbb{P} \left( \bigcup_{i=1}^{\infty} E_i \mid F  \right) = \sum_{i=1}^{\infty } \mathbb{P} (E_i \mid F).  
+        \]
+    \end{itemize}
+\end{proposition}
+
+\begin{corollary}
+    \((S, \mathbb{P} \left( \cdot \mid F \right) )\) is also a probability space, where: 
+    \begin{itemize}
+        \item \(0 \le \mathbb{P} (E \mid F) \le 1\).
+        \item \(\mathbb{P} (S \mid F) = 1\).
+        \item Countable additivity.   
+    \end{itemize} 
+\end{corollary}
+
+\begin{eg}
+    \(n\) people at \(n\) party, each with their own hat. At the end, every one gets a random hat. What is the probability that exactly \(r\) people get their own hats?  
+\end{eg}
+
+\begin{explanation}
+    Let \(E_r = \left\{ \text{exactly } r \text{ people get their own hats}   \right\} \). Then, \(E_r = \bigcup_{\substack{R \subseteq [n] \\ \vert R \vert = r}} E_R\), where
+    \[
+        E_R = \left\{ \text{people in } R \text{ get their own hats and people not in } R \text{ not}     \right\}. 
+    \]  
+    Thus, 
+    \[
+        \mathbb{P} (E_r) = \mathbb{P} \left( \bigcup_{\substack{R \subseteq [n] \\ \vert R \vert = r}} E_R \right) = \sum_{\substack{R \subseteq [n] \\ \vert R \vert = r }} \mathbb{P} (E_R).  
+    \]
+    By symmetry, \(E_R\) has the same probability for every \(R\). Thus,
+    \[
+        \mathbb{P} (E_r) = \binom{n}{r} \mathbb{P} \left( E_{\left\{ n - r + 1, n - r + 2, \dots , n \right\} } \right). 
+    \]
+    Note that 
+    \[
+        E_{\left\{ n-r+1,\dots ,n \right\} } = \underbrace{\left\{ \text{people in } n-r+1, \dots , n \text{ get their hats}   \right\}}_{F} \cap \underbrace{\left\{ \text{nobody in } 1,\dots ,n-r \text{ get their hats}   \right\}}_{E}.  
+    \]
+    Thus, \(\mathbb{P} (E \cap F) = \mathbb{P} (E \mid F) \mathbb{P} (F)\), where 
+    \[
+        \mathbb{P} (F) = \frac{\vert F \vert }{\vert S_n \vert } = \frac{(n-r)!}{n!} 
+    \] 
+    and 
+    \[
+        \mathbb{P} (E \mid F) = \mathbb{P} (\text{dearrangement of } n-r \text{ hats}) = \sum_{k=0}^{n-r} \frac{(-1)^k}{k!} 
+    \]
+    by our previous argument, so 
+    \[
+        \mathbb{P} (E \cap F) = \frac{(n-r)!}{n!} \sum_{k=0}^{n-r} \frac{(-1)^k}{k!}. 
+    \]
+\end{explanation}
+
+\section{The Law of Total Probability}
+\begin{definition}
+    Given a set \(S\), we say \(E_1, E_2, \dots , E_n\) partition \(S\) if 
+    \[
+        E_1 \cupdot E_2 \cupdot \dots \cupdot E_n = S.
+    \]   
+\end{definition}
+
+\begin{theorem}[Law of Total Probability]
+    Let \((S, \mathbb{P} )\) be a probability space, and let \(S = F_1 \cupdot F_2 \cupdot \dots \cupdot F_n\) be a partition, then for any event \(E\),
+    \[
+        \mathbb{P} (E) = \sum_{i=1}^n \mathbb{P} (E \mid F_i) \mathbb{P} (F_i). 
+    \]   
+\end{theorem}
+
+\begin{proof}
+    \begin{align*}
+        E &= E \cap S = E \cap \left( \bigcup_{i=1}^{n} F_i  \right) = \bigcup_{i=1}^{n} (E \cap F_i),  
+    \end{align*}
+    so 
+    \[
+        \mathbb{P} (E) = \sum_{i=1}^n \mathbb{P} (E \cap F_i) = \sum_{i=1}^n \mathbb{P} (E \mid F_i) \mathbb{P} (F_i).  
+    \]
+\end{proof}
