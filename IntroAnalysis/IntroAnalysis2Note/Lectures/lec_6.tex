@@ -6,8 +6,7 @@ Recall that if \(f: \mathbb{R} \to \mathbb{R} \) is invertible, i.e. \(f^{-1} : 
 \]      
 which can be proved by chain rule.
 
-In fact, one can say something even when \(f^{\prime} \) is not invertible, as long as we know that \(f\) is continuously differentiable. 
-%something left
+In fact, one can say something even when \(f^{\prime} \) is not invertible, as long as we know that \(f\) is continuously differentiable. If \(f^{\prime} (x_0) \neq 0\), then \(f^{\prime} (x_0)\) must be either strictly positive or strictly negative (since we assume \(f^{\prime} \) to be continuous by \autoref{thm: differentiable implies continuous}), which implies \(f^{\prime} (x)\) is strictly positive for \(x\) near \(x_0\), or strictly negative for \(x\) near \(x_0\), and thus one-to-one in such small interval. In either case, \(f\) will become invertible if we restrict the domain and codomain of \(f\) to be sufficiently close to \(x_0\) and to \(f(x_0)\), respectively.            
 
  Now if \(f: \mathbb{R} ^n \to \mathbb{R} ^n\) and \(f \in C^1\), i.e. \(f\) is continuously differentiable. Suppose 
 \[
@@ -27,7 +26,7 @@ First, we prepare a lemma.
     \todo{DIY}
 \end{proof}
 
-\begin{theorem}
+\begin{theorem}[The Inverse Function Theorem] \label{thm: The inverse function theorem}
     Let \(E\) be an open subset of \(\mathbb{R} ^n\) and let \(f : E \to \mathbb{R} ^n\) be a function which is continuously differentiable on \(E\). Suppose \(x_0 \in E\) is the point s.t. the linear map \(f^{\prime}(x_0) : \mathbb{R} ^n \to \mathbb{R} ^n \) is invertible, then there exists an open set \(U \subseteq E\) s.t. \(x_0 \in U\) and an open set \(V \subseteq \mathbb{R} ^n\) s.t. \(f(x_0) \in V\) so that \(f: U \to V\) is a bijection. In particular, there is a linear map \(f^{-1} : V \to U \). Furthermore, this inverse map is differentiable at \(f(x_0)\), and 
     \[
         \left( f^{-1} \right)^{\prime}  (f(x_0)) = \left( f^{\prime} (x_0) \right)^{-1}.
@@ -65,13 +64,13 @@ First, we prepare a lemma.
     Note that \(g(0) = 0\). Thus, 
     \[
         \lim_{x \to 0} \frac{\lVert g(x) - g(0) - 0 \rVert }{\lVert x \rVert } = 0, 
-    \] which shows \(g\) is differentiable at \(0\) with \(g^{\prime} (0) = 0\). Now let's analyze \(g(x)\). Since \(f\) is continuously differentiable, \(g\) is also continuously differentiable. 
+    \] which shows \(g\) is differentiable at \(0\) with derivative \(g^{\prime} (0) = 0\). Now let's analyze \(g(x)\). Since \(f\) is continuously differentiable, \(g\) is also continuously differentiable. Since \(E\) is open and \(x_0 \in E\), there exists \(r_0 > 0\) s.t. \(B(x_0, r_0) \subseteq E\). Hence, \(g\) is defined on \(B(0, r_0)\). (For \(x \in B(0, r_0)\), \(\lVert x \rVert < r_0 \), so \(\lVert (x + x_0) - x_0 \rVert < r_0 \), i.e. \(x + x_0 \in B(x_0, r_0) \subseteq E\), so \(g(x)\) is well-defined.)      
 
-    Thus, \(\exists r > 0\) s.t. 
+    Thus, for all \(i, j\), \(\exists r > 0\) s.t. 
     \[
-        \left\vert \frac{\partial g_j}{\partial x_i}  \right\vert \le \frac{1}{2\sqrt{n^t}} \text{ for } x \in B(0, r)  
+        \left\vert \frac{\partial g_j}{\partial x_i}  \right\vert \le \frac{1}{2\sqrt{n^5}} \text{ for } x \in B(0, r)  
     \]     
-    since \(\frac{\partial g_j(0)}{\partial x_i} = 0\) and hence
+    since \(\frac{\partial g_j(0)}{\partial x_i} = 0\) (since \(g^{\prime} (0) = 0\) and thus \(g\)'s Jacobian matrix at \(0\) is \(0\) matrix) and \(\frac{\partial g_j}{\partial x_i} \) is continuous,  and hence
     \[
         \left\vert \frac{\partial g_j(x)}{\partial x_i} - \frac{\partial g_j(0)}{\partial x_i}   \right\vert\le \frac{1}{2\sqrt{n^5} } \text{ if } \lVert x \rVert < r \text{ for some small enough } r.   
     \] 
@@ -79,7 +78,7 @@ First, we prepare a lemma.
     \[
         \left\lVert \frac{\partial g(x)}{\partial x_j}  \right\rVert = \left( \sum_{i=1}^n \left( \frac{\partial g_i(x)}{\partial x_j}  \right)^2   \right)^{\frac{1}{2}}  \le \frac{1}{2n^2} \text{ for all } x \in B(0, r), \quad j = 1,2,\dots   
     \]
-    Also, 
+    Now if \(x, y \in B(0, r)\), then \(x + t(y - x) \in B(0, r)\) if \(0 \le t \le 1\). Also, 
     \begin{align*}
         g(y) - g(x) &= \int _0^1 \left( \frac{\mathrm{d}}{\mathrm{d}t} \left[ g(x + t (y - x)) \right]   \right) \, \mathrm{d} t = \int _0^1 \left[ Dg(x + t(y - x)) \circ (y - x) \right] \, \mathrm{d} t \\
         &= \int _0^1 \left( D_{(y-x)} g(x + t(y - x)) \right) \, \mathrm{d} t.     
@@ -88,7 +87,7 @@ First, we prepare a lemma.
     \begin{align*}
         \lVert D_v g(x) \rVert &= \left\lVert \sum_{j=1}^n v_j \frac{\partial g(x)}{\partial x_j}   \right\rVert \le \sum_{j=1}^n \lVert v_j \rVert \left\lVert \frac{\partial g(x)}{\partial x_j}  \right\rVert \le \sum_{j=1}^n \lVert v \rVert \frac{1}{2n^2} = \frac{\lVert v \rVert }{2n} \le \frac{\lVert v \rVert }{2}.       
     \end{align*}    
-    Now if \(x, y \in B(0, r)\), then \(x + t(y - x) \in B(0, r)\) if \(0 \le t \le 1\). Thus, 
+    Thus, 
     \[
         \left\lVert D_{(y-x)} g(x + t(y - x)) \right\rVert \le \frac{\lVert x - y \rVert }{2}. 
     \]
@@ -100,8 +99,8 @@ First, we prepare a lemma.
     \[
         \lVert g(x) - g(y) \rVert \le \frac{\lVert x - y \rVert }{2} \text{ for } x, y \in B(0, r).  
     \]  
-    Let \(\Phi (x) = x + g(x)\). By \autoref{lm: first lemma for inverse function theorem}, \(\Phi :B(0, r) \to \mathbb{R} ^n\) is one to one and \(B\left( 0, \frac{r}{2} \right) \subseteq \Phi \left( B(0, r) \right)  \). Since \(\Phi \) is one to one on \(B(0, r)\). Let \(W = \Phi ^{-1} \left( B\left(0, \frac{r}{2} \right)  \right) \), then \(\Phi : W \to B\left( 0, \frac{r}{2} \right) \) is one to one and onto. Now we know \(\Phi \) is continuous, so \(W\) is open (preimage of open set is open for continuous map). Also, \(0 \in W \) since \(\Phi (0) = 0 \in B\left( 0, \frac{r}{2} \right) \). Now we claim \(\Phi ^{-1} : B \left( 0, \frac{r}{2} \right) \to W \) is continuous. 
-    Note that 
+    Let \(\Phi (x) = x + g(x)\). By \autoref{lm: first lemma for inverse function theorem}, \(\Phi :B(0, r) \to \mathbb{R} ^n\) is one to one and \(B\left( 0, \frac{r}{2} \right) \subseteq \Phi \left( B(0, r) \right)  \). Since \(\Phi \) is one to one on \(B(0, r)\). Let \(W = \Phi ^{-1} \left( B\left(0, \frac{r}{2} \right)  \right) \), then \(\Phi : W \to B\left( 0, \frac{r}{2} \right) \) is one to one and onto. Now we know \(\Phi \) is continuous (since \(g\) is composition of differentiable and thus continuous map, so \(g\) is continuous, and thus \(\Phi \) is continuous), so \(W\) is open (preimage of open set is open for continuous map). Also, \(0 \in W \) since \(\Phi (0) = 0 \in B\left( 0, \frac{r}{2} \right) \). Now we claim \(\Phi ^{-1} : B \left( 0, \frac{r}{2} \right) \to W \) is continuous. 
+    Note that for all \(x, y \in W\) 
     \begin{align*}
         \lVert \Phi (x) - \Phi (y) \rVert &= \lVert x - y + g(x) - g(y) \rVert \ge \lVert x - y \rVert - \lVert g(x) - g(y) \rVert \ge \lVert x - y \rVert - \frac{1}{2} \lVert x - y \rVert = \frac{\lVert x - y \rVert }{2}.     
     \end{align*}
@@ -118,7 +117,7 @@ First, we prepare a lemma.
     \[
         \left\lVert \Phi ^{-1}(u) - \Phi ^{-1}(v) \right\rVert \le 2 \lVert u - v \rVert,
     \]
-    and implies \(\Phi ^{-1}\) is continuous. Thus, \(\Phi :W \to B\left( 0, \frac{r}{2} \right) \) is a homomorphism, i.e. \(\Phi \) is continuous and \(\Phi ^{-1}\) is also continuous. Since \(\Phi (0) = 0\), so \(\Phi ^{-1} (0) = 0\). Also, note that 
+    and implies \(\Phi ^{-1}\) is continuous. Thus, \(\Phi :W \to B\left( 0, \frac{r}{2} \right) \) is a homomorphism, i.e. \(\Phi \) is continuous and \(\Phi ^{-1}\) is also continuous. Since \(\Phi (0) = 0\) and \(\Phi \) is one-to-one, \(\Phi ^{-1} (0) = 0\). Also, note that 
     \[
         \lim_{z \to 0} \frac{\left\lVert \Phi ^{-1}(z) - \Phi ^{-1}(0) - z \right\rVert }{\lVert z \rVert } = \lim_{z \to 0} \frac{\lVert \Phi ^{-1}(z) - z \rVert }{\lVert z \rVert }.  
     \]     
@@ -134,13 +133,20 @@ First, we prepare a lemma.
     \[
         \left\lVert \Phi ^{-1}(z) - \Phi ^{-1}(0) \right\rVert \le 2 \lVert z - 0 \rVert \implies \frac{\left\lVert \Phi ^{-1}(z) \right\rVert }{\lVert z \rVert } \le 2,
     \]    
+    and since
+    \[
+        \lim_{z \to 0} \frac{\lVert g(x) \rVert }{\lVert x \rVert } = \lim_{x \to 0} \frac{\lVert g(x) \rVert }{\lVert x \rVert } = 0,  
+    \]
     so by Squeeze theorem, 
     \[
        \lim_{z \to 0} \frac{\left\lVert \Phi ^{-1}(z) - z \right\rVert }{\lVert z \rVert } = 0. 
     \]
     This shows \(\left( \Phi ^{-1} \right)^ {\prime} (0) = I\). 
-
-    Recall that \(\Phi : W \to B\left( 0, \frac{r}{2} \right) \) is a homomorpism. Now set 
+    Recall that 
+    \[
+        \Phi (x) = x + g(x) = A^{-1} (f(x + x_0) - f(x_0))
+    \]
+    and \(\Phi : W \to B\left( 0, \frac{r}{2} \right) \) is a homomorpism. Now set 
     \[
         U = x_0 + W, \quad V = f(x_0) + A\left( B\left( 0, \frac{r}{2} \right)  \right). 
     \] 
@@ -163,7 +169,11 @@ First, we prepare a lemma.
     \] 
     This shows \(V \subseteq f(U)\) and thus \(f(U) = V\), i.e. \(f:U \to V\) is surjective. Since \(\Phi \) is one to one, so the \(x\) above is unique. It follows that \(f\) is one to one on \(U\). Thus, \(f:U \to V\) is bijective.       
 
-    Now for \(x \in W\) we let \(y = f(x + x_0)\), so \(x + x_0 = f^{-1}(y)\).  Recall \(\Phi (x) = A^{-1} (f(x + x_0) - f(x_0)) = A^{-1} (y - f(x_0))\). Hence,
+    Now for \(y \in V\) we know \(y = f(x + x_0)\) for some \(x \in W\), so \(x + x_0 = f^{-1}(y)\).  Recall 
+    \[
+        \Phi (x) = A^{-1} (f(x + x_0) - f(x_0)) = A^{-1} (y - f(x_0)).
+    \]
+    Hence,
     \[
         x = \Phi ^{-1} \left( A^{-1} (y - f(x_0)) \right) \implies f^{-1}(y) - x_0 = \Phi ^{-1} \left( A^{-1} (y - f(x_0)) \right). 
     \]
@@ -173,7 +183,7 @@ First, we prepare a lemma.
     \]
     This shows
     \begin{align*}
-        \left( f^{-1} \right)^{\prime} (f(x_0)) &= \left( \Phi ^{-1} \right) \left( A^{-1} (f(x) - f(x_0)) \right) (A^{-1})^{\prime} (0) = (\Phi ^{-1})(0) \circ A^{-1} = IA^{-1} = (f^{\prime} (x_0))^{-1}   
+        \left( f^{-1} \right)^{\prime} (f(x_0)) &= \left( \Phi ^{-1} \right)^{\prime}  \left( A^{-1} (f(x_0) - f(x_0)) \right) (A^{-1})^{\prime} (0) = (\Phi ^{-1})^{\prime} (0) \circ A^{-1} = IA^{-1} = (f^{\prime} (x_0))^{-1}   
     \end{align*}
     since \(x_0 \in U\) so \(f(x_0) \in V\) and every linear transformation is differentiable at every point where \(\left( A^{-1} \right)(x) = A^{-1} \) for all \(x\).
     Thus, we're done.  
