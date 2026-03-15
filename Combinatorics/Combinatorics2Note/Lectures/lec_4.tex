@@ -27,7 +27,7 @@ With more improvement,
     We may assume \(G\) is complete. If an edge \(\left\{ x, y \right\} \) is missing, add it with \(\infty \) weight.   
 \end{observation}
 
-\begin{lemma}
+\begin{lemma} \label{lm: cheapest path}
     If \(P\) is a cheapest path from \(u\) to \(v\), then for any \(x, y \in P\), \(P[x, y]\) is a shortest path from \(x\) to \(y\).       
 \end{lemma}
 
@@ -88,9 +88,19 @@ With more improvement,
             which is a contradiction. 
             \item Induction step: (a) is obvious. 
             
-            Now we show (b). If we didn't update \(t(x), \text{prev}(x) \) in the \(i\)-th iteration, then this is true by induction. If we did update, then \(\text{prev}(x) = v_0 \) where \(v_0\) is the vertex added to \(W\) in the \(i\)-th iteration, and \(t(x) = t(v_0) + w(\left\{ v_0, x \right\} ) =\) weight of path \(u \to \dots \to v_0 \to x\), and \(u\) to \(\text{prev}(v_0) \) all in \(W\) by induction, and \(v_0\) was added to \(W\) in the \(i\)-th iteration. 
+            Now we show (b). If we didn't update \(t(x), \text{prev}(x) \) in the \((i-1)\)-th iteration, then this is true by induction. If we did update, then \(\text{prev}(x) = v_0 \) where \(v_0\) is the vertex added to \(W\) in the \((i-1)\)-th iteration, and \(t(x) = t(v_0) + w(\left\{ v_0, x \right\} ) =\) weight of path \(u \to \dots \to v_0 \to x\), and \(u\) to \(\text{prev}(v_0) \) all in \(W\) by induction, and \(v_0\) was added to \(W\) in the \((i-1)\)-th iteration. 
             
-            Now we show (c). Suppose not, then \(\exists z \in V\setminus W\) minimizing \(t(z)\) but \(t(z) > d(z, u)\). Consider the cheapest path from \(z\) to \(u\).                  
+            Now we show (c). Suppose not, then \(\exists z \in V\setminus W\) minimizing \(t(z)\) but \(t(z) > d(z, u)\). Consider the cheapest path from \(u\) to \(z\), say \(P\). Let \(y\) be the first vertex in \(P\) (starting from \(u\)) that is not in \(W\). (such \(y\) exists since \(z\) is not in \(W\)) Let \(x\) be the preceding vertex on \(P\), noting that \(x \in W\). Then, 
+            \begin{align*}
+                t(z) &> w(P) = w(P_{[u, x]}) + w(\left\{ x,y \right\} ) + w(P_{[y, z]}) \ge w(P_{[u, x]}) + w(\left\{ x, y \right\}).
+            \end{align*}                        
+            By \autoref{lm: cheapest path}, \(P_{[u, x]}\) has to be a lightest path from \(u\) to \(x\). By induction (where we add \(x\) to \(W\)), \(t(x) = w(P_{[u, x]})\). Thus,
+            \[
+                t(z) > w(P_{[u,x]}) + w(\left\{ x,y \right\} ) = t(x) + w(\left\{ x, y \right\}) \ge t(y),
+            \]   
+            which is by the induction statement of (d). However, this contradicts \(z\) minimizeing \(t(v)\) for \(v \in V\setminus W\). 
+            
+            As for (d), after the step where we added \(v\) to \(W\), we check whether \(t(v) + w(\left\{ v, y \right\} ) < t(y)\), and update if so. Hence, after this round, \(t(v)\) will not change, and \(t(v)\) is decreasing, so it is impossible that \(t(y) > t(v) + w(\left\{ v, y \right\} )\).      
         \end{itemize}
     \end{explanation}
 
