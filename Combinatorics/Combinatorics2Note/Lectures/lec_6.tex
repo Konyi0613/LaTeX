@@ -91,31 +91,56 @@ For necessary condition:
 \end{itemize}
 
 \begin{remark}
-    For the last argument, it is because \(G\) has a perfect matching, and for the odd components in \(G - S\), there must be edges between them and \(S\), i.e. some vertices in those odd componenets must match with the vertex in \(S\), and thus \(o(G - S) \le \vert S \vert \).     
+    For the last argument, it is because \(G\) has a perfect matching, and for the odd components in \(G - S\), there must be edges between them and \(S\), i.e. some vertices in those odd componenets must match with the vertex in \(S\), and thus \(o(G - S) \le \vert S \vert \).
+    
+    \begin{figure}[H]
+        \centering
+        \incfig{oddComponent}
+    \end{figure}
 \end{remark}
 
 \begin{theorem}[Tutte, 1947]
     If \(o(G - S) \le \vert S \vert \) for every \(S \subseteq V(G)\), then \(G\) has a perfect matching.   
 \end{theorem}
 \begin{proof}[proof (Lovasz, 1975)]
-    Suppose for contradiction. \(G\) is a counterexample on \(n\) vertices with the maximum number of edges. 
+    Note that for \(S = \varnothing\), we have \(o(G) \le \vert 0 \vert \), so \(\vert V(G) \vert \) is even. If \(G\) is complete, then \(G\) obviously has a perfect matching. Now we consider the case that \(G\) is not complete. Suppose for contradiction. \(G\) is a counterexample on \(n\) vertices with the maximum number of edges.      
     \begin{claim}
         \(\forall \left\{ x, y \right\} \notin E(G) \), \(G^{\prime} = G + \left\{ x, y \right\} \) has a perfect matching.  
     \end{claim} 
     \begin{explanation}
         We have to show \(G^{\prime} \) satisfies Tutte's condition. If so, then since \(G\) was a longest counterexample, \(G^{\prime} \) cannot be a counterexample, so \(G^{\prime} \) has a perfect matching. 
 
-        Note that we have \(o(G - S) \le \vert S \vert \) for akk \(S \subseteq V(G)\). If \(\left\{ x, y \right\} \cap S \neq \varnothing \), then \(o(G^{\prime} - S) = o(G - S)\). If \(\left\{ x, y \right\} \) is contained in a component of \(G - S\), components don't change, so \(o(G^{\prime} - S) \le \vert S \vert \). If \(\left\{ x, y \right\} \) connects two components of \(G - S\), then no matter what happens, 
+        Note that we have \(o(G - S) \le \vert S \vert \) for all \(S \subseteq V(G)\). If \(\left\{ x, y \right\} \cap S \neq \varnothing \), then \(o(G^{\prime} - S) = o(G - S)\). If \(\left\{ x, y \right\} \) is contained in a component of \(G - S\), components don't change, so \(o(G^{\prime} - S) \le \vert S \vert \). If \(\left\{ x, y \right\} \) connects two components of \(G - S\), then no matter what happens, 
         \[
             o(G^{\prime} - S) \le o(G - S) \le \vert S \vert. 
         \]  
     \end{explanation} 
+
+    \begin{remark}
+        The perfect matching must pick \(\left\{ x, y \right\} \), otherwise we have a perfect matching in \(G\).  
+    \end{remark}
     Let \(U = \left\{ v \in G: \deg(v) = n - 1 \right\} \). 
     \begin{itemize}
-        \item Case 1: Every component of \(G - U\) is a clique(complete subgraph). Each even clique admits a perfect matching. Each odd clique has a matching with only one unsaturated vertex. By Tutte's condition, number of odd cliques \(\le \vert U \vert \). Thus, we can match the unsaturated vertices to different vertices in \(U\). There will be even number of unused vertices in \(U\) (taking \(S = \varnothing \) in Tutte's condition, so \(G\) is even), and thus we can match them arbitrarily.  
-        \item Case 2: There is a non-clique component in \(G \setminus U\). We can find the following configuration: %fill
-        
-        Let \(M_1\) be a perfect matching in \(G + \left\{ w, y \right\} \) and let \(M_2\) be a perfect matching in \(G + \left\{ x, z \right\} \). Let \(G^{\prime} = M_1 \cup M_2\). Then the components of \(G^{\prime} \) are either isolated edges (really in \(G\)) %fill 
-        or even edges, alternating \(M_1\) and \(M_2\) edges. To build a matching \(M\) of \(G\), we can take all edges that are components in \(G^{\prime}\). Consider the cycle component \(C\) in \(G^{\prime} \). If the edges \(\left\{ y, w \right\} \) is not in \(C\), then take the \(M_1\) edges. If the edge \(\left\{ x, z \right\} \) is not in \(C\), then take the \(M_2\) edges. If both edges are in \(C\):                   
+        \item Case 1: Every component of \(G - U\) is a clique(complete subgraph). Each even clique admits a perfect matching. Each odd clique has a matching with only one unsaturated vertex. By Tutte's condition, number of odd cliques \(\le \vert U \vert \), say there are \(k\) odd cliques. Thus, we can match the unsaturated vertices to different vertices in \(U\). Note that there will be even number of unused vertices in \(U\) since
+        \[
+            \vert V(G) \vert = \vert U \vert + \sum \text{size of components},    
+        \]
+        and since \(\vert V(G) \vert \) is even, we have 
+        \[
+            \vert U \vert \equiv k \mod{2}. 
+        \]
+        This shows \(\vert U \vert - k \) is even, i.e. after we match the unsaturated vertex in each odd component to \(U\), the number of unused verteices in \(U\) is even,  and thus we can match them arbitrarily.  
+        \item Case 2: There is a non-clique component in \(G \setminus U\). We can find the following configuration:
+        \begin{figure}[H]
+            \centering
+            \incfig{configuration}
+        \end{figure}
+        The reason is in \(G \setminus U\), there must be \(x, y, z\) which do not form a triangle, otherwise every component is a clique. On the other hand, \(y \notin U\), so there exists some \(w\) that is not adjacent to \(y\).     
+        Let \(\textcolor{purple}{M_1}\) be a perfect matching in \(G + \left\{ w, y \right\} \) and let \(\textcolor{blue}{M_2}\) be a perfect matching in \(G + \left\{ x, z \right\} \). Let \(G^{\prime} = M_1 \cup M_2\). Then the components of \(G^{\prime} \) are either isolated edges (really in \(G\)) or even edges, alternating \(M_1\) and \(M_2\) edges. 
+        \begin{figure}[H]
+            \centering
+            \incfig{m1mwtype}
+        \end{figure}
+        To build a matching \(M\) of \(G\), we can take all edges that are components in \(G^{\prime}\). Consider the cycle component \(C\) in \(G^{\prime} \). If the edges \(\left\{ y, w \right\} \) is not in \(C\), then take the \(M_1\) edges. If the edge \(\left\{ x, z \right\} \) is not in \(C\), then take the \(M_2\) edges. If both edges are in \(C\):                   
     \end{itemize}
 \end{proof}
