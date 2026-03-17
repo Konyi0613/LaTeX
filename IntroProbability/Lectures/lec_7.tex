@@ -1,0 +1,192 @@
+\lecture{7}{17 March.}{}
+\begin{eg}
+    A professor is grading homework while watching Man City vs Real Madroid. If Real Madroid win, professor is happy, and students pass with probability \(80 \%\). If they don't, professor is sad, and students pass with probability \(50 \%\). Now we know Real Madroid win with probability \(67 \%\). What is the probability that a student will pass?   
+\end{eg}
+\begin{explanation}
+    Let
+    \[
+        S = \left\{ (x, y): x = \begin{dcases}
+            1, &\text{ if } \text{Madroid win}  ;\\
+            0, &\text{ otherwise}.
+        \end{dcases}, y = \begin{dcases}
+            1, &\text{ if } \text{student passes}  ;\\
+            0, &\text{ otherwise}.
+        \end{dcases} \right\}, 
+    \]
+    Let \(F_1 = \left\{ \text{Real Madroid win}  \right\}, F_2 = \left\{ \text{Real Madroid lose}  \right\}  \), then \(S = F_1 \cupdot F_2\). Now let \(E = \left\{ \text{student passes}  \right\} \), then since we know 
+    \[
+        \mathbb{P} (F_1) = 0.67, \mathbb{P} (F_2) = 0.33, \mathbb{P} (E \mid F_1) = 0.8, \mathbb{P} (E \mid F_2) = 0.5,
+    \]   
+    then 
+    \[
+        \mathbb{P} (E) = \mathbb{P} (E \mid F_1) \mathbb{P} (F_1) + \mathbb{P} (E \mid F_2) \mathbb{P} (F_2) = 0.70.
+    \]
+\end{explanation}
+
+\begin{theorem}[Bayes' Rule]
+    Let \((S, \mathbb{P} )\) be a probability space, and suppose we have partition \(S = F_1 \cupdot F_2 \cupdot \dots \cupdot F_n\), and an event \(E \subseteq S\), then for any \(1 \le i \le n\),
+    \[
+        \mathbb{P} (F_i \mid E) = \frac{\mathbb{P} (E \mid F_i) \mathbb{P} (F_i)}{\sum_{j=1}^n \mathbb{P} (E \mid F_j) \mathbb{P} (F_j) }.
+    \]    
+\end{theorem}
+\begin{proof}
+    \begin{align*}
+        \mathbb{P} (F_i \mid E) &= \frac{\mathbb{P} (F_i \cap E)}{\mathbb{P} (E)} = \frac{\mathbb{P} (E \cap F_i)}{\mathbb{P} (E)} = \frac{\mathbb{P} (E \mid F_i) \mathbb{P} (F_i)}{\mathbb{P} (E)} = \frac{\mathbb{P} (E \mid F_i) \mathbb{P} (F_i)}{\sum_{j=1}^n \mathbb{P} (E \mid F_j) \mathbb{P} (F_j) }.
+    \end{align*}
+\end{proof}
+
+\begin{eg}
+    A student passes their homeworks. What's the probability that Real Madroid won?
+\end{eg}
+\begin{explanation}
+    \begin{align*}
+        \mathbb{P} (F_1 \mid E) = \frac{\mathbb{P} (E \mid F_1) \mathbb{P} (F_1)}{\mathbb{P} (E \mid F_1) \mathbb{P} (F_1) + \mathbb{P} (E \mid F_2) \mathbb{P} (F_2) } \thickapprox 0.76.
+    \end{align*}
+\end{explanation}
+
+\begin{eg}
+    \(1 \%\) of the population has COVID. A rapid test is \(95 \%\) accurate. A random person tests positive for COVID. What is the probability they actually have COVID?  
+\end{eg}
+\begin{explanation}
+    Let \(E = \left\{ \text{have COVID}  \right\} \) and \(F = \left\{ \text{test positive}  \right\} \). We want to calculate \(\mathbb{P} (E \mid F)\). We know \(\mathbb{P} (F \mid E) = 0.95\) and \(\mathbb{P} (E) = 0.01\), and since \(S = E \cup E^C\), so 
+    \[
+        \mathbb{P} (E \mid F) = \frac{\mathbb{P} (F \mid E) \mathbb{P} (E)}{\mathbb{P} (F \mid E) \mathbb{P} (E) + \mathbb{P} (F \mid E^C) \mathbb{P} (E^C) }.
+    \]       
+    Note that \(\mathbb{P} (F \mid E^C) = 0.05\). Thus,
+    \[
+        \mathbb{P} (E \mid F) \thickapprox 0.16.
+    \] 
+\end{explanation}
+
+\begin{remark}
+    The definition of accuracy of the rapid test is "Given a random person, the probability of the rapid test giving the correct result."
+\end{remark}
+
+\begin{eg}
+    City has \(3000000\) populations, and the DNA test is \(99.99\%\) accurate. If we take a random person and get a match, what is the probability it was their DNA? 
+\end{eg}
+
+\begin{explanation}
+    Let \(E = \left\{ \text{have a right person}  \right\} \), and \(F = \left\{ \text{test gives a match} \right\} \). We want to calculate \(\mathbb{P} (E \mid F)\). Note that \(\mathbb{P} (E) = \frac{1}{3000000}\) and \(\mathbb{P} (F \mid E) = 0.9999\), and \(\mathbb{P} (F \mid E^C) = 0.0001\). Hence,
+    \[
+        \mathbb{P} (E \mid F) = \frac{\mathbb{P} (F \mid E) \mathbb{P} (E)}{\mathbb{P} (F \mid E) \mathbb{P} (E) + \mathbb{P} (F \mid E^C) \mathbb{P} (E^C)} = \frac{0.9999 \times \frac{1}{3000000}}{0.9999 \times \frac{1}{3000000} + 0.0001 \times \frac{2999999}{3000000}} \thickapprox 0.
+    \]     
+\end{explanation}
+
+\section{Independence}
+\begin{definition}
+    Given a probability space \((S, \mathbb{P} )\), we say two events are independent if
+    \[
+        \mathbb{P} (E \cap F) = \mathbb{P} (E) \mathbb{P} (F).
+    \]  
+\end{definition}
+
+\begin{eg}
+    Roll two fair die. Let \(E = \left\{ \text{first roll is odd} \right\} \) and \(F = \left\{ \text{second roll is even}  \right\} \). In this case
+    \[
+        S=\left\{ (x, y): x, y \in [6] \right\} 
+    \]  
+    and \(\mathbb{P} \) is uniform probability, then 
+    \[
+        E = \left\{ (x, y) \mid x \in \left\{ 1, 3, 5 \right\}, y \in [6]  \right\}, F = \left\{ (x, y) \mid x \in [6], y \in \left\{ 2, 4, 6 \right\}  \right\}.  
+    \]
+    Hence, \(\vert S \vert = 36 \), \(\vert E \vert = 18\), and \(\vert F \vert = 18 \). This gives \(\mathbb{P} (E) = \mathbb{P} (F) = \frac{1}{2}\). Note that 
+    \[
+        E \cap F = \left\{ (x, y) \mid x \in \left\{ 1, 3, 5 \right\}, y \in \left\{ 2, 4, 6 \right\}   \right\}, 
+    \]     
+    so 
+    \[
+        \mathbb{P} (E \cap F) = \frac{1}{4} = \mathbb{P} (E) \mathbb{P} (F),
+    \]
+    which means \(E\) and \(F\) are independent.  
+\end{eg}
+
+\begin{proposition}
+    \hfill 
+    \begin{itemize}
+        \item [(1)] If \(E, F\) are disjoint, then they are independent. \(\iff \) \(\mathbb{P} (E)\) or \(\mathbb{P} (F)\) is \(0\). 
+        \item [(2)] If \(E \subseteq F\), and they are independent, then \(\mathbb{P} (E) = 0\) or \(\mathbb{P} (F) = 1\).       
+    \end{itemize}
+\end{proposition}
+\begin{proof}
+\hfill
+    \begin{itemize}
+        \item [(1)] \(0 = \mathbb{P} (E \cap F) = \mathbb{P} (E) \mathbb{P} (F)\) if and only if \(\mathbb{P} (E)\) or \(\mathbb{P} (F)\) is \(0\).
+        \item [(2)] \(\mathbb{P} (E) = \mathbb{P} (E \cap F) = \mathbb{P} (E) \mathbb{P} (F)\), so \(\mathbb{P} (E) = 0\) or \(\mathbb{P} (F) = 1\).      
+    \end{itemize}
+\end{proof}
+
+\begin{proposition}
+    If \(E\) and \(F\) are independent, then so are \(E\) and \(F^C\).    
+\end{proposition}
+\begin{proof}
+    \begin{align*}
+        \mathbb{P} (E) &= \mathbb{P} (E \cap S) = \mathbb{P} (E \cap (F \cup F^C)) = \mathbb{P}((E \cap F) \cup (E \cap F^C)) = \mathbb{P} (E \cap F) + \mathbb{P} (E \cap F^C). 
+    \end{align*}
+    Hence,
+    \[
+        \mathbb{P} (E \cap F^C) = \mathbb{P} (E) - \mathbb{P} (E \cap F) = \mathbb{P} (E) - \mathbb{P} (E) \mathbb{P} (F) = \mathbb{P} (E) (1 - \mathbb{P} (F)) = \mathbb{P} (E) \mathbb{P} (F^C).
+    \]
+\end{proof}
+
+\begin{corollary}
+    If \(E, F\) are independent, then \(E, F^C\) are independent, so \(E^C, F^C\) are independent, so \(E^C, F\) are independent.    
+\end{corollary}
+
+\begin{eg}
+    Now we roll two fair die. We can define \(E = \left\{ \text{first roll is odd}  \right\} \) and \(\mathbb{P} (E) = \frac{1}{2}\), while \(F = \left\{ \text{second roll is even}  \right\} \) and \(\mathbb{P} (F) = \frac{1}{2}\). Also, define \(G = \left\{ \text{sum is even}  \right\} \), and we have \(\mathbb{P} (G) = \frac{1}{2}\) since \(\vert E \vert = 6 \times 3\) where it means for the first die we can roll any number, and the second die has \(3\) options.
+    \begin{claim}
+        \(E, G\) are independent. 
+    \end{claim}    
+    \begin{explanation}
+        \[
+            E \cap G = \left\{ (x, y): x \in \left\{ 1, 3, 5 \right\}, y \in \left\{ 1, 3, 5 \right\}   \right\}, 
+        \]
+        so \(\vert E \cap G \vert = 9\) and thus 
+        \[
+            \mathbb{P} (E \cap G) = \frac{9}{36} = \frac{1}{4} = \mathbb{P} (E) \mathbb{P} (G).
+        \]
+        This shows \(E\) and \(G\) are independent.   
+    \end{explanation}
+    Similarly, \(F, G\) are independent. However,
+    \[
+        0 = \mathbb{P} (E \cap F \cap G) \neq \mathbb{P} (E) \mathbb{P} (F) \mathbb{P} (G).
+    \] 
+\end{eg}
+
+\begin{definition}
+    Given a sequence of events \(E_1, E_2, \dots \) in a probability space \((S, \mathbb{P} )\). We say they are (mutually) independent if for any finite set \(I \subseteq \mathbb{N} \),
+    \[
+        \mathbb{P} \left( \bigcap_{i \in I} E_i  \right) = \prod_{i \in I} \mathbb{P} (E_i). 
+    \]   
+\end{definition}
+
+\begin{eg}
+    \(\left\{ E_1, E_2, E_3 \right\} \) are independent if
+    \begin{align*}
+        \mathbb{P} (E_i) &= \mathbb{P} (E_i) \\
+        \mathbb{P} (E_i \cap E_j) &= \mathbb{P} (E_i) \mathbb{P} (E_j) \\
+        \mathbb{P} (E_1 \cap E_2 \cap E_3) &= \mathbb{P} (E_1) \mathbb{P} (E_2) \mathbb{P} (E_3).
+    \end{align*} 
+\end{eg}
+
+\begin{remark}
+    Pairwise independence menas any pair \(E_i, E_j\) are independent, which is different from mutually independence. 
+\end{remark}
+
+\begin{eg}
+    Let \(E_1, E_2, \dots , E_n\) be mutually independent, then 
+    \begin{align*}
+        \mathbb{P} (E_1 \cup \dots \cup E_n) &= \sum_{\varnothing \neq I \subseteq [n]} (-1)^{\vert I \vert + 1} \mathbb{P} \left( \bigcap_{i \in I} E_i  \right) = \sum_{\varnothing \neq I \subseteq [n]} (-1)^{\vert I \vert + 1} \prod_{i \in I} \mathbb{P} (E_i) \\
+        &= - \sum_{\varnothing \neq I \subseteq [n]} \prod _{i \in I} (-\mathbb{P} (E_i)) = 1 - \sum_{I \subseteq [n]} \prod _{i \in I} (-\mathbb{P} (E_i)) = 1 - \prod _{i = 1}^n (1 - \mathbb{P} (E_i)).     
+    \end{align*} 
+
+    An alternative proof is by de Morgan's Law:
+    \[
+        \left( \bigcup_{i=1}^{n} E_i  \right)^C = \bigcap_{i=1}^{n} E_i^C.  
+    \]
+    Hence, 
+    \[
+        \mathbb{P} \left( \bigcup_{i=1}^n E_i  \right) = 1 - \mathbb{P} \left( \left( \bigcap_{i=1}^{n} E_i  \right)^C  \right) = 1 - \prod _{i=1}^n \mathbb{P} (E_i^C) = 1 - \prod _{i=1}^n (1 - \mathbb{P} (E_i)).  
+    \] 
+\end{eg}
