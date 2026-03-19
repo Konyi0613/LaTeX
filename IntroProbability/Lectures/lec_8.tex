@@ -1,0 +1,172 @@
+\lecture{8}{19 March.}{}
+\begin{eg}
+    If \(\mathbb{P} (\text{sunny} ) = 0.8\), \(\mathbb{P} (\text{swim} \mid \text{sunny}  ) = 0.7\), \(\mathbb{P} (\text{swim} \mid \text{not sunny}) = 0.3\), and \(\mathbb{P} (\text{shark bite} \mid \text{swim}) = 0.5\) and \(\mathbb{P} (\text{shark bite} \mid \text{not swim}  ) = 0.01\), then \(\mathbb{P} (\text{shark bite} ) = ?\)     
+\end{eg}
+\begin{explanation}
+    By the law of total probability,
+    \begin{align*}
+        \mathbb{P} (\text{shark bite} ) &= \mathbb{P} (\text{shark bite} \mid \text{swim}) \mathbb{P} (\text{swim}) + \mathbb{P} (\text{shark bite} \mid \text{not swim}) \mathbb{P} (\text{not swim} ) \\
+        &= 0.5 \mathbb{P} (\text{swim} ) + 0.01 (1 - \mathbb{P} (\text{swim} ) ) = 0.49 \mathbb{P} (\text{swim}) + 0.01.
+    \end{align*}
+    By the law of total probability again,
+    \begin{align*}
+        \mathbb{P} (\text{swim}) &= \mathbb{P} (\text{swim} \mid \text{sunny} ) \mathbb{P} (\text{sunny} ) + \mathbb{P} (\text{swim} \mid \text{not sunny} ) \mathbb{P} (\text{not sunny} ) \\
+        &= 0.7 \times 0.8 + 0.3 \times (1 - 0.8) = 0.62.
+    \end{align*} 
+    Hence, \(\mathbb{P} (\text{shark bite}) = 0.49 \times 0.62 + 0.01 = 0.3138\). 
+\end{explanation}
+
+\begin{question}
+    Given that one get bitten by a shark, what's the probability it was sunny?
+\end{question}
+
+\begin{answer}
+    \begin{align*}
+        \mathbb{P} (\text{bite} \mid \text{sunny}) &= \mathbb{P} (\text{bite} \mid \text{swim, sunny}) \mathbb{P} (\text{swim} \mid \text{sunny}) + \mathbb{P} (\text{bite} \mid \text{not swim, sunny}) \mathbb{P} (\text{not swim} \mid \text{sunny}) \\
+        &= \mathbb{P} (\text{bite} \mid \text{swim}) \mathbb{P} (\text{swim} \mid \text{sunny}) + \mathbb{P} (\text{bite} \mid \text{not swim}) \mathbb{P} (\text{not swim} \mid \text{sunny}) \\
+        &= 0.5 \times 0.7 + 0.01 \times (1 - 0.7) = 0.353.
+    \end{align*}
+
+    Hence,
+    \begin{align*}
+        \mathbb{P} (\text{sunny} \mid \text{bite} ) &= \frac{\mathbb{P} (\text{sunny} \cap \text{bite})}{\mathbb{P} (\text{bite})} = \frac{\mathbb{P} (\text{bite} \mid \text{sunny}) \cdot \mathbb{P} (\text{sunny} )}{\mathbb{P} (\text{bite} )} = \frac{0.353 \times 0.8}{0.3138} \thickapprox 0.899.
+    \end{align*}
+\end{answer}
+
+\begin{eg}[Monty hall problem]
+    Three doors, two have goats, one have car, if the contestant choose a door, then the host, who knows where is the car, open a door to reaveal a goat, then should the contestant switch? 
+\end{eg}
+
+\begin{explanation}
+    Let \(F_1 = \left\{ \text{initial choice is car}  \right\} \) and \(F_2 = \left\{ \text{initial choice is goat}  \right\} \). Then \(\mathbb{P} (F_1) = \frac{1}{3}\) and \(\mathbb{P} (F_2) = \frac{2}{3}\). Now let \(E = \left\{ \text{wins the car if he switches}  \right\} \) and \(E^{\prime} = \left\{ \text{wins the car if he does not switch}  \right\} \), then by the law of total probability,
+    \begin{align*}
+        \mathbb{P} (E^{\prime} ) &= \mathbb{P} (E^{\prime} \mid F_1) \mathbb{P} (F_1) + \mathbb{P} (E^{\prime} \mid F_2) \mathbb{P} (F_2) \\
+        &= 1 \cdot \frac{1}{3} + 0 \cdot \frac{2}{3} = \frac{1}{3}.
+    \end{align*}       
+    Also,
+    \begin{align*}
+        \mathbb{P} (E) &= \mathbb{P} (E \mid F_1) \mathbb{P} (F_1) + \mathbb{P} (E \mid F_2) \mathbb{P} (F_2) \\
+        &= 0 \cdot \frac{1}{3} + 1 \cdot \frac{2}{3} = \frac{2}{3}.
+    \end{align*}
+
+    Hence, switching is a better choice.
+\end{explanation}
+
+\begin{eg}[Gambler's Ruin]
+    A gambler goes to a casino with \(\$ 67\). They need \(\$ 100\) to pay debts. They play a game where you win \(\$ 1\) with probability \(\frac{1}{2}\) and you lose \(\$ 1\) with probability \(\frac{1}{2}\). As soon as they have \(\$ 100\), they quit and are happy. But if they reach \(\$ 0\), they have to stop and will die. What is the probability of being happy?        
+\end{eg}
+\begin{explanation}
+    Given \(0 \le n \le 100\), let 
+    \[
+        p_n = \mathbb{P} (\text{happy} \mid \text{start with } \$ n).
+    \] 
+    Hence, \(p_{100} = 1\) and \(p_0 = 0\). Now we want to calculate \(p_{67} \). Consider the first move, and apply the law of total probability, we have 
+    \begin{align*}
+        p_{67} &= p_{68} \times \frac{1}{2} + p_{66} \times \frac{1}{2}.
+    \end{align*}   
+    In fact,
+    \begin{align*}
+        p_{67} &= \mathbb{P} (\text{happy} \mid \text{start at } 67 \text{ and win first round}) \mathbb{P} (\text{start at } 67 \text{ and win first round}) \\ &+ \mathbb{P} (\text{happy} \mid \text{start at } 67 \text{ and lose first round}) \mathbb{P} (\text{start at } 67 \text{ and lose first round}) 
+    \end{align*}
+    and by the independence of the rounds, the probability of happiness only depends on how much money we have, not on how we get there. By the same reasoning, for any \(1 \le n \le 99\), 
+    \[
+        p_n = \frac{1}{2} p_{n+1} + \frac{1}{2} p_{n-1}.
+    \] 
+    Note that 
+    \[
+        p_1 = \frac{1}{2} p_2 + \frac{1}{2} p_0 = \frac{1}{2} p_2,
+    \]
+    and 
+    \[
+        p_2 = \frac{1}{2} p_3 + \frac{1}{2} p_1 = \frac{1}{2} p_3 + \frac{1}{4} p_2,
+    \]
+    so \(p_2 = \frac{2}{5} p_3\). We can do induction on \(n\) to show
+    \[
+        p_n = \frac{n}{n + 1} p_{n+1} \text{ for } 1 \le n \le 99. 
+    \]
+    Hence,
+    \[
+        p_n = \frac{n}{n+1} p_{n+1} = \frac{n}{n+1} \frac{n+1}{n+2} p_{n+2} = \frac{n}{n+2} p_{n+2} = \dots = \frac{n}{n^{\prime} } p_{n^{\prime} }.
+    \]  
+    Hence, 
+    \[
+        p_n = \frac{n}{100} p_{100} = \frac{n}{100}. 
+    \]
+\end{explanation}
+
+\section{Second Borel-Cantelli Lemma}
+Recall that if \(E_1, E_2, \dots \) is a countably infinite sequence of events in \((S, \mathbb{P})\), then 
+\[
+    \limsup_{n \to \infty} E_n = \bigcap_{i=1}^{\infty} \left( \bigcup_{i=n}^{\infty} E_i \right),   
+\]  
+while the first Borel-Cantelli lemma states that 
+\[
+    \sum_{n=1}^{\infty} \mathbb{P} (E_n) < \infty \implies \mathbb{P} (\limsup_{n \to \infty} E_n ) = 0. 
+\]
+
+\begin{theorem}[Second Borel-Cantelli Lemma]
+    Let \((S, \mathbb{P} )\) be a probability space, and let \(E_1, E_2, \dots \) be a countably infinite sequence of mutually independent events. Then, if \(\sum_{n=1}^{\infty} \mathbb{P} (E_n) = \infty \), then 
+    \[
+        \mathbb{P} (\limsup_{n \to \infty} E_n ) = 1.
+    \]   
+\end{theorem}
+
+\begin{proof}
+    \begin{align*}
+        \mathbb{P} (\limsup_{n \to \infty} E_n )&= \mathbb{P} \left( \bigcap_{n=1}^{\infty} \left( \bigcup_{i=n}^{\infty} E_i \right) \right) = \lim_{n \to \infty} \mathbb{P} \left( \bigcup_{i=n}^{\infty} E_i  \right) \\
+        &= \lim_{n \to \infty} 1 - \mathbb{P} \left( \bigcup_{i=n}^{\infty} E_i  \right)^C = 1 - \lim_{n \to \infty} \mathbb{P} \left( \bigcap_{i=n}^{\infty} E_i^C  \right) \\
+        &= 1 - \lim_{n \to \infty} \prod _{i = n}^{\infty} \mathbb{P} (E_i^C) = 1 - \lim_{n \to \infty} \prod _{i = n}^{\infty} (1 - \mathbb{P} (E_i)) = 1.       
+    \end{align*}
+
+    Since the convergence test for infinite product states that 
+    \[
+        \sum_{i=n}^{\infty} \mathbb{P} (E_i) = \infty \implies \prod _{i=n}^{\infty} (1 - \mathbb{P} (E_i)) = 0. 
+    \]
+\end{proof}
+
+\chapter{Discrete Random Variables}
+
+\begin{definition}
+    Given a probability space \((S, \mathbb{P} )\), a random variable is a function \(X: S \to \mathbb{R} \). We say it is discrete if it only takes countably many values. The random variable determines a (usually simpler) probability space on the set of values it takes, \(X(S)\). For any \(x \in \mathbb{R} \),
+    \[
+        \left\{ X = x \right\} = \left\{ w \in S: X(w) = x \right\}  \subseteq S .
+    \] 
+    If \(X\) is discrete, let \(x_1, x_2, \dots \) be the values it takes. Then, 
+    \[
+        S = \bigcup_{i=1}^{\infty} \left\{ X = x_i \right\},  
+    \]     
+    and we can define a distribution 
+    \[
+        p(x_i) = \mathbb{P} (X = x_i) = \mathbb{P} (\left\{ w \in S: X(w) = x_i \right\} ).
+    \]
+    This defines a new probability space \((\left\{ x_1, x_2, \dots \right\}, p )\), where \(p\) is called the probability mass function of \(X\).   
+\end{definition}
+
+\begin{eg}
+    Multiple choices test:
+    \begin{itemize}
+        \item \(5\) questions, each with \(4\) options, one of which is correct. 
+        \item You choose a uniform, random answer for each question independently. 
+        \item \(X=\) number of correct answers.  
+    \end{itemize}
+    What is \(p(k)\) for \(0 \leq k \leq 5\)?  
+\end{eg}
+
+\begin{explanation}
+    Since our choices are uniformly random, 
+    \begin{align*}
+        p(k) &= \mathbb{P} (\left\{ k \text{ answers correct}  \right\}) = \frac{\# \left\{ \text{choices with exactly } k \text{ correct}   \right\} }{\# \left\{ \text{choices}  \right\} } \\
+        &= \frac{\# \left\{ \text{choices with } k \text{ correct}   \right\} }{4^5} = \frac{\binom{5}{k} 3^{5 - k}}{4^5} = \binom{5}{k} \left( \frac{1}{4} \right)^k \left( \frac{3}{4} \right)^{5-k}.  
+    \end{align*}
+
+    Alternatively, 
+    \begin{align*}
+        \mathbb{P} (\text{getting exact } k \text{ right}) &= \mathbb{P} \left( \bigcup_{\substack{R \subseteq [5] \\ \vert R \vert = k }} \left\{ \text{all answers in } R \text{ correct and all answer not in } R \text{ incorrect}    \right\}   \right) \\
+        &= \sum_{\substack{R \subseteq [5] \\ \vert R \vert = k}} \mathbb{P} \left( \left\{ \text{all answers in } R \text{ correct and all answer not in } R \text{ incorrect}    \right\}   \right)   
+    \end{align*}
+    If we let \(E_i = \left\{ \text{answer } i \text{ correct}   \right\} \), then \(\mathbb{P} (E_i) = \frac{1}{4}\) and \(\mathbb{P} (E_i^C) = \frac{3}{4}\). 
+    Thus, we want to compute
+    \begin{align*}
+        \sum_{\substack{R \subseteq [5] \\ \vert R \vert = k}} \mathbb{P} \left( \left( \bigcap_{i \in R} E_i  \right) \cap \left( \bigcap_{i \notin R} E_i^C  \right)   \right) = \sum_{\substack{R \subseteq [5] \\ \vert R \vert = k }} \prod _{i \in R} \mathbb{P} (E_i) \times \prod _{i \notin R} \mathbb{P} (E_i^C) = \binom{5}{k} \left( \frac{1}{4} \right)^k \left( \frac{3}{4} \right)^{5-k}.     
+    \end{align*}   
+\end{explanation}

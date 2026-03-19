@@ -24,7 +24,7 @@ For a \(\mathbb{R} ^3\) case, consider \(S = \left\{ (x, y, z) \mid x^2 + y^2 - 
 \begin{center}
 \begin{tikzpicture}
 \begin{axis}[
-  width=0.8\linewidth,
+  width=0.7\linewidth,
   view={120}{25},
   axis lines=center,
   xlabel={$x$},
@@ -62,7 +62,7 @@ Then \(S\) is symmetric with respect to \(z\).
 \begin{center}
 \begin{tikzpicture}
 \begin{axis}[
-  width=0.82\linewidth,
+  width=0.7\linewidth,
   view={120}{25},
   axis lines=center,
   xlabel={$x$},
@@ -217,4 +217,69 @@ Then \(S\) is symmetric with respect to \(z\).
         \]
         which shows \(x \in A\). 
     \end{explanation}
+
+    Now for \((x_1, x_2, \dots , x_{n-1}) \in U\), we know
+    \[
+        f(x_1, x_2, \dots , x_{n-1}, g(x_1, x_2, \dots , x_{n-1})) = 0.
+    \] 
+    Fix \(j \in [n - 1]\), and set \(y^{\prime} = (y_1, \dots , y_{n-1})\). Consider 
+    \[
+        \psi (t) \coloneqq f(y^{\prime} + te_j, g(y^{\prime} + te_j)),
+    \]  
+    defined for \(t\) near \(0\). Note that \(\psi (t) \equiv 0\) for all \(t\) sufficiently close to \(0\). Hence, \(\psi ^{\prime} (0) = 0\). Since \(f\) is differentiable at \(y = (y^{\prime} , g(y^{\prime} ))\) and \(g\) is differentiable at \(y^{\prime} \), we may apply the chain rule to compute \(\psi ^{\prime} (0)\). Suppose \(\psi (t) = f(\gamma (t))\), where \(\gamma : \mathbb{R} \to \mathbb{R} ^n\) is defined by 
+    \[
+        t \mapsto (y^{\prime} + te_j, g(y^{\prime} + te_j)).
+    \]   
+    Now since
+    \[
+        \psi ^{\prime} (t) = f^{\prime} (\gamma (t)) \circ \gamma ^{\prime} (t),
+    \]
+    and \(f\) is a function from a subset of \(\mathbb{R} ^n\) to \(\mathbb{R} \), so
+    \[
+        f^{\prime} (\gamma (t)) = \nabla f(\gamma (t)) = \left( \frac{\partial f(\gamma (t))}{\partial x_1}, \frac{\partial f(\gamma (t))}{\partial x_2}, \dots , \frac{\partial f(\gamma (t))}{\partial x_n}  \right), 
+    \]    
+    which gives
+    \[
+        f^{\prime} (\gamma (0)) = \left( \frac{\partial f(y)}{\partial x_1}, \frac{\partial f(y)}{\partial x_2}, \dots , \frac{\partial f(y)}{\partial x_n}  \right). 
+    \]
+    Also, 
+    \[
+        \gamma ^{\prime} (t) = \left( 0, \dots , 1, \dots , 0, \frac{\mathrm{d} g(y^{\prime}  + te_j)}{\mathrm{d}t} \right) \implies \gamma ^{\prime} (0) = \left( 0, \dots , 1, \dots , 0, \frac{\mathrm{d} g(y^{\prime})}{\mathrm{d}t} \right), 
+    \]
+    and note that 
+    \[
+       \frac{\mathrm{d} g(y^{\prime}  + te_j)}{\mathrm{d}t} = \nabla g(y^{\prime} + te_j) \circ e_j \implies \frac{\mathrm{d} g(y^{\prime} )}{\mathrm{d}t} = \nabla g(y^{\prime} ) \circ e_j = \frac{\partial g(y^{\prime} )}{\partial x_j}.   
+    \]
+    Hence, 
+    \begin{align*}
+        \psi ^{\prime} (0) &=  \left( \frac{\partial f(y)}{\partial x_1}, \frac{\partial f(y)}{\partial x_2}, \dots , \frac{\partial f(y)}{\partial x_n}  \right) \circ \left( 0, \dots , 1, \dots , 0, \frac{\partial g(y^{\prime} )}{\partial t}  \right) \\
+        &= \frac{\partial f}{\partial x_j}(y) + \frac{\partial f}{\partial x_n}(y) \frac{\partial g}{\partial x_j}(y^{\prime} ),
+    \end{align*}        
+    and thus 
+    \[
+       0 = \psi ^{\prime} (0) = \frac{\partial f}{\partial x_j}(y) + \frac{\partial f}{\partial x_n}(y) \frac{\partial g}{\partial x_j}(y^{\prime} ). 
+    \]
+    Now since \(\frac{\partial f}{\partial x_n}(y) \neq 0 \), we have 
+    \[
+        \frac{\partial g}{\partial x_j}(y^{\prime} ) = -\frac{\frac{\partial f}{\partial x_j}(y) }{\frac{\partial f}{\partial x_n}(y) }. 
+    \]  
 \end{proof}
+
+\begin{eg}
+    Let \(S = \left\{ (x, y, z) \in \mathbb{R} ^3 \mid xy + yz + xz = -1 \right\} \), which we rewrite as 
+    \[
+        \left\{ (x, y, z) \in \mathbb{R} ^3 : f(x, y, z) = 0 \right\} ,
+    \]
+     where \(f: \mathbb{R} ^3 \to \mathbb{R} \) is the function 
+    \[
+        f(x, y, z) = xy + yz + xz + 1.
+    \]      
+    Clearly \(f\) is continuously differentiable, and \(\frac{\partial f}{\partial z} = y + x \). Thus, for any \((x_0, y_0, z_0) \in S\) sith \(y_0 + x_0 \neq 0\), one can write this surface (near \((x_0, y_0, z_0)\)) as a graph of the form 
+    \[
+        \left\{ (x, y, g(x, y)) : (x, y) \in U \right\} 
+    \]   
+    for some open set \(U\) containing \((x_0, y_0)\), and some function \(g\) which is differentiable at \((x_0, y_0)\). Indeed one can implicitly obtain
+    \[
+        \frac{\partial g}{\partial x} (x_0, y_0) = - \frac{y_0 + z_0}{y_0 + x_0}, \quad \text{and} \quad \frac{\partial g}{\partial y}(x_0, y_0) = -\frac{x_0 + z_0}{y_0 + x_0}.    
+    \]    
+\end{eg}
