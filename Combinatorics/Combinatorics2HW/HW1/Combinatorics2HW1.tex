@@ -1,0 +1,210 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{bbding,combelow,textcomp,amsfonts,amsthm,amsmath,amssymb,graphicx,color,hyperref,etoolbox}
+\usepackage[utf8x]{inputenc}
+\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+
+\newtoggle{story}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Customisation options --- update as necessary
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Course details: title, semester, instructors
+
+\newcommand{\courseTitle}{Combinatorics II (Math 7702)}
+\newcommand{\semester}{Spring 2026}
+\newcommand{\instructorA}{Shagnik Das}
+\newcommand{\instructorB}{Lu Yun-Chi}
+
+%% Sheet number
+
+\newcommand{\sheetNumber}{1}
+
+
+%% Submission details
+
+\newcommand{\dueDate}{15:30, Mar 24th.}
+\newcommand{\lateWarning}{Late submissions will receive no credit.}
+
+
+%% Display irrelevant footnotes?  \toggletrue for yes, \togglefalse for no
+
+\toggletrue{story}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End of customisation options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pdfpagewidth 8.5in
+\pdfpageheight 11in
+\topmargin -1in
+\headheight 0in
+\headsep 0in
+\textheight 8.5in
+\textwidth 6.5in
+\oddsidemargin 0in
+\evensidemargin 0in
+\headheight 77pt
+\headsep 0in
+\footskip .75in
+
+\makeatletter
+\newcommand{\buildtitle}[4]{
+\begin{flushleft}
+{\large
+#1
+\hfill{}
+#2
+\par
+#3
+}
+\end{flushleft}
+\vskip 4pt
+\begin{center}
+{\large\bfseries#4\par}
+\end{center}
+\bigskip
+}
+\makeatother
+
+\renewcommand{\thesection}{\normalsize\arabic{section}}
+
+\renewcommand{\deg}{\textrm{deg}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\ceil}[1]{\left \lceil #1 \right \rceil}
+
+\newcommand{\hint}{\begin{flushright} [Hint at \url{\hintURL}.] \end{flushright}}
+
+\newcommand{\card}[1]{\left| #1 \right|}
+\newcommand{\mb}[1]{\mathbb{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+
+
+\newcommand{\story}[1]{\iftoggle{story}{\footnote{#1}}{}}
+\newcommand{\storymark}[1][42]{\iftoggle{story}{\footnotemark[#1]}{}}
+\newcommand{\storytext}[2][42]{\iftoggle{story}{\footnotetext[#1]{#2}}{}}
+
+\newcommand{\bonus}[2]{\paragraph{Bonus (#1 pt\ifstrequal{#1}{1}{}{s})} #2}
+
+
+\begin{document}
+
+
+\buildtitle{\courseTitle{}}{\semester}{\instructorA{} \hfill \instructorB{}}{Exercise Sheet \sheetNumber{}}
+
+\vspace{-0.2in}
+
+\begin{center}
+
+{\bf Due date: \dueDate \\ \lateWarning}
+
+\end{center}
+
+\noindent You should try to solve all of the exercises below, and then submit two solutions to be graded --- each problem is worth $10$ points. Make sure to clearly justify your answers, defining everything precisely and stating any results you are using. You should then submit your solutions on NTU COOL, either as a typed PDF or a clear picture or scan of your handwritten answers.
+
+\paragraph{Exercise 1}  Consider the following algorithm to find the minimum of a set of $2^k$ numbers.
+\begin{algorithm}[H]
+\medskip
+\TitleOfAlgo{MIN}
+\KwData{$A = \{a_1, \hdots, a_n\}$, $n = 2^k \ge 2$}
+\KwResult{MIN($A$) = $\min \{a_1, \hdots, a_n\}$}
+\medskip
+\eIf{$n = 2$}
+{\eIf{$a_1 < a_2$}{return $a_1$\;}{return $a_2$\;}}
+{\For{$1 \le i \le n/2$}{set $y_i$ = MIN($\{a_{2i-1}, a_{2i}\}$)\;}
+return MIN($\{y_1, \hdots, y_{n/2}\}$)\;}
+\end{algorithm}
+
+\begin{itemize}
+	\item[(a)] Show that the MIN algorithm requires $n-1$ comparisons to find the minimum element, and that this is the best possible.
+	\item[(b)] After running the MIN algorithm to find the minimal element, how many additional comparisons are required to find the second-smallest element?
+	\item[(c)] Deduce a sorting algorithm that requires $\sim n \log_2 n$ comparisons to sort $n = 2^k$ elements.
+\end{itemize}
+
+\paragraph{Exercise 2}  Consider the following game.  I think of an integer $x$ between $1$ and $n$, and your job is to try and determine $x$.  You are allowed to ask questions of the form ``Is $x < y$?" or ``Is $x > y$?" for any $y$.
+\begin{itemize}
+	\item[(a)] Show that you can find $x$ with only $\ceil{\log_2 n}$ questions, and that this is best possible.
+\end{itemize}
+To make your job slightly harder, I am now allowed to lie to you at most $k$ times, for some constant $k$.
+\begin{itemize}
+	\item[(b)] How many questions do you now need to determine $x$?  Provide the best lower and upper bounds that you can find.
+\end{itemize}
+
+\paragraph{Exercise 3}  Given a connected graph $G$ and an arbitrary vertex $v_0 \in V(G)$, show that the breadth-first search starting at $v_0$ returns a tree $T_B$ that preserves distances\footnote{In an unweighted graph $G = (V,E)$, the \emph{distance} $d_G(u,v)$ between vertices $u, v \in V$ is the minimum length of a path from $u$ to $v$.  If $u$ and $v$ are in separate connected components, we may take their distance to be infinite.} to $v_0$; that is, for every $v \in V(G)$, $d_G(v_0, v) = d_{T_B}(v_0, v)$.
+
+\paragraph{Solution:} 
+Note that since \(G\) is connected, so every \(v \in V(G)\) has \(v \in T_B\).   
+Now suppose $v \in V(G)$ satisfies $d_G(v_0,v)=d$.
+
+Let
+\[
+P: v_0 \to v_1 \to \cdots \to v_d = v
+\]
+be the path in $T_B$ from $v_0$ to $v$. We claim that
+\[
+d_G(v_0,v_i)=d_{T_B}(v_0,v_i)=i \qquad \text{for all } 0\le i\le d .
+\]
+
+We prove this by induction on $i$.
+
+\textbf{Base case:} $i=0$. This is trivial since $v_0=v_0$ and
+\[
+d_G(v_0,v_0)=d_{T_B}(v_0,v_0)=0 .
+\]
+
+\textbf{Inductive step:} Suppose the statement is true for all $0\le i<k$. Then
+\[
+v_0 \to v_1 \to \cdots \to v_{k-1}
+\]
+is a shortest path from $v_0$ to $v_{k-1}$. Hence
+\[
+v_0 \to v_1 \to \cdots \to v_{k-1} \to v_k
+\]
+is a shortest path from $v_0$ through \(v_{k-1}\) to $v_k$ of length $k$.
+
+Now suppose that $d_G(v_0,v_k)<k$. Then there exists a path $P'$ from $v_0$ to $v_k$ of length $d'<k$. Let $u$ be the vertex just before $v_k$ on the path $P'$, so that
+\[
+{u,v_k}\in P'.
+\]
+Note that $u\ne v_{k-1}$, otherwise we would obtain a shorter path from $v_0$ through $v_{k-1}$ to $v_k$, which is impossible.
+
+Since $d'<k$, by the induction hypothesis the path in $T_B$ from $v_0$ to $u$ is a shortest path, and its length is $d'-1$. Hence $u$ must be added to the set $W$ (the set of explored vertices in breadth-first search) earlier than $v_{k-1}$.
+
+Therefore,
+\[
+d_{T_B}(v_0,v_k) \le d_{T_B}(v_0,u)+1=d_G(v_0,u)+1=(d'-1)+1=d'<k,
+\]
+which shows that
+\[
+v_0 \to v_1 \to \cdots \to v_{k-1} \to v_k
+\]
+is not the path in $T_B$ from $v_0$ to $v_k$, a contradiction.
+
+Hence $d_G(v_0,v_k)\ge k$. Since we already have a path of length $k$ from $v_0$ to $v_k$, we conclude that
+\[
+d_G(v_0,v_k)=k=d_{T_B}(v_0,v_k).
+\]
+
+This completes the induction, and therefore for every vertex $v$ in the same connected component as $v_0$,
+\[
+d_G(v_0,v)=d_{T_B}(v_0,v).
+\]
+
+
+
+\paragraph{Exercise 4}  Given a weighted graph $G$ with $m$ edges, order the edges by weight so that $w(e_1) \ge w(e_2) \ge \hdots \ge w(e_m)$.  Set $G_0 = G$.  At step $1 \le t \le m$, if the graph $G_{t-1} - e_t$ is connected, delete $e_t$, and set $G_t = G_{t-1} - e_t$.  Otherwise keep $e_t$ and set $G_t = G_{t-1}$.
+
+Prove that the final graph $G_m$ is a minimum weight spanning tree.
+
+% \newpage
+
+% \section*{Hints}  The following QR codes contain hints for some of the homework exercises.  You should be able to decode them using any QR code scanner, including this one: \url{https://zxing.org/w/decode.jspx}.
+
+% \paragraph{Exercise ?} Also available at \url{https://i.ibb.co/???????/S??E?.png}.
+
+\begin{center}
+% \includegraphics[scale=0.5]{Hints/S??E?.png}
+\end{center}
+
+\end{document}
