@@ -3,6 +3,8 @@
 \usepackage[utf8x]{inputenc}
 \usepackage[lined,boxed,commentsnumbered]{algorithm2e}
 
+\usepackage{mathtools}
+
 \newtoggle{story}
 
 
@@ -97,6 +99,8 @@
 
 \begin{center}
 
+{B13902024 Chang, Yi-Kuei}
+
 {\bf Due date: \dueDate \\ \lateWarning}
 
 \end{center}
@@ -120,6 +124,44 @@ return MIN($\{y_1, \hdots, y_{n/2}\}$)\;}
 	\item[(a)] Show that the MIN algorithm requires $n-1$ comparisons to find the minimum element, and that this is the best possible.
 	\item[(b)] After running the MIN algorithm to find the minimal element, how many additional comparisons are required to find the second-smallest element?
 	\item[(c)] Deduce a sorting algorithm that requires $\sim n \log_2 n$ comparisons to sort $n = 2^k$ elements.
+\end{itemize}
+
+\paragraph{Solution:} 
+\begin{itemize}
+	\item [(a)] Suppose \(T(n)\) is the number of comparison MIN algorithm needs to find minimum element for a set of size \(n\), then 
+	\[
+		\begin{dcases}
+			T(n) = \frac{n}{2} T(2) + T\left( \frac{n}{2} \right), &n > 2, n = 2^k \\
+			T(2) = 1. 
+		\end{dcases}
+	\]
+	Hence,
+	\begin{align*}
+		T(n) =& T\left( 2^k \right) = 2^{k-1} + T\left( 2^{k-1} \right) = 2^{k-1} + 2^{k-2} + T\left( 2^{k-2} \right) \\
+		&= \dots = 2^{k-1} + 2^{k-2} + \dots + 2 + T(2) = 2^{k-1} + 2^{k-2} + \dots + 2 + 1 \\
+		&= \frac{2^k - 1}{2 - 1} = 2^k - 1 = n - 1.  
+	\end{align*}
+	Now we show \(n - 1\) is the best possible. Initially, all \(n\) elements may be the minimum element, but after 1 comparison, suppose we compare \(x\) and \(y\), then if \(x < y\), we can eliminate \(y\) since it is impossible that \(y\) is the minimum element; if \(x > y\), then we can eliminate \(x\) similarly. To find the minimum element, we have to eliminate \(n-1\) elements, so we have to do at least \(n - 1\) comparisons. This shows \(n - 1\) comparisons is the best possible.           
+	\item [(b)] If we consider the tournament tree of the MIN algorithm, and suppose \(x\) is the minimum element, then we'll find that \(y\) is the second-smallest element only if \(y\) loses to \(x\) in the tournament tree, otherwise if \(y\) loses to some \(z \neq x\) in the tournament tree, then \(y \ge z \ge x\), and \(y\) is impossible to be the second-smallest element (if the equality holds, we may ignore \(y\) and pick \(z\) is fine, so our argument still holds). Note that the number of leaves of the tournament tree is \(n\), so the depth of the tournament tree is \(\log _2 n\), and thus we have \(\log _2 n\) candidates for the second-smallest element, and we can run MIN algorithm on them so that we need \(\log _2 n - 1\) comparisons to find the second-smallest element.           
+	\item [(c)] We can give the following algorithm: \\
+	\begin{algorithm}[H]
+		\medskip
+		\TitleOfAlgo{Sorting algorithm induced by MIN}
+		\KwData{\(A = \left\{ a_1, a_2, \dots , a_n \right\}, n = 2^k \ge 2 \)}
+		\KwResult{\((a_{s_1}, a_{s_2}, \dots , a_{s_n})\), where \(a_{s_1} \le a_{s_2} \le \dots \le a_{s_n}\)}
+		\medskip
+		\(m_1 \gets \text{MIN}(A)\), and record the tournament tree in the MIN algorithm, say it is \(T\). 
+		
+		
+		\For () {\(i\) from \(1\) to \(n\)} {
+			\(m_i \gets T\).root 
+
+			Find the leaf of \(T\) of value \(m_{i - 1}\) and set it to \(\infty \), then update \(T\) by run down the path starting from that leaf of value \(\infty \). 
+		}
+
+		\Return{\((m_1, m_2, \dots , m_n)\)}
+	\end{algorithm}
+	Note that the time of comparison in this algorithm is \(\sim n \log _2 n\) since except the first \(\text{MIN}(A) \) takes \(n - 1\) comparisons, in every round of the for loop, it takes about \(\log _2 n\) comparisons. Now we explain the correctness. Note that in the beginning of every round of the for loop, \(T\).root has the minimum value remaining in the tree since in the previous round we have removed \(m_{i-1}\) from the tree by set it to \(\infty \) and update the affected path.     
 \end{itemize}
 
 \paragraph{Exercise 2}  Consider the following game.  I think of an integer $x$ between $1$ and $n$, and your job is to try and determine $x$.  You are allowed to ask questions of the form ``Is $x < y$?" or ``Is $x > y$?" for any $y$.
