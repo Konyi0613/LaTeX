@@ -1,0 +1,316 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{bbding,combelow,textcomp,amsfonts,amsthm,amsmath,amssymb,graphicx,color,hyperref,etoolbox}
+\usepackage[utf8x]{inputenc}
+\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+\usepackage{mathtools}
+\newtoggle{story}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Customisation options --- update as necessary
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Course details: title, semester, instructors
+
+\newcommand{\courseTitle}{Introduction to Probability Theory (Math 2502)}
+\newcommand{\semester}{Spring 2026}
+\newcommand{\instructorA}{Shagnik Das}
+\newcommand{\instructorB}{}
+
+%% Sheet number
+
+\newcommand{\sheetNumber}{2}
+
+
+%% Submission details
+
+\newcommand{\dueDate}{13:00, Mar 26th.}
+\newcommand{\lateWarning}{Submissions that are late will receive no credit.}
+
+
+%% Display irrelevant footnotes?  \toggletrue for yes, \togglefalse for no
+
+\toggletrue{story}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End of customisation options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pdfpagewidth 8.5in
+\pdfpageheight 11in
+\topmargin -1in
+\headheight 0in
+\headsep 0in
+\textheight 8.5in
+\textwidth 6.5in
+\oddsidemargin 0in
+\evensidemargin 0in
+\headheight 77pt
+\headsep 0in
+\footskip .75in
+
+\makeatletter
+\newcommand{\buildtitle}[4]{
+\begin{flushleft}
+{\large
+#1
+\hfill{}
+#2
+\par
+#3
+}
+\end{flushleft}
+\vskip 4pt
+\begin{center}
+{\large\bfseries#4\par}
+\end{center}
+\bigskip
+}
+\makeatother
+
+\renewcommand{\thesection}{\normalsize\arabic{section}}
+
+\renewcommand{\deg}{\textrm{deg}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\ceil}[1]{\left \lceil #1 \right \rceil}
+
+\newcommand{\hint}{\begin{flushright} [Hint at \url{\hintURL}.] \end{flushright}}
+
+\newcommand{\card}[1]{\left| #1 \right|}
+\newcommand{\mb}[1]{\mathbb{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+
+
+\newcommand{\story}[1]{\iftoggle{story}{\footnote{#1}}{}}
+\newcommand{\storymark}[1][42]{\iftoggle{story}{\footnotemark[#1]}{}}
+\newcommand{\storytext}[2][42]{\iftoggle{story}{\footnotetext[#1]{#2}}{}}
+
+\newcommand{\bonus}[2]{\paragraph{Bonus (#1 pt\ifstrequal{#1}{1}{}{s})} #2}
+
+
+\begin{document}
+
+
+\buildtitle{\courseTitle{}}{\semester}{\instructorA{} \hfill \instructorB{}}{Exercise Sheet \sheetNumber{}}
+
+\vspace{-0.2in}
+
+\begin{center}
+{B13902024 Chang, Yi-Kuei}
+
+{\bf Due date: \dueDate \\ \lateWarning}
+
+\end{center}
+
+\noindent You should try to solve all of the exercises below --- each problem is worth $10$ points. Make sure to clearly justify your answers, defining everything precisely and stating any results you are using. You should then submit your solutions in Gradescope on NTU COOL, either as a typed PDF or a clear scan of your handwritten answers, and should indicate where in the file the solutions to each exercise are. If you have difficulties with Gradescope, please send your solutions by e-mail.
+
+\paragraph{Exercise 1}  Let $E_1, E_2, \hdots, E_n$ be mutually independent events in a probability space.
+\begin{itemize}
+	\item[(a)] Show that for any choice of $F_i \in \{ E_i, E_i^c \}$, $1 \le i \le n$, the events $F_1, F_2, \hdots, F_n$ are mutually independent.
+	\item[(b)] Deduce that if $F$ is an event formed from $E_1, E_2, \hdots, E_{n-1}$ by taking complements, unions, and intersections,\story{For example, we could have $F = \left( E_1 \cap E_3^c \cap E_4 \right) \cup \left(E_1^c \cap \left( E_2 \cup E_4^c \cup E_6 \right) \right)$.} then $F$ is independent of $E_n$.
+\end{itemize}
+
+\paragraph{Solution:} 
+\begin{itemize}
+	\item [(a)]	Suppose for \(1 \le i \le k\), \(F_i = E_i\) and for \(k + 1 \le i \le n\), \(F_i = E_i^C\). If this not holds, then we can re-label \(\left\{ F_i \right\} \) to make it true. Now we prove on induction that for any \(n \ge 2\), if \(E_1, \dots , E_n\) are mutually independent, and \(F_i = E_i\) for all \(1 \le i \le k\) and \(F_i = E_i^c\) for all \(k + 1 \le i \le n\) for some \(k \le n\), then \(F_1, F_2, \dots , F_n\) are mutually independent. 
+	\begin{itemize}
+		\item Base case: For \(n = 2\), since \(E_1, E_2\) are mutually independent, so
+		\[
+			\mathbb{P} (E_1 \cap E_2) = \mathbb{P} (E_1) \mathbb{P} (E_2).
+		\]
+		Also, 
+		\begin{align*}
+			\mathbb{P} (E_1 \cap E_2^c) &= \mathbb{P} (E_1) - \mathbb{P} (E_1 \cap E_2) = \mathbb{P} (E_1) - \mathbb{P} (E_1) \mathbb{P} (E_2) = \mathbb{P} (E_1) (1 - \mathbb{P} (E_2)) \\
+			&= \mathbb{P} (E_1) \mathbb{P} (E_2^c). \\
+			\mathbb{P} (E_1^c \cap E_2^c) &= \mathbb{P} (E_1 \cup E_2)^c = 1 - \mathbb{P} (E_1 \cup E_2) = 1 - (\mathbb{P} (E_1) + \mathbb{P} (E_2) - \mathbb{P} (E_1 \cap E_2)) \\
+			&= (1 - \mathbb{P} (E_1)) - \mathbb{P} (E_2) + \mathbb{P} (E_1 \cap E_2) \\
+			&= \mathbb{P} (E_1^c) - \mathbb{P} (E_2) + \mathbb{P} (E_1) \mathbb{P} (E_2) = \mathbb{P} (E_1^c) - \mathbb{P} (E_2) (1 - \mathbb{P} (E_1)) \\
+			&= \mathbb{P} (E_1^c) - \mathbb{P} (E_2) \mathbb{P} (E_1^c) = (1 - \mathbb{P} (E_2))\mathbb{P} (E_1^c) = \mathbb{P} (E_2^c) \mathbb{P} (E_1^c).
+		\end{align*}
+		Thus, for \(n = 2\) the statement is true. 
+		
+		\item Induction step: Now we know 
+		\begin{align*}
+			\mathbb{P} \left( \bigcap_{i=1}^{n} F_i  \right) &= \mathbb{P} \left( \bigcap_{i=1}^{k} E_i \cap \bigcap_{i=k+1}^{n} E_i^c   \right) = \mathbb{P} \left( \bigcap_{i=1}^{k} E_i \cap \left( \bigcup_{i=k+1}^{n} E_i \right)^c   \right) \\
+			&= \mathbb{P} \left( \bigcap_{i=1}^{k} E_i \right) - \mathbb{P} \left( \bigcap_{i=1}^{k} E_i \cap \bigcup_{i=k+1}^{n} E_i \right).   
+		\end{align*}
+		Define \(C_j = \bigcap_{i=1}^{k} E_i \cap E_j \), and let \(S = \left\{ z \in \mathbb{N} : k + 1 \le z \le n \right\} \), so 
+		\begin{align*}
+			\mathbb{P} \left( \bigcap_{i=1}^{k} E_i \cap \bigcup_{i=k+1}^{n} E_i \right) &= \mathbb{P} \left( \bigcup_{i=k+1}^{n} C_i \right) = \sum_{\varnothing \neq I \subseteq S} (-1)^{\vert I \vert + 1} \mathbb{P} \left( \bigcap_{i \in I} C_i  \right) \\
+			&= \sum_{\varnothing \neq I \subseteq S} (-1)^{\vert I \vert + 1} \mathbb{P} \left( \bigcap_{i=1}^{k} E_i \cap \bigcap_{j \in I} E_j   \right) \\
+			&= \sum_{\varnothing \neq I \subseteq S} (-1)^{\vert I \vert + 1} \mathbb{P} \left( \bigcap_{i=1}^k E_i  \right) \mathbb{P} \left( \bigcap_{j \in I} E_j  \right) \\
+			&= \mathbb{P} \left( \bigcap_{i=1}^k E_i  \right) \left( \sum_{\varnothing \neq I \subseteq S} (-1)^{\vert I \vert + 1} \mathbb{P} \left( \bigcap_{j \in I} E_j  \right) \right) \\
+			&= \mathbb{P} \left( \bigcap_{i=1}^k E_i  \right) \mathbb{P} \left( \bigcup_{i=k+1}^{n} E_i  \right).          
+		\end{align*} 
+		This gives 
+		\begin{align*}
+			\mathbb{P} \left( \bigcap_{i=1}^{n} F_i  \right) &= \mathbb{P} \left( \bigcap_{i=1}^{k} E_i \right) - \mathbb{P} \left( \bigcap_{i=1}^{k} E_i \cap \bigcup_{i=k+1}^{n} E_i \right) \\
+			&= \mathbb{P} \left( \bigcap_{i=1}^{k} E_i  \right) - \mathbb{P} \left( \bigcap_{i=1}^{k} E_i  \right) \mathbb{P} \left( \bigcup_{i=k+1}^{n} E_i  \right) \\
+			&= \mathbb{P} \left( \bigcap_{i=1}^{k} E_i  \right)  \left( 1 - \mathbb{P} \left( \bigcup_{i=k+1}^{n} E_i  \right)  \right) \\
+			&= \mathbb{P} \left( \bigcap_{i=1}^{k} E_i  \right)  \mathbb{P} \left( \bigcup_{i=k+1}^{n} E_i  \right)^c = \mathbb{P} \left( \bigcap_{i=1}^{k} E_i  \right)  \mathbb{P} \left( \bigcap_{i=k+1}^{n} E_i^c  \right),      
+		\end{align*}
+		and by induction hypothesis,
+		\[
+			\mathbb{P} \left( \bigcap_{i=1}^{n} F_i  \right) = \mathbb{P} \left( \bigcap_{i=1}^{k} E_i  \right)  \mathbb{P} \left( \bigcap_{i=k+1}^{n} E_i^c  \right) = \prod _{i=1}^k \mathbb{P} (E_i) \prod _{i = k + 1}^n \mathbb{P} \left( E_i^c \right) = \prod _{i=1}^n \mathbb{P} (F_i), 
+		\]
+		so we're done.
+	\end{itemize}
+	\item [(b)] We know
+	\[
+		F = \bigcup_{i=1}^{k} A_i, \text{ where } A_i = \bigcap_{j=1}^{s_i} F_{a_{i, j}} \text{ s.t. } F_{a_{i, j}} \in \left\{ E_{a_{i, j}}, E_{a_{i, j}}^c \right\} \text{ and } 1 \le a_{i, j} \le n-1 \text{ for all } i, j.      
+	\]
+	Hence,
+	\begin{align*}
+		\mathbb{P} (F \cap E_n) &= \mathbb{P} \left( \left( \bigcup_{i=1}^{k} A_i  \right) \cap E_n  \right) = \mathbb{P} \left( \bigcup_{i=1}^{k} (A_i \cap E_n)  \right) \\
+		&= \sum_{\varnothing \neq I \subseteq [k]} (-1)^{\vert I \vert + 1} \mathbb{P} \left( \bigcap_{i \in I} (A_i \cap E_n)  \right) = \sum_{\varnothing \neq I \subseteq [k]} (-1)^{\vert I \vert + 1} \mathbb{P} \left( \bigcap_{i \in I} A_i \cap E_n  \right) \\
+		&= \sum_{\varnothing \neq I \subseteq [k]} (-1)^{\vert I \vert + 1} \mathbb{P} \left( \bigcap_{i \in I} A_i  \right) \mathbb{P} (E_n) = \mathbb{P} \left( \bigcup_{i=1}^k A_i  \right)  \mathbb{P} (E_n) = \mathbb{P} (F) \mathbb{P} (E_n)   
+	\end{align*}
+	by (a), and we're done.
+\end{itemize}
+
+\paragraph{Exercise 2}  A local TV station hosts a dumpling tasting contest --- in each round, the contestants are served three dumplings --- a pork and cabbage dumpling, a pork and leek dumpling, and a beef dumpling --- in a uniformly random order. They have to identify the flavour of each dumpling, and whoever gets the most dumplings correct in each round progresses to the next round.
+
+After several rounds of fierce competition, three people are left for the Grand Final --- Ho Keun, David, and Mark. However, after eating so many dumplings, their taste buds are completely exhausted, so they cannot taste anything. Instead, they come up with different strategies.
+
+Ho Keun decides to guess that each dumpling is a pork and cabbage dumpling, since that is his favourite flavour. David, on the other hand, guesses a uniformly random flavour for each dumpling, independently of his previous guesses. Mark, though, realises that the flavours cannot be repeated, so instead chooses a uniformly random order of the three flavours for his guesses.
+
+In order to win the Grand Final, a player has to score strictly more points than the other two --- ties mean there will be no winner.
+
+\begin{itemize}
+	\item[(a)] Before doing any calculations, which player do you think has the greatest probability of winning?
+	\item[(b)] Calculate the probability of each player winning the Grand Final.
+\end{itemize}
+
+\paragraph{Solution:}
+\begin{itemize}
+	\item [(a)] I think Ho Keun will win because his name is more asian, so he knows more about dumplings. 
+	\item [(b)] Suppose \(P_1 = \) Ho Kuen, \(P_2 = \) David, \(P_3 = \) Mark, and \(n(P_i)\) means the number of dunmplings that \(P_i\) guesses correctly among three dumplings. Note that \(n(P_1) = 1\) in all cases since one of the three dumplings must be pork and cabbage dumpling, and the other two must not be. Hence, the only way that \(P_1\) win is \(n(P_2) = n(P_3) = 0\). Thus,
+	\begin{align*}
+		\mathbb{P} (P_1 \text{ win} ) &= \mathbb{P} (n(P_2) = n(P_3) = 0) = \mathbb{P} (n(P_2) = 0) \cdot \mathbb{P} (n(P_3) = 0) \\
+		&= \left( \frac{2}{3} \right)^3 \cdot \frac{2}{3!} = \frac{8}{81}, 
+	\end{align*}
+	since the guess result of \(P_2\) and \(P_3\) are independent. 
+	
+	Now we compute \(\mathbb{P} (P_2 \text{ win} )\). \(P_2\) wins if and only if
+	\[
+		n(P_2) \ge 2 \text{ and } n(P_3) < n(P_2) 
+	\] 
+	since \(n(P_1) = 1\). Thus, 
+	\begin{align*}
+		\mathbb{P} (P_2 \text{ win}) &= \mathbb{P} (n(P_2) = 3 \cap n(P_3) \in \left\{ 0, 1 \right\} ) + \mathbb{P} (n(P_2) = 3 \cap n(P_3) \in \left\{ 0, 1, 2 \right\} ) \\
+		&= \mathbb{P} (n(P_2) = 2) \left( \mathbb{P} (n(P_3) = 0) + \mathbb{P} (n(P_3) = 1) \right) + \mathbb{P} (n(P_3) = 3) (1 - \mathbb{P} (n(P_3) = 3)) \\
+		&= \binom{3}{2} \left( \frac{1}{3} \right)^2 \left( \frac{2}{3} \right) \cdot \left( \frac{2}{3!} + \frac{3}{3!} \right) + \left( \frac{1}{3} \right)^3 \left( 1 - \frac{1}{3!} \right) = \frac{35}{162}.      
+	\end{align*} 
+
+	Now we compute \(\mathbb{P} (P_3 \text{ win} )\). Note that \(P_3\) wins if and only if 
+	\[
+		n(P_3) \ge 2 \text{ and }  n(P_2) < n(P_3).
+	\]     
+	However, note that \(\mathbb{P} (n(P_3) = 2) = 0\) since for each order of three dumplings, it is only possible that Mark guess right \(0, 1, 3\) dumplings. Thus,
+	\begin{align*}
+		\mathbb{P} (P_3 \text{ win} ) &=  \mathbb{P} (n(P_3) = 3 \cap n(P_2) \in \left\{ 0, 1, 2 \right\} ) = \mathbb{P} (n(P_3) = 3) \left( 1 - \mathbb{P} (n(P_2) = 3) \right) \\
+		&= \frac{1}{3!} \left( 1 - \left( \frac{1}{3} \right)^3  \right) = \frac{13}{81}. 
+	\end{align*}  
+
+\end{itemize}
+
+\paragraph{Exercise 3}  Recall the unfortunate gambler from the example in lectures. After his latest bankruptcy, he is forced to move to a less reputable part of town, where the local casino rigs the games. This time, for every round he plays, with probability $p$, where $0 < p < \frac12$, he wins, in which case he gains \$1, while with probability $1 - p$, he loses, in which case he loses \$1. As before, the results of each game are mutually independent.
+
+Suppose he enters with \$k in his pocket, and will keep playing until either he runs out of money, or he has a total of \$n, where $0 < k < n$. What is the probability that he will run out of money?
+
+\paragraph{Solution: } Suppose \(q_i\) is the probability of running out of money starting from \(\$ i\). Then, \(q_1 = 0\) and \(q_n = 0 \). Now suppose \(E_1 = \) next round win and \(E_2 = \) next round lose, then \(S = E_1 \cup E_2 \), ans suppose \(F = \text{ running out of money starting at } \ell\), then by law of total probability:
+\[
+	\mathbb{P} (F) = \mathbb{P} (E_1) \mathbb{P} (F \mid E_1) + \mathbb{P} (E_2) \mathbb{P} (F \mid E_2),
+\]
+which is equivalent to
+\[
+	q_{\ell } = p q_{\ell + 1} + (1 - p) q_{\ell - 1} \text{ for all } 1 \le \ell \le n - 1. 
+\]  
+We want to compute \(q_k\). Hence, we have 
+\[
+	\begin{dcases}
+		q_{\ell + 1} = \frac{1}{p} q_{\ell } + \frac{p-1}{p} q_{\ell - 1} &\text{for } 1 \le \ell \le n - 1 \\
+		q_0 = 0 \\
+		q_n = 1.  
+	\end{dcases}
+\]   
+and thus the characteristic function of this recurrence relation is 
+\[
+	x^2 = \frac{1}{p} x + \frac{p-1}{p},
+\]
+which has roots \(1, \frac{1-p}{p}\). Thus,
+\[
+	q_{\ell } = c + d \left( \frac{1-p}{p} \right)^{\ell }  
+\] for some constant \(c, d\). Thus, by plug \(0, n\) in \(\ell \) we have 
+\[
+	\begin{dcases}
+		1 = c + d \\
+		0 = c + d \left( \frac{1-p}{p} \right)^n.
+	\end{dcases}
+\] 
+Thus, 
+\[
+	c = 1 - \frac{1}{1 - \left( \frac{1-p}{p} \right)^n }, \quad d = \frac{1}{1 - \left( \frac{1-p}{p} \right)^n }.
+\]
+Thus,
+\begin{align*}
+	q_k &= 1 - \frac{1}{1 - \left( \frac{1-p}{p} \right)^n } + \frac{1}{1 - \left( \frac{1-p}{p} \right)^n } \left( \frac{1-p}{p} \right)^k = \frac{\left( \frac{1-p}{p} \right)^k - \left( \frac{1-p}{p} \right)^n  }{1 - \left( \frac{1-p}{p} \right)^n }. 
+\end{align*}
+
+\paragraph{Exercise 4}  Consider the experiment of choosing a point $z$ from the interval $(0,1]$ uniformly at random. In this setting, we have the (infinite) sample space $S = (0,1]$. Given any interval $(x,y] \subseteq S$, we can define the event of $z$ belonging to the interval; that is, $E_{x,y} = \{ z \in (x,y] \} = \{ x < z \le y \}$. Under the uniform distribution, the probability of this event is $\mathbb{P}\left( E_{x,y} \right) = y - x$.
+
+More generally (as required by the third axiom of probability), if there is a disjoint union of intervals $(x_1, y_1] \cup (x_2, y_2] \cup \hdots$ with $x_1 \le y_1 < x_2 \le y_2 < \hdots$, then we can define the event $E$ that $z$ lies in the union of these intervals, and $\mathbb{P}(E) = \sum_{i=1}^\infty \mathbb{P}(E_{x_i,y_i}) = \sum_{i=1}^\infty y_i - x_i$.
+
+Show that for any values $p_1, p_2, p_3, \hdots$ satisfying $0 \le p_i \le 1$ and $\sum_{i=1}^{\infty} p_i = \infty$, there are events $E_1, E_2, E_3, \hdots$ with $\mathbb{P}(E_i) = p_i$ and $\mathbb{P}( \limsup_{n \to \infty} E_n ) = 1$. Recall that $\limsup_{n \to \infty} E_n$ is the event that infinitely many of the events $E_i$ occur.
+
+\paragraph{Solution: } 
+We define \(F(s) = s - \lfloor s \rfloor\), and then we define 
+\[
+	L: \mathbb{R} ^2 \to \left\{ S: S \subseteq [0,1)  \right\}
+\]
+by 
+\[
+	L(a, b) \coloneqq \begin{dcases}
+		[F(a), F(b)), &\text{ if } F(a) \leq F(b) ;\\
+		[F(a), 1) \cup [0, F(b)], &\text{ if } F(a) > F(b).
+	\end{dcases}
+\]
+
+Now suppose the sample space \(S = [0, 1)\) and the probability is the uniform distribution, and \(p_0 = 0\), then we can define event \(E_i\) by  
+\[
+	E_i = \left\{ x: x \in L \left( \sum_{k=0}^{i-1} p_k, \sum_{k=0}^i p_k   \right)  \right\} \text{ for all } i \in \mathbb{N}. 
+\] 
+Hence, we can check that 
+\[
+	\mathbb{P} (E_i) = p_i \text{ for all } i \in \mathbb{N}.  
+\]
+This can be thought by letting \(I_i = \left( \sum_{k=0}^{i-1} p_k, \sum_{k=0}^i p_k   \right] \), then the length of \(I_i\) is \(p_i \le 1\), and \(L \left( \sum_{k=0}^{i-1} p_k, \sum_{k=0}^i p_k   \right)\) is \(I_i\) modulo \(1\), which is the set of all decimal part \(I_i\) contains. Now since \(\sum_{i=1}^{\infty} p_i = \infty \), so 
+\[
+	\bigcup_{i=1}^{\infty } I_i = \left\{ x \in \mathbb{R} : x > 0 \right\}.  
+\]      
+Now for any \(x \in [0, 1)\), we know for all \(k \in \mathbb{N} \cup \left\{ 0 \right\} \), \(x + k \in I_j\) for a unique \(j \in \mathbb{N} \) (since \(I_p, I_q\) are disjoint for distinct \(p, q\)). Also, for any distinct \(k_1, k_2 \in \mathbb{N} \cup \left\{ 0 \right\}  \),  since
+\[
+	\vert (x + k_1) - (x + k_2) \vert = \vert k_1 - k_2 \vert \ge 1,  
+\]   
+so if \(x + k_1 \in I_{j_1}\) and \(x + k_2 \in I_{j_2}\), then \(j_1 \neq j_2\), so there exists infinitely many \(j \in \mathbb{N} \) s.t. \(x + k \in I_j\) for some \(k \in \mathbb{N} \cup \left\{ 0 \right\} \). Also, for \(x \in [0, 1)\), \(x + k \in I_j\) for some \(k \in \mathbb{N} \cup \left\{ 0 \right\} \) iff
+\[
+	x \in L \left( \sum_{r=0}^{j-1} p_r, \sum_{r=0}^j p_r   \right), 
+\]    
+so we have shown that for any \(x \in [0, 1)\), there are infinitely many \(j \in \mathbb{N} \) has 
+\[
+	x \in L \left( \sum_{r=0}^{j-1} p_r, \sum_{r=0}^j p_r   \right),
+\]   
+i.e. there are infinitely many \(j \in \mathbb{N} \) has \(x \in E_j\). Thus, 
+\[
+	\mathbb{P} (\limsup_{n \to \infty} E_n ) = 1.
+\]  
+
+%\section*{Hints}  The following QR codes contain hints for some of the homework exercises.  You should be able to decode them using any QR code scanner, including this one: \url{https://zxing.org/w/decode.jspx}.
+
+%\paragraph{Exercise 4} Also available at \url{https://i.ibb.co/MDgMvpXB/S02E4.png}.
+
+%\begin{center}
+	%\includegraphics[scale=0.5]{Hints/S02E4.png}
+%\end{center}
+
+\end{document}
