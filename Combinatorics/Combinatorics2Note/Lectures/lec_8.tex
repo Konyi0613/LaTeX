@@ -1,0 +1,198 @@
+\lecture{8}{24 March.}{}
+\begin{observation}
+    Let \(G = (V, E)\) and suppose \(G\) has a hamilton cycle. Then, for every \(\varnothing \neq S \subseteq V\), 
+    \[
+        \underbrace{c(G - S)}_{\# \text{ of cpts}} \le \vert S \vert.
+    \]   
+    We must enter and leave each component at least once each, and all of these edges go to \(S\). Thus, 
+    \[
+        \# \text{ of edges b/w } S \text{ and cpts } \ge 2 c(G - S),   
+    \]   
+    but each vertex in \(2\) edges of the cycles, so 
+    \[
+        \# \text{ of edges b/w } S \text{ and cpts } \le 2 \vert S \vert.
+    \]
+    This necessary condition is not sufficient. For example, the Peterson graph. 
+\end{observation}
+
+\begin{definition}[toughness]
+    Given \(t \in \mathbb{R} \), we say a graph \(G\) is \(t\)-tough if 
+    \[
+        \vert S \vert \ge t c(G - S) 
+    \]   
+    for all \(S \subseteq V(G)\) and \(S \neq \varnothing \).  
+\end{definition}
+
+Hence, the observation above states that the Hamiltonicity implies \(1\)-tough. 
+
+\begin{conjecture}[Chvatal, 1973]
+    There is some \(t\) s.t. \(t\)-tough implies Hamiltonicity.  
+\end{conjecture}
+
+Construction of Bauer-Broersma-Veldman (2000): families of non-Hamiltonian graphs with toughness \(\left( \frac{9}{4} - o(1) \right) \). 
+
+\begin{note}
+    Toughness of \(C_n \coloneqq 1\). 
+\end{note}
+
+\section{Complexity}
+
+\begin{definition}
+    A decision problem is a problem of answer yes/no.
+\end{definition}
+
+\begin{definition}[polynomial time]
+    A decision problem with an algorithm to find the answer in polynomial time  in the size of the input means there exists a constant \(\alpha \) s.t. if input has size \(n\), then we can find the answer in time \(O(n^{\alpha })\).   
+\end{definition}
+
+\begin{definition}[Nondeterministic polynomial time]
+    "Yes" answers come with a certificate that can be verified in polynomial time.
+\end{definition}
+
+\begin{eg}
+    In Hamiltonicity problem, the certificate is the hamilton cycle. 
+\end{eg}
+
+\begin{claim}
+    \(P \subseteq NP\). 
+\end{claim}
+\begin{explanation}
+    To check the certificate, ignore it and solve the problem from scratch.
+\end{explanation}
+
+\begin{definition}[co-NP]
+    co-NP problem is the class of decision problems where No instances have a certificate that can be verified in polynomial time.
+\end{definition}
+
+\begin{eg}[co-NP]
+\hfill
+    \begin{itemize}
+        \item anything in \(P\). 
+        \item Is this graph not Hamiltonian?
+        \item Does a graph \(G\) has a perfect matching? (This problem is in \(NP \cap \text{co-}NP \) since for yes instances the certificate is the perfect matching itself and for no instances we can use Tutte's theorem, i.e. the certificate is \(S \subseteq V\) s.t. \(o(G - S) > \vert S \vert \)).  
+    \end{itemize}
+\end{eg}
+
+\begin{question}
+    Does \(P = NP\)? 
+\end{question}
+Common belief: \(P \neq NP\).
+
+\begin{definition}[NP-hard]
+    A problem that any NP-problem can be reduced to in polynomial time.
+\end{definition}
+
+\begin{definition}[NP-complete]
+    \(NP\)-complete \(=NP\)-hard \(\cap NP\).   
+\end{definition}
+
+Karp(1972) provided an initial list of many NP-complete problem, including
+\begin{itemize}
+    \item Hamiltonicity. 
+    \item 3-Colorability. 
+    \item 3-SAT
+\end{itemize}
+
+\section{Maximum matching problem}
+\begin{question}
+    Given a graph \(G\), what is the size of its largest matching? 
+\end{question}
+
+This is an optimization problem (OPT). 
+
+The related decision problem is: Is the size of the largest matching \(\ge k\)?
+
+\begin{theorem}[Hall, min-max version]
+    Let \(G = (X \cup Y, E)\) be a bipartite graph. Then, 
+    \[
+        \max \vert M \vert = \min _{S \subseteq X} \vert X \vert - \vert S \vert + \vert N(S) \vert,
+    \] 
+    where \(\vert M \vert \) is the number of edges in a matching. 
+\end{theorem}
+
+\begin{proof}
+    We first show 
+    \[
+        \max \vert M \vert \le \min \vert X \vert - \vert S \vert + \vert N(S) \vert.    
+    \]
+    Suppose \(S \subseteq X\), then in any matching, there are at least \(\vert S \vert - \vert N(S) \vert  \) unsaturated vertices in \(X\). Hence, there are at most 
+    \[
+        \vert X \vert - (\vert S \vert - \vert N(S) \vert) = \vert X \vert - \vert S \vert + \vert N(S) \vert    
+    \]   
+    vertices saturated in \(X\). This is true for all \(S \subseteq X\), so
+    \[
+        \# \text{ of saturated vertices in } X \le \min _{S \subseteq X} \vert X \vert - \vert S \vert + \vert N(S) \vert.    
+    \] 
+    This shows for all \(M, S\), 
+    \[
+        \vert M \vert \le \vert X \vert - \vert S \vert + \vert N(S) \vert,    
+    \]  
+    so 
+    \[
+        \max _{M} \vert M \vert \le \min _{S \subseteq X} \vert X \vert - \vert S \vert + \vert N(S) \vert.    
+    \]
+    Now we show 
+    \[
+        \max _{M} \vert M \vert \ge \min _{S \subseteq X} \vert X \vert - \vert S \vert + \vert N(S) \vert,    
+    \]
+    i.e. we want to show if for all \(S \subseteq X\), 
+    \[
+        \vert N(S) \vert \ge \vert S \vert - t,  
+    \] 
+    then there exists a matching of size \(\vert X \vert - t \). Let \(G^{\prime} \) be the bipartite graph obtained by adding a set \(Y^{\prime} \) of \(t\) vertices, adjacent to everything in \(X\). We can observe that 
+    \[
+        \forall \varnothing \neq S \subseteq X, N_{G^{\prime} }(S) = N_G(S) \cupdot Y^{\prime}.
+    \]    
+    Thus, 
+    \[
+        \vert N_{G^{\prime} }(S) \vert = \vert N_G(S) \vert + t \ge \vert S \vert - t + t = \vert S \vert.    
+    \]
+    By Hall's theorem, there is a matching in \(G^{\prime} \) saturating \(X\). Deleting the edges to \(Y^{\prime} \), we obtain a matching in \(G\) of size \(\ge \vert X \vert - t \).     
+\end{proof}
+
+\begin{remark}
+    This shows that "Does a bipartite graph have a matching of size \(k\)?" is in NP and co-NP.
+\end{remark}
+
+\begin{definition}
+    A vertex cover of a graph is a set \(C \subseteq V\) of vertices such that for every edge \(e \in E\), \(e \cap C \neq \varnothing\).   
+\end{definition}
+
+\begin{definition}
+    Given a graph \(G\), we write 
+    \begin{align*}
+        \alpha ^{\prime} (G) &= \max \left\{ \vert M \vert : M \subseteq E \text{ is a matching}   \right\} \\
+        \beta (G) &= \min \left\{ \vert C \vert: C \subseteq V \text{ is a vertex cover}   \right\}. 
+    \end{align*}
+\end{definition}
+
+\begin{claim}
+    For any \(G\), \(\alpha ^{\prime} (G) \le \beta (G)\), i.e. for any matching \(M\) and vertex cover \(C\), \(\vert M \vert \le \vert C \vert  \).     
+\end{claim}
+
+\begin{remark}
+    We don't necessarily have \(\alpha ^{\prime} (G) = \beta (G)\) (consider \(K_3\)). 
+\end{remark}
+
+\begin{theorem}[Konig]
+    If \(G\) is bipartite, then 
+    \[
+        \alpha ^{\prime} (G) = \beta (G).
+    \] 
+\end{theorem}
+
+\begin{proof}
+    We already know \(\alpha ^{\prime} (G) \le \beta (G)\). Thus, we need to show \(\alpha ^{\prime} (G) \ge \beta (G)\). Let \(C \subseteq V\) be a smallest vertex cover, then we need to find a matching of size \(\vert C \vert \). We will use Hall's theorem to find a matching in \((C \cap X) \cup (Y \setminus C)\) saturating \(C \cap X\) and a matching in \((C \cap Y) \cup (X \equiv C)\) saturating \(C \cap Y\). Then, the union of these matchings is a matching of size 
+    \[
+        \vert C \cap X \vert + \vert C \cap Y \vert = \vert C \vert.   
+    \] 
+    If not, then WLOG there is no matching in \((X \cap C) \cup (Y \setminus C)\) saturating \(X \cap C\). By Hall's theorem, \(\exists S \subseteq X \cap C\) s.t. 
+    \[
+        \vert N_{Y \setminus C}(S) \vert < \vert S \vert,  
+    \]          
+    but then 
+    \[
+        C^{\prime} = (C \setminus S) \cup N(S)
+    \]
+    is also a vertex cover of smaller size, which is a contradiction.
+\end{proof}

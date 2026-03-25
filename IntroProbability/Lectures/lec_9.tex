@@ -1,0 +1,216 @@
+\lecture{9}{24 March.}{}
+\begin{eg}[Coupon collector problem]
+    Every purchase we make, we get a coupon, which is uniformly randomly chosen from one of \(n\) types, independent of all previous coupons. The goal is to complete a set: have at least one of every type of coupon. We can define a random variable \(T\), which is the number of purchases before we have a full set. Then, what is the distribution of \(T\)? i.e. for \(k \in \mathbb{N} \), what is \(p(k) = \mathbb{P} (T = k)\)?    
+\end{eg}
+
+\begin{explanation}
+    Suppose 
+    \[
+        S = \left\{ (s_1, s_2, \dots) : s_i \in [n] \text{ is the type of the } i\text{-th coupon}  \right\}. 
+    \]
+    Then \(\mathbb{P} (s_j = j) = \frac{1}{n}\) since coupons are uniform. By independence, 
+    \[
+        \mathbb{P} (\left\{ s_i = j_i : 1 \le i \le k \right\} ) = \frac{1}{n^k} \text{ for any } j_i \in [n]. 
+    \] 
+    Also,
+    \[
+        T((s_1, s_2, \dots )) = \begin{dcases}
+            \min \left\{ k: (s_1, \dots , s_k) \text{ contain all type form}  \right\} , &\text{ if such } k \text{ exists};\\
+            -1, &\text{ if such } k \text{ does not exist}.
+        \end{dcases}
+    \]
+    Thus, \(\mathbb{P} (T = k)\) for \(k < n\) is \(0\) since we need at least \(n\) purchases to get \(n\) coupons. Now since the first \(n\) coupons are uniformly distributed over all possible sequences. Thus, 
+    \begin{align*}
+        \# \text{ of possible sequences } &= n^n \text{ (product rule)} \\
+        \# \text{ of good sequences } &= n! \text{ (permutation of all types of coupon)}.  
+    \end{align*}
+    Thus, 
+    \[
+        \mathbb{P} (T = n) = \frac{n!}{n^n} \thickapprox \left( \frac{1}{e} \right)^n. 
+    \] 
+    Now we want to compute \(\mathbb{P} (T = k)\) for \(k > n\). We can first consider \(\mathbb{P} (T > k)\). Let 
+    \[
+        E_i^{(k)} = \left\{ \text{coupon } i \text{ missing from the first } k \text{ coupons}    \right\}. 
+    \]  
+    Then,
+    \[
+        \left\{ T > k \right\} \coloneqq \bigcup_{i=1}^{n} E_i^{(k)}.  
+    \]
+    Note that for all \(i\) 
+    \[
+        \mathbb{P} \left( E_i^{(k)} \right) = \left( \frac{n-1}{n} \right)^k.  
+    \]
+    \begin{question}
+        Are \(E_1^{(k)}, E_2^{(k)}, \dots , E_n^{(k)}\) independent? 
+    \end{question}
+    \begin{answer}
+        Since \(\mathbb{P} \left( E_i^{(k)} \right) = \left( \frac{n-1}{n} \right)^k\) for all \(i\), so
+        \[
+            \prod _{i=1}^n \mathbb{P} (E_i^{(k)}) = \left( \frac{n-1}{n} \right)^{kn},
+        \] but
+        \[
+            \mathbb{P} \left( \bigcap_{i=1}^{n} \mathbb{P} (E_i^{(k)})  \right) = 0, 
+        \]
+        so the answer is no.
+    \end{answer}
+    By inclusion-exclusion principle,
+    \begin{align*}
+        \mathbb{P} \left( \bigcup_{i=1}^{n} E_i^{(k)}  \right) &= \sum_{\varnothing \neq I \subseteq [n]} (-1)^{\vert I \vert + 1} \mathbb{P} \left( \bigcap_{i \in I} E_i^{(k)}  \right) = \sum_{\varnothing \neq I \subseteq [n]} (-1)^{\vert I \vert  + 1} \left( \frac{n - \vert I \vert }{n} \right)^k \\
+        &= \sum_{r=1}^{n-1} \binom{n}{r} (-1)^{r+1} \left( \frac{n-r}{n} \right)^k. 
+    \end{align*}
+    Thus, 
+    \begin{align*}
+        \mathbb{P} (T = k) &= \mathbb{P} (T > k - 1) - \mathbb{P} (T > k) \\
+        &= \sum_{r=1}^{n-1} \binom{n}{r} (-1)^{r+1} \left( \frac{n-r}{n} \right)^{k-1} - \sum_{r=1}^{n-1} \binom{n}{r} (-1)^{r+1} \left( \frac{n-r}{n} \right)^k \\
+        &= \sum_{r=1}^{n-1} \binom{n}{r} (-1)^{r+1} \left( \frac{n-r}{n} \right)^{k-1} \frac{r}{n}.    
+    \end{align*}
+    
+
+\end{explanation}
+
+\begin{definition}[Expected value]
+    Let \((S, \mathbb{P})\) be a probability space and let \(X: S \to \mathbb{R} \) be a discrete random variable. Then the expected value of \(X\) 
+    \[
+        \mathbb{E} [X] = \sum_{x_i} x_i p(x_i) = \sum_{x_i} x_i \mathbb{P} (X = x_i).  
+    \]  
+\end{definition}
+
+\begin{remark}
+    Expected value is what we expect to see on average if we repeat the random experiment many times.
+\end{remark}
+
+Suppose we repeat \(N\) times, and let \(n_i\) to be the number of times we see \(X = x_i\), then the average value of \(X\) is 
+\[
+    \frac{\sum_{i} x_i n_i }{N} = \sum_{i} x_i \frac{n_i}{N} \thickapprox \sum_{i} x_i \mathbb{P} (X = x_i) \text{ when } N \to \infty .   
+\]    
+
+\begin{eg}
+    Two multiple choice questions, each with four options. If we choose answers uniformly at random, how many do we expect to get correct?
+\end{eg}
+\begin{explanation}
+    Let \(X = \#\) of correct answers. Then, 
+    \renewcommand{\arraystretch}{1.5}
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{c|c}
+            \toprule
+                \(x_i\)  & \(\mathbb{P} (X = x_i)\)   \\
+            \midrule
+                \(0\)  & \(\left( \frac{3}{4} \right)^2 \)  \\
+
+                \(1\)  & \(2 \left( \frac{1}{4} \right) \left( \frac{3}{4} \right)  \)   \\
+                \(2\)  & \(\left( \frac{1}{4} \right)^2 \)   \\
+            \bottomrule
+        \end{tabular}
+    \end{table} 
+    Thus, 
+    \[
+        \mathbb{E} [X] = \sum_{i} x_i \mathbb{P} (X = x_i) = 0 \cdot \frac{9}{16} + 1 \cdot \frac{6}{16} + 2 \cdot \frac{1}{16} = \frac{1}{3}. 
+    \]
+\end{explanation}
+
+\begin{claim}
+    \[
+        \mathbb{E} [X] = \sum_{s \in S} X(s) \mathbb{P} (\left\{ s \right\} ) 
+    \]
+\end{claim}
+\begin{explanation}
+        \begin{align*}
+            \mathbb{E} [X] &= \sum_{x_i} x_i \mathbb{P} (X = x_i) = \sum_{x_i} \mathbb{P} (\left\{ s : X(s) = x_i \right\} ) \\
+            &= \sum_{x_i} x_i \mathbb{P} \left( \bigcup_{s: X(s) = x_i} \left\{ s \right\}   \right) = \sum_{x_i} x_i \sum_{\substack{s \in S \\ X(s) = x_i}} \mathbb{P} (\left\{ s \right\} ) = \sum_{s \in S} X(s) \mathbb{P} \left( \left\{ s \right\}  \right).    
+        \end{align*}
+\end{explanation}
+
+\section{Expected value of functions of random variable}
+Let \((S, \mathbb{P} )\) be a probability space. Let \(X: S \to \mathbb{R} \) be a random variable. Let \(g: \mathbb{R} \to \mathbb{R} \) be a function. Then, \(g(X) = g \circ X: S \to \mathbb{R} \) is another random variable.
+
+\begin{claim}
+    \[
+        \mathbb{E} [g(X)] = \sum_{x_i} g(x_i) \mathbb{P} (X = x_i). 
+    \]
+\end{claim}
+
+\begin{explanation}
+    By the earlier claim, 
+    \begin{align*}
+        E [g(X)] &= \sum_{s \in S} g(X(s)) \mathbb{P} \left( \left\{ s \right\}  \right) = \sum_{x_i} \sum_{\substack{s \in S \\ X(s) = x_i}} g(X(s)) \mathbb{P} \left( \left\{ s \right\}  \right) \\
+        &= \sum_{x_i} g(x_i) \sum_{\substack{s \in S \\ X(s) = x_i}} \mathbb{P} \left( \left\{ s \right\}  \right) = \sum_{x_i} g(x_i) \mathbb{P} (X = x_i).       
+    \end{align*}
+\end{explanation}
+
+\begin{proposition}
+    Let \(X_1, x_2, \dots , X_n: S \to \mathbb{R} \) be random variables on a probability space and \(\alpha _1, \alpha _2, \dots , \alpha _n \in \mathbb{R} \). Then if 
+    \[
+        X = \sum_{i=1}^n \alpha _i X_i : S \to \mathbb{R} , \text{ we have } \mathbb{E} [X] = \sum_{i=1}^n \alpha _i \mathbb{E} [X_i].   
+    \] 
+    This is called linearity of expectation. 
+\end{proposition}
+
+\begin{proof}
+    By earlier claim,
+    \begin{align*}
+        \mathbb{E} [X] &= \sum_{s \in S} X(s) \mathbb{P} \left( \left\{ s \right\}  \right) = \sum_{s \in S} \left( \sum_{i=1}^n \alpha _i X_i(s)  \right) \mathbb{P} \left( \left\{ s \right\}  \right) \\
+        &= \sum_{s \in S} \sum_{i=1}^n \alpha _i X_i(s) \mathbb{P} \left( \left\{ s \right\}  \right) = \sum_{i=1}^n \alpha _i \sum_{s \in S} X_i(s) \mathbb{P} \left( \left\{ s \right\}  \right) \\
+        &= \sum_{i=1}^n \alpha _i \mathbb{E} [X_i].            
+    \end{align*}
+\end{proof}
+
+\begin{remark}
+    We do not require any independence.
+\end{remark}
+
+\begin{definition}
+    Random variables \(X_1, X_2, \dots \) are independent if for any \(x_1, x_2, \dots \), then events 
+    \[
+        E_i = \left\{ X_i = x_i \right\} \text{ for all } i 
+    \] 
+    are independent.
+\end{definition}
+
+\begin{eg}
+    Multiple choice: each question has \(k\) options, one of each which is correct. Suppose there are \(n\) questions in total. If we guess uniformly at random, independently, what is the expected score?  
+\end{eg}
+
+\begin{answer}      
+    Let \(X\) be the number of correct numbers. Then \(X\) takes values in \([n] \cup \left\{ 0 \right\} \). For each \(0 \le r \le n\), 
+    \[
+        \mathbb{P} (X = r) = \binom{n}{r} \left( \frac{1}{k} \right)^r \left( \frac{k-1}{k} \right)^{n-r}.  
+    \]
+    Thus, 
+    \[
+        \mathbb{E} [X] = \sum_{x_i} x_i \mathbb{P} (X = x_i) = \sum_{r = 0}^n r \mathbb{P} (X = r) = \sum_{r = 1}^n r \binom{n}{r} \left( \frac{1}{k} \right)^r \left( \frac{k-1}{k} \right)^{n-r} = \frac{n}{k}.   
+    \]    
+\end{answer}        
+
+\begin{answer}
+    Let 
+    \[
+        X_i = \begin{dcases}
+            1, &\text{ if } i \text{-th question is correct}  ;\\
+            0, &\text{ if } i \text{-th question is not correct} ,
+        \end{dcases}
+    \]
+    which is the indicator random variable for the event of getting \(i\)-th question correct. Then,
+    \begin{align*}
+        \mathbb{E} [X_i] &= 0 \cdot \mathbb{P} (i\text{-th question is not correct} ) + 1 \cdot \mathbb{P} (i\text{-th question is correct} ) \\
+        &= 0 \cdot \frac{k-1}{k} + 1 \cdot \frac{1}{k} = \frac{1}{k}.
+    \end{align*}
+    Then, the number of correct answers is given by 
+    \[
+        X = \sum_{i=1}^n X_i. 
+    \]
+    By linearity of expectation,
+    \[
+        \mathbb{E} [X] = \sum_{i=1}^n \mathbb{E} [X_i] = \frac{n}{k}. 
+    \]
+\end{answer}
+
+\begin{question}
+    Three investment opportunities: 
+    \begin{itemize}
+        \item [1.] Guaranteed to get \(\$ 1\) after a year. 
+        \item [2.] We get \(\$ 1000\) with probability \(\frac{1}{1000}\) and \(\$ 0\) at probability \(0\). 
+        \item [3.] Get \(\$ \frac{2000}{999}\) with probability \(\frac{999}{1000}\) and \(\$ -1000\) at probability \(\frac{1}{1000}\).        
+    \end{itemize}
+    Which should we choose?
+\end{question}
