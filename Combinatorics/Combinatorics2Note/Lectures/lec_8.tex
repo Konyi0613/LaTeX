@@ -2,17 +2,36 @@
 \begin{observation}
     Let \(G = (V, E)\) and suppose \(G\) has a hamilton cycle. Then, for every \(\varnothing \neq S \subseteq V\), 
     \[
-        \underbrace{c(G - S)}_{\# \text{ of cpts}} \le \vert S \vert.
+        \underbrace{c(G - S)}_{\# \text{ of cpts}} \le \vert S \vert
     \]   
-    We must enter and leave each component at least once each, and all of these edges go to \(S\). Thus, 
-    \[
-        \# \text{ of edges b/w } S \text{ and cpts } \ge 2 c(G - S),   
-    \]   
-    but each vertex in \(2\) edges of the cycles, so 
-    \[
-        \# \text{ of edges b/w } S \text{ and cpts } \le 2 \vert S \vert.
-    \]
-    This necessary condition is not sufficient. For example, the Peterson graph. 
+    Let $C$ be a Hamiltonian cycle of $G$. Consider removing the vertices in $S$ from $C$. Since $C$ is a cycle passing through all vertices of $G$, deleting $S$ breaks $C$ into a collection of vertex-disjoint paths, each of which lies entirely in $G - S$.
+
+Each such path is contained in a connected component of $G - S$. Moreover, every component of $G - S$ must contain at least one of these path segments, since $C$ visits every vertex of $G$.
+
+Now fix a component $H$ of $G - S$. Along the cycle $C$, the vertices of $H$ appear consecutively in one or more segments. Each maximal segment of $C$ contained in $H$ must be entered from $S$ and exited back to $S$. Therefore, for each such segment, there are at least two edges of $C$ between $S$ and $H$ (one entering and one leaving).
+
+In particular, each component $H$ of $G - S$ is incident with at least two edges of $C$ that go between $S$ and $V(H)$. Hence, the total number of edges of $C$ between $S$ and $G - S$ is at least
+\[
+    2 \, c(G - S).
+\]
+
+On the other hand, each vertex in $S$ has degree exactly $2$ in the cycle $C$. Therefore, the total number of edges of $C$ incident to vertices in $S$ is at most
+\[
+    2|S|.
+\]
+All edges between $S$ and $G - S$ are among these edges, so
+\[
+    \#\{\text{edges between } S \text{ and } G - S \text{ in } C\} \le 2|S|.
+\]
+
+Combining the two inequalities, we obtain
+\[
+    2\,c(G - S) \le 2|S|,
+\]
+which implies
+\[
+    c(G - S) \le |S|.
+\]
 \end{observation}
 
 \begin{definition}[toughness]
@@ -41,57 +60,114 @@ Construction of Bauer-Broersma-Veldman (2000): families of non-Hamiltonian graph
     A decision problem is a problem of answer yes/no.
 \end{definition}
 
+\begin{remark}
+More formally, a decision problem can be viewed as a language $L \subseteq \{0,1\}^*$, where an input $x$ is a \textbf{yes-instance} if $x \in L$, and a \textbf{no-instance} otherwise.
+\end{remark}
+
 \begin{definition}[polynomial time]
-    A decision problem with an algorithm to find the answer in polynomial time  in the size of the input means there exists a constant \(\alpha \) s.t. if input has size \(n\), then we can find the answer in time \(O(n^{\alpha })\).   
+    A decision problem with an algorithm to find the answer in polynomial time in the size of the input means there exists a constant $\alpha$ s.t. if input has size $n$, then we can find the answer in time $O(n^{\alpha})$.   
 \end{definition}
+
+\begin{remark}
+The class of all decision problems solvable in polynomial time is denoted by $P$. 
+Polynomial time is considered ``efficient'' or ``tractable'' in theoretical computer science.
+\end{remark}
 
 \begin{definition}[Nondeterministic polynomial time]
     "Yes" answers come with a certificate that can be verified in polynomial time.
 \end{definition}
 
+\begin{remark}
+More precisely, a decision problem is in $NP$ if there exists a polynomial-time algorithm $V(x,c)$ (called a \textbf{verifier}) such that:
+\begin{itemize}
+    \item if $x$ is a yes-instance, then there exists a certificate $c$ with $|c| \le \text{poly}(|x|)$ such that $V(x,c)=1$,
+    \item if $x$ is a no-instance, then for all $c$, $V(x,c)=0$.
+\end{itemize}
+\end{remark}
+
 \begin{eg}
     In Hamiltonicity problem, the certificate is the hamilton cycle. 
 \end{eg}
 
+\begin{remark}
+Given a sequence of vertices, we can check in polynomial time whether it forms a Hamiltonian cycle by verifying:
+\begin{itemize}
+    \item all vertices appear exactly once,
+    \item consecutive vertices are adjacent,
+    \item the first and last vertices are also adjacent.
+\end{itemize}
+\end{remark}
+
 \begin{claim}
-    \(P \subseteq NP\). 
+    $P \subseteq NP$. 
 \end{claim}
 \begin{explanation}
     To check the certificate, ignore it and solve the problem from scratch.
 \end{explanation}
 
+\begin{remark}
+Indeed, if a problem can be solved in polynomial time, then we can verify it in polynomial time by simply recomputing the answer. Hence every problem in $P$ is also in $NP$.
+\end{remark}
+
 \begin{definition}[co-NP]
     co-NP problem is the class of decision problems where No instances have a certificate that can be verified in polynomial time.
 \end{definition}
 
+\begin{remark}
+Equivalently, a problem $L$ is in co-$NP$ if its complement $\overline{L}$ is in $NP$.
+\end{remark}
+
 \begin{eg}[co-NP]
 \hfill
     \begin{itemize}
-        \item anything in \(P\). 
+        \item anything in $P$. 
         \item Is this graph not Hamiltonian?
-        \item Does a graph \(G\) has a perfect matching? (This problem is in \(NP \cap \text{co-}NP \) since for yes instances the certificate is the perfect matching itself and for no instances we can use Tutte's theorem, i.e. the certificate is \(S \subseteq V\) s.t. \(o(G - S) > \vert S \vert \)).  
+        \item Does a graph $G$ has a perfect matching? (This problem is in $NP \cap \text{co-}NP$ since for yes instances the certificate is the perfect matching itself and for no instances we can use Tutte's theorem, i.e. the certificate is $S \subseteq V$ s.t. $o(G - S) > |S|$).  
     \end{itemize}
 \end{eg}
 
+\begin{remark}
+For many problems (such as Hamiltonicity), it is unknown whether they belong to co-$NP$. 
+In particular, we do not know whether Hamiltonicity has efficiently verifiable certificates for \emph{non}-existence.
+\end{remark}
+
 \begin{question}
-    Does \(P = NP\)? 
+    Does $P = NP$? 
 \end{question}
-Common belief: \(P \neq NP\).
+
+Common belief: $P \neq NP$.
+
+\begin{remark}
+This is one of the most important open problems in computer science. It asks whether every efficiently verifiable problem is also efficiently solvable.
+\end{remark}
 
 \begin{definition}[NP-hard]
     A problem that any NP-problem can be reduced to in polynomial time.
 \end{definition}
 
+\begin{remark}
+More precisely, a problem $H$ is NP-hard if for every problem $L \in NP$, there exists a polynomial-time reduction $L \le_p H$.
+Note that NP-hard problems are not required to be in $NP$ (they may even be undecidable).
+\end{remark}
+
 \begin{definition}[NP-complete]
-    \(NP\)-complete \(=NP\)-hard \(\cap NP\).   
+    $NP$-complete $= NP$-hard $\cap NP$.   
 \end{definition}
 
-Karp(1972) provided an initial list of many NP-complete problem, including
+\begin{remark}
+NP-complete problems are the ``hardest'' problems in $NP$. If any NP-complete problem can be solved in polynomial time, then $P = NP$.
+\end{remark}
+
+Karp (1972) provided an initial list of many NP-complete problem, including
 \begin{itemize}
     \item Hamiltonicity. 
     \item 3-Colorability. 
-    \item 3-SAT
+    \item 3-SAT.
 \end{itemize}
+
+\begin{remark}
+These problems are polynomially equivalent under reductions, meaning that an efficient algorithm for any one of them would yield efficient algorithms for all NP problems.
+\end{remark}
 
 \section{Maximum matching problem}
 \begin{question}
@@ -111,43 +187,93 @@ The related decision problem is: Is the size of the largest matching \(\ge k\)?
 \end{theorem}
 
 \begin{proof}
-    We first show 
-    \[
-        \max \vert M \vert \le \min \vert X \vert - \vert S \vert + \vert N(S) \vert.    
-    \]
-    Suppose \(S \subseteq X\), then in any matching, there are at least \(\vert S \vert - \vert N(S) \vert  \) unsaturated vertices in \(X\). Hence, there are at most 
-    \[
-        \vert X \vert - (\vert S \vert - \vert N(S) \vert) = \vert X \vert - \vert S \vert + \vert N(S) \vert    
-    \]   
-    vertices saturated in \(X\). This is true for all \(S \subseteq X\), so
-    \[
-        \# \text{ of saturated vertices in } X \le \min _{S \subseteq X} \vert X \vert - \vert S \vert + \vert N(S) \vert.    
-    \] 
-    This shows for all \(M, S\), 
-    \[
-        \vert M \vert \le \vert X \vert - \vert S \vert + \vert N(S) \vert,    
-    \]  
-    so 
-    \[
-        \max _{M} \vert M \vert \le \min _{S \subseteq X} \vert X \vert - \vert S \vert + \vert N(S) \vert.    
-    \]
-    Now we show 
-    \[
-        \max _{M} \vert M \vert \ge \min _{S \subseteq X} \vert X \vert - \vert S \vert + \vert N(S) \vert,    
-    \]
-    i.e. we want to show if for all \(S \subseteq X\), 
-    \[
-        \vert N(S) \vert \ge \vert S \vert - t,  
-    \] 
-    then there exists a matching of size \(\vert X \vert - t \). Let \(G^{\prime} \) be the bipartite graph obtained by adding a set \(Y^{\prime} \) of \(t\) vertices, adjacent to everything in \(X\). We can observe that 
-    \[
-        \forall \varnothing \neq S \subseteq X, N_{G^{\prime} }(S) = N_G(S) \cupdot Y^{\prime}.
-    \]    
-    Thus, 
-    \[
-        \vert N_{G^{\prime} }(S) \vert = \vert N_G(S) \vert + t \ge \vert S \vert - t + t = \vert S \vert.    
-    \]
-    By Hall's theorem, there is a matching in \(G^{\prime} \) saturating \(X\). Deleting the edges to \(Y^{\prime} \), we obtain a matching in \(G\) of size \(\ge \vert X \vert - t \).     
+We first show
+\[
+    \max |M| \le \min_{S \subseteq X} \big( |X| - |S| + |N(S)| \big).
+\]
+
+Fix any $S \subseteq X$, and let $M$ be any matching in $G$.
+
+Each vertex in $N(S)$ can be matched to at most one vertex in $S$, so at most $|N(S)|$ vertices of $S$ are saturated by $M$. Hence at least
+\[
+    |S| - |N(S)|
+\]
+vertices of $S$ are unsaturated.
+
+Therefore, the total number of vertices in $X$ that are saturated by $M$ is at most
+\[
+    |X| - (|S| - |N(S)|) = |X| - |S| + |N(S)|.
+\]
+
+Since this holds for every $S \subseteq X$, we obtain
+\[
+    |M| \le \min_{S \subseteq X} \big( |X| - |S| + |N(S)| \big).
+\]
+
+Taking maximum over all matchings $M$, we get
+\[
+    \max |M| \le \min_{S \subseteq X} \big( |X| - |S| + |N(S)| \big).
+\]
+
+\medskip
+
+Now we prove the reverse inequality.
+
+Define the \emph{deficiency} of a set $S \subseteq X$ by
+\[
+    |S| - |N(S)|.
+\]
+Let
+\[
+    t := \max_{S \subseteq X} |S| - |N(S)| = \max_{S \subseteq X} \big( |S| - |N(S)| \big).
+\]
+
+Then for every $S \subseteq X$, we have
+\[
+    |S| - |N(S)| \le t,
+\]
+which implies
+\[
+    |N(S)| \ge |S| - t.
+\]
+
+We now construct a new bipartite graph $G' = (X \cup (Y \cup Y'), E')$ by adding a set $Y'$ of $t$ new vertices, each adjacent to every vertex in $X$.
+
+For any nonempty $S \subseteq X$, we have
+\[
+    N_{G'}(S) = N_G(S) \cup Y',
+\]
+and hence
+\[
+    |N_{G'}(S)| = |N_G(S)| + t \ge (|S| - t) + t = |S|.
+\]
+
+Thus Hall's condition holds in $G'$, and by Hall's theorem there exists a matching in $G'$ that saturates all vertices in $X$.
+
+Since $|Y'| = t$, at most $t$ vertices of $X$ are matched to vertices in $Y'$. Therefore, at least $|X| - t$ vertices of $X$ are matched to vertices in $Y$.
+
+Removing all edges incident to $Y'$, we obtain a matching in $G$ of size at least $|X| - t$. Hence
+\[
+    \max |M| \ge |X| - t.
+\]
+
+Finally, observe that
+\[
+    |X| - t = |X| - \max_{S} (|S| - |N(S)|)
+    = \min_{S} \big( |X| - |S| + |N(S)| \big).
+\]
+
+Therefore,
+\[
+    \max |M| \ge \min_{S \subseteq X} \big( |X| - |S| + |N(S)| \big).
+\]
+
+\medskip
+
+Combining the two inequalities, we conclude
+\[
+    \max |M| = \min_{S \subseteq X} \big( |X| - |S| + |N(S)| \big).
+\]
 \end{proof}
 
 \begin{remark}
@@ -170,6 +296,24 @@ The related decision problem is: Is the size of the largest matching \(\ge k\)?
     For any \(G\), \(\alpha ^{\prime} (G) \le \beta (G)\), i.e. for any matching \(M\) and vertex cover \(C\), \(\vert M \vert \le \vert C \vert  \).     
 \end{claim}
 
+\begin{explanation}
+    Let $M$ be any matching in $G$, and let $C$ be any vertex cover of $G$.
+
+By definition, every edge in $M$ must be incident to at least one vertex in $C$, since $C$ is a vertex cover.
+
+On the other hand, since $M$ is a matching, no two edges in $M$ share a common endpoint. Therefore, each vertex in $C$ can cover at most one edge of $M$.
+
+Hence, to cover all edges in $M$, we need at least $|M|$ vertices in $C$. That is,
+\[
+    |C| \ge |M|.
+\]
+
+Since this holds for all matchings $M$ and all vertex covers $C$, we conclude
+\[
+    \alpha'(G) \le \beta(G).
+\]
+\end{explanation}
+
 \begin{remark}
     We don't necessarily have \(\alpha ^{\prime} (G) = \beta (G)\) (consider \(K_3\)). 
 \end{remark}
@@ -182,7 +326,7 @@ The related decision problem is: Is the size of the largest matching \(\ge k\)?
 \end{theorem}
 
 \begin{proof}
-    We already know \(\alpha ^{\prime} (G) \le \beta (G)\). Thus, we need to show \(\alpha ^{\prime} (G) \ge \beta (G)\). Let \(C \subseteq V\) be a smallest vertex cover, then we need to find a matching of size \(\vert C \vert \). We will use Hall's theorem to find a matching in \((C \cap X) \cup (Y \setminus C)\) saturating \(C \cap X\) and a matching in \((C \cap Y) \cup (X \equiv C)\) saturating \(C \cap Y\). Then, the union of these matchings is a matching of size 
+    We already know \(\alpha ^{\prime} (G) \le \beta (G)\). Thus, we need to show \(\alpha ^{\prime} (G) \ge \beta (G)\). Let \(C \subseteq V\) be a smallest vertex cover, then we need to find a matching of size \(\vert C \vert \). We will use Hall's theorem to find a matching in \((C \cap X) \cup (Y \setminus C)\) saturating \(C \cap X\) and a matching in \((C \cap Y) \cup (X \setminus C)\) saturating \(C \cap Y\). Then, the union of these matchings is a matching of size 
     \[
         \vert C \cap X \vert + \vert C \cap Y \vert = \vert C \vert.   
     \] 
@@ -192,7 +336,61 @@ The related decision problem is: Is the size of the largest matching \(\ge k\)?
     \]          
     but then 
     \[
-        C^{\prime} = (C \setminus S) \cup N(S)
+        C^{\prime} = (C \setminus S) \cup N_{Y \setminus C}(S)
     \]
-    is also a vertex cover of smaller size, which is a contradiction.
+    is a vertex cover of smaller size, which is a contradiction.
+
+    \begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm,>=Latex, every node/.style={font=\small}]
+  \node[font=\bfseries\large] at (-4.8,3.25) {$X$};
+  \node[font=\bfseries\large] at (4.8,3.25) {$Y$};
+
+  \draw[thick] (-4.8,0.25) ellipse (1.55 and 2.35);
+  \draw[thick] (4.8,0.25) ellipse (1.55 and 2.35);
+
+  \node[circle,draw,fill=red!20,minimum size=7mm] (x1) at (-5.2,1.9) {$x_1$};
+  \node[circle,draw,fill=red!20,minimum size=7mm] (x2) at (-4.4,1.1) {$x_2$};
+  \node[circle,draw,fill=orange!35,minimum size=7mm] (x3) at (-5.2,-0.2) {$x_3$};
+  \node[circle,draw,fill=orange!35,minimum size=7mm] (x4) at (-4.4,-1.0) {$x_4$};
+  \node at (-4.8,0.25) {$\vdots$};
+
+  \node[circle,draw,fill=red!20,minimum size=7mm] (y1) at (4.4,1.9) {$y_1$};
+  \node[circle,draw,fill=red!20,minimum size=7mm] (y2) at (5.2,1.1) {$y_2$};
+  \node[circle,draw,fill=blue!25,minimum size=7mm] (y3) at (4.4,-0.2) {$y_3$};
+  \node[circle,draw,fill=orange!35,minimum size=7mm] (y4) at (5.2,-1.0) {$y_4$};
+  \node[circle,draw,fill=orange!35,minimum size=7mm] (y5) at (4.8,-1.8) {$y_5$};
+  \node at (4.8,0.25) {$\vdots$};
+
+  \draw[very thick] (x1) -- (y3);
+  \draw[very thick] (x2) -- (y3);
+
+  \draw[gray!70] (x3) -- (y1);
+  \draw[gray!70] (x3) -- (y4);
+  \draw[gray!70] (x4) -- (y2);
+  \draw[gray!70] (x4) -- (y5);
+
+  \draw[dashed,rounded corners] (-5.75,0.55) rectangle (-3.9,2.35);
+  \node[anchor=east] at (-5.8,2.45) {$S\subseteq X\cap C$};
+
+  \draw[dashed,rounded corners] (3.95,-0.65) rectangle (4.85,0.25);
+  \node[anchor=west] at (4.95,0.45) {$N_{Y\setminus C}(S)$};
+
+  \node[red!70!black] at (-4.8,2.65) {$X\cap C$};
+  \node[red!70!black] at (4.8,2.65) {$Y\cap C$};
+  \node[orange!60!black] at (-4.8,-2.35) {$X\setminus C$};
+  \node[orange!60!black] at (4.8,-2.35) {$Y\setminus C$};
+
+  \node[align=center] at (0,-2.10) {$|N_{Y\setminus C}(S)|<|S|$};
+  \node[align=center] at (0,-2.55) {$C'=(C\setminus S)\cup N_{Y\setminus C}(S)$};
+  \node[align=center] at (0,-3.00) {$|C'|<|C|\Rightarrow$ contradiction};
+
+  \node[draw,rounded corners,align=left,anchor=north west] at (-7.0,-2.65) {
+    \textcolor{red!70!black}{紅色：在 $C$ 中}\\
+    \textcolor{blue!60!black}{藍色：$N_{Y\setminus C}(S)$}\\
+    \textcolor{orange!60!black}{橘色：不在 $C$ 中}
+  };
+\end{tikzpicture}
+\end{center}
 \end{proof}
+
+
