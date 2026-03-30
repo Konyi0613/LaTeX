@@ -1,13 +1,145 @@
 \lecture{9}{27 March.}{}
-\begin{theorem}[Tutte, min-max]
-    In any graph \(G\),
-    \[
-        2 \alpha ^{\prime} (G) = \min _{S \subseteq V} \vert V \vert + \vert S \vert - o(G - S).  
-    \] 
+\begin{theorem}[Tutte--Berge min--max formula]
+For every finite graph $G=(V,E)$,
+\[
+2\alpha'(G)=\min_{S\subseteq V}\Bigl(|V|+|S|-o(G-S)\Bigr),
+\]
+where $\alpha'(G)$ is the maximum size of a matching in $G$, and
+$o(G-S)$ is the number of odd components of $G-S$.
 \end{theorem}
 
 \begin{proof}
-    HW
+Set $n:=|V|$, and define the \emph{deficiency}
+\[
+\operatorname{def}(G):=\max_{S\subseteq V}\bigl(o(G-S)-|S|\bigr).
+\]
+The claimed identity is equivalent to
+\[
+\alpha'(G)=\frac{n-\operatorname{def}(G)}{2}.
+\]
+
+First, we show $n-2\alpha'(G)\ge \operatorname{def}(G)$. Let $M$ be any matching.
+Fix $S\subseteq V$. Consider odd components of $G-S$.
+In an odd component $C$, edges of $M$ internal to $C$ cover an even number of vertices;
+therefore at least one vertex of $C$ is either unmatched by $M$ or matched by an edge going from $C$ to $S$.
+Each vertex of $S$ is incident to at most one matching edge, so at most $|S|$ odd components can be ``accounted for'' by such edges to $S$.
+Hence at least $o(G-S)-|S|$ odd components contain a vertex unmatched by $M$.
+So the total number of unmatched vertices, namely $n-2|M|$, satisfies
+\[
+n-2|M|\ge o(G-S)-|S|.
+\]
+Since this holds for every $S$, we get
+\[
+n-2|M|\ge \operatorname{def}(G).
+\]
+Taking $|M|=\alpha'(G)$ gives
+\[
+n-2\alpha'(G)\ge \operatorname{def}(G).\tag{1}
+\]
+
+For the reverse inequality, let $d:=\operatorname{def}(G)$.
+By parity, $d\equiv n \pmod 2$ (because $o(G-S)\equiv |V\setminus S|$ mod $2$ for every $S$).
+Hence $n+d$ is even.
+
+Now form the graph
+\[
+H:=G\vee K_d
+\]
+(join $G$ with a complete graph on $d$ new vertices).
+We claim $H$ has a perfect matching.
+By Tutte's 1-factor theorem, it is enough to show
+\[
+o(H-T)\le |T| \quad \text{for all } T\subseteq V(H).
+\]
+Write $T=S\cup R$, where $S\subseteq V(G)$ and $R\subseteq V(K_d)$.
+
+If $R\neq V(K_d)$, then at least one vertex of $K_d$ remains in $H-T$; because that vertex is adjacent to every remaining vertex of $G$, all vertices of $H-T$ lie in one connected component. Thus $o(H-T)\le 1\le |T|$ unless $T=\varnothing$; and for $T=\varnothing$, $|V(H)|=n+d$ is even, so $o(H)=0$.
+
+If $R=V(K_d)$, then $H-T=G-S$, so
+\[
+o(H-T)=o(G-S)\le |S|+d=|T|,
+\]
+because $d=\max_{X\subseteq V}(o(G-X)-|X|)$.
+
+Therefore Tutte's condition holds, and $H$ has a perfect matching $P$.
+Restrict $P$ to edges of $G$: this gives a matching $M$ in $G$.
+At most $d$ vertices of $G$ can be matched in $P$ to vertices of $K_d$, so at least $n-d$ vertices of $G$ are matched within $G$.
+Hence
+\[
+|M|\ge \frac{n-d}{2},
+\]
+so
+\[
+\alpha'(G)\ge \frac{n-d}{2}
+\quad\Longrightarrow\quad
+n-2\alpha'(G)\le d=\operatorname{def}(G).\tag{2}
+\]
+
+Combining (1) and (2):
+\[
+n-2\alpha'(G)=\operatorname{def}(G).
+\]
+Rewriting,
+\[
+2\alpha'(G)=n-\max_{S\subseteq V}\bigl(o(G-S)-|S|\bigr)
+=\min_{S\subseteq V}\bigl(n+|S|-o(G-S)\bigr),
+\]
+which is exactly the formula.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    scale=1.25,
+    vtx/.style={circle, draw, inner sep=1.8pt},
+    edgeG/.style={black},
+    edgeJoin/.style={densely dotted, gray!70},
+    edgeM/.style={very thick, red!80!black}
+]
+    % vertices of G
+    \node[vtx] (g1) at (0,2.2) {$v_1$};
+    \node[vtx] (g2) at (1.4,2.8) {$v_2$};
+    \node[vtx] (g3) at (2.6,2.0) {$v_3$};
+    \node[vtx] (g4) at (2.4,0.8) {$v_4$};
+    \node[vtx] (g5) at (1.1,0.3) {$v_5$};
+    \node[vtx] (g6) at (-0.2,1.0) {$v_6$};
+
+    % some edges inside G
+    \draw[edgeG] (g1)--(g2)--(g3)--(g4)--(g5)--(g6)--(g1);
+    \draw[edgeG] (g2)--(g5);
+    \draw[edgeG] (g1)--(g4);
+
+    % vertices of K_d
+    \node[vtx] (k1) at (6.3,2.6) {$x_1$};
+    \node[vtx] (k2) at (7.6,1.9) {$x_2$};
+    \node[vtx] (k3) at (7.3,0.6) {$x_3$};
+    \node[vtx] (k4) at (5.9,0.5) {$x_4$};
+
+    % complete graph on K_d vertices
+    \draw[edgeG] (k1)--(k2)--(k3)--(k4)--(k1);
+    \draw[edgeG] (k1)--(k3);
+    \draw[edgeG] (k2)--(k4);
+
+    % all join edges between V(G) and V(K_d)
+    \foreach \gi in {1,2,3,4,5,6} {
+        \foreach \kj in {1,2,3,4} {
+            \draw[edgeJoin] (g\gi)--(k\kj);
+        }
+    }
+
+    % sample matching M in H
+    \draw[edgeM] (g1)--(g2);
+    \draw[edgeM] (g3)--(g4);
+    \draw[edgeM] (g5)--(k1);
+    \draw[edgeM] (g6)--(k2);
+    \draw[edgeM] (k3)--(k4);
+
+    \node[draw=none] at (1.2,-0.4) {$G$};
+    \node[draw=none] at (6.8,-0.4) {$K_d$};
+    \node[draw=none, text=red!80!black] at (4.2,3.55) {thick red edges $=$ the perfect matching $P$};
+\end{tikzpicture}
+\caption{$H=G\vee K_d$.}
+\label{fig:join}
+\end{figure}
 \end{proof}
 
 \section{Traveling salesman problem}
