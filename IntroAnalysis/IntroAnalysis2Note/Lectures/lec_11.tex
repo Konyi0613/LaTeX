@@ -1,0 +1,369 @@
+\lecture{11}{31 March.}{}
+\section{Measurable sets}
+In this chapter, our goal is to construct a measure. Note that we constructed outer measure in previous lecture, but countbale additivity fails on it. 
+
+\begin{definition}[Lebesgue measurability]
+    Let \(E \subseteq \mathbb{R} ^n\). We say \(E\) is Lebesgue measurable, or measurable, iff we have the identity 
+    \[
+        m^*(A) = m^*(A \cap E) + m^*(A \setminus E) \text{ for all } A \subseteq \mathbb{R} ^n. 
+    \]  
+\end{definition}
+
+\begin{notation}
+    If \(E\) is measurable, then we define \(m(E) = m^*(E)\).  
+\end{notation}
+
+\begin{remark}
+    We know \(A = (A \cap E) \cup (A \setminus E)\), so 
+    \[
+        m^*(A) \le m^*(A \cap E) + m^*(A \setminus E).
+    \] 
+    Thus, \(E\) is measurable iff 
+    \[
+        m^*(A) \ge m^*(A \cap E) + m^*(A \setminus E).
+    \] 
+    Note that \(\mathbb{R} ^n\) is measurable since \(A \cap \mathbb{R} ^n = A\) and \(A \setminus \mathbb{R} ^n = \varnothing\). Also, \(\varnothing\) is measurable since \(A \cap \varnothing = \varnothing\) and \(A \setminus \varnothing = A\).      
+\end{remark}
+
+\begin{lemma}[Half-spaces are measurable] \label{lm: Half-spaces are measurable}
+    The half space \(\left\{ (x_1, \dots , x_n) \in \mathbb{R} ^n : x_n > 0 \right\} \) is measurable. 
+\end{lemma}
+
+\begin{proof}
+    Let \(E = \left\{ x \in \mathbb{R} ^n \mid x_n > 0 \right\} \). Then 
+    \[
+        m^*(A) \le m^*(A \cap E) + m^*(A \setminus E)
+    \] 
+    is true for all \(A \subseteq \mathbb{R} ^n\), so it suffices to show that 
+    \[
+        m^*(A) \ge m^*(A \cap E) + m^*(A \setminus E) \text{ for all } A \subseteq \mathbb{R}^n. 
+    \]
+    If \(m^*(A) = \infty\), then this is obviously true. Now we assume \(m^*(A) < \infty\). Given \(\varepsilon > 0\), \(\exists \) a countable collection of open boxes \((B_k)\) s.t. \(A \subseteq \bigcup_{k=1}^{\infty} B_k \) and 
+    \[
+        \sum_{k=1}^{\infty} \mathrm{vol} (B_k) \le m^*(A) + \varepsilon.  
+    \]
+    We know that 
+    \[
+        m^*(B_k) = m^*(B_k \cap E) + m^*(B_k \setminus E) \text{ by exercises.} 
+    \]      
+    Thus,
+    \[
+        \mathrm{vol} (B_k) = m^*(B_k \cap E) + m^*(B_k \setminus E). 
+    \]
+    This gives 
+    \begin{align*}
+        \sum_{k=1}^{\infty} \mathrm{vol} (B_k) &= \sum_{k=1}^{\infty} m^*(B_k \cap E) + \sum_{k=1}^{\infty} m^*(B_k \setminus E) \ge m^* \left( \left( \bigcup_{k=1}^{\infty} B_k \right) \cap E   \right) + m^* \left( \left( \bigcup_{k=1}^{\infty} B_k  \right) \setminus E \right) \\
+        &\ge m^* (A \cap E) + m^*(A \setminus E).
+    \end{align*}
+    Hence,
+    \[
+        m^*(A) + \varepsilon \ge \sum_{k=1}^{\infty} m^*(B_k) \ge m^*(A \cap E) + m^*(A \setminus E), 
+    \]
+    and we're done.
+\end{proof}
+
+\begin{remark}
+    A similar argument will also shows that any half-space of the form
+    \[
+        \left\{ (x_1, \dots , x_n) \in \mathbb{R} ^n: x_j > 0 \right\} \text{ or } \left\{ (x_1, \dots , x_n) \in \mathbb{R} ^n: x_j < 0 \right\} 
+    \]
+    for all \(1 \le j \le n\) is measurable.   
+\end{remark}
+
+\begin{lemma}[Properties of measurable sets]
+\hfill
+    \begin{itemize}
+        \item [(a)] If \(E\) is measurable, then \(\mathbb{R} ^n \setminus E\) is also measurable. 
+        \item [(b)] If \(E\) is measurable, and \(x \in \mathbb{R} ^n\), then \(x + E\) is also measurable. 
+        \item [(c)] If \(E_1\) and \(E_2\) are measurable, then \(E_1 \cap E_2\) and \(E_1 \cup E_2\) are measurable. 
+        \item [(d)] If \(E_1, \dots , E_N\) are measurable, then \(\bigcup_{j=1}^{N} E_j \) and \(\bigcap_{j=1}^{N} E_j \) are measurable. 
+        \item [(e)] Every open box and close box is measurable. 
+        \item [(f)] Any set \(E\) of outer measure zero is measurable.           
+    \end{itemize}
+\end{lemma}
+
+\begin{proof}[proof of (a)]
+    Since \(E\) is measurable, \(m^*(A) = m^*(A \cap E) + m^*(A \setminus E)\) for any \(A \subseteq \mathbb{R} ^n\). Also,
+    \[
+        A \cap (\mathbb{R} ^n \setminus E) = A \setminus E \text{ and } A \setminus (\mathbb{E} \setminus E) = A \cap E. 
+    \]   
+    Thus,
+    \[
+        m^*(A) = m^*(A \setminus (\mathbb{R} ^n \setminus E)) + m^*(A \cap (\mathbb{R} ^n \setminus E))
+    \]
+    for all \(A \subseteq \mathbb{R} ^n\), which means \(\mathbb{R} ^n \setminus E\) is measurable.  
+\end{proof}
+
+\begin{proof}[proof of (b)]
+    Suppose \(E\) is meausrable, then \(m^*(B) = m^*(B \cap E) + m^*(B \setminus E)\) for any \(B \subseteq \mathbb{R} ^n\). To show \(x + E\) is measurable, if we let \(A \subseteq \mathbb{R} ^n\) arbitrarily, we have 
+    \[
+        m^*(A - x) = m^*((A - x) \cap E) + m^*((A - x) \setminus E).
+    \] 
+    Now since \(m^*(A) = m^*(A - x)\), and
+    \[
+        (A - x) \cap E = (A \cap (E + x)) - x \text{ and } (A - x) \setminus E = (A \setminus (E + x)) - x, 
+    \]      
+    we have 
+    \begin{align*}
+        m^*(A) &= m^*(A - x) = m^*((A - x) \cap E) + m^*((A - x) \setminus E) \\
+        &= m^*((A \cap (E + x)) - x) + m^*((A \setminus (E + x)) - x) = m^*(A \cap  (E + x)) + m^*(A \setminus (E + x)). 
+    \end{align*}
+    Thus, \(E + x\) is measurable. 
+\end{proof}
+
+\begin{proof}[proof of (c)]
+    It sufficies to show that \(E_1 \cup E_2\) is measurable. Then, by Demorgan's law,
+    \[
+        E_1 \cap E_2 = \mathbb{R} ^n \setminus \left( (\mathbb{R} ^n \setminus E_1) \cup (\mathbb{R} ^n \setminus E_2) \right), 
+    \] 
+    so we can show \(E_1 \cap E_2\) is measurable. Now we want to show 
+    \[
+        m^*(A) = m^*(A \cap (E_1 \cup E_2)) + m^*(A \setminus (E_1 \cup E_2)).
+    \]
+    Since \(E_1\) is measurable,
+    \[
+        m^*(A) = m^*(A \cap E_1) + m^*(A \setminus E_1).
+    \]  
+    Next, since \(E_2\) is measurable,
+    \[
+        m^*(A \setminus E_1) = m^*((A \setminus E_1) \cap E_2) + m^*((A \setminus E_1) \setminus E_2).
+    \]
+    Hence,
+    \[
+        m^*(A) = m^*(A \cap E_1) + m^*(A \setminus E_1) = m^*(A \cap E_1) + m^*((A \setminus E_1) \cap E_2) + m^*((A \setminus E_1) \setminus E_2). 
+    \]
+    Notice that \((A \setminus E_1) \cap E_2 = A \cap (E_2 \setminus E_1)\) and \((A \setminus E_1) \setminus E_2 = A \setminus (E_1 \cup E_2)\). Thus,
+    \[
+        m^*(A) = m^*(A \cap E_1) + m^*(A \cap (E_2 \setminus E_1)) + m^*(A \setminus (E_1 \cup E_2)).
+    \]
+    Note that 
+    \[
+        (A \cap E_1) \cup (A \cap (E_2 \setminus E_1)) = A \cap (E_1 \cup E_2),
+    \]   
+    so 
+    \[
+        m^* (A \cap (E_1 \cup E_2)) \le m^*(A \cap E_1) + m^*(A \cap (E_2 \setminus E_1)).
+    \]
+    This gives
+    \[
+        m^*(A) \ge m^*(A \cap (E_1 \cup E_2)) + m^*(A \setminus (E_1 \cup E_2)).
+    \]
+    On the other hand, we have \(A = (A \cap (E_1 \cup E_2)) \cup (A \setminus (E_1 \cup E_2))\), so we have 
+    \[
+        m^*(A) = m^*(A \cap (E_1 \cup E_2)) + m^*(A \setminus (E_1 \cup E_2)).
+    \] 
+\end{proof}
+
+\begin{proof}[proof of (d)]
+    This can be proved by induction on \(N\) with (c).
+\end{proof}
+
+\begin{proof}[proof of (e)]
+    Note that every open boxes is the intersection of many half-spaces of the form 
+    \[
+        \left\{ x: x_j > a_j \right\} \text{ or } \left\{ x: x_j < b_j \right\}.   
+    \]
+    Thus, by \autoref{lm: Half-spaces are measurable} and (d), we know every open box is measurable. Closed boxes are complement of union of open half spaces and thus measurable. 
+\end{proof}
+
+\begin{proof}[proof of (f)]
+    Suppose \(m^*(E) = 0\). For any \(A \subseteq \mathbb{R} ^n\), we have \(A \cap E \subseteq E\), so 
+    \[
+        m^*(A \cap E) \le m^*(E) = 0.
+    \]  
+    Hence, 
+    \[
+        m^*(A \cap E) + m^*(A \setminus E) = m^*(A \setminus E) \le m^*(A).
+    \]
+    Since
+    \[
+        m^*(A \cap E) + m^*(A \setminus E) \ge m^*(A)
+    \]
+    is trivial, so we're done.
+\end{proof}
+
+\begin{lemma}[Finite additivity] \label{lm: finite additivity of disjoint sets}
+    If \((E_j)_{j \in J}\) are a finite collection of disjoint measurable sets, then for any set \(A\) (not necessarily measurable), we have 
+    \[
+        m^* \left( A \cap \left( \bigcup_{j \in J} E_j  \right)  \right) = \sum_{j \in J} m^*(A \cap E_j).  
+    \]
+    Furthermore, we have 
+    \[
+        m \left( \bigcup_{j \in J} E_j  \right) = \sum_{j \in J} m(E_j ).  
+    \]  
+\end{lemma}
+
+\begin{proof}
+    It sufficies to show the case of two sets: If \(E\) and \(F\) are disjoint measurable sets, then for any \(A \subseteq \mathbb{R} ^n\), 
+    \[
+        m^*(A \cap (E \cup F)) = m^*(A \cap E) + m^*(A \cap F).
+    \]   
+    Assume the statement is true for \(k\) pairwise disjoint measurable sets, and let \(E_1, E_2, \dots ,E_k, E_{k+1}\) be pairwise disjoint measurable sets. Applying the two sets case,
+    \[
+        m^*(A \cap (\bigcup_{i=1}^{k} E_i \cup E_{k+1})) = m^*(A \cap \bigcup_{i=1}^{k} E_i ) + m^*(A \cap E_{k+1}).
+    \]   
+    Now the induction hypothesis gives 
+    \[
+        m^*(A \cap \bigcup_{i=1}^{k} E_i ) = \sum_{i=1}^k m^*(A \cap E_i), 
+    \]
+    so 
+    \[
+        m^* (A \cap \left( \bigcup_{i=1}^{k+1} E_i  \right) ) = \sum_{i=1}^{k+1} m^*(A \cap E_i). 
+    \]
+
+    Now we show the two set cases. Suppose \(E\) and \(F\) are measurable and disjoint, then \(U \coloneqq E \cup F\) is measurable, and since \(E\) is measurable,
+    \[
+        m^*(A \cap U) = m^*((A \cap U) \cap E) + m^*((A \cap U) \setminus E).
+    \]   
+    Note that 
+    \[
+        A \cap U \cap E = A \cap (E \cup F) \cap E = A \cap E \text{ and } (A \cap U) \setminus E = (A \cap (E \cup F)) \setminus E = A \cap F
+    \]
+    since \(E \cap F = \varnothing\). Hence,
+    \[
+        m^*(A \cap U) = m^*(A \cap E) + m^*(A \cap F),
+    \]
+    and we're done.
+
+    Now if we have pairwise disjoint \(E_1, E_2, \dots , E_k\), we can pick \(A = \varnothing \), and thus 
+    \[
+      m(\bigcup_{j \in J} E_j ) = \sum_{j \in J} m(E_j).  
+    \]  
+\end{proof}
+
+\begin{corollary}
+    If \(A \subseteq B\) and \(A, B\) ar both measurable, then \(B \setminus A\) is measurable and
+    \[
+        m(B \setminus A) + m(A) = m(B).
+    \]   
+\end{corollary}
+\begin{proof}
+    Since 
+    \[
+        B \setminus A = B \cap (\mathbb{R} ^n \setminus A),
+    \]
+    and \(A, B\) are measurable, so we can deduce \(B \setminus A\) is measurable. Also, since \(A \cap (B \setminus A) = \varnothing\), so by \autoref{lm: finite additivity of disjoint sets}, we know 
+    \[
+        m(B) = m(A) + m(B \setminus A).
+    \] 
+\end{proof}
+
+\begin{lemma}[Countable additivity] \label{lm: countable additivity}
+    Let \((E_j)_{j \in J}\) be a countable collection of pairwise disjoint measurable subsets of \(\mathbb{R} ^n\), then 
+    \[
+        E \coloneqq \bigcup_{j \in J} E_j 
+    \]  
+    is measurable, and 
+    \[
+        m(E) = \sum_{j \in J} m(E_j). 
+    \]
+\end{lemma}
+
+\begin{proof}
+    Since \(J\) is countable, we may enumerate it as \(\left\{ j_1, j_2, \dots  \right\} \). For each \(N \in \mathbb{N} \), define \(F_N = \bigcup_{k=1}^{N} E_{j_k} \). Thus, \(F_N\) is measurable. By previous result,
+    \[
+        m(F_N) = \sum_{k=1}^N m(E_{j_k}). 
+    \]     
+    Let \(E = \bigcup_{k=1}^{\infty} E_{j_k} \), we have \(E = \bigcup_{N=1}^{\infty} F_N \) and \(F_1 \subseteq F_2 \subseteq \dots \). 
+
+    We first show \(E\) is measurable. It sufficies to show that 
+    \[
+        m^*(A \cap E) + m^*(A \setminus E) \le m^*(A) \text{ for all } A \subseteq \mathbb{R} ^n.  
+    \]    
+    Since \(F_N\) is measurable and \(F_N \subseteq E\), we have 
+    \[
+        m^*(A) = m^*(A \cap F_N) + m^*(A \setminus F_N)
+    \]  
+    and 
+    \[
+        A \setminus E \subseteq A \setminus F_N  \implies m^*(A \setminus F_N) \ge m^*(A \setminus E).
+    \]
+    Also,
+    \[
+        m^*(A \cap F_N) = \sum_{k=1}^N m^*(A \cap E_{j_k}). 
+    \]
+    Hence,
+    \[
+        m^*(A) \ge \sum_{k=1}^N m^*(A \cap E_{j_k}) + m^*(A \setminus E) \text{ true for all }N.  
+    \]
+    Thus,
+    \[
+        m^*(A) \ge \sum_{k=1}^{\infty} m^*(A \cap E_{j_k}) + m^*(A \setminus E). 
+    \]
+    Since 
+    \[
+        \bigcup_{k=1}^{\infty} (A \cap E_{j_k}) = A \cap \left( \bigcup_{k=1}^{\infty} E_{j_k}  \right) = A \cap E,  
+    \]
+    we have 
+    \[
+        m^*(A \cap E) \le \sum_{k=1}^{\infty} m^*(A \cap E_{j_k}), 
+    \]
+    so 
+    \[
+        m^*(A) \ge m^*(A \cap E) + m^*(A \setminus E).
+    \]
+    This shows \(E\) is measurable. 
+
+\end{proof}
+
+\begin{lemma}[\(\sigma \)-algebra property] \label{lm: sigma algebra property}
+    If \((\Omega _j)_{j \in J}\) is a countable collection of measurable sets, then \(\bigcup_{j \in J} \Omega _j \) and \(\bigcap_{j \in J} \Omega _j \) are both measurable.   
+\end{lemma}
+
+\begin{proof}
+    Write \(J = \left\{ j_1, j_2, \dots  \right\} \) and define \(E_1 = \Omega _{j_1}\) and
+    \[
+        E_N = \Omega _N \setminus \left( \bigcup_{k=1}^{N-1} \Omega _{j_k}  \right) \text{ for all } N \ge 2.  
+    \]   
+    Hence, \(E_i\) is measurable for all \(i \in \mathbb{N}\) and disjoint by construction. Note that 
+    \[
+        \bigcup_{k=1}^{\infty} E_k = \bigcup_{k=1}^{\infty} \Omega _{j_k}.  
+    \]  
+    Hence, \(\bigcup_{k=1}^{\infty} \Omega _{j_k}\) is measurable. 
+
+    Now since 
+    \[
+        \bigcap_{k=1}^{\infty} \Omega _{j_k} = \mathbb{R} ^n \setminus \bigcup_{k=1}^{\infty} (\mathbb{R} ^n \setminus \Omega _{j_k}),  
+    \] 
+    we know \(\bigcap_{k=1}^{\infty} \Omega _{j_k}\) is measurable. 
+
+\end{proof}
+
+\begin{lemma}
+    Every open set can be written as a countable or finite union of open boxes.
+\end{lemma}
+
+\begin{proof}
+    We say an open box is rational if \(B = \prod _{i=1}^n (a_i, b_i)\) where \(a_i, b_i \in \mathbb{Q} \). The set of rational open boxes is countable (since this set is isomorphic to \(\mathbb{Q} ^{2n}\)). 
+
+    We make the following claim: given any open ball \(B(x, r)\), \(\exists \) a rational box \(B\) with \(x \in B \subseteq B(x, r)\). To show this, let \(x = (x_1, \dots , x_n)\) by any point in \(\mathbb{R} ^n\). Let \(a_i, b_i\) be rational numbers s.t. 
+    \[
+        x_i - \frac{r}{n} < a_i < x_i < b_i < x_i + \frac{r}{n}, 
+    \]        
+    then we show that \(B \subseteq B(x, r)\). Let \(y \in B\), then 
+    \[
+        x_i - \frac{r}{n} < a_i < y_i < b_i < x_i + \frac{r}{n},
+    \]  
+    so 
+    \[
+        \vert y_i - x_i \vert < \frac{r}{n}.
+    \]
+    Hence,
+    \[
+        \lVert y - x \rVert = \sqrt{\sum_{i=1}^n (y_i - x_i)^2 } \le \sum_{i=1}^n \vert y_i - x_i \vert < \frac{r}{n} \cdot n = r.   
+    \]
+    Hence, \(y \in B(x, r)\). Thus, we're done. 
+
+    Now let \(E\) be an open set in \(\mathbb{R} ^n\). For any \(x \in E\), \(\exists r_x > 0\) s.t. \(B(x, r_x) \subseteq E\). Thus, \(E = \bigcup_{x \in E} B(x, r_x) \). Also, for any \(B(x, r_x)\), there exists a rational box \(B_x\) s.t. \(x \in B_x \subseteq B(x, r_x)\). Thus,
+    \[
+        \bigcup_{x \in E} B_x = E. 
+    \]          
+\end{proof}
+
+\begin{lemma}
+    Every open set, and every closed set, is Lebesgue measurable.
+\end{lemma}
+
+\begin{proof}
+    By previous lemma, every open set can be written as the union of countable or finite rational open boxes, and every rational open box is measurable, so every open set is measurable. Since every closed box is \(\mathbb{R} ^n \setminus E\) for some open \(E\), so it is also measurable.  
+\end{proof}

@@ -1,0 +1,195 @@
+\lecture{10}{31 March.}{}
+\begin{proof}[alternative proof of Hall's theorem]
+Let \(G = (X \cup Y, E)\) be a bipartite graph, and let \(M\) be a maximum matching.
+
+Suppose, for contradiction, that \(M\) does not saturate all vertices in \(X\).  
+Let
+\[
+U = \{x \in X : x \text{ is unmatched in } M\}.
+\]
+
+Starting from \(U\), explore all vertices reachable via \(M\)-alternating paths:
+\begin{itemize}
+    \item from \(X\) to \(Y\): along edges not in \(M\),
+    \item from \(Y\) to \(X\): along edges in \(M\).
+\end{itemize}
+
+Let \(S \subseteq X\) and \(T \subseteq Y\) be the sets of vertices in \(X\) and \(Y\), respectively, that are reachable from \(U\) with the above rule.
+
+We claim that every vertex in \(T\) is matched by \(M\), and its matched partner lies in \(S\).  
+Indeed, if some \(y \in T\) were unmatched, then there would exist an \(M\)-augmenting path starting from some \(u \in U\) and ending at \(y\), contradicting the maximality of \(M\).
+
+Thus every \(y \in T\) is matched to a vertex in \(S\), so
+\[
+|T| \le |S|.
+\]
+
+Next, we claim that \(N(S) = T\).  
+By construction, every neighbor of a vertex in \(S\) that is reached lies in \(T\), so \(N(S) \subseteq T\).  
+Conversely, every vertex in \(T\) is reached from some vertex in \(S\), so \(T \subseteq N(S)\).  
+Hence,
+\[
+N(S) = T.
+\]
+
+Finally, since \(U \subseteq S\) and \(U \neq \emptyset\), there is at least one vertex in \(S\) that is unmatched, while every vertex in \(T = N(S)\) is matched to a distinct vertex in \(S\).  
+Therefore,
+\[
+|N(S)| = |T| < |S|.
+\]
+
+This violates Hall's condition. Hence, if Hall's condition holds, there exists a matching that saturates \(X\).        
+
+\end{proof}
+
+\section{The Augmenting Path Algorithm (APA)}
+Now we want to design an algorithm such that
+\begin{itemize}
+    \item Input: A bipartite graph \((X \cup Y, E)\) and a matching \(M\). 
+    \item Output: Either an \(M\)-augmenting path or a vertex cover \(C \subseteq X \cup Y\) with \(\vert C \vert = \vert M \vert  \).     
+\end{itemize}
+
+\begin{remark}
+    If \(M\) is a maximum matching, then \(M\)-augmenting path does not exists and since \(\alpha ^{\prime} (G) = \beta (G)\), so a vertex cover \(C\) with \(\vert C \vert = \vert M \vert  \) exists. If \(M\) is not maximum, then \(M\)-augmenting path exists and we will return one.       
+\end{remark}
+
+If we can show that such an algorithm exists, then we can design an algorithm to find maximum matching:
+
+\begin{algorithm}[H]
+    \caption{Maximum Matching Algorithm (MMA)}
+    \KwData{Bipartite graph \(G = (X \cup Y, E)\).}
+    \KwResult{Maximum matching \(M \subseteq E\) and minimum vertex cover \(C \subseteq X \cup Y\) s.t. \(\vert C \vert = \vert M \vert  \).}
+
+    \(M \gets \varnothing\) 
+
+    Run the augmenting path algorithm on \(M\).
+    \If() {we got an augmenting path} {
+        flip edges to get a larger matching \(M\), and repeat. 
+    } \Else() {
+        we have a maximum matching \(M\) and a minimum vertex cover \(C\) (the vertex cover can be obtained from the augmenting path algorithm).  
+    }
+\end{algorithm}
+
+\begin{observation}
+    Since \(\vert M \vert \) is strictly increasing, we only run the augmenting path algorithm at most \(\vert X \vert \) times. If APA is polynomial, so is MMA. 
+\end{observation}
+
+
+The idea of APA is to start from unsaturated vertices of \(X\), which are all in a set \(U\), and see which vertices we can reach with \(M\)-alternating paths. If we can reach an unsaturated vertex in \(Y\), then there is an \(M\)-augmenting path, and we can return it. If we have explored all \(M\)-alternating path starting from \(U\), and finds that there is not any augmenting path, then \(M\) is a maximum matching, and we can return the corresponding minimum vertex cover. We can maintain 3 sets of vertices:
+\begin{align*}
+    S &= \left\{ \text{vertices we can reach in } X \text{ via } M \text{-alternating path from } U    \right\} \\
+    T &= \left\{ \text{vertices in } Y \text{ we can reach via } M\text{-alternating paths from } U    \right\} \\
+    Q &= \left\{ \text{vertices in } X \text{ where neighborhoods we have explolred}   \right\}  
+\end{align*}
+
+\begin{algorithm}[H]
+    \caption{Augmenting Path Algorithm}
+    \KwData{A bipartite graph \((X \cup Y, E)\) and a matching \(M\).}
+    \KwResult{Either an \(M\)-augmenting path or a vertex cover \(C \subseteq X \cup Y\) with \(\vert C \vert = \vert M \vert  \).}
+    \(S \gets U, T \gets \varnothing, Q \gets \varnothing\)
+    
+    \While(){True} {
+        \If(){\(S = Q\)}{
+            \(M\) is a maximum matching, which covers \(T \cup (X \setminus S)\), so   Done.
+        } \Else() {
+            Let \(x \in S \setminus Q\) be arbitrary. 
+
+            \If() {\(x\) has any neighborhood \(y \in Y\) that is unsaturated} {
+                STOP: \(M\)-augmenting path found: \(M\)-alternating path to \(x\), together with \(\left\{ x, y \right\} \).    
+            } \Else() {
+                \For() {every neighborhood \(y\) of \(x\) that is not in \(T\)} {
+                    \(T \gets T \cup \left\{ y \right\} \). 
+
+                    add the \(M\)-neighborhood \(x^{\prime} \) of \(y\) to \(S\).     
+                }
+            }
+            \(Q \gets Q \cup \left\{ x \right\} \). 
+        }
+    }
+\end{algorithm}
+
+\begin{observation}
+    Since any vertex in \(U\) is unsaturated by \(M\), any \(M\)-alternating path starting from \(U\) has the first endpoint (starting point) unsaturated by \(M\), and thus once we find an \(y \in T\) is unsaturated by \(M\), then there must be an \(M\)-augmenting path.        
+\end{observation}
+
+\begin{remark}
+    From line 9, it means all neighbors of \(x\) are saturated by \(M\), suppose \(y\) is a neighbor of \(x\) saturated by \(M\). Then 
+    \begin{itemize}
+        \item Case 1: \(x\) is the \(M\)-partner of \(y\). But we have reached \(x\), so we must went through this edge from \(y\) to \(x\). But we can explore \(x\) here since \(x \in S \setminus Q\), so \(x\) has been added to \(S\) when we explore \(\left\{ y, x \right\} \). Note that after this round \(x\) is added to \(Q\), so we will not recompute \(x\).          
+        \item Case 2: \(x\) is not the \(M\)-partner of \(y\). Then we can walk from \(x\) through \(\left\{ x, y \right\} \) to \(y\), which can extend the alternating path.               
+    \end{itemize}     
+\end{remark}
+
+\begin{observation}
+    Each iteration increases the size of \(Q\) by \(1\), so at most \(\vert X \vert \) iterations. Also, every edge is considered at most once, so the running time is \(O(\vert E \vert )\).
+\end{observation}
+
+%eg
+
+\subsection{Correction of APA}
+If an augmenting path is returned, each vertex we reached, we kept track of how we reached it, so we do get a paph, where the path traces back to \(U\), and thus endpoints are unsaturated, which means this path is an augmenting path (Note that this path is altering since edges from \(X\) to \(Y\) in this path not in the matching and edges from \(Y\) to \(X\) are in the matching). 
+
+If no path is founded, we return a cover \(C = T \cup (X \setminus S)\). 
+\begin{itemize}
+    \item [(1)] \(C\) is a cover: Since \(S = Q\), we have explored all neighbors of \(S\), and all neighbors of \(S\) should be in \(T\), so there are no edges between \(S\) and \(Y \setminus T\), i.e. for each edge \(e \in E(G)\), one of endpoint of \(e\) must be in \(T \cup (X \setminus S)\), i.e. \(T \cup (X \setminus S)\) covers \(E(G)\). 
+    \item [(2)] \(\vert C \vert = \vert M \vert  \). Every vertex in \(T\) is saturated, with its \(M\)-partner in \(S\), otherwise there is an augmenting path. Every vertex in \(X \setminus S\) is saturated with its \(M\)-partner outside \(T\). (Every vertex in \(X \setminus S\) saturated since \(S\) is initially \(U\) and keep getting larger, so \(X \setminus S\) only contains vertices that is saturated by \(M\), and if \(x\)'s \(M\)-partner is in \(T\), then \(x \in S\), which is a contradiction. Also, remember that no edges bewteen \(S\) and \(Y \setminus T\), so \(\vert C \vert \) counts all edges in \(M\).)               
+\end{itemize} 
+
+\section{Maximum weight matchings}
+\begin{itemize}
+    \item Setting: We have a weighting on the edges of \(K_{n, n}\): \(w: E(K_{n, n}) \to \mathbb{R}\).
+    \item Goal: Find a perfect matching \(M\) that maximizes \(w(M) = \sum_{e \in M} w(e) \).  
+\end{itemize}
+
+Maximum weight matching problem can help us solve to maximum matching problem: Given a bipartite \(G \subseteq K_{n, n}\), then we define 
+\[
+    w(e) = \begin{dcases}
+        1, &\text{ if } e \in E(G) ;\\
+        0, &\text{ if } e \notin E(G) .
+    \end{dcases}
+\] 
+Then maximum weight of a perfect matching is the max size of a matching in \(G\). 
+
+\begin{definition}[Duality]
+    Let \(w\) be a weighting of \(E(K_{n, n})\). Then \(c: V(K_{n, n}) \to \mathbb{R}\) is a (weighted) cover of \(w\) if 
+    \[
+        \forall \left\{ x, y \right\} \in E(K_{n, n}), \quad w(\left\{ x, y \right\} ) \le c(x ) + c(y). 
+    \] 
+    The value of the cover is 
+    \[
+        \mathrm{val}(c) = \sum_{v \in V(K_{n, n})} c(v).  
+    \]   
+\end{definition}
+
+\begin{proposition}
+    Let \(w\) be a weighting of \(E(K_{n, n})\), let \(M\) be a perfect matching, and let \(c\) be a weighted cover. Then, \(w(M) \le \mathrm{val}(c) \), and we have equality iff 
+    \[
+        w(\left\{ x, y \right\} ) = c(x ) + c(y ) \text{ for all } \left\{ x, y \right\} \in M.  
+    \]     
+\end{proposition}
+
+\begin{proof}
+    \begin{align*}
+        w(M) &= \sum_{\left\{ x, y \right\} \in M } w(\left\{ x, y \right\} ) \le \sum_{\left\{ x, y \right\} \in M} (c(x) + c(y)) = \sum_{v \in V(K_{n, n})} c(v) = \mathrm{val}(c)   
+    \end{align*}
+    since \(c\) is a cover and \(M\) is a perfect matching. Also, the equality holds iff
+    \[
+        w(\left\{ x, y \right\} ) = c(x) + c(y) \text{ for all } \left\{ x, y \right\} \in M.  
+    \]   
+\end{proof}
+
+\begin{theorem}[Duality for max weight matching]
+    For any weighting of \(E(K_{n, n})\), 
+    \[
+        \max \left\{ w(M) : M \text{ is a perfect matching}  \right\} = \min \left\{ \mathrm{val}(c): c \text{ is a weighted cover}   \right\}.  
+    \] 
+\end{theorem}
+\begin{proof}
+    We prove this algorithmically: given a weighting \(w\), we will find a perfect matching \(M\) and a cover \(c\) s.t. \(w(M) = \mathrm{val}(c) \), and \(M\) is a max weight matching and \(c\) is a min-value cover. 
+
+    The idea is: Start with a cover \(c\). Build the equality subgraph \(G \subseteq K_{n, n}\):
+    \[
+        E(G) = \left\{ \left\{ x, y \right\} \in E(K_{n, n}): w(\left\{ x, y \right\} ) = c(x) + c(y)  \right\}. 
+    \] 
+    If \(G\) has a perfect matching \(M\) (use MMA), then we have a proposition: \(M\) and \(c\) are optimal. If not, use the cover from MMA to improve \(c\).          
+\end{proof}

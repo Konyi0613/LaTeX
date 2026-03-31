@@ -1,0 +1,241 @@
+\lecture{11}{31 March.}{}
+\begin{definition}[Poisson distribution]
+    Suppose \(\lambda \in \mathbb{R} _{\ge 0}\), then we say \(X \sim \mathrm{Poi}(\lambda ) \) if rare independent events that occurs on average \(\lambda \) times per unit interval of time, and we want to count how many times actually occur in a given interval. Hence, \(X\) takes value \(0, 1, 2, 3, \dots \).     
+\end{definition}
+
+As we increase \(n\) (decrease the length of the subintervals), we expect each subinterval to have \(0\) or \(1\) events, with \(\frac{\lambda}{n}\) on average. Note that whether or not a subinterval has an event are independent.
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    x=0.9cm,
+    y=0.9cm,
+    >=Latex,
+    tick/.style={line width=0.85pt},
+    eventarrow/.style={note, line width=1.15pt, ->},
+    guide/.style={note!75, line width=1.2pt}
+]
+    % colors similar to pen colors in photo
+    \colorlet{ink}{black}
+    \colorlet{note}{violet!80!blue}
+
+    % main unit-time interval line [0,1]
+    \draw[ink, line width=1.25pt] (0,0) -- (12,0);
+    \draw[ink, line width=1.25pt] (0,-0.26) -- (0,0.26);
+    \draw[ink, line width=1.25pt] (12,-0.26) -- (12,0.26);
+    \node[ink, above] at (0,0.26) {$0$};
+    \node[ink, above] at (12,0.26) {$1$};
+
+    % subdivision ticks: each step is 1/lambda of the unit interval
+    \foreach \x in {1,...,11} {
+        \draw[ink,tick] (\x,-0.14) -- (\x,0.14);
+    }
+    \node[ink] at (6,-0.5) {$\underbrace{\hspace{8.5cm}}_{\text{unit time interval}}$};
+
+    % event arrows (stylized Poisson arrivals)
+    \foreach \x/\h in {0.55/1.20,1.45/1.18,2.35/1.22,3.35/1.15,4.20/1.28,5.35/1.12} {
+        \draw[eventarrow] (\x,\h) -- (\x,0.33);
+    }
+    \draw[eventarrow] (11.5,1.35) -- (11.5,0.33);
+
+    % top annotation
+    \node[note] at (3.2,1.9) {on average $\dfrac{1}{\lambda}$ event};
+    \node[note] at (7.2,1.05) {$\cdots\ \cdots$};
+    \draw[guide,->] (3.2,1.63) to[out=-75,in=120] (3.0,0.45);
+
+    % highlight one small interval of length 1/lambda
+    \draw[guide,decorate,decoration={brace,mirror,amplitude=5pt}] (0,-0.1) -- (1,-0.1)
+        node[midway,below=0pt,ink] {$\dfrac{1}{\lambda}$ unit time interval};
+
+    % lower curved guide showing expected total count over one unit interval
+    \draw[guide] (0.4,-2.2) .. controls (3.2,-2.95) and (8.8,-2.95) .. (11.45,-1.8);
+
+    % bottom annotation
+    \node[note] at (6.2,-3.0) {on average $\lambda$ events in one unit interval};
+\end{tikzpicture}
+\end{figure}
+Hence,
+\begin{align*}
+    X &= \# \text{ of events in unit interval} \gtrsim \# \text{ of subintervals that have an event} \sim \mathrm{Bin}(n, \frac{\lambda}{n}).   
+\end{align*}
+Hence,
+\begin{align*}
+    \mathbb{P} (X = k) &\simeq \lim_{n \to \infty} \mathbb{P} \left( \mathrm{Bin}(n, \frac{\lambda}{n}) = k  \right) = \lim_{n \to \infty} \binom{n}{k} \left( \frac{\lambda}{n} \right)^k \left( 1 - \frac{\lambda}{n} \right)^{n-k} \\
+    &= \lim_{n \to \infty} \frac{n(n-1)\dots (n-k+1)}{k!} \left( \frac{\lambda}{n} \right)^k \left( 1 - \frac{\lambda}{n} \right)^{n-k} = \frac{\lambda ^k e^{-\lambda }}{k!}.      
+\end{align*}
+
+Thus, the mass function:
+\[
+    \mathbb{P} (X = k) = \frac{e^{-\lambda } \lambda ^k}{k!}, \quad k = 0, 1, 2, \dots .
+\]
+\begin{claim}
+    This is a valid distribution.
+\end{claim}
+\begin{explanation}
+    Since \(\mathbb{P} (X = k) \ge 0\) for all \(k\), and 
+    \[
+        \sum_{k=0}^{\infty } \mathbb{P} (X = k) = \sum_{k=0}^{\infty} \frac{e^{-\lambda } \lambda ^k}{k!} = e^{-\lambda } \sum_{k=0}^{\infty} \frac{\lambda ^k}{k!} = e^{-\lambda } e^{\lambda } = 1,   
+    \] 
+    and the countable additivity is trivial, so this is a valid distribution.
+\end{explanation}
+
+Now we compute the expectation value:
+\begin{align*}
+    \mathbb{E} [X] &= \sum_{k=0}^{\infty} k \mathbb{P} (X = k) = \sum_{k=1}^{\infty} k \cdot \frac{e^{-\lambda } \lambda ^k}{k!} = e^{-\lambda } \sum_{k=1}^{\infty} \frac{\lambda ^k}{(k-1)!} = \lambda e^{-\lambda } \sum_{k=1}^{\infty } \frac{\lambda ^{k-1}}{(k-1)!} \\
+    &= \lambda e^{-\lambda } \sum_{k=0}^{\infty} \frac{\lambda ^k}{k!} = \lambda e^{-\lambda } e^{\lambda } = \lambda .      
+\end{align*}
+
+Now we compute the variance:
+\begin{align*}
+    \Var(X) &= \mathbb{E} [X^2] - \mathbb{E} [X]^2 = \mathbb{E} [X^2 - X] + \mathbb{E} [X] - \mathbb{E} [X]^2 = \lambda ^2 + \lambda - \lambda ^2 = \lambda . 
+\end{align*}
+Note that \(\mathbb{E} [X^2 - X] = \mathbb{E} [X(X - 1)]\), and can be computed similarly as \(\mathbb{E} [X]\). 
+
+\begin{remark}
+    \(\mathrm{Poi}(\lambda ) \thickapprox \mathrm{Bin} \left( n, \frac{\lambda}{n} \right)   \) when \(n\) is large. We can notice the expectaion of \(\mathrm{Bin} \left( n, \frac{\lambda}{n} \right)  \) is \(n p = \lambda \) and the variance of \(\mathrm{Bin} \left( n, \frac{\lambda}{n} \right)  \) is \(np(1 - p) = \lambda \left( 1 - \frac{\lambda}{n} \right) \to \lambda  \) as \(n \to \infty\).      
+\end{remark}
+
+\begin{remark}[Poisson approximation]
+    If \(n\) is large, and \(np \to \lambda \in \mathbb{R} \), then we can approximate \(\mathrm{Bin}(n, p) \) by \(\mathrm{Poi}(np) \).    
+\end{remark}
+
+\begin{eg}[The Poisson Paradigm]
+    Suppose we have a probability space \((S, \mathbb{P})\), and a sequence of events \(E_1, E_2, \dots , E_n\), with 
+    \[
+        \mathbb{P} (E_i) = p_i, \quad \text{for } 1 \le i \le n.
+    \]  
+    If the \(p_i\)'s are all small, and the events \(E_i\) are independent or "weakly independent", i.e. \(\mathbb{P} (E_i \mid E_j) \thickapprox \mathbb{P} (E_i)\) for \(i \neq j\), then setting 
+    \[
+        \lambda = p_1 + p_2 + \dots + p_n,
+    \]    
+    if \(X\) is the number of events that occur, then \(X\) is approximately \(\mathrm{Poi}(\lambda ) \).   
+\end{eg}
+
+\begin{eg}
+    \(n\) people leaving a party, each takes a random hat. What is the probability that exactly \(k\) people get their hats?  
+\end{eg}
+\begin{explanation}
+    Define the events \(E_i = \left\{ i\text{-th person gets own hat}  \right\} \), then \(\mathbb{P} (E_i) = \frac{1}{n}\) for all \(i\), which is small. Also, 
+    \[
+        \mathbb{P} (E_i \mid E_j) = \frac{\frac{1}{n(n-1)}}{\frac{1}{n}} = \frac{1}{n-1} \thickapprox \frac{1}{n},
+    \]  
+    so by Poisson paradigm, \(X = \# \) of people getting own hat is approximaely \(\mathrm{Poi}(1) \), i.e. 
+    \[
+        \mathbb{P} (X = k) \thickapprox \frac{e^{-1} 1^k}{k!} = \frac{1}{k! e}.
+    \]    
+\end{explanation}
+
+\begin{eg}
+    Which of these is a random binary string?
+    \begin{itemize}
+        \item [(a)] 00000000001111111111
+        \item [(b)] 01010101010101010101
+        \item [(c)] 00011110100001111001
+        \item [(d)] 00100110000110111110
+    \end{itemize}
+\end{eg}
+
+\begin{eg}
+    Toss a fair coin \(n\) times. Let \(L_n\) be the length of the longest sequence of consecutive heads. What will \(L_n\) typically be?   
+\end{eg}
+
+\begin{explanation}
+    Since \(S = \left\{ H, T \right\}^n \), and \(\mathbb{P} \) is uniform, so 
+    \begin{align*}
+        \left\{ L_n \ge k \right\} &= \left\{ \text{there is a sequence of } k \text{ consecutive heads}   \right\} = E.  
+    \end{align*}  
+    Hence, \(E = \bigcup_{i=1}^{n - k + 1} E_i\) where \(E_i\) is the set of there is a sequence of \(k\) heads in a row starting from \(i\)-th toss. Also, \(\mathbb{P} (E_i) = 2^{-k}\), which is small if \(k\) is not too small. Note that 
+    \[
+        \mathbb{P} (E_{i+1} \mid E_i) = \frac{1}{2} \text{ (only need to see the last toss)}, 
+    \]     
+    which is not close to \(2^{-k}\). Hence, no weak independence here, and thus no Poisson paradigm.
+
+    Now we change a method to solve this problem. 
+    \[
+        E = \left\{ L_n \ge k \right\} = \bigcup_{i=1}^{n-k+1} E_i^{\prime}  
+    \] 
+    where 
+    \[
+        E_i^{\prime}  = \begin{dcases}
+            \text{toss } i, i + 1, \dots , i + k - 1 \text{ are heads and toss } i + k \text{ is tail} , &\text{ if }  0 \le i \le n - k;\\
+            \text{toss } n - k + 1, \dots , n \text{ are heads}  , &\text{ if }  i = n - k + 1.
+        \end{dcases}
+    \]
+    Hence,
+    \[
+        \mathbb{P} (E_i^{\prime} ) = \begin{dcases}
+            2^{-(k + 1)}, &\text{ if } 1 \le i \le n - k  ;\\
+            2^{-k}, &\text{ if } i = n - k + 1,
+        \end{dcases}
+    \]
+    which are all small.
+    Now 
+    \[
+        \mathbb{P} (E_i \mid E_j) = \begin{dcases}
+            \mathbb{P} (E_i), &\text{ if } \vert i - j \vert > k + 1 ;\\
+            0, &\text{ if } \vert i - j \vert \le k.
+        \end{dcases}
+    \]
+    Note that when \(k\) is big, \(\mathbb{P} (E_i) \thickapprox 0\), so under this setting we have \((E_i^{\prime} )\) weakly independent. Now since \(\mathbb{P} (E_i)\) is small for all \(i\), Poisson paradigm applies. Now let 
+    \[
+        \lambda = \sum_{i=1}^{n-k+1} \mathbb{P} (E_i) = (n - k + 2) 2^{-(k + 1)}. 
+    \]    
+    then \(X_k \coloneqq \) number of \(i\) s.t. \(E_i^{\prime} \) happens \(\sim \mathrm{Poi}((n - k + 2) 2^{-(k+1)}) \). Then, \(\left\{ L_n \ge k \right\} = \left\{ X_k \ge 1 \right\}  \) and thus \(\left\{ L_n < k \right\} = \left\{ X_k = 0 \right\}  \). Hence,
+    \[
+        \mathbb{P} (L_n < k) = \mathbb{P} (X = 0) \thickapprox e^{- \frac{n - k + 2}{2^{k+1}}}.
+    \]   
+    If \(k \le (1 + \varepsilon) \log_2 n\) for some \(\varepsilon > 0\), then 
+    \[
+        \frac{n - k + 2}{2^{k+1}} \to \infty,
+    \]  
+    so \(\mathbb{P} (L_n < k) \to 0\) as \(n \to \infty\). If \(k \ge (1 + \varepsilon) \log _2 n\) for all \(\varepsilon > 0\), then 
+    \[
+        \frac{n - k + 2}{2^{k + 1}} \to 0,
+    \]  
+    then \(\mathbb{P} (L_n < k) \to 1\). If \(k = \log _2 n + c\) for some constant \(c\), then 
+    \[
+        \frac{n - k + 2}{2^{k + 1}} = \frac{n - \log _2 n + 2 + c}{2^{c + 1} n} \to 2^{-(c+1)}. 
+    \]   
+    Thus,
+    \[
+        \mathbb{P} (L_n < \log _2 n + c) \to e^{-2^{-(c+1)}}.
+    \]
+    \begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[x=1cm,y=1cm,>=Latex]
+        % axes
+        \draw[->, line width=0.9pt] (0,0) -- (11,0) node[right] {$k$};
+        \draw[->, line width=0.9pt] (0,0) -- (0,6) node[above] {$P(L_n\le k)$};
+
+        % origin label
+        \node[below left] at (0,0) {$0$};
+
+        % reference marker near transition
+        \draw[densely dashed] (3.2,-0.45) -- (3.2,4.9);
+        \node[below] at (3.2,-0.45) {$\log_2 n$};
+
+        % CDF-like sketch: near zero, smooth sharp rise, then plateau
+        \draw[line width=1.1pt]
+            (0.55,0.05) -- (2.85,0.05)
+            .. controls (3.02,0.18) and (3.10,2.55) .. (3.28,3.55)
+            .. controls (3.38,4.02) and (3.60,4.18) .. (3.95,4.20)
+            .. controls (6.0,4.22) and (8.3,4.24) .. (10.2,4.25);
+
+        % x-axis n mark near right side (as on board)
+        \node[below] at (10.0,-0.35) {$n$};
+    \end{tikzpicture}
+    \end{figure}
+
+\end{explanation}
+
+\begin{definition}[Geometric Distribution]
+    \(X \sim \mathrm{Geom}(p) \) where \(0 \le p \le 1\) when independent trials with success probability \(p\) and we eant to count the number of trials until first success (inclusive). Hence, \(\mathrm{Geom}(p) \) takes values \(1, 2, 3, 4, \dots \).     
+\end{definition}
+
+Hence,
+\[
+    \mathbb{P} (X = k) = (1 - p)^{k-1} p \ge 0.
+\]
+We can check that 
+\[
+    \sum_{k=1}^{\infty} \mathbb{P} (X = k) = \sum_{k=1}^{\infty} (1 - p)^{k-1} p = p \sum_{k=1}^{\infty} (1-p)^{k-1} = p \cdot \frac{1}{1 - (1 - p)} = 1.  
+\]
