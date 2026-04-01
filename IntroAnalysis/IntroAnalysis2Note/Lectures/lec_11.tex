@@ -25,6 +25,49 @@ In this chapter, our goal is to construct a measure. Note that we constructed ou
     Note that \(\mathbb{R} ^n\) is measurable since \(A \cap \mathbb{R} ^n = A\) and \(A \setminus \mathbb{R} ^n = \varnothing\). Also, \(\varnothing\) is measurable since \(A \cap \varnothing = \varnothing\) and \(A \setminus \varnothing = A\).      
 \end{remark}
 
+\begin{exercise} \label{exercise: half-spaces}
+    If \(A\) is an open box in \(\mathbb{R} ^n\) and \(E = \left\{ (x_1, x_2, \dots , x_n) \in \mathbb{R} ^n: x_n > 0 \right\} \), then 
+    \[
+        m^*(A) = m^*(A \cap E) + m^*(A \setminus E).
+    \]   
+\end{exercise}
+\begin{proof}
+    We first give a claim:
+    \begin{claim}
+        If \(A\) is an open interval in \(\mathbb{R} \), then 
+        \[
+            m^*(A) = m^*(A \cap (0, \infty )) + m^*(A \setminus (0, \infty )).
+        \]  
+    \end{claim}
+    \begin{explanation}
+        Suppose \(A = (a_i, b_i)\) s.t. \(a_i \le b_i\), then 
+        \begin{itemize}
+            \item Case 1: \(0 \le a_i \le b_i\), then \(A \cap (0, \infty ) = A\) and \(A \setminus (0, \infty ) = \varnothing\), so this is true. 
+            \item Case 2: \(a_i \le 0 \le b_i\). Similar.
+            \item Case 3: \(a_i \le b_i \le 0\). Similar.     
+        \end{itemize}  
+    \end{explanation}
+    Suppose \(A = \prod _{i=1}^n I_i \). Note that 
+    \[
+        m^*(A) = \mathrm{vol}(A) =  \prod _{i=1}^n \mathrm{vol}(I_i) = \prod_{i=1}^n m_1^*(I_i).  
+    \]
+    Also,
+    \begin{align*}
+        A \cap E &= \left( \prod _{i=1}^{n-1} I_i \right) \times (I_n \cap (0, \infty)) \quad
+        A \setminus E = \left( \prod _{i=1}^{n-1} I_i \right) \times (I_n \setminus (0, \infty)).  
+    \end{align*}
+    Thus, \(A \cap E\) and \(A \setminus E\) are both open boxes. By the claim, we have 
+    \[
+        m_1^*(I_n) = m_1^*(I_n \cap (0, \infty )) + m_1^*(I_n \setminus (0, \infty)).
+    \]  
+    Thus,
+    \begin{align*}
+        m^*(A) &= \prod _{i=1}^n m_1^*(I_i) = \prod _{i=1}^{n-1} m_1^*(I_i) \times m_1^*(I_n) = \prod _{i=1}^{n-1} m_1^*(I_i) \times (m_1^*(I_n \cap (0, \infty )) + m_1^*(I_n \setminus (0, \infty ))) \\
+        &= \prod _{i=1}^{n-1} m_1^*(I_i) \times m_1^*(I_n \cap (0, \infty )) + \prod _{i=1}^{n-1} m_1^*(I_i) \times m_1^*(I_n \setminus (0, \infty )) \\
+        &= m^*(A \cap E) + m^*(A \setminus E).
+    \end{align*}
+\end{proof}
+
 \begin{lemma}[Half-spaces are measurable] \label{lm: Half-spaces are measurable}
     The half space \(\left\{ (x_1, \dots , x_n) \in \mathbb{R} ^n : x_n > 0 \right\} \) is measurable. 
 \end{lemma}
@@ -44,7 +87,7 @@ In this chapter, our goal is to construct a measure. Note that we constructed ou
     \]
     We know that 
     \[
-        m^*(B_k) = m^*(B_k \cap E) + m^*(B_k \setminus E) \text{ by exercises.} 
+        m^*(B_k) = m^*(B_k \cap E) + m^*(B_k \setminus E) \text{ by \autoref{exercise: half-spaces}.} 
     \]      
     Thus,
     \[
@@ -57,9 +100,9 @@ In this chapter, our goal is to construct a measure. Note that we constructed ou
     \end{align*}
     Hence,
     \[
-        m^*(A) + \varepsilon \ge \sum_{k=1}^{\infty} m^*(B_k) \ge m^*(A \cap E) + m^*(A \setminus E), 
+        m^*(A) + \varepsilon \ge \sum_{k=1}^{\infty} \mathrm{vol} (B_k) \ge m^*(A \cap E) + m^*(A \setminus E), 
     \]
-    and we're done.
+    and since this is true for all \(\varepsilon > 0\), so we're done.
 \end{proof}
 
 \begin{remark}
@@ -85,7 +128,7 @@ In this chapter, our goal is to construct a measure. Note that we constructed ou
 \begin{proof}[proof of (a)]
     Since \(E\) is measurable, \(m^*(A) = m^*(A \cap E) + m^*(A \setminus E)\) for any \(A \subseteq \mathbb{R} ^n\). Also,
     \[
-        A \cap (\mathbb{R} ^n \setminus E) = A \setminus E \text{ and } A \setminus (\mathbb{E} \setminus E) = A \cap E. 
+        A \cap (\mathbb{R} ^n \setminus E) = A \setminus E \text{ and } A \setminus (\mathbb{R} \setminus E) = A \cap E. 
     \]   
     Thus,
     \[
@@ -159,7 +202,7 @@ In this chapter, our goal is to construct a measure. Note that we constructed ou
 \end{proof}
 
 \begin{proof}[proof of (e)]
-    Note that every open boxes is the intersection of many half-spaces of the form 
+    Note that every open box is the intersection of many half-spaces of the form 
     \[
         \left\{ x: x_j > a_j \right\} \text{ or } \left\{ x: x_j < b_j \right\}.   
     \]
@@ -225,7 +268,7 @@ In this chapter, our goal is to construct a measure. Note that we constructed ou
     \]
     and we're done.
 
-    Now if we have pairwise disjoint \(E_1, E_2, \dots , E_k\), we can pick \(A = \varnothing \), and thus 
+    Now if we have pairwise disjoint \(E_1, E_2, \dots , E_k\), we can pick \(A = \mathbb{R}^n \), and thus 
     \[
       m(\bigcup_{j \in J} E_j ) = \sum_{j \in J} m(E_j).  
     \]  
@@ -302,7 +345,24 @@ In this chapter, our goal is to construct a measure. Note that we constructed ou
     \[
         m^*(A) \ge m^*(A \cap E) + m^*(A \setminus E).
     \]
-    This shows \(E\) is measurable. 
+    This shows \(E\) is measurable.
+    
+    Now we show 
+    \[
+        m(E) = \sum_{k=1}^{\infty} m(E_{j_k}). 
+    \]
+    First, since \(E = \bigcup_{i=1}^{\infty} E_{j_k} \), so 
+    \[
+        m(E) \le \sum_{k=1}^{\infty} m(E_{j_k}). 
+    \] 
+    Now since \(F_N \subseteq E\) for all \(N\), so 
+    \[
+        \sum_{k=1}^N m(E_{j_k}) = m(F_N) \le m(E), 
+    \]  
+    so 
+    \[
+        m(E) = \sum_{k=1}^{\infty} m(E_{j_k}). 
+    \]
 
 \end{proof}
 
@@ -319,7 +379,7 @@ In this chapter, our goal is to construct a measure. Note that we constructed ou
     \[
         \bigcup_{k=1}^{\infty} E_k = \bigcup_{k=1}^{\infty} \Omega _{j_k}.  
     \]  
-    Hence, \(\bigcup_{k=1}^{\infty} \Omega _{j_k}\) is measurable. 
+    By this, \(\bigcup_{k=1}^{\infty} \Omega _{j_k}\) is measurable since we have shown that the union of countably infinitely many measurable sets is measurable. 
 
     Now since 
     \[
