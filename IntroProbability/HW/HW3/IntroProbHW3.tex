@@ -1,0 +1,264 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{bbding,combelow,textcomp,amsfonts,amsthm,amsmath,amssymb,graphicx,color,hyperref,etoolbox}
+\usepackage[utf8x]{inputenc}
+\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+\usepackage{mathtools}
+\newtoggle{story}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Customisation options --- update as necessary
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Course details: title, semester, instructors
+
+\newcommand{\courseTitle}{Introduction to Probability Theory (Math 2502)}
+\newcommand{\semester}{Spring 2026}
+\newcommand{\instructorA}{Shagnik Das}
+\newcommand{\instructorB}{}
+
+%% Sheet number
+
+\newcommand{\sheetNumber}{3}
+
+
+%% Submission details
+
+\newcommand{\dueDate}{13:00, Apr 7th.}
+\newcommand{\lateWarning}{Submissions that are late will receive no credit.}
+
+
+%% Display irrelevant footnotes?  \toggletrue for yes, \togglefalse for no
+
+\toggletrue{story}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End of customisation options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pdfpagewidth 8.5in
+\pdfpageheight 11in
+\topmargin -1in
+\headheight 0in
+\headsep 0in
+\textheight 8.5in
+\textwidth 6.5in
+\oddsidemargin 0in
+\evensidemargin 0in
+\headheight 77pt
+\headsep 0in
+\footskip .75in
+
+\makeatletter
+\newcommand{\buildtitle}[4]{
+\begin{flushleft}
+{\large
+#1
+\hfill{}
+#2
+\par
+#3
+}
+\end{flushleft}
+\vskip 4pt
+\begin{center}
+{\large\bfseries#4\par}
+\end{center}
+\bigskip
+}
+\makeatother
+
+\renewcommand{\thesection}{\normalsize\arabic{section}}
+
+\renewcommand{\deg}{\textrm{deg}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\ceil}[1]{\left \lceil #1 \right \rceil}
+
+\newcommand{\hint}{\begin{flushright} [Hint at \url{\hintURL}.] \end{flushright}}
+
+\newcommand{\card}[1]{\left| #1 \right|}
+\newcommand{\mb}[1]{\mathbb{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+
+
+\newcommand{\story}[1]{\iftoggle{story}{\footnote{#1}}{}}
+\newcommand{\storymark}[1][42]{\iftoggle{story}{\footnotemark[#1]}{}}
+\newcommand{\storytext}[2][42]{\iftoggle{story}{\footnotetext[#1]{#2}}{}}
+
+\newcommand{\bonus}[2]{\paragraph{Bonus (#1 pt\ifstrequal{#1}{1}{}{s})} #2}
+
+
+\begin{document}
+
+
+\buildtitle{\courseTitle{}}{\semester}{\instructorA{} \hfill \instructorB{}}{Exercise Sheet \sheetNumber{}}
+
+\vspace{-0.2in}
+
+\begin{center}
+
+{B13902024 Chang, Yi-Kuei \\ \bf Due date: \dueDate \\ \lateWarning}
+
+\end{center}
+
+\noindent You should try to solve all of the exercises below --- each problem is worth $10$ points. Make sure to clearly justify your answers, defining everything precisely and stating any results you are using. You should then submit your solutions in Gradescope on NTU COOL, either as a typed PDF or a clear scan of your handwritten answers, and should indicate where in the file the solutions to each exercise are. If you have difficulties with Gradescope, please send your solutions by e-mail.
+
+\paragraph{Exercise 1}  Let $X$ be a random variable that takes nonnegative integer values. Prove that
+\[ \mb E [X] = \sum_{n \in \mathbb{N}} \mb P (X \ge n). \]
+
+\paragraph{Solution:} For any \(n \in \mathbb{N} \),
+\[
+	\mathbb{P} (X \ge n) = \mathbb{P} \left( \bigcup_{ik \ge n} \left\{ X = k \right\}   \right) = \sum_{k \ge n} \mathbb{P} (X = k).  
+\] 
+Thus,
+\begin{align*}
+	\sum_{n \in \mathbb{N}} \mathbb{P} (X \ge n) &= \sum_{n \in \mathbb{N} } \sum_{k \ge n} \mathbb{P} (X = k) = \sum_{x_i \ge 1} x_i \mathbb{P} (X = x_i)   
+\end{align*}
+since for each \(k \in \mathbb{N} \), \(\mathbb{P} (X = k)\) will be added for every \(1 \le n \le k\), and thus \(\mathbb{P} (X = k)\) will be added \(k\) times. Note that 
+\[
+	\sum_{x_i \ge 1} x_i \mathbb{P} (X = X_i) = \sum_{x_i} x_i \mathbb{P} (X = x_i) = \mathbb{E} [X]  
+\]    
+since \(x_i\) only takes nonnegative integer value and for \(x_i = 0\), \(x_i \mathbb{P} (X = x_i) = 0\). Hence,
+\[
+	\mathbb{E} [X] = \sum_{x \in \mathbb{N} } \mathbb{P} (X \ge n). 
+\] 
+
+\paragraph{Exercise 2}  A store is offering a promotion --- they have $n$ different types of coupons, and every time you buy something, you get a coupon of a uniformly random type, independently of your previous coupons. Once you have collected all the different types of coupons, you can redeem them for a free probability textbook!
+
+Recall that in lecture we saw that the probability you will need to collect more than $t$ coupons before you have a full set is
+\[ \sum_{i = 1}^n (-1)^{i+1} \binom{n}{i} \left( \frac{n-i}{n} \right)^t. \]
+
+What is the probability that, after collecting $t$ coupons, you will have exactly $k$ different types in your collection?
+
+\paragraph{Solution:} Let 
+\[
+	E^{(t)} = \left\{ \text{after collecting } t \text{ coupons, having exactly } k \text{ different types of coupons}    \right\}, 
+\]
+and
+\[
+	E_K^{(t)} = \left\{ \text{after collecting } t \text{ coupons, having exactly types of coupons in } K  \right\} 
+\]
+if \(K\) is the set of types of coupons we have and \(\vert K \vert = k\). To compute the probability of \(E^{(t)}\), we have \(\binom{n}{k}\) ways to choose \(k\) types of coupons. Thus, suppose we denote the type of different type of coupons by \(1, 2, 3, \dots , n\), then 
+\[
+	\mathbb{P} (E^{(t)}) = \sum_{K \subseteq \binom{[n]}{k}} \mathbb{P} (E_K^{(t)}) = \binom{n}{k} \mathbb{P} (E^{(t)}_{[k]})
+\] 
+since the distribution of getting coupons is uniform. Note that 
+\begin{align*}
+	E_{[k]}^{(t)} &= \overbrace{\left\{ \text{after having } t \text{ coupons, all coupons we have are the types in } [k]  \right\}}^{D} \\ &\setminus \bigcup_{i=1}^{k} \overbrace{\left\{ \text{after having } t \text{ coupons, all coupons we have are in } [k] \setminus \left\{ i \right\} \right\}}^{C_i}.   
+\end{align*}
+Hence,
+\[
+	\mathbb{P} (E_{[k]}^{(t)}) = \mathbb{P} (D) - \mathbb{P} \left( \bigcup_{i=1}^{k} C_i  \right) = \frac{k^t}{n^t} - \mathbb{P} \left( \bigcup_{i=1}^{k} C_i  \right). 
+\]
+Note that 
+\begin{align*}
+	\mathbb{P} (\bigcup_{i=1}^{k} C_i ) &= \sum_{r=1}^k (-1)^{r+1} \sum_{1 \le i_1 < i_2 < \dots < i_r \le k} \mathbb{P} \left( \bigcap_{j=1}^{r} C_{i_j}  \right) \\
+	&= \sum_{r=1}^k (-1)^{r+1} \sum_{1 \le i_1 < i_2 < \dots < i_r \le k}\mathbb{P} \left( \left\{ \substack{\text{after having } t \text{ coupons, all coupons we have are in } \\ [k] \setminus \left\{ i_1, i_2, \dots , i_r \right\}}    \right\}  \right) \\
+	&= \sum_{r=1}^k (-1)^{r+1} \sum_{1 \le i_1 < i_2 < \dots < i_r \le k} \frac{(k-r)^t}{n^t} = \sum_{r=1}^k (-1)^{r+1} \binom{k}{r} \frac{(k-r)^t}{n^t}.       
+\end{align*}
+Hence,
+\begin{align*}
+	\mathbb{P} (E_{[k]}^{(t)}) &= \frac{k^t}{n^t} - \sum_{r=1}^k (-1)^{r+1} \binom{k}{r} \frac{(k-r)^t}{n^t} = \sum_{r=0}^k (-1)^r \binom{k}{r} \frac{(k-r)^t}{n^t}, 
+\end{align*}
+and thus
+\[
+	\mathbb{P} (E^{(t)}) = \binom{n}{k} \mathbb{P} (E_{[k]}^{(t)}) = \binom{n}{k} \sum_{r=0}^k (-1)^r \binom{k}{r} \frac{(k-r)^t}{n^t}.
+\]
+
+\newpage
+
+\paragraph{Exercise 3}  A casino introduces a new game for $n$ players. The dealer has a deck of $n+1$ cards, labelled from $1$ to $n+1$, which she shuffles. She then gives each player a (different) random card, leaving the remaining card for herself.
+
+The dealer will then reveal her card, after which the players reveal their cards, one at a time. Every player whose card is higher than all of the previously revealed cards wins \$100.
+
+How much should the casino expect to pay out in prizes each round?
+
+\paragraph{Solution:} We define random variables 
+\begin{align*}
+	X &= \# \text{ of \$ the casino would pay out in prizes each round} \\
+	X_p &= \# \text{ of players win in each round}.
+\end{align*}
+Thus, \(X = 100X_p\), and thus \(\mathbb{E} [X] = 100 \mathbb{E} [X_p]\). Also, we define 
+\[
+	X_i = \begin{dcases}
+		1, &\text{ if } i\text{-th player win in one round} \\
+		0, &\text{ if } i\text{-th player lose in one round}
+	\end{dcases} \text{ for } 1 \le i \le n. 
+\] 
+Thus, \(X_p = X_1 + X_2 + \dots + X_n\). Thus,
+\[
+	\mathbb{E} [X_p] = \mathbb{E} [X_1] + \mathbb{E} [X_2] + \dots + \mathbb{E} [X_n],
+\] 
+where \(\mathbb{E} [X_i] = \mathbb{P} \left( \text{player } i \text{ win in one round}   \right) \). Note that 
+\begin{align*}
+	\mathbb{P} (\text{player } i \text{ win in one round}) &= \sum_{j=1}^{n+1} \mathbb{P} \left( i\text{-th player win} \mid \text{player } i \text{ gets card }j     \right) \mathbb{P} \left( \text{player } i \text{ gets card } j   \right).  
+\end{align*} 
+
+For each card \(j\), since the dealer gives each player a card at random, so the probability that player \(i\) gets card \(j\) is \(\frac{1}{n+1}\). Besides, notice that 
+\begin{align*}
+	\mathbb{P} \left( i\text{-th player win} \mid \text{player } i \text{ gets card }j     \right) &= \frac{\binom{j-1}{i} i! (n-i)!}{n!} 
+\end{align*}    
+since if we know player \(i\) gets card \(j\), then the left \(n\) cards can be given to each player at random, which has \(n!\) ways, and the only way player \(i\) can win if he gets card \(j\) is that player \(1\) to \(i-1\) gets cards smaller than \(j\), so we can choose \(\binom{j-1}{i}\) cards to player \(1\) to \(i-1\) and give these cards randomly to them, and cards \(j+1\) to \(n+1\) can be given to the left players at random, so we have \(\binom{j-1}{i} i! (n-i)!\) ways for player \(i\) to win if we know player \(i\) gets card \(j\). Hence,
+\begin{align*}
+	&\sum_{j=1}^{n+1} \mathbb{P} \left( i\text{-th player win} \mid \text{player } i \text{ gets card }j     \right) \mathbb{P} \left( \text{player } i \text{ gets card } j   \right) = \sum_{j=1}^{n+1} \frac{\binom{j-1}{i} i! (n-i)!}{n!} \frac{1}{n+1} \\
+	&= \frac{1}{\binom{n}{i} (n+1)}\sum_{j=1}^{n+1} \binom{j-1}{i} = \frac{1}{\binom{n}{i} (n+1)} \sum_{j=0}^n \binom{j}{i}.   
+\end{align*}                  
+Note that 
+\[
+	\sum_{j=0}^n \binom{j}{i} = \binom{n+1}{i+1} 
+\]
+since \(\binom{n+1}{i+1}\) counts the number of ways to pick \(i + 1\) balls from \(n + 1\) balls labelled with \(1, 2, \dots , n + 1\), and \(\binom{j}{i}\) counts the number of ways to pick \(i + 1\) balls with the maximum picked ball \(i+1\), which shows \(\sum_{j=0}^n \binom{j}{i} = \binom{n+1}{j+1}\). Hence,
+\[
+	\frac{1}{\binom{n}{i} (n+1)} \sum_{j=0}^n \binom{j}{i} = \frac{1}{\binom{n}{i} (n+1)} \binom{n+1}{j+1} = \frac{1}{i+1}. 
+\]         
+This shows 
+\[
+	\mathbb{P} (\text{player } i \text{ win in one round}  ) = \frac{1}{i+1}.
+\]
+Hence,
+\[
+	\mathbb{E} [X_p] = \mathbb{E} [X_1] + \mathbb{E} [X_2] + \dots + \mathbb{E} [X_n] =  \frac{1}{2} + \frac{1}{3} + \dots + \frac{1}{n + 1},
+\]
+and thus 
+\[
+	\mathbb{E} [X] = 100 X_p = 100 \left( \frac{1}{2} + \frac{1}{3} + \dots + \frac{1}{n+1} \right). 
+\]
+
+\newpage
+
+\paragraph{Exercise 4}  An absent-minded professor has $10$ keys on his keyring, labelled $1$, $2$, ..., $10$ in cyclic order. Key $6$ opens his front door, but he has unfortunately forgotten this crucial piece of information.
+
+He starts by trying Key $1$, which of course does not open the door. He then tries a neighbouring key --- either the next or the previous one --- uniformly at random (in this instance, the second key he tries could be Key $2$ or Key $10$).
+
+The professor is unable to remember which keys he has already tried, so every time a key doesn't work, he next tries one of its two neighbouring keys, uniformly at random, independently of all previous choices.
+
+What is the probability that he tries all the other keys before he tries Key $6$ and is finally able to open the door?
+
+\paragraph{Solution:} If we want to try all other keys before key 6 and is finally able to open the door, we call this event \(X\), and there are two cases in \(X\): try key 5 earlier than key 7, then try key 7 before key 6, and finally try key 6, while the other way is to try key 7 earlier than key 5, then try key 5 before key 6, and finally try key 6. We call the first case \(E\) and the second case \(F\), then \(\mathbb{P} (X) = \mathbb{P} (E) + \mathbb{P} (F)\). Now we define 
+\begin{align*}
+	A &= \left\{ \text{after trying key 1, then try key 5 before key 7}  \right\} \\
+	B &= \left\{ \text{after trying key 5, try key 7 before key 6}  \right\} \\
+	C &= \left\{ \text{after trying key 7, finally try key 6}  \right\}.    
+\end{align*} 
+Then,
+\[
+	\mathbb{P} (E) = \mathbb{P} (A) \mathbb{P} (B \mid A) \mathbb{P} (C \mid A, B).
+\] 
+Note that \(\mathbb{P} (A) = \frac{1}{2}\) by symmetry (key 5 and key 7 has same distance from key 1). To compute \(\mathbb{P} (B)\), we can convert it to an equivalent question: If we have a line and we write \(6, 5, 4, 3, 2, 1, 10, 9, 8, 7\) from left to right on it, and initially we are at \(5\), then what is the probability of reaching 7 before reaching 6 given that the probability of moving to left or right in each move are both \(\frac{1}{2}\). Suppose \(p(i)\) is the probability of starting at \(i\) and first reaching \(7\) than \(6\), then \(p(6) = 0\) and \(p(7) = 1\), and \(p(i) = \frac{1}{2} p(\text{left of } i) + p(\text{right of } i)\). Suppose we rename the number on the line from left to right as \(a_0, a_1, \dots , a_{9}\), then \(p(a_0) = 0\) and \(p(a_{9}) = 1\), and 
+\[
+	p(a_i) = \frac{1}{2} p(a_{i-1}) + \frac{1}{2} p(a_{i+1}) \implies p(a_i) - p(a_{i-1}) = p(a_{i+1}) - p(a_i).
+\]          
+This shows \(\left\{ p(a_i) \right\}_{i=0}^{9} \) is an arithmetic series, and we can deduce \(p(5) = p(a_1) = \frac{1}{9}\). Hence, \(\mathbb{P} (B) = \frac{1}{9}\). Now we show \(\mathbb{P} (C \mid A, B) = 1\). Actually, \(\mathbb{P} (C \mid A, B) = \mathbb{P} (C)\) since all choices of key in each round are independent. We can similarly convert the problem of computing \(\mathbb{P} (C)\) to an equivalent question: If we have a line with \(6, 7, 6, 5, 4, 3, 2, 1, 10, 9, 8, 7 , 6\) from left to right on it, where the \(i\)-th number(0-index) from left to right on this line we call it \(a_i\), then \(p(a_0) = p(a_{12}) = 1\), and 
+\[
+	p(a_i) = \frac{1}{2} p(a_{i-1}) + \frac{1}{2} p(a_{i+1}),
+\]           
+so similarly we can know \(\left\{ p(a_i) \right\}_{i=0}^{12} \) is an arithmetic series. Thus, \(p(7) = 1\). By this, we know \(\mathbb{P} (C) = 1\). Thus, 
+\[
+	\mathbb{P} (E) = \mathbb{P} (A) \mathbb{P} (B \mid A) \mathbb{P} (C \mid A, B) = \frac{1}{2} \cdot \frac{1}{9} \cdot 1 = \frac{1}{18}.
+\]   
+By symmetry, \(\mathbb{P} (F) = \frac{1}{18}\), so 
+\[
+	\mathbb{P} (X) = \mathbb{P} (E) + \mathbb{P} (F) = \frac{1}{18} + \frac{1}{18} = \frac{1}{9}.
+\] 
+
+\end{document}
