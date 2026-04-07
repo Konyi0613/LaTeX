@@ -1,0 +1,155 @@
+\lecture{12}{2 April.}{}
+Now we compute the expectation:
+\begin{align*}
+    \mathbb{E} [X] &= \sum_{k=1}^{\infty} k \mathbb{P} (X = k) = \sum_{k=1}^{\infty} k (1 - p)^{k-1} p = p \sum_{k=1}^{\infty} k (1-p)^{k-1}.   
+\end{align*}
+Note that 
+\[
+    \sum_{k=1}^{\infty} x^k = \frac{x}{1-x}, 
+\]
+so differentiating w.r.t. \(x\), we have 
+\[
+    \sum_{k=1}^{\infty} kx^{k-1} = \frac{(1-x) - x(-1)}{(1-x)^2} = \frac{1}{(1-x)^2}.
+\] 
+Hence, plugging in \(x = 1 - p\),
+\[
+    \mathbb{E} [X] = p \sum_{k=1}^{\infty} k(1 - p)^{k-1} = p \cdot \frac{1}{(1 - (1-p))^2} = \frac{1}{p}.
+\] 
+Now we compute the variance:
+\begin{align*}
+    \Var(X) &= \mathbb{E} [(X - \mathbb{E} [X])^2] = \mathbb{E} [X^2] - \mathbb{E} [X]^2 = \mathbb{E} [X(X + 1)] - \mathbb{E} [X] - \mathbb{E} [X]^2 \\
+    &= \mathbb{E} [X(X + 1)] - \frac{1}{p} - \frac{1}{p^2 }.
+\end{align*}
+Note that 
+\begin{align*}
+    \mathbb{E} [X(X + 1)] &= \sum_{k=1}^{\infty} k(k + 1) \mathbb{P} (X = k) = \sum_{k=1}^{\infty} k(k + 1) (1 - p)^{k - 1} p = p \sum_{k=1}^{\infty} k(k + 1) (1 - p)^{k - 1}.   
+\end{align*}
+Now we already have 
+\[
+    \sum_{k=1}^{\infty} k x^{k - 1} = \frac{1}{(1 - x)^2}. 
+\]
+Differentiating on both side, we have 
+\[
+    \sum_{k=1}^{\infty} k(k + 1) x^{k - 1} = \frac{2}{(1 - x)^3}. 
+\]
+Thus,
+\[
+    \mathbb{E} [X(X + 1)] = p \cdot \frac{2}{p^3} = \frac{2}{p^2}.
+\]
+This gives 
+\[
+    \Var(X) = \mathbb{E} [X(X + 1)] - \frac{1}{p} - \frac{1}{p^2} = \frac{2}{p^2} - \frac{1}{p} - \frac{1}{p^2} = \frac{1}{p^2} - \frac{1}{p} = \frac{1-p}{p^2}.
+\]
+\begin{eg}[Coupon collector problem]
+    Store has \(n\) types of coupons: Type 1, 2, ..., n. Every purchase gives uniformly random type of coupon. 
+    \begin{itemize}
+        \item Q1. How many purchases needed to get a coupon of Type \(i\), \(1 \le i \le n\)? 
+        \item Q2. How many purchases until we have all types?  
+    \end{itemize} 
+\end{eg}
+
+\begin{explanation}
+    Let \(X_i = \#\) of purchases before first coupon of type \(i\), \(1 \le i \le n\). Then, \(X_i \sim \mathrm{Geom}(\frac{1}{n}) \). Hence, \(\mathbb{P} (X_i = k) = \frac{1}{n} \left( 1 - \frac{1}{n} \right)^{k-1} \), and \(\mathbb{E} [X_i] = n\). Let \(X = \#\) of purchases until we have all types of coupons. Then, \(X = \max \left\{ X_i: 1 \le i \le n \right\} \), but this is not linear, so it is not easy to compute. 
+    
+    For \(i = 1, 2, \dots , n\), let \(y_i = \#\) of purchases needed to go from having \((i - 1)\) different types of coupons to having \(i\) different types. Then, \(X = \sum_{i=1}^n y_i \). Then, \(y_i \sim \mathrm{Geom}\left( \frac{n-i+1}{n} \right)  \) since \(y_i\) is the number of purchases we need to get one of the \(n - i + 1\) types of coupons that we haven't got. Thus,
+    \begin{align*}
+        \mathbb{E} [X] &= \mathbb{E} \left[ \sum_{i=1}^n y_i  \right] = \sum_{i=1}^n \mathbb{E} [y_i] = \sum_{i=1}^n \frac{n}{n - i + 1} = n \sum_{i=1}^n \frac{1}{n - i + 1} = n \sum_{i=1}^n \frac{1}{i} = n H_n.     
+    \end{align*}               
+\end{explanation}
+
+\begin{definition}[Negative Binomial Distribution]
+    We denote this distribution by \(X \sim \mathrm{NB}(r, p) \), where \(0 < p \le 1\) and \(r \in \mathbb{N} \). The setting is to repeat independent trial with success probability \(p\), and count the number of trials until \(r\)-th success. Thus, \(X\) takes value \(r, r+1, r+2, \dots \).       
+\end{definition}
+
+\begin{observation}
+    \(\mathrm{NB}(1, p) \sim \mathrm{Geom}(p) \).  
+\end{observation}
+
+Note that 
+\[
+    \mathbb{P} (X = n) = \binom{n - 1}{r - 1} p^r (1 - p)^{n - r}    
+\]
+since we can choose \(r - 1\) trials to be success in the first \(n - 1\) trials, and the \(n\)-th trial must be success. 
+
+We can compute the expectation:
+\begin{align*}
+    \mathbb{E} [X] &= \sum_{n=r}^{\infty} n \mathbb{P} (X = n) = \sum_{n=r}^{\infty} n \binom{n-1}{r-1} p^r (1 - p)^{n - r} \\
+    &= \sum_{n=r}^{\infty} \frac{n(n-1)!}{(r-1)!(n-r)!} p^r (1 - p)^{n - r} = \sum_{n=r}^{\infty} r \binom{n}{r} p^r (1-p)^{n-r} = r \sum_{n=r}^{\infty} \binom{n}{r} p^r (1-p)^{n-r} \\
+    &= \frac{r}{p} \sum_{n=r}^{\infty} \binom{(n+1)-1}{(r+1)-1} p^{r+1} (1-p)^{(n+1)-(r+1)} = \frac{r}{p} \sum_{n=r}^{\infty} \mathbb{P} (y = n) \quad (\text{if } y \sim \mathrm{NB}(r+1, p)) \\
+    &= \frac{r}{p}.        
+\end{align*}
+
+An alternative way to compute \(\mathbb{E} [X]\): If \(X \sim \mathrm{NB}(r, p) \), then we can write \(X = X_1 + X_2 + \dots + X_r\), where \(X_r = \#\) of trials to go fromm \((i-1)\)-th success to \(i\)-th success, where each \(X_i \sim \mathrm{Geom}(p) \) is independent. 
+
+Thus, 
+\[
+    \mathbb{E} [X] = \mathbb{E} \left[ \sum_{i=1}^r X_i  \right] = \sum_{i=1}^r \mathbb{E} [X_i] = \sum_{i=1}^r \frac{1}{p} = \frac{r}{p}.   
+\]
+
+As for the variance,
+\[
+    \Var(X) = \frac{r(1 - p)}{p^2} \quad [\text{HW}]. 
+\]
+
+\begin{definition}[Hyper Geometric Distribution]
+    We denote hyper geometric distribution by \(X \sim \mathrm{Hypergeometric}(N, m, n) \), where \(N, m, n\) are integers and \(0 \le m \le N\), \(1 \le n \le N\). The setting is: Population of size \(N\), of which \(m\) are good, and we select a random subset of \(n\) members of the populations without replacement uniformly, and we count the number of good members in sample, so \(X\) takes value \(0, 1, 2, \dots , \min \left\{ m, n \right\} \).      
+\end{definition}
+
+\begin{observation}
+    If we sample \(n\) people with replacement, then we could have a binomial distribution \(X^{\prime} \sim \mathrm{Bin}(n, \frac{m}{N})\), and thus 
+    \[
+        \mathbb{E} [X^{\prime} ] = \frac{nm}{N}, \quad \Var(X^{\prime} ) = \frac{nm(N - m)}{N^2}.
+    \]  
+\end{observation}
+
+Note that 
+\begin{align*}
+    \mathbb{P} (X = k) &= \frac{\substack{\text{number of ways of picking } k \text{ good members and } n - k \text{ bad members}   } }{\substack{\text{number of ways of picking } n \text{ members}  }} = \frac{\binom{m}{k} \binom{N - m}{n - k}}{\binom{N}{n}}.
+\end{align*}
+
+To compute the expectation, we can define 
+\[
+    X_i = \begin{dcases}
+        1, &\text{ if } i\text{-th member in the sample is good}  ;\\
+        0, &\text{ if } i\text{-th member in the sample is bad}  .
+    \end{dcases}
+\]
+Then,
+\[
+    X = \sum_{i=1}^n X_i \implies \mathbb{E} [X] = \sum_{i=1}^n \mathbb{E} [X_i].  
+\]
+Note that 
+\begin{align*}
+    \mathbb{E} [X_i] &= \mathbb{P} (i\text{-th member is good} ) = \frac{m}{N}
+\end{align*}
+because every one is equally likely to  be the \(i\)-th chosen person, and thus the probability of good member to be picked in \(i\)-th choice is \(\frac{m}{N}\). Hence,
+\[
+    \mathbb{E} [X] = n \cdot \frac{m}{N}.
+\] 
+
+Now we compute the variance \(\Var(X) = \mathbb{E} [X^2] - \mathbb{E} [X]^2\), where 
+\begin{align*}
+    \mathbb{E} [X^2] &= \mathbb{E} \left[ \left( \sum_{i=1}^n X_i  \right)^2  \right] = \mathbb{E} \left[ \sum_{i, j} X_i X_j  \right] = \sum_{i, j} \mathbb{E} [X_i X_j] \\
+    &= \sum_{i=1}^n \mathbb{E} [X_i^2] + 2 \sum_{1 \le i < j \le n} \mathbb{E} [X_i X_j] = \sum_{i=1}^n \mathbb{E} [X_i] + 2 \sum_{1 \le i < j \le n} \mathbb{E} [X_i X_j] \quad \text{since } X_i \text{ takes value 0, 1.}         
+\end{align*} 
+
+Note that 
+\[
+    X_i X_j = \begin{dcases}
+        1, &\text{ if } i\text{-th and } j\text{-th people are good};\\
+        0, &\text{ otherwise}  .
+    \end{dcases}
+\]
+Thus,
+\begin{align*}
+    \mathbb{E} [X_i X_j] &= \mathbb{P} \left( i\text{-th and } j \text{-th people are good}   \right) = \frac{\# \text{ of pairs of good members} }{\# \text{ of pairs}} = \frac{\binom{m}{2}}{\binom{N}{2}}. 
+\end{align*}
+Thus,
+\[
+    \mathbb{E} [X^2] = n \cdot \frac{m}{N} + 2 \binom{n}{2} \frac{\binom{m}{2}}{\binom{N}{2}} = \frac{nm}{N} + \frac{n(n - 1)m(m - 1)}{N(N - 1)},
+\]
+which shows 
+\[
+    \Var(X) = \mathbb{E} [X^2] - \mathbb{E} [X]^2 = \frac{nm}{N} + \frac{n(n - 1)m(m - 1)}{N(N - 1)} - \frac{n^2 m^2}{N^2} = \frac{nm(N - m)(N - n)}{N^2(N - 1)}. 
+\]
+

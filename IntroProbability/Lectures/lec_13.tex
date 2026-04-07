@@ -1,0 +1,229 @@
+\chapter{Continuous Random Variables}
+\lecture{13}{7 April.}{}
+\section{Sigma Algebras}
+\begin{eg}[Sigma algebras]
+    If we have infinite sequence of tosses of a fair coin. Let \(S = \left\{ H, T \right\}^{\mathbb{N}} \), then what is \(\mathbb{P} (w)\) for \(w \in S\)?   
+\end{eg}
+\begin{explanation}
+    Since the coin is fair, so the probability should be uniform, and thus no one sequence should be more likely than another. Hence, for \(w\), since each toss has \(\frac{1}{2}\) probability, and due to the independence, we can multiply the probabilities: \(\mathbb{P} (w)\) should be \(0\). However, \(S = \bigcup_{w \in S} \left\{ w \right\}  \), so 
+    \[
+        1 = \mathbb{P} (S) = \mathbb{P} \left( \bigcup_{w \in S} \left\{ w \right\}   \right) = \sum_{w \in S} \mathbb{P} \left( \left\{ w \right\}  \right) = 0 ?   
+    \]    
+    In fact, there is an error:
+    \[
+        \mathbb{P} \left( \bigcup_{w \in S} \left\{ w \right\}   \right) \neq \sum_{w \in S} \mathbb{P} (\left\{ w \right\} ),  
+    \]
+    this is because probability only has "countable" additivity but \(S\) is uncountable. 
+\end{explanation}
+
+Thus, we can define a uniform probability measure, where we wants:
+\begin{itemize}
+    \item [(1)] \(\mathbb{P} (S) = 1\). 
+    \item [(2)] \(\mathbb{P} (\left\{ w \right\} ) = 0\) for every \(w \in S\). 
+    \item [(3)] If \(E_1, E_2, \dots \subseteq S\) are mutually exclusive, then \(\mathbb{P} \left( \bigcup_{i=1}^{\infty} E_i  \right) = \sum_{i=1}^{\infty} \mathbb{P} (E_i)  \). 
+    \item [(4)] For any \(i \in \mathbb{N} \), let \(T_i : S \to S\) be the map that flips the outcome of the \(i\)-th coin toss, and for \(I \subseteq \mathbb{N}\), let \(T_I: S \to S\) be the map that flips the outcomes of all toses in \(I\). For every \(E \subseteq S\), and any \(I \subseteq \mathbb{N}\), then \(\mathbb{P} (T_I(E))= \mathbb{P} (E)\).              
+\end{itemize}
+
+\begin{proposition}
+    No such \(\mathbb{P}\) exists. 
+\end{proposition}
+\begin{proof}
+    Define an equivalence relation on \(S\). Say \(w_1, w_2 \in S\) are equivalent if they only have finitely many differences, i.e.e \(\exists n \in \mathbb{N}\) s.t. \((w_1)_i = (w_2)_i\) for all \(i \ge n\). Then, we can partition \(S\) into equivalence classes \([w] = \left\{ w^{\prime} \in S: w^{\prime} \sim w \right\} \). Let \(E \subseteq S\) be an event that contains one member from every equivalence class. (by Axiom of choice) 
+    \begin{claim}
+        \(S = \bigcupdot_{\substack{I \subseteq \mathbb{N} \\ \vert I \vert < \infty}} T_I(E) \). 
+    \end{claim}        
+    \begin{explanation}
+        For every \(w \in S\), we have that \([w] \cap E = \left\{ w^{\prime} \right\} \) for some \(w^{\prime} \sim w\). Hence, \(\exists \) finite st \(I \subseteq \mathbb{N} \) of differences. Thus, \(T_I (\left\{ w^{\prime}  \right\} ) = \left\{ w \right\} \) and \(T_I (\left\{ w^{\prime}  \right\} ) \subseteq T_I(E)\). Hence, \(w \in \bigcupdot_{\substack{I \subseteq \mathbb{N} \\ \vert I \vert < \infty}} T_I(E)\).
+
+        Now we show the union is disjoint. If \(T_I(E) \cap T_J(E) \neq \varnothing \) for some \(I \neq J\), then \(\exists w, w^{\prime} \in E\) s.t. 
+        \[
+            T_I(\left\{ w \right\} ) = T_J(\left\{ w^{\prime} \right\} ) = \left\{ w^{\prime\prime}  \right\}. 
+        \]
+        Hence, \(w \sim w^{\prime\prime} \sim w^{\prime}\), so \(w = w^{\prime}\), so \(I = J\) since this means flips toss in \(I\) and toss in \(J\) gets same outcome.             
+    \end{explanation}
+
+    Note that \(S = \bigcupdot_{\substack{I \subseteq \mathbb{N} \\ \vert I \vert < \infty}} T_I(E)\) and R.H.S. is a countable union. Thus,
+    \begin{align*}
+        1 &= \mathbb{P} (S) = \mathbb{P} \left( \bigcupdot_{\substack{I \subseteq \mathbb{N} \\ \vert I \vert < \infty}} T_I(E) \right) = \sum_{\substack{I \subseteq \mathbb{N} \\ \vert I \vert < \infty }} \mathbb{P} (T_I(E)) = \sum_{\substack{I \subseteq \mathbb{N} \\ \vert I \vert < \infty }} \mathbb{P} (E)
+    \end{align*} 
+    by property (4) above. However, if \(\mathbb{P} (E) = 0\), then \(\sum_{\substack{I \subseteq \mathbb{N} \\ \vert I \vert < \infty }} \mathbb{P} (E) = 0\), but if \(\mathbb{P} (E) > 0\), then \(\sum_{\substack{I \subseteq \mathbb{N} \\ \vert I \vert < \infty }} \mathbb{P} (E) = \infty\), so such \(\mathbb{P} \) does not exist.     
+\end{proof}
+
+\begin{definition}
+    A sigma-algebra (\(\sigma \)-algebra) is a collection of subsets \(\Sigma \subseteq 2^S\) satisfying
+    \begin{itemize}
+        \item [(1)] \(S \in \Sigma\). 
+        \item [(2)] If \(E \in \Sigma\), then \(E^c \in \Sigma\). 
+        \item [(3)] If \(E_1, E_2, \dots \in \Sigma\), then \(\bigcup_{n=1}^{\infty} E_n \in \Sigma \).    
+    \end{itemize} 
+\end{definition}
+
+\paragraph{Discussion and Motivation.}
+The preceding example illustrates a fundamental obstruction in defining a probability measure on the entire power set $2^S$ when $S = \{H,T\}^{\mathbb{N}}$. 
+
+At first glance, it is natural to require that the probability measure $\mathbb{P}$ be \emph{uniform}, in the sense that every infinite sequence $w \in S$ has the same probability. Since each coordinate is an independent fair coin toss, this suggests that $\mathbb{P}(\{w\}) = 0$ for all $w \in S$, while $\mathbb{P}(S) = 1$. This is not contradictory, because countable additivity does not extend to uncountable unions.
+
+However, the proposition above shows that even if we only assume the following seemingly reasonable properties:
+\begin{itemize}
+    \item normalization ($\mathbb{P}(S) = 1$),
+    \item countable additivity,
+    \item and invariance under finite coordinate flips,
+\end{itemize}
+we arrive at a contradiction. The key step is the construction (via the axiom of choice) of a set $E \subseteq S$ that selects exactly one representative from each equivalence class of sequences that differ in only finitely many coordinates. This set is highly non-constructive and exhibits pathological behavior.
+
+The contradiction arises because $S$ can be decomposed into a countable disjoint union of translates $T_I(E)$, all of which must have the same probability as $E$ by invariance. This forces the total measure to be either $0$ or $\infty$, contradicting $\mathbb{P}(S) = 1$.
+
+The conclusion is that it is impossible to define a probability measure on all subsets of $S$ that satisfies these natural properties. In particular, there exist subsets of $S$ (such as the set $E$ above) to which no consistent probability can be assigned.
+
+This motivates the introduction of \emph{$\sigma$-algebras}. Instead of assigning probabilities to all subsets of $S$, we restrict attention to a smaller collection $\Sigma \subseteq 2^S$ of \emph{measurable sets}, which is closed under complements and countable unions. A probability measure is then defined only on $\Sigma$, thereby avoiding pathological sets and ensuring consistency of the theory.
+
+\paragraph{"Fix" probability}
+
+Now we can define a probability space to be a triple \((S, \Sigma , \mathbb{P})\), where \(S\) is the sample space, \(\Sigma \subseteq 2^S\) is a sigma-algebra, and \(\mathbb{P} : \Sigma \to \mathbb{R} _{\ge 0}\) assigns a probability to all events (members of \(\Sigma\)).   
+
+\begin{definition}
+    The \(\Sigma\) generated by intervals \([a, b]\) are called Borel \(\sigma \)-algebra.    
+\end{definition}
+
+\begin{remark}
+    If \(S\) is finite, we can take \(\Sigma = 2^S\).  
+\end{remark}
+
+\section{Introduction}
+\begin{definition}[Cumulative distribution function]
+    Given a probability space and a random variable \(X: S \to \mathbb{R}\), the cumulative distribution function, or cdf, \(F_X: \mathbb{R} \to [0, 1]\) is given by 
+    \[
+        F_X(b) = \mathbb{P} (X \le b).
+    \]  
+\end{definition}
+
+\begin{proposition}
+    \hfill 
+    \begin{itemize}
+        \item [(1)] \(\lim_{x \to \infty} F_X(x) = 1 \), and \(\lim_{x \to -\infty} F_X(x) = 0 \). 
+        \item [(2)] \(F_X(x)\) is increasing in \(x\). 
+        \item [(3)] \(F_X\) is right-continuous: Let $\{x_n\}_{n\ge 1}$ be a sequence such that
+        \[
+        x_n \searrow x,
+        \]
+        which means:
+        \begin{enumerate}
+            \item $x_1 \ge x_2 \ge \cdots \ge x_n \ge \cdots$ (monotone decreasing),
+            \item $\displaystyle \lim_{n\to\infty} x_n = x$.
+        \end{enumerate}
+
+        Then the cumulative distribution function $F_X$ is \emph{right-continuous} at $x$, i.e.,
+        \[
+        \lim_{n\to\infty} F_X(x_n) = F_X(x).
+        \]     
+    \end{itemize}
+\end{proposition}
+
+\begin{proof}[proof of (1)]
+    \[
+        \lim_{x \to \infty} F_X(x) = \mathbb{P} \left( \lim_{x \to \infty} F_X(x)  \right) = \mathbb{P} \left( \bigcup_{x \to \infty} \left\{ X \le x \right\}   \right) = \mathbb{P} (X \in \mathbb{R}) = 1.   
+    \]
+\end{proof}
+
+\begin{proof}[proof of (2)]
+    If \(a < b\), then 
+    \begin{align*}
+        F_X(b) - F_X(a) &= \mathbb{P} (X \le b) - \mathbb{P} (X \le a) = \mathbb{P} (a < X \le b) \ge 0.
+    \end{align*} 
+\end{proof}
+
+\begin{proof}[proof of (3)]
+    The sets $\{X \le x_n\}$ form a decreasing sequence of events:
+    \[
+    \{X \le x_1\} \supseteq \{X \le x_2\} \supseteq \cdots
+    \]
+    and
+    \[
+    \bigcap_{n=1}^{\infty} \{X \le x_n\} = \{X \le x\}.
+    \]
+    By the continuity of probability from above, we have
+    \[
+    \lim_{n\to\infty} P(X \le x_n) = P\Big(\bigcap_{n=1}^{\infty} \{X \le x_n\}\Big) = P(X \le x) = F_X(x).
+    \]
+
+    \noindent
+    \emph{Intuition:} The symbol $x_n \searrow x$ indicates a sequence approaching $x$ \emph{from the right}, e.g., $x_n = x + \frac{1}{n}$.
+\end{proof}
+
+%fig 
+\begin{note}
+    \(F_X\) does not have to be left-continuous: If \(b_n \nearrow b\), then \(\left\{ X \le b_n \right\} \nearrow \left\{ X < b \right\}  \). Thus,
+    \[
+        \lim_{n \to \infty} F_X(b_n) = \mathbb{P} (X < b) = F_X(b) - \mathbb{P} (X = b). 
+    \] 
+\end{note}
+
+\begin{definition}[Continuoius random variable]
+    A random variable \(X\) is said to be (absolutely) continuous if there is some function \(f_X: \mathbb{R} \to \mathbb{R} _{\ge 0}\) s.t. the cumulative distribution function 
+    \[
+        F_X(x) = \mathbb{P} (X \le x) = \int _{-\infty }^x f_X(t) \, \mathrm{d} t. 
+    \] 
+    Then, \(f_X\) is the probability density function of \(X\), or pdf.   
+\end{definition}
+
+\begin{remark}
+    In general,
+    \[
+        \mathbb{P} (a < X \le b) = F_X(b) - F_X(a).
+    \]
+    If \(X\) is absolutely continuous, then 
+    \[
+        \mathbb{P} (a < X \le b) = \int _{-\infty }^b f_X(t) \, \mathrm{d} t - \int _{-\infty }^a f_X(t) \, \mathrm{d} t = \int _a^b f_X(t) \, \mathrm{d} t.  
+    \] 
+    Thus, \(f_X(x)\) is a measure of how likely the random variable is to be around \(x\). Hence,
+    \[
+        \mathbb{P} (x - \varepsilon < X \le x + \varepsilon) = \int _{x - \varepsilon}^{x + \varepsilon } f_X(t) \, \mathrm{d} t \thickapprox 2 \varepsilon f_X(x) 
+    \]  
+    as \(\varepsilon \searrow 0\) if \(f_X\) is "nice".  
+\end{remark}
+
+\begin{remark}
+    By FTC, \(f_X(x) = F_X^{\prime} (x)\). 
+\end{remark}
+
+\begin{eg}
+    Now if 
+    \[
+        f(x) = \begin{dcases}
+            \frac{C}{x^3}, &\text{ if } x \ge 1 ;\\
+            0, &\text{ if } x < 1.
+        \end{dcases}
+    \]
+    \begin{itemize}
+        \item [(a)] What does \(C\) have to be for \(f\) to be the pdf of a random variable of \(X\)? 
+        \item [(b)] What is \(\mathbb{P} (a \le X \le b)\) for \(1 \le a \le b\)?      
+    \end{itemize}
+\end{eg}
+
+\begin{explanation}
+\hfill
+    \begin{itemize}
+        \item [(a)] Since 
+        \[
+            1 = \mathbb{P} (-\infty < X < \infty) = \int _{-\infty }^{\infty } f(t) \, \mathrm{d} t = \int _1^{\infty} \frac{C}{t^3} \, \mathrm{d} t = \left[ \frac{-C}{2t^2} \right]_1^{\infty} = \frac{C}{2},  
+        \]
+        so \(C = 2\). 
+        \item [(b)] For \(1 \le a \le b\), 
+        \[
+            \mathbb{P} (a \le X \le b) = \int _a^b f(t) \, \mathrm{d} t = \frac{1}{a^2} - \frac{1}{b^2}. 
+        \]
+    \end{itemize}
+\end{explanation}
+
+\paragraph{Expectation} In the discrete setting, we define \(\mathbb{E} [X] = \sum_{x_i} x_i \mathbb{P} (X = x_i) \), while in the continuous setting, we define \(\mathbb{E} [X] = \int _{-\infty }^{\infty} t f_X(t) \, \mathrm{d} t \). 
+
+\begin{eg}
+\[
+    f_X(t) = \begin{dcases}
+        \frac{2}{t^3}, &\text{ if } t \ge 1 ;\\
+        0, &\text{ if } t < 1.
+    \end{dcases}
+\]
+\end{eg}
+
+

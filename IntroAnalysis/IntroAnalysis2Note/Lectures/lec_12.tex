@@ -1,0 +1,148 @@
+\lecture{12}{7 April.}{}
+\section{Measurable Functions}
+\begin{definition}[Measurable functions]
+    Let \(\Omega \) be a measurable subset of \(\mathbb{R} ^n\), and let \(f: \Omega \to \mathbb{R} ^m\) be a function. Then, \(f\) is measurable iff \(f^{-1}(V)\) is measurable for every open set \(V \subseteq \mathbb{R} ^m\), where 
+    \[
+        f^{-1}(V) = \left\{ x \in \Omega \mid f(x) \in V \right\} 
+    \]
+    is the pre-image(or inverse image) of \(V\) under \(f\).      
+\end{definition}
+
+\begin{remark}
+    In measure theory, this type of function is called Borel measurable.  
+\end{remark}
+
+\begin{definition}
+    Given a set \(X\). A collection of subsets \(\sigma (X)\) of \(X\) is called a \(\sigma \)-algebra if 
+    \begin{itemize}
+        \item [(1)] \(X \in \sigma (X)\). 
+        \item [(2)] \(E \in \sigma (X)\) implies \(X \setminus E \in \sigma (X)\).
+        \item [(3)] \(E_i \in \sigma (X)\) for all \(i \in \mathbb{N}\) implies \(\bigcup_{i=1}^{\infty} E_i \in \sigma (X) \). 
+    \end{itemize} 
+\end{definition}
+
+\begin{remark}
+    Since 
+    \[
+        \bigcap_{i=1}^{\infty} E_i = X \setminus \left( \bigcup_{i=1}^{\infty} (X \setminus E_i)  \right),  
+    \]
+    so \(E_i \in \sigma (X)\) for all \(i \in \mathbb{N}\) implies \(\bigcap_{i=1}^{\infty} E_i \in \sigma (X) \).  
+\end{remark}
+
+\begin{definition}
+    In \(\mathbb{R} ^n\), a set is called Borel measurable if it is in the smallest \(\sigma\)-algebra that contains all open sets.  
+\end{definition}
+
+\begin{lemma}
+    Let \(\Omega \) be a measurable subset of \(\mathbb{R} ^n\), and \(f: \Omega \to \mathbb{R} ^m\) be continuous, then \(f\) is also measurable.    
+\end{lemma}
+\begin{proof}
+    Let \(V\) be any open subset of \(\mathbb{R} ^m\), then since \(f\) is continuous, so \(f^{-1} (V)\) is open, and since all open sets are measurable, we know \(f^{-1}(V)\) is measurable, and thus \(f\) is measurable.      
+\end{proof}
+
+\begin{lemma} \label{lm: f measurable iff preimage of open box measurable}
+    Let \(\Omega \) be a measurable subset of \(\mathbb{R} ^n\), and let \(f: \Omega \to \mathbb{R} ^m\) be a function. Then \(f\) is measurable if and only if \(f^{-1}(B)\) is measurable for every open box \(B\).      
+\end{lemma}
+\begin{proof}
+    \hfill 
+    \begin{itemize}
+        \item [\((\implies)\)] If \(f\) is measurable, then since every open box \(B\) is open, \(f^{-1}(B)\) is measurable.
+        \item [\((\impliedby )\)] Given any open set \(V\), \(\exists \) a countable union of open boxes s.t. \(V = \bigcup_{\ell=1}^{\infty} B_{\ell} \) by \autoref{lm: open set is countable union of open boxes}, and 
+        \[
+            f^{-1} (V) = f^{-1} \left( \bigcup_{\ell=1}^{\infty} B_{\ell} \right) = \bigcup_{\ell=1}^{\infty} f^{-1}(B_{\ell}),  
+        \]
+        and since \(f^{-1}(B_{\ell})\) is measurable for all \(\ell \in \mathbb{N}\), and thus \(\bigcup_{\ell=1}^{\infty} f^{-1}(B_{\ell})\) is measurable by \autoref{lm: sigma algebra property}.  
+    \end{itemize}
+\end{proof}
+
+\begin{corollary} \label{cl: f measurable iff f_j measurable for all j}
+    Let \(\Omega\) be a measurable subset of \(\mathbb{R} ^n\), and let \(f: \Omega \to \mathbb{R} ^m\) be a function. Suppose \(f = (f_1, f_2, \dots , f_m)\), where \(f_j : \Omega \to \mathbb{R}\) is the \(j\)-th coordinate of \(f\). Then \(f\) is measurable if and only if \(f_j\) is measurable for all \(1 \le j \le m\).           
+\end{corollary}
+
+\begin{proof}
+    \hfill 
+    \begin{itemize}
+        \item [\((\implies)\)] Fix \(j \in \left\{ 1, 2, \dots , m \right\} \). Let \(I \subseteq \mathbb{R}\) be an open interval. Consider the open set \(B_j = \mathbb{R} \times \dots \times I \times \dots \times \mathbb{R} \), where \(I\) is in the \(j\)-th coordinate, then for \(x \in \Omega \), we know 
+        \begin{align*}
+            x \in f^{-1}(B_j) &\iff f(x) \in B_j \iff f_j(x) \in I \iff x \in f_j^{-1}(I).
+        \end{align*}      
+        Hence, \(f^{-1} (B_j) = f_j^{-1} (I)\). Since \(f\) is measurable, \(f^{-1}(B_j)\) is measurable since \(B_j\) is an open box. Hence, \(f_j^{-1}(I)\) is measurable, and since this is true for all open box \(I\) of \(\mathbb{R}\), so by \autoref{lm: f measurable iff preimage of open box measurable}, \(f_j\) is measurable for all \(1 \le j \le m\).       
+        \item [\((\impliedby)\)] Let \(B = I_1 \times I_2 \times \dots \times I_m\) be an open box in \(\mathbb{R} ^m\). Then, 
+        \begin{align*}
+            x \in f^{-1}(B) &\iff f(x) = (f_1(x), f_2(x), \dots , f_m(x)) \in B = I_1 \times I_2 \times \dots \times I_m \\
+            &\iff f_j(x) \in I_j \text{ for all } 1 \le j \le m \iff x \in f_j^{-1}(I_j) \text{ for all } 1 \le j \le m \\
+            &\iff x \in \bigcap_{j=1}^{m} f_j^{-1}(I_j).   
+        \end{align*}
+        Hence, \(f^{-1}(B) = \bigcap_{j=1}^{m} f_j^{-1}(I_j)\). Since for all \(1 \le j \le m\), \(f_j\) is measurable and \(I_j\) is an open box in \(\mathbb{R} \), so \(f^{-1}(I_j)\) is measurable and thus \(\bigcap_{j=1}^{m} f_j^{-1}(I_j)\) is measurable, so \(f^{-1}(B)\) is measurable, and thus \(f\) is measurable.       
+    \end{itemize}
+\end{proof}
+
+\begin{lemma} \label{lm: composition of conti and measurable func are measurable}
+    Let \(\Omega \) be a measurable subset of \(\mathbb{R} ^n\), and let \(W\) be an open subset of \(\mathbb{R} ^m\). If \(f: \Omega \to W\) is measurable and \(g: W \to \mathbb{R} ^p\) is continuous, then \(g \circ f: \Omega \to \mathbb{R} ^p\) is measurable.      
+\end{lemma}
+
+\begin{proof}
+    Let \(V\) be an open set in \(\mathbb{R} ^p\), then \((g \circ f)^{-1}(V) = f^{-1} \left( g^{-1}(V) \right) \). Since \(g\) is continuous and \(V\) is open, \(g^{-1}(V)\) is open in \(W\), so \(g^{-1}(V) = U \cap W\), where \(U\) is open in \(\mathbb{R} ^m\). Since \(W\) is also open in \(\mathbb{R} ^m\), \(W \cap U\) is also open in \(\mathbb{R} ^m\), so \(g^{-1}(V)\) is open in \(\mathbb{R} ^m\). Now since \(f\) is measurable, \(f^{-1} \left( g^{-1}(V) \right) \) is measurable, i.e. \((g \circ f)^{-1} (V)\) is measurable.                  
+\end{proof}
+
+\begin{corollary}
+    Let \(\Omega \) be a measurable subset of \(\mathbb{R} ^n\).  If \(f: \Omega \to \mathbb{R} \) is measurable, then so is \(\vert f \vert, \max \left\{ f, 0 \right\}  \), and \(\min \left\{ f, 0 \right\} \).
+\end{corollary}
+
+\begin{proof}
+    Since \(g_1(x) \coloneqq \vert x \vert, g_2(x) \coloneqq \max \left\{ x, 0 \right\}, \) and \(g_3(x) \coloneqq \min \left\{ x, 0 \right\} \) are all continuous, so by \autoref{lm: composition of conti and measurable func are measurable}, \(g_1 \circ f, g_2 \circ f, g_3 \circ f\) are all measurable. 
+    \begin{remark}
+        \[
+            \max \left\{ x, 0 \right\} = \frac{x + \vert x \vert }{2}, \quad \min \left\{ x, 0 \right\} = \frac{x - \vert x \vert }{2}. 
+        \]
+    \end{remark} 
+\end{proof}
+
+\begin{corollary}
+    Let \(\Omega \) be a measurable subset of \(\mathbb{R} ^n\). If \(f: \Omega \to \mathbb{R} \) and \(g: \Omega \to \mathbb{R} \) are measurable, then so are \(f + g, f - g, f \cdot g, \max \left\{ f, g \right\}, \) and \(\min \left\{ f, g \right\} \). If \(g(x) \neq 0\) for all \(x \in \Omega \), then \(f / g\) is also measurable.         
+\end{corollary}
+
+\begin{proof}
+    Consider the map \(F: \Omega \to \mathbb{R} ^2\) defined by \(F(x) = (f(x), g(x))\), then by \autoref{cl: f measurable iff f_j measurable for all j}, \(F\) is also measurable. Define \(h_+ (u, v) = u + v\), where \(h_+ : \mathbb{R} ^2 \to \mathbb{R} \) is continuous. Then \(h_+ \circ F\) is measurable, where \((h_+ \circ F)(x) = f(x) + g(x)\). Similarly, we can define 
+    \begin{align*}
+        h_{\ast}  (u, v) &= uv, \\
+        h_{\text{max}} (u, v) &= \max (u, v) = \frac{u + v + \vert u - v \vert }{2}, \\
+        h_{\text{min}} (u, v) &= \min (u, v) = \frac{u + v - \vert u - v \vert }{2},
+    \end{align*}      
+    and they are all continuous, so \(h_{\ast} \circ F, h_{\text{max}} \circ F, h_{\text{min}} \circ F\) are all measurable. As for the division, it is similar. 
+\end{proof}
+
+\begin{lemma}
+    Let \(\Omega \) be a measurable subset of \(\mathbb{R} ^n\), and let \(f: \Omega \to \mathbb{R} \) be a function, then \(f\) is measurable iff \(f^{-1}((a, \infty))\) is measurable for any \(a \in \mathbb{R} \).       
+\end{lemma}
+
+\begin{proof}
+    \hfill 
+    \begin{itemize}
+        \item [\((\implies)\)] Since \((a, \infty)\) is open, so \(f^{-1} ((a, \infty))\) is measurable. 
+        \item [\((\impliedby)\)] Let \(I\) be an open interval in \(\mathbb{R}\) with \(I = (\alpha , \beta)\) where \(\alpha < \beta\), then it sufficies to show \(f^{-1}(I)\) is measurable by \autoref{lm: f measurable iff preimage of open box measurable}. Note that \((\alpha , \beta ) = (\alpha , \infty) \cap (\mathbb{R} \setminus [\beta , \infty ))\), and 
+        \[
+            [\beta , \infty) = \bigcap_{m=1}^{\infty} \left( \beta - \frac{1}{m}, \infty \right) . 
+        \]
+        Therefore, 
+        \[
+            f^{-1} ([\beta , \infty)) = f^{-1} \left( \bigcap_{m=1}^{\infty} \left( \beta - \frac{1}{m}, \infty \right)   \right) = \bigcap_{m=1}^{\infty} f^{-1} \left( \left( \beta - \frac{1}{m}, \infty \right)  \right),   
+        \]
+        which is measurable since \(f^{-1}(a, \infty)\) is measurable for all \(a \in \mathbb{R}\). Hence,
+        \[
+            f^{-1} (\alpha , \beta ) = f^{-1}(\alpha , \infty) \cap \left( \Omega \setminus f^{-1}(\beta , \infty) \right) 
+        \]
+        is measurable.  
+    \end{itemize}
+\end{proof}
+
+\begin{definition}[Measurable functions in the extended reals]
+    Let \(\Omega \) be a measurable subset of \(\mathbb{R} ^n\). Set 
+    \[
+        \mathbb{R} ^* \coloneqq \mathbb{R} \cup \left\{ +\infty \right\} \cup \left\{ -\infty \right\}.  
+    \]  
+    A function \(f: \Omega \to \mathbb{R} ^*\) is said to be measurable if \(f^{-1} ((a, \infty])\) for all \(a \in \mathbb{R}\), where
+    \[
+        f^{-1}((a, \infty]) = f^{-1}((a, \infty )) \cup f^{-1}(\left\{ \infty \right\} ).
+    \]    
+\end{definition}

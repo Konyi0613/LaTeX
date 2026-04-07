@@ -46,7 +46,7 @@ This violates Hall's condition. Hence, if Hall's condition holds, there exists a
 Now we want to design an algorithm such that
 \begin{itemize}
     \item Input: A bipartite graph \((X \cup Y, E)\) and a matching \(M\). 
-    \item Output: Either an \(M\)-augmenting path or a vertex cover \(C \subseteq X \cup Y\) with \(\vert C \vert = \vert M \vert  \).     
+    \item Output: Either an \(M\)-augmenting path or a vertex cover \(C \subseteq X \cup Y\) with \(\vert C \vert = \vert M \vert  \), where \(C\) is a minimum vertex cover.     
 \end{itemize}
 
 \begin{remark}
@@ -90,7 +90,7 @@ The idea of APA is to start from unsaturated vertices of \(X\), which are all in
     
     \While(){True} {
         \If(){\(S = Q\)}{
-            \(M\) is a maximum matching, which covers \(T \cup (X \setminus S)\), so   Done.
+            \(M\) is a maximum matching, and we return a vertex cover \(T \cup (X \setminus S)\).
         } \Else() {
             Let \(x \in S \setminus Q\) be arbitrary. 
 
@@ -127,13 +127,17 @@ The idea of APA is to start from unsaturated vertices of \(X\), which are all in
 %eg
 
 \subsection{Correction of APA}
-If an augmenting path is returned, each vertex we reached, we kept track of how we reached it, so we do get a paph, where the path traces back to \(U\), and thus endpoints are unsaturated, which means this path is an augmenting path (Note that this path is altering since edges from \(X\) to \(Y\) in this path not in the matching and edges from \(Y\) to \(X\) are in the matching). 
+If an augmenting path is returned, each vertex we reached, we kept track of how we reached it, so we do get a path, where the path traces back to \(U\), and thus endpoints are unsaturated, which means this path is an augmenting path (Note that this path is altering since edges from \(X\) to \(Y\) in this path not in the matching and edges from \(Y\) to \(X\) are in the matching). 
 
-If no path is founded, we return a cover \(C = T \cup (X \setminus S)\). 
+If no path is found, we return a cover \(C = T \cup (X \setminus S)\). 
 \begin{itemize}
     \item [(1)] \(C\) is a cover: Since \(S = Q\), we have explored all neighbors of \(S\), and all neighbors of \(S\) should be in \(T\), so there are no edges between \(S\) and \(Y \setminus T\), i.e. for each edge \(e \in E(G)\), one of endpoint of \(e\) must be in \(T \cup (X \setminus S)\), i.e. \(T \cup (X \setminus S)\) covers \(E(G)\). 
     \item [(2)] \(\vert C \vert = \vert M \vert  \). Every vertex in \(T\) is saturated, with its \(M\)-partner in \(S\), otherwise there is an augmenting path. Every vertex in \(X \setminus S\) is saturated with its \(M\)-partner outside \(T\). (Every vertex in \(X \setminus S\) saturated since \(S\) is initially \(U\) and keep getting larger, so \(X \setminus S\) only contains vertices that is saturated by \(M\), and if \(x\)'s \(M\)-partner is in \(T\), then \(x \in S\), which is a contradiction. Also, remember that no edges bewteen \(S\) and \(Y \setminus T\), so \(\vert C \vert \) counts all edges in \(M\).)               
-\end{itemize} 
+\end{itemize}
+
+\begin{remark}
+    In fact, \(C\) is a minimum vertex cover since we return \(C\) when \(M\) is a maximum matching and \(\vert C \vert = \vert M \vert\), and in bipartite graph \(\alpha ^{\prime} (G) = \beta (G)\), so \(C\) is a minimum vertex cover.      
+\end{remark}
 
 \section{Maximum weight matchings}
 \begin{itemize}
@@ -185,11 +189,67 @@ Then maximum weight of a perfect matching is the max size of a matching in \(G\)
     \] 
 \end{theorem}
 \begin{proof}
-    We prove this algorithmically: given a weighting \(w\), we will find a perfect matching \(M\) and a cover \(c\) s.t. \(w(M) = \mathrm{val}(c) \), and \(M\) is a max weight matching and \(c\) is a min-value cover. 
+    We prove this algorithmically:
 
-    The idea is: Start with a cover \(c\). Build the equality subgraph \(G \subseteq K_{n, n}\):
+    \begin{algorithm}[H]
+\caption{Hungarian Algorithm (Maximum Weight Perfect Matching)}
+
+\textbf{Input:} 
+A complete bipartite graph \( K_{n,n} = (X \cup Y, E) \) with weight function 
+\( w : E \to \mathbb{R} \).
+
+\textbf{Output:} 
+A perfect matching \( M \subseteq E \) of maximum total weight, together with a weighted cover \( c = (u,v) \) certifying optimality.
+
+\vspace{0.5em}
+
+\textbf{Initialization:}  
+Choose an initial weighted cover \( c = (u,v) \), where 
+\( u : X \to \mathbb{R} \), \( v : Y \to \mathbb{R} \), satisfying \(u(x) + v(y) \ge w(x,y), \quad \forall (x,y) \in E.\) 
+
+\vspace{0.5em}
+
+\While{true}{
+
+    Construct the equality graph: \(G_{u,v} = \left\{ (x,y) \in E \;\middle|\; u(x) + v(y) = w(x,y) \right\}.\) 
+
+    Use the MMA to find a maximum matching \(M\) in \(G_{u,v}\).
+
+    \If{\(M\) is a perfect matching}{
+        \Return \(M\) together with \( c = (u,v) \) as a certificate of optimality.
+    }
+
+    Let \(Q\) be the minimum vertex cover of \(G_{u,v}\) obtained from the MMA.
+
+    Define: \(R = Q \cap X, \quad T = Q \cap Y.\) 
+
+    Let
     \[
-        E(G) = \left\{ \left\{ x, y \right\} \in E(K_{n, n}): w(\left\{ x, y \right\} ) = c(x) + c(y)  \right\}. 
-    \] 
-    If \(G\) has a perfect matching \(M\) (use MMA), then we have a proposition: \(M\) and \(c\) are optimal. If not, use the cover from MMA to improve \(c\).          
+    \varepsilon = \min_{\substack{x \notin  R \\ y \notin T}} 
+    \bigl( u(x) + v(y) - w(x,y) \bigr).
+    \]
+
+    Update the weighted cover \(c = (u,v)\) as follows:
+    \[
+    u(x) \leftarrow
+    \begin{cases}
+    u(x) - \varepsilon, & x \notin R \\
+    u(x), & x \in R
+    \end{cases}
+    \qquad
+    v(y) \leftarrow
+    \begin{cases}
+    v(y) + \varepsilon, & y \in T \\
+    v(y), & y \notin T
+    \end{cases}
+    \]
+
+    This preserves the weighted cover condition and enlarges \(G_{u,v}\).
+}
+\end{algorithm}
+Since for every perfect matching \(M\) and weighted cover \(c\) in \(K_{n, n}\), we have shown that \(w(M) \le \mathrm{val}(c) \), so
+    \[
+       \max \left\{ w(M): M \text{ is a perfect matching}  \right\} \le \min \left\{ \mathrm{val}(c): c \text{ is a weighted cover}   \right\},  
+    \]      
+    and this algorithm shows finally we can find a perfect matching \(M\) and a weighted cover \(c\) s.t. \(w(M) = \mathrm{val}(c) \). Thus, the equality holds.         
 \end{proof}

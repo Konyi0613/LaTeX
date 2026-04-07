@@ -1,0 +1,166 @@
+\lecture{11}{7 April.}{}
+Now we explain why Hungarian Algorithm is correct.
+
+\begin{remark}
+    Observe that \(\varepsilon > 0\), since if \(x \notin R\) and \(y \notin T\), then \(\left\{ x, y \right\} \) is not covered by \(Q\). Hence, \(\left\{ x, y \right\} \notin E(G_{u, v}) \). This shows \(w(\left\{ x, y \right\} ) < u(x) + v(y)\).       
+\end{remark}
+
+\begin{proposition}
+After the update step, the pair \(c = (u,v)\) remains a weighted cover, i.e.,
+\[
+u(x) + v(y) \ge w(x,y), \quad \forall (x,y) \in E.
+\]
+\end{proposition}
+
+\begin{proof}
+Let \(u', v'\) denote the updated functions. We verify that
+\[
+u'(x) + v'(y) \ge w(x,y), \quad \forall (x,y) \in E,
+\]
+by considering all possible cases.
+
+\medskip
+
+\textbf{Case 1:} \(x \in R,\; y \notin T.\)
+
+In this case, no update is applied:
+\[
+u'(x) = u(x), \quad v'(y) = v(y).
+\]
+Hence,
+\[
+u'(x) + v'(y) = u(x) + v(y) \ge w(x,y),
+\]
+since \(c = (u,v)\) is a weighted cover.
+
+\medskip
+
+\textbf{Case 2:} \(x \in R,\; y \in T.\)
+
+We have:
+\[
+u'(x) = u(x), \quad v'(y) = v(y) + \varepsilon.
+\]
+Thus,
+\[
+u'(x) + v'(y) = u(x) + v(y) + \varepsilon \ge w(x,y),
+\]
+again using the feasibility of \(c\).
+
+\medskip
+
+\textbf{Case 3:} \(x \notin R,\; y \in T.\)
+
+Here,
+\[
+u'(x) = u(x) - \varepsilon, \quad v'(y) = v(y) + \varepsilon,
+\]
+so
+\[
+u'(x) + v'(y) = u(x) + v(y) \ge w(x,y).
+\]
+
+\medskip
+
+\textbf{Case 4:} \(x \notin R,\; y \notin T.\)
+
+In this case,
+\[
+u'(x) = u(x) - \varepsilon, \quad v'(y) = v(y),
+\]
+and hence
+\[
+u'(x) + v'(y) = u(x) + v(y) - \varepsilon.
+\]
+
+By the definition of \(\varepsilon\),
+\[
+\varepsilon = \min_{\substack{x \notin R \\ y \notin T}} 
+\bigl( u(x) + v(y) - w(x,y) \bigr),
+\]
+it follows that for all \(x \notin R, y \notin T\),
+\[
+\varepsilon \le u(x) + v(y) - w(x,y).
+\]
+Rearranging gives
+\[
+u(x) + v(y) - \varepsilon \ge w(x,y),
+\]
+and therefore
+\[
+u'(x) + v'(y) \ge w(x,y).
+\]
+
+\medskip
+
+Since all cases satisfy the inequality, we conclude that \(c' = (u',v')\) is still a weighted cover.
+\end{proof}
+
+\begin{remark}
+When we update the weighted cover from $(u, v)$ to $(u', v')$, the current matching $M$ remains a valid matching in \(G_{u^{\prime}, v^{\prime} }\). To show this, we have to show for every \(\left\{ x, y \right\}  \in M\), \(\left\{ x, y \right\} \in G_{u^{\prime} , v^{\prime}} \), then since all edges in \(M\) are in \(G_{u^{\prime} , v^{\prime} }\), and vertices in \(G_{u^{\prime} , v^{\prime} }\) is same as \(G_{u, v}\), so \(M\) is still a matching in \(G_{u^{\prime} , v^{\prime} }\). Now we show every \(\left\{ x, y \right\} \in M \) is in \(G_{u^{\prime} , v^{\prime} }\). Note that \(M\) is a maximum matching of \(G_{u, v}\). Thus, \(\left\{ x, y \right\} \) satisfies \(w(x, y) = u(x) + v(y)\). Now since \(Q\) is a minimum vertex cover of \(G_{u, v}\), so \(\left\{ x, y \right\} \) is covered by \(Q\), i.e. \(x\) or \(y\) is in \(Q\). Note that exactly one of \(x, y\) is in \(Q\), since \(\vert Q \vert = \vert M \vert  \) (since \(G_{u, v}\) is bipartite) and \(Q\) covers \(M\). Thus, either \(x \in R, y \notin T\) or \(x \notin R, y \in T\) will occur, and each case we have \(u(x) + v(y) = u^{\prime} (x) + v^{\prime} (y)\), so we're done.    
+
+Consequently, the size of a maximum matching in the equality graph does not decrease:
+\[
+\alpha'(G_{u',v'}) \ge \alpha'(G_{u,v}).
+\]
+
+\medskip
+
+Let us consider the set of $M$-unsaturated vertices in $X$, i.e., vertices not covered by $M$. 
+After the update, for each $M$-unsaturated vertex $x \in X$, we explore the $M$-alternating paths in $G_{u',v'}$. 
+The update rule for $(u',v')$ (Case 4 above, since some edges \(\left\{ x, y \right\} \) has \(\varepsilon = u(x) + v(y) - w(x, y)\)) ensures that at least one new edge in $G_{u',v'}$ connects some vertex $x \notin R$ to a vertex $y \notin T$, 
+which was previously not in the equality graph. This creates a new vertex in $Y$ that can be reached by an $M$-alternating path from $x$. 
+
+\medskip
+
+Since there are at most $n$ vertices in $Y$, after at most $n$ iterations of expanding the alternating tree from an $M$-unsaturated vertex in $X$, 
+we either reach an $M$-unsaturated vertex in $Y$ or we add a new reachable vertex to the equality graph. 
+In the former case, an $M$-augmenting path exists, allowing us to increase the size of the matching by flipping edges of this augmenting paths:
+\[
+|M| \longrightarrow |M| + 1.
+\]
+
+\medskip
+
+Because the maximum size of a matching in a bipartite graph with $n$ vertices on each side is $n$, 
+this argument implies that within at most $n^2$ iterations, we must obtain a perfect matching. 
+Thus, the algorithm terminates with a perfect matching, and the process is guaranteed to converge.
+\end{remark}
+
+
+\section{Stable Matching Problem}
+Suppose we have a bipartite graph \(G = (X \cup Y, E)\), where \(\vert X \vert = \vert Y \vert  \), then we can define preference lists: 
+\paragraph{Preference lists} Each vertex ranks the vertices on the other side in order of preference, i.e. \(\forall x \in X\), \(\exists \pi ^{(x)} \in S_Y\) and \(\forall y \in Y\), \(\exists \pi ^{(y)} \in S_X\).
+
+\begin{definition}
+    Given a matching \(M\), a pair \(\left\{ x, y \right\} \notin M \) is an unstable pair if \(x\) preferes \(y\) to their \(M\)-partner and \(y\) prefer \(x\) to their \(M\)-partner. A perfect matching \(M\) is a stable matching if there are no unstable pairs.          
+\end{definition}
+
+\begin{theorem}[Gale-Shapley, 1962]
+    A stable matching always exists.
+\end{theorem}
+
+\subsection{Gale-Shapley Proposal Algorithm}
+Every night, every man proposes to their top-ranked woman who haven't reject them. If every women receives exactly one proposal, then stop, and there is a stable matching formed by the woman and the man who proposed to her. Otherwise, every woman says "maybe" to her top suitor and rejects any other. 
+
+\begin{remark}
+    In each round, if a woman says "maybe" to a man, then this man can propose again to this woman in next round, but the men who are rejected by the woman cannot.
+\end{remark}
+
+\begin{claim}
+    If the algorithm produces a matching, then it is stable. 
+\end{claim}
+\begin{explanation}
+    Suppose not, suppose man \(x\) is matched with woman \(y\) and man \(x^{\prime} \) is matched with woman \(y^{\prime} \), and \(\left\{ x, y^{\prime} \right\} \) is an unstable pair. Note that in the algorithm, the men move down their preference lists, the women move up their preference lists, so \(x\) proposed to \(y^{\prime} \) before proposing to \(y\), and \(y^{\prime} \) only rejected \(x\) because she had a better option, so she prefer \(x^{\prime} \) to \(x\), so \(\left\{ x, y^{\prime}  \right\} \) is not a unstable pair, which is a contradiction.             
+\end{explanation}
+
+\begin{claim}
+    The algorithm terminates.
+\end{claim}
+\begin{explanation}
+    Suppose in an iteration, the \(i\)-th man is proposing to the \(j_i\)-th woman on their list (initially \(j_i = 1\) for all \(i\)). Then, \(\sum_{i=1}^n j_i \) is strictly increasing with every iteration. Thus, it terminates within \(n^2\) iterations. 
+\end{explanation}
+
+\begin{claim}
+    The algorithm always produces a matching.
+\end{claim}
