@@ -142,7 +142,7 @@ Suppose we have a bipartite graph \(G = (X \cup Y, E)\), where \(\vert X \vert =
 \paragraph{Preference lists} Each vertex ranks the vertices on the other side in order of preference, i.e. \(\forall x \in X\), \(\exists \pi ^{(x)} \in S_Y\) and \(\forall y \in Y\), \(\exists \pi ^{(y)} \in S_X\).
 
 \begin{definition}
-    Given a matching \(M\), a pair \(\left\{ x, y \right\} \notin M \) is an unstable pair if \(x\) preferes \(y\) to their \(M\)-partner and \(y\) prefer \(x\) to their \(M\)-partner. A perfect matching \(M\) is a stable matching if there are no unstable pairs.          
+    Given a matching \(M\), a pair \(\left\{ x, y \right\} \notin M \) is an unstable pair if \(x\) prefers \(y\) to their \(M\)-partner and \(y\) prefer \(x\) to their \(M\)-partner. A perfect matching \(M\) is a stable matching if there are no unstable pairs.         
 \end{definition}
 
 \begin{theorem}[Gale-Shapley, 1962]
@@ -156,18 +156,22 @@ Every night, every man proposes to their top-ranked woman who haven't reject the
     In each round, if a woman says "maybe" to a man, then this man can propose again to this woman in next round, but the men who are rejected by the woman cannot.
 \end{remark}
 
+\begin{remark}
+    If the man receive "maybe" from a woman, then he will propose to this woman in the following rounds until he is rejected or the algorithm ends.
+\end{remark}
+
 \begin{claim}
     If the algorithm produces a matching, then it is stable. 
 \end{claim}
 \begin{explanation}
-    Suppose not, suppose man \(x\) is matched with woman \(y\) and man \(x^{\prime} \) is matched with woman \(y^{\prime} \), and \(\left\{ x, y^{\prime} \right\} \) is an unstable pair. Note that in the algorithm, the men move down their preference lists, the women move up their preference lists, so \(x\) proposed to \(y^{\prime} \) before proposing to \(y\), and \(y^{\prime} \) only rejected \(x\) because she had a better option, so she prefer \(x^{\prime} \) to \(x\), so \(\left\{ x, y^{\prime}  \right\} \) is not a unstable pair, which is a contradiction.             
+    Suppose not, suppose man \(x\) is matched with woman \(y\) and man \(x^{\prime} \) is matched with woman \(y^{\prime} \), and \(\left\{ x, y^{\prime} \right\} \) is an unstable pair. Note that in the algorithm, the men move down their preference lists, the women move up their preference lists, so \(x\) proposed to \(y^{\prime} \) before proposing to \(y\), and \(y^{\prime} \) only rejected \(x\) because she had a better option, so she prefer \(x^{\prime} \) to \(x\) (If \(y^{\prime} \) prefer \(x\) more than \(x^{\prime}\), then when \(y^{\prime}\) rejects \(x\), there will always be a better option than \(x\) in the following rounds, but then when \(x^{\prime}\) propose to \(y^{\prime}\), \(x^{\prime}\) will not be the best option and thus \(x^{\prime} \) will be rejected by \(y^{\prime}\)), so \(\left\{ x, y^{\prime}  \right\} \) is not a unstable pair, which is a contradiction.             
 \end{explanation}
 
 \begin{claim}
     The algorithm terminates.
 \end{claim}
 \begin{explanation}
-    Suppose in an iteration, the \(i\)-th man is proposing to the \(j_i\)-th woman on their list (initially \(j_i = 1\) for all \(i\)). Then, \(\sum_{i=1}^n j_i \) is strictly increasing with every iteration. Thus, it terminates within \(n^2\) iterations. 
+    Suppose in an iteration, the \(i\)-th man is proposing to the \(j_i\)-th woman on their list (initially \(j_i = 1\) for all \(i\)). Then, \(\sum_{i=1}^n j_i \) is strictly increasing with every iteration. (If every man propose to different woman, then the algorithm ends. If two men propose to same woman, then one of them will be rejected and thus \(\sum_{i=1}^n j_i \) increases in next round) Thus, it terminates within \(n^2\) iterations. 
 \end{explanation}
 
 \begin{claim}
