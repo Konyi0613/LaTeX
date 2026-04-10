@@ -199,5 +199,133 @@ Thus,
 \end{explanation}
 
 \begin{eg}[Waiting Time Paradox]
-    
+   The \emph{waiting time paradox} says that if buses do \emph{not} arrive at perfectly regular intervals, then a passenger who shows up at a random time tends to land in a \emph{longer-than-average} gap between buses. Because of that sampling bias, the time the passenger waits can be larger than ``half of the average gap,'' and the bus interval that the passenger finds themself inside is also typically larger than the population-average interval.
+
+\section*{What is going on in your example?}
+
+Let
+\[
+X = \text{the time from now until the next bus arrives}.
+\]
+If we model the bus arrivals as a Poisson process with rate $\lambda = 1/10$ per minute, then
+\[
+X \sim \mathrm{Exp}(1/10),
+\qquad
+\mathbb{E}[X] = 10 \text{ minutes.}
+\]
+
+Now suppose that, at the moment you observe the system,
+
+\begin{itemize}[leftmargin=2em]
+    \item the last bus left $8$ minutes ago, and
+    \item the next bus will come in $2$ minutes.
+\end{itemize}
+
+So the two buses around you are exactly $10$ minutes apart.
+
+The apparent paradox is this:
+
+\begin{enumerate}[label=(\arabic*), leftmargin=2em]
+    \item By the memoryless property, the future waiting time from \emph{now} has mean $10$ minutes.
+    \item By time-reversal symmetry of the Poisson process, the elapsed time since the previous bus also has mean $10$ minutes.
+    \item So it looks like
+    \[
+    \mathbb{E}[\text{backward gap}] + \mathbb{E}[\text{forward gap}] = 10 + 10 = 20,
+    \]
+    but the bus interval in the picture is only $10$ minutes.
+\end{enumerate}
+
+\section*{Where the paradox lies}
+
+The mistake is that these expectations are \emph{not conditioned on the event that the surrounding gap equals $10$ minutes}. They are unconditional averages over \emph{all} possible observation times.
+
+There are really two different random quantities:
+
+\begin{itemize}[leftmargin=2em]
+    \item $B$ = time since the previous bus (backward recurrence time),
+    \item $F$ = time until the next bus (forward recurrence time).
+\end{itemize}
+
+For a Poisson process,
+\[
+B \sim \mathrm{Exp}(1/10),
+\qquad
+F \sim \mathrm{Exp}(1/10),
+\qquad
+\mathbb{E}[B] = \mathbb{E}[F] = 10.
+\]
+
+But once you are told that in this particular realization $B=8$ and $F=2$, there is nothing random left in that local picture: the surrounding interval is simply
+\[
+B+F=8+2=10.
+\]
+
+So the incorrect step is mixing
+\[
+\mathbb{E}[B] + \mathbb{E}[F]
+\]
+with
+\[
+B+F \text{ for a particular observed sample.}
+\]
+
+Those are different objects.
+
+\section*{Why $\mathbb{E}[B+F]=20$ is actually correct}
+
+For a Poisson bus process, the bus interval containing a \emph{random observation time} is not distributed like an ordinary interarrival time. It is \emph{length-biased}: long gaps are more likely to contain your arrival time.
+
+If the ordinary interarrival time is
+\[
+T \sim \mathrm{Exp}(1/10),
+\qquad
+\mathbb{E}[T]=10,
+\]
+then the interval containing a random observation time has mean
+\[
+\mathbb{E}[B+F] = 20.
+\]
+
+That does \emph{not} contradict the fact that an ordinary gap between consecutive buses has average length $10$. It only says that when you sample by picking a random time, you are more likely to land inside a long gap than a short one.
+
+For the exponential case, one can verify directly that
+\[
+\mathbb{E}[B+F]=\mathbb{E}[B]+\mathbb{E}[F]=10+10=20.
+\]
+
+\begin{center}
+\begin{tikzpicture}[x=0.9cm,y=0.9cm]
+    \draw[thick, ->] (0,0) -- (14,0) node[right] {time};
+    \draw[thick] (3,-0.25) -- (3,0.25);
+    \draw[thick] (13,-0.25) -- (13,0.25);
+    \filldraw[blue] (11,0) circle (2pt);
+
+    \node[above] at (3,0.25) {previous bus};
+    \node[above] at (13,0.25) {next bus};
+    \node[below, blue] at (11,-0.05) {you arrive now};
+
+    \draw[<->] (3,-0.9) -- (11,-0.9);
+    \node[below] at (7,-0.9) {$B=8$ min};
+
+    \draw[<->] (11,-1.8) -- (13,-1.8);
+    \node[below] at (12,-1.8) {$F=2$ min};
+
+    \draw[<->] (3,-2.9) -- (13,-2.9);
+    \node[below] at (8,-2.9) {$B+F=10$ min in this sample};
+\end{tikzpicture}
+\end{center}
+
+In this drawing, the local sample gives $8+2=10$. But if you repeat the experiment many times and choose your observation time uniformly at random on a long timeline, then the average containing interval is $20$ minutes, not $10$ minutes, because long intervals are overrepresented.
+
+\section*{Short resolution}
+
+The paradox disappears once we separate:
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{ordinary bus gap:} mean $10$ minutes,
+    \item \textbf{gap seen by a random observer:} mean $20$ minutes,
+    \item \textbf{your particular observed sample:} here it is exactly $8+2=10$ minutes.
+\end{itemize}
+
+So the statement ``$10+10=10$'' is not a real contradiction. The left side is an \emph{unconditional expectation}; the right side is the length of \emph{one realized interval} in your example. 
 \end{eg}
