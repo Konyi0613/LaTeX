@@ -1,6 +1,6 @@
 \lecture{14}{21 April.}{}
 \begin{definition}
-    Let \(\Omega \subseteq \mathbb{R} ^n\) be measurable, and let \(f : \Omega \to \mathbb{R} \) be a simple function which is non-negative, thus \(f\) is measurable and the image \(f(\Omega)\) is finite and contained in \([0, \infty)\). Thus, we can define the Lebesgue integral \(\int _{\Omega } f\) of \(f\) on \(\Omega \) by 
+    Let \(\Omega \subseteq \mathbb{R} ^n\) be measurable, and let \(f : \Omega \to [0, \infty) \) be a simple function which is non-negative, thus \(f\) is measurable and the image \(f(\Omega)\) is finite and contained in \([0, \infty)\). Thus, we can define the Lebesgue integral \(\int _{\Omega } f\) of \(f\) on \(\Omega \) by 
     \[
         \int _{\Omega} f = \sum_{\lambda \in f(\Omega), \lambda > 0} \lambda m\left( \left\{ x \in \Omega: f(x) = \lambda \right\}  \right) = \sum_{\lambda \in f(\Omega)} \lambda m\left( \left\{ x \in \Omega: f(x) = \lambda \right\}  \right).  
     \]    
@@ -24,6 +24,8 @@
         \int _\mathbb{R} f = 3 m([1, 2]) + 4 m([2, 4]) = 11.
     \]     
 \end{eg}
+
+Now we show the simple integral of a simple function can equal \(+\infty\). (The reason why we restrict this integral to non-negative functions is to avoid ever encountering the indefinite form \(+\infty + (-\infty)\).)
 
 \begin{eg}
     Suppose \(g: \mathbb{R} \to \mathbb{R} \) is the function which is \(1\) on \([0, \infty)\) and is zero on \((-\infty , 0)\), then \(g = 1 \cdot \chi _{[0. \infty)}\) and 
@@ -55,7 +57,7 @@
 \end{proof}
 
 \begin{proposition}
-    Let \(\Omega \subseteq \mathbb{R} ^n\) be measurable, and let \(f: \Omega \to \mathbb{R} \) and \(g: \Omega \to \mathbb{R}\) be non-negative simple functions. 
+    Let \(\Omega \subseteq \mathbb{R} ^n\) be measurable, and let \(f: \Omega \to [0, \infty) \) and \(g: \Omega \to [0, \infty)\) be non-negative simple functions. 
     \begin{itemize}
         \item [(a)] We have \(0 \le \int_{\Omega} \le \infty\). Furthermore, we have \(\int _\Omega f = 0\) iff \(m(\left\{ x \in \Omega: f(x) \neq 0 \right\} ) = 0\).   
         \item [(b)] \(\int _\Omega f + g = \int _\Omega f + \int _\Omega g\).
@@ -70,7 +72,8 @@
 \begin{proof}
     Since
     \[
-        f = \sum_{\lambda \in f(\Omega) \setminus \left\{ 0 \right\} } \lambda \chi _{x \in \Omega: f(x) = \lambda }, 
+        f = \sum_{\lambda \in f(\Omega) \setminus \left\{ 0 \right\} } \lambda 
+    \cdot \chi _{\left\{ x \in \Omega: f(x) = \lambda \right\}  }, 
     \]
     we can write \(f = \sum_{j=1}^N c_j \chi _{E_j} \), where \(E_1, \dots , E_N\) are pairwise disjoint, and each of \(c_j\) is positive. Similarly, we write \(g = \sum_{j=1}^M d_j \chi _{F_j} \), where \(F_1, \dots , F_M\) are pairwise disjoint and \(d_1, \dots , d_M\) are positive.    
     \begin{itemize}
@@ -97,6 +100,7 @@
         \[
             f = \sum_{j=0}^N \sum_{k=0}^M c_j \chi _{E_j \cap F_k}, \quad g = \sum_{j=0}^N \sum_{k=0}^M d_k \chi _{E_j \cap F_k}. 
         \]
+        (Note that we need to define \(E_0, F_0\) to write this thing.)
         Hence, 
         \[
             f + g = \sum_{j=0}^N \sum_{k=0}^M (c_j + d_k) \chi _{E_j \cap F_k},  
@@ -105,7 +109,7 @@
         \[
             \int _\Omega (f + g) = \sum_{j=0}^N \sum_{k=0}^M (c_j + d_k) m(E_j \cap F_k) = \int _\Omega f + \int _\Omega g
         \]
-        by previous lemma since 
+        by previous lemma (\(c_j + d_k\) may repeat, so we have to use the lemma) since 
         \[
             \int _\Omega f = \sum_{j=0}^N c_j m(E_j) = \sum_{j=0}^N \sum_{k=0}^M c_j m(E_j \cap F_k),   
         \]
@@ -117,7 +121,7 @@
         \[
             \int _\Omega cf = \sum_{j=1}^N cc_j m(E_j) = c \int _\Omega f. 
         \]
-        \item [(d)] Write \(h \coloneqq g - f\), then \(h\) is simple and \(g = h + f\). Hence, by (b), \(\int _\Omega g = \int _\Omega h + \int _\Omega f\), but by (a) \(\int _\Omega h \ge 0\), so we're done.    
+        \item [(d)] Write \(h \coloneqq g - f\), then \(h\) is simple and non-negative and \(g = h + f\). Hence, by (b), \(\int _\Omega g = \int _\Omega h + \int _\Omega f\), but by (a) \(\int _\Omega h \ge 0\), so we're done.    
     \end{itemize}   
                 
 \end{proof}
@@ -130,14 +134,15 @@ We now pass from integrating non-negative simple functions to integrating genera
     \[
         f(x) \ge g(x) \quad \forall x \in \Omega.
     \]      
-    We sometimes use the phrase “\(f\) dominates \(g\)” instead of “\(f\) majorizes \(g\)”. We also use the phrase \(g\) minorizes \(f\).
+    We sometimes use the phrase “\(f\) dominates \(g\)” instead of “\(f\) majorizes \(g\)”
 \end{definition}
 
 \begin{definition}
     Let \(\Omega \subseteq \mathbb{R} ^n\) be measurable, and \(f: \Omega \to [0, \infty]\) be measurable and non-negative. We define the Lebesgue integral \(\int _\Omega f\) of \(f\) on \(\Omega \) by 
-    \[
-        \int _\Omega f \coloneqq \sup \left\{ \int _\Omega s: s \text{ is simple and non-negative, and } s \text{ minorizes } f   \right\}.
-    \]     
+    \begin{align*}
+        \int _\Omega f &\coloneqq \sup \left\{ \int _\Omega s: s \text{ is simple and non-negative, and } s \text{ minorizes } f   \right\} \\
+        &= \sup \left\{ \int _\Omega s: s \text{ is simple and non-negative, and } s(x) \le f(x) \quad \forall x \in \Omega  \right\}. 
+    \end{align*}   
 \end{definition}
 
 \begin{remark}
@@ -147,20 +152,119 @@ We now pass from integrating non-negative simple functions to integrating genera
     \]  
 \end{remark}
 
-\begin{remark}
-    \(0 \le \int _\Omega f \le \infty\) since zero function is simple and non-negative, and minorizes \(f\) for all \(f\).   
-\end{remark}
-
 \begin{proposition}
     Let \(\Omega\) be a measurable set, and let \(f: \Omega \to [0, \infty]\) and \(g: \Omega \to [0, \infty]\) be non-negative measurable functions. 
     \begin{itemize}
         \item [(a)] We have \(0 \le \int _\Omega f \le \infty\). Furthermore, \(\int _\Omega f = 0\) iff \(f(x) = 0\) for almost every \(x \in \Omega\). 
-        \item [(b)] For any positive \(c\), \(\int _\Omega cf = c \int _\omega f\). 
+        \item [(b)] For any positive \(c\), \(\int _\Omega cf = c \int _\Omega f\). 
         \item [(c)] If \(f(x) \le g(x)\) for all \(x \in \Omega\), then \(\int _\Omega f \le \int _\Omega g\). 
-        \item [(d)] If \(f(x) = g(x)\) for all \(x \in \Omega\), then \(\int _\Omega f = \int _\Omega g\).
+        \item [(d)] If \(f(x) = g(x)\) for almost every \(x \in \Omega\), then \(\int _\Omega f = \int _\Omega g\).
         \item [(e)] If \(\Omega ^{\prime} \subseteq \Omega \) is measurable, then 
         \[
             \int _{\Omega ^{\prime} } f = \int _\Omega f \chi _{\Omega ^{\prime} } \le \int _{\Omega } f.
         \]
     \end{itemize}   
 \end{proposition}
+
+\begin{proof}
+\hfill
+    \begin{itemize}
+    \item [(a)] \(0 \le \int _\Omega f \le \infty\) since zero function is simple and non-negative, and minorizes \(f\) for all \(f\). Now we show 
+    \[
+        \int _\Omega f = 0 \iff f(x) = 0 \text{ almost everywhere in } \Omega. 
+    \]
+    If \(f \equiv 0\) almost everywhere in \(\Omega\), then for any simple non-negative function \(s\) minorizes \(f\), we have \(s(x) = 0\) whenever \(f(x) = 0\). This shows \(s \equiv 0\) almost everywhere in \(\Omega\). Hence, \(\int _\Omega s = 0\) by definition. This implies \(\int _\Omega f = 0\).   
+
+    Now if \(\int _\Omega f = 0\). For each \(k \in \mathbb{N}\), define 
+    \[
+        A_k \coloneqq \left\{ x \in \Omega : f(x) \ge \frac{1}{k} \right\}. 
+    \]         
+    Since \(f\) is measurable, so \(A_k = f^{-1}\left( \left( \frac{1}{k}, \infty \right)  \right) \) is measurable for all \(k \in \mathbb{N}\). Now define \(s_k \coloneqq \frac{1}{k} \chi _{A_k}\). Then, \(s_k\) is a non-negative simple function. Note that \(s_k \le f\) on \(\Omega\). Thus, 
+    \[
+        \int _\Omega s_k \le \int _\Omega f = 0
+    \]      
+    by definition, which shows \(\int _\Omega s_k = 0\). Note that 
+    \[
+        0 = \int _\Omega s_k = \frac{1}{k} m(A_k) \implies m(A_k) = 0.
+    \] 
+    This is true for all \(k \in \mathbb{N}\), and since 
+    \[
+        \left\{ x \in \Omega : f(x) > 0 \right\} = \bigcup_{k=1}^{\infty} A_k, 
+    \] 
+    we have 
+    \[
+        m(\left\{ x \in \Omega : f(x) > 0 \right\} ) \le \sum_{k=1}^{\infty} m(A_k) = 0, 
+    \]
+    and we're done.
+
+    \item [(b)] We first show \(\int _\Omega cf \ge c \int _\Omega f\). Let \(s\) be any simple non-negative function minorizing \(f\), then \(cs\) minorizes \(cf\). Note that 
+    \[
+        \int _\Omega cs = c \int _\Omega s,
+    \]
+    Hence,
+    \[
+        \int _\Omega cf \ge \int _\Omega cs = c \int _\Omega s.
+    \]
+    Since this is true for all simple non-negative \(s\) minorizing \(f\), so 
+    \[
+        \int _\Omega cf \ge c \sup \left\{ \int _\Omega s: s \text{ simple and non-negative and minorizes } f  \right\} = c \int _\Omega f.  
+    \]  
+
+    For the reverse inequality, let \(t\) be any simple non-negative function s.t. \(t \le cf\), then since \(c > 0\), we have \(\frac{1}{c} t\) simple, non-negative, and \(\frac{1}{c} t \le f\). Hence,
+    \[
+        \int _\Omega t = c \int _\Omega \frac{1}{c} t \le c \int _\Omega f. 
+    \]      
+    Since this is true for all simple, non-negative \(t\) s.t. \(t \le cf\), so we can take supremum over all such \(t\) and gets
+    \[
+        \int _\Omega cf \le c \int _\Omega f.
+    \]   
+
+    \item [(c)] Let \(s\) be any simple, non-negative function s.t. \(s \le f\), then \(s \le g\). Thus,
+    \[
+        \sup \left\{ \int _\Omega s: s \text{ simple, non-negative, and } s \le f  \right\} \le \sup \left\{ \int _\Omega s: s \text{ simple, non-negative, and } s \le g  \right\},
+    \]
+    i.e. \(\int _\Omega f \le \int _\Omega g\). 
+
+    \item [(d)] Let \(N = \left\{ x \in \Omega : f(x) \neq g(x) \right\} \), then \(m(N) = 0\) and \(N\) is measurable, and we have \(f = g\) on \(\Omega \setminus N\). We first prove that \(\int _\Omega f \le \int _\Omega g\). Let \(s\) be any non-negative simple function s.t. \(s \le f\) on \(\Omega \), then define \(t\coloneqq s \chi _{\Omega \setminus N}\). Note that \(t\) is simple and non-negative. Moreover, if \(x \in \Omega \setminus N\), then 
+    \[
+        t(x) = s(x) \le f(x) = g(x),
+    \]
+    while if \(x \in N\), then \(t(x) = 0 \le g(x)\). Thus, \(t \le g\) on \(\Omega\). Since \(s\) and \(t\) only differ on \(N\), so \(s = t\) almost everywhere in \(\Omega \). In other words, \(s - t \equiv 0\) almost everywhere in \(\Omega \). This shows \(\int _\Omega s - t = 0\), i.e. \(\int _\Omega s = \int _\Omega t\). Note that we have 
+    \[
+        \int _\Omega s = \int _\Omega t \le \int _\Omega g
+    \]             
+    by definition of \(\int _\Omega g\), and this is true for any simple, non-negative \(s \le f\), so taking supremum we have \(\int _\Omega f \le \int _\Omega g\). Now we can interchanging the role of \(f\) and \(g\), and we can get \(\int _\Omega g \le \int _\Omega f\).
+
+    \item [(e)] We first show that \(\int _{\Omega ^{\prime} } f = \int _{\Omega } f \chi _{\Omega ^{\prime} }\). First note that \(\int _{\Omega ^{\prime} } f = \int _{\Omega ^{\prime} } f\vert_{\Omega ^{\prime} }\). We then first show 
+    \[
+        \int _{\Omega ^{\prime} } f \le \int _\Omega f \chi _{\Omega ^{\prime} }.
+    \]
+    Let \(s\) be any simple non-negative function on \(\Omega ^{\prime} \) s.t. \(s \le f\vert_{\Omega ^{\prime} }\). Extend \(s\) to a function \(\widetilde{s} \) on \(\Omega \) by 
+    \[
+        \widetilde{s}(x) \coloneqq \begin{dcases}
+            s(x), &\text{ if } x \in \Omega ^{\prime} ;\\
+            0, &\text{ if } \Omega \setminus \Omega ^{\prime}.
+        \end{dcases} 
+    \]      
+    Then, \(\widetilde{s} \) is simple and non-negative on \(\Omega\), and we have \(\widetilde{s} \le f \chi _{\Omega ^{\prime}} \). Moreover, we have 
+    \[
+        \int _{\Omega } \widetilde{s} = \int _{\Omega ^{\prime} } s 
+    \]   
+    by definition. Hence, every simple, non-negative \(s\) with \(s \le f\vert_{\Omega ^{\prime} }\) produces a simple, non-negative \(\widetilde{s}  \) with \(\widetilde{s} \le f \chi _{\Omega ^{\prime} } \) and \(s, \widetilde{s} \) has same Lebesgue integral. Hence, by taking supremum,
+    \[
+        \int _{\Omega ^{\prime} } f\vert_{\Omega ^{\prime} } \le \int _{\Omega } f \chi _{\Omega ^{\prime} } \implies \int _{\Omega ^{\prime} } f \le \int _{\Omega } f \chi _{\Omega ^{\prime} }.
+    \]   
+    Now we show \(\int _{\Omega } f \chi _{\Omega ^{\prime} } \le \int _{\Omega ^{\prime} } f\). Let \(t\) be any simple, non-negative function on \(\Omega\) s.t. \(t \le f \chi _{\Omega ^{\prime} }\), then \(t(x) = 0\) for every \(x \notin \Omega ^{\prime} \). Also, we have \(t\vert_{\Omega ^{\prime} } \le f \vert_{\Omega ^{\prime} }\), and \(t\vert_{\Omega ^{\prime} }\) is a simple, non-negative function on \(\Omega ^{\prime} \). Hence,
+    \[
+        \int _{\Omega } t = \int _{\Omega ^{\prime} } t\vert_{\Omega ^{\prime} } \le \int _{\Omega ^{\prime} } f\vert_{\Omega ^{\prime} } = \int _{\Omega ^{\prime} } f.
+    \]         
+    Since this is true for all simple, non-negative \(t\) s.t. \(t \le f \chi _{\Omega ^{\prime} }\), so by taking supremum, we have 
+    \[
+        \int _\Omega f \chi _{\Omega ^{\prime} } \le \int _{\Omega ^{\prime} } f.
+    \] 
+    Now we have shown \(\int _{\Omega ^{\prime} } f = \int _{\Omega } f \chi _{\Omega ^{\prime} }\), and since \(f \chi _{\Omega ^{\prime} } \le f\) on \(\Omega \), so 
+    \[
+        \int _\Omega f \chi _{\Omega ^{\prime} } \le \int _{\Omega } f.
+    \]   
+\end{itemize}
+\end{proof}
