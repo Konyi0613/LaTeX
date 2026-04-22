@@ -164,7 +164,14 @@ which has \(f_X(x) > 0\) for all \(x\), so for any \(a < b\), \(\mathbb{P} (a \l
     Hence, \(I = 1\). 
 \end{explanation}
 
-We say \(N(0, 1)\) is the \emph{standard normal distribution}.
+\begin{definition}
+    We say \(N(0, 1)\) is the \emph{standard normal distribution}.
+\end{definition}
+
+Note that if \(Z \sim N(0, 1)\), then 
+\[
+    f_Z(z) = \frac{1}{\sqrt{2\pi}} e^{-\frac{z^2}{2}}.
+\] 
 
 \begin{claim}
     If \(X \sim N(\mu , \sigma ^2)\), then if \(Z = \frac{X - \mu}{\sigma}\), we have \(Z \sim N(0, 1)\).   
@@ -172,11 +179,11 @@ We say \(N(0, 1)\) is the \emph{standard normal distribution}.
 
 \begin{explanation}
     \begin{align*}
-        \mathbb{P} (Z \le z) &= \mathbb{P} \left( \frac{X - \mu}{\sigma} \le z \right) = \mathbb{P} (X \le \mu + 2 \sigma) = \int _{-\infty }^{\mu + 2 \sigma} \frac{1}{\sigma \sqrt{2 \pi} } e^{-\frac{(x - \mu )^2}{2 \sigma ^2}} \, \mathrm{d} x.  
+        \mathbb{P} (Z \le z) &= \mathbb{P} \left( \frac{X - \mu}{\sigma} \le z \right) = \mathbb{P} (X \le \mu + z \sigma) = \int _{-\infty }^{\mu + z \sigma} \frac{1}{\sigma \sqrt{2 \pi} } e^{-\frac{(x - \mu )^2}{2 \sigma ^2}} \, \mathrm{d} x.  
     \end{align*}
     Now we change the variable, let \(t = \frac{x - \mu}{\sigma}\), i.e. \(x = \mu + t \sigma \), then we have 
     \[
-        \mathbb{P} (Z \le z) = \int _{-\infty }^{\mu + 2 \sigma} \frac{1}{\sigma \sqrt{2 \pi} } e^{-\frac{(x - \mu )^2}{2 \sigma ^2}} \, \mathrm{d} x = \int _{-\infty }^z \frac{1}{\sqrt{2 \pi } } e^{-\frac{t^2}{2}} \, \mathrm{d} t = \mathbb{P} (N(0, 1) \le z).  
+        \mathbb{P} (Z \le z) = \int _{-\infty }^{\mu + z \sigma} \frac{1}{\sigma \sqrt{2 \pi} } e^{-\frac{(x - \mu )^2}{2 \sigma ^2}} \, \mathrm{d} x = \int _{-\infty }^z \frac{1}{\sqrt{2 \pi } } e^{-\frac{t^2}{2}} \, \mathrm{d} t = \mathbb{P} (N(0, 1) \le z).  
     \]  
 \end{explanation}
 
@@ -206,7 +213,7 @@ Hence,
     \Var(Z) = \mathbb{E} [Z^2] - \mathbb{E} [Z]^2 = 1 - 0 = 1.
 \]
 
-Thus, for \(X \sim N(\mu , \sigma ^2)\), we have \(Z = \frac{X - \mu}{\sigma }\), i.e. \(2 \sigma + \mu = X\). Hence,
+Thus, for \(X \sim N(\mu , \sigma ^2)\), we have \(Z = \frac{X - \mu}{\sigma }\), i.e. \(Z \sigma + \mu = X\). Hence,
 \[
     \Var(X) = \mathbb{E} [(X - \mu)^2] = \mathbb{E} [(Z \sigma )^2] = \sigma ^2 \mathbb{E} [Z^2] = \sigma ^2.
 \]   
@@ -218,34 +225,87 @@ Thus, for \(X \sim N(\mu , \sigma ^2)\), we have \(Z = \frac{X - \mu}{\sigma }\)
 \begin{explanation}
     Suppose the envelop we get has \(\$ y\), then there is \(50 \%\) of chance that \(y = x\) and the other has \(\$ 2y\), while there is \(50 \%\) of chance that \(y = 2x\) and the other has \(\frac{1}{2} y\). Thus,
     \[
-        \mathbb{E} [\text{payout} ] = \frac{1}{2} \$2y + \frac{1}{2} \$ \frac{1}{2} y = \$ \frac{5}{4} y.
+        \mathbb{E} [\text{payout} ] = \frac{1}{2} (\$2y) + \frac{1}{2} (\$ \frac{1}{2} y) = \$ \frac{5}{4} y.
     \]       
 
     We can beat \(50 \%\) chance of getting the bigger envelop. The method is to let \(Z \sim N(0, 1)\) and sample \(z\) from \(Z\). If \(y < z\), then switch the envelop, and if \(y \ge z\), then keep the envelop. There are three cases:
     \begin{itemize}
-        \item Case 1: \(z < x\), always keep envelop, we have \(50 \%\) of winning. 
-        \item Case 2: \(x < z < 2x\), always get right right envelop, so we have \(100 \%\) of winning.  
+        \item Case 1: \(z \le x\), always keep envelop, we have \(50 \%\) of winning. 
+        \item Case 2: \(x < z \le 2x\), always get right right envelop, so we have \(100 \%\) of winning.  
         \item Case 3: \(2x < z\), always switch, so \(50\%\) of winning.    
     \end{itemize}  
     By the law of probability,
     \begin{align*}
         \mathbb{P} (\text{win} ) &= \mathbb{P} (\text{win} \mid z < x ) \mathbb{P} (z < x) + \mathbb{P} (\text{win} \mid x < z < 2x ) \mathbb{P} (x < z < 2x) + \mathbb{P} (\text{win} \mid 2x < z ) \mathbb{P} (2x < z) \\
-        &= 50\% + 50 \% \cdot \mathbb{P} (x < z < 2x) > 50 \%.
+        &= 50 \% \cdot \mathbb{P} (z \le x) + 100 \% \cdot \mathbb{P} (x < z \le 2x) + 50 \% \cdot \mathbb{P} (2x < z) \\
+        &= 50 \% (1 - \mathbb{P} (x < z \le 2x)) + 100 \% \cdot \mathbb{P} (x < z \le 2x) \\
+        &= 50\% + 50 \% \cdot \mathbb{P} (x < z \le 2x) > 50 \%.
     \end{align*}
 \end{explanation}
 
-Recall that if \(X \sim N(\mu , \sigma ^2)\), \(f_X(x) = \frac{1}{\sigma \sqrt{2 \pi } } e^{- \frac{(x - \mu )^2}{2 \sigma ^2}}\), then if we let \(Z = \frac{X - \mu}{\sigma }\), then \(Z \sim N(0, 1)\), and we call \(Z\) to be the z-score. 
+Recall that if \(X \sim N(\mu , \sigma ^2)\), \(f_X(x) = \frac{1}{\sigma \sqrt{2 \pi } } e^{- \frac{(x - \mu )^2}{2 \sigma ^2}}\), then if we let \(Z = \frac{X - \mu}{\sigma }\), then \(Z \sim N(0, 1)\), we call \(Z\) to be the z-score. 
 
 \paragraph{CDF}
 \[
-    F_Z(z) = \mathbb{P} (Z \le z) = \int _{-\infty }^z \frac{1}{\sqrt{2 \pi} } e^{- \frac{t^2}{2}} \, \mathrm{d} t \coloneqq \Phi (z). 
+    F_Z(z) = \mathbb{P} (Z \le z) = \int _{-\infty }^z \frac{1}{\sqrt{2 \pi} } e^{- \frac{t^2}{2}} \, \mathrm{d} t \coloneqq \Phi (z), 
 \]
+which cannot be expressed by elementary functions.
 
 \begin{remark}
     \hfill 
     \begin{itemize}
         \item [(i)] \(\mathbb{P} (a < Z \le b) = \mathbb{P} (Z \le b) - \mathbb{P} (Z \le a) = \Phi (b) - \Phi (a)\). 
         \item [(ii)] \(\mathbb{P} (Z > a) = 1 - \mathbb{P} (Z \le a) = 1 - \Phi (a)\). 
-        \item [(iii)] By symmetry of this distribution, \(\mathbb{P} (Z \le z) = \mathbb{P} (Z \ge -z) = 1 - \mathbb{P} (Z \le -z) = 1 - \Phi (-z)\).   
+        \item [(iii)] By symmetry of this distribution,
+        \[
+            \Phi (z) = \mathbb{P} (Z \le z) = \mathbb{P} (Z \ge -z) = 1 - \mathbb{P} (Z \le -z) = 1 - \Phi (-z).
+        \]
+        Thus, it suffices to know \(\Phi (z)\) for \(z \ge 0\).   
+        \begin{center}
+        \begin{tikzpicture}
+        \begin{axis}[
+            width=12cm,
+            height=7cm,
+            domain=-3.6:3.6,
+            samples=250,
+            axis lines=middle,
+            xlabel={$t$},
+            ylabel={$f_Z(t)$},
+            ymin=0,
+            ymax=0.45,
+            xmin=-3.6,
+            xmax=3.6,
+            xtick={-2,0,2},
+            xticklabels={$-z$, $0$, $z$},
+            ytick=\empty,
+            clip=false
+        ]
+            \addplot[name path=normal, very thick, black] {1/sqrt(2*pi) * exp(-x^2/2)};
+            \path[name path=axis] (axis cs:-3.6,0) -- (axis cs:3.6,0);
+
+            \addplot[blue!35, draw=none] fill between[of=normal and axis, soft clip={domain=-3.6:-2}];
+            \addplot[purple!45, draw=none] fill between[of=normal and axis, soft clip={domain=-2:2}];
+            \addplot[red!35, draw=none] fill between[of=normal and axis, soft clip={domain=2:3.6}];
+
+            \addplot[dashed] coordinates {(-2,0) (-2,{1/sqrt(2*pi) * exp(-(-2)^2/2)})};
+            \addplot[dashed] coordinates {(2,0) (2,{1/sqrt(2*pi) * exp(-(2)^2/2)})};
+
+            \node[blue!70!black] at (axis cs:-2.7,0.05) {left-only part};
+            \node[purple!70!black] at (axis cs:0,0.18) {shared by both};
+            \node[red!70!black] at (axis cs:2.7,0.05) {right-only part};
+            \node[blue!70!black] at (axis cs:-1.9,0.29) {$\mathbb{P}(Z\le z)$};
+            \node[red!70!black] at (axis cs:1.9,0.29) {$\mathbb{P}(Z\ge -z)$};
+        \end{axis}
+        \end{tikzpicture}
+        \end{center}
+
+        \item [(iv)] If \(X \sim N(\mu , \sigma ^2)\), 
+        \[
+            \mathbb{P} (X \le x) = \mathbb{P} \left( Z \le \frac{x - \mu}{\sigma} \right)  = \Phi \left( \frac{x - \mu}{\sigma} \right). 
+        \]
     \end{itemize}
 \end{remark}
+
+\begin{eg}
+    Transmitting binary data over a noise channel. If we send 1, then the receiver gets \(1 + X\); if we send 0, then the receiver gets \(X\), where \(X \sim N(0, 0.03^2)\). Our decoding algorithm is, when the receiver receives a number \(> 0.5\), then they will see it as 1, otherwise they see it as 0. Then, what is the probability of mistaking a bit?     
+\end{eg}
