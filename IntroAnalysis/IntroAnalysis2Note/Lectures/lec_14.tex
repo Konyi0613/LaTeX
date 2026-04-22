@@ -1,0 +1,166 @@
+\lecture{14}{21 April.}{}
+\begin{definition}
+    Let \(\Omega \subseteq \mathbb{R} ^n\) be measurable, and let \(f : \Omega \to \mathbb{R} \) be a simple function which is non-negative, thus \(f\) is measurable and the image \(f(\Omega)\) is finite and contained in \([0, \infty)\). Thus, we can define the Lebesgue integral \(\int _{\Omega } f\) of \(f\) on \(\Omega \) by 
+    \[
+        \int _{\Omega} f = \sum_{\lambda \in f(\Omega), \lambda > 0} \lambda m\left( \left\{ x \in \Omega: f(x) = \lambda \right\}  \right) = \sum_{\lambda \in f(\Omega)} \lambda m\left( \left\{ x \in \Omega: f(x) = \lambda \right\}  \right).  
+    \]    
+    We'll also sometimes write \(\int _{\Omega} f\) as \(\int _\Omega f \, \mathrm{d} m \).
+\end{definition}
+
+\begin{remark}
+    By definition, we know  simple function can be written as 
+    \[
+        f = \sum_{j=1}^N c_j \chi _{E_j}, 
+    \]
+    where \(\left\{ c_1, \dots , c_N \right\} \) are distinct and \(\left\{ E_j \right\}_{j=1}^N \) are disjoint, measurable subsets of \(\Omega\) defined by \(E_j = f^{-1} (\left\{ c_j \right\} )\), and thus 
+    \[
+        \int _{\Omega } f = \sum_{j=1}^N c_j m(E_j). 
+    \]   
+\end{remark}
+
+\begin{eg}
+    Let \(f: \mathbb{R} \to \mathbb{R}\) be the function which is equal to \(3\) on \([1, 2]\) and equal to \(4\) on \((2, 4)\) and is zero elsewhere. Then, 
+    \[
+        \int _\mathbb{R} f = 3 m([1, 2]) + 4 m([2, 4]) = 11.
+    \]     
+\end{eg}
+
+\begin{eg}
+    Suppose \(g: \mathbb{R} \to \mathbb{R} \) is the function which is \(1\) on \([0, \infty)\) and is zero on \((-\infty , 0)\), then \(g = 1 \cdot \chi _{[0. \infty)}\) and 
+    \[
+        \int _{\mathbb{R}} g = 1 \cdot m([0, \infty)) = \infty.
+    \]      
+\end{eg}
+
+\begin{lemma}
+    Let \(\Omega \subseteq \mathbb{R} ^n\) be measurable and let \(E_1, E_2, \dots , E_N\) be pairwise disjoint measurable subset of \(\Omega\). Let \(c_1, \dots , c_N\) be non-negative real numbers (not required to be distinct). Then,
+    \[
+        \int _{\Omega} \sum_{j=1}^N c_j \chi _{E_j} = \sum_{j=1}^N c_j m(E_j).  
+    \]    
+\end{lemma}
+
+\begin{proof}
+    Define \(f \coloneqq \sum_{j=1}^N c_j \chi _{E_j}\), then \(f\) is simple by definition. Let \(d_1, \dots , d_L\) be the distinct positive numbers that occurs among \(c_1, \dots , c_N\). Let 
+    \[
+        F_{\ell } \coloneqq \bigcup_{\left\{ j: c_j = d_{\ell}  \right\} } E_j. 
+    \]    
+    Then since each \(E_j\) is measurable, so \(F_{\ell}\) is measurable. Note that \(F_1, F_2, \dots , F_{\ell}\) are pairwise disjoint since \(E_1, \dots , E_N\) are pairwise disjoint. Also, note that 
+    \[
+        f = \sum_{\ell = 1}^L d_{\ell} \chi _{F_{\ell}}. 
+    \] 
+    Now since \(d_1, \dots , d_{L}\) are distinct and \(F_1, F_2, \dots , F_{L} \) are pairwise disjoint, by definition we have 
+    \[
+        \int_{\Omega} f = \sum_{\ell = 1}^L d_{\ell} m(F_{\ell}) = \sum_{\ell = 1}^L d_{\ell} \sum_{j: c_j = d_{\ell} } m(E_j)  = \sum_{\ell = 1}^L \sum_{j: c_j = d_{\ell}} c_j m(E_j) = \sum_{j=1}^N c_j m(E_j).    
+    \]    
+\end{proof}
+
+\begin{proposition}
+    Let \(\Omega \subseteq \mathbb{R} ^n\) be measurable, and let \(f: \Omega \to \mathbb{R} \) and \(g: \Omega \to \mathbb{R}\) be non-negative simple functions. 
+    \begin{itemize}
+        \item [(a)] We have \(0 \le \int_{\Omega} \le \infty\). Furthermore, we have \(\int _\Omega f = 0\) iff \(m(\left\{ x \in \Omega: f(x) \neq 0 \right\} ) = 0\).   
+        \item [(b)] \(\int _\Omega f + g = \int _\Omega f + \int _\Omega g\).
+        \item [(c)] For any \(c > 0\), we have \(\int _\Omega cf = c \int _{\Omega} f\).
+        \item [(d)] If \(f(x) \le g(x)\) for all \(x \in \Omega\), then \(\int _\Omega f \le \int _\Omega g\).      
+    \end{itemize}   
+    \begin{remark}
+        We make a very convenient notational convention: if a property \(P(x)\) holds for all points in \(\Omega\), except for a set of measure zero, then we say that \(P\) holds for almost every point in \(\Omega\). Thus (a) asserts that \(\int _\omega f = 0\) if and only if \(f\) is zero for almost every point in \(\Omega\).
+    \end{remark}
+\end{proposition}
+
+\begin{proof}
+    Since
+    \[
+        f = \sum_{\lambda \in f(\Omega) \setminus \left\{ 0 \right\} } \lambda \chi _{x \in \Omega: f(x) = \lambda }, 
+    \]
+    we can write \(f = \sum_{j=1}^N c_j \chi _{E_j} \), where \(E_1, \dots , E_N\) are pairwise disjoint, and each of \(c_j\) is positive. Similarly, we write \(g = \sum_{j=1}^M d_j \chi _{F_j} \), where \(F_1, \dots , F_M\) are pairwise disjoint and \(d_1, \dots , d_M\) are positive.    
+    \begin{itemize}
+        \item [(a)] Since \(\int _\Omega f = \sum_{j=1}^N c_j m(E_j) \), so it is clear that \(0 \le \int _\Omega f \le \infty\). If \(f\) is zero almost everywhere, then all of \(E_j\) must have measure \(0\) (because \(E_j \subseteq \left\{ x \in \Omega : f(x) \neq 0 \right\} \) ), and thus \(\int _\Omega f = 0\). 
+        
+        Conversely, if \(\int _\Omega f = 0\), then \(\sum_{j=1}^N c_j m(E_j) = 0 \), which can only happen when all of \(m(E_j)\) are \(0\), and hence \(f\) is zero almost everywhere.    
+        \item [(b)] Set 
+        \[
+            E_0 = \Omega \setminus \bigcup_{j=1}^{N} E_j, \quad c_0 = 0, 
+        \]
+        then \(E_0, E_1, \dots , E_N\) are pairwise disjoint, and their union is \(\Omega\), and \(f = \sum_{j=0}^N c_j \chi _{E_j} \). Similarly, we can define 
+        \[
+            F_0 = \Omega \setminus \bigcup_{k=1}^{M} F_k, \quad d_0 = 0,
+        \]  
+        and \(g = \sum_{k=0}^M d_k \chi _{F_k} \), where \(F_0, F_1, \dots , F_M\) are pairwise disjoint and their union is \(\Omega\). Now we know 
+        \[
+            \left\{ E_j \cap F_k: 0 \le j \le N, 0 \le k \le M \right\}
+        \] 
+        forms a partition of \(\Omega\). Now since 
+        \[
+            \chi _{E_j} = \sum_{k=0}^M \chi _{E_j \cap F_k}, \quad \chi _{F_k} = \sum_{j=0}^N \chi _{E_j \cap F_k},  
+        \]  
+        we have 
+        \[
+            f = \sum_{j=0}^N \sum_{k=0}^M c_j \chi _{E_j \cap F_k}, \quad g = \sum_{j=0}^N \sum_{k=0}^M d_k \chi _{E_j \cap F_k}. 
+        \]
+        Hence, 
+        \[
+            f + g = \sum_{j=0}^N \sum_{k=0}^M (c_j + d_k) \chi _{E_j \cap F_k},  
+        \]
+        which shows 
+        \[
+            \int _\Omega (f + g) = \sum_{j=0}^N \sum_{k=0}^M (c_j + d_k) m(E_j \cap F_k) = \int _\Omega f + \int _\Omega g
+        \]
+        by previous lemma since 
+        \[
+            \int _\Omega f = \sum_{j=0}^N c_j m(E_j) = \sum_{j=0}^N \sum_{k=0}^M c_j m(E_j \cap F_k),   
+        \]
+        and similarly we have 
+        \[
+            \int _\Omega g = \sum_{k=0}^M d_k m(F_k) = \sum_{k=0}^M \sum_{j=0}^N d_k m(E_j \cap F_k).   
+        \]
+        \item [(c)] Since \(c f = \sum_{j=1}^N (cc_j) \chi _{E_j} \), we have 
+        \[
+            \int _\Omega cf = \sum_{j=1}^N cc_j m(E_j) = c \int _\Omega f. 
+        \]
+        \item [(d)] Write \(h \coloneqq g - f\), then \(h\) is simple and \(g = h + f\). Hence, by (b), \(\int _\Omega g = \int _\Omega h + \int _\Omega f\), but by (a) \(\int _\Omega h \ge 0\), so we're done.    
+    \end{itemize}   
+                
+\end{proof}
+
+\section{Integration of non-negative measurable functions}
+We now pass from integrating non-negative simple functions to integrating general non- negative measurable functions. In this section we allow our measurable functions to take the value \(+\infty\).
+
+\begin{definition}
+    Let \(f: \Omega \to \mathbb{R} \) and \(g: \Omega \to \mathbb{R}\) be functions, we say that \(f\) majorizes \(g\), or equivalently that \(g\) minorizes \(f\), if
+    \[
+        f(x) \ge g(x) \quad \forall x \in \Omega.
+    \]      
+    We sometimes use the phrase “\(f\) dominates \(g\)” instead of “\(f\) majorizes \(g\)”. We also use the phrase \(g\) minorizes \(f\).
+\end{definition}
+
+\begin{definition}
+    Let \(\Omega \subseteq \mathbb{R} ^n\) be measurable, and \(f: \Omega \to [0, \infty]\) be measurable and non-negative. We define the Lebesgue integral \(\int _\Omega f\) of \(f\) on \(\Omega \) by 
+    \[
+        \int _\Omega f \coloneqq \sup \left\{ \int _\Omega s: s \text{ is simple and non-negative, and } s \text{ minorizes } f   \right\}.
+    \]     
+\end{definition}
+
+\begin{remark}
+    If \(\Omega ^{\prime} \subseteq \Omega\) is a measurable subset of \(\Omega\), then 
+    \[
+        \int _{\Omega ^{\prime}} f = \int _{\Omega ^{\prime} } f\vert_{\Omega ^{\prime} }. 
+    \]  
+\end{remark}
+
+\begin{remark}
+    \(0 \le \int _\Omega f \le \infty\) since zero function is simple and non-negative, and minorizes \(f\) for all \(f\).   
+\end{remark}
+
+\begin{proposition}
+    Let \(\Omega\) be a measurable set, and let \(f: \Omega \to [0, \infty]\) and \(g: \Omega \to [0, \infty]\) be non-negative measurable functions. 
+    \begin{itemize}
+        \item [(a)] We have \(0 \le \int _\Omega f \le \infty\). Furthermore, \(\int _\Omega f = 0\) iff \(f(x) = 0\) for almost every \(x \in \Omega\). 
+        \item [(b)] For any positive \(c\), \(\int _\Omega cf = c \int _\omega f\). 
+        \item [(c)] If \(f(x) \le g(x)\) for all \(x \in \Omega\), then \(\int _\Omega f \le \int _\Omega g\). 
+        \item [(d)] If \(f(x) = g(x)\) for all \(x \in \Omega\), then \(\int _\Omega f = \int _\Omega g\).
+        \item [(e)] If \(\Omega ^{\prime} \subseteq \Omega \) is measurable, then 
+        \[
+            \int _{\Omega ^{\prime} } f = \int _\Omega f \chi _{\Omega ^{\prime} } \le \int _{\Omega } f.
+        \]
+    \end{itemize}   
+\end{proposition}
