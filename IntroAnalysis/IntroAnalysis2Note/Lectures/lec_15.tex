@@ -1,0 +1,193 @@
+\lecture{15}{23 April.}{}
+\begin{remark}
+    (d) of \autoref{prop: measurable func integral property} shows that one can modify the values of a function on any measure zero set (e.g. every rational number), and not affect its integral at all.
+\end{remark}
+
+\begin{remark}
+    We havn't shown that \(\int _\Omega (f + g) = \int _\Omega f + \int _\Omega g\). From definition, it is easy to show \(\int _\Omega (f + g) \ge \int _\Omega f + \int _\Omega g\), but proving equality requires more work and will be done later.  
+\end{remark}
+
+As we have seen in previous chapters, we cannot always interchange an integral with a limit (or with limit-like concepts such as supremum). However, for the Lebesgue integral it is possible to do so when the functions are increasing:
+
+\begin{theorem}[Lebesgue monotone convergence theorem]
+    Let \(\Omega\) be a measurable subset of \(\mathbb{R} ^n\), and let \((f_n)_{n=1}^{\infty} \) be a sequence of non-negative measurable functions from \(\Omega\) to \([0, \infty]\) which are increasing in the sense that 
+    \[
+        0 \le f_1(x) \le f_2(x) \le \dots \quad \forall x \in \Omega. 
+    \]     
+    (Note that we are assuming \(f_n(x)\) is increasing with respect to \(n\); this is different notion from \(f_n(x)\) increasing with respect to \(x\).) Then we have 
+    \[
+        0 \le \int _\Omega f_1 \le \int _\Omega f_2 \le \int _\Omega f_3 \le \dots 
+    \]
+    and 
+    \[
+    \int _\Omega \sup _n f_n = \sup _n \int _\Omega f_n.
+    \]
+\end{theorem}
+
+\begin{proof}
+    Since \(f_n(x) \le f_{n+1}(x)\) for all \(x \in \Omega\), then by (c) of \autoref{prop: measurable func integral property}, we have 
+    \[
+        \int _\Omega f_n \le \int _\Omega f_{n+1} \quad \forall n \ge 1.
+    \]
+    In particular,
+    \[
+        0 \le \int _\Omega f_1 \le \int _\Omega f_2 \le \int _\Omega f_3 \le \dots .
+    \]  
+    It remains to prove that 
+    \[
+        \int _\Omega \sup _n f_n = \sup _n \int _\Omega f_n.
+    \]
+    Set \(f \coloneqq \sup _n f_n\), then by \autoref{lm: sup, inf, limsup, liminf of measurable func are measurable}, \(f\) is also measurable and takes values in \([0, \infty]\). We first show 
+    \[
+        \int _\Omega f \ge \sup _n \int _\Omega f_n.
+    \]    
+    Since \(f_n \le f\) pointwise for every \(n\), (c) of \autoref{prop: measurable func integral property} yields 
+    \[
+        \int _\Omega f_n \le \int _\Omega f \quad \forall n.
+    \]   
+    Taking supremum over \(n\), then we're done.
+
+    Now we show 
+    \[
+        \int _\Omega f \le \sup _n \int _\Omega f_n.
+    \] 
+    Since 
+    \[
+        \int _\Omega f = \sup \left\{ \int _\Omega s: s \text{ is simple, non-negative, and } s \le f  \right\}, 
+    \]
+    it suffices to show that for every simple, non-negative function \(s\) satisfying \(s \le f\), one has 
+    \[
+        \int _\Omega s \le \sup _n \int _\Omega f_n.
+    \]  
+    Thus, we fix a non-negative simple function \(s\) with
+    \[
+        s(x) \le f(x) = \sup _n f_n(x) \quad \forall x \in \Omega.
+    \] 
+    We will prove that \(\int _\Omega s \le \sup _n \int _\Omega f_n\). 
+
+    Now let \(0 < \varepsilon < 1\). For each \(n \ge 1\), define 
+    \[
+        E_n \coloneqq \left\{ x \in \Omega : f_n(x) \ge (1 - \varepsilon) s(x) \right\}. 
+    \]   
+    Now we have \(f_n\) and \(s\) are measurable, we know that each set \(E_n\) is measurable since
+    \[
+        E_n = (f_n - (1- \varepsilon ) s)^{-1} ([0, \infty]),
+    \]    
+    and since 
+    \[
+        A_{n, k} \coloneqq (f_n - (1- \varepsilon ) s)^{-1} ((-\frac{1}{k}, \infty]) 
+    \]
+    is measurable by definition for all \(k \in \mathbb{N}\), we have \(E_n = \bigcup_{k=1}^{\infty} A_{n, k} \) measurable. 
+
+    \begin{claim}
+        \(E_1 \subseteq E_2 \subseteq E_3 \subseteq \dots \) and \(\bigcup_{n=1}^{\infty} E_n = \Omega \).   
+    \end{claim}
+    \begin{explanation}
+        We first show \(E_n \subseteq E_{n+1}\). This follows from \(f_n \le f_{n+1}\), so if \(x \in E_n\), i.e. \(f_n(x) \ge (1 - \varepsilon) s(x)\), then 
+        \[
+            f_{n+1}(x) \ge f_n(x) \ge (1 - \varepsilon) s(x) \implies x \in E_{n+1}.
+        \]   
+        To prove that \(\bigcup_{n=1}^{\infty} E_n = \Omega \), fix \(x \in \Omega\). Since 
+        \[
+            s(x) \le f(x) = \sup _n f_n(x),
+        \]  
+        there exists some index \(N(x)\) s.t. \(f_{N(x)}(x) \ge s(x) \ge (1 - \varepsilon)s(x)\). Thus, \(x \in E_{N(x)}\), and we're done.   
+    \end{explanation}
+
+    Since \(s\) is a non-negative simple function, we know 
+    \[
+        s = \sum_{j=1}^N c_j \chi _{F_j} 
+    \] 
+    for some \(c_1, \dots , c_N \ge 0\) and \(F_1, \dots , F_N\) are pairwise disjoint measurable subsets of \(\Omega\). For each \(n\), 
+    \[
+        \chi _{F_j} \chi _{E_n} = \chi _{F_j \cap E_n},
+    \]    
+    and hence 
+    \[
+        s \chi _{E_n} = \sum_{j=1}^N c_j \chi _{F_j} \chi _{E_n} = \sum_{j=1}^N c_j \chi _{F_j \cap E_n}.  
+    \]
+    Therefore,
+    \[
+        \int _{E_n} s = \int _\Omega s \chi _{E_n} = \int _\Omega \sum_{j=1}^N c_j \chi _{F_j \cap E_n} = \sum_{j=1}^N c_j m(F_j \cap E_n).  
+    \]
+    Now since \(E_n \uparrow \Omega\) by the claim, so for each \(j\),
+    \[
+        F_j \cap E_1 \subseteq F_j \cap E_2 \subseteq \dots \quad \text{and} \quad \bigcup_{n=1}^{\infty} (F_j \cap E_n) = F_j.  
+    \]  
+    Since each \(F_j \cap E_n\) is measurable, continuity from belowe of Lebesgure measure gives 
+    \[
+        m(F_j \cap E_n) \uparrow m(F_j) \quad \text{as } n \to \infty. 
+    \] 
+    Thus,
+    \[
+        \int _{E_n} s = \sum_{j=1}^N c_j m(F_j \cap E_n) \to \sum_{j=1}^N c_j m(F_j) = \int _\Omega s \text{ as } n \to \infty.
+    \]
+    Note that since \(E_1 \subseteq E_2 \subseteq \dots \), we have 
+    \[
+        \int _{E_1} s \le \int _{E_2} s \le \int _{E_3} s \le \dots  
+    \] 
+    and \(\lim_{n \to \infty} \int _{E_n} s = \int _\Omega s \), so 
+    \[
+        \sup _n \int _{E_n} s = \int _\Omega s.
+    \] 
+
+    Now by definition of \(E_n\), we have 
+    \[
+        f_n(x) \ge (1 - \varepsilon) s(x) \quad \text{for every } x \in E_n. 
+    \]  
+    Hence, by (c), (e) of \autoref{prop: measurable func integral property}, 
+    \[
+        \int _\Omega f_n \ge \int _{E_n} f_n \ge \int _{E_n} (1 - \varepsilon) s = (1 - \varepsilon) \int _{E_n} s.
+    \] 
+    Taking supremum over \(n\),
+    \[
+        \sup _n \int _\Omega f_n \ge (1 - \varepsilon) \sup _n \int_{E_n} s = (1 - \varepsilon) \int _\Omega s. 
+    \] 
+    Since this holds for all \(0 < \varepsilon < 1\), letting \(\varepsilon \to 0\) gives 
+    \[
+        \sup _n \int _\Omega f_n \ge \int _\Omega s.
+    \]  
+    Hence, we're done.
+\end{proof}
+
+\begin{lemma}[Interchange of addition and integration]
+    Let \(\Omega \) be a measurable subset of \(\mathbb{R} ^n\), and let \(f, g: \Omega \to [0, \infty]\) be measurable functions. Then, 
+    \[
+        \int _\Omega (f + g) = \int _\Omega f + \int _\Omega g.
+    \]   
+\end{lemma}
+
+\begin{proof}
+    By \autoref{lm: use simple function approach measurable function}, there exist increasing sequence of non-negative simple functions 
+    \[
+        s_1 \le s_2 \le \dots \le f, \quad t_1 \le t_2 \le \dots \le g
+    \] 
+    s.t. \(s_n(x) \uparrow f(x)\) and \(t_n(x) \uparrow g(x)\) for every \(x \in \Omega\). For each \(n\), \(s_n + t_n\) is again a non-negative simple function. Moreover, since both \((s_n)\) and \((t_n)\) are increasing, so is \((s_n + t_n)\). For each \(x \in \Omega\), we have 
+    \[
+        s_n(x) + t_n(x) \uparrow f(x) + g(x),
+    \]         
+    and hence \(s_n + t_n \uparrow f + g\) pointwise on \(\Omega\). Applying the monotone convergence theorem to the three increasing sequecnes
+    \[
+        s_n \uparrow f, \quad t_n \uparrow g, \quad s_n + t_n \uparrow f + g,
+    \]  
+    we obtain 
+    \[
+        \int _\Omega f = \sup _n \int _\Omega s_n, \quad \int _\Omega g = \sup _n \int _\Omega t_n, \quad \int _\Omega (f + g) = \sup _n \int _\Omega (s_n + t_n).
+    \]
+    Note that 
+    \[
+        \int _\Omega (s_n + t_n) = \int _\Omega s_n + \int _\Omega t_n \quad \text{for every } n 
+    \]
+    since \(s_n, t_n\) are non-negative simple functions. Thus, 
+    \[
+        \int _\Omega (f + g) = \sup _n \int _\Omega (s_n + t_n) = \sup _n \left( \int _\Omega s_n + \int _\Omega t_n \right) 
+    \] 
+    Now let \(a_n \coloneqq \int _\Omega s_n\) and \(b_n \coloneqq \int _\Omega t_n\), then \((a_n)\) and \((b_n)\) are increasing seuqences in \([0, \infty]\). Consequently, 
+    \[
+        a_n + b_n \uparrow \left( \sup _n a_n \right) + \left( \sup _n b_n \right),  
+    \]     
+    Thus, \(\sup _n (a_n + b_n) = \sup _n a_n + \sup _n b_n\). It follows that 
+    \[
+        \int _\Omega (f + g) = \sup _n \left( \int _\Omega s_n + \int _\Omega t_n \right) = \sup _n \int _\Omega s_n + \sup _n \int_\Omega t_n = \int _\Omega f + \int _\Omega g.  
+    \] 
+\end{proof}

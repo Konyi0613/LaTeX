@@ -307,5 +307,67 @@ which cannot be expressed by elementary functions.
 \end{remark}
 
 \begin{eg}
-    Transmitting binary data over a noise channel. If we send 1, then the receiver gets \(1 + X\); if we send 0, then the receiver gets \(X\), where \(X \sim N(0, 0.03^2)\). Our decoding algorithm is, when the receiver receives a number \(> 0.5\), then they will see it as 1, otherwise they see it as 0. Then, what is the probability of mistaking a bit?     
+    Transmitting binary data over a noise channel. If we send 1, then the receiver gets \(1 + X\); if we send 0, then the receiver gets \(X\), where \(X \sim N(0, 0.3^2)\). Our decoding algorithm is, when the receiver receives a number \(\ge 0.5\), then they will see it as 1, otherwise they see it as 0. Then, what is the probability of mistaking a bit?     
 \end{eg}
+
+\begin{explanation}
+    Suppose the signal sent is \(S \in \left\{ 0, 1 \right\} \), then 
+    \begin{align*}
+        \mathbb{P} (\text{error}) &= \mathbb{P} (\text{error} \mid S = 0) \mathbb{P} (S = 0) + \mathbb{P} (\text{error} \mid S = 1) \mathbb{P} (S = 1) \\
+        &= \mathbb{P} (X \ge 0.5) \mathbb{P} (S = 0) + \mathbb{P} (X < -0.5) \mathbb{P} (S = 1) \\
+        &= \mathbb{P} (X < -0.5) \mathbb{P} (S = 0) + \mathbb{P} (X < -0.5) \mathbb{P} (S = 1) \quad (\text{by symmetry}) \\
+        &= \mathbb{P} (X < -0.5) = \mathbb{P} \left( \frac{X - 0}{0.3} < \frac{-0.5}{0.3} \right) = \Phi \left( -1.67 \right).
+    \end{align*}
+    %fig
+
+    \begin{figure}[H]
+        \begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=12cm,
+            height=6.5cm,
+            axis lines=middle,
+            xmin=-1.1, xmax=2.1,
+            ymin=0, ymax=1.55,
+            xtick={0,0.5,1},
+            xticklabels={$0$,$0.5$,$1$},
+            ytick=\empty,
+            enlargelimits=false,
+            clip=false,
+            domain=-1.1:2.1,
+            samples=200,
+            xlabel={$y$},
+            every axis x label/.style={at={(current axis.right of origin)}, anchor=west},
+        ]
+            % left density: Y | S=0 ~ N(0, 0.3^2)
+            \addplot[name path=A, very thick, draw=pink!70!black] {1/(0.3*sqrt(2*pi))*exp(-x^2/(2*0.3^2))};
+
+            % right density: Y | S=1 ~ N(1, 0.3^2)
+            \addplot[name path=B, very thick, draw=olive!70!black] {1/(0.3*sqrt(2*pi))*exp(-(x-1)^2/(2*0.3^2))};
+
+            % x-axis path for shading
+            \path[name path=axis] (axis cs:-1.1,0) -- (axis cs:2.1,0);
+
+            % shaded error regions
+            \addplot[pink!35, opacity=0.8] fill between[
+                of=A and axis,
+                soft clip={domain=0.5:2.1},
+            ];
+            \addplot[olive!35, opacity=0.8] fill between[
+                of=B and axis,
+                soft clip={domain=-1.1:0.5},
+            ];
+
+            % threshold line
+            \addplot[dashed, gray] coordinates {(0.5,0) (0.5,1.45)};
+
+            % labels
+            \node[pink!70!black] at (axis cs:-0.08,1.38) {$S=0$};
+            \node[olive!70!black] at (axis cs:1.08,1.38) {$S=1$};
+            \node[gray!80] at (axis cs:0.58,1.48) {$y=0.5$};
+        \end{axis}
+    \end{tikzpicture}
+    \end{center}
+    \caption{Colored area represents misreading signal}
+    \end{figure}
+\end{explanation}

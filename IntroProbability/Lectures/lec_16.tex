@@ -1,0 +1,153 @@
+\lecture{16}{23 April.}{}
+\paragraph{Approximating Binomials}
+If \(np(1 - p) \to \infty\), then \(\mathrm{Bin}(n, p)\) looks normal. 
+
+\begin{theorem}[de Moivre-Laplace]
+    Let \(S_n \sim \mathrm{Bin}(n, p)\), and let \(p \in (0, 1)\) be fixed, then for any fixed \(a < b\), 
+    \[
+        \mathbb{P} \left( a \le \frac{S_n - np}{\sqrt{np(1 - p)} } \le b \right) \to \Phi (b) - \Phi (a) \text{ as } n \to \infty, 
+    \]   
+    i.e. \(\frac{S_n - np}{\sqrt{np(1 - p)} }\) behaves like \(N(0, 1)\), which shows \(S_n\) behaves like \(N(np, np(1 - p))\).    
+\end{theorem}
+
+\begin{remark}
+    This approximation already works well if \(np(1 - p) \ge 10\). 
+\end{remark}
+
+\paragraph{Continuity correction}
+
+If \(S_n \sim \mathrm{Bin}(n, p) \), and we estimate it with a normal distribution, then we should correct for the continuity: 
+\[
+    \left\{ S_n = k \right\} \leftrightarrow \left\{ k  - \frac{1}{2} < S_n \le k + \frac{1}{2} \right\}.  
+\]
+
+\begin{eg}
+    Tossing a fair coin 40 times. What is the probability of seeing 20 heads?
+\end{eg}
+\begin{answer}
+    Number of heads \(S_n \sim \mathrm{Bin}\left( 40, \frac{1}{2} \right)  \), then 
+    \[
+        \mathbb{P} (S_n = 20) = \binom{40}{20} \left( \frac{1}{2} \right)^{20} \left( \frac{1}{2} \right)^{20} = 0.1254.   
+    \] 
+    For the normal approximation:
+    \begin{align*}
+        \mathbb{P} (S_n = 20) &= \mathbb{P} (19.5 \le S_n \le 20.5) = \mathbb{P} \left( \frac{-0.5}{\sqrt{10} } \le \frac{S_n - 20}{\sqrt{10} } \le \frac{0.5}{\sqrt{10} } \right) \\
+        &= \Phi \left( \frac{0.5}{\sqrt{10} } \right) - \Phi \left( \frac{-0.5}{\sqrt{10} } \right) = \Phi \left( \frac{0.5}{\sqrt{10} } \right) - \left( 1 - \Phi \left( \frac{0.5}{\sqrt{10} } \right) \right) = 2 \Phi \left( \frac{0.5}{\sqrt{10} } \right) - 1 \\ 
+        &\thickapprox 0.1272.   
+    \end{align*}
+\end{answer}
+
+\begin{eg}
+    There is a country with population of \(N\). The government wants to estimate the level of support for a new initiative. Suppose \(p \%\) of the population are in support, and the government polls \(n\) people (with replacement) uniformly at random. Then, number of positive responses \(S_n \sim \mathrm{Bin}(n, p) \),then what should \(n\) be to estimate \(p\) to within \(\pm 1 \%\) with probability \(\ge 95\%\)?      
+\end{eg}
+
+\begin{answer}
+    \begin{align*}
+        \left\{ \text{Estimating } p \text{ to within } 1 \%   \right\} &= \left\{ \left\vert \frac{S_n}{n} - p \right\vert \le 0.01 \right\} = \left\{ np - 0.01n \le S_n \le np + 0.01n \right\} \\
+        &= \left\{ -0.01 n \le S_n - np \le 0.01n \right\} \\
+        &= \left\{ \frac{-0.01n}{\sqrt{np(1-p)} } \le \frac{S_n - np}{\sqrt{np(1 - p)} } \le \frac{0.01n}{\sqrt{np(1-p)} } \right\}.  
+    \end{align*}
+    Note that 
+    \[
+        \frac{0.01 n}{\sqrt{np(1-p)} } = \frac{0.01 \sqrt{n} }{\sqrt{p(1-p)} } \ge 0.02 \sqrt{n}, 
+    \]
+    so 
+    \begin{align*}
+        \mathbb{P} (\text{accurate} ) &= \mathbb{P} \left( \frac{-0.01n}{\sqrt{np(1-p)} } \le \frac{S_n - np}{\sqrt{np(1 - p)} } \le \frac{0.01n}{\sqrt{np(1-p)} } \right) \\ &\ge \mathbb{P} \left( -0.02 \sqrt{n} \le \frac{S_n - np}{\sqrt{np(1-p)} } \le 0.02\sqrt{n}   \right) \\
+        &\thickapprox \Phi (0.02 \sqrt{n} ) - \Phi (-0.02\sqrt{n} ) = 2 \Phi (0.02\sqrt{n} ) - 1 \ge 0.95,
+    \end{align*}
+    Hence, we want \(n \ge 9604\). 
+\end{answer}
+
+\subsection{Gamma Distribution}
+Setting: Consider the Poisson process. That is, we have a sequence of occurrences, and:
+\begin{itemize}
+    \item [1.] The waiting time between successive occurrences is exponentially distributed with rate \(\lambda \).
+    \item [2.] The occurrences are independent of each others. Note that the waiting time for the first occurrence follows a \(\mathrm{Exp}(\lambda ) \) and the number of occurrences in a unit of time follows a \(\mathrm{Poi}(\lambda) \). Now, we care about the waiting time of the \(n\)-th occurrence.
+\end{itemize}
+
+Now let \(X_n = \) timestamp of the \(n\)-th event. Then, \(X_1 \sim \mathrm{Exp}(\lambda )\), and we know 
+\begin{align*}
+    F_{X_n}(t) &= \mathbb{P} (X_n \le t) = \mathbb{P} (\text{at least } n \text{ events occur in } [0, t]) = \mathbb{P} (\mathrm{Poi}(t \lambda ) \ge n ) \\
+    &= \sum_{j=n}^{\infty} \mathbb{P} (\mathrm{Poi}(t \lambda ) = j) = \sum_{j=n}^{\infty} e^{-t \lambda} \frac{(t \lambda )^j}{j!}.  
+\end{align*}   
+Thus,
+\begin{align*}
+    f_{X_n}(t) &= \frac{\mathrm{d}}{\mathrm{d}t} F_{X_n}(t) = \sum_{j=n}^{\infty} \frac{\mathrm{d}}{\mathrm{d}t} \left[ \frac{e^{-\lambda t} (t \lambda )^j}{j!} \right] = \sum_{j=n}^{\infty} \frac{1}{j!} \left[ - \lambda e^{-t \lambda } (t \lambda )^j + e^{-t \lambda } \lambda j (t \lambda )^{j - 1} \right] \\
+    &= \left( -\lambda \sum_{j=n}^{\infty} e^{-t \lambda} \frac{(t \lambda )^j}{j!}  \right) + \left( \lambda \sum_{j=n}^{\infty} e^{-t \lambda} \frac{(t \lambda )^{j-1}}{(j-1)!}  \right) \\
+    &= \left( -\lambda \sum_{j=n}^{\infty} e^{-t \lambda} \frac{(t \lambda )^j}{j!}  \right) + \left( \lambda \sum_{j=n-1}^{\infty} e^{-t \lambda} \frac{(t \lambda )^j}{j!}  \right) = \frac{\lambda e^{-t \lambda } (t \lambda)^{n - 1}}{(n - 1)!},         
+\end{align*}
+so we have 
+\[
+    f_{X_n}(t) = \frac{\lambda e^{-t \lambda } (t \lambda)^{n - 1}}{(n - 1)!} \quad (t \ge 0). 
+\]
+We can check that 
+\[
+    f_{X_1}(t) = \lambda e^{-t \lambda },
+\]
+which is an exponential pdf, so it makes sense. 
+
+\begin{definition}[Gamma Distribution]
+    If we have \(\lambda \in \mathbb{R} _{> 0}\) and \(\alpha \in \mathbb{R} _{> 0}\), then \(X \sim \Gamma (\alpha , \lambda )\) iff 
+    \[
+        f_X(x) = \begin{dcases}
+            \frac{\lambda e^{-\lambda x} (\lambda x)^{\alpha  - 1}}{\Gamma (\alpha)}, &\text{ if } x \ge 0 ;\\
+            0, &\text{ if } x < 0.
+        \end{dcases}
+    \]   
+    where 
+    \[
+        \Gamma (\alpha ) \coloneqq \int _0^{\infty} e^{-y} y^{\alpha - 1} \, \mathrm{d} y. 
+    \]
+\end{definition}
+
+Note that \(\Gamma (1) = 1\). In general, for \(\alpha > 1\),
+\begin{align*}
+    \Gamma (\alpha ) &= \int _0^{\infty } e^{-y} y^{\alpha - 1} \, \mathrm{d} y = \left[ -e^{-y} y^{\alpha - 1}  \right]_0^{\infty } + \int _0^{\infty} (\alpha - 1) e^{-y} y^{\alpha - 2} \, \mathrm{d} y = (\alpha - 1) \Gamma (\alpha - 1).   
+\end{align*} 
+
+Hence,
+\[
+    \Gamma (1) = 1, \quad \Gamma (\alpha ) = (\alpha - 1) \Gamma (\alpha - 1),
+\]
+and by induction we can show that 
+\[
+    \Gamma (n) = (n - 1)! \quad \forall n \in \mathbb{N}.
+\]
+Hence, 
+\[
+    \Gamma (n, \lambda ) = \text{timestamps for the } n\text{-th event in the Poisson process with rate } \lambda.  
+\]
+
+\paragraph{Expectation}
+\begin{align*}
+    \mathbb{E} [X] &= \int _{-\infty }^{\infty} x f_X(x) \, \mathrm{d} x = \int _0^{\infty} x \frac{\lambda e^{-\lambda x} (\lambda x)^{\alpha - 1}}{\Gamma (\alpha )} \, \mathrm{d} x = \frac{1}{\Gamma (\alpha )} \int _0^{\infty } e^{-\lambda x} (\lambda x)^\alpha \,\mathrm{d} x \\
+    &= \frac{1}{\Gamma (\alpha )} \int _0^{\infty} e^{-y} y^\alpha \cdot \frac{1}{\lambda } \, \mathrm{d}y  = \frac{1}{\lambda \Gamma (\alpha )} \int _0^{\infty} e^{-y} y^{(\alpha + 1) - 1} \, \mathrm{d} y = \frac{\Gamma (\alpha + 1)}{\lambda \Gamma (\alpha )} = \frac{\alpha}{\lambda }.   
+\end{align*}
+
+\paragraph{Special case: \(\alpha = n \in \mathbb{N}\)} 
+\[
+    \Gamma (n, \lambda ) = \text{timestamps for the } n\text{-th event in the Poisson process with } \mathrm{Exp}(\lambda ) \text{ waiting time} .  
+\]
+Suppose \(X \sim \Gamma (n, \lambda )\), then \(X = W_1 + W_2 + \dots + W_n\), where \(W_i\) is the waiting time between \((i-1)\)-th and \(i\)-th event. Hence, \(W_i \sim \mathrm{Exp}(\lambda ) \). 
+
+Hence,
+\[
+    \mathbb{E} [X] = \mathbb{E} \left[ \sum_{i=1}^n W_i  \right] = \sum_{i=1}^n \mathbb{E} [W_i] = \sum_{i=1}^n \frac{1}{\lambda} = \frac{n}{\lambda}.   
+\]
+
+\paragraph{Variance}
+If \(S \sim \Gamma (\alpha , \lambda )\), then 
+\[
+    \Var(X) = \mathbb{E} [X^2] - \mathbb{E} [X]^2, 
+\] 
+and 
+\begin{align*}
+    \mathbb{E} [X^2] &= \int _0^{\infty} x^2 \frac{\lambda e^{-\lambda x} (\lambda x)^{\alpha - 1}}{\Gamma (\alpha )} \,\mathrm{d} x = \frac{1}{\lambda \Gamma (\alpha )} \int _0^{\infty} e^{\lambda x} (\lambda x)^{\alpha + 1} \, \mathrm{d} x \\
+    &= \frac{1}{\lambda ^2 \Gamma (\alpha )} \int _0^{\infty} e^{-y} y^{\alpha + 1} \, \mathrm{d} y \\
+    &= \frac{\Gamma (\alpha + 2)}{\lambda ^2 \Gamma (\alpha)} = \frac{(\alpha + 1) \alpha \Gamma (\alpha)}{\lambda ^2 \Gamma (\alpha )} = \frac{(\alpha + 1) \alpha}{\lambda ^2}. 
+\end{align*}
+Thus,
+\[
+    \Var(X) = \mathbb{E} [X^2] - \mathbb{E} [X]^2 = \frac{(\alpha + 1)\alpha }{\lambda ^2} - \frac{\alpha ^2}{\lambda ^2} = \frac{\alpha }{\lambda ^2}.
+\]
