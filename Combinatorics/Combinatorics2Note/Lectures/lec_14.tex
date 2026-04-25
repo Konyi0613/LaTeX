@@ -1,0 +1,97 @@
+\lecture{14}{24 April.}{}
+\paragraph{Edge Menger}
+\begin{definition}
+    \begin{align*}
+        \kappa ^{\prime} (u, v) &= \min \left\{ \vert F \vert: F \subseteq E(G), u, v \text{ disconnected in } G - F   \right\} \\
+        \lambda ^{\prime} (u, v) &= \max \left\{ \vert P \vert: P \text{ is a set of pairwise edge-disjoint } uv\text{-path}    \right\} 
+    \end{align*}
+\end{definition}
+
+\begin{theorem}[Local edge Menger Theorem]
+    \(\forall u, v \in V(G)\), \(\kappa ^{\prime} (u, v) = \lambda ^{\prime} (u, v)\). 
+\end{theorem}
+\begin{proof}
+    Follows from local vertex Menger. \todo{HW}
+\end{proof}
+
+\begin{theorem}[Global edge Menger Theorem]
+    If \(G\) is \(k\)-edge-connected, then for any \(u, v \in V(G)\), there are \(k\) pairwise edge-disjoint \(uv\)-paths.     
+\end{theorem}
+
+\chapter{Network Flows}
+\begin{definition}
+    A network is a 4-tuple \((\vec{D}, s, t, c)\), where 
+    \begin{itemize}
+        \item \(\vec{D} = (V, E)\) is a directed multigraph s.t. \(V\) is a set of vertices and \(E \subseteq V^2\) is a multiset of directed edges: \(e = (e^-, e^+)\), where \(e^-\) is the endpoint of \(e\), and \(e^+\) is the starting point of \(e\).
+        \item \(s \in V\) is a source vertex. 
+        \item \(t \in V\) is a sink vertex. 
+        \item \(c: \vec{E} \to \mathbb{R} _{\ge 0}\) are the capacities of the edges.   
+    \end{itemize}     
+\end{definition}
+
+\begin{definition}
+    A flow is a function \(f: \vec{E} \to \mathbb{R} _{\ge 0}\). A flow is feasible if 
+    \begin{itemize}
+        \item \(f(\vec{e}) \le c(\vec{e})\). 
+        \item (Conservation of flow) \(\forall v \neq s, t\), 
+        \[
+            \sum_{\vec{e}: v = e^-} f(\vec{e}) = \sum_{\vec{e}: v = e^+} f(\vec{e}). 
+        \]
+    \end{itemize} 
+    The value of the flow is 
+    \[
+        \mathrm{val}(f) = \sum_{\vv{e}: t = e^+} f(\vv{e}) - \sum_{\vv{e}: t = e^-} f(\vv{e}).   
+    \]
+\end{definition}
+
+Our objective is to maximize the value of a feasible flow.
+
+\begin{definition}
+    A source-sink cut is 
+    \[
+        \left[ S, \overline{S} \right] = \left\{ \vv{e} = (x, y) \in \vv{E}: x \in S, y \in \overline{S} \right\},  
+    \]
+    where \(S \subseteq V, \overline{S} \subseteq V \setminus S, s \in S, t \in \overline{S}\). The capacity of the cut is 
+    \[
+        \mathrm{cap}(S, \overline{S}) = \sum_{\vv{e} \in [S, \overline{S}]} c(\vv{e}).  
+    \]
+\end{definition}
+
+\begin{lemma}[Weak Duality]
+    For any feasible flow \(f\), and any source-sink cut \([S, \overline{S}]\), 
+    \[
+        \mathrm{val}(f) \le \mathrm{cap}(S, \overline{S}).  
+    \]  
+\end{lemma}
+
+\begin{proof}
+    \begin{align*}
+        \mathrm{cap}(S, \overline{S}) = \sum_{\vv{e} \in \left[ S, \overline{S} \right] } c(\vv{e}) \ge \sum_{\vv{e} \in \left[ S, \overline{S}  \right] } f(\vv{e}) \ge \sum_{\vv{e} \in \left[ S, \overline{S}  \right] } f(\vv{e}) - \sum_{\vv{e} \in \left[ \overline{S} , S  \right] } f(\vv{e}) = \mathrm{val}(f).   
+    \end{align*}
+\end{proof}
+
+\begin{lemma}[Conservation]
+    For any source-sink cut \(\left[ Q, \overline{Q} \right] \), 
+    \[
+        \sum_{\vv{e} \in \left[ Q, \overline{Q} \right] } f(\vv{e}) - \sum_{\vv{e} \in \left[ \overline{Q} , Q \right] } f(\vv{e}) = \mathrm{val}(f).   
+    \] 
+\end{lemma}
+
+\begin{proof}
+    We can do induction on \(\vert Q \vert \). 
+    \begin{itemize}
+        \item Base case: \(\vert \overline{Q} \vert = 1\), then \(\overline{Q} = \left\{ t \right\} \). Hence,
+        \[
+            \sum_{\vv{e} \in \left[ Q, \overline{Q} \right] } f(\vv{e}) - \sum_{\vv{e} \in \left[ \overline{Q} , Q \right] } f(\vv{e}) = \sum_{\vv{e}: e^+ = t} f(\vv{e}) - \sum_{\vv{e}: e^- = t} f(\vv{e}) = \mathrm{val}(f). 
+        \]
+        \item Induction step: Now if \(\vert Q \vert \ge 2 \). Let \(x \in \overline{Q}\) where \(x \neq t\). Consider \(R = Q \cup \left\{ x \right\} \), then \(\left[ R, \overline{R}  \right] \) is a source-sink cut with \(\vert \overline{R} \vert < \vert \overline{Q} \vert  \). By induction,
+        \begin{align*}
+            \mathrm{val}(f) &= \sum_{\vv{e} \in \left[ R, \overline{R} \right] } f(\vv{e}) - \sum_{\vv{e} \in \left[ \overline{R} , R \right] } f(\vv{e}) \\
+            &= \sum_{\substack{\vv{e} \in \left[ R, \overline{R} \right] \\ x \neq e^- }} f(\vv{e}) + \sum_{\substack{\vv{e} \in \left[ R, \overline{R} \right] \\ x = e^- }} f(\vv{e}) - \sum_{\substack{\vv{e} \in \left[ \overline{R}, R \right] \\ x = e^+ }} f(\vv{e}) - \sum_{\substack{\vv{e} \in \left[ \overline{R}, R \right] \\ x \neq e^+ }} f(\vv{e}) \\
+            &= \sum_{\substack{\vv{e} \in \left[ Q, \overline{Q} \right] \\ x \neq e^+ }} - \sum_{\substack{\vv{e} \in \left[ \overline{Q}, Q \right] \\ x \neq e^- }} + \sum_{\vv{e} \in \left[ x, \overline{R} \right] } f(\vv{e}) - \sum_{\vv{e} \in \left[ \overline{R} , x \right] } f(\vv{e}) \\
+            &= \sum_{\vv{e} \in \left[ Q, \overline{Q} \right] } f(\vv{e}) - \sum_{\vv{e} \in [Q, x]} f(\vv{e}) - \sum_{\vv{e} \in [\overline{Q} , Q]} f(\vv{e}) + \sum_{\vv{e} \in [x, Q]} f(\vv{e}) + \sum_{\vv{e} \in [x, \overline{R}]} f(e) - \sum_{\vv{e} \in \left[ \overline{R} , x \right] } f(\vv{e}) \\
+            &= \sum_{\vv{e} \in [Q, \overline{Q}]} f(\vv{e}) - \sum_{\vv{e} \in [\overline{Q}, Q]} f(\vv{e}) + \sum_{\vv{e} \in \left[ x, Q \cup \overline{R} \right] } f(\vv{e}) - \sum_{\vv{e} \in \left[ Q \cup \overline{R}, x \right] } f(\vv{e}) \\
+            &= \sum_{\vv{e} \in [Q, \overline{Q}]} f(\vv{e}) - \sum_{\vv{e} \in [\overline{Q}, Q]} f(\vv{e}) + \overbrace{\sum_{\vv{e}: x=e^-} f(\vv{e}) - \sum_{\vv{e}: x = e^+} f(\vv{e}) }^{=0}             
+        \end{align*}
+    \end{itemize} 
+\end{proof}
