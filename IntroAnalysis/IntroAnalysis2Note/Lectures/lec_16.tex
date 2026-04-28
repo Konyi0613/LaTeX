@@ -1,0 +1,213 @@
+\lecture{16}{28 April.}{}
+Once we can interchange an integral with a sum of two functions, we can handle fininte sums by induction. More suprisingly, we can handle infinite sums of non-negative functions as well:
+
+\begin{corollary} \label{cl: int and countable sum can interchange}
+    If \(\Omega \subseteq \mathbb{R} ^n\) is measurable and \(g_1, g_2, \dots \) are a sequence of non-negative measurable functions from \(\Omega\) to \([0, \infty]\), then 
+    \[
+        \int _\Omega \sum_{n=1}^{\infty} g_n = \sum_{n=1}^{\infty} \int _\Omega g_n.  
+    \]    
+\end{corollary}
+
+\begin{proof}
+    For each integer \(N \ge 1\), define \(G_N \coloneqq \sum_{n=1}^N g_n \). Since \(g_n\) is measurable and non-negative, it follows that each \(G_N\) is also measurable and non-negative. Moreover, the sequence \((G_N)\) is increasing pointwise, because 
+    \[
+        G_{N+1}(x) = G_N(x) + g_{N+1}(x) \ge G_N(x) \quad \forall x \in \Omega.
+    \]     
+    Hence, we may apply the Lebesgue monotone convergence theorem to the sequence \(\left( G_N \right) \). We obtain 
+    \[
+        \int _\Omega \sup _N G_N = \sup _N \int _\Omega G_N.
+    \] 
+    Now since for each \(x \in \Omega\), \(G_1(x) \le G_2(x) \le \dots \), so \(\sup _N G_N(x) = \lim_{N \to \infty} G_N(x) = \sum_{n=1}^{\infty} g_n(x)  \). This gives
+    \[
+        \int _\Omega \sup _N G_N = \int _\Omega \sum_{n=1}^{\infty} g_n. 
+    \]  
+    Now since for each \(N \in \mathbb{N}\),
+    \[
+        \int _\Omega G_N = \int _\Omega \sum_{n=1}^N g_n = \sum_{n=1}^N \int _\Omega g_n.  
+    \] 
+    Hence,
+    \[
+        \sup _N \int _\Omega G_N = \sup _N \sum_{n=1}^N \int _\Omega g_n. 
+    \]
+    Note that the sequence \(\left( \sum_{n=1}^N \int _\Omega g_n  \right)_{N=1}^{\infty} \) is increasing, so 
+    \[
+        \sup _N \sum_{n=1}^N \int _\Omega g_n = \sum_{n=1}^{\infty} \int _\Omega g_n.  
+    \] 
+    Thus,
+    \[
+        \int _\Omega \sum_{n=1}^{\infty} g_n = \int _\Omega \sup _N G_N = \sup _N \int _\Omega G_N = \sum_{n=1}^{\infty} \int _\Omega g_n. 
+    \]
+\end{proof}
+
+\begin{remark}
+    We do not need to assume anything about convergence of above sums; it may well happen that both sides equal \(+\infty\). However, we do need to assume non-negativity.  
+\end{remark}
+
+One might similarly ask whether we can interchange limits and integrals; i.e. whether 
+\[
+    \int _\Omega \lim_{n \to \infty} f_n = \lim_{n \to \infty} \int _\Omega f_n  
+\]
+holds in general. Unfortunately this is not true: For \(n = 1, 2, 3, \dots \) let \(f_n: \mathbb{R} \to \mathbb{R} \) be \(f_n = \chi _{[n, n+1)}\). Then, \(f_n(x) \to 0\) for every \(x\), but \(\int _\mathbb{R} f_n = 1\) for every \(n\) since \(f_n\) is a simple function, and thus 
+\[
+    \lim_{n \to \infty} \int _\mathbb{R} f_n = 1 \neq 0. 
+\]        
+
+However, the following lemma of Fatou shows that the reverse cannot happen: the limiting function cannot have larger integral than the (liminf of the) original integrals. 
+
+\begin{lemma}[Fatou's lemma]
+    Let \(\Omega\) be a measurable subset of \(\mathbb{R} ^n\), and let \(f_1, f_2, \dots : \Omega \to [0, \infty]\) be a sequence of non-negative measurable functions. Then 
+    \[
+        \int _\Omega \liminf_{n \to \infty} f_n \le \liminf_{n \to \infty} \int _\Omega f_n.  
+    \]   
+\end{lemma}
+
+\begin{proof}
+    For each \(N \in \mathbb{N} \), define 
+    \[
+        g_N(x) \coloneqq \inf_{n \ge N} f_n(x) \quad \forall x \in \Omega.
+    \] 
+    Then \(g_N\) is non-negative and measurable. Moreover, \(g_1(x) \le g_2(x) \le \dots \) for all \(x \in \Omega\). By the definition of liminf, 
+    \[
+        \liminf_{n \to \infty} f_n(x) = \sup _{N \ge 1} g_N(x). 
+    \]  
+    Since \((g_N(x))\) is increasing, this means that \(g_N(x) \uparrow \liminf_{n \to \infty} f_n(x) \) for all \(x \in \Omega\). Note that we can apply Lebesgue monotone convergence theorem since \((g_N)\) is increasing:
+    \[
+        \int _\Omega \liminf_{n \to \infty} f_n(x) = \int _\Omega \sup _{N \ge 1} g_N = \sup _{N \ge 1} \int _\Omega g_N.
+    \]
+    On the other hand, for every \(N\) and every \(n \ge N\), we have \(g_N \le f_n\). Hence,
+    \[
+        \int _\Omega g_N \le \int _\Omega f_n \quad \forall n \ge N.
+    \]  
+    Taking infinimum over all \(n \ge N\), we get \(\int _\Omega g_N \le \inf_{n \ge N} \int _\Omega f_n\). Now take the supremum over \(N\) to obtain 
+    \[
+        \sup _{N \ge 1} \int _\Omega g_N \le \sup _{N \ge 1} \inf_{n \ge N} \int _\Omega f_n.
+    \]   
+    Combining previous result, we have 
+    \[
+       \int _\Omega \liminf_{n \to \infty} f_n(x) = \sup _{N \ge 1} \int _\Omega g_N \le \sup _{N \ge 1} \inf _{n \ge N} \int_\Omega f_n = \liminf_{n \to \infty} f_n.  
+    \]
+
+\end{proof}
+
+Note that we are allowing our functions to take the value \(+ \infty\) at some points. It is even possible for a function to take the value \(+ \infty\) but still have a finite integral; for instance, if \(E\) is a set of measure zero, and \(f: \Omega \to \mathbb{R} \) is equal to \(+\infty \) on \(E\) but equal \(0\) everywhere else, then \(\int _\Omega f = 0\) by (a) of \autoref{prop: measurable func integral property}. However, if the integral is finite, the function must be finite almost everywhere:
+
+\begin{lemma} \label{lm: finite integral implies infty set has measure 0}
+    Let \(\Omega \) be a measurable subset of \(\mathbb{R} ^n\), and let \(f: \Omega \to [0, \infty]\) be a non-negative measurable function s.t. \(\int _\Omega f\) is finite. Then \(f\) is finite almost everywhere, i.e. the set \(\left\{ x \in \Omega : f(x) = + \infty  \right\} \) has measure zero.      
+\end{lemma}
+
+\begin{proof}
+    For each integer \(k \ge 1\), define \(A_k \coloneqq \left\{ x \in \Omega: f(x) \ge k \right\} \). Since \(f\) is measurable and \([k, \infty]\) is a Borel subset of \([0, \infty]\), each set \(A_k\) is measurable. 
+
+    On the set \(A_k\), we have \(f(x) \ge k\), while outside \(A_k\) the function \(k \chi _{A_k}\) vanishes. Thus, for every \(x \in \Omega\), \(k \chi _{A_k}(x) \le f(X)\). Because both \(k \chi _{A_k}\) and \(f\) are non-negative measurable functions, the monotonicity property gives \(\int _\Omega k \chi _{A_k} \le \int _\Omega f\). Now 
+    \[
+        \int _\Omega k \chi _{A_k} = k \int _\Omega \chi _{A_k} = k m(A_k),
+    \]                
+    so we obtain \(k m(A_k) \le \int _\Omega f\). Since \(\int _\Omega f < \infty\), it follows that \(m(A_k) \le \frac{1}{k} \int _\Omega f\), and thus 
+    \[
+        m(A_k) \to 0 \quad \text{as } k \to \infty. 
+    \]   
+    Note that 
+    \[
+        \left\{ x \in \Omega: f(x) = +\infty \right\} = \bigcap_{k=1}^{\infty} A_k.  
+    \]
+    Also, \(A_1 \supseteq A_2 \supseteq A_3 \supseteq \dots \) by definition, and by continuity of measure (HW5 P2),
+    \[
+        m \left( \bigcap_{k=1}^{\infty} A_k  \right) = \lim_{k \to \infty} m(A_k).  
+    \]
+    Since we have shown \(\lim_{k \to \infty} m(A_k) = 0 \), so we have 
+    \[
+        m\left( \left\{ x \in \Omega : f(x) = +\infty \right\}  \right) = m \left( \bigcap_{k=1}^{\infty} A_k  \right) = 0.  
+    \] 
+\end{proof}
+
+\begin{lemma}[Borel-Cantelli lemma]
+    Let \(\Omega _1, \Omega _2, \dots \) be measurable subsets of \(\mathbb{R} ^n\) such that
+    \[
+        \sum_{n=1}^{\infty} m(\Omega _n) < \infty.
+    \]
+    Then the set 
+    \[
+        \left\{ x \in \mathbb{R} ^n: x \in \Omega _k \text{ for infinitely many } k  \right\} 
+    \]
+    has measure zero. Equivalently, for almost every \(x \in \mathbb{R} ^n\), there exists \(N = N(x)\) s.t. \(x \notin \Omega _k\) for all \(k \ge N\).    
+\end{lemma}
+
+\begin{proof}
+    Define 
+    \[
+        G(x) \coloneqq \sum_{n=1}^{\infty} \chi _{\Omega _n} (x), \quad \forall x \in \mathbb{R} ^n,
+    \]
+    where the value \(+ \infty\) is allowed. 
+
+    For each \(n\), \(\chi _{\Omega _n}\) is measurable and non-negative. Hence, the partial sums 
+    \[
+        G_N(x) \coloneqq \sum_{n=1}^N \chi _{\Omega _n} (x) 
+    \]
+    are non-negative measurable functions. Since \(G_N(x) \uparrow G(x)\) for every \(x \in \mathbb{R} ^n\). It follows that \(G = \sup _N G_N\) is also measurable and non-negative. By \autoref{cl: int and countable sum can interchange}, we have 
+    \[
+        \int _{\mathbb{R} ^n} G = \int _{\mathbb{R} ^n} \sum_{n=1}^{\infty} \chi _{\Omega _n} = \sum_{n=1}^{\infty} \int _{\mathbb{R} ^n} \chi _{\Omega _n}.  
+    \]   
+    Since \(\int _{\mathbb{R} ^n} \chi _{\Omega _n} = m(\Omega _n)\), this becomes
+    \[
+        \int _{\mathbb{R} ^n} G = \sum_{n=1}^{\infty} m(\Omega _n) < \infty. 
+    \] 
+    By \autoref{lm: finite integral implies infty set has measure 0}, 
+    \[
+        m \left( \left\{ x \in \mathbb{R} ^n: G(x) = +\infty \right\}  \right) = 0. 
+    \] 
+    Note that 
+    \[
+        G(x) = +\infty \iff \sum_{n=1}^{\infty} \chi _{\Omega _n}(x) = \infty \iff x \in \Omega _k \text{ for infinitely many } k,  
+    \]
+    so 
+    \[
+        \left\{ x \in \mathbb{R} ^n: G(x) = +\infty \right\} = \left\{ x \in \mathbb{R} ^n: x \in \Omega _k \text{ for infinitely many } k  \right\}, 
+    \]
+    and we're done.
+\end{proof}
+
+\section{Integration of Absolutely Integrable Functions}
+We have now completed the theory of the Lebesgue integral for non-negative functions. We now consider how to integrate functions which can be both positive and negative. However, we wish to avoid the indefinite expression \(+\infty + (- \infty)\), so we restrict our attention to a subclass of measurable functions: the absolutely integrable functions.
+
+\begin{definition}
+    Let \(\Omega\) be a measurable subset of \(\mathbb{R} ^n\). A measurable function \(f: \Omega \to \mathbb{R} ^*\) is said to be absolutely integrable if the integral \(\int _\Omega \vert f \vert \) is finite.
+\end{definition}
+
+Of course, \(\vert f \vert \) is always non-negative, so this definition makes sense even if \(f\) changes sign. Absolutely integrable functions are also known as \(L^1(\Omega)\) functions. 
+
+If \(f: \Omega \to \mathbb{R} ^*\) is a function, we define the positive part \(f^+: \Omega \to [0, \infty]\) and the negative part \(f^-: \Omega \to [0, \infty]\) by 
+\[
+    f^+ \coloneqq \max (f, 0), \quad f^- \coloneqq - \min (f, 0).
+\]   
+Equivalently, for each \(x \in \Omega\), 
+\[
+    f^+(x) = \max \left\{ f(x), 0 \right\}, \quad f^-(x) = \max \left\{ -f(x), 0 \right\}.  
+\] 
+From \autoref{cl: measurable func plus, minus, ... is measurable}, which can be extended to \(\mathbb{R} ^*\)-valued functions without difficulty, we know that \(f^+, f^-\) are measurable. Clearly \(f^+\) and \(f^-\) are non-negative.
+
+We also have the pointwise identities
+\[
+    f = f^+ - f^-, \quad \vert f \vert = f^+ + f^-. 
+\]
+
+\begin{definition}[Lebesgue integral]
+    Let \(f: \Omega \to \mathbb{R} ^*\) be an absolutely integrable function. We define the Lebesgue integral \(\int _\Omega f\) of \(f\) to be the quantity
+    \[
+        \int _\Omega f \coloneqq \int _\Omega f^+ - \int _\Omega f^-.
+    \]   
+\end{definition}
+
+\begin{remark}
+    Note that since \(f\) is absolutely integrable, \(\int _\Omega f^+\) and \(\int _\Omega f^-\) are less than or equal to \(\int _\Omega \vert f \vert \) and hence are finite. Thus, \(\int _\Omega f\) is always finite; we are never encountering the indeterminate form \(+ \infty - (+ \infty)\).      
+\end{remark}
+
+\begin{remark}
+    We have the useful triangle inequality
+    \[
+        \left\vert \int _\Omega f \right\vert \le \int _\Omega \vert f \vert.
+    \]
+    This is because
+    \[
+        \left\vert \int _\Omega f \right\vert = \left\vert \int _\Omega f^+ - \int _\Omega f^- \right\vert \le \left\vert \int _\Omega f^+ \right\vert + \left\vert \int _\Omega f^- \right\vert = \int _\Omega f^+ + \int _\Omega f^- = \int _\Omega f^+ + f^- = \int _\Omega \vert f \vert.     
+    \]
+\end{remark}

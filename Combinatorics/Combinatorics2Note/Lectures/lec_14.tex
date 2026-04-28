@@ -32,7 +32,7 @@
 \begin{definition}
     A flow is a function \(f: \vec{E} \to \mathbb{R} _{\ge 0}\). A flow is feasible if 
     \begin{itemize}
-        \item \(f(\vec{e}) \le c(\vec{e})\). 
+        \item (Capacity constraint) \(0 \le f(\vec{e}) \le c(\vec{e})\) for all \(\vv{e} \in E(G)\). 
         \item (Conservation of flow) \(\forall v \neq s, t\), 
         \[
             \sum_{\vec{e}: v = e^-} f(\vec{e}) = \sum_{\vec{e}: v = e^+} f(\vec{e}). 
@@ -66,32 +66,34 @@ Our objective is to maximize the value of a feasible flow.
 
 \begin{proof}
     \begin{align*}
-        \mathrm{cap}(S, \overline{S}) = \sum_{\vv{e} \in \left[ S, \overline{S} \right] } c(\vv{e}) \ge \sum_{\vv{e} \in \left[ S, \overline{S}  \right] } f(\vv{e}) \ge \sum_{\vv{e} \in \left[ S, \overline{S}  \right] } f(\vv{e}) - \sum_{\vv{e} \in \left[ \overline{S} , S  \right] } f(\vv{e}) = \mathrm{val}(f).   
+        \mathrm{cap}(S, \overline{S}) = \sum_{\vv{e} \in \left[ S, \overline{S} \right] } c(\vv{e}) \ge \sum_{\vv{e} \in \left[ S, \overline{S}  \right] } f(\vv{e}) \ge \sum_{\vv{e} \in \left[ S, \overline{S}  \right] } f(\vv{e}) - \sum_{\vv{e} \in \left[ \overline{S} , S  \right] } f(\vv{e}) = \mathrm{val}(f),   
     \end{align*}
+    where the last equality is from \autoref{lm: conservation}. 
 \end{proof}
 
-\begin{lemma}[Conservation]
-    For any source-sink cut \(\left[ Q, \overline{Q} \right] \), 
+\begin{lemma}[Conservation] \label{lm: conservation}
+    For any source-sink cut \(\left[ Q, \overline{Q} \right] \) and a feasible flow \(f\), 
     \[
         \sum_{\vv{e} \in \left[ Q, \overline{Q} \right] } f(\vv{e}) - \sum_{\vv{e} \in \left[ \overline{Q} , Q \right] } f(\vv{e}) = \mathrm{val}(f).   
     \] 
 \end{lemma}
 
 \begin{proof}
-    We can do induction on \(\vert Q \vert \). 
+    We can do induction on \(\vert \overline{Q} \vert \). 
     \begin{itemize}
         \item Base case: \(\vert \overline{Q} \vert = 1\), then \(\overline{Q} = \left\{ t \right\} \). Hence,
         \[
             \sum_{\vv{e} \in \left[ Q, \overline{Q} \right] } f(\vv{e}) - \sum_{\vv{e} \in \left[ \overline{Q} , Q \right] } f(\vv{e}) = \sum_{\vv{e}: e^+ = t} f(\vv{e}) - \sum_{\vv{e}: e^- = t} f(\vv{e}) = \mathrm{val}(f). 
         \]
-        \item Induction step: Now if \(\vert Q \vert \ge 2 \). Let \(x \in \overline{Q}\) where \(x \neq t\). Consider \(R = Q \cup \left\{ x \right\} \), then \(\left[ R, \overline{R}  \right] \) is a source-sink cut with \(\vert \overline{R} \vert < \vert \overline{Q} \vert  \). By induction,
+        \item Induction step: Now if \(\vert \overline{Q} \vert \ge 2 \). Let \(x \in \overline{Q}\) where \(x \neq t\). Consider \(R = Q \cup \left\{ x \right\} \), then \(\left[ R, \overline{R}  \right] \) is a source-sink cut with \(\vert \overline{R} \vert < \vert \overline{Q} \vert  \). By induction,
         \begin{align*}
             \mathrm{val}(f) &= \sum_{\vv{e} \in \left[ R, \overline{R} \right] } f(\vv{e}) - \sum_{\vv{e} \in \left[ \overline{R} , R \right] } f(\vv{e}) \\
             &= \sum_{\substack{\vv{e} \in \left[ R, \overline{R} \right] \\ x \neq e^- }} f(\vv{e}) + \sum_{\substack{\vv{e} \in \left[ R, \overline{R} \right] \\ x = e^- }} f(\vv{e}) - \sum_{\substack{\vv{e} \in \left[ \overline{R}, R \right] \\ x = e^+ }} f(\vv{e}) - \sum_{\substack{\vv{e} \in \left[ \overline{R}, R \right] \\ x \neq e^+ }} f(\vv{e}) \\
-            &= \sum_{\substack{\vv{e} \in \left[ Q, \overline{Q} \right] \\ x \neq e^+ }} - \sum_{\substack{\vv{e} \in \left[ \overline{Q}, Q \right] \\ x \neq e^- }} + \sum_{\vv{e} \in \left[ x, \overline{R} \right] } f(\vv{e}) - \sum_{\vv{e} \in \left[ \overline{R} , x \right] } f(\vv{e}) \\
-            &= \sum_{\vv{e} \in \left[ Q, \overline{Q} \right] } f(\vv{e}) - \sum_{\vv{e} \in [Q, x]} f(\vv{e}) - \sum_{\vv{e} \in [\overline{Q} , Q]} f(\vv{e}) + \sum_{\vv{e} \in [x, Q]} f(\vv{e}) + \sum_{\vv{e} \in [x, \overline{R}]} f(e) - \sum_{\vv{e} \in \left[ \overline{R} , x \right] } f(\vv{e}) \\
+            &= \sum_{\substack{\vv{e} \in \left[ Q, \overline{Q} \right] \\ x \neq e^+ }} f(\vv{e}) - \sum_{\substack{\vv{e} \in \left[ \overline{Q}, Q \right] \\ x \neq e^- }} f(\vv{e}) + \sum_{\vv{e} \in \left[ x, \overline{R} \right] } f(\vv{e}) - \sum_{\vv{e} \in \left[ \overline{R} , x \right] } f(\vv{e}) \\
+            &= \left( \sum_{\vv{e} \in \left[ Q, \overline{Q} \right] } f(\vv{e}) - \sum_{\vv{e} \in [Q, x]} f(\vv{e}) \right) - \left( \sum_{\vv{e} \in [\overline{Q} , Q]} f(\vv{e}) - \sum_{\vv{e} \in [x, Q]} f(\vv{e}) \right)  + \sum_{\vv{e} \in [x, \overline{R}]} f(e) - \sum_{\vv{e} \in \left[ \overline{R} , x \right] } f(\vv{e}) \\
             &= \sum_{\vv{e} \in [Q, \overline{Q}]} f(\vv{e}) - \sum_{\vv{e} \in [\overline{Q}, Q]} f(\vv{e}) + \sum_{\vv{e} \in \left[ x, Q \cup \overline{R} \right] } f(\vv{e}) - \sum_{\vv{e} \in \left[ Q \cup \overline{R}, x \right] } f(\vv{e}) \\
-            &= \sum_{\vv{e} \in [Q, \overline{Q}]} f(\vv{e}) - \sum_{\vv{e} \in [\overline{Q}, Q]} f(\vv{e}) + \overbrace{\sum_{\vv{e}: x=e^-} f(\vv{e}) - \sum_{\vv{e}: x = e^+} f(\vv{e}) }^{=0}             
+            &= \sum_{\vv{e} \in [Q, \overline{Q}]} f(\vv{e}) - \sum_{\vv{e} \in [\overline{Q}, Q]} f(\vv{e}) + \overbrace{\sum_{\vv{e}: x=e^-} f(\vv{e}) - \sum_{\vv{e}: x = e^+} f(\vv{e}) }^{=0} \\
+            &= \sum_{\vv{e} \in [Q, \overline{Q}]} f(\vv{e}) - \sum_{\vv{e} \in [\overline{Q}, Q]} f(\vv{e}).             
         \end{align*}
     \end{itemize} 
 \end{proof}

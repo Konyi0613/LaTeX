@@ -1,0 +1,198 @@
+\lecture{15}{28 April.}{}
+\begin{corollary}
+    For any feasible flow \(f\),
+    \[
+        \mathrm{val}(f) = \sum_{\vv{e}: e^- = s} f( \vv{e}) - \sum_{\vv{e}: e^+ = s} f(\vv{e}).   
+    \]
+\end{corollary}
+
+\begin{proof}
+    This can be immediately obtained from \autoref{lm: conservation} by letting \(Q = \left\{ s \right\} \). 
+\end{proof}
+
+\begin{remark}
+    We have shown that the value of a flow is how much is left at the sink, which is also equal to the value of what comes in through the source. Therefore, we can instead for mulate the problem as follows: we add an edge \(e^* = (t, s)\) with \(\infty\) capacity. If \(f(e^*) = \mathrm{val}(f) \), we have conservation at \(s\) and \(t\) as well. Therefore, by maximizeing the value of the flow in the original problem, with this formulation we simply aim to maximize \(f(e^*)\), where we impose conservation for all \(v \in V\).  
+
+    \begin{figure}[H]
+        \centering
+        \begin{tikzpicture}[
+        >=Latex,
+        node distance=2.4cm,
+        vertex/.style={circle, draw, thick, minimum size=9mm},
+        edge/.style={->, thick},
+        blueedge/.style={->, thick, blue}
+    ]
+        \node[vertex] (s) {$s$};
+        \node[vertex, right=of s] (v1) {$v_1$};
+        \node[vertex, above right=1.4cm and 2.2cm of v1] (v2) {$v_2$};
+        \node[vertex, below right=1.4cm and 2.2cm of v1] (v3) {$v_3$};
+        \node[vertex, right=3.0cm of v1] (t) {$t$};
+
+        \draw[edge] (s) -- node[above] {$5$} (v1);
+        \draw[edge] (s) to[bend left=18] node[above] {$3$} (v2);
+        \draw[edge] (s) to[bend right=18] node[below] {$4$} (v3);
+        \draw[edge] (v1) -- node[above] {$4$} (t);
+        \draw[edge] (v2) -- node[above] {$2$} (t);
+        \draw[edge] (v3) -- node[below] {$3$} (t);
+        \draw[edge] (v1) -- node[left] {$2$} (v2);
+        \draw[edge] (v1) -- node[left] {$2$} (v3);
+
+        \draw[blueedge, bend left=70] (t) to node[below] {$e^*,\ \infty$} (s);
+    \end{tikzpicture}
+        \caption{An example of formulation}
+    \end{figure}
+    Note that this formulation makes sense since if we can maximize \(f(e^*)\) with all vertices satisfy conservation property and all edges satisfy capacity property, then \(f(e^*) = \mathrm{val}(f)\) if we consider \(f\) only on original graph without \(e^*\).    
+\end{remark}
+
+\section{Augmenting a flow}
+\begin{definition}
+    Let \(f\) be a feasible flow in \((\vv{D}, s, t, c)\). Let \(G\) be the undirected underlying multigraph of \(D\). An \(s, t\)-path in \(G\) 
+    \[
+        s = v_0 e_1 v_1 e_2 v_2 \dots e_k v_k = t
+    \]      
+    is an \(f\)\emph{-augmenting path} if for every forwards edge \(\vv{e_i}\) (i.e. that \(\vv{e_i} = (v_{i-1}, v_i)\) in \(\vv{D}\)) we have \(f(\vv{e_i}) < c(\vv{e_i})\), and for every backwards edge \(\vv{e_i}\) (i.e. that \(\vv{e_i} = (v_i, v_{i-1})\) in \(\vv{D}\)) we have \(f(\vv{e_i}) > 0\). The \emph{tolerance} of the path is 
+    \[
+        \min \left\{ \left\{ c(\vv{e_i}) - f(\vv{e_i}): \vv{e_i} \text{ is forwards}  \right\} \cup \left\{ f(\vv{e_i}): \vv{e_i} \text{ is backwards}  \right\}   \right\}. 
+    \]    
+\end{definition}
+
+\begin{observation}
+    Any \(f\)-augmenting path for some feasible flow \(f\) has positive tolerance.  
+\end{observation}
+
+\begin{lemma}[Augmenting lemma]
+    Let \(f\) be a feasible flow in \((\vv{D}, s, t, c)\), and let \(P\) be an \(f\)-augmenting path with tolerance \(z\). Then, if \(f^{\prime}\) is defined by 
+    \[
+        f^{\prime} (\vv{e}) = \begin{dcases}
+            f(\vv{e}) + z, &\text{ if } \vv{e} \in P \text{ is forwards}  ;\\
+            f(\vv{e}) - z, &\text{ if } \vv{e} \in P \text{ is backwards}  ;\\
+            f(\vv{e}), &\text{ otherwise} .
+        \end{dcases}
+    \]
+    Then, \(f^{\prime} \) is feasible with \(\mathrm{val}(f^{\prime} ) = \mathrm{val} (f) + z  \).      
+\end{lemma}
+
+\begin{proof}
+    \hfill 
+    \begin{itemize}
+        \item [(i)] \(f^{\prime} \) is feasible:
+        \begin{itemize}
+            \item \(0 \le f^{\prime} (\vv{e}) \le c(\vv{e})\) is true by our choice of \(z\). (\(\vv{e} \notin P\): \(f(\vv{e})\) is unchanged and \(f\) is feasible, so it is true. \(\vv{e} \in P\): \(z\) is the minimum of the tolerance along all edges, so \(\vv{e}\) can afford to change by \(z\).)
+            \item Conservation: for \(v \neq s, t\), consider 
+            \[
+                \sum_{\vv{e}: e^+ = v} f^{\prime} (\vv{e}) - \sum_{\vv{e}: e^- = v} f^{\prime} (\vv{e}).  
+            \]
+            If \(v \notin P\), then everything is the same; if \(v \in P\), by discussing each of 4 possible orientations of the edges in \(P\) incident to \(v\) in \(\vv{D}\), we have the equality. More specifically, if \(v = v_i\) for some \(1 \le i \le k - 1\), then \(v_{i-1} e_i v_i e_{i+1} v_{i+1} \subseteq P\), and if \(e_i, e_{i+1}\) are both forwards edges or both backwards edges, then 
+            \[
+               \sum_{\vv{e}: e^+ = v} f^{\prime} (\vv{e}) - \sum_{\vv{e}: e^- = v} f^{\prime} (\vv{e}) = \left( \sum_{\vv{e}: e^+ = v} f (\vv{e}) \pm z \right)  - \left( \sum_{\vv{e}: e^- = v} f (\vv{e}) \pm z  \right). 
+            \]
+            If one of \(e_i, e_{i+1}\) is forwards and the other is backwards, then 
+            \[
+               \sum_{\vv{e}: e^+ = v} f^{\prime} (\vv{e}) - \sum_{\vv{e}: e^- = v} f^{\prime} (\vv{e}) = \begin{dcases}
+                \left( \sum_{\vv{e}: e^+ = v} f (\vv{e}) + z - z \right) - \sum_{\vv{e}: e^- = v} f (\vv{e}), &\text{ if } e_i \text{ forwards}  ;\\
+                \sum_{\vv{e}: e^+ = v} f (\vv{e}) - \left( \sum_{\vv{e}: e^- = v} f (\vv{e})  + z - z \right), &\text{ if } e_i \text{ backwards}.
+               \end{dcases} 
+            \]         
+        \end{itemize}
+        \item [(ii)] Value: Consider 
+        \[
+            \mathrm{val}(f^{\prime} ) = \sum_{\vv{e}: e^+ = t} f^{\prime} (\vv{e}) - \sum_{\vv{e}: e^- = t} f^{\prime} (\vv{e}).   
+        \]
+        Then no matter the edge in \(P\) incident to \(t\) is forwards or backwards we can see that \(\mathrm{val}(f^{\prime} ) = \mathrm{val}(f) + z\) by definition of \(f^{\prime}\).    
+    \end{itemize}
+\end{proof}
+
+\begin{lemma}[Characteriazation lemma]
+    A feasible flow \(f\) in \((\vv{D}, s, t, c)\) is of maximum value iff there is no \(f\)-augmenting path (with positive tolerance).   
+\end{lemma}
+
+\begin{proof}
+    \hfill 
+    \begin{itemize}
+        \item [\((\implies )\)] If \(f\) is of maximum value and there is some \(f\)-augmenting path, then by augmenting lemma we can have a flow \(f^{\prime}\) of larger value, which is a contradiction. 
+        \item [\((\impliedby)\)] If there is no \(f\)-augmenting path, let
+        \[
+            S_f = \left\{ v \in V: \exists f\text{-augmenting path from } s \text{ to } v   \right\} (s \in S_f, t \notin S_f).
+        \]
+        \begin{claim}
+            \(\mathrm{cap}(S_f, \overline{S_f} ) = \mathrm{val}(f) \). 
+        \end{claim}
+        \begin{explanation}
+            By the conservation lemma, 
+            \[
+                \mathrm{val}(f) = \sum_{\vv{e} \in [S_f, \overline{S_f}]} f(\vv{e}) - \sum_{\vv{e} \in [\overline{S_f}, S ]} f(\vv{e}) = \sum_{\vv{e} \in [S_f, \overline{S_f} ]} c(\vv{e}) - \sum_{\vv{e} \in [\overline{S_f} , S_f]} 0 = \mathrm{cap}([S_f, \overline{S_f}]).  
+            \]
+            since for each edge \(\vv{e}\) between \(S_f\) and \(\overline{S_f}\), it cannot be forwards edge with \(f(\vv{e}) < c(\vv{e})\) or backwards edge with \(f(\vv{e}) > 0\), otherwise there is a \(f\)-augmenting path from \(s\) to the endpoint of \(\vv{e}\) in \(\overline{S_f}\), which is a contradiction.        
+        \end{explanation}
+
+        Now since the claim holds, if \(f^*\) is a max-value flow, then by weak duality, we have
+        \[
+            \mathrm{val}(f^*) \le \mathrm{cap}(S_f, \overline{S_f}) = \mathrm{val}(f), 
+        \] 
+        so \(f\) is indeed of maximum value. 
+    \end{itemize}
+\end{proof}
+
+Then, we have the following corollary:
+\begin{theorem}[Ford-Fulkerson, 1956]
+    For any network flow problem \((\vv{D}, s, t, c)\), we have 
+    \[
+        \max _{\text{feasible flow } f} \mathrm{val}(f) = \min_{\text{source-sink cut } [S, \overline{S}] } \mathrm{cap}(S, \overline{S}).  
+    \] 
+\end{theorem}
+
+\begin{proof}
+    \hfill 
+    \begin{itemize}
+        \item \(\le\): weak duality. 
+        \item \(\ge\): Let \(f^*\) be a max-value flow. Let \([S_{f^*}, \overline{S_{f^*}} ]\) be the source-sink cut from characterization lemma. Then the claim implies \(\mathrm{cap}(S_{f^*}, \overline{S_{f^*}} ) = \mathrm{val}(f^*)\).      
+    \end{itemize}
+\end{proof}
+
+\paragraph{Application: Local edge-Menger theorem} In any graph \(G\), for any \(u, v \in V(G)\), we have 
+\[
+    \kappa ^{\prime} (u, v) = \lambda ^{\prime} (u, v).
+\]  
+(Here \(\kappa^{\prime}  (u, v)\) is the minimum number of edges in a \(u, v\)-separator, and \(\lambda ^{\prime} (u, v)\) is the maximum number of pairwise edge-disjoint \(u, v\)-paths.) 
+
+We construct an instance of a network flow problem: \(\vv{D} = (v(G), \vv{E})\) where 
+\[
+    \vv{E} = \bigcup_{e = \left\{ x, y \right\} \in E(G) } \left\{ (x, y), (y, x) \right\},  
+\] 
+and \(s = u, t = v\). We let \(c \equiv 1\) (capacity of each edge is 1). 
+
+\begin{claim}
+    \(\lambda ^{\prime} (u, v) \ge \max \mathrm{val}(f) \) and \(\kappa ^{\prime} (u, v) = \min \mathrm{cap}(S, \overline{S}) \).  
+\end{claim}
+\begin{explanation}
+    Let \(F \subseteq E\) be a minimum \(u, v\)-separator. Hence, \(\vert F \vert = \kappa ^{\prime} (u, v) \). Let \(S\) be the component of \(u\) in \(G - F\); then \(v \notin S\). Then, we have \([S, \overline{S}] = F\), and so \(\mathrm{cap}(S, \overline{S}) = \vert F \vert = \kappa ^{\prime} (u, v) \). 
+
+    Conversely, for any source-sink cut \([S, \overline{S}]\), \([S, \overline{S}]\) is a \(u, v\)-separaotr in \(G\), and thus 
+    \[
+        \kappa ^{\prime} (u, v) \le \left\vert [S, \overline{S}] \right\vert = \mathrm{cap}(S, \overline{S}).  
+    \]    
+
+    On the other hand, we know \(\min \mathrm{cap}(S, \overline{S}) \) is an integer, and by Ford-Fulkerson, \(\max \mathrm{val}(f) = \min \mathrm{cap}(S, \overline{S})\), so \(\max \mathrm{val} (f) \) is an integer. 
+
+    \begin{question}
+        Can we decompose it into edge-disjoint paths from \(u\) to \(v\)?  
+    \end{question}   
+
+    We may assume that for every \(\left\{ x, y \right\} \in E \), \(f(x, y) f(y, x) = 0\). (This is because WLOG if \(f(x, y) = f_1\) and \(f(y, x) = f_2\) with \(f_1 \ge f_2\), then we may instead set \(f(x, y) = f_1 - f_2\) and \(f(y, x) = 0\).)
+
+    \begin{theorem}[Integrality theorem]
+        If \((\vv{D}, s, t, c)\) is a network with integer capacities, then there is a maximum value flow \(f^*\) whose values of all edges are all integral, and moreover we can decompose the flow
+        \[
+            f^* = g_1 + g_2 + \dots + g_{\mathrm{val}(f^*)},
+        \]   
+        where each \(g_i\) is a unit \(s, t\)-flow (all edges are of integer value).  
+    \end{theorem}  
+
+    Assuming the integrality theorem holds, the proof follows: in out Menger network, we have integer capacities, so we have a maximum flow with a decomposition into \(\mathrm{val}(f^*) \) unit flows. Note that for each \(g_i\), it is a unit \(u, v\)-flow, so if we collect all edges \(e\) has \(g_i(e) = 1\), then it forms a \(u, v\)-path.    Also, each path given by \(g_i\) for all \(i\) are pairwise edge-disjoint because capacities are 1, and thus we cannot reuse edges here.   
+\end{explanation}
+
+This claim shows
+\[
+    \kappa ^{\prime} (u, v) = \min \mathrm{cap}(S, \overline{S}) = \max \mathrm{val} (f) \le \lambda ^{\prime} (u, v),  
+\]
+and note that \(\lambda ^{\prime} (u, v) \ge \kappa ^{\prime} (u, v)\) is trivial since if we have \(\lambda ^{\prime} (u, v)\) pairwise edge-disjoint \(u, v\)-path, we at least have to take one edge out from each path to disconnect \(u\) and \(v\). Thus, we have proved the local edge-Menger theorem.     

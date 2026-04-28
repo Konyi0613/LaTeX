@@ -1,0 +1,208 @@
+\lecture{17}{28 April.}{}
+\section{Functions of continuous random variables}
+Let \(X\) be a continuous random variable with pdf \(f_X\) and \(X: S \to \mathbb{R}\). Let \(Y = g(X)\) for some \(g: \mathbb{R} \to \mathbb{R}\). Then \(Y\) is also a random variable \(Y = g \circ X:S \to \mathbb{R}\). 
+
+\begin{question}
+    What can we say about its distribution?
+\end{question}
+
+To solve this problem, we can 
+\begin{itemize}
+    \item [1.] Find the cdf \(F_Y(y) \coloneqq \mathbb{P} (Y \le y)\). 
+    \item [2.] Differentiate to find \(f_Y(y) = F_Y^{\prime} (y)\).  
+\end{itemize}
+
+\begin{eg}
+    Let \(Y = X^2\), then
+    \begin{align*}
+        F_Y(y) &= \mathbb{P} (Y \le y) = \mathbb{P} (X^2 \le y) = \mathbb{P} (-\sqrt{y} \le X \le \sqrt{y}) = \int _{-\sqrt{y} }^{\sqrt{y}} f_X(x) \, \mathrm{d} x 
+    \end{align*} 
+\end{eg}
+
+\begin{theorem}
+    Let \(Y = g(X)\), where \(g\) is differentiable and strictly increasing. Then, if \(X\) has pdf \(f_X\), the pdf of \(Y\) is 
+    \[
+        f_Y(y) = \begin{dcases}
+            0, &\text{ if } y \notin g(\mathbb{R});\\
+            f_X \left( g^{-1}(y) \right) \frac{\mathrm{d}}{\mathrm{d}y} \left( g^{-1}(y) \right) , &\text{ if } y \in g(\mathbb{R}).
+        \end{dcases}
+    \]   
+
+    \begin{remark}
+        \[
+            \frac{\mathrm{d}}{\mathrm{d}y} g^{-1} (y) = \frac{1}{g^{\prime} \left( g^{-1}(y) \right) }. 
+        \]
+    \end{remark}
+\end{theorem}
+
+\begin{proof}
+    We first find cdf of \(Y\):
+    \begin{align*}
+        \mathbb{P} (Y \le y) &= \mathbb{P} (g(X) \le y) = \begin{dcases}
+            \mathbb{P} (X \le g^{-1}(y)) = F_X \left( g^{-1}(y) \right) , &\text{ if } y \in g(\mathbb{R}) ;\\
+            0, &\text{ if } y \le \inf g(\mathbb{R}) ;\\
+            1, &\text{ if } y \ge \sup g(\mathbb{R}).
+        \end{dcases}
+    \end{align*} 
+    where \(F_X(x) = \mathbb{P} (X \le x)\) is the cdf of \(X\). To find the density function of \(Y\), we can differentiate:
+    \[
+        f_Y(y) = \frac{\mathrm{d}}{\mathrm{d}y} \mathbb{P} (Y \le y) = \begin{dcases}
+            0, &\text{ if } y \notin g(\mathbb{R}) ;\\
+            f_X(g^{-1} (y)) \cdot \frac{\mathrm{d}}{\mathrm{d}y} \left( g^{-1}(y) \right)  , &\text{ if } y \in g(\mathbb{R}).
+        \end{dcases} 
+    \]  
+\end{proof}
+
+\chapter{Jointly Distributed Random Variables}
+\begin{eg}
+    Suppose \(X \sim \mathrm{Bin}(n, p)\), \(Y \sim \mathrm{Geom}(p) \), where \(0 \le p \le 1\) and \(n \in \mathbb{N} \). What is \(\mathbb{P} (X = k, Y = n)\) and \(\mathbb{E} [X + Y]\)?      
+\end{eg}
+
+\begin{answer}
+    By linearity of expectation: \(\mathbb{E} [X + Y] = \mathbb{E} [X] + \mathbb{E} [Y] = np + \frac{1}{p}\). However, \(\mathbb{P} (X = k, Y = n)\) may not equal to \(\mathbb{P} (X = k) \mathbb{P} (Y = n)\). 
+
+    Note that \(X\) and \(Y\) needs not to be independent. To compute \(\mathbb{P} (X = k, Y = n)\), suppose we have a \(p\)-biased coin, and \(X\) is the number of heads in \(n\) tosses, while \(Y\) is the number of tosses until the first head. If we toss \(n\) times, count heads, then start over and count tosses to first head, then they are independent, and we have 
+    \[
+        \mathbb{P} (X = k, Y = n) = \mathbb{P} (X = k) \mathbb{P} (Y = n).
+    \]        
+    But if we use the same tosses to measure both \(X\) and \(Y\), i.e. tosses until first heads / \(n\) tosses, whichever comes last, then variables depend on each other, so 
+    \[
+       \mathbb{P} (X = k, Y = n) = \mathbb{P} (X = k) \mathbb{P} (Y = n) 
+    \]
+    need not be true.
+\end{answer}
+
+\begin{definition}[Joint cdf]
+    Given random variables \(X, Y\) in a probability space \((S, \mathbb{P})\), we define the joint cummulative distribution function 
+    \[
+        F_{X, Y} (a, b) \coloneqq \mathbb{P} \left( \left\{ X \le a \right\} \cap \left\{ Y \le b \right\}   \right) = \mathbb{P} (X \le a, Y \le b). 
+    \]  
+\end{definition}
+
+\begin{definition}[Marginal Distribution]
+    Given variables \(X, Y\) on a probability space \((S, \mathbb{P})\) with joint cdf \(F_{X,Y}\), the marginal distributions are 
+    \[
+        F_X(x) = \mathbb{P} (X \le x) = \mathbb{P} (X \le x, Y \le \infty) = F_{X, Y}(x, \infty) = \lim_{y \to \infty} F_{X, Y} (x, y). 
+    \]   
+    Similarly, 
+    \[
+        F_Y(y) = F_{X, Y}(\infty , y) = \lim_{x \to \infty} F_{X, Y} (x, y). 
+    \]
+\end{definition}
+
+\begin{definition}
+    Given discrete random variables \(X, Y\) on a probability space \((S, \mathbb{P})\), we define the joint probability mass function 
+    \[
+        p_{X, Y} (x, y) = \mathbb{P} (X = x, Y = y).
+    \]  
+    Note that we have the marginals 
+    \[
+        p_X(x) = \sum_{y} p_{x, y} (x, y), \quad p_Y(y) = \sum_{x} p_{X, Y} (x, y).   
+    \]
+\end{definition}
+
+\begin{lemma}
+    For any random variables \(X, Y\), 
+    \begin{align*}
+        \mathbb{P} (\left\{ a_1 \le X \le b_1 \right\} \cap \left\{ a_2 \le Y \le b_2 \right\}  ) &= F_{X, Y} (a_1, a_2) + F_{X, Y} (b_1, b_2) - F_{X, Y} (a_1, b_2) - F_{X, Y} (a_2, b_1).
+    \end{align*} 
+\end{lemma}
+
+\begin{eg}
+    In a country,
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{c}
+               15 \% of families have 0 children   \\
+               30 \% of families have 1 children   \\
+               35 \% of families have 2 children   \\
+               20 \% of families have 3 children   \\
+        \end{tabular}
+    \end{table}
+    Each child is equally likely to be a boy or a girl, independently. Let \(X = \#\) of boys in a uniformly random family, and \(Y = \#\) of girls in a uniformly random family. What is the distribution of \(X, Y\)? What is \(\mathbb{E} [X]\)?    
+\end{eg}
+
+\begin{explanation}
+    \[
+        p_{X, Y} (i, j) = \mathbb{P} (X = i, Y = j) = \mathbb{P} (X=i, Y=j, X+Y=i+j),
+    \]
+    since
+    \[
+        \mathbb{P} (X=i, Y=j, X+Y=i+j) = \mathbb{P} (X+Y=i+j \mid X=i, Y=j) \mathbb{P} (X = i, Y = j) = \mathbb{P} (X = i, Y = j).
+    \]
+    Also,
+    \begin{align*}
+        \mathbb{P} (X = i, Y = j, X + Y = i + j) &= \mathbb{P} (X = i, Y = j \mid X + Y = i + j) \mathbb{P} (X + Y = i + j) \\
+        &= \mathbb{P} (\mathrm{Bin} \left( i+j, \frac{1}{2} \right) = i) \mathbb{P} (X+Y = i + j)
+    \end{align*}
+    \begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.8}
+    \setlength{\tabcolsep}{10pt}
+    \begin{tabular}{|>{\centering\arraybackslash}m{1.3cm}|>{\centering\arraybackslash}m{2.7cm}|>{\centering\arraybackslash}m{2.7cm}|>{\centering\arraybackslash}m{2.7cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{1.8cm}|}
+    \hline
+    $X \backslash Y$ & $0$ & $1$ & $2$ & $3$ & $p_X(x)$ \\
+    \hline
+    $0$ &
+    $0.15$ &
+    $\binom{1}{0}\left(\tfrac12\right)^1(0.30)=0.15$ &
+    $\binom{2}{0}\left(\tfrac12\right)^2(0.35)=0.0875$ &
+    $\binom{3}{0}\left(\tfrac12\right)^3(0.20)=0.025$ &
+    $0.4125$ \\
+    \hline
+    $1$ &
+    $\binom{1}{1}\left(\tfrac12\right)^1(0.30)=0.15$ &
+    $\binom{2}{1}\left(\tfrac12\right)^2(0.35)=0.175$ &
+    $\binom{3}{1}\left(\tfrac12\right)^3(0.20)=0.075$ &
+    $0$ &
+    $0.4$ \\
+    \hline
+    $2$ &
+    $\binom{2}{2}\left(\tfrac12\right)^2(0.35)=0.0875$ &
+    $\binom{3}{2}\left(\tfrac12\right)^3(0.20)=0.075$ &
+    $0$ &
+    $0$ &
+    $0.1625$ \\
+    \hline
+    $3$ &
+    $\binom{3}{3}\left(\tfrac12\right)^3(0.20)=0.025$ &
+    $0$ &
+    $0$ &
+    $0$ &
+    $0.025$ \\
+    \hline
+    \end{tabular}
+    \end{table}
+    Hence,
+    \[
+        \mathbb{E} [X] = \sum_{x=0}^3 x \mathbb{P} (X = x) = 0.4 + 2 \times 0.1625 + 3 \times 0.025 = 0.8.
+    \]
+\end{explanation}
+
+\begin{definition}
+    Given continuous random variables \(X, Y\) on a probability space \((S, \mathbb{P})\), we say they have a joint probability density function \(f_{X, Y} (x, y)\) if for any (measurable) set \(C \subseteq \mathbb{R} ^2\),
+    \[
+        \mathbb{P} ((x, y) \in C) = \iint_C f_{X, Y}(x, y) \, \mathrm{d} x \, \mathrm{d} y.   
+    \]    
+\end{definition}
+
+We can observe that
+\begin{align*}
+    F_{X, Y}(x, y) \coloneqq \mathbb{P} (X \le x, Y \le y) = \mathbb{P} \left( (x, y) \in (-\infty, x] \times (-\infty , y] \right) = \int _{-\infty }^x \int _{-\infty }^y f_{X, Y}(u, v) \, \mathrm{d} v \, \mathrm{d} u.  
+\end{align*}
+
+Thus, 
+\[
+    f_{X, Y} (x, y) = \left. \frac{\partial^2}{\partial u \partial v} F_{X, Y}(u, v) \right\vert_{\substack{u = x \\ v = y}}.  
+\]
+
+\begin{eg}
+    Let \(X, Y\) have the joint density 
+    \[
+        f_{X, Y} (x, y) = \begin{dcases}
+            e^{-(x+y)}, &\text{ if } x+y \ge 0 ;\\
+            0, &\text{ if } x+y < 0 .
+        \end{dcases}
+    \] 
+    What is \(\mathbb{P} (X > Y)\)? What is \(\mathbb{P} (X \le t)\) for \(t \in \mathbb{R}\). What is the distribution of \(\frac{X}{Y}\)?    
+\end{eg}
