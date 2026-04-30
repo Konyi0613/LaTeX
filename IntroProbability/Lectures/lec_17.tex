@@ -200,9 +200,32 @@ Thus,
     Let \(X, Y\) have the joint density 
     \[
         f_{X, Y} (x, y) = \begin{dcases}
-            e^{-(x+y)}, &\text{ if } x+y \ge 0 ;\\
-            0, &\text{ if } x+y < 0 .
+            e^{-(x+y)}, &\text{ if } x, y \ge 0 ;\\
+            0, &\text{ if } x < 0 \text{ or } y < 0 .
         \end{dcases}
     \] 
-    What is \(\mathbb{P} (X > Y)\)? What is \(\mathbb{P} (X \le t)\) for \(t \in \mathbb{R}\). What is the distribution of \(\frac{X}{Y}\)?    
+    What is \(\mathbb{P} (X > Y)\)? What is \(\mathbb{P} (X \le t)\) for \(t \in \mathbb{R}\)? What is the distribution of \(\frac{X}{Y}\)?    
 \end{eg}
+
+\begin{explanation}
+    \hfill 
+    \begin{itemize}
+        \item [(a)] What is \(\mathbb{P} (X > Y)\)? Let \(C = \left\{ (x, y): X > Y \right\} \), then 
+        \begin{align*}
+            \mathbb{P} (X > Y) &= \mathbb{P} ((x, y) \in C) = \iint_C f_{X, Y}(u, v) \, \mathrm{d} u \, \mathrm{d} v = \int _{-\infty }^{\infty } \int _{-\infty }^u f_{X, Y} (u, v) \, \mathrm{d} v \, \mathrm{d} u \\
+            &= \int _0^{\infty } \int _0^u e^{-(u+v)} \, \mathrm{d} v \, \mathrm{d} u = \int _0^{\infty } e^{-u} \int _0^u e^{-v} \, \mathrm{d} v \, \mathrm{d} u \\
+            &= \int _0^{\infty } e^{-u} \left( \left[ -e^{-v} \right]_0^u  \right) \, \mathrm{d} u = \int _0^{\infty} e^{-u} \left( 1 - e^{-u} \right) \, \mathrm{d} u \\
+            &= \int _0^{\infty} e^{-u} - e^{-2 u} \, \mathrm{d} u = \frac{1}{2}.          
+        \end{align*}
+        \item [(b)] What is \(\mathbb{P} (X \le t)\) for \(t \in \mathbb{R}\)? 
+        \begin{align*}
+            \mathbb{P} (X \le t) &= \iint_{\left\{ u \le t \right\} } f_{X, Y}(u, v) \, \mathrm{d} u \, \mathrm{d} v = \int _{-\infty }^{\infty} \int _{-\infty }^t f_{X, Y}(u, v) \, \mathrm{d} u \, \mathrm{d} v \\
+            &= \int _0^{\infty} \int _0^t e^{-(u + v)} \, \mathrm{d} u \, \mathrm{d} v = 1 - e^{-t}.    
+        \end{align*}
+        \item [(c)] What is \(F_{\frac{X}{Y}} (t)\)? 
+        \begin{align*}
+            F_{\frac{X}{Y}}(t) &= \mathbb{P} \left( \frac{X}{Y} \le t \right) = \mathbb{P} (X \le tY) = \iint_{\left\{ u \le tv \right\} } f_{X, Y} (u, v) \, \mathrm{d} u \, \mathrm{d} v \\
+            &= \int_{-\infty }^{\infty} \int _{-\infty }^{tv} f_{X, Y}(u, v) \, \mathrm{d} u \, \mathrm{d} v = \int_{0}^{\infty} \int _{0}^{tv} e^{-(u + v)} \, \mathrm{d} u \, \mathrm{d} v = 1 - \frac{1}{t+1}.    
+        \end{align*}
+    \end{itemize}
+\end{explanation}

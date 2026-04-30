@@ -165,3 +165,127 @@ Prove that $m^*_2(\Gamma_f) = 0$.
         m^*(A) \ge m^*(A \cap E) + m^*(A \setminus E).
     \]    
 \end{theorem}
+
+\chapter{Additional proof}
+\begin{theorem} \label{thm: linf eq lsup eq f, then converge}
+    If \(f = \liminf_{n \to \infty} f_n = \limsup_{n \to \infty} f_n  \), then \(f_n \to f\) pointwise.  
+\end{theorem}
+
+\begin{proof}
+Let $\{f_n\}_{n=1}^\infty$ be a sequence of real-valued functions on a set $\Omega$, and suppose that for every $x \in \Omega$,
+\[
+f(x) = \liminf_{n\to\infty} f_n(x) = \limsup_{n\to\infty} f_n(x).
+\]
+
+We will show that $f_n(x) \to f(x)$ for every $x \in \Omega$.
+
+Fix $x \in \Omega$. Then $\{f_n(x)\}$ is a sequence of real numbers satisfying
+\[
+\liminf_{n\to\infty} f_n(x) = \limsup_{n\to\infty} f_n(x) = f(x).
+\]
+
+We prove that $f_n(x) \to f(x)$.
+
+\medskip
+
+Let $\varepsilon > 0$.
+
+By the definition of $\limsup$, we have
+\[
+\limsup_{n\to\infty} f_n(x) = \lim_{n\to\infty} \sup_{k \ge n} f_k(x) = f(x).
+\]
+Hence there exists $N_1 \in \mathbb{N}$ such that for all $n \ge N_1$,
+\[
+\sup_{k \ge n} f_k(x) < f(x) + \varepsilon.
+\]
+In particular, for all $k \ge n \ge N_1$,
+\[
+f_k(x) \le \sup_{j \ge n} f_j(x) < f(x) + \varepsilon.
+\]
+Thus for all $k \ge N_1$,
+\[
+f_k(x) < f(x) + \varepsilon.
+\]
+
+\medskip
+
+Similarly, by the definition of $\liminf$, we have
+\[
+\liminf_{n\to\infty} f_n(x) = \lim_{n\to\infty} \inf_{k \ge n} f_k(x) = f(x).
+\]
+Hence there exists $N_2 \in \mathbb{N}$ such that for all $n \ge N_2$,
+\[
+\inf_{k \ge n} f_k(x) > f(x) - \varepsilon.
+\]
+In particular, for all $k \ge n \ge N_2$,
+\[
+f_k(x) \ge \inf_{j \ge n} f_j(x) > f(x) - \varepsilon.
+\]
+Thus for all $k \ge N_2$,
+\[
+f_k(x) > f(x) - \varepsilon.
+\]
+
+\medskip
+
+Let $N = \max\{N_1, N_2\}$. Then for all $n \ge N$,
+\[
+f(x) - \varepsilon < f_n(x) < f(x) + \varepsilon,
+\]
+which implies
+\[
+|f_n(x) - f(x)| < \varepsilon.
+\]
+
+\medskip
+
+Since $\varepsilon > 0$ is arbitrary, we conclude that
+\[
+f_n(x) \to f(x).
+\]
+
+Since $x \in \Omega$ was arbitrary, the convergence is pointwise on $\Omega$.
+\end{proof}
+
+\begin{theorem} \label{thm: almost equal to measurable func then measurable}
+Let $f:\mathbb{R}^n \to \mathbb{R}$ be a Lebesgue measurable function, and let $g:\mathbb{R}^n \to \mathbb{R}$ be a function such that $f=g$ almost everywhere. Then $g$ is also Lebesgue measurable.
+\end{theorem}
+
+\begin{proof}
+Since $f=g$ almost everywhere, there exists a measurable set $N \subset \mathbb{R}^n$ such that $m(N)=0$ and
+\[
+f(x)=g(x) \quad \text{for all } x \in \mathbb{R}^n \setminus N.
+\]
+
+To prove that $g$ is measurable, it suffices to show that for every $a \in \mathbb{R}$, the set
+\[
+E := \{x \in \mathbb{R}^n : g(x) > a\}
+\]
+is measurable.
+
+Fix $a \in \mathbb{R}$ and define
+\[
+F := \{x \in \mathbb{R}^n : f(x) > a\}.
+\]
+Since $f$ is measurable, the set $F$ is measurable.
+
+We claim that
+\[
+E \triangle F \subseteq N,
+\]
+where $E \triangle F = (E \setminus F) \cup (F \setminus E)$ denotes the symmetric difference.
+
+Indeed, let $x \notin N$. Then $f(x)=g(x)$, and hence
+\[
+g(x) > a \iff f(x) > a.
+\]
+Thus $x \in E$ if and only if $x \in F$, which implies $x \notin E \triangle F$. Therefore $E \triangle F \subseteq N$.
+
+Since $N$ has measure zero, it is measurable. It follows that $E \triangle F$ is measurable. As $F$ is measurable and the collection of measurable sets is closed under symmetric difference, we conclude that
+\[
+E = F \triangle (E \triangle F)
+\]
+is measurable.
+
+Since $a \in \mathbb{R}$ was arbitrary, this shows that $\{x : g(x) > a\}$ is measurable for all $a$, and hence $g$ is measurable.
+\end{proof}

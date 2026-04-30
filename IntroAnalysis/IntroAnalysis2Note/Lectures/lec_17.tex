@@ -1,0 +1,260 @@
+\lecture{17}{30 April.}{}
+As discussed in the previous section, limits and integrals cannot in general be interchanged. That is, even if \(f_n \to f\) pointwise on \(\Omega\), it may happen that 
+\[
+    \lim_{n \to \infty} \int _\Omega f_n \neq \int _\Omega \lim_{n \to \infty} f_n.  
+\]  
+Thus, in order to justify passing a limit through an integral, one needs an additional hypothesis. The Lebesgue dominated convergence theorem provides one of the most useful such criteria: if the sequence is dominated by a single absolutely integrable function, then the interchange of limit and integral is valid. 
+
+\begin{theorem}[Lebesgue dominated convergence theorem]
+    Let \(\Omega \) be a measurable subset of \(\mathbb{R} ^n\), and let \(f_1, f_2, \dots\) be measurable functions from \(\Omega\) to \(\mathbb{R} ^*\) such that \(f_n(x)\) converges pointwise for every \(x \in \Omega\). Suppose moreover that there exists an absolutely integrable function \(F: \Omega \to [0, \infty]\) such that \(\vert f_n(x) \vert \le F(x) \) for all \(x \in \Omega\) and all \(n \ge 1\). Then, if we write \(f(x) \coloneqq \lim_{n \to \infty} f_n (x)  \), we have
+    \[
+        \int _\Omega f = \lim_{n \to \infty} \int _\Omega f_n.
+    \]            
+\end{theorem}
+
+\begin{proof}
+    Since \(F\) is non-negative, measurable, and absolutely integrable, we knoe \(F < \infty\) almost everywhere by \autoref{lm: finite integral implies infty set has measure 0}. In other words, \(E \coloneqq \left\{ x \in \Omega: F(x) = + \infty \right\} \) has measure zero. If we replace \(\Omega\) by \(\Omega \setminus E\), then none of the relevant integrals changes, because deleting a measure zero set does not affect the integral of an absolutely integrable function. Hence, without loss of generality, we may assume from now on that \(F(x) < \infty\) for every \(x \in \Omega\). Since \(\vert f_n(x) \vert \le F(x) \) for all \(n\), this also implies that each \(f_n(x)\) is finite for every \(x \in \Omega\). 
+
+    Because each \(f_n\) is measurable and \(f_n \to f\) pointwise, \(f\) is measurable by \autoref{lm: sup, inf, limsup, liminf of measurable func are measurable}. Next, since \(\vert f_n(x) \vert \le F(x) \) for all \(n\) and all \(x \in \Omega\), we may pass to the limit in \(n\) and obtain 
+    \[
+        \vert f(x) \vert \le F(x) \quad \text{for all } x \in \Omega.   
+    \]                  
+    Therefore,
+    \[
+        \int _\Omega \vert f \vert \le \int _\Omega F < \infty, 
+    \]
+    so \(f\) is absolutely integrable. The same argument can shows that \(f_n\) is absolutely integrable, because 
+    \[
+        \int _\Omega \vert f_n \vert \le \int _\Omega F < \infty. 
+    \] 
+    Thus, all of the integrals appearing below are finite and well-defined.
+
+    For each \(n\) and each \(x \in \Omega\), we have \(\vert f_n(x) \vert \le F(x) \). Hence, 
+    \[
+        -F(x) \le f_n(x) \le F(x).
+    \]   
+    It follows that \(F(x) + f_n(x) \ge 0\) for all \(x \in \Omega\). So the function \(F + f_n\) are non-negative and measurable. Moreover, since \(f_n(x) \to f(x)\), we also have 
+    \[
+        F(x) + f_n(x) \to F(x) + f(x) \quad \text{pointwise on } \Omega. 
+    \]    
+    \hyperref[lm: Fatou]{Fatou's lemma} therefore gives
+    \[
+        \int _\Omega (F + f) = \int _\Omega \liminf_{n \to \infty} (F + f_n) \le \liminf_{n \to \infty} \int _\Omega (F + f_n). 
+    \] 
+    Using additivity of the integral for absolutely integrable functions, this becomes
+    \[
+        \int _\Omega F + \int _\Omega f \le \liminf_{n \to \infty} \left( \int _\Omega F + \int _\Omega f_n \right).  
+    \]
+    Since \(\int _\Omega F\) is a fixed finite number, we may subtract it from both sides and obtain 
+    \[
+        \int _\Omega f \le \liminf_{n \to \infty} \int _\Omega f_n. 
+    \] 
+
+    Similarly, since \(\vert f_n(x) \vert \le F(x) \), we have \(F(x) - f_n(x) \ge 0\) for all \(x \in \Omega\). Thus, \(F - f_n\) is non-negative and measurable for all \(n\). Since \(f_n(x) \to f(x)\) pointwise, we also have 
+    \[
+        F(x) - f_n(x) \to F(x) - f(x) \quad \text{pointwise on } \Omega. 
+    \]     
+    Applying \hyperref[lm: Fatou]{Fatou's lemma} once more, we obtain 
+    \[
+        \int _\Omega (F - f) = \int _\Omega \liminf_{n \to \infty} \left( F - f_n  \right) \le \liminf_{n \to \infty} \int _\Omega (F - f_n).  
+    \] 
+    By additivity,
+    \[
+        \int _\Omega F - \int _\Omega f \le \liminf_{n \to \infty} \left( \int _\Omega F - \int _\Omega f_n \right) = \int _\Omega F - \textcolor{red}{\limsup_{n \to \infty}} \int _\Omega f_n.   
+    \]
+    This gives 
+    \[
+        \int _\Omega f \ge \limsup_{n \to \infty} \int _\Omega f_n. 
+    \]
+    
+    Now we have 
+    \[
+        \limsup_{n \to \infty} \int _\Omega f_n \le \int _\Omega f \le \liminf_{n \to \infty} \int _\Omega f_n.  
+    \]
+    But for real sequence \((a_n)\)  we always has 
+    \[
+      \liminf_{n \to \infty} a_n \le \limsup_{n \to \infty} a_n.    
+    \]
+    Therefore, the only possibility is that
+    \[
+        \liminf_{n \to \infty} \int _\Omega f_n = \limsup_{n \to \infty} \int _\Omega f_n = \int _\Omega f.  
+    \]
+    Hence, the sequence \((\int _\Omega f_n)\) converges, and its limit is \(\int _\Omega f\) by \autoref{thm: linf eq lsup eq f, then converge}. That is, 
+    \[
+        \lim_{n \to \infty} \int _\Omega f_n = \int _\Omega f. 
+    \] 
+    This proves the dominated convergence theorem.
+\end{proof}
+
+Finally, we record a lemma which is not particularly interesting in itself, but we will have some useful consequences later in these notes. 
+
+\begin{definition}[Upper and lower Lebesgue integral]
+    Let \(\Omega\) be a measurable subset of \(\mathbb{R} ^n\), and let \(f: \Omega \to \mathbb{R}\) (not necessarily measurable). We define the upper Lebesgue integral \(\overline{\int _\Omega} f\) to be 
+    \[
+        \overline{\int _\Omega } f \coloneqq \inf \left\{ \int _\Omega g: g \text{ is an absolutely integrable function from } \Omega \text{ to } \mathbb{R} \text{ that majorizes } f    \right\}, 
+    \]    
+    and the lower Lebesgue integral \(\underline{\int _\Omega} f\) to be 
+    \[
+        \underline{\int _\Omega} f \coloneqq \sup \left\{ \int _\Omega g: g \text{ is an absolutely integrable function from } \Omega \text{ to } \mathbb{R} \text{ that minorizes } f  \right\}.
+    \] 
+\end{definition}
+
+We first record two elementary consequences of this definition. 
+
+It is easy to see that 
+\[
+    \underline{\int _\Omega } f \le \overline{\int _\Omega } f.  
+\]
+Next, suppose \(f\) is absolutely integrable. Then \(f\) is both an absolutely integrable minorant and an absolutely integrable majorant of itself. Therefore,
+\[
+    \underline{\int _\Omega } f = \sup \left\{ \int _\Omega u: u \text{ is absolutely intergable and } u \le f  \right\} \ge \int _\Omega f.  
+\]  
+On the other hand, if \(u \le f\) for some absolutely integrable \(u\), then 
+\[
+    \int _\Omega u \le \int _\Omega f.
+\]  
+Taking the supremum over all absolutely integrable \(u \le f\), we obtain 
+\[
+    \underline{\int _\Omega } f \le \int _\Omega f. 
+\] 
+Hence, \(\underline{\int _\Omega } f = \int _\Omega f \).
+
+Similarly, since \(f\) is an absolutely integrable majorant of itself, 
+\[
+    \overline{\int _\Omega } f = \inf \left\{ \int _\Omega v: v \text{ is absolutely integrable and } f \le v   \right\} \le \int _\Omega f.  
+\]
+Conversely, if \(f \le v\) for some absolutely integrbale \(v\), then 
+\[
+    \int _\Omega f \le \int _\Omega v.
+\]  
+Taking the infimum over all absolutely integrbale \(v \ge f\), we get \(\int _\Omega f \le \overline{\int _\Omega} f\). Thus, \(\overline{\int _\Omega } f = \int _\Omega f.\) 
+Consequently, whenever \(f\) is absolutely integrable,
+\[
+    \underline{\int _\Omega } f = \int _\Omega f = \overline{\int _\Omega } f.  
+\] 
+The converse is also true:
+\begin{lemma}
+    Let \(\Omega \) be a measurable subset of \(\mathbb{R} ^n\), and let \(f: \Omega \to \mathbb{R} \) be a function, not assumed a priori to be measurable. Suppose that there exists \(A \in \mathbb{R}\) s.t. 
+    \[
+        \overline{\int _\Omega } f = \underline{\int _\Omega} f = A. 
+    \]    
+    Then \(f\) is absolutely integrable, and 
+    \[
+       \int _\Omega f = \overline{\int _\Omega } f = \underline{\int _\Omega} f = A. 
+    \] 
+\end{lemma}
+
+\begin{proof}
+    We will show that \(f\) agree almost everywhere with an absolutely integrable function, and hence \(f\) itself is absolutely integrable with integral \(A\). 
+
+    By definition,
+    \[
+        \overline{\int _\Omega f} = \inf \left\{ \int _\Omega g: g \text{ is absolutely integrable and } g \ge f  \right\}.  
+    \]   
+    Since this infimum is equal to \(A\), for every \(n \ge 1\), there exists an absolutely integrable function \(f_n^+: \Omega \to \mathbb{R}\) s.t. \(f_n^+\) majorizes \(f\) and
+    \[
+        \int _\Omega f_n^+ \le A + \frac{1}{n}.
+    \]     
+    Similarly, since 
+    \[
+        A = \underline{\int _\Omega } f = \sup \left\{ \int _\Omega g: g \text{ is absolutely integrable and } g \le f \right\},  
+    \]
+    for every integer \(n \ge 1\) there exists an absolutely integrable function \(f_n^-: \Omega \to \mathbb{R}\) s.t. \(f_n^-\) minorizes \(f\) and 
+    \[
+        \int _\Omega f_n^- \ge A - \frac{1}{n}.
+    \]   
+    Thus, for every \(n\) we have \(f_n^- \le f \le f_n^+\) on \(\Omega\).
+
+    Now set 
+    \[
+        F^+(x) \coloneqq \inf _{n \ge 1} f_n^+ (x), \quad F^-(x) \coloneqq \sup _{n \ge 1} f_n^-(x), \quad x \in \Omega.
+    \]   
+    Since each \(f_n^+\) and \(f_n^-\) is measurable, we know \(F^+\) and \(F^-\) are measurable by \autoref{lm: sup, inf, limsup, liminf of measurable func are measurable}. Since \(f(x) \le f_n^+(x)\) for all \(n\), we have 
+    \[
+        f(x) \le \inf _{n \ge 1} f_n^+(x) = F^+(x).
+    \]       
+    Similarly, we have 
+    \[
+        F^-(x) = \sup _{n \ge 1} f_n^-(x) \le f(x).
+    \]
+    Hence, 
+    \[
+        F^-(x) \le f(x) \le F^+(x) \quad \forall x \in \Omega.
+    \]
+
+    We first consider \(F^+\). Since \(F^+ \le f_1^+\) pointwise and \(f_1^+\) is absolutely integrable, we would like to conclude that \(F^+\) is also absolutely integrable. For this we also need a lower bound by an absolutely integrable functoin. 
+
+    Because \(f_n^- \le f \le F^+\) for every \(n\), in particular we have 
+    \[
+        f_1^- \le F^+ \le f_1^+.
+    \]      
+    Hence,
+    \[
+        \vert F^+ \vert \le \max \left\{ \left\vert f_1^- \right\vert, \left\vert f_1^+ \right\vert   \right\} \le \vert f_1^- \vert + \vert f_1^+ \vert.   
+    \]
+    Since \(f_1^-\) and \(f_1^+\) are absolutely integrable, so is \(\vert f_1^- \vert + \vert f_1^+ \vert  \). By comparison, \(F^+\) is absolutely integrable. 
+
+    The same argument applies to \(F^-\), by \(f_1^- \le F^- \le f_1^+\), we have 
+    \[
+        \vert F^- \vert \le \vert f_1^- \vert + \vert f_1^+ \vert  
+    \]   
+    and thus \(F^-\) is also absolutely integrable.
+
+    Now since \(F^+ \le f_n^+\) for all \(n\) and they are both absolutely integrable, 
+    \[
+        \int _\Omega F^+ \le \int _\Omega f^+ \le A + \frac{1}{n} \quad \forall n \ge 1.
+    \]    
+    Letting \(n \to \infty\), we obtain 
+    \[
+        \int _\Omega F^+ \le A.
+    \] 
+    Similarly, we have 
+    \[
+        A - \frac{1}{n} \le \int _\Omega f_n^- \le \int _\Omega F^-.
+    \]
+    Letting \(n \to \infty\), we have 
+    \[
+        A \le \int _\Omega F^-.
+    \] 
+    On the other hand, since \(F^- \le F^+\) pointwise, we have 
+    \[
+        \int _\Omega F^- \le \int _\Omega F^+.
+    \] 
+    Combining the three inequalities,
+    \[
+        A \le \int _\Omega F^- \le \int _\Omega F^+ \le A.
+    \]
+    Thus,
+    \[
+        \int _\Omega F^- = \int _\Omega F^+ = A.
+    \]
+
+    Now since 
+    \[
+        \int _\Omega (F^+ - F^-) = \int _\Omega F^+ - \int _\Omega F^- = A - A = 0,
+    \]
+    we know \(F^+ - F^-\) is zero almost everywhere since \(F^+ - F^-\) is a non-negative measurable function. Hence, \(F^+ = F^-\) almost everywhere on \(\Omega\).    
+
+    Recall that 
+    \[
+        F^-(x) \le f(x) \le F^+(x) \quad \forall x \in \Omega.
+    \]
+    At every point where \(F^+(x) = F^-(x)\), we have 
+    \[
+        f(x) = F^+(x) = F^-(x).
+    \]
+    Since \(F^+ = F^-\) almost everywhere, it follows that \(f = F^+\) almost everywhere. Now \(F^+\) is measurable and absolutely integrable. A function which agrees almost everywhere with a measurable function is measurable by \autoref{thm: almost equal to measurable func then measurable}, so \(f\) is measurable. Also, \(\vert f \vert = \vert F^+ \vert  \) almost everywhere, and therefore 
+    \[
+        \int _\Omega \vert f \vert = \int _\Omega \vert F^+ \vert < \infty.  
+    \]     
+    Thus, \(f\) is absolutely integrable. 
+    
+    Finally, since \(f = F^+\) almost everywhere, we have 
+    \[
+        \int _\Omega f = \int _\Omega F^+ = A.
+    \]
+    Therefore,
+    \[
+        \int _\Omega f = \overline{\int _\Omega } f = \underline{\int _\Omega } f = A.  
+    \]
+\end{proof}

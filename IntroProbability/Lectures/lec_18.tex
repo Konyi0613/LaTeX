@@ -1,0 +1,194 @@
+\lecture{18}{April 30.}{}
+\begin{eg}
+    A dart lands at a uniformly random point \((X, Y)\) on a dartboard of radius \(R\). 
+    \begin{itemize}
+        \item [(a)] Find the joint pdf \(f_{X, Y}(x, y)\). 
+        \item [(b)] Find the marginal pdf of \(X\).
+        \item [(c)] What is the expectation of \(D\), the distance to the center of the dashboard?   
+    \end{itemize}  
+\end{eg}
+
+\begin{explanation}
+    \hfill 
+    \begin{itemize}
+        \item [(a)] Since \((X, Y)\) is uniform on the board, 
+        \[
+            f_{X, Y}(x, y) = \begin{dcases}
+                C, &\text{ if } x^2 + y^2 \le R^2 ;\\
+                0, &\text{ if } x^2 + y^2 > R^2.
+            \end{dcases}
+        \]
+        Thus, 
+        \[
+            1 = \iint_{\mathbb{R} ^2} f_{X, Y}(u, v) \, \mathrm{d} u \, \mathrm{d} v = \iint_{\left\{ u^2 + v^2 \le R^2 \right\} } C \, \mathrm{d} u \, \mathrm{d} v = C \pi R^2.    
+        \]
+        Hence, \(C = \frac{1}{\pi R^2}\).
+        \item [(b)] 
+        \begin{align*}
+            F_X(t) &= \mathbb{P} (X \le t) = \iint_{\left\{ u \le t \right\} } f_{X, Y}(u, v) \, \mathrm{d} u \, \mathrm{d} v \\
+            &= \begin{dcases}
+                0, &\text{ if } t < -R ;\\
+                \iint_{\left\{ u \le t \right\} } f_{X, Y}(u, v) \, \mathrm{d} u \, \mathrm{d} v, &\text{ if } -R \le t \le R ;\\
+                0, &\text{ otherwise} t > R .
+            \end{dcases}  
+        \end{align*}
+        If \(-R \le t \le R\), 
+        \begin{align*}
+            \iint_{\left\{ u \le t \right\} } f_{X, Y}(u, v) \, \mathrm{d} u \, \mathrm{d} v &= \int _{-R}^t \int _{- \sqrt{R^2 - u^2}}^{\sqrt{R^2 - u^2}} \frac{1}{\pi R^2} \, \mathrm{d} v \, \mathrm{d} u = \int _{-R}^t \frac{2}{\pi R^2} \sqrt{R^2 - u^2} \, \mathrm{d} u.    
+        \end{align*} 
+        Hence, \(X\) has the pdf 
+        \[
+            f_X(t) = \begin{dcases}
+                \frac{2}{\pi R^2} \sqrt{R^2 - t^2} , &\text{ if } t \in [-R, R] ;\\
+                0, &\text{ if } t \notin [-R, R]. 
+            \end{dcases}
+        \] 
+        \item [(c)] Since for \(0 \le t \le R\) we know 
+        \begin{align*}
+            F_D(t) &= \mathbb{P} (D \le t) = \mathbb{P} (D^2 \le t^2) = \mathbb{P} (X^2 + Y^2 \le t^2) = \iint _{\left\{ u^2 + v^2 \le t^2 \right\} } f_{X, Y}(u, v) \, \mathrm{d} u \, \mathrm{d} v \\
+            &= \iint_{\left\{ u^2 + v^2 \le t^2 \right\} } \frac{1}{\pi R^2} \, \mathrm{d} u \, \mathrm{d} v = \frac{t^2}{R^2}.    
+        \end{align*}
+        Hence, \(D\) has the pdf 
+        \[
+            f_D(t) = F_D^{\prime} (t) = \begin{dcases}
+                \frac{2t}{R^2}, &\text{ if } 0 \le t \le R ;\\
+                0, &\text{ otherwise}.
+            \end{dcases}
+        \] 
+        Hence,
+        \[
+            \mathbb{E} [D] = \int_{\mathbb{R} } t f_D(t) \, \mathrm{d} t = \int _0^R \frac{2t^2}{R^2} \, \mathrm{d} t = \frac{2}{3}R.  
+        \]
+    \end{itemize}
+\end{explanation}
+
+\section{Independent Random Variables}
+\begin{definition}
+    We say that two random variables \(X, Y\) on a probability space \(X, Y\) are independent if for all (measurable) \( A, B \subseteq \mathbb{R}\), we have 
+    \[
+        \mathbb{P} (X \in A, Y \in B) = \mathbb{P} (X \in A) \mathbb{P} (Y \in B).
+    \]   
+\end{definition}
+
+\begin{proposition}
+    Random variables \(X, Y\) are independent if and only if \(F_{X, Y}(x, y) = F_X(x) F_Y(y)\) for all \(x, y\).   
+\end{proposition}
+
+\begin{proof}
+    \hfill 
+    \begin{itemize}
+        \item [\((\implies)\)] Since \(X, Y\) are independent, 
+        \begin{align*}
+            F_{X, Y}(x, y) &= \mathbb{P} (X \le x, Y \le y) = \mathbb{P} (X \in (-\infty , x], Y \in (-\infty , y]) \\
+            &= \mathbb{P} (X \le (-\infty , X]) \mathbb{P} (Y \in (-\infty , Y]).
+        \end{align*}
+        \item [\((\impliedby)\)] We only do the case that \(A = (a_1, a_2)\) and \(B = (b_1, b_2)\), 
+        \begin{align*}
+            \mathbb{P} (X \in A, Y \in B) &= F_{X, Y}(a_2, b_2) + F_{X, Y}(a_1, b_1) - F_{X, Y}(a_1, b_2) - F_{X, Y}(a_2, b_1) \\
+            &= F_X(a_2) F_Y(b_2) + F_X(a_1) F_Y(b_1) - F_X(a_1) F_Y(b_2) - F_X(a_2) F_Y(b_1) \\
+            &= (F_X(a_2) - F_X(a_1)) (F_Y(b_2) - F_Y(b_1)) \\
+            &= \mathbb{P} (a_1 < x \le a_2) \cdot \mathbb{P} (b_1 \le Y < b_2) = \mathbb{P} (X \in A) \cdot \mathbb{P} (Y \in B).
+        \end{align*}
+    \end{itemize}
+\end{proof}
+
+\begin{remark}
+    For discrete random variables or \(X, Y\) continuous and have joint pdf,
+    \[
+        F_{X, Y}(x, y) = F_X(x) F_Y(y) \iff p_{X, Y} (x, y) = p_X(x) p_Y(y).
+    \]
+\end{remark}
+
+\begin{eg}
+    Atletico Madroid v.s. Arsenal. Suppose the number of penalties \(\sim \mathrm{Poi}(\lambda) \). When a penalty is awarded, it is for Atletico with probability \(p\), and Arsenal with probability \(1 - p\), independently of all other penalties. Let \(X\) be the number of penalties for Atl Madroid, \(Y\) be the number of penalties for Ars. 
+    \begin{align*}
+        p_{X, Y}(x, y) &= \mathbb{P} (X = x, Y = y) = \mathbb{P} (\left\{ X = x, Y = y \right\} \cap \left\{ X + Y = x + y \right\}) \\
+        &= \mathbb{P} (X = x, Y = y \mid X + Y = x + y) \mathbb{P} (X + Y = x + y).
+    \end{align*}
+    Since \(X + Y \sim \mathrm{Poi}(\lambda)\), 
+    \[
+        \mathbb{P} (X + Y = x + y) = e^{-\lambda} \frac{\lambda ^{x + y}}{(x + y)!}.
+    \] 
+    Since each penalty goes to Atl Madroid with probability \(p\), independently, if we condition on there being \(x+y\) penalties, in total, \(X \sim \mathrm{Bin}(x+y, p) \). Hence,
+    \begin{align*}
+        \mathbb{P} (X = x, Y = y \mid X + Y = x + y) &= \mathbb{P} (X = x \mid X + Y = x + y) = \mathbb{P} (\mathrm{Bin}(x+y, p) = x)\\ 
+        &= \binom{x+y}{x} p^x (1-p)^{(x+y)-x}.
+    \end{align*}   
+    Hence,
+    \begin{align*}
+        p_{X, Y}(x, y) &= \mathbb{P} (X = x, Y = y) = \binom{x+y}{x} p^x (1-p)^y \cdot e^{-\lambda } \frac{\lambda ^{x+y}}{(x+y)!} \\
+        &= \frac{e^{-\lambda} p^x (1-p)^y \lambda ^{x+y}}{x! y!} = e^{-\lambda } \left( \frac{p^x \lambda ^x}{x!} \right) \left( \frac{(1-p)^y \lambda ^y}{y!} \right) \\
+        &= e^{-\lambda (p + (1 - p))} \left( \frac{p^x \lambda ^x}{x!} \right) \left( \frac{(1-p)^y \lambda ^y}{y!} \right) \\
+        &= \left( e^{-\lambda p} \frac{p^x \lambda ^x}{x!} \right) \left( e^{-\lambda (1 - p)} \frac{(1-p)^y \lambda ^y}{y!} \right) = p_X(x) p_Y(y).
+    \end{align*}
+    This gives \(X \sim \mathrm{Poi}(\lambda p) \) and \(Y \sim \mathrm{Poi}(\lambda (1 - p)) \) and \(X, Y\) are independent.
+
+    \begin{remark}
+        Last equality holds since we can use 
+        \[
+            p_X(x) = \sum_{y=0}^{\infty} p_{X, Y}(x, y), \quad p_Y(y) = \sum_{x = 0}^{\infty} p_{X, Y}(x, y).  
+        \]
+    \end{remark}  
+\end{eg}
+
+\begin{proposition}
+    If \(X, Y\) are continuous random variables on a probability space \((S, \mathbb{P})\), and their joint pdf function \(f_{X, Y}(x, y) = g(x) h(y)\) for some function \(g, h\) of \(x, y\), respectively, then \(X\) and \(Y\) are independent.     
+\end{proposition}
+
+\begin{proof}
+    Let \(c_1 = \int _\mathbb{R} g(x) \, \mathrm{d} x\) and \(c_2 = \int _\mathbb{R} h(y) \, \mathrm{d} y\). Then, 
+    \begin{align*}
+        1 &= \iint_{\mathbb{R} ^2} f_{X, Y}(x, y) \, \mathrm{d} x \, \mathrm{d} y = \iint_{\mathbb{R} ^2} g(x) h(y) \, \mathrm{d} x \, \mathrm{d} y \\
+        &= \left( \int _\mathbb{R} g(x) \, \mathrm{d} x  \right) \left( \int _\mathbb{R} h(y) \, \mathrm{d} y \right) = c_1 c_2.     
+    \end{align*}  
+    Also,
+    \[
+        f_X(x) = \int _{\mathbb{R} } f_{X, Y}(x, y) \, \mathrm{d} y = \int _{\mathbb{R}} g(x) h(y) \, \mathrm{d} y = c_2 g(x).  
+    \]
+    Similarly, \(f_Y(y) = c_1 h(y)\). Hence,
+    \[
+        f_{X, Y}(x, y) = g(x) h(y) = 1 \cdot g(x) h(y) = c_1 c_2 g(x) h(y) = f_X(x) f_Y(y).
+    \] 
+\end{proof}
+
+\begin{eg}
+    Suppose
+    \begin{itemize}
+        \item \(X, Y\) are continuous random variables with differentiable pdf \(f_X, f_Y\). 
+        \item \(X, Y\) are independent. 
+        \item joint density function only depends on \(X^2 + Y^2\), ie.. \(f_{X, Y}(x, y) = g(x^2 + y^2)\) for some function \(g\).      
+    \end{itemize}
+    Then, \(X\) and \(Y\) are normally distributed.  
+\end{eg}
+
+\begin{explanation}
+    \begin{align*}
+        f_X(x) f_Y(y) = f_{X, Y}(x, y) = g(x^2 + y^2)
+    \end{align*}
+    by independence. If we differentiate w.r.t. \(x\), we have 
+    \[
+        f_X^{\prime} (x) f_Y(y) = 2x g^{\prime} (x^2 + y^2).
+    \] 
+    Hence,
+    \[
+        \frac{f_X^{\prime} (x)}{f_X (x)} = \frac{2x g^{\prime} (x^2 + y^2)}{g(x^2 + y^2)} \implies \frac{f^{\prime}_X(x)}{x f_X(x)} = \frac{2 g^{\prime} (x^2 + y^2)}{g(x^2 + y^2)}.
+    \]
+
+     Now we give a claim: 
+     \begin{claim}
+    \[
+        \frac{f_X^{\prime} (x_1)}{x_1 f_X(x_1)} = \frac{f_X^{\prime} (x_2)}{x_2 f_X(x_2)} \quad \forall x_1, x_2 \in \mathbb{R}.
+    \]
+\end{claim}
+\begin{explanation}
+    Find \(y_1, y_2\) s.t. \(x_1^2 + y_1^2 = x^2_2 + y_2^2\), i.e. \(y_1 = x_2\) and \(y_2 = x_1\), then 
+    \begin{align*}
+        \frac{f_X^{\prime} (x_1)}{x_1 f_X(x_1)} = \frac{2 g^{\prime} (x_1^2 + y_1^2)}{g(x_1^2 + y_1^2)} = \frac{2 g^{\prime} (x_2^2 + y_2^2)}{g(x_2^2 + y_2^2)} = \frac{f_X^{\prime} (x_2)}{x_2 f_X(x_2)}.
+    \end{align*}   
+    Hence,
+    \[
+        \frac{f_X^{\prime} (x)}{x f_X(x)} \equiv c \text{ for some } c \in \mathbb{R}. 
+    \] 
+\end{explanation}
+\end{explanation}
+
