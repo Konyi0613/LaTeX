@@ -11,7 +11,7 @@
 \end{proof}
 
 \begin{remark}
-    We have shown that the value of a flow is how much is left at the sink, which is also equal to the value of what comes in through the source. Therefore, we can instead for mulate the problem as follows: we add an edge \(e^* = (t, s)\) with \(\infty\) capacity. If \(f(e^*) = \mathrm{val}(f) \), we have conservation at \(s\) and \(t\) as well. Therefore, by maximizeing the value of the flow in the original problem, with this formulation we simply aim to maximize \(f(e^*)\), where we impose conservation for all \(v \in V\).  
+    We have shown that the value of a flow is how much is left at the sink, which is also equal to the value of what comes in through the source. Therefore, we can instead formulate the problem as follows: we add an edge \(e^* = (t, s)\) with \(\infty\) capacity. If \(f(e^*) = \mathrm{val}(f) \), we have conservation at \(s\) and \(t\) as well. Therefore, by maximizing the value of the flow in the original problem, with this formulation we simply aim to maximize \(f(e^*)\), where we impose conservation for all \(v \in V\).  
 
     \begin{figure}[H]
         \centering
@@ -120,7 +120,7 @@
         \begin{explanation}
             By the conservation lemma, 
             \[
-                \mathrm{val}(f) = \sum_{\vv{e} \in [S_f, \overline{S_f}]} f(\vv{e}) - \sum_{\vv{e} \in [\overline{S_f}, S ]} f(\vv{e}) = \sum_{\vv{e} \in [S_f, \overline{S_f} ]} c(\vv{e}) - \sum_{\vv{e} \in [\overline{S_f} , S_f]} 0 = \mathrm{cap}([S_f, \overline{S_f}]).  
+                \mathrm{val}(f) = \sum_{\vv{e} \in [S_f, \overline{S_f}]} f(\vv{e}) - \sum_{\vv{e} \in [\overline{S_f}, S_f ]} f(\vv{e}) = \sum_{\vv{e} \in [S_f, \overline{S_f} ]} c(\vv{e}) - \sum_{\vv{e} \in [\overline{S_f} , S_f]} 0 = \mathrm{cap}([S_f, \overline{S_f}]).  
             \]
             since for each edge \(\vv{e}\) between \(S_f\) and \(\overline{S_f}\), it cannot be forwards edge with \(f(\vv{e}) < c(\vv{e})\) or backwards edge with \(f(\vv{e}) > 0\), otherwise there is a \(f\)-augmenting path from \(s\) to the endpoint of \(\vv{e}\) in \(\overline{S_f}\), which is a contradiction.        
         \end{explanation}
@@ -155,7 +155,7 @@ Then, we have the following corollary:
 \]  
 (Here \(\kappa^{\prime}  (u, v)\) is the minimum number of edges in a \(u, v\)-separator, and \(\lambda ^{\prime} (u, v)\) is the maximum number of pairwise edge-disjoint \(u, v\)-paths.) 
 
-We construct an instance of a network flow problem: \(\vv{D} = (v(G), \vv{E})\) where 
+We construct an instance of a network flow problem: \(\vv{D} = (V(G), \vv{E})\) where 
 \[
     \vv{E} = \bigcup_{e = \left\{ x, y \right\} \in E(G) } \left\{ (x, y), (y, x) \right\},  
 \] 
@@ -165,12 +165,16 @@ and \(s = u, t = v\). We let \(c \equiv 1\) (capacity of each edge is 1).
     \(\lambda ^{\prime} (u, v) \ge \max \mathrm{val}(f) \) and \(\kappa ^{\prime} (u, v) = \min \mathrm{cap}(S, \overline{S}) \).  
 \end{claim}
 \begin{explanation}
-    Let \(F \subseteq E\) be a minimum \(u, v\)-separator. Hence, \(\vert F \vert = \kappa ^{\prime} (u, v) \). Let \(S\) be the component of \(u\) in \(G - F\); then \(v \notin S\). Then, we have \([S, \overline{S}] = F\), and so \(\mathrm{cap}(S, \overline{S}) = \vert F \vert = \kappa ^{\prime} (u, v) \). 
+    Let \(F \subseteq E\) be a minimum \(u, v\)-separator. Hence, \(\vert F \vert = \kappa ^{\prime} (u, v) \). Let \(S\) be the component of \(u\) in \(G - F\); then \(v \notin S\). Then, we have \([S, \overline{S}] = F\), and so \(\mathrm{cap}(S, \overline{S}) = \vert F \vert = \kappa ^{\prime} (u, v) \).
 
     Conversely, for any source-sink cut \([S, \overline{S}]\), \([S, \overline{S}]\) is a \(u, v\)-separaotr in \(G\), and thus 
     \[
         \kappa ^{\prime} (u, v) \le \left\vert [S, \overline{S}] \right\vert = \mathrm{cap}(S, \overline{S}).  
-    \]    
+    \] 
+    Thus, we have shown 
+    \[
+        \kappa ^{\prime} (u, v) = \min \mathrm{cap}(S, \overline{S}).
+    \]   
 
     On the other hand, we know \(\min \mathrm{cap}(S, \overline{S}) \) is an integer, and by Ford-Fulkerson, \(\max \mathrm{val}(f) = \min \mathrm{cap}(S, \overline{S})\), so \(\max \mathrm{val} (f) \) is an integer. 
 
