@@ -105,3 +105,76 @@
 
 \newcommand{\cupdot}{\charfusion[\mathbin]{\cup}{\cdot}}
 \newcommand{\bigcupdot}{\charfusion[\mathop]{\bigcup}{\cdot}}
+
+\definecolor{match01}{RGB}{228,26,28}
+\definecolor{match02}{RGB}{55,126,184}
+\definecolor{match03}{RGB}{77,175,74}
+\definecolor{match04}{RGB}{152,78,163}
+\definecolor{match05}{RGB}{255,127,0}
+\definecolor{match06}{RGB}{255,255,51}
+\definecolor{match07}{RGB}{166,86,40}
+\definecolor{match08}{RGB}{247,129,191}
+\definecolor{match09}{RGB}{153,153,153}
+\definecolor{match10}{RGB}{27,158,119}
+\definecolor{match11}{RGB}{217,95,2}
+\definecolor{match12}{RGB}{117,112,179}
+\definecolor{match13}{RGB}{231,41,138}
+\definecolor{match14}{RGB}{102,166,30}
+\definecolor{match15}{RGB}{230,171,2}
+\definecolor{match16}{RGB}{166,118,29}
+\definecolor{match17}{RGB}{102,102,102}
+\definecolor{match18}{RGB}{141,211,199}
+\definecolor{match19}{RGB}{255,255,179}
+\definecolor{match20}{RGB}{190,186,218}
+\definecolor{match21}{RGB}{251,128,114}
+
+\newcommand{\matchingcolor}[1]{match\ifnum#1<10 0\fi\number#1}
+
+\newcommand{\drawmatching}[1]{%
+    \begin{scope}
+        \def\R{0.95}
+        \coordinate (v21) at (0,0);
+        \foreach \i in {0,...,20}{
+            \coordinate (v\i) at ({90-360*\i/21}:\R);
+        }
+
+        \node[font=\scriptsize] at (0,1.42) {Week \number\numexpr #1+1\relax};
+
+        \draw[gray!45, thin] (0,0) circle (\R);
+        \foreach \i in {0,...,20}{
+            \fill[black] (v\i) circle (0.028);
+        }
+        \fill[black] (v21) circle (0.028);
+
+        \draw[thick, RoyalBlue] (v21) -- (v#1);
+        \foreach \k in {1,...,10}{
+            \pgfmathtruncatemacro{\a}{mod(#1+\k,21)}
+            \pgfmathtruncatemacro{\b}{mod(#1-\k+21,21)}
+            \draw[thick, RoyalBlue] (v\a) -- (v\b);
+        }
+    \end{scope}%
+}
+
+\newcommand{\drawallmatchings}{%
+    \def\R{4.15}
+    \coordinate (v21) at (0,0);
+    \foreach \i in {0,...,20}{
+        \coordinate (v\i) at ({90-360*\i/21}:\R);
+    }
+
+    \foreach \r in {0,...,20}{
+        \pgfmathtruncatemacro{\week}{\r+1}
+        \draw[line width=0.8pt, draw=\matchingcolor{\week}] (v21) -- (v\r);
+        \foreach \k in {1,...,10}{
+            \pgfmathtruncatemacro{\a}{mod(\r+\k,21)}
+            \pgfmathtruncatemacro{\b}{mod(\r-\k+21,21)}
+            \draw[line width=0.8pt, draw=\matchingcolor{\week}] (v\a) -- (v\b);
+        }
+    }
+
+    \draw[black!35, thin] (0,0) circle (\R);
+    \foreach \i in {0,...,20}{
+        \fill[black] (v\i) circle (0.055);
+    }
+    \fill[black] (v21) circle (0.065);
+}

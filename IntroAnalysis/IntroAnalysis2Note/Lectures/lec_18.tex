@@ -1,0 +1,234 @@
+\section*{8.5 Fubini's Theorem}
+
+In one dimension, we have already seen how the Lebesgue integral is related to the Riemann integral. We now turn to the corresponding question in higher dimensions. To keep the discussion simple, we shall focus on two-dimensional integrals, although the same ideas extend naturally to higher dimensions. We shall study integrals of the form
+$$\int_{\mathbb{R}^{2}}f.$$
+Once integration over $\mathbb{R}^{2}$ is understood, integration over a measurable subset $\Omega\subseteq\mathbb{R}^{2}$ follows by writing
+$$\int_{\Omega}f=\int_{\mathbb{R}^{2}}f\chi_{\Omega}.$$
+
+Let $f(x,y)$ be a function of two variables. There are, in principle, three natural ways to integrate $f$ over $\mathbb{R}^{2}$. First, we may regard $f$ as a function on $\mathbb{R}^{2}$ and take its two-dimensional Lebesgue integral:
+$$\int_{\mathbb{R}^{2}}f(x,y)dx\,dy.$$
+Second, we may fix $x$, integrate first with respect to $y$, and then integrate the resulting function of $x$:
+$$\int_{\mathbb{R}}\left(\int_{\mathbb{R}}f(x,y)dy\right)dx.$$
+Third, we may reverse the order of integration: fix $y$, integrate first with respect to $x$, and then integrate the resulting function of $y$:
+$$\int_{\mathbb{R}}\left(\int_{\mathbb{R}}f(x,y)dx\right)dy.$$
+
+A fundamental question is whether these three quantities are equal. The answer is provided by Fubini's theorem and Tonelli's theorem. Roughly speaking, Tonelli's theorem applies to non-negative measurable functions, while Fubini's theorem applies to absolutely integrable functions. Together, these theorems allow us to compute many higher-dimensional integrals by reducing them to successive one-dimensional integrals. Fortunately, if the function $f$ is absolutely integrable on $\mathbb{R}^{2}$, then all three integrals are equal:
+
+\begin{theorem}[Fubini's theorem]
+Let $f:\mathbb{R}^{2}\rightarrow\mathbb{R}$ be an absolutely integrable function. Then there exist absolutely integrable functions $F:\mathbb{R}\rightarrow\mathbb{R}$ and $G:\mathbb{R}\rightarrow\mathbb{R}$ such that for almost every $x$, $f(x,y)$ is absolutely integrable in $y$ with
+$$F(x)=\int_{\mathbb{R}}f(x,y)dy,$$
+and for almost every $y$, $f(x,y)$ is absolutely integrable in $x$ with
+$$G(y)=\int_{\mathbb{R}}f(x,y)dx.$$
+Finally, we have
+$$\int_{\mathbb{R}}F(x)dx=\int_{\mathbb{R}^{2}}f=\int_{\mathbb{R}}G(y)dy.$$
+\end{theorem}
+
+\begin{proof}
+The proof of Fubini's theorem is somewhat delicate, mainly because the one-dimensional integrals $\int_{\mathbb{R}}f(x,y)dy$ and $\int_{\mathbb{R}}f(x,y)dx$ need not exist for every $x$ and $y$. We shall prove the theorem by a sequence of reductions, keeping track of where the "almost everywhere" statements enter.
+
+\textbf{Step 1: Reduction to non-negative functions.}
+Suppose first that the theorem has been proved for non-negative integrable functions. Let $f:\mathbb{R}^{2}\rightarrow\mathbb{R}$ be absolutely integrable. Then
+\[
+    f=f^{+}-f^{-},
+\]
+with $f^{+}, f^{-}\ge0$, and $\int_{\mathbb{R}^{2}}f^{+}<\infty$, $\int_{\mathbb{R}^{2}}f^{-}<\infty$. Thus $f^{+}$ and $f^{-}$ are both non-negative integrable functions on $\mathbb{R}^{2}$. By the non-negative case, there exist absolutely integrable functions $F^{+}, F^{-}:\mathbb{R}\rightarrow\mathbb{R}$ such that, for almost every $x$, $F^{+}(x)=\int_{\mathbb{R}}f^{+}(x,y)dy$, $F^{-}(x)=\int_{\mathbb{R}}f^{-}(x,y)dy$. Moreover, $\int_{\mathbb{R}}F^{+}(x)dx=\int_{\mathbb{R}^{2}}f^{+}$, $\int_{\mathbb{R}}F^{-}(x)dx=\int_{\mathbb{R}^{2}}f^{-}$. For almost every $x$, both one-dimensional integrals above are finite. Hence, for almost every $x$,
+\[
+    \int_{\mathbb{R}}|f(x,y)|dy=\int_{\mathbb{R}}f^{+}(x,y)dy+\int_{\mathbb{R}}f^{-}(x,y)dy<\infty.
+\]
+Therefore $y\mapsto f(x,y)$ is absolutely integrable for almost every $x$, and for such $x$,
+\[
+    \int_{\mathbb{R}}f(x,y)dy=\int_{\mathbb{R}}f^{+}(x,y)dy-\int_{\mathbb{R}}f^{-}(x,y)dy.
+\]
+
+Define $F(x):=F^{+}(x)-F^{-}(x)$. Then $F\in L^{1}(\mathbb{R})$, and for almost every $x$, $F(x)=\int_{\mathbb{R}}f(x,y)dy$. Also,
+\[
+    \int_{\mathbb{R}}F(x)dx=\int_{\mathbb{R}}F^{+}(x)dx-\int_{\mathbb{R}}F^{-}(x)dx=\int_{\mathbb{R}^{2}}f^{+}-\int_{\mathbb{R}^{2}}f^{-}=\int_{\mathbb{R}^{2}}f.
+\]
+The same argument, with $x$ and $y$ interchanged, gives the corresponding function $G\in L^{1}(\mathbb{R})$. Hence it suffices to prove the theorem for non-negative integrable functions. From now on, assume that $f\ge0$.
+
+\textbf{Step 2: Reduction to bounded support.}
+We next reduce to the case where $f$ is supported in a bounded box. For each $N\in\mathbb{N}$ define $f_{N}:=f\chi_{[-N,N]\times[-N,N]}$. Then $0\le f_{1}\le f_{2}\le\cdot\cdot\cdot\le f$ and $f_{N}(x,y)\rightarrow f(x,y)$ for every $(x,y)\in\mathbb{R}^{2}$. By the monotone convergence theorem,
+\[
+    \int_{\mathbb{R}^{2}}f_{N}\longrightarrow\int_{\mathbb{R}^{2}}f.
+\]
+Assume the theorem has been proved for non-negative integrable functions supported in bounded boxes. Then, for each $N$,
+\[
+    \int_{\mathbb{R}}\left(\int_{\mathbb{R}}f_{N}(x,y)dy\right)dx=\int_{\mathbb{R}^{2}}f_{N}.
+\]
+For each fixed $x$, the functions $f_{N}(x,\cdot)$ increase pointwise to $f(x,\cdot)$. Hence, by the one-dimensional monotone convergence theorem, $\int_{\mathbb{R}}f_{N}(x,y)dy\longrightarrow\int_{\mathbb{R}}f(x,y)dy$. Applying monotone convergence once more in the $x$-variable, we get
+\[
+    \int_{\mathbb{R}}\left(\int_{\mathbb{R}}f(x,y)dy\right)dx=\lim_{N\rightarrow\infty}\int_{\mathbb{R}}\left(\int_{\mathbb{R}}f_{N}(x,y)dy\right)dx=\lim_{N\rightarrow\infty}\int_{\mathbb{R}^{2}}f_{N}=\int_{\mathbb{R}^{2}}f.
+\]
+The same argument works with $x$ and $y$ interchanged. Thus it suffices to prove the theorem for non-negative functions supported in a bounded box. Henceforth assume that
+\[
+    f\ge0 \text{ and } \text{supp}(f)\subseteq[-N,N]\times[-N,N].
+\]
+
+\textbf{Step 3: Reduction to simple functions and then to characteristic functions.}
+By \autoref{lm: use simple function approach measurable function}, there exists an increasing sequence of non-negative simple functions $s_{k}$ such that $0\le s_{1}\le s_{2}\le\cdot\cdot\cdot\le f$ and $s_{k}(x,y)\rightarrow f(x,y)$ for every $(x,y)\in[-N,N]\times[-N,N]$. We may also assume that each $s_{k}$ is supported in $[-N,N]\times[-N,N]$. Assume the theorem has been proved for non-negative simple functions supported in $[-N,N]\times[-N,N]$. Then
+\[
+    \int_{\mathbb{R}}\left(\int_{\mathbb{R}}s_{k}(x,y)dy\right)dx=\int_{\mathbb{R}^{2}}s_{k}.
+\]
+Letting $k\rightarrow\infty$ and using monotone convergence in the $y$-variable, then in the $x$-variable, and finally in $\mathbb{R}^{2}$, gives
+\[
+    \int_{\mathbb{R}}\left(\int_{\mathbb{R}}f(x,y)dy\right)dx=\int_{\mathbb{R}^{2}}f.
+\]
+Again the same argument applies with $x$ and $y$ interchanged. Thus it remains to prove the theorem for non-negative simple functions supported in $[-N,N]\times[-N,N]$. Since every such simple function is a finite linear combination of characteristic functions of measurable sets, it is enough, by finite linearity, to prove the result for $f=\chi_{E}$, where $E\subseteq[-N,N]\times[-N,N]$ is measurable.
+
+\textbf{Step 4: The key identity for characteristic functions.}
+Let $Q:=[-N,N]\times[-N,N]$ and let $E\subseteq Q$ be measurable. We shall prove
+\begin{equation} \label{eq: 8.4}
+    \int_{[-N,N]}\left(\int_{[-N,N]}\chi_{E}(x,y)dy\right)dx=m(E),
+\end{equation}
+where the inner integral exists for almost every $x$. For each fixed $x\in[-N,N]$ define
+$$U(x):=\overline{\int_{[-N,N]}}\chi_{E}(x,y)dy, \quad L(x):=\underline{\int_{[-N,N]}}\chi_{E}(x,y)dy.$$
+Thus $U(x)$ and $L(x)$ are respectively the upper and lower one-dimensional Lebesgue integrals of the slice function $y\mapsto\chi_{E}(x,y)$. We shall first prove the upper estimate
+\begin{equation} \label{eq: 8.2}
+    \overline{\int_{[-N,N]}} U(x)dx\le m(E).
+\end{equation}
+Assuming \autoref{eq: 8.2}  for the moment, we show how it implies \autoref{eq: 8.4}. 
+Apply \autoref{eq: 8.2} to the measurable set $Q\setminus E$. Since
+\[
+    m(Q\setminus E)=m(Q)-m(E)=4N^{2}-m(E),
+\]
+we get
+\[
+    \overline{\int_{[-N,N]}}\left(\overline{\int_{[-N,N]}}\chi_{Q\setminus E}(x,y)dy\right)dx\le 4N^{2}-m(E).
+\]
+But on $Q$, $\chi_{Q\setminus E}(x,y)=1-\chi_{E}(x,y)$. Therefore, for each fixed $x$,
+\[
+    \overline{\int_{[-N,N]}}\chi_{Q\setminus E}(x,y)dy=\overline{\int_{[-N,N]}}(1-\chi_{E}(x,y))dy.
+\]
+By the elementary relation between upper and lower integrals,
+\[
+    \overline{\int_{[-N,N]}} (1-\chi_{E}(x,y))dy=2N-\underline{\int_{[-N,N]}}\chi_{E}(x,y)dy=2N-L(x).
+\]
+Hence
+\[
+    \overline{\int_{[-N,N]}}(2N-L(x))dx\le 4N^{2}-m(E).
+\]
+Using again the relation between upper and lower integrals, now in the $x$-variable, we have
+\[
+    \overline{\int_{[-N,N]}} (2N-L(x))dx=4N^{2}-\underline{\int_{[-N,N]}}L(x)dx .
+\]
+Thus
+\[
+    4N^{2}-\underline{\int_{[-N,N]}}L(x)dx\le 4N^{2}-m(E),
+\]
+and therefore 
+\[
+    \underline{\int_{[-N,N]}} L(x)dx\ge m(E).
+\]
+Since $L(x)\le U(x)$ for every $x$, we also have
+\[
+    \underline{\int_{[-N,N]}}U(x)dx\ge\underline{\int_{[-N,N]}}L(x)dx\ge m(E).
+\]
+Combining this with \autoref{eq: 8.2}, we obtain
+\[
+    \underline{\int_{[-N,N]}} U(x)dx=\overline{\int_{[-N,N]}}U(x)dx=m(E).
+\]
+
+By \autoref{lm: upper integral and lower integral are same implies absolutely integrable}, $U$ is absolutely integrable on $[-N, N]$, and
+\[
+    \int_{[-N,N]}U(x)dx=m(E).
+\]
+Similarly, since $L\le U$, we have
+\[
+    \overline{\int_{[-N,N]}}L(x)dx\le\overline{\int_{[-N,N]}}U(x)dx\le m(E),
+\]
+while we already proved $\underline{\int_{[-N,N]}} L(x)dx\ge m(E)$. Therefore
+\[
+    \underline{\int_{[-N,N]}} L(x)dx=\overline{\int_{[-N,N]}}L(x)dx=m(E).
+\]
+Again by \autoref{lm: upper integral and lower integral are same implies absolutely integrable}, $L$ is absolutely integrable on $[-N, N]$, and $\int_{[-N,N]}L(x)dx=m(E)$. Now $0\le L\le U$. Hence $U-L\ge0$ and 
+\[
+    \int_{[-N,N]}(U(x)-L(x))dx=\int_{[-N,N]}U(x)dx-\int_{[-N,N]}L(x)dx=m(E)-m(E)=0
+\]
+since we have shown \(U, L\) are absolutely integrable. 
+Since $U-L$ is non-negative and measurable, it follows that $U(x)=L(x)$ for almost every $x\in[-N,N]$. For every such $x$, \autoref{lm: upper integral and lower integral are same implies absolutely integrable} applied to the one-dimensional function $y\mapsto\chi_{E}(x,y)$ shows that this slice is Lebesgue integrable on $[-N, N]$, and 
+\[
+    \int_{[-N,N]}\chi_{E}(x,y)dy=U(x)=L(x).
+\]
+Consequently,
+\[
+    \int_{[-N,N]}\left(\int_{[-N,N]}\chi_{E}(x,y)dy\right)dx=\int_{[-N,N]}U(x)dx=m(E).
+\]
+This proves \autoref{eq: 8.4}, provided that the estimate \autoref{eq: 8.2} is known. The same argument, with $x$ and $y$ interchanged, proves $\int_{[-N,N]}\left(\int_{[-N,N]}\chi_{E}(x,y)dx\right)dy=m(E)$. It remains only to prove the upper estimate \autoref{eq: 8.2}.
+
+\textbf{Step 5: Proof of the estimate \autoref{eq: 8.2}.}
+Let $\varepsilon>0$. Since $E$ is measurable, $m(E)=m^{*}(E)$. By the definition of outer measure, there exists an at most countable collection of boxes $(B_{j})_{j\in J}$ such that 
+\[
+    E\subseteq\bigcup_{j\in J}B_{j} \text{ and }  \sum_{j\in J}m(B_{j})\le m(E)+\varepsilon.
+\]
+Write each box as $B_{j}=I_{j}\times J_{j}$ where $I_{j}, J_{j}\subseteq\mathbb{R}$ are intervals. For a single box $B_{j}=I_{j}\times J_{j}$, we have $m(B_{j})=|I_{j}||J_{j}|$. Also,
+\[
+    \int_{\mathbb{R}}\left(\int_{\mathbb{R}}\chi_{B_{j}}(x,y)dy\right)dx=|I_{j}||J_{j}|=m(B_{j}).
+\]
+Since $E\subseteq Q=[-N,N]\times[-N,N]$ and since only the values on $[-N,N]\times[-N,N]$ are relevant for the estimate, we may write
+\[
+    \int_{[-N,N]}\left(\int_{[-N,N]}\chi_{B_{j}}(x,y)dy\right)dx\le m(B_{j}).
+\]
+The inequality is enough for our purposes; equality would hold if $B_{j}$ were already contained in $Q$. Now define
+\[
+    H(x,y):=\sum_{j\in J}\chi_{B_{j}}(x,y).
+\]
+This is a non-negative measurable function, possibly taking the value $+\infty$. Since $E\subseteq\bigcup_{j\in J}B_{j}$, we have $\chi_{E}(x,y)\le H(x,y)$ for all $(x,y)\in Q$. Therefore, for each fixed $x\in[-N,N]$,
+\[
+    \overline{\int_{[-N,N]}} \chi_{E}(x,y)dy\le\int_{[-N,N]}H(x,y)dy
+\]
+In other words,
+\[
+    U(x)\le\int_{[-N,N]}H(x,y)dy.
+\]
+Thus the function $x\mapsto\int_{[-N,N]}H(x,y)dy$ is an admissible majorant for $U$. Hence, by the definition of the upper Lebesgue integral,
+\[
+    \int_{[-N,N]}U(x)dx\le\int_{[-N,N]}\left(\int_{[-N,N]}H(x,y)dy\right)dx.
+\]
+Since $H=\sum_{j\in J}\chi_{B_{j}}$ is non-negative, Corollary 8.2.11 allows us to interchange the countable sum and the integral. Therefore
+\begin{align*}
+    \int_{[-N,N]}\left(\int_{[-N,N]}H(x,y)dy\right)dx &=\int_{[-N,N]}\left(\int_{[-N,N]}\sum_{j\in J}\chi_{B_{j}}(x,y)dy\right)dx \\
+    &= \sum_{j\in J}\int_{[-N,N]}\left(\int_{[-N,N]}\chi_{B_{j}}(x,y)dy\right)dx \\
+    &\le\sum_{j\in J}m(B_{j}) \le m(E)+\varepsilon
+\end{align*}
+Hence
+\[
+    \overline{\int_{[-N,N]}} U(x)dx\le m(E)+\varepsilon.
+\]
+Since $\varepsilon>0$ was arbitrary, we obtain $\overline{\int_{[-N,N]}} U(x)dx\le m(E)$. This proves \autoref{eq: 8.2}.
+
+\textbf{Step 6: Conclusion.}
+We have proved Fubini's theorem for characteristic functions $\chi_{E}$ where $E\subseteq[-N,N]\times[-N,N]$ is measurable. By finite linearity, the theorem holds for non-negative simple functions supported in $[-N,N]\times[-N,N]$. By approximation from below and the monotone convergence theorem, it holds for all non-negative measurable functions supported in bounded boxes. By applying the result to $f_{N}=f\chi_{[-N,N]\times[-N,N]}$ and then letting $N\rightarrow\infty$, it holds for all non-negative integrable functions on $\mathbb{R}^{2}$. Finally, by Step 1, the theorem follows for every absolutely integrable function $f:\mathbb{R}^{2}\rightarrow\mathbb{R}$. Thus there exist absolutely integrable functions $F,G:\mathbb{R}\rightarrow\mathbb{R}$ such that, for almost every $x$, $F(x)=\int_{\mathbb{R}}f(x,y)dy$, and, for almost every $y$, $G(y)=\int_{\mathbb{R}}f(x,y)dx$. Moreover,
+\[
+    \int_{\mathbb{R}}F(x)dx=\int_{\mathbb{R}^{2}}f=\int_{\mathbb{R}}G(y)dy.
+\]
+This completes the proof.
+\end{proof}
+
+\begin{remark}
+Very roughly speaking, Fubini's theorem says that
+$$\int_{\mathbb{R}}\left(\int_{\mathbb{R}}f(x,y)dy\right)dx=\int_{\mathbb{R}^{2}}f=\int_{\mathbb{R}}\left(\int_{\mathbb{R}}f(x,y)dx\right)dy.$$
+This allows us to compute two-dimensional integrals by splitting them into two one-dimensional integrals. The reason why we do not write Fubini's theorem this way, though, is that it is possible that the integral $\int_{\mathbb{R}}f(x,y)dy$ does not actually exist for every $x$, and similarly $\int_{\mathbb{R}}f(x,y)dx$ does not exist for every $y$; Fubini's theorem only asserts that these integrals only exist for almost every $x$ and $y$. For instance, if $f(x,y)$ is the function which equals 1 when $y>0$ and $x=0$, equals -1 when $y<0$ and $x=0$ and is zero otherwise, then $f$ is absolutely integrable on $\mathbb{R}^{2}$ and $\int_{\mathbb{R}^{2}}f=0$ (since $f$ equals zero almost everywhere in $\mathbb{R}^{2}$), but $\int_{\mathbb{R}}f(x,y)dy$ is not absolutely integrable when $x=0$ (though it is absolutely integrable for every other $x$).
+\end{remark}
+
+\begin{proposition}
+Let $A\subset \mathbb{R}^{n}$ and $B\subset \mathbb{R}^{m}$ be arbitrary sets. Then
+$$m^{*}(A\times B)=m^{*}(A)m^{*}(B),$$
+where $m^{*}$ denotes Lebesgue outer measure in the relevant Euclidean space.
+\end{proposition}
+
+\begin{proof}
+We prove the two inequalities separately.
+
+\textbf{Step 1: Upper bound.} We first show that $m^{*}(A\times B)\le m^{*}(A)m^{*}(B)$. Fix $\epsilon>0$. By the definition of outer measure, there exist countable collections of open boxes $\{Q_{i}\}_{i=1}^{\infty}\subset \mathbb{R}^{n}$, $\{R_{j}\}_{j=1}^{\infty}\subset \mathbb{R}^{m}$ such that $A\subset\bigcup_{i=1}^{\infty}Q_{i}$, $B\subset\bigcup_{j=1}^{\infty}R_{j}$, and $\sum_{i=1}^{\infty}\text{vol}(Q_{i})<m^{*}(A)+\epsilon$, $\sum_{j=1}^{\infty}\text{vol}(R_{j})<m^{*}(B)+\epsilon$. Then $A\times B\subset\bigcup_{i,j=1}^{\infty}(Q_{i}\times R_{j})$. Each $Q_{i}\times R_{j}$ is an open box in $\mathbb{R}^{n+m}$, and its volume is $\text{vol}(Q_{i}\times R_{j})=\text{vol}(Q_{i})\text{vol}(R_{j})$. Therefore,
+\begin{align*}
+m^{*}(A\times B) &\le \sum_{i,j=1}^{\infty}\text{vol}(Q_{i}\times R_{j}) \\
+&= \sum_{i,j=1}^{\infty}\text{vol}(Q_{i})\text{vol}(R_{j}) \\
+&= \left(\sum_{i=1}^{\infty}\text{vol}(Q_{i})\right)\left(\sum_{j=1}^{\infty}\text{vol}(R_{j})\right) \\
+&< (m^{*}(A)+\epsilon)(m^{*}(B)+\epsilon).
+\end{align*}
+Since $\epsilon>0$ is arbitrary, we conclude that $m^{*}(A\times B)\le m^{*}(A)m^{*}(B)$.
+
+\textbf{Step 2: Lower bound.} We now show that $m^{*}(A\times B)\ge m^{*}(A)m^{*}(B)$. Let $G\subset \mathbb{R}^{n+m}$ be any open set such that $A\times B\subset G$. For each $y\in \mathbb{R}^{m}$, define the section $G_{y}:=\{x\in \mathbb{R}^{n}:(x,y)\in G\}$. Since $G$ is open, each section $G_{y}$ is an open subset of $\mathbb{R}^{n}$ hence Lebesgue measurable. Now let $y\in B$. If $x\in A$, then $(x,y)\in A\times B\subset G$, so $x\in G_{y}$. Thus $A\subset G_{y}$ for every $y\in B$. By monotonicity of outer measure, $m(G_{y})\ge m^{*}(A)$ for every $y\in B$. Consider the function $f(y):=m(G_{y})$, $y\in \mathbb{R}^{m}$. Since $G$ is open, it is measurable, and by Tonelli's theorem for the indicator function $1_{G}$, $m(G)=\int_{\mathbb{R}^{m}}f(y)dy$. Set $H:=\{y\in \mathbb{R}^{m}:f(y)\ge m^{*}(A)\}$. Because $f$ is measurable, the set $H$ is measurable. Moreover, from the previous observation we have $B\subset H$. Therefore, by monotonicity of outer measure, $m(H)\ge m^{*}(B)$. Using the fact that $f(y)\ge m^{*}(A)$ on $H$, we obtain
+$$m(G)=\int_{\mathbb{R}^{m}}f(y)dy \ge \int_{H}f(y)dy \ge \int_{H}m^{*}(A)dy = m^{*}(A)m(H) \ge m^{*}(A)m^{*}(B).$$
+Thus every open set $G \supset A \times B$ satisfies $m(G) \ge m^{*}(A)m^{*}(B)$. Taking the infimum over all such open sets $G$, we conclude that $m^{*}(A \times B) \ge m^{*}(A)m^{*}(B)$. Combining this with the upper bound proved in Step 1, we obtain $m^{*}(A \times B) = m^{*}(A)m^{*}(B)$. This completes the proof.
+\end{proof}

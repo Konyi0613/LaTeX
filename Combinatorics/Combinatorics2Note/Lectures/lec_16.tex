@@ -1,0 +1,223 @@
+\lecture{16}{May 5.}{}
+\begin{theorem}[Integrality theorem]
+    If \(c\) is integer-valued, then there is a max flow that is integer-valued. 
+\end{theorem}
+\begin{proof}
+    Ford-Fulkerson algorithm: all tolerances are integer-valued. 
+    \begin{remark}
+        Max flow do not needs to be integer-valued.
+    \end{remark}
+\end{proof}
+
+\begin{theorem}[Unit flow decomposition]
+    Given \((\vv{D}, s, t, c)\) and any feasible integer-valued flow \(f\), we can decompose \(f\) into unit flow along \(s, t\)-paths (plus closed loops).     
+\end{theorem}
+\begin{proof}
+    Keep the edges with positive flow.
+\end{proof}
+
+\paragraph{Baranyai's Theorem}
+Suppose the league has 22 teams. Every weekend some games are played: Every team plays at most once in a weekend. Besides, every pair of temas should play exactly once in the season. 
+\begin{question}
+    How long must the season be?
+\end{question}
+\textbf{Lower bound:} At least 21 weekends since any team must play all 21 others.
+
+Now we can convert the tournament into a complete graph \(K_{22}\), with vertices representing teams and edges representing matches, and we can color edges according to the schedule, e.g. \textcolor{red}{Week 1}, \textcolor{green}{Week 2}, \textcolor{blue}{Week 3}, \textcolor{yellow}{Week 4}.
+
+Note that, in order for every team to play every weekend, the edges of each color should be a perfect matching; on the other hand, we want to avoid repetitive matches between the same pair teams, and so an edge can only have one color. The question thus becomes as follows.
+\begin{question}
+    Can we decompose \(E(K_n)\) into perfect matchings? 
+\end{question}
+
+There is a clever construction to decompose $E(K_n)$ into perfect matchings by arranging the vertices into a regular $(n-1)$-gon plus a central vertex. Then, we can match the central vertex with a vertex and pair up the rest, and then rotate $(n-1)$ times. (See next page)
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[every node/.style={inner sep=0pt, outer sep=0pt}]
+        \foreach \r in {0,...,20}{
+            \pgfmathtruncatemacro{\col}{mod(\r,4)}
+            \pgfmathtruncatemacro{\row}{int(\r/4)}
+            \begin{scope}[shift={({3.1*\col},{-3.0*\row})}]
+                \drawmatching{\r}
+            \end{scope}
+        }
+    \end{tikzpicture}%
+    }
+    \caption{A decomposition of $E(K_{22})$ into 21 perfect matchings, one for each weekend.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{\textwidth}
+        \centering
+        \resizebox{0.72\textwidth}{!}{%
+        \begin{tikzpicture}
+            \drawallmatchings
+        \end{tikzpicture}%
+        }
+
+        \vspace{0.6em}
+
+        \resizebox{0.84\textwidth}{!}{%
+        \begin{tikzpicture}[x=1.9cm,y=0.45cm, every node/.style={font=\tiny, anchor=west}]
+            \foreach \n/\name in {
+                1/match01, 2/match02, 3/match03, 4/match04, 5/match05, 6/match06, 7/match07,
+                8/match08, 9/match09, 10/match10, 11/match11, 12/match12, 13/match13, 14/match14,
+                15/match15, 16/match16, 17/match17, 18/match18, 19/match19, 20/match20, 21/match21}{
+                \pgfmathtruncatemacro{\col}{mod(\n-1,3)}
+                \pgfmathtruncatemacro{\row}{int((\n-1)/3)}
+                \draw[line width=1.6pt, draw=\name] (\col,-\row) -- ++(0.32,0);
+                \node at ({\col+0.38},{-\row}) {Week \n};
+            }
+        \end{tikzpicture}%
+        }
+        \captionof{figure}{A 1-factorization of $K_{22}$ drawn on a single graph. For each $i\in\{1,\dots,21\}$, the edges in the color labeled ``Week $i$'' form one perfect matching.}
+    \end{minipage}
+\end{figure}
+
+\begin{definition}
+    A \(k\)-graph (\(k\)-uniform hypergraph) is a pair \((V, E)\) where \(E \subseteq \binom{V}{k}\), i.e. every edge contains \(k\) vertices. The \(k\)-graph is complete if \(E = \binom{V}{k}\). A matching is a pairwise-disjoint set of edges and is perfect if every vertex is covered.       
+\end{definition}
+
+\begin{theorem}[Baranyai, 1973]
+    The edges of a complete \(k\)-graph on \(n\) vertices, where \(k \mid n\), can be partitioned into perfect matchings.   
+\end{theorem}
+
+\begin{question}
+    How many edges are there?
+\end{question}
+\begin{answer}
+    \(\binom{n}{k}\). 
+\end{answer}
+
+\begin{question}
+    How many edges in a perfect matching?
+\end{question}
+\begin{answer}
+    \(\frac{n}{k}\). 
+\end{answer}
+
+\begin{question}
+    How many perfect matchings do we need?
+\end{question}
+\begin{answer}
+    \(\frac{\binom{n}{k}}{\left( \frac{n}{k} \right) } = \binom{n - 1}{k - 1}\). 
+\end{answer}
+
+\begin{question}
+    How many perfect matchings are there?
+\end{question}
+\begin{answer}
+    \(\binom{n}{k} \binom{n - k}{k} \dots \binom{k}{k} \cdot \frac{1}{\left( \frac{n}{k} \right)! }\). 
+\end{answer}
+
+\paragraph{Special cases:}
+\begin{itemize}
+    \item \(k = 3\): Pelte sohn, 1936. 
+    \item \(k = 4\): Bermond. 
+    \item all \(k\): Baranyai, 1973.   
+\end{itemize}
+
+\begin{proof}[proof of Baranyai's theorem]
+    We first give a definition:
+    \begin{definition}
+        A \(m\)-partition of \([n]\), \(\mathcal{A}\), is a partition of \([n]\) into \(m\) pairwise-disjoint parts (multiple parts could be empty), e.g.
+        \[
+            \underbrace{\varnothing , \varnothing , \dots , \varnothing }_{m - 1}, [n]
+        \]   
+        is an \(m\)-partition. 
+    \end{definition}
+
+    \begin{eg}
+        A perfect matching in the complete \(k\)-graph is an \(m\)-partition of \(V = [n]\) where \(m = \frac{n}{k}\).    
+    \end{eg}
+
+    We want \(M = \binom{n - 1}{k - 1}\) perfect matchings. 
+    \begin{claim}
+        For any \(0 \le \ell \le n\), there is a collection \(\mathcal{A}_1, \mathcal{A}_2, \dots , \mathcal{A}_M\) of \(m\)-partitions of \([\ell]\) s.t. for any \(S \in 2^{[\ell]}\), \(S\) appears \(\binom{n - \ell}{k - \vert S \vert }\) times in \(\mathcal{A}_1, \mathcal{A}_2, \dots , \mathcal{A}_M\).       
+    \end{claim}
+    \begin{explanation}
+        We do induction on \(\ell\). 
+        \begin{itemize}
+            \item Base case: \(\ell = 0\), then let
+            \[
+                \mathcal{A}_i = \underbrace{\varnothing , \varnothing , \dots , \varnothing }_{m \text{ times}},
+            \]
+            we know \(\varnothing \) appears \(mM = \frac{n}{k} \binom{n - 1}{k - 1} = \binom{n}{k}\) times, so the claim is true for \(\ell = 0\). 
+            \item Induction step: \(\ell \to \ell + 1\). Suppose we have a network \(\vv{D}\), where the source vertex \(s \to \mathcal{A}_i\) for \(i = 1, 2, \dots , M\), and \(\mathcal{A}_i \to S\) for \(S \in 2^{[\ell]}\) if \(S\) is a part of \(\mathcal{A}_i\), and \(S \to t\) for all \(S \in 2^{[\ell]}\) where \(t\) is the sink vertex. Now let 
+            \[
+                c(\vv{e}) = \begin{dcases}
+                    1, &\text{ if } \vv{e} = s \to \mathcal{A}_i ;\\
+                    2^M \text{ (large integer)} , &\text{ if } \vv{e} = A_i \to S ;\\
+                    \binom{n - \ell - 1}{k - \vert S \vert - 1}, &\text{ if } \vv{e} = S \to t.
+                \end{dcases}
+            \]
+            We aim to show that max flow is of value \(M\), and we can decompose to unit flow, and we can update \(\mathcal{A}_i\) to \(\mathcal{A}_i^{\prime} \): \(m\)-partition of \([\ell + 1]\), by replacing \(S\) with \(S \cup \left\{ \ell + 1 \right\} \) if flow goes through \(A_i \to S\), and then we can show the counts are correct.  
+            \begin{figure}[H]
+                \centering
+                \begin{tikzpicture}[
+                    >=Latex,
+                    x=1cm,
+                    y=1cm,
+                    every node/.style={font=\small},
+                    box/.style={draw, rounded corners, minimum width=17mm, minimum height=7mm, align=center},
+                    setnode/.style={draw, circle, minimum size=8mm, inner sep=1pt, align=center},
+                    edgelabel/.style={font=\scriptsize, fill=white, inner sep=1pt}
+                ]
+                    \node[box] (s) at (0,0) {$s$};
+
+                    \node[box] (a1) at (3,1.8) {$\mathcal{A}_1$};
+                    \node[box] (a2) at (3,0.6) {$\mathcal{A}_2$};
+                    \node[box] (a3) at (3,-0.6) {$\mathcal{A}_3$};
+                    \node at (3,-1.6) {$\vdots$};
+                    \node[box] (am) at (3,-2.6) {$\mathcal{A}_M$};
+
+                    \node[setnode] (s1) at (7,2.2) {$S_1$};
+                    \node[setnode] (s2) at (7,0.7) {$S_2$};
+                    \node[setnode] (s3) at (7,-0.8) {$S_3$};
+                    \node at (7,-1.8) {$\vdots$};
+                    \node[setnode] (sr) at (7,-2.8) {$S$};
+
+                    \node[box] (t) at (11,0) {$t$};
+
+                    \draw[->] (s) -- node[edgelabel, above] {$1$} (a1);
+                    \draw[->] (s) -- node[edgelabel, above] {$1$} (a2);
+                    \draw[->] (s) -- node[edgelabel, below] {$1$} (a3);
+                    \draw[->] (s) -- node[edgelabel, below] {$1$} (am);
+
+                    \draw[->] (a1) -- (s1);
+                    \draw[->] (a1) -- (s2);
+                    \draw[->] (a2) -- (s2);
+                    \draw[->] (a2) -- (s3);
+                    \draw[->] (a3) -- (s3);
+                    \draw[->, dashed] (a3) to[bend left=10] (sr);
+                    \draw[->, dashed] (am) -- (sr);
+
+                    \draw[->] (s1) -- node[edgelabel, above] {$\binom{n-\ell-1}{k-|S_1|-1}$} (t);
+                    \draw[->] (s2) -- node[edgelabel, above] {$\binom{n-\ell-1}{k-|S_2|-1}$} (t);
+                    \draw[->] (s3) -- node[edgelabel, above] {$\cdots$} (t);
+                    \draw[->] (sr) -- node[edgelabel, below] {$\binom{n-\ell-1}{k-|S|-1}$} (t);
+
+                    \node[align=center] at (0,1.1) {source};
+                    \node[align=center] at (11,1.1) {sink};
+                    \node[align=center] at (3,3.0) {current\\partitions};
+                    \node[align=center] at (7,3.0) {parts $S\subseteq[\ell]$};
+                \end{tikzpicture}
+                \caption{The induction-step flow network. A unit of flow from \(s\) through \(\mathcal{A}_i\) to a part \(S\) means: in partition \(\mathcal{A}_i\), enlarge the chosen part \(S\) by adding the new element \(\ell+1\).}
+            \end{figure}       
+        \end{itemize} 
+    \end{explanation}
+
+    \begin{observation}
+        \(\ell = n\) gives Baranyai's theorem. This is because 
+        \[
+            \binom{\ell - \ell}{k - \vert S \vert } = \begin{dcases}
+                0, &\text{ if } k - \vert S \vert \neq 0  ;\\
+                1, &\text{ if } k - \vert S \vert = 0.
+            \end{dcases},
+        \]
+        i.e. \(S \in 2^{[\ell]}\) appears in \(\mathcal{A}_1, \dots , \mathcal{A}_M\) for exactly one time iff \(\vert S \vert = k \), otherwise \(S\) appears 0 time.  
+    \end{observation}
+\end{proof}

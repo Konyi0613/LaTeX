@@ -1,0 +1,141 @@
+\lecture{19}{May 5.}{}
+\begin{eg}
+    Suppose \((X, Y)\) is uniform on the unit square \(S = [0, 1]^2\). Are \(X\) and \(Y\) independent?    
+\end{eg}
+
+\begin{explanation}
+    Note that
+    \[
+        f_{X, Y}(x, y) = \begin{dcases}
+            C, &\text{ if } (x, y) \in S  ;\\
+            0, &\text{ if } (x, y) \neq S.
+        \end{dcases}
+    \]
+    Now by \(\iint f_{X, Y} \, \mathrm{d} x \, \mathrm{d} y = 1\), we have \(C = 1\). Hence,
+    \[
+        f_{X, Y}(x,y) = 1_{(x, y) \in S}(x,y) = 1_{0 \le x \le 1} (x) \cdot 1_{0 \le y \le 1}(y) = f_X(x) \cdot f_Y(y).
+    \]   
+\end{explanation}
+
+
+\begin{eg}
+    Let \((X, Y)\) be uniformly distributed over the triangle with vertices \((0, 0), (1, 0), (1, 1)\). Are \(X, Y\) independent?   
+\end{eg}
+
+\begin{explanation}
+    No. Since \(\mathbb{P} (0 < X < \frac{1}{2}, \frac{1}{2} < Y < 1) = 0\) but 
+    \[
+        \mathbb{P} (0 < X < \frac{1}{2}) \cdot \mathbb{P} (\frac{1}{2} < Y < 1) = \frac{1}{4} \cdot \frac{1}{4} \neq 0.
+    \] 
+\end{explanation}
+
+\section{Sums of Independent Random Variables}
+\begin{question}
+    Suppose \(X, Y\) are independent continuous random variables. What is the distribution of \(X + Y\)?  
+\end{question}
+
+\begin{answer}
+    Calculate the cdf of \(X + Y\):
+    \begin{align*}
+        F_{X + Y}(z) &= \mathbb{P} (X + Y \le z) = \mathbb{P} (\left\{ (x, y): x + y \le z \right\} ) = \iint_{\left\{ x+y \le z \right\} } f_{X, Y}(x, y) \, \mathrm{d} x \, \mathrm{d} y \\
+        &= \iint_{\left\{ x+y \le z \right\} } f_X(x) f_Y(y) \, \mathrm{d} x \, \mathrm{d} y = \int _{-\infty }^{\infty} \int _{-\infty }^{z - x} f_X(x) f_Y(y) \, \mathrm{d} y \, \mathrm{d} x    
+    \end{align*} 
+    Now let \(v = y + x\), then 
+    \begin{align*}
+       \int _{-\infty }^{\infty} \int _{-\infty }^{z - x} f_X(x) f_Y(y) \, \mathrm{d} y \, \mathrm{d} x &= \int _{-\infty }^{\infty} \int _{-\infty }^{\infty} f_X(x) f_Y(v - x) \, \mathrm{d} v \, \mathrm{d} \times    
+    \end{align*} 
+    Thus,
+    \[
+        F_{X+Y}(z) = \int _{-\infty }^z \int _{-\infty }^{\infty} f_X(x) f_Y(v-x) \, \mathrm{d} x \, \mathrm{d} v.  
+    \]
+    Differentiating w.r.t. \(z\),
+    \[
+        f_{X+Y}(z) = F_X^{\prime} (z) = \int _{-\infty }^{\infty} f_X(x) f_Y(z - x) \, \mathrm{d} x. 
+    \] 
+\end{answer}
+
+\begin{definition}
+    Given functions \(f, g\), their convolution is 
+    \[
+        h(z) = \int _{-\infty }^{\infty } f(x) g(z - x) \, \mathrm{d} x .  
+    \] 
+\end{definition}
+
+\begin{proposition}
+    Let \(X\) and \(Y\) be independent continuous random variables with density functions \(f_X\) and \(f_Y\). Then the density of the sum \(X + Y\) is the convolution of \(f_X\) and \(f_Y\).       
+\end{proposition}
+
+\begin{remark}
+    \[
+        f_{X + Y}(x) = \int _{-\infty }^{\infty } f_X(x) f_Y(z - x) \, \mathrm{d} x = \int _{-\infty }^{\infty} f_X(z - y) f_Y(y) \, \mathrm{d} y.  
+    \]
+\end{remark}
+
+\begin{eg}
+    Let \(X, Y \sim \mathrm{Unif}([0, 1]) \) and independent. What is the distribution of \(X + Y\)?  
+\end{eg}
+
+\begin{explanation}
+    By proposition,
+    \begin{align*}
+        f_{X + Y}(z) &= \int _{-\infty }^{\infty} f_X(x) f_Y(z - x) \, \mathrm{d} x = \int _{-\infty }^{\infty} 1_{[0, 1]}(x) \cdot 1_{[0, 1]}(z - x) \, \mathrm{d} x \\
+        &= \int _{\max (0, z-1)}^{\min (z, 1)} 1 \, \mathrm{d} x = \min (z, 1) - \max (0, z - 1) \\
+        &= \begin{dcases}
+            0, &\text{ if } z < 0 ;\\
+            z, &\text{ if } 0 \le z \le 1 ;\\
+            2 - z, &\text{ if } 1 \le z \le 2 ;\\
+            0, &\text{ if } z \ge 2 .
+        \end{dcases} 
+    \end{align*}
+    %fig
+\end{explanation}
+
+\begin{question}
+    Let \(X_1, X_2, \dots , X_n \sim \mathrm{Unif}([0, 1]) \) independent, what is the distribution of \(S_n = \sum_{i=1}^n X_i \) over the region \([0, 1]\)?    
+\end{question}
+
+\begin{answer}
+    Do induction on \(n\). 
+    \begin{itemize}
+        \item \(n = 1\): \(f_{S_1}(z) = 1\) for \(0 \le z \le 1\). 
+        \item \(n = 2\): \(f_{S_2}(z) = z\) for \(0 \le z \le 1\) (last example).
+        \item \(n = 3\): \(S_3 = X_1 + X_2 + X_3 = S_2 + X_3\), then for \(0 \le z \le 1\),
+        \[
+            f_{S_3}(z) = \int _0^z f_{S_2}(z) \overbrace{f_{X_3}(z - x)}^1 \, \mathrm{d} x = \int _0^z x \, \mathrm{d} x = \frac{z^2}{2}.  
+        \]
+        \begin{claim}
+            \(f_{S_n}(z) = \frac{z^{n-1}}{(n-1)!}\) for \(0 \le z \le 1\).  
+        \end{claim}
+        \begin{explanation}
+            We have shown for \(n = 1, 2, 3\) it is true (Base case). Now since \(S_{n+1} = S_n + X_{n+1}\),
+            \begin{align*}
+                f_{S_{n+1}}(t) &= \int _0^z f_{S_n}(x) \overbrace{f_{X_{n+1}}(z - x)}^1 \, \mathrm{d} x = \int _0^z f_{S_n}(x) \, \mathrm{d} x = \int _0^z \frac{x^{n-1}}{(n-1)!} \, \mathrm{d} x = \frac{z^n}{n!}.   
+            \end{align*}  
+        \end{explanation}
+    \end{itemize} 
+
+\end{answer}
+
+\begin{eg}
+    We have 2 cakes in one fridge. Every day we eat a uniformly random amount, between 0 cake and 1 cake, independently of all previous days. How long does the first cake last?  
+\end{eg}
+
+\begin{explanation}
+    Let \(X_i\) be the portion of cake eaten on day \(i\). Thus, \(X_i \sim \mathrm{Unif}([0, 1]) \) independently. Let \(S_n\) be the total amount eaten after \(n\) days. Thus, \(S_n = X_1 + X_2 + \dots + X_n\). Let \(D\) be the number of days it takes to finish the first cake. Then 
+    \[
+        \left\{ D = n \right\} = \left\{ S_n \ge 1, S_{n-1} < 1 \right\}.  
+    \]       
+    Also, \(\left\{ D > n \right\} = \left\{ S_n < 1 \right\}  \). Thus,
+    \begin{align*}
+        \mathbb{P} (D > n) &= \mathbb{P} (S_n < 1) = \int _0^1 f_{S_n}(x) \, \mathrm{d} x = \int _0^1 \frac{x^{n-1}}{(x-1)!} \, \mathrm{d} x = \left[ \frac{x^n}{n!} \right]_0^1 = \frac{1}{n!}.  
+    \end{align*}
+    Thus,
+    \[
+        \mathbb{P} (D = n) = \mathbb{P} (D > n - 1) - \mathbb{P} (D > n) = \frac{1}{(n-1)!} - \frac{1}{n!} = \frac{n-1}{n!}.
+    \]
+    Hence,
+    \begin{align*}
+        \mathbb{E} [D] &= \sum_{n=1}^{\infty} n \mathbb{P} (D = n) = \sum_{n=1}^{\infty} n \cdot \frac{n-1}{n!} = \sum_{n=2}^{\infty} \frac{1}{(n-2)!} = \sum_{k=0}^{\infty} \frac{1}{k!} = e.    
+    \end{align*}
+\end{explanation}
+
