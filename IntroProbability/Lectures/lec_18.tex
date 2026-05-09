@@ -29,7 +29,7 @@
             &= \begin{dcases}
                 0, &\text{ if } t < -R ;\\
                 \iint_{\left\{ u \le t \right\} } f_{X, Y}(u, v) \, \mathrm{d} u \, \mathrm{d} v, &\text{ if } -R \le t \le R ;\\
-                0, &\text{ otherwise} t > R .
+                1, &\text{ if } t > R .
             \end{dcases}  
         \end{align*}
         If \(-R \le t \le R\), 
@@ -71,26 +71,91 @@
 \end{definition}
 
 \begin{proposition}
-    Random variables \(X, Y\) are independent if and only if \(F_{X, Y}(x, y) = F_X(x) F_Y(y)\) for all \(x, y\).   
+Random variables \(X\) and \(Y\) are independent if and only if
+\[
+F_{X,Y}(x,y)=F_X(x)F_Y(y)
+\]
+for all \(x,y\in \mathbb{R}\).
 \end{proposition}
 
 \begin{proof}
-    \hfill 
-    \begin{itemize}
-        \item [\((\implies)\)] Since \(X, Y\) are independent, 
-        \begin{align*}
-            F_{X, Y}(x, y) &= \mathbb{P} (X \le x, Y \le y) = \mathbb{P} (X \in (-\infty , x], Y \in (-\infty , y]) \\
-            &= \mathbb{P} (X \le (-\infty , X]) \mathbb{P} (Y \in (-\infty , Y]).
-        \end{align*}
-        \item [\((\impliedby)\)] We only do the case that \(A = (a_1, a_2)\) and \(B = (b_1, b_2)\), 
-        \begin{align*}
-            \mathbb{P} (X \in A, Y \in B) &= F_{X, Y}(a_2, b_2) + F_{X, Y}(a_1, b_1) - F_{X, Y}(a_1, b_2) - F_{X, Y}(a_2, b_1) \\
-            &= F_X(a_2) F_Y(b_2) + F_X(a_1) F_Y(b_1) - F_X(a_1) F_Y(b_2) - F_X(a_2) F_Y(b_1) \\
-            &= (F_X(a_2) - F_X(a_1)) (F_Y(b_2) - F_Y(b_1)) \\
-            &= \mathbb{P} (a_1 < x \le a_2) \cdot \mathbb{P} (b_1 \le Y < b_2) = \mathbb{P} (X \in A) \cdot \mathbb{P} (Y \in B).
-        \end{align*}
-    \end{itemize}
+\hfill
+\begin{itemize}
+    \item[\((\implies)\)]
+    Suppose that \(X\) and \(Y\) are independent. Then
+    \begin{align*}
+        F_{X,Y}(x,y)
+        &= \mathbb{P}(X\le x,\ Y\le y) = \mathbb{P}(X\in (-\infty,x],\ Y\in (-\infty,y]) \\
+        &= \mathbb{P}(X\in (-\infty,x]) \,
+           \mathbb{P}(Y\in (-\infty,y]) = F_X(x)F_Y(y).
+    \end{align*}
+
+    \item[\((\impliedby)\)]
+    Assume that
+    \[
+    F_{X,Y}(x,y)=F_X(x)F_Y(y)
+    \]
+    for all \(x,y\in\mathbb{R}\).
+
+    We first prove that
+    \[
+    \mathbb{P}(X\in A,\ Y\in B)
+    =
+    \mathbb{P}(X\in A)\mathbb{P}(Y\in B)
+    \]
+    whenever
+    \[
+    A=(a_1,a_2], \qquad B=(b_1,b_2].
+    \]
+
+    Indeed,
+    \begin{align*}
+        \mathbb{P}(X\in A,\ Y\in B)
+        &=
+        \mathbb{P}(a_1<X\le a_2,\ b_1<Y\le b_2) \\
+        &=
+        F_{X,Y}(a_2,b_2)
+        -F_{X,Y}(a_1,b_2)
+        -F_{X,Y}(a_2,b_1)
+        +F_{X,Y}(a_1,b_1) \\
+        &=
+        F_X(a_2)F_Y(b_2)
+        -F_X(a_1)F_Y(b_2)
+        -F_X(a_2)F_Y(b_1)
+        +F_X(a_1)F_Y(b_1) \\
+        &=
+        \bigl(F_X(a_2)-F_X(a_1)\bigr)
+        \bigl(F_Y(b_2)-F_Y(b_1)\bigr) \\
+        &=
+        \mathbb{P}(a_1<X\le a_2)\,
+        \mathbb{P}(b_1<Y\le b_2) \\
+        &=
+        \mathbb{P}(X\in A)\mathbb{P}(Y\in B).
+    \end{align*}
+
+    Since the collection of half-open intervals \((a,b]\) generates the
+    Borel \(\sigma\)-algebra on \(\mathbb{R}\), it follows from the
+    monotone class theorem (or the \(\pi\)-\(\lambda\) theorem) that
+    \[
+    \mathbb{P}(X\in E,\ Y\in F)
+    =
+    \mathbb{P}(X\in E)\mathbb{P}(Y\in F)
+    \]
+    for all Borel sets \(E,F\subseteq \mathbb{R}\).
+
+    Therefore \(X\) and \(Y\) are independent.
+\end{itemize}
 \end{proof}
+
+\begin{corollary}
+Suppose that the random variables \(X\) and \(Y\) admit a joint density
+function \(f_{X,Y}\) and marginal density functions \(f_X\) and \(f_Y\).
+Then \(X\) and \(Y\) are independent if and only if
+\[
+f_{X,Y}(x,y)=f_X(x)f_Y(y)
+\]
+for almost every \((x,y)\in\mathbb{R}^2\).
+\end{corollary}
 
 \begin{remark}
     For discrete random variables or \(X, Y\) continuous and have joint pdf,
@@ -210,7 +275,7 @@
     \[
         f_X(x) = A e^{- \frac{x^2}{2 \sigma ^2}},
     \]    
-    and by \(\int _{-\infty }^{\infty} f_X(x) \, \mathrm{d} x  = 1\), we have \(A = \frac{1}{\sigma \sqrt{2 \pi} }\). Hence, \(X \sim N(0, \sigma ^2)\). By symmetry, we know \(Y \sim N(0, \overline{\sigma} ^2)\). Hence, 
+    and by \(\int _{-\infty }^{\infty} f_X(x) \, \mathrm{d} x  = 1\) and \(f_X\) is proposional to \(f_Z\) where \(Z \sim N(0, \sigma ^2)\), we have \(A = \frac{1}{\sigma \sqrt{2 \pi} }\). Hence, \(X \sim N(0, \sigma ^2)\). By symmetry, we know \(Y \sim N(0, \overline{\sigma} ^2)\). Hence, 
     \[
         f_{X, Y}(x, y) = f_X(x) f_Y(y) = \frac{1}{\sigma \overline{\sigma} 2 \pi} e^{- \frac{x^2}{2 \sigma ^2} - \frac{y^2}{2 \overline{\sigma}^2}},
     \]    

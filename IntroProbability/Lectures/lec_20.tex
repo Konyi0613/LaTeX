@@ -1,0 +1,176 @@
+\lecture{20}{May 7.}{}
+Recall that \(X \sim \Gamma (\alpha , \lambda )\) if 
+\[
+    f_X(x) = \begin{dcases}
+        \frac{\lambda ^\alpha x^{\alpha - 1} e^{-\lambda x}}{\Gamma (\alpha )}, &\text{ if } x \ge 0 ;\\
+        0, &\text{ if } x < 0.
+    \end{dcases}
+\] 
+\begin{eg}
+    Let \(X \sim \Gamma (\alpha , \lambda )\), \(Y \sim \Gamma (\beta , \lambda )\), where \(\alpha , \beta , \lambda > 0\), and \(X, Y\) are independent. What is the distribution of \(X + Y\)?     
+\end{eg}
+\begin{explanation}
+    \begin{align*}
+        f_{X + Y}(z) &= \int _{-\infty }^{\infty } f_X(x) f_Y(z - z) \, \mathrm{d} x = \int _0^z \frac{\lambda ^\alpha x^{\alpha - 1} e^{-\lambda x}}{\Gamma (\alpha )} \cdot \frac{\lambda ^\beta (z - x)^{\beta - 1} e^{-\lambda (z - x)}}{\Gamma (\beta )} \, \mathrm{d} x \\
+        &= \frac{\lambda ^{\alpha + \beta} e^{-\lambda z}}{\Gamma (\alpha ) \Gamma (\beta )} \int _0^z x^{\alpha - 1} (z - x)^{\beta - 1} \, \mathrm{d} x = \frac{\lambda ^{\alpha + \beta} e^{-\lambda z}}{\Gamma (\alpha ) \Gamma (\beta )} \int _0^1 (zu)^{\alpha - 1} (z - zu)^{\beta - 1} z \, \mathrm{d} u \\
+        &= \frac{\lambda ^{\alpha + \beta } z^{\alpha + \beta - 1} e^{-\lambda z}}{\Gamma (\alpha ) \Gamma (\beta )} \int _0^1 u^{\alpha - 1} (1 - u)^{\beta - 1} \, \mathrm{d} u = \frac{C_{\alpha , \beta}}{\Gamma (a) \Gamma (\beta )} \lambda ^{\alpha + \beta } z^{\alpha + \beta - 1} e^{-\lambda z} \\
+        &= C \cdot \frac{\lambda ^{\alpha + \beta } z^{\alpha + \beta - 1} e^{-\lambda z}}{\Gamma (\alpha + \beta )},    
+    \end{align*}
+    which is propotional to \(f_Z(z)\) where \(Z \sim \Gamma (\alpha + \beta , \lambda )\). Since \(f_{X+Y}\) and \(f_Z\) are both pdf,
+    \[
+        \int _{-\infty }^{\infty } f_{X+Y}(t) \, \mathrm{d} t = \int _{-\infty }^{\infty} f_Z(t) \, \mathrm{d} t = 1,  
+    \]
+    so we have \(C = 1\), and thus \(X+Y \sim \Gamma (\alpha + \beta , \lambda )\). 
+
+    \paragraph{Summary:} If \(X \sim \Gamma (\alpha , \lambda )\), \(Y \sim \Gamma (\beta , \lambda )\) are independent, \(X+Y \sim \Gamma (\alpha + \beta , \lambda )\).       
+\end{explanation}
+
+\begin{corollary}
+    If \(X_i \sim \mathrm{Exp}(\lambda ) \) for \(1 \le i \le n\), are independent, then \(\sum_{i=1}^n X_i \sim \Gamma (n, \lambda) \).   
+\end{corollary}
+\begin{proof}
+    Since \(\mathrm{Exp}(\lambda) = \Gamma (1, \lambda)\), so this is true. 
+\end{proof}
+
+\begin{eg}
+    Let \(Z_i \sim N(0, 1)\), \(1 \le i \le n\), be independent. What is the distribution of \(\sum_{i=1}^n Z_i^2 \)?   
+\end{eg}
+
+\begin{explanation}
+    We can first solve a subproblem.
+    \paragraph{Subproblem:} What is the distribution of \(Z_i^2\)?
+
+    \begin{align*}
+        F_{Z_i^2}(a) &= \mathbb{P} (Z_i^2 \le a) = \mathbb{P} (-\sqrt{a} \le Z_i \le \sqrt{a}) = \int _{-\sqrt{a} }^{\sqrt{a} } f_{Z_i}(z) \, \mathrm{d} z  = \int _{-\sqrt{a} }^{\sqrt{a} } \frac{1}{\sqrt{2 \pi } } e^{- \frac{z^2}{2}} \, \mathrm{d} z \\
+        &= 2 \int _0^{\sqrt{a}} \frac{1}{\sqrt{2\pi } } e^{- \frac{z^2}{2}} \, \mathrm{d} z.   
+    \end{align*} 
+    Hence,
+    \begin{align*}
+        f_{Z_i^2}(a) &= \frac{\mathrm{d}}{\mathrm{d} a} F_{Z_i^2} (a) = 2 \left[ \frac{1}{\sqrt{2 \pi } } e^{- \frac{z^2}{2}} \right]_{z = \sqrt{a}} \cdot \frac{\mathrm{d}}{\mathrm{d}a} (\sqrt{a} ) = 2 \frac{1}{\sqrt{2 \pi }} e^{- \frac{a}{2}} \cdot \frac{1}{2} a^{-\frac{1}{2}} = \frac{1}{\sqrt{2 \pi }} e^{- \frac{a}{2}} a^{\frac{1}{2} - 1}.  
+    \end{align*}
+    This means \(Z_i^2 \sim \Gamma \left( \frac{1}{2}, \frac{1}{2} \right) \) (compare pdf of \(Z_i^2\) and \(\Gamma \left( \frac{1}{2}, \frac{1}{2} \right) \)), so 
+    \[
+        \sum_{i=1}^n Z_i^2 \sim \Gamma \left( \frac{n}{2}, \frac{1}{2} \right).  
+    \] 
+    \begin{remark}
+        This is called the chi-squared distribution with \(n\) degrees of freedom. 
+    \end{remark}
+\end{explanation}
+
+
+\begin{question}
+    Let \(X_i \sim N(\mu _i, \sigma _i^2)\) be independent for \(1 \le i \le n\). What is the distribution of \(\sum_{i=1}^n X_i \)?   
+\end{question}
+
+\begin{proposition}
+    \[
+        \sum_{i=1}^N X_i \sim N \left( \sum_{i=1}^n \mu_i, \sum_{i=1}^n \sigma _i^2   \right).  
+    \]
+\end{proposition}
+
+\begin{proof}
+    We can first show the \(n = 2\) case implies general case, then show that when \(n= 2\), the case \(\mu _1 = \mu _2 = 0\) and \(\sigma _1 = 1, \sigma _2 = \sigma \) implies the general case of \(n = 2\), and finally prove the base case: \(n = 2, \mu _1 = \mu _2 = 0\) and \(\sigma _1 = 1, \sigma _2 = \sigma\). \\
+    \textbf{1. Prove by induction on \(n\):} We know \(X_1 + \dots + X_n + X_{{n+1}} = \left( X_1 + \dots + X_n \right) + X_{n+1} \) where 
+    \[
+        X_1 + \dots + X_n \sim N \left( \sum_{i=1}^n \mu _i, \sum_{i=1}^n \sigma _i^2   \right), 
+    \]    
+    and \(X_{n+1} \sim N(\mu _{n+1}, \sigma _{n+1}^2)\). Thus, if we can prove the \(n = 2\) case, we have 
+    \[
+        X_1 + \dots + X_n + X_{n+1} \sim N \left( \sum_{i=1}^n \mu _i + \mu _{n+1}, \sum_{i=1}^n \sigma _i^2 + \sigma_{n+1}^2   \right) = N \left( \sum_{i=1}^{n+1} \mu _i, \sum_{i=1}^{n+1} \sigma _i^2   \right).
+    \]  
+    \textbf{2. Prove the specific case \(n = 2, \mu _1 = \mu _2 = 0, \sigma _1 = 1, \sigma _2 = \sigma\) implies general cases for \(n=2\):} If \(X_1 \sim N (\mu _1, \sigma _1^2 ), X_2 \sim N(\mu _2, \sigma _2^2)\), then 
+    \begin{align*}
+        X_1 + X_2 &= \sigma _1 \left( \frac{X_1 + X_2}{\sigma _1} \right) = \sigma _1 \left( \frac{X_1 - \mu_1}{\sigma _1} + \frac{X_2 - \mu_2}{\sigma _1} + \frac{\mu _1 + \mu _2}{\sigma _1} \right) \\
+        &= \sigma _1 \left( \frac{X_1 - \mu _1}{\sigma _1} + \frac{\sigma _2}{\sigma _1} \cdot \frac{X_2 - \mu _2}{\sigma _2} \right) + (\mu _1 + \mu _2),   
+    \end{align*}  
+    where 
+    \[
+        \frac{X_1 - \mu _1}{\sigma _1} \sim N(0, 1), \quad \frac{\sigma _2}{\sigma _1} \frac{X - \mu_2}{\sigma _2} \sim N \left( 0, \frac{\sigma _2 ^2}{\sigma _1 ^2} \right). 
+    \]
+    If the \(\mu _1 = \mu _2 = 0\) and \(\sigma _1 = 1, \sigma _2 = \sigma \) case is true, then 
+    \[
+        \frac{X_1 - \mu_1}{\sigma_1} + \frac{\sigma _2}{\sigma _1} \cdot \frac{X_2 - \mu _2}{\sigma _2} \sim N\left( 0, 1 + \frac{\sigma _2^2}{\sigma _1^2} \right), 
+    \]  
+    so 
+    \[
+        \sigma _1 \left( \frac{X_1 - \mu_1}{\sigma_1} + \frac{\sigma _2}{\sigma _1} \cdot \frac{X_2 - \mu _2}{\sigma _2} \right) \sim N(0, \sigma_1^2 + \sigma _2^2), 
+    \]
+    which shows 
+    \[
+        X_1 + X_2 = \sigma _1 \left( \frac{X_1 - \mu_1}{\sigma_1} + \frac{\sigma _2}{\sigma _1} \cdot \frac{X_2 - \mu _2}{\sigma _2} \right) + (\mu _1 + \mu _2) \sim N (\mu _1 + \mu _2, \sigma _1^2 + \sigma _2^2). 
+    \]
+    \textbf{3. Prove the \(n=2, X_1 \sim N(0, 1), X_2 \sim N(0, \sigma ^2) \) case.} Suppose \(X_1 \sim N(0, 1), X_2 \sim N(0, \sigma ^2)\) are independent, then since we have 
+    \[
+        f_{X_1}(x) = \frac{1}{\sqrt{2 \pi } } e^{- \frac{x^2}{2}}, \quad f_{X_2}(x) = \frac{1}{\sigma \sqrt{2 \pi}} e^{- \frac{x^2}{2 \sigma ^2}},
+    \]   
+    the density of \(X_1 + X_2\) is the convolution of these densities:
+    \begin{align*}
+        f_{X_1 + X_2} (z) &= \int _{-\infty }^{\infty } f_{X_1}(x) f_{X_2} (z - x) \, \mathrm{d} x = \int _{-\infty }^{\infty } f_{X_1}(z - y) f_{X_2}(y) \, \mathrm{d} y \\
+        &= \frac{1}{2 \pi \sigma } \int _{-\infty }^{\infty} e^{- \frac{(z-y)^2}{2}} \cdot e^{- \frac{y^2}{2 \sigma ^2}} \, \mathrm{d} y.   
+    \end{align*}  
+    Note that 
+    \begin{align*}
+        - \frac{(z-y)^2}{2} - \frac{y^2}{2 \sigma ^2} &= - \frac{z^2}{2} - \frac{\sigma ^2 + 1}{2 \sigma ^2} \left( y^2 - \frac{2 \sigma ^2 zy}{\sigma ^2 + 1} \right) \\
+        &= - \frac{z^2}{2} - \frac{\sigma ^2 + 1}{2 \sigma ^2} \left( y - \frac{\sigma ^2}{\sigma ^2 + 1} z \right)^2 + \frac{\sigma ^2}{2(\sigma ^2 + 1)} z^2, 
+    \end{align*}
+    so 
+    \begin{align*}
+        f_{X_1 + X_2}(z) &= \frac{1}{2 \pi \sigma} e^{-\frac{z^2}{2} + \frac{\sigma ^2}{2(\sigma ^2 + 1)} z^2} \int _{-\infty }^{\infty } e^{-\frac{\sigma ^2 + 1}{2 \sigma ^2} \left( y - \frac{\sigma ^2}{\sigma ^2 + 1} z \right)^2 } \, \mathrm{d} y \\
+        &= \frac{1}{2 \pi \sigma} e^{-\frac{z^2}{2} + \frac{\sigma ^2}{2(\sigma ^2 + 1)} z^2} \underbrace{\int _{-\infty }^{\infty } e^{- \frac{\sigma ^2 + 1}{2 \sigma ^2} u^2} \, \mathrm{d} u}_{\text{some constant}} \\
+        &= C^{\prime} e^{- \frac{z^2}{2} + \frac{\sigma ^2}{2(\sigma ^2 + 1)} z^2} \\
+        &= C^{\prime} e^{- \frac{(\sigma ^2 + 1) z^2 - \sigma ^2 z^2}{2 (\sigma ^2 + 1)}} = C^{\prime} e^{- \frac{z^2}{2(\sigma ^2 + 1)}}
+    \end{align*}
+    This is proportional to the pdf of \(N(0, 1 + \sigma ^2)\), so \(X_1 + X_2 \sim N(0, 1 + \sigma ^2)\). 
+\end{proof}
+
+\begin{eg}
+    We say a random variable \(X\) is log-normally distributed if \(\log X\) is normally distributed. There is a stock whose price after \(n\) weeks is \(S_n\). The ratios \(\frac{S_n}{S_{n-1}}\) are independent and log-normally with \(\mu = 0.0165\) and \(\sigma = 0.0730\), then 
+    \begin{itemize}
+        \item [(1)] What is the probability that \(S_n > S_{n-1}\) for the 52 weeks of a year? 
+        \item [(2)] What is the probability that \(S_n > S_{n-1}\) for at least 30 weeks in the year? 
+        \item [(3)] What is the probability that the stock will have gained value over the course of the year? (過一年會漲)
+    \end{itemize}       
+\end{eg}
+\begin{proof}
+    Note that 
+    \[
+        \left\{ S_n > S_{n-1} \right\} \equiv \left\{ \frac{S_n}{S_{n-1}} > 1 \right\} \equiv \left\{ \log \frac{S_n}{S_{n-1}} > 0 \right\},   
+    \]
+    where \(\log \frac{S_n}{S_{n-1}} \sim N(0.0165, 0.0730^2)\). Let \(X \sim N(0.0165, 0.0730^2)\), then 
+    \[
+        \mathbb{P} (X > 0) = \mathbb{P} \left( \frac{X - 0.0165}{0.0730} > \frac{-0.0165}{0.0730} \right) = \mathbb{P} (Z < \frac{0.0165}{0.0730}) = \Phi \left( \frac{0.0165}{0.0730} \right) = 0.5894, 
+    \]  
+    where \(Z \sim N(0, 1)\) and by symmetry. 
+
+    \begin{itemize}
+        \item [(1)] 
+        \begin{align*}
+            \mathbb{P} \left( \left\{ S_1 > S_0 \right\} \cap \left\{ S_2 > S_1 \right\} \cap \dots \cap \left\{ S_{52} > S_{51} \right\}    \right) &= \mathbb{P} \left( \left\{ \frac{S_1}{S_0} > 1 \right\} \cap \left\{ \frac{S_2}{S_1} > 1 \right\} \cap \dots \cap \left\{ \frac{S_{52}}{S_{51}} > 1 \right\}  \right) \\
+            &= \mathbb{P} \left( \frac{S_1}{S_0} > 1 \right) \mathbb{P} \left( \frac{S_2}{S_1} > 1 \right) \dots \mathbb{P} \left( \frac{S_{52}}{S_{51}} > 1 \right) \\
+            &= \Phi \left( \frac{0.0165}{0.0730} \right)^{52} \\
+            &\thickapprox 1.15 \times 10^{-12}    
+        \end{align*}
+        by independence.
+        \item [(2)] Let \(Y = \#\) of weeks in the year with \(S_n > S_{n-1}\). Then, \(Y \sim \mathrm{Bin} \left( 52, 0.5814 \right)  \) since each ratio \(\frac{S_n}{S_{n-1}}\) are independent. Hence,
+        \[
+            \mathbb{P} (Y \ge 30) = \sum_{k=0}^{52} \binom{52}{k} 0.5894^k \cdot 0.4106^{52 - k} .
+        \]
+        Using normal approximation:
+        \[
+            \mathrm{Bin}(52, 0.5894) \sim N(52 \times 0.5894, 52 \times 0.5894 \times 0.4106). 
+        \]
+        Thus,
+        \begin{align*}
+            \mathbb{P} (Y \ge 30) &= \mathbb{P} (Y \ge 29.5) = \mathbb{P} \left( \frac{Y - 52 \times 0.5894}{52 \times 0.5894 \times 0.4106} \ge \frac{29.5 - 52 \times 0.5894}{52 \times 0.5894 \times 0.4106}  \right) \thickapprox 0.627.
+        \end{align*}
+        \item [(3)] 
+        \begin{align*}
+            \mathbb{P} (S_{52} > S_0) &= \mathbb{P} \left( \log \left( \frac{S_{52}}{S_0} \right) > 0  \right) = \mathbb{P} \left( \sum_{n=1}^{52} \log \left( \frac{S_n}{S_{n-1}} \right)  > 0 \right) \thickapprox 0.9484.  
+        \end{align*}
+        This is because 
+        \[
+           \sum_{n=1}^{52} \log \left( \frac{S_n}{S_{n-1}} \right) \sim N(52 \times 0.0165, 52 \times 0.0730^2) 
+        \]
+        by the log-normally distributed condition and the previous example.
+    \end{itemize}  
+\end{proof}

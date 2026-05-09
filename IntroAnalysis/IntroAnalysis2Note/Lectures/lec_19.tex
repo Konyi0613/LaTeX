@@ -1,0 +1,292 @@
+\chapter{Some Comments and Further Directions}
+\lecture{19}{May 7.}{}
+
+We have now reached the end of our study of the main topics in Analysis II. The material developed in this course provides a bridge between classical real analysis and several central areas of modern analysis. In particular, the notions of metric spaces, compactness, uniform convergence, differentiation, Riemann integration, and Lebesgure measure and integral are not isolated topics. Rather, they form part of the foundation for further study in measure theory, functional analysis, partial differential equations, probability theory, Fourier analysis, and geometric analysis.
+
+One natural next step is to study Lebesgue measure and Lebesgue integration. The Riemann integral is very useful for continuous functions and for many functions arising in elementary analysis, but it is not flexible enough for many limiting processes. The Lebesgue integral is designed to interact well with limits of functions. This is why convergence theorems such as the monotone convergence theorem, Fatou's lemma, and the dominated convergence theorem play such a central role in modern analysis.
+
+A very suitable continuation is Terence Tao's book \textit{An Introduction to Measure Theory}. This book develops the theory of Lebesgue measure and Lebesgue integration systematically, beginning with measure theory on Euclidean spaces and then moving toward abstract measure spaces. It also discusses measurable functions, modes of convergence, differentiation theorems, outer measures, premeasures, and product measures. Thus it provides a natural continuation from the analysis of functions on $\mathbb{R}^{n}$ to the more general framework needed in modern analysis. The book is available at \url{https://terrytao.wordpress.com/wp-content/uploads/2012/12/gsm-126-tao5-measure-book.pdf}.
+
+\subsection*{The spaces $L^{p}(\Omega)$}
+
+One of the most important constructions arising from Lebesgue integration is the family of $L^p$-spaces. Let $\Omega \subset \mathbb{R}^{n}$ be a measurable set. For $0 < p < \infty$ we define
+\[ L^{p}(\Omega) := \{f : \Omega \rightarrow \mathbb{R} \text{ measurable} : \int_{\Omega} |f(x)|^{p} dx < \infty\} , \]
+where two functions are identified if they are equal almost everywhere on $\Omega$. This identification is essential, because Lebesgue integration does not distinguish functions that differ only on a set of measure zero. For $1 \le p < \infty$ the quantity
+\[ \|f\|_{L^{p}(\Omega)} := \left(\int_{\Omega} |f(x)|^{p} dx\right)^{1/p} \]
+defines a norm on $L^{p}(\Omega)$. Hence $L^{p}(\Omega)$ becomes a metric space with metric
+\[ d_{p}(f,g) := \|f-g\|_{L^{p}(\Omega)} = \left(\int_{\Omega} |f(x)-g(x)|^{p} dx\right)^{1/p} . \]
+The reason we identify functions that agree almost everywhere is that $\|f-g\|_{L^{p}(\Omega)} = 0$ implies only that $f=g$ almost everywhere, not necessarily pointwise everywhere. With this identification, $d_p$ is a genuine metric for $1 \le p < \infty$. In fact, $L^{p}(\Omega)$ is complete with respect to this metric, and hence is a Banach space.
+
+The endpoint case $p = \infty$ is also important. We define
+\[ L^{\infty}(\Omega) := \{f : \Omega \rightarrow \mathbb{R} \text{ measurable: } f \text{ is essentially bounded} \}, \]
+where a function \(f\) is essentially bounded if there exists \(M \in \mathbb{R}\) s.t. \(\vert f(x) \vert \le M\) for almost every \(x \in \Omega\). Its norm is
+\[ \|f\|_{L^{\infty}(\Omega)} := \esssup_{x \in \Omega} |f(x)| = \inf \left\{ M \in \mathbb{R}: \vert f(x) \vert \le M \text{ for almost every } x \in \Omega \right\}  . \]
+With this norm, $L^{\infty}(\Omega)$ is also a Banach space.
+
+For $0 < p < 1$, the formula
+\[ \left(\int_{\Omega} |f-g|^{p}\right)^{1/p} \]
+does not define a metric because the triangle inequality fails. However,
+\[ d_{p}(f,g) := \int_{\Omega} |f-g|^{p} \]
+does define a metric on $L^{p}(\Omega)$, after identifying functions that agree almost everywhere. Thus $L^{p}(\Omega)$ is a metric space for every $0 < p < \infty$, but it is a normed space only when $1 \le p < \infty$.
+
+\subsection*{Hölder's inequality}
+
+One of the fundamental estimates in the theory of $L^p$-spaces is Hölder's inequality. Let $1 \le p, q \le \infty$ satisfy
+\[ \frac{1}{p} + \frac{1}{q} = 1 . \]
+The numbers $p$ and $q$ are called conjugate exponents. Thus, if $1 < p < \infty$ then $q = \frac{p}{p-1}$. If $p = 1$ then $q = \infty$, and if $p = \infty$, then $q = 1$.
+
+\begin{theorem}[Hölder's inequality]
+Let $1 \le p, q \le \infty$ be conjugate exponents. If $f \in L^{p}(\Omega)$ and $g \in L^{q}(\Omega)$, then $fg \in L^{1}(\Omega)$, and
+\[ \int_{\Omega} |f(x)g(x)| dx \le \|f\|_{L^{p}(\Omega)} \|g\|_{L^{q}(\Omega)} \]
+Equivalently,
+\[ \|fg\|_{L^{1}(\Omega)} \le \|f\|_{L^{p}(\Omega)} \|g\|_{L^{q}(\Omega)} \]
+\end{theorem}
+
+\begin{proof}
+We first consider the case $1 < p < \infty$, so that $1 < q < \infty$. The key ingredient is Young's inequality: for all $a, b \ge 0$,
+\[ ab \le \frac{a^{p}}{p} + \frac{b^{q}}{q}. \]
+Assume first that $f \ne 0$ in $L^{p}(\Omega)$ and $g \ne 0$ in $L^{q}(\Omega)$. Define
+\[ F(x) := \frac{|f(x)|}{\|f\|_{L^{p}(\Omega)}}, \quad G(x) := \frac{|g(x)|}{\|g\|_{L^{q}(\Omega)}}. \]
+Then $\|F\|_{L^{p}(\Omega)} = 1$, $\|G\|_{L^{q}(\Omega)} = 1$. Applying Young's inequality pointwise gives
+\[ F(x)G(x) \le \frac{F(x)^{p}}{p} + \frac{G(x)^{q}}{q} \]
+Integrating over $\Omega$, we obtain
+\[ \int_{\Omega} F(x)G(x) dx \le \frac{1}{p} \int_{\Omega} F(x)^{p} dx + \frac{1}{q} \int_{\Omega} G(x)^{q} dx = \frac{1}{p} + \frac{1}{q} = 1. \]
+Therefore
+\[ \int_{\Omega} \frac{|f(x)g(x)|}{\|f\|_{L^{p}(\Omega)} \|g\|_{L^{q}(\Omega)}} dx \le 1, \]
+which implies
+\[ \int_{\Omega} |f(x)g(x)| dx \le \|f\|_{L^{p}(\Omega)} \|g\|_{L^{q}(\Omega)}. \]
+If $f = 0$ in $L^{p}(\Omega)$ or $g = 0$ in $L^{q}(\Omega)$, the inequality is immediate. It remains to consider the endpoint cases. If $p = 1$ and $q = \infty$, then
+\[ |f(x)g(x)| \le |f(x)| \|g\|_{L^{\infty}(\Omega)} \text{ for almost every } x \in \Omega. \]
+Hence
+\[ \int_{\Omega} |f(x)g(x)| dx \le \|g\|_{L^{\infty}(\Omega)} \int_{\Omega} |f(x)| dx = \|f\|_{L^{1}(\Omega)} \|g\|_{L^{\infty}(\Omega)} \]
+The case $p = \infty$ and $q = 1$ is identical.
+
+\begin{remark}
+    If \(f, g: \Omega \to \mathbb{R}^*\) are two Lebesgue integrable function s.t. \(f \le g\) almost everwhere, then \(\int_\Omega f \le \int_\Omega  g\). This is because we can modify the value of \(f\) on the set \(\left\{ x \in \Omega: f(x) > g(x) \right\} \), which has measure zero, and thus modify value of \(f\) on this set will not change the value of integral, and thus suppose the modified function is \(f^{\prime} \), then \(f^{\prime} \le g\) almost everywhere, and \(\int_\Omega f^{\prime} = \int _\Omega f\), so we have 
+    \[
+        \int _\Omega f = \int _\Omega f^{\prime} \le \int _\Omega g.
+    \]        
+\end{remark}
+\end{proof}
+
+\begin{remark}
+Hölder's inequality generalizes the Cauchy-Schwarz inequality. Indeed, when $p = q = 2$, we obtain
+\[ \int_{\Omega} |f(x)g(x)| dx \le \left(\int_{\Omega} |f(x)|^{2} dx\right)^{1/2} \left(\int_{\Omega} |g(x)|^{2} dx\right)^{1/2} \]
+Thus the Cauchy-Schwarz inequality is precisely Hölder's inequality in the special case $L^{2}(\Omega)$.
+\end{remark}
+
+\begin{remark}
+Hölder's inequality shows that multiplication is compatible with conjugate $L^p$-spaces. More precisely, if $f \in L^{p}(\Omega)$ and $g \in L^{q}(\Omega)$, where $p$ and $q$ are conjugate exponents, then the product $fg$ is absolutely integrable. This is one of the main reasons why $L^{q}(\Omega)$ is naturally related to the dual space of $L^{p}(\Omega)$ when $1 < p < \infty$.
+\end{remark}
+
+\subsection*{Further topics}
+
+We briefly mention several directions that naturally continue the material of this course.
+
+\begin{enumerate}
+    \item \textbf{Measure theory and Lebesgue integration.} A first direction is to study Lebesgue measure, measurable functions, and the Lebesgue integral in depth. This gives a more flexible theory of integration than the Riemann integral and allows one to handle limits of functions much more effectively. Important results include the monotone convergence theorem, Fatou's lemma, the dominated convergence theorem, and Fubini's theorem.
+    
+    \item \textbf{Functional analysis.} The spaces $C(K)$, $L^{p}(\Omega)$, and $C^{k}(\Omega)$ are examples of infinite-dimensional function spaces. Functional analysis studies such spaces using the language of normed spaces, Banach spaces, Hilbert spaces, bounded linear operators, and dual spaces. In this subject, compactness is often more subtle than in finite-dimensional spaces, and the Arzelà-Ascoli theorem is a model example of a compactness theorem in an infinite-dimensional setting.
+    
+    \item \textbf{Hilbert spaces and $L^{2}$-theory.} Among the $L^p$-spaces, the space $L^{2}(\Omega)$ is especially important because it has an inner product:
+    \[ \langle f,g \rangle_{L^{2}} := \int_{\Omega} f(x)g(x) dx. \]
+    This makes $L^{2}(\Omega)$ into a Hilbert space. The geometry of Hilbert spaces generalizes Euclidean geometry to infinite dimensions. Orthogonal projection, Fourier series, weak convergence, and spectral theory all naturally arise from this point of view.
+    
+    \item \textbf{Fourier analysis.} Fourier analysis studies how functions can be decomposed into basic oscillatory functions such as sine waves, cosine waves, or complex exponentials. It is one of the most important applications of $L^p$-spaces and Hilbert space theory. Fourier series, the Fourier transform, Plancherel's theorem, and convolution are fundamental tools in analysis, partial differential equations, probability, and signal processing.
+    
+    \item \textbf{Sobolev spaces and weak derivatives.} In many applications, especially in partial differential equations, one needs to study functions that may not be differentiable in the classical sense. Sobolev spaces provide a framework for defining and studying weak derivatives. For example, the Sobolev space $W^{1,p}(\Omega)$ consists of functions in $L^{p}(\Omega)$ whose first weak derivatives also belong to $L^{p}(\Omega)$. These spaces are indispensable in the modern theory of elliptic and parabolic partial differential equations.
+    
+    \item \textbf{Partial differential equations.} Many equations in geometry, physics, and applied mathematics are partial differential equations. Examples include the Laplace equation, heat equation, wave equation, and minimal surface equation. The analytic tools developed in measure theory, $L^p$-spaces, Sobolev spaces, and compactness theory are essential for studying existence, uniqueness, regularity, and qualitative properties of solutions.
+    
+    \item \textbf{Probability theory.} Measure theory also provides the foundation of modern probability. A probability space is a measure space with total measure one. Random variables are measurable functions, expectation is integration, and convergence theorems from measure theory become fundamental tools in probability. From this perspective, $L^p$-spaces measure the size of random variables through their moments:
+    \[ \|X\|_{L^{p}} = (\mathbb{E}|X|^{p})^{1/p}. \]
+    
+    \item \textbf{Geometric analysis.} Another direction is geometric analysis, where tools from analysis are used to study geometric problems. Examples include harmonic functions on manifolds, minimal surfaces, curvature equations, and geometric evolution equations. In this area, compactness theorems, integral estimates, Sobolev inequalities, and weak convergence methods play a central role.
+\end{enumerate}
+
+In summary, the material of this course should be viewed as the beginning of a larger analytic framework. The study of metric spaces, compactness, continuous functions, and integration prepares us for the more advanced language of measure theory, $L^p$-spaces, Banach and Hilbert spaces, Fourier analysis, Sobolev spaces, and partial differential equations. These subjects form the core of modern analysis and have deep connections with geometry, probability, mathematical physics, and data science.
+
+\chapter{The Arzela-Ascoli Theorem and Applications}
+\section{Normed spaces and Spaces of Bounded Functions}
+Before studying spaces of functions, it is useful to recall how one measures size in an abstract vector space. In \(\mathbb{R} ^n\), the Euclidean length allows us to speak about distance, convergence, Cauchy sequences, continuity, and completeness. A norm is the corresponding abstract notion of length. Once a vector space is equipped with a norm, it becomes a metric space in a natural way.
+
+\begin{definition}
+    Let \(V\) be a vector space over \(\mathbb{R}\) and \(\mathbb{C}\). A norm is a function \(\lVert \cdot \rVert: V \to [0, \infty) \) satisfying the following properties for all \(x, y \in V\) and all scalars \(\lambda\).:
+    \begin{itemize}
+        \item [(1)] \(\lVert x \rVert \ge 0 \), \(\lVert x \rVert = 0 \iff x = 0 \). 
+        \item [(2)] \(\lVert \lambda x \rVert = \vert \lambda \vert \cdot \lVert x \rVert   \). 
+        \item [(3)] \(\lVert x + y \rVert \le \lVert x \rVert + \lVert y \rVert   \).
+    \end{itemize}      
+    A vector space equippeed with a norm is called a normed (vector) space and is denoted by \((V, \lVert \cdot \rVert )\). 
+\end{definition}
+
+\begin{remark}
+    Every normed space \((V, \lVert \cdot \rVert )\) carries a natural metric \(d(x, y) \coloneqq \lVert x - y \rVert \).  
+\end{remark}
+
+\begin{definition}
+    A normed space \((V, \lVert \cdot \rVert )\) is called Banach space if it is complete with respect to the metric induced by the norm. Equivalently, every Cauchy sequence in \(V\) converges to an element of \(V\), i.e. 
+    \[
+        \left\{ x_n \right\} \text{ is Cauchy } \iff \lVert x_n - x_m \rVert \to 0 \text{ as } n, m \to \infty \iff \exists x^* \in V \text{ s.t. }  \lVert x_n - x^* \rVert \to 0 \text{ as } n \to \infty.  
+    \]   
+\end{definition}
+
+Recall that suppose \((X, d_X)\) and \((Y, d_Y)\) are metric spaces. Let
+\[
+    B(X \to Y) \coloneqq \left\{ f \mid f:X \to Y \text{ is a bounded function}  \right\}. 
+\]
+If \(X\) is nonempty, we define \(d_{\infty }(f, g) = \sup _{x \in X} d_Y(f(x), g(x))\) on \(B(X \to Y)\), then this is a metric on \(B(X \to Y)\). We also write \(d_{B(X \to Y)}\) as a synonym for \(d_{\infty}\). If \(X\) is empty, then we define \(d_{\infty }(f, g) = 0\) for all \(f, g\).
+
+\begin{observation}
+    The distance \(d_{\infty } (f, g)\) is always finite because both \(f, g\) are bounded functions on \(X\). Therefore \((B(X \to Y), d_{\infty })\) forms a well-defined metric space.    
+\end{observation}
+
+Also, we have following proposition:
+\newpage
+\begin{proposition}[Analysis I] \label{prop: uniform metric}
+    \[
+        f^{(n)} \to f \text{ in } d_{B(X \to Y)} \iff f^{(n)} \to f \text{ uniformly on } X,  
+    \]
+\end{proposition}
+
+Now we can define
+\[
+    C(X \to Y) \coloneqq \left\{ f: f \in B(X \to Y) \text{ and } f \text{ is continuous}   \right\}. 
+\]
+
+\begin{theorem}
+    Let \((X, d_X)\) be a metric space, and \((Y, d_Y)\) a complete metric space. Then 
+    \[
+        \left( C(X \to Y), d_{B(X \to Y)}  \vert_ {C(X \to Y) \times C(X \to Y)} \right) 
+    \]  
+    is a complete metric subspace of \((B(X \to Y), d_{B(X \to Y)})\). Equivalently, every Cauchy sequence of continuous bounded functions converges uniformly to a continuous bounded function in \(C(X \to Y)\).   
+\end{theorem}
+
+\section{The Banach Space \(C(K)\)}
+Throughout this section, \((K,d)\) denotes a non-empty compact metric space. We write 
+\[
+    \mathcal{B} (K) \coloneqq B(K \to \mathbb{R}) = \left\{ f: K \to \mathbb{R}, f \text{ is bounded}  \right\},
+\] 
+and 
+\[
+    C(K) \coloneqq C(K \to \mathbb{R}) = \left\{ f: K \to \mathbb{R}, f \text{ is continuous}  \right\}. 
+\]
+Note that \(C(K \to \mathbb{R} ) = \left\{ f: K \to \mathbb{R}, f \text{ is continuous}  \right\}\) since \(K\) is compact and \(f\) is continuous,  so \(f(K)\) is compact and thus bounded. Hence, \(C(K) \subseteq \mathcal{B}(K)\). 
+
+Both \(\mathcal{B}(K)\) and \(C(K)\) are vector spaces over \(\mathbb{R}\), with usual pointwise operations
+\[
+    (f + g)(x) \coloneqq f(x) + g(x), \quad (\lambda f)(x) \coloneqq \lambda f(x).
+\]   
+Indeed, if \(f, g \in \mathcal{B} (K)\), and \(a, b \in \mathbb{R}\), then \(a f + b g\) is bounded, because 
+\[
+    \vert a f + b g \vert \le a \lVert f \rVert_{\infty } + b \lVert g \rVert_{\infty} \quad \text{for all } x \in K.    
+\]   
+Similarly, if \(f, g \in C(K)\), then \(af + bg \in C(K)\).
+
+On \(\mathcal{B} (K)\), we can define \(\lVert f \rVert_{\infty} \coloneqq \sup _{x \in K} \vert f(x) \vert  \), where for \(f \in C(K)\), the supremum is actually a maximum: \(\lVert f \rVert_{\infty } = \max _{x \in K} \vert f(x) \vert  \).    
+
+\begin{proposition}
+    The function 
+    \[
+        \lVert \cdot \rVert_\infty :\mathcal{B} (K) \to [0, \infty), \quad \lVert f \rVert_\infty \coloneqq \sup _{x \in K} \vert f(x) \vert
+    \]
+    is a norm on \(\mathcal{B} (K)\). Its restriction to \(C(K)\) is a norm on \(C(K)\).   
+\end{proposition}
+
+\begin{remark}
+    Note that 
+    \[
+        d_{B(K \to \mathbb{R})}(f, g) = \sup_{x \in K} d_Y(f(x), g(x)) = \sup_{x \in K} \vert f(x) - g(x) \vert. 
+    \]
+    Therefore, 
+    \[
+        d_{B(K \to \mathbb{R})}(f, g) = \lVert f - g \rVert_\infty. 
+    \]
+    Thus, we can modify \autoref{prop: uniform metric} to be 
+    \[
+        f_n \to f \text{ in } \lVert \cdot \rVert_\infty \iff f_n \to f \text{ uniformly on } K.   
+    \] 
+\end{remark}
+
+\begin{proposition}
+    The normed space \((\mathcal{B} (K), \lVert \cdot \rVert_{\infty }) \) is a Banach space.
+\end{proposition}
+\begin{proof}
+    In chapter 3, we proved that the space of bounded maps into complete metric space is complete with respect to the uniform metric. Applying this result to \(X = K\) and \(Y = \mathbb{R}\) and using the completeness of \(\mathbb{R}\), we see that 
+    \[
+        (B(K \to \mathbb{R}), d_{B(K \to \mathbb{R})})
+    \]    
+    is a complete metric space. Since \(B(K \to \mathbb{R}) = \mathcal{B} (K)\), and since previous remark shows that 
+    \[
+        d_{B(K \to \mathbb{R})}(f, g) = \lVert f - g \rVert_\infty, 
+    \] 
+    it follows that \((\mathcal{B}(K), \lVert \cdot \rVert_\infty )\) is complete.
+\end{proof}
+
+\begin{proposition}
+    Every function \(f \in C(K)\) is bounded and uniformly continuous. 
+\end{proposition}
+
+\begin{proposition}
+    The space \(C(K)\) is a closed vector subspace of \(\mathcal{B} (K)\).   
+\end{proposition}
+\begin{proof}
+    We already know that \(C(K)\) is a vector subspace of \(\mathcal{B} (K)\). It remains to prove that \(C(K)\) is closed. 
+
+    Let \(\left\{ f_n \right\}_{n=1}^{\infty} \subseteq C(K) \) and suppose that \(f_n \to f\) in \(\mathcal{B} (K)\) with respect to the supremum norm, for some \(f \in \mathcal{B} (K)\), so \(f_n \to f\) uniformly on \(K\) by previous remark. Since each \(f_n\) is continuous and \(f_n \to f\) uniformly, we have \(f\) continuous, i.e. \(f \in C(K)\). Therefore, \(C(K)\) is closed in \(\mathcal{B}(K)\).
+
+    \begin{remark}
+        "\(\left\{ f_n \right\}  \subseteq C(K)\) and \(f_n \to f\) implies \(f \in C(K)\)" is equivalent to \(C(K)\) is closed.    
+    \end{remark}          
+\end{proof}
+
+\begin{proposition}
+    \((C (K), \lVert \cdot \rVert_{\infty })\) is a Banach space.
+\end{proposition}
+\begin{proof}
+    Since we have shown \((\mathcal{B} (K), \lVert \cdot \rVert_\infty  )\) is complete and \((C(K), \lVert \cdot \rVert_\infty )\) is a closed subspace of \(\mathcal{B} (K)\). A closed subspace of a complete metric space is complete. Therefore, \(C(K)\), equipped with the norm \(\lVert \cdot \rVert_\infty  \) is complete.    
+\end{proof}
+
+\section{Equi-continuity and Arzela-Ascoli Theorem}
+\begin{definition}
+    Let \(\mathcal{F} \subseteq C(K)\),
+    \begin{itemize}
+        \item [(i)] The family \(\mathcal{F}\) is called pointwise bounded if for every \(x \in K\), \(\exists \) constant \(M_x < \infty\) s.t. \(\vert f(x) \vert \le M_x \) for every \(f \in \mathcal{F}\). 
+        \item [(ii)] The family \(\mathcal{F}\) is uniformly bounded if \(\exists \) a constant \(M < \infty\) s.t. \(\lVert f \rVert _\infty \le M \) for every \(f \in \mathcal{F}\).
+        \item [(iii)] The family \(\mathcal{F}\) is called equi-continuous if for every \(\varepsilon > 0\), \(\exists \delta > 0\) s.t. \(d(x, y) < \delta\) implies \(\vert f(x) - f(y) \vert < \varepsilon \) for all \(x, y \in K\) and all \(f \in \mathcal{F} \). (\(\delta \) is independent of \(f\) and \(x\).)                   
+    \end{itemize} 
+\end{definition}
+
+\begin{remark}
+    The adjective "equi-continuous" means that the same \(\delta\) works simultaneously for every function in the family. 
+\end{remark}
+
+\begin{lemma}[Pointwise boundedness becomes uniform boundedness] \label{lm: Pointwise boundedness becomes uniform boundedness}
+    If \(\mathcal{F} \subseteq C(K)\) is pointwise bounded and equi-continuous, then \(\mathcal{F} \) is uniformly bounded.   
+\end{lemma}
+\begin{proof}
+    Apply equicontinuity with \(\varepsilon = 1\), there exists \(\delta > 0\) s.t. \(d(x, y) < \delta \) implies \(\vert f(x) - f(y) \vert < 1 \) for all \(f \in \mathcal{F}\). Since \(K\) is compact, choose finitely many points \(x_1, \dots , x_L \in K\) s.t. 
+    \[
+        K \subseteq \bigcup_{i=1}^{L} B(x_i, \delta). 
+    \]   
+    For each \(i\), pointwise boundedness gives a constant \(M_i\) s.t. 
+    \[
+        \vert f(x_i) \vert \le M_i \quad \text{for every } f \in \mathcal{F}.  
+    \]  
+    Let \(M \coloneqq 1 + \max _{1 \le i \le L} M_i\). For any \(x \in K\), choose \(i\) with \(d(x, x_i) < \delta\), then 
+    \[
+        f(x) \le \vert f(x) - f(x_i) \vert + \vert f(x_i) \vert < 1 + M_i \le M.  
+    \]    
+    Taking the supremum over all \(x \in K\), then \(\lVert f \rVert_{\infty} \le M \) for every \(f \in \mathcal{F}\).   
+\end{proof}
+
+\begin{theorem}[Arzela-Ascoli's theorem: sequential form]
+    Let \((K, d)\) be a compact metric space. If \(\left\{ f_n \right\}_{n=1}^{\infty} \subseteq C(K) \) is uniformly bounded and equi-continuous, then \(\left\{ f_n \right\} \) has a subsequence which converges uniformly on \(K\) to a function in \(C(K)\).   
+\end{theorem}
+
+\begin{corollary}
+    Let \(\left\{ f_n \right\} \subseteq C(K) \) be pointwise bounded and equicontinuous. Then \(\left\{ f_n \right\} \) has a subsequence which converges uniformly on \(K\). In particular, the same conclusion holds if the sequence is uniformly bounded and equicontinuous.
+\end{corollary}
+\begin{proof}
+    By \autoref{lm: Pointwise boundedness becomes uniform boundedness} and Arzela-Ascoli Theorem, this is true. 
+\end{proof}

@@ -210,6 +210,108 @@ $$\int_{\mathbb{R}}\left(\int_{\mathbb{R}}f(x,y)dy\right)dx=\int_{\mathbb{R}^{2}
 This allows us to compute two-dimensional integrals by splitting them into two one-dimensional integrals. The reason why we do not write Fubini's theorem this way, though, is that it is possible that the integral $\int_{\mathbb{R}}f(x,y)dy$ does not actually exist for every $x$, and similarly $\int_{\mathbb{R}}f(x,y)dx$ does not exist for every $y$; Fubini's theorem only asserts that these integrals only exist for almost every $x$ and $y$. For instance, if $f(x,y)$ is the function which equals 1 when $y>0$ and $x=0$, equals -1 when $y<0$ and $x=0$ and is zero otherwise, then $f$ is absolutely integrable on $\mathbb{R}^{2}$ and $\int_{\mathbb{R}^{2}}f=0$ (since $f$ equals zero almost everywhere in $\mathbb{R}^{2}$), but $\int_{\mathbb{R}}f(x,y)dy$ is not absolutely integrable when $x=0$ (though it is absolutely integrable for every other $x$).
 \end{remark}
 
+\begin{theorem}[Tonelli's Theorem]
+Let $E \subset \mathbb{R}^r$ and $F \subset \mathbb{R}^s$ be measurable sets, and let
+$f : E \times F \to \mathbb{R}$ be a nonnegative measurable function. Then:
+
+\begin{enumerate}
+    \item For almost every $x \in E$, the function $f(x,\cdot)$ is measurable on $F$.
+    \item For almost every $y \in F$, the function $f(\cdot,y)$ is measurable on $E$.
+    \item The function
+    \[
+        g(x) = \int_F f(x,y)\,dy
+    \]
+    is measurable on $E$.
+    \item The function
+    \[
+        h(y) = \int_E f(x,y)\,dx
+    \]
+    is measurable on $F$.
+    \item The following equality holds:
+    \[
+        \int_{E\times F} f(x,y)\,dx\,dy
+        =
+        \int_E \left(\int_F f(x,y)\,dy\right) dx
+        =
+        \int_F \left(\int_E f(x,y)\,dx\right) dy.
+    \]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+This theorem is a consequence of Fubini's Theorem and the Monotone Convergence
+Theorem. Define an increasing sequence of bounded nonnegative integrable functions
+$\{f_n\}_{n=1}^\infty$ as follows. For each $n \in \mathbb{N}$, let
+\[
+    C_n = [-n,n]^{r+s}.
+\]
+Then define
+\[
+    f_n(x,y)=
+    \begin{cases}
+        \min\{f(x,y),n\}, & (x,y)\in C_n,\\
+        0, & (x,y)\notin C_n.
+    \end{cases}
+\]
+Clearly, $f_n \uparrow f$ on $E\times F$. Note that \(f_n\) is measurable and absolutely integrable for each \(n\).  
+
+By Fubini's Theorem, for almost every $x \in \mathbb{R}^r$, the function
+$y \mapsto f_n(x,y)$ is absolutely integrable on $\mathbb{R}^s$, and
+\[
+    g_n(x) = \int_{\mathbb{R}^s} f_n(x,y)\,dy
+\]
+is absolutely integrable on $\mathbb{R}^r$.
+
+Since $f(x,\cdot)$ is nonnegative, the integral
+\[
+    g(x) = \int_F f(x,y)\,dy
+\]
+exists, possibly equal to $+\infty$. Moreover, for almost every $x \in E$,
+we have
+\[
+    f_n(x,\cdot)\uparrow f(x,\cdot),
+\]
+so by the Monotone Convergence Theorem,
+\[
+    g_n(x)\uparrow g(x)=\int_F f(x,y)\,dy.
+\]
+Hence $g$ is measurable on $E$.
+
+Applying the Monotone Convergence Theorem again,
+\[
+    \int_E g(x)\,dx
+    =
+    \lim_{n\to\infty}\int_E g_n(x)\,dx.
+\]
+Using Fubini's Theorem for each $f_n$,
+\[
+    \int_E g_n(x)\,dx
+    =
+    \int_E \left(\int_F f_n(x,y)\,dy\right) dx
+    =
+    \int_{E\times F} f_n(x,y)\,dx\,dy.
+\]
+Since $f_n \uparrow f$, another application of the Monotone Convergence Theorem gives
+\[
+    \lim_{n\to\infty}\int_{E\times F} f_n(x,y)\,dx\,dy
+    =
+    \int_{E\times F} f(x,y)\,dx\,dy.
+\]
+Therefore,
+\[
+    \int_E \left(\int_F f(x,y)\,dy\right) dx
+    =
+    \int_{E\times F} f(x,y)\,dx\,dy.
+\]
+Interchanging the roles of $x$ and $y$ yields
+\[
+    \int_F \left(\int_E f(x,y)\,dx\right) dy
+    =
+    \int_{E\times F} f(x,y)\,dx\,dy.
+\]
+This proves the theorem.
+\end{proof}
+
 \begin{proposition}
 Let $A\subset \mathbb{R}^{n}$ and $B\subset \mathbb{R}^{m}$ be arbitrary sets. Then
 $$m^{*}(A\times B)=m^{*}(A)m^{*}(B),$$
@@ -219,7 +321,15 @@ where $m^{*}$ denotes Lebesgue outer measure in the relevant Euclidean space.
 \begin{proof}
 We prove the two inequalities separately.
 
-\textbf{Step 1: Upper bound.} We first show that $m^{*}(A\times B)\le m^{*}(A)m^{*}(B)$. Fix $\epsilon>0$. By the definition of outer measure, there exist countable collections of open boxes $\{Q_{i}\}_{i=1}^{\infty}\subset \mathbb{R}^{n}$, $\{R_{j}\}_{j=1}^{\infty}\subset \mathbb{R}^{m}$ such that $A\subset\bigcup_{i=1}^{\infty}Q_{i}$, $B\subset\bigcup_{j=1}^{\infty}R_{j}$, and $\sum_{i=1}^{\infty}\text{vol}(Q_{i})<m^{*}(A)+\epsilon$, $\sum_{j=1}^{\infty}\text{vol}(R_{j})<m^{*}(B)+\epsilon$. Then $A\times B\subset\bigcup_{i,j=1}^{\infty}(Q_{i}\times R_{j})$. Each $Q_{i}\times R_{j}$ is an open box in $\mathbb{R}^{n+m}$, and its volume is $\text{vol}(Q_{i}\times R_{j})=\text{vol}(Q_{i})\text{vol}(R_{j})$. Therefore,
+\textbf{Step 1: Upper bound.} We first show that
+\[
+    m^{*}(A\times B)\le m^{*}(A)m^{*}(B).
+\]
+Fix $\epsilon>0$. By the definition of outer measure, there exist countable collections of open boxes $\{Q_{i}\}_{i=1}^{\infty}\subset \mathbb{R}^{n}$, $\{R_{j}\}_{j=1}^{\infty}\subset \mathbb{R}^{m}$ such that $A\subset\bigcup_{i=1}^{\infty}Q_{i}$, $B\subset\bigcup_{j=1}^{\infty}R_{j}$, and
+\[
+    \sum_{i=1}^{\infty}\text{vol}(Q_{i})<m^{*}(A)+\epsilon, \quad \sum_{j=1}^{\infty}\text{vol}(R_{j})<m^{*}(B)+\epsilon.
+\]
+Then $A\times B\subset\bigcup_{i,j=1}^{\infty}(Q_{i}\times R_{j})$. Each $Q_{i}\times R_{j}$ is an open box in $\mathbb{R}^{n+m}$, and its volume is $\text{vol}(Q_{i}\times R_{j})=\text{vol}(Q_{i})\text{vol}(R_{j})$. Therefore,
 \begin{align*}
 m^{*}(A\times B) &\le \sum_{i,j=1}^{\infty}\text{vol}(Q_{i}\times R_{j}) \\
 &= \sum_{i,j=1}^{\infty}\text{vol}(Q_{i})\text{vol}(R_{j}) \\
@@ -228,7 +338,17 @@ m^{*}(A\times B) &\le \sum_{i,j=1}^{\infty}\text{vol}(Q_{i}\times R_{j}) \\
 \end{align*}
 Since $\epsilon>0$ is arbitrary, we conclude that $m^{*}(A\times B)\le m^{*}(A)m^{*}(B)$.
 
-\textbf{Step 2: Lower bound.} We now show that $m^{*}(A\times B)\ge m^{*}(A)m^{*}(B)$. Let $G\subset \mathbb{R}^{n+m}$ be any open set such that $A\times B\subset G$. For each $y\in \mathbb{R}^{m}$, define the section $G_{y}:=\{x\in \mathbb{R}^{n}:(x,y)\in G\}$. Since $G$ is open, each section $G_{y}$ is an open subset of $\mathbb{R}^{n}$ hence Lebesgue measurable. Now let $y\in B$. If $x\in A$, then $(x,y)\in A\times B\subset G$, so $x\in G_{y}$. Thus $A\subset G_{y}$ for every $y\in B$. By monotonicity of outer measure, $m(G_{y})\ge m^{*}(A)$ for every $y\in B$. Consider the function $f(y):=m(G_{y})$, $y\in \mathbb{R}^{m}$. Since $G$ is open, it is measurable, and by Tonelli's theorem for the indicator function $1_{G}$, $m(G)=\int_{\mathbb{R}^{m}}f(y)dy$. Set $H:=\{y\in \mathbb{R}^{m}:f(y)\ge m^{*}(A)\}$. Because $f$ is measurable, the set $H$ is measurable. Moreover, from the previous observation we have $B\subset H$. Therefore, by monotonicity of outer measure, $m(H)\ge m^{*}(B)$. Using the fact that $f(y)\ge m^{*}(A)$ on $H$, we obtain
+\textbf{Step 2: Lower bound.} We now show that $m^{*}(A\times B)\ge m^{*}(A)m^{*}(B)$. Let $G\subset \mathbb{R}^{n+m}$ be any open set such that $A\times B\subset G$. For each $y\in \mathbb{R}^{m}$, define the section $G_{y}:=\{x\in \mathbb{R}^{n}:(x,y)\in G\}$. Since $G$ is open, each section $G_{y}$ is an open subset of $\mathbb{R}^{n}$ hence Lebesgue measurable. Now let $y\in B$. If $x\in A$, then $(x,y)\in A\times B\subset G$, so $x\in G_{y}$. Thus $A\subset G_{y}$ for every $y\in B$. By monotonicity of outer measure, $m(G_{y})\ge m^{*}(A)$ for every $y\in B$. Consider the function $f(y):=m(G_{y})$, $y\in \mathbb{R}^{m}$. Since $G$ is open, it is measurable, and by Tonelli's theorem for the indicator function $\chi_{G}$,
+\begin{align*}
+    m(G) &= \int _{\mathbb{R} ^{n + m}} \chi _G = \int _{\mathbb{R} ^m} \left( \int _{\mathbb{R} ^n} \chi_G(x, y) \, \mathrm{d} x  \right) \, \mathrm{d} y \\
+    &= \int _{\mathbb{R} ^m} \left( \int _{\mathbb{R} ^n} \chi _{G_y}(x) \, \mathrm{d} x  \right) \, \mathrm{d} y = \int _{\mathbb{R} ^m} m(G_y) \, \mathrm{d} y = \int _{\mathbb{R} ^m} f(y) \, \mathrm{d} y.   
+\end{align*}
+Set $H:=\{y\in \mathbb{R}^{m}:f(y)\ge m^{*}(A)\}$. Now since
+\[
+    f(y) \coloneqq m(G_y) = \int_{\mathbb{R}^{n+m}} \chi _{G}(x, y),
+\]
+which gives \(f\) is measurable since \(\chi _G\) is measurable and by Tonelli's theorem. 
+Because $f$ is measurable, the set $H$ is measurable. Moreover, from the previous observation we have $B\subset H$. Therefore, by monotonicity of outer measure, $m(H)\ge m^{*}(B)$. Using the fact that $f(y)\ge m^{*}(A)$ on $H$, we obtain
 $$m(G)=\int_{\mathbb{R}^{m}}f(y)dy \ge \int_{H}f(y)dy \ge \int_{H}m^{*}(A)dy = m^{*}(A)m(H) \ge m^{*}(A)m^{*}(B).$$
 Thus every open set $G \supset A \times B$ satisfies $m(G) \ge m^{*}(A)m^{*}(B)$. Taking the infimum over all such open sets $G$, we conclude that $m^{*}(A \times B) \ge m^{*}(A)m^{*}(B)$. Combining this with the upper bound proved in Step 1, we obtain $m^{*}(A \times B) = m^{*}(A)m^{*}(B)$. This completes the proof.
 \end{proof}

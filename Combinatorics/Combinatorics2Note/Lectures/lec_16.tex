@@ -136,10 +136,9 @@ There is a clever construction to decompose $E(K_n)$ into perfect matchings by a
 
     We want \(M = \binom{n - 1}{k - 1}\) perfect matchings. 
     \begin{claim}
-        For any \(0 \le \ell \le n\), there is a collection \(\mathcal{A}_1, \mathcal{A}_2, \dots , \mathcal{A}_M\) of \(m\)-partitions of \([\ell]\) s.t. for any \(S \in 2^{[\ell]}\), \(S\) appears \(\binom{n - \ell}{k - \vert S \vert }\) times in \(\mathcal{A}_1, \mathcal{A}_2, \dots , \mathcal{A}_M\).       
+        For any \(0 \le \ell \le n\), there is a collection \(\mathcal{A}_1, \mathcal{A}_2, \dots , \mathcal{A}_M\) of \(m\)-partitions of \([\ell]\) s.t. \(m = \frac{n}{k}\) and for any \(S \in 2^{[\ell]}\), \(S\) appears \(\binom{n - \ell}{k - \vert S \vert }\) times in \(\mathcal{A}_1, \mathcal{A}_2, \dots , \mathcal{A}_M\).       
     \end{claim}
-    \begin{explanation}
-        We do induction on \(\ell\). 
+    \textbf{proof:} We do induction on \(\ell\). 
         \begin{itemize}
             \item Base case: \(\ell = 0\), then let
             \[
@@ -150,11 +149,55 @@ There is a clever construction to decompose $E(K_n)$ into perfect matchings by a
             \[
                 c(\vv{e}) = \begin{dcases}
                     1, &\text{ if } \vv{e} = s \to \mathcal{A}_i ;\\
-                    2^M \text{ (large integer)} , &\text{ if } \vv{e} = A_i \to S ;\\
+                    \infty, &\text{ if } \vv{e} = \mathcal{A}_i \to S ;\\
                     \binom{n - \ell - 1}{k - \vert S \vert - 1}, &\text{ if } \vv{e} = S \to t.
                 \end{dcases}
             \]
-            We aim to show that max flow is of value \(M\), and we can decompose to unit flow, and we can update \(\mathcal{A}_i\) to \(\mathcal{A}_i^{\prime} \): \(m\)-partition of \([\ell + 1]\), by replacing \(S\) with \(S \cup \left\{ \ell + 1 \right\} \) if flow goes through \(A_i \to S\), and then we can show the counts are correct.  
+            Now we have \(M\) \(m\)-partitions of \([\ell]\), with the sets appearing with the right multiplicity. Now we need to choose to put \(\ell + 1\) in each \(m\)-partition, maintaining correct multiplicities.
+
+            Network represents the assignment of \(\ell + 1\) to a part in each partition. Need to ensure that the set multiplicities are correct. 
+            
+            \textbf{Dream:} Find an integer flow with edges \((s, \mathcal{A}_i)\) and \((S, t)\) used to capacity. Then each \(\mathcal{A}_i\) has a part \(S_i \in \mathcal{A}_i\) s.t. \(f((\mathcal{A}_i, S_i)) = 1\). Hence, we can form new \(m\)-partition of \([\ell + 1]\) by taking \(\mathcal{A}_i\) and replacing \(S_i\) with \(S_i \cup \left\{ \ell + 1 \right\} \). Now we count the multiplicities of sets \(S \in 2^{[\ell + 1]}\). If \(\ell + 1 \in S\), then let \(S^{\prime} = S - \left\{ \ell + 1 \right\} \), we get \(S\) by adding \(\ell + 1\) to \(S^{\prime} \) in an \(m\)-partition. This happens 
+            \[
+                f((S^{\prime}, t)) = c((S^{\prime} , t)) = \binom{n - \ell - 1}{k - \vert S^{\prime}  \vert - 1} = \binom{n - (\ell + 1)}{k - \vert S \vert } \text{ times}. 
+            \]                  
+            Now if \(\ell + 1 \notin S\), we get \(S\) by having it in our \(m\)-partition before, and not adding \(\ell + 1\) to it. Hence, its multiplicity is 
+            \begin{align*}
+               \binom{n - \ell}{k - \vert S \vert } - \underbrace{f((S, t))}_{\substack{\text{\# of times} \\ \text{we add }  \ell + 1 \text{ to } S}} &= \binom{n - \ell}{k - \vert S \vert } - c((S, t)) \\
+               &= \binom{n - \ell}{k - \vert S \vert } - \binom{n - \ell - 1}{k - \vert S \vert - 1} = \binom{n - \ell - 1}{k - \vert S \vert }.
+            \end{align*}   
+
+            Now we want to show that such a flow of value \(M\) exists in the original network.
+            
+            \textbf{Sanity checks:} Note that the value of this flow leaving \(s\) is \(M = \binom{n - 1}{k - 1}\), and the value of flow entering \(t\) is 
+            \[
+                \sum_{S} c((S, t)) = \sum_{S \subseteq [\ell]} \binom{n - \ell - 1}{k - \vert S \vert - 1} = \sum_{i=0}^{\ell } \binom{\ell}{i} \binom{n - \ell - 1}{k - i - 1} = \binom{n - 1}{k - 1} = M,    
+            \]   
+            which makes sense. Hence, we need a feasible integer flow of value \(\binom{n - 1}{k - 1}\).
+            
+            By Ford-Fulkerson, it is enough to show that \(\mathrm{cap}(S, \overline{S}) \ge \binom{n - 1}{k - 1} \) for any source sink cut \([S, \overline{S}]\), then max flow is equal to the min cut \(\ge \binom{n - 1}{k - 1}\), and thus the max flow is of value \(M\), and by integrality theorem, there exist an integer-valued flow of value \(\binom{n - 1}{k - 1}\), and we're done. However, this is hard to prove since the edges between \(\mathcal{A}_i\) and \(S\) are of capacity \(\infty\) by our setting, so it is hard to analyze the capacity of a source sink cut.   
+
+            The actual argument is to find a fractional feasible flow \(f^*\) with \(\mathrm{val}(f^*) = \binom{n - 1}{k - 1} \), then max flow \(\ge \binom{n - 1}{k - 1}\), and by integrality theorem, there is an integer flow of value \(\binom{n - 1}{k - 1}\). Note that \(m\)-partition will grow into \(m = \frac{n}{k}\) sets of size \(k\). We add \(\ell + 1\) to a uniformly random spot, then 
+            \[
+                \mathbb{P} (\text{we add it to } S) = \frac{k - \vert S \vert }{n - \ell}.
+            \]             
+            Set 
+            \[
+                f^*((\mathcal{A}_i, S)) = \begin{dcases}
+                    \frac{k - \vert S \vert }{n - \ell}, &\text{ if } \forall S \in \mathcal{A}_i, S \neq \varnothing ;\\
+                    \frac{\lambda k}{n - \ell }, &\text{ if }\varnothing \in \mathcal{A}_i \text{ with multiplicity } \lambda.
+                \end{dcases}
+            \]
+            Note that this setting is enough since there is an edge between \(\mathcal{A}_i\) and \(S\) iff \(S \in \mathcal{A}_i\). Now we analyze the flow value going out each vertex \(\mathcal{A}_i\) and \(S\).     
+            Flow out of \(\mathcal{A}_i\):
+            \begin{align*}
+                \sum_{S \in \mathcal{A}_i} f^*((\mathcal{A}_i, S)) &= \sum_{\varnothing \neq S \in \mathcal{A}_i} \frac{k - \vert S \vert }{n - \ell} + \frac{\lambda k}{n - \ell} = \frac{\sum_{S \in \mathcal{A}_i} (k - \vert S \vert )}{n - \ell} \\
+                &= \frac{\sum_{S \in \mathcal{A}_i} k - \sum_{S \in \mathcal{A}_i} \vert S \vert  }{n - \ell} = \frac{n - \ell}{n - \ell } = 1.   
+            \end{align*} 
+            Flow into \(S\):
+            \[
+                \sum_{i: S \in \mathcal{A}_i} f^*((A_i, S)) = \sum_{i: S \in \mathcal{A}_i} \frac{k - \vert S \vert }{n - \ell} = \frac{k - \vert S \vert }{n - \ell } \binom{n - \ell}{k - \vert S \vert } = \binom{n - \ell - 1}{k - \vert S \vert - 1}.  
+            \] 
             \begin{figure}[H]
                 \centering
                 \begin{tikzpicture}[
@@ -208,7 +251,6 @@ There is a clever construction to decompose $E(K_n)$ into perfect matchings by a
                 \caption{The induction-step flow network. A unit of flow from \(s\) through \(\mathcal{A}_i\) to a part \(S\) means: in partition \(\mathcal{A}_i\), enlarge the chosen part \(S\) by adding the new element \(\ell+1\).}
             \end{figure}       
         \end{itemize} 
-    \end{explanation}
 
     \begin{observation}
         \(\ell = n\) gives Baranyai's theorem. This is because 
