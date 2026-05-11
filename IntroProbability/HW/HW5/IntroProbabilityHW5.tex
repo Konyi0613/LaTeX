@@ -1,0 +1,332 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{bbding,combelow,textcomp,amsfonts,amsthm,amsmath,amssymb,graphicx,color,hyperref,etoolbox, mathtools}
+\usepackage[utf8x]{inputenc}
+\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+
+\newtoggle{story}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Customisation options --- update as necessary
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Course details: title, semester, instructors
+
+\newcommand{\courseTitle}{Introduction to Probability Theory (Math 2502)}
+\newcommand{\semester}{Spring 2026}
+\newcommand{\instructorA}{Shagnik Das}
+\newcommand{\instructorB}{}
+
+%% Sheet number
+
+\newcommand{\sheetNumber}{5}
+
+
+%% Submission details
+
+\newcommand{\dueDate}{13:00, May 14th.}
+\newcommand{\lateWarning}{Submissions that are late will receive no credit.}
+
+
+%% Display irrelevant footnotes?  \toggletrue for yes, \togglefalse for no
+
+\toggletrue{story}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End of customisation options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pdfpagewidth 8.5in
+\pdfpageheight 11in
+\topmargin -1in
+\headheight 0in
+\headsep 0in
+\textheight 8.5in
+\textwidth 6.5in
+\oddsidemargin 0in
+\evensidemargin 0in
+\headheight 77pt
+\headsep 0in
+\footskip .75in
+
+\makeatletter
+\newcommand{\buildtitle}[4]{
+\begin{flushleft}
+{\large
+#1
+\hfill{}
+#2
+\par
+#3
+}
+\end{flushleft}
+\vskip 4pt
+\begin{center}
+{\large\bfseries#4\par}
+\end{center}
+\bigskip
+}
+\makeatother
+
+\renewcommand{\thesection}{\normalsize\arabic{section}}
+
+\renewcommand{\deg}{\textrm{deg}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\ceil}[1]{\left \lceil #1 \right \rceil}
+
+\newcommand{\hint}{\begin{flushright} [Hint at \url{\hintURL}.] \end{flushright}}
+
+\newcommand{\card}[1]{\left| #1 \right|}
+\newcommand{\mb}[1]{\mathbb{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+
+
+\newcommand{\story}[1]{\iftoggle{story}{\footnote{#1}}{}}
+\newcommand{\storymark}[1][42]{\iftoggle{story}{\footnotemark[#1]}{}}
+\newcommand{\storytext}[2][42]{\iftoggle{story}{\footnotetext[#1]{#2}}{}}
+
+\newcommand{\bonus}[2]{\paragraph{Bonus (#1 pt\ifstrequal{#1}{1}{}{s})} #2}
+
+
+\begin{document}
+
+
+\buildtitle{\courseTitle{}}{\semester}{\instructorA{} \hfill \instructorB{}}{Exercise Sheet \sheetNumber{}}
+
+\vspace{-0.2in}
+
+\begin{center}
+
+{B13902024 Chang, Yi-Kuei \\ \bf Due date: \dueDate \\ \lateWarning}
+
+\end{center}
+
+\noindent You should try to solve all of the exercises below --- each problem is worth $10$ points. Make sure to clearly justify your answers, defining everything precisely and stating any results you are using. You should then submit your solutions in Gradescope on NTU COOL, either as a typed PDF or a clear scan of your handwritten answers, and should indicate where in the file the solutions to each exercise are. If you have difficulties with Gradescope, please send your solutions by e-mail.
+
+\paragraph{Exercise 1}  $X$ is a random variable whose cumulative distribution function $F_X$ is given by
+\[ F_X(x) = \begin{cases}
+	0 & x \le 0, \\
+	x^2 & 0 \le x \le 1, \\
+	1 & 1\le x.
+	\end{cases} \]
+Determine the expectation and variance of $X$.
+
+\paragraph{Solution:} Since 
+\[
+	f_X(x) = F_X^{\prime} (x) = \begin{dcases}
+		0, &\text{ if } x \notin [0, 1] ;\\
+		2x, &\text{ if } x \in [0, 1].
+	\end{dcases}
+\]
+We have 
+\[
+	\mathbb{E} [X] = \int _{-\infty }^{\infty } t f_X(t) \, \mathrm{d} t = \int _0^1 t \cdot 2t \, \mathrm{d} t = \frac{2}{3}.  
+\]
+Also,
+\[
+	\mathbb{E} [X^2] = \int _{-\infty }^{\infty } t^2 f_X(t) \, \mathrm{d} t = \int _0^1 t^2 \cdot 2t \, \mathrm{d} t = \frac{1}{2}.  
+\]
+Thus, 
+\[
+	\mathrm{Var}(X) = \mathbb{E} [X^2] - \mathbb{E} [X]^2 = \frac{1}{2} - \frac{4}{9} = \frac{1}{18}.
+\]
+
+\paragraph{Exercise 2} Two brothers, Alpha and Beta, have a 30cm long chocolate bar to share. They break the bar at a uniformly random point, and then the older brother, Alpha, takes the larger piece, while Beta gets the shorter piece. What is the expectation of the length of Alpha's piece of chocolate?
+
+\paragraph{Solution:} Suppose when we break the chocolate bar, we put it on a platform, and define \(X\) to be the length (cm) from the breakpoint to the left of chocolate bar. Then, we know \(X \sim \mathrm{Unif}([0, 30])\). Since Alpha will take the larger piece, so we define the length of chocolate bar that Alpha gets to be 
+\[
+	Y \sim \max \left\{ X, 30 - X \right\},  
+\] 
+which is becuase the breaked chocolate bar has 2 portions, one of length \(X\), while the other one of length \(30 - X\), and Alpha will take the larger piece. Note that \(Y \ge 15\) since if \(X \le 15\), \(30 - X \ge 15\), otherwise \(X \ge 15\) also gives \(Y \ge 15\). Now for \(t \in [15, 30]\), we know 
+\begin{align*}
+	F_Y(t) &= \mathbb{P} \left( \max \left\{ X, 30 - X \right\} \le t  \right) = \mathbb{P} (X \le t, 30 - X \le t) \\
+	&= \mathbb{P} (30 - t \le X \le t) = \int _{30 - t}^t f_X(x) \, \mathrm{d} x \\
+	&= \int _{30 - t}^t \frac{1}{30} \, \mathrm{d} x = \frac{1}{30} \left( t - (30 - t) \right) = \frac{1}{15} t - 1.    
+\end{align*}   
+Hence, we have 
+\[
+	f_Y(t) = \begin{dcases}
+		F_Y^{\prime} (t) = \frac{1}{15}, &\text{ if } 15 \le t \le 30 ;\\
+		0, &\text{ if } t \notin [15, 30].
+	\end{dcases}
+\]     
+Thus, 
+\[
+	\mathbb{E} [Y] = \int _{15}^{30} t \cdot \frac{1}{15} \, \mathrm{d} t = \left[ \frac{t^2}{30} \right]_{15}^{30} = 22.5.  
+\]
+
+\paragraph{Exercise 3} $X$ and $Y$ are two independent exponential random variables with the rate $\lambda$. Let $Z = \max \{ X, Y \}$.
+\begin{itemize}
+	\item[(a)] What is the probability density function of $Z$?
+	\item[(b)] What is the expectation of $Z$?
+\end{itemize}
+\paragraph{Solution:}
+\begin{itemize}
+	\item [(a)] Note that 
+	\begin{align*}
+		F_Z(t) &= \mathbb{P} (Z \le t) = \mathbb{P} (\max \left\{ X, Y \right\} \le t) = \mathbb{P} (X \le t, Y \le t) \\
+		&= \mathbb{P} (X \le t) \mathbb{P} (Y \le t) \quad \text{[independence]} \\
+		&= F_X(t) F_Y(t) = \begin{dcases}
+			(1 - e^{-\lambda t})^2, &\text{ if } t \ge 0 ;\\
+			0, &\text{ otherwise} .
+		\end{dcases}
+	\end{align*}
+	Thus,
+	\[
+		f_Z(t) = F_Z^{\prime} (t) = \begin{dcases}
+			2 (1 - e^{-\lambda t}) \cdot (\lambda e^{-\lambda t}), &\text{ if } t \ge 0 ;\\
+			0, &\text{ if }  t < 0.
+		\end{dcases}
+	\]
+	\item [(b)] 
+	\begin{align*}
+		\mathbb{E} [Z] &= \int _{-\infty }^{\infty } t f_Z(t) \, \mathrm{d} t = \int _0^{\infty} 2 \lambda t (1 - e^{-\lambda t}) \, \mathrm{d} t = 2\lambda \left( \int _0^{\infty } t e^{-\lambda t} \, \mathrm{d} t - \int _0^{\infty } t e^{-2 \lambda t} \, \mathrm{d} t   \right) \\
+		&= 2\lambda \left( -\int _{-\infty }^0 \frac{u}{\lambda ^2} e^u \, \mathrm{d} u + \int _{-\infty }^- \frac{u}{4 \lambda ^2} e^u \, \mathrm{d} u   \right) = \left( - \frac{2}{\lambda} + \frac{1}{2 \lambda} \right) \int _{-\infty }^0 u e^u \, \mathrm{d} u \\
+		&= \left( - \frac{3}{2 \lambda} \right) \int _{-\infty }^0 u e^u \, \mathrm{d} u = \frac{3}{2 \lambda}.        
+	\end{align*}
+\end{itemize}
+
+\paragraph{Exercise 4}  There are two tour bus routes that stop at the same bus stop - a red bus and a green bus. The waiting times for the buses are all independent, with the times between consecutive red buses exponentially distributed with rate $\lambda_1$, while the times between consecutive green buses are exponentially distributed with rate $\lambda_2$. 
+\begin{itemize}
+	\item[(a)] A tourist arrives at the bus stop. What is the probability that the first bus to arrive will be a red bus?
+	\item[(b)] The tourist has already bought a ticket for the green bus. What is the expected number of red buses that will arrive before the first green bus?
+\end{itemize}
+
+\paragraph{Solution:}
+\begin{itemize}
+	\item [(a)] Suppose \(X\) is the time of first red bus to arrive, and \(Y\) is the time of the first green bus to arrive, then \(X \sim \mathrm{Exp}(\lambda _1) \) and \(Y \sim \mathrm{Exp}(\lambda _2) \) and \(X, Y\) are independent. Hence,
+	\begin{align*}
+		\mathbb{P} (\text{first bus is red}) &= \mathbb{P} (X < Y) = \int _{0}^{\infty } \int _u^{\infty } f_{X_1, X_2}(u, v) \, \mathrm{d} v \, \mathrm{d} u \\
+		&= \int _0^{\infty} \int _u^{\infty} f_{X_1}(u) f_{X_2}(v) \, \mathrm{d} v \, \mathrm{d} u  \quad \text{[independence]} \\
+		&= \int _0^{\infty } \int _u^{\infty } \lambda _1 e^{-\lambda _1 u} \cdot \lambda _2 e^{-\lambda _2 v} \, \mathrm{d} v \, \mathrm{d} u \\
+		&= \int _0^{\infty } \lambda _1 e^{-\lambda _1 u} \left( \int _u^{\infty } \lambda _2 e^{-\lambda _2 v} \, \mathrm{d} v  \right) \, \mathrm{d} u \\
+		&= \int _0^{\infty } \lambda _1 e^{-\lambda _1 u - \lambda _2 u} \, \mathrm{d} u \\
+		&= \frac{\lambda _1}{\lambda _1 + \lambda _2}.     
+	\end{align*}
+	\item [(b)] We model red and green buses as two independent Poisson processes with rates $\lambda_1$ and $\lambda_2$, respectively. Let $(R(t))_{t \ge 0}$ and $(G(t))_{t \ge 0}$ be their counting processes. Let $S_i$ denote the arrival time of the $i$-th red bus, and let $Y$ be the arrival time of the first green bus:
+\[
+Y = \inf\{t \ge 0 : G(t) \ge 1\}.
+\]
+Define
+\[
+N = \max\{i \ge 0 : S_i < Y\},
+\]
+the number of red arrivals before the first green arrival.
+
+\medskip
+\noindent
+\textbf{Step 1: distribution of event ordering.}
+At any time, the next red arrival occurs after an exponential waiting time with rate $\lambda_1$, and the next green arrival occurs after an independent exponential waiting time with rate $\lambda_2$. Hence, for independent $X \sim \mathrm{Exp}(\lambda_1)$ and $Y \sim \mathrm{Exp}(\lambda_2)$, we have shown that
+\[
+\mathbb{P}(X < Y) = \frac{\lambda_1}{\lambda_1+\lambda_2}.
+\]
+in (a), and
+\[
+\mathbb{P}(Y < X) = 1 - \frac{\lambda_1}{\lambda _1 + \lambda _2} = \frac{\lambda_2}{\lambda_1+\lambda_2}.
+\]
+
+\medskip
+\noindent
+\textbf{Step 2: memoryless property and stopping times.}
+Let $Y \sim \mathrm{Exp}(\lambda_2)$ and let $T \ge 0$ be a continuous random variable independent of $Y$ (in particular, $T$ may be a stopping time determined by the red process such as $S_i$). Then for any $s \ge 0$,
+\[
+\mathbb{P}(Y - T > s \mid Y > T)
+= \frac{\mathbb{P}(Y > T+s)}{\mathbb{P}(Y > T)}.
+\]
+We compute numerator and denominator by conditioning on $T$:
+\begin{align*}
+	\mathbb{P}(Y > T+s)
+&= \int_0^\infty \mathbb{P}(Y > t+s) f_T(t) \, \mathrm{d} (t)
+= \int_0^\infty e^{-\lambda_2(t+s)} f_T(t) \, \mathrm{d} t 
+\\ &= e^{-\lambda_2 s}\int_0^\infty e^{-\lambda_2 t} f_T(t)\, \mathrm{d} t,
+\end{align*}
+
+and
+\[
+\mathbb{P}(Y > T)
+= \int_0^\infty e^{-\lambda_2 t} f_T(t)\, \mathrm{d} t.
+\]
+Hence,
+\[
+\mathbb{P}(Y - T > s \mid Y > T) = e^{-\lambda_2 s}.
+\]
+Therefore,
+\[
+Y - T \mid (Y > T) \sim \mathrm{Exp}(\lambda_2).
+\]
+
+Applying this with $T = S_i$, and using that $S_i$ depends only on the red process and is independent of the green process, we obtain
+\[
+Y - S_i \mid (S_i < Y) \sim \mathrm{Exp}(\lambda_2).
+\]
+
+\medskip
+\noindent
+\textbf{Step 3: regeneration.}
+At each red arrival time before $Y$, the residual green waiting time has the same exponential distribution and is independent of the past. Moreover, by independence of increments of Poisson processes, the future evolution after any such time has the same law as the original system. Hence after each red arrival (before the first green), the process probabilistically restarts.
+
+Thus, the sequence of observed bus colors forms a sequence of independent trials where each event is red with probability
+\[
+\frac{\lambda_1}{\lambda_1+\lambda_2}
+\quad \text{and green with probability} \quad
+\frac{\lambda_2}{\lambda_1+\lambda_2}.
+\]
+The process stops at the first green arrival.
+
+\medskip
+\noindent
+\textbf{Step 4: distribution of $N$.}
+For $k \ge 0$, the event $\{N = k\}$ means that the first $k$ arrivals are red and the $(k+1)$-th is green. Hence
+\[
+\mathbb{P}(N = k)
+= \left(\frac{\lambda_1}{\lambda_1+\lambda_2}\right)^k
+\left(\frac{\lambda_2}{\lambda_1+\lambda_2}\right).
+\]
+
+\medskip
+\noindent
+\textbf{Step 5: expectation via integral.}
+We compute
+\[
+\mathbb{E}[N]
+= \sum_{k=0}^\infty k \, \mathbb{P}(N=k)
+= \sum_{k=0}^\infty k \left(\frac{\lambda_1}{\lambda_1+\lambda_2}\right)^k
+\left(\frac{\lambda_2}{\lambda_1+\lambda_2}\right).
+\]
+Let $p = \frac{\lambda_2}{\lambda_1+\lambda_2}$ and $q = \frac{\lambda_1}{\lambda_1+\lambda_2}$. Then
+\[
+\mathbb{E}[N]
+= p \sum_{k=0}^\infty k q^k.
+\]
+Using the standard identity (derived from differentiating $\sum_{k=0}^\infty q^k = \frac{1}{1-q}$ for $|q|<1$),
+\[
+\sum_{k=0}^\infty k q^k = \frac{q}{(1-q)^2},
+\]
+we obtain
+\[
+\mathbb{E}[N]
+= p \cdot \frac{q}{(1-q)^2}.
+\]
+Substituting $1-q = p$ gives
+\[
+\mathbb{E}[N] = \frac{q}{p} = \frac{\lambda_1}{\lambda_2}.
+\]
+
+\medskip
+\noindent
+\textbf{Conclusion.}
+\[
+\boxed{\mathbb{E}[N] = \frac{\lambda_1}{\lambda_2}.}
+\]
+\end{itemize}
+% \newpage
+
+% \section*{Hints}  The following QR codes contain hints for some of the homework exercises.  You should be able to decode them using any QR code scanner, including this one: \url{https://zxing.org/w/decode.jspx}.
+
+% \paragraph{Exercise ?} Also available at \url{https://i.ibb.co/???????/S??E?.png}.
+
+\begin{center}
+% \includegraphics[scale=0.5]{Hints/S??E?.png}
+\end{center}
+
+\end{document}
