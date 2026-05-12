@@ -1,0 +1,159 @@
+\lecture{21}{May 12.}{}
+\paragraph{Sum of independent discrete random variables}
+\begin{proposition}
+    Let \(X, Y\) be independent discrete random variables with probability mass functions \(p_x, p_y\). Then their sum has pmf 
+    \[
+        p_{x+y}(z) = \sum_{x} p_X(x) p_Y(z - x) = \sum_{y} p_X(z - y) p_Y(y).  
+    \]  
+\end{proposition}
+
+\begin{proof}
+    \begin{align*}
+        p_{X + Y}(z) &= \mathbb{P} (X + Y = z),
+    \end{align*}
+    and let \(E = \left\{ X + Y = z \right\} \), then the sample space \(S\) can be partitioned based on the value of \(X\). Let \(F_i = \left\{ X = x_i \right\} \), where \(\left\{ x_1, x_2, \dots  \right\} \) are the values of \(X\) takes. By the law of total probability,
+    \begin{align*}
+        \mathbb{P} (X + Y = z) &= \sum_{i} \mathbb{P} (X + Y = z \mid X = x_i) \mathbb{P} (X = x_i) = \sum_{i} \mathbb{P} (Y = z - x_i \mid X = x_i) \mathbb{P} (X = x_i) \\
+        &= \sum_{i} \mathbb{P} (Y = z - x_i) \mathbb{P} (X = x_i) = \sum_{i} p_X(x_i) p_Y(z - x_i) = \sum_{x} p_X(x) p_Y(z - x).    
+    \end{align*}      
+\end{proof}
+
+\begin{eg}[Sums of Poisson random variables]
+Suppose \(X \sim \mathrm{Poi}(\lambda_1), Y \sim \mathrm{Poi}(\lambda _2)  \) are independent, then what is the distribution of \(X + Y\)?  
+\end{eg}
+
+\begin{explanation}
+    \begin{align*}
+        p_{X + Y}(z) &= \sum_{x = 0}^z p_X(x) p_Y(z - x) = \sum_{x = 0}^z \frac{\lambda _1 ^x e^{-\lambda _1}}{x!} \frac{\lambda _2^{z - x} e^{-\lambda _2}}{(z - x)!} \\
+        &= e^{-(\lambda _1 + \lambda _2)} \sum_{x=0}^z \frac{\lambda _1^x \lambda _2^{z - x}}{x! (z - x)!} = \frac{e^{-(\lambda _1 + \lambda _2)}}{z!} \sum_{x=0}^z \frac{z!}{x! (z - x)!} \lambda _1^x \lambda _2^{z - x} \\
+        &= \frac{e^{-(\lambda_1 + \lambda _2)}}{z!} (\lambda _1 + \lambda _2)^z,   
+    \end{align*}
+    so \(X + Y \sim \mathrm{Poi}(\lambda _1 + \lambda _2) \). 
+\end{explanation}
+
+\chapter{Conditional Random Variables}
+\textbf{Setting:} Two random variables in a probability space, not necessarily independent. If we know the value of one, what does that tell us about the other?
+
+\section{Discrete Case}
+\begin{definition}
+    Let \(X, Y\) be discrete random variables. The conditional probability mass function of \(X\) given \(Y\) is given by 
+    \[
+        p_{X \mid Y} (x \mid y) = \mathbb{P} (X = x \mid Y = y).
+    \]   
+\end{definition}
+
+By definition of conditional probability:
+\[
+    p_{X \mid Y}(x \mid y) = \mathbb{P} (X = x \mid Y = y) = \frac{\mathbb{P} (X = x, Y = y)}{\mathbb{P} (Y = y)} = \frac{p_{X, Y}(x, y)}{p_Y(y)}.
+\]
+
+If \(X, Y\) are independent, \(p_{X, Y}(x, y) = p_X(x) p_Y(y) \), so 
+\[
+    p_{X \mid Y} (x \mid y) = \frac{p_{X, Y}(x, y)}{p_Y(y)} = \frac{p_X(x) p_Y(y)}{p_Y(y)} = p_X(x).
+\]
+
+\begin{eg}
+    Suppose \(X \sim \mathrm{Poi} (\lambda _1), Y \sim \mathrm{Poi}(\lambda _2)  \) are independent. What is the conditional distribution of \(X\) given \(X + Y = n\)?  
+\end{eg}
+
+\begin{explanation}
+    Since \(X+Y \sim \mathrm{Poi}(\lambda _1 + \lambda _2) \) by the last example in last section, we have 
+    \begin{align*}
+        p_{X \mid X + Y}(x \mid n) &= \frac{\mathbb{P} (X = x, X + Y = n)}{\mathbb{P} (X + Y = n)} = \frac{\mathbb{P} (X = x, Y = n - x)}{\mathbb{P} (X + Y = n)} = \frac{\mathbb{P} (X = x) \mathbb{P} (Y = n - x)}{\mathbb{P} (X + Y = n)} \\
+        &= \frac{\left( \frac{\lambda _1^x e^{-\lambda _1}}{x!} \right) \left( \frac{\lambda _2^{n - x} e^{-\lambda _2}}{(n - x)!} \right)  }{\frac{(\lambda _1 + \lambda _2)^n e^{-(\lambda _1 + \lambda _2)}}{n!}} = \binom{n}{x} \left( \frac{\lambda _1}{\lambda _1 + \lambda _2} \right)^x \left( \frac{\lambda _2}{\lambda _1 + \lambda _2} \right)^{n-x}.  
+    \end{align*}
+    This is the pmf of a binomial random variable: \(X\) conditioning on \(X + Y = n\) \(\sim \mathrm{Bin}\left( n, \frac{\lambda _1}{\lambda _1 + \lambda _2} \right)  \).    
+\end{explanation}
+
+\begin{eg}
+    We repeat a random experiment \(n\) times, independently, with probability of occurs \(p\). Now let \(X = \#\) of successes (\(X \sim \mathrm{Bin}(n, p) \)), and \(\sigma =\) sequence of outcomes (success/failure) \( \in \left\{ S, F \right\}^n \). For example,if \(n = 5\), then  
+    \[
+        \mathbb{P} (\sigma = SSFSF) = p \cdot p \cdot (1 - p) \cdot p \cdot (1 - p).
+    \]      
+    Then, what is the distribution of \(\sigma\) given \(X = k\)?  
+\end{eg}
+
+\begin{explanation}
+    \begin{align*}
+        \mathbb{P} _{\sigma \mid X}(s \mid k) &= \frac{p_{\sigma , X}(s, k)}{p_X(k)} = \frac{\mathbb{P} (\sigma = s, X = k)}{\mathbb{P} (X = k)} = \frac{\mathbb{P} (\sigma = s)}{\mathbb{P} (X = k)} = \frac{p^k (1 - p)^{n - k}}{\binom{n}{k} p^k (1 - p)^k} = \frac{1}{\binom{n}{k}}.
+    \end{align*}
+    Thus, \(\sigma \mid X = k\) is uniform on the set of sequences with \(k\) successes.  
+\end{explanation}
+
+\section{Continuous Random Variables case}
+Suppose \(X, Y\) are continuous random variables in a probability space. If we have \(Y = y\), what can we say about \(X\)?
+
+It doesn't make sense to talk about \(\mathbb{P} (X = x \mid Y = y)\) directly. Instead, we should look at intervals. 
+\begin{align*}
+    \mathbb{P} \left( x \le X \le x + \delta _x \mid y \le Y \le y + \delta _y \right) &= \frac{\mathbb{P} (x \le X \le x + \delta _x, y \le Y \le Y + \delta _y)}{\mathbb{P} (y \le Y \le y + \delta _y)} \\
+    &= \frac{\int _x^{x + \delta _x} \int _y^{y + \delta _y} f_{X, Y}(u, v) \, \mathrm{d} v \, \mathrm{d} u  }{\int _y^{y + \delta _y} f_Y(v) \, \mathrm{d} v } \\
+    &\thickapprox \frac{f_{X, Y} \delta _x \delta _y}{f_Y(y) \delta _y} \quad \text{ as } \delta _x, \delta _y \to 0  \\
+    &\to \frac{f_{X, Y}(x, y)}{f_Y(y)} \, \mathrm{d} x  
+\end{align*} 
+
+\begin{definition}
+    The conditional probability density function of \(X\) given \(Y = y\) is 
+    \[
+        f_{X \mid Y}(x \mid y) = \frac{f_{X, Y}(x, y)}{f_Y(y)}
+    \]  and 
+    \[
+        \mathbb{P} (X \in A \mid Y = y) = \int _A f_{X \mid Y}(x \mid y) \, \mathrm{d} x. 
+    \]
+\end{definition}
+
+\begin{remark}
+    If \(X, Y\) are independent: 
+    \[
+        f_{X \mid Y}(x \mid y) = \frac{f_{X, Y}(x, y)}{f_Y(y)} = \frac{f_X(x) f_Y(y)}{f_Y(y)} = f_X(x).
+    \] 
+\end{remark}
+
+\begin{eg}
+    \[
+        f_{X, Y}(x, y) = \begin{dcases}
+            \frac{e^{- \frac{x}{y}} e^{-y}}{y}, &\text{ if } x, y > 0 ;\\
+            0, &\text{ otherwise}.
+        \end{dcases}
+    \]
+    What is \(\mathbb{P} (X > 1 \mid Y = y)\)? 
+\end{eg}
+
+\begin{explanation}
+    \begin{align*}
+        f_Y(y) &= \int _\mathbb{R} f_{X, Y}(x, y) \, \mathrm{d} x = \begin{dcases}
+            0, &\text{ if } y \le 0 ;\\
+            \int _0^{\infty} \frac{e^{- \frac{x}{y}} e^{-y}}{y} \, \mathrm{d} x = e^{-y}, &\text{ if }y > 0.
+        \end{dcases} 
+    \end{align*}
+    Thus, for \(x, y > 0\),
+    \[
+        f_{X \mid Y} (x \mid y) = \frac{ \left( \frac{e^{- \frac{x}{y}} e^{-y}}{y} \right) }{e^{-y}} = \frac{e^{- \frac{x}{y}}}{y}.
+    \] 
+    Hence, 
+    \[
+        \mathbb{P} (X > 1 \mid Y = y) = \int _1^{\infty} f_{X \mid Y} (x \mid y) \, \mathrm{d} x = \int _1^{\infty} \frac{e^{- \frac{x}{y}}}{y} \, \mathrm{d} x = e^{- \frac{1}{y}}.  
+    \]
+\end{explanation}
+
+\section{Mixed case}
+Suppose \(X\) is a continuous random variable, and \(N\) is a discrete random variable in the same probability space. What is the conditional distribution of \(X\) given \(N = n\)? 
+
+\begin{align*}
+    \mathbb{P} (x \le X \le x + \delta _x \mid N = n) &= \frac{\mathbb{P} (x \le X \le x + \delta _x, N = n)}{\mathbb{P} (N = n)} = \frac{\mathbb{P} (N = n \mid x \le X \le x + \delta _x) \mathbb{P} (x \le X \le x + \delta _x)}{\mathbb{P} (N = n)} \\
+    &\to \frac{\mathbb{P} (N = n \mid X = x) f_X(x)}{\mathbb{P} (N = n)} \quad \text{ as } \delta _x \to 0. 
+\end{align*}
+
+\begin{eg}
+    We take a coin whose probability of heads is unknown, i.e. \(\mathbb{P} (\text{head}) = P \sim \mathrm{Unif}([0, 1]) \). We toss the coin \(n\) times and observe \(k\) heads. Given this information, what can we say about the distribution of \(p\)?   
+\end{eg}
+
+\begin{explanation}
+    \begin{align*}
+        f_{P \mid N} (p \mid k) = \frac{\mathbb{P} (N = k \mid P = p) f_P(p)}{\mathbb{P} (N = k)} = \frac{\binom{n}{k} p^k (1 - p)^{n - k} \cdot 1}{\mathbb{P} (N = k)} = c p^k (1 - p)^{n - k}
+    \end{align*}
+    for some \(c\) independent of \(p\) since 
+    \[
+        \int _0^1 f_{P \mid N} (p \mid k) \, \mathrm{d} p = 1, 
+    \]  
+    and thus we can calculate \(c\). This distribution is called the beta distribution. 
+\end{explanation}
