@@ -1,0 +1,280 @@
+\lecture{21}{May 14.}{}
+Conversely, 
+\[
+    \vert f \vert = f \lor (-f). 
+\]
+Therefore, we can give a corollary:
+\begin{corollary} \label{cl: algebra is vector lattice iff statement}
+    An algebra \(A \subseteq C(X)\) is a vector lattice if and only if 
+    \[
+        \vert f \vert \in A \quad \text{for every } f \in A.  
+    \]     
+\end{corollary}
+
+\begin{proof}
+    If an algebra \(A \subseteq C(X)\) is a vector lattice, then for \(f \in A\), we have \(-f \in A\) since \(A\) is a vector space, and \(\vert f \vert = f \lor (-f) \in A\) since \(A\) is a vector lattice. 
+
+    Now if \(\vert f \vert \in A\) for every \(f \in A\), where \(A\) is an algebra, then for all \(f, g \in A\), we have \(f - g, f + g \in A\) since \(A\) is a vector space, and thus \(\vert f - g \vert \in A\). Hence, we have
+    \[
+        f \lor g = \frac{1}{2} (f + g) + \frac{1}{2} \vert f - g \vert \in A, \quad f \land g = \frac{1}{2} (f + g) - \frac{1}{2} \vert f - g \vert \in A. 
+    \]             
+    Thus, \(A\) is a vector lattice. 
+\end{proof}
+
+\begin{definition}[Separating points and vanishing at a point]
+    Let \(S\) be a set of functions on \(X\). We say \(S\) separates points if for every pair of distinct points \(x, y \in X\), there exists \(f \in S\) such that 
+    \[
+        f(x) \neq f(y).
+    \]     
+    We say that \(S\) vanishes at a point \(x_0 \in X\) if 
+    \[
+        f(x_0) = 0 \quad \text{for every } f \in S. 
+    \]   
+\end{definition}
+
+In order for an algebra \(A \subseteq C(X)\) to approximate arbitrary continuous functions on \(X\), it is necessary that \(A\) separates points. Moreover, \(A\) cannot vanish at any point, since otherwise it could not approximate the constant function \(1\). 
+
+The Stone-Weierstrass theorem states that these two natural conditions are also sufficient. 
+
+\section{The Stone-Weierstrass theorem}
+\begin{theorem}[Stone-Weierstrass theorem]
+    Let \(X\) be a compact metric space, and let \(A \subseteq C(X)\) be an algebra of real-valued continuous functions. Suppose that \(A\) separates points and does not vanish at any point of \(X\). Then \(A\) is dense in \(C(X)\) with respect to the uniform norm. In other words, for every \(f \in C(X)\) and every \(\varepsilon > 0\), there exists \(g \in A\) s.t. 
+    \[
+        \lVert f - g \rVert_X < \varepsilon. 
+    \]         
+    Here 
+    \[
+        \lVert f \rVert_X \coloneqq \sup _{x \in X} \vert f(x) \vert  
+    \]
+    denotes the uniform norm on \(X\). 
+\end{theorem}
+
+We break the proof into several lemmas. 
+
+\begin{lemma} \label{lm: 1121}
+    Let \(n \in \mathbb{N}\) and \(0 \le x \le 1\). Then 
+    \[
+        \sum_{k=0}^n \left( \frac{k}{n} - x \right)^2 \binom{n}{k} x^k (1 - x)^{n - k} = \frac{x(1 - x)}{n}.  
+    \]  
+\end{lemma}
+
+\begin{proof}
+    We first record three elementary identities which will be used in the proof. They are consequences of the binomial theorem. For two variables \(x\) and \(y\), we have 
+    \[
+        (x + y)^n = \sum_{k=0}^n \binom{n}{k} x^k y^{n - k}. 
+    \]  
+    First, set \(y = 1 - x\). Then \(x + y = 1\), and hence 
+    \[
+        \sum_{k=0}^n \binom{n}{k} x^k (1 - x)^{n - k} = (x + (1 - x))^n = 1. 
+    \]  
+
+    Next, differentiate the binomial identity with respect to \(x\). Since \(y\) is treated as an independent variable, we obtain 
+    \[
+        n(x + y)^{n - 1} = \sum_{k=1}^n k \binom{n}{k} x^{k - 1} y^{n - k}. 
+    \]  
+    Multiplying both sides by \(x\), we get 
+    \[
+        nx(x + y)^{n - 1} = \sum_{k=1}^n k \binom{n}{k} x^k y^{n - k}. 
+    \] 
+    The term \(k = 0\) is zero, so we may write the right-hand side as a sum from \(k = 0\) to \(n\). Setting \(y = 1 - x\), we obtain 
+    \[
+        \sum_{k=0}^n k \binom{n}{k} x^k (1 - x)^{n - k} = nx(x+(1 - x))^{n - 1} = nx. 
+    \]    
+    Finally, differentiate the binomial identity twice with respect to \(x\). This gives 
+    \[
+        n(n - 1)(x + y)^{n - 2} = \sum_{k=2}^n k(k - 1) \binom{n}{k} x^{k - 2} y^{n - k}. 
+    \] 
+    Multiplying both sides by \(x^2\), we obtain 
+    \[
+        n(n - 1)x^2 (x+y)^{n - 2} = \sum_{k=2}^n k(k - 1) \binom{n}{k} x^k y^{n-k}. 
+    \] 
+    The terms \(k = 0\) and \(k = 1\) are zero, so again we may extend the sum to start from \(k = 0\). Setting \(y = 1 - x\), we get 
+    \[
+        \sum_{k=0}^n k(k - 1) \binom{n}{k} x^k (1 - x)^{n - k} = n(n - 1)x^2 (x + (1 - x))^{n - 2} = n( n - 1)x^2. 
+    \]    
+    Now expand the square:
+    \begin{align*}
+        &\quad \sum_{k=0}^n \left( \frac{k}{n} - x \right)^2 \binom{n}{k} x^k (1 - x)^{n - k} \\
+        &= \frac{1}{n^2} \sum_{k=0}^n k^2 \binom{n}{k} x^k (1 - x)^{n - k} - \frac{2x}{n} \sum_{k=0}^n k \binom{n}{k} x^k (1 - x)^{n - k} + x^2 \sum_{k=0}^n \binom{n}{k} x^k (1 - x)^{n - k}.     
+    \end{align*}
+    Since \(k^2 = k(k - 1) + k\), we have 
+    \begin{align*}
+        \sum_{k=0}^n k^2 \binom{n}{k} x^k (1 - x)^{n - k} &= \sum_{k=0}^n k(k - 1) \binom{n}{k} x^k (1 - x)^{n - k} + \sum_{k=0}^n k \binom{n}{k} x^k (1 - x)^{n - k} \\
+        &= n(n - 1)x^2 + nx.   
+    \end{align*} 
+    Therefore,
+    \begin{align*}
+        \sum_{k=0}^n \left( \frac{k}{n} - x \right)^2 \binom{n}{k} x^k (1 - x)^{n - k} &= \frac{n(n - 1)x^2 + nx}{n^2} - \frac{2x}{n} (nx) + x^2 \\
+        &= \frac{n - 1}{n} x^2 + \frac{x}{n} - 2x^2 + x^2 = \frac{x}{n} - \frac{x^2}{n} = \frac{x(1-x)}{n}.  
+    \end{align*}
+\end{proof}
+
+\begin{theorem}[Weierstrass approximation theorem]
+    Let \(h : [a, b] \to \mathbb{R}\) be continuous. Then there exists a sequence of polynomials \(\left\{ p_n \right\}_{n=1}^{\infty} \) such that \(p_n \to h\) uniformly on \([a, b]\). Equivalently, 
+    \[
+        \lim_{n \to \infty} \sup _{x \in [a, b]} \vert p_n(x) - h(x) \vert = 0.
+    \]    
+\end{theorem}
+
+\begin{proof}
+    We first prove the theorem on the interval \([0, 1]\). Let \(h : [0, 1] \to \mathbb{R} \) be continuous. For each \(n \in \mathbb{N}\), define Bernstein polynomial of degree \(n\) by 
+    \[
+        B_n h(x) \coloneqq \sum_{k=0}^n h \left( \frac{k}{n} \right) \binom{n}{k} x^k (1 - x)^{n - k}, \quad 0 \le x \le 1.  
+    \]   
+    This is indeed a polynomial in \(x\). We will prove that \(B_n h \to h\) uniformly on \([0, 1]\). 
+
+    Fix \(x \in [0, 1]\). Since 
+    \[
+        \sum_{k=0}^n \binom{n}{k} x^k (1 - x)^{n - k} = (x + (1 - x))^n = 1, 
+    \]    
+    we have 
+    \[
+        h(x) = \sum_{k=0}^n h(x) \binom{n}{k} x^k (1 - x)^{n - k}, 
+    \]
+    so we may write 
+    \[
+        B_n h(x) - h(x) = \sum_{k=0}^n \left[ h \left( \frac{k}{n} \right) - h(x)  \right] \binom{n}{k} x^k (1 - x)^{n - k}. 
+    \]
+    Therefore, 
+    \[
+        \left\vert B_n h(x) - h(x) \right\vert \le \sum_{k=0}^n \left\vert h \left( \frac{k}{n} \right) - h(x)  \right\vert \binom{n}{k} x^k (1 - x)^{n - k}.   
+    \]
+    Since \(h\) is continuous on the compact interval \([0, 1]\), it is uniformly continuous. Thus, for every \(\varepsilon > 0\), there exists \(\delta > 0\) such that 
+    \[
+        \vert u - v \vert < \delta \implies \vert h(u) - h(v) \vert < \frac{\varepsilon}{2}
+    \]    
+    for all \(u, v \in [0, 1]\). 
+
+    Also, since \(h\) is continuous on \([0, 1]\), it is bounded. Hence, there exists \(M > 0\) s.t. 
+    \[
+        \vert h(x) \vert \le M \quad \text{for every } x \in [0, 1]. 
+    \]    
+    We split the sum into two parts:
+    \[
+        A_n(x) \coloneqq \left\{ k \in [n]: \left\vert \frac{k}{n} - x \right\vert < \delta  \right\}, \quad A_n(x)^c \coloneqq [n] \setminus A_n(x). 
+    \]
+    For \(k \in A_n(x)\), uniform continuity gives 
+    \[
+        \left\vert h \left( \frac{k}{n} \right) - h(x)  \right\vert < \frac{\varepsilon}{2}. 
+    \] 
+    For all \(k\), the boundedness of \(h\) gives 
+    \[
+        \left\vert h \left( \frac{k}{n} \right) - h(x)  \right\vert \le 2M. 
+    \]  
+    Hence,
+    \begin{align*}
+        \left\vert B_n h(x) - h(x) \right\vert \le \frac{\varepsilon}{2} \sum_{k \in A_n(x)} \binom{n}{k} x^k (1 - x)^{n - k} + 2M \sum_{k \in A_n(x)^c} \binom{n}{k} x^k (1 - x)^{n - k}.   
+    \end{align*}
+    Since
+    \[
+        \sum_{k=0}^n \binom{n}{k} x^k (1 - x)^{n - k} = 1, 
+    \] 
+    we have
+    \[
+        \vert B_n h(x) - h(x) \vert \le \frac{\varepsilon}{2} + 2M \sum_{\left\vert \frac{k}{n} - x \right\vert \ge \delta} \binom{n}{k} x^k (1 - x)^{n - k}.  
+    \]
+    It remains to estimate the last sum. We shall use the elementary identity established in \autoref{lm: 1121}:
+    \[
+        \sum_{k=0}^n \left( \frac{k}{n} - x \right)^2 \binom{n}{k} x^k (1 - x)^{n - k} = \frac{x(1 - x)}{n}.  
+    \] 
+    Since \(0 \le x(1 - x) \le \frac{1}{4}\), we have 
+    \[
+        \sum_{k=0}^n \left( \frac{k}{n} - x \right)^2 \binom{n}{k} x^k (1 - x)^{n - k} \le \frac{1}{4n}.  
+    \] 
+    On the set where \(\left\vert \frac{k}{n} - x \right\vert \ge \delta \), we have 
+    \[
+        1 \le \frac{1}{\delta ^2} \left( \frac{k}{n} - x \right)^2. 
+    \] 
+    Therefore, 
+    \[
+        \sum_{\left\vert \frac{k}{n} - x \right\vert \ge \delta } \binom{n}{k} x^k (1 - x)^{n - k} \le \frac{1}{\delta ^2} \sum_{k=0}^n \left( \frac{k}{n} - x \right)^2 \binom{n}{k} x^k (1 - x)^{n - k} \le \frac{1}{4n \delta ^2}.   
+    \]
+    Consequently, 
+    \[
+        \vert B_n h(x) - h(x) \vert \le \frac{\varepsilon}{2} + \frac{M}{2n \delta ^2}. 
+    \]
+    Choose \(N \in \mathbb{N}\) such that 
+    \[
+        \frac{M}{2N \delta ^2} < \frac{\varepsilon}{2}.
+    \] 
+    Then, for every \(n \ge N\) and every \(x \in [0, 1]\), we have 
+    \[
+        \vert B_n h(x) - h(x) \vert < \varepsilon. 
+    \]  
+    Thus, 
+    \[
+        \lim_{n \to \infty} \sup _{x \in [0, 1]} \vert B_n h(x) - h(x) \vert = 0.  
+    \]
+
+    Now let \(h: [a, b] \to \mathbb{R}\) be continuous. Define 
+    \[
+        \phi (t) \coloneqq h(a + (b - a)t), \quad 0 \le t \le 1.
+    \] 
+    Then, \(\phi \) is continuous on \([0, 1]\). By the result just proved, there exists a seuqence of polynomials \(q_n(t)\) such that \(q_n \to \phi\) uniformly on \([0, 1]\). 
+
+    For \(x \in [a, b]\), set 
+    \[
+        t = \frac{x - a}{b - a}.
+    \]      
+    Define 
+    \[
+        p_n(x) \coloneqq q_n \left( \frac{x-a}{b-a} \right), 
+    \]
+    then since \(q_n\) is polynomial in \(t\), the function \(p_n\) is a polynomial in \(x\). Moreover, 
+    \[
+        p_n(x) - h(x) = q_n \left( \frac{x-a}{b-a} \right) - \phi \left( \frac{x-a}{b-a} \right).  
+    \]   
+    Taking the supremum over \(x \in [a, b]\), we obtain 
+    \[
+        \sup _{x \in [a, b]} \vert p_n(x) - h(x) \vert = \sup _{t \in [0, 1]} \vert q_n(t) - \phi (t) \vert.  
+    \]
+    Since the right-hand side tends to \(0\) as \(n \to \infty\), we conclude that \(p_n \to h\) uniformly on \([a, b]\). 
+    
+    This proves the Weierstrass approximation theorem.    
+\end{proof}
+
+\begin{lemma}
+    Let \(A \subseteq C(X)\) be an algebra of real-valued continuous functions. Then its uniform closure \(\overline{A}\) is a closed algebra and a vector lattice.  
+\end{lemma}
+
+\begin{proof}
+    It is straightforward to check that the closure of a vector subspace is again a vector subspace. Thus, \(\overline{A}\) is a vector subspace of \(C(X)\). 
+
+    We next show that \(\overline{A} \) is closed under multiplication. Let \(f, g \in \overline{A}\). Choose seuqences \(\left\{ f_n \right\} \) and \(\left\{ g_n \right\} \) in \(A\) s.t. \(f_n \to f\) and \(g_n \to g\) uniformly on \(X\). Since \(A\) is an algebra, \(f_n g_n \in A\) for every \(n\). Also, because uniform convergence preserves products of bounded continuous functions, we have \(f_n g_n \to fg\) uniformly on \(X\). Hence, \(fg \in \overline{A}\). Therefore \(\overline{A} \) is an algebra. 
+
+    It remains to show that \(\overline{A} \) is a vector lattice. By \autoref{cl: algebra is vector lattice iff statement}, it suffices to prove that \(\vert f \vert \in \overline{A} \) for every \(f \in \overline{A}\). 
+
+    Fix \(f \in \overline{A}\). Consider the function 
+    \[
+        h(t) = \vert t \vert, \quad t \in \left[ -\lVert f \rVert_X, \lVert f \rVert_X   \right].  
+    \]                
+    By the Weierstrass approximation theorem, there exists a sequence of polynomials \(p_n\) s.t. \(p_n \to h\) uniformly on \(\left[ -\lVert f \rVert_X, \lVert f \rVert   \right] \). 
+
+    We may arrange that the approximating polynomials vanish at \(0\). Indeed, since \(h(0) = 0\) and \(p_n(0) \to 0\), define 
+    \[
+        q_n(t) \coloneqq p_n(t) - p_n(0).
+    \]       
+    Then \(q_n(0) = 0\) and 
+    \[
+        \lVert h - q_n \rVert_\infty \le \lVert h - p_n \rVert_\infty + \vert p_n(0) \vert \to 0.  
+    \] 
+    Thus, \(q_n \to h\) uniformly on \(\left[ -\lVert f \rVert_X, \lVert f \rVert_X   \right] \), and each \(q_n\) has the form 
+    \[
+        q_n(t) = a_1 t + a_2 t^2 + \dots + a_k t^k.
+    \]   
+
+    Since \(\overline{A} \) is an algebra and \(f \in \overline{A}\), every power \(f^j \in \overline{A}\). Hence, 
+    \[
+        q_n(f) = a_1 f + a_2 f^2 + \dots + a_k f^k \in \overline{A}.
+    \]   
+
+    Moreover, for any two such polynomials \(p, q\),
+    \[
+        \lVert p(f) - q(f) \rVert_X = \sup _{x \in X} \vert p(f(x)) - q(f(x)) \vert \le \sup _{\vert t \vert \le \lVert f \rVert_X } \vert p(t) - q(t) \vert. 
+    \] 
+    Since \(\left\{ q_n \right\} \) is a uniformly Cauchy sequence on \(\left[ - \lVert f \rVert_X, \lVert f \rVert_X   \right] \), it follows that \(\left\{ q_n(f) \right\} \) is Cauchy in \(C(X)\). Its uniform limit is 
+    \[
+        \lim_{n \to \infty} q_n(f(x)) = h(f(x)) = \vert f(x) \vert.  
+    \]    
+    Becuase \(\overline{A} \) is closed, this limit belongs to \(\overline{A}\). Therefore, \(\vert f \vert \in \overline{A} \), and thus \(\overline{A} \) is a vector lattice.    
+\end{proof}
