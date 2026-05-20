@@ -1,0 +1,163 @@
+\lecture{23}{May 19.}{}
+\begin{eg}[Quick Sort]
+\quad \\
+    \begin{algorithm}[H]
+    \caption{Quick Sort}
+        Pick a number uniformly at random. \\
+        Compute the other numbers to this pivot, and put them in "smaller" or "bigger" lists accordingly. \\
+        Sort sublists recurrsively. \\
+        Return "smaller", pivot, "bigger". 
+    \end{algorithm}
+
+    How many times do we need to compare two numbers?
+\end{eg}
+
+\begin{explanation}
+    Let \(X = \#\) of comparisons. Our goal is to determine \(\mathbb{E} [X]\), and suppose after sorted we have
+    \[
+        x_1 < x_2 < \dots < x_n.
+    \]
+    For \(1 \le i < j \le n\), let 
+    \[
+        X_{i, j} = \begin{dcases}
+            1, &\text{ if } x_i \text{ and } x_j \text{ are compared}    ;\\
+            0, &\text{ if not}.
+        \end{dcases}
+    \]   
+    Then, \(X = \sum_{1 \le i \le j \le n} X_{i, j} \). Hence, by linearity of expectation,
+    \[
+        \mathbb{E} [X] = \mathbb{E} \left[ \sum_{1 \le i < j \le n} X_{i, j}  \right] = \sum_{1 \le i < j \le n} \mathbb{E} [X_{i, j}] = \sum_{1 \le i < j \le n} \mathbb{P}(x_i, x_j \text{ are compared}).   
+    \] 
+    Consider the round in which we choose a pivot in \(\left\{ x_i, x_{i+1}, \dots , x_j \right\} \), \(x_i, x_j\) get compared means one of them is the pivot. Then
+    \[
+        \mathbb{P} (x_i, x_j \text{ are compared}) = \frac{2}{j + i - 1},
+    \]  
+    so 
+    \begin{align*}
+        \mathbb{E} [X] &= \sum_{i < j} \mathbb{P} (x_i, x_j \text{ are compared}) = \sum_{i=1}^{n-1} \sum_{j = i + 1}^n \frac{2}{j - i + 1} \\
+        &= \sum_{i=1}^{n-1} \sum_{j^{\prime} = 1}^{n - i} \frac{2}{j^{\prime} + 1} \thickapprox 2 \sum_{i=1}^{n - 1} \ln (n - i) \thickapprox 2 n \ln n.      
+    \end{align*}
+\end{explanation}
+
+\section{Moments of Number of events}
+Let \(A_1, A_2, \dots , A_n\) be events in a probability space. Let \(X\) to be the number of these events that occur, then 
+\[
+    X = \sum_{i=1}^n I_i, \text{ where } I_i = \begin{dcases}
+        1, &\text{ if } A_i \text{ occurs}  ;\\
+        0, &\text{ if not}.
+    \end{dcases}  
+\]  
+Thus,
+\[
+    \mathbb{E} [X] = \sum_{i=1}^n \mathbb{E} [I_i] = \sum_{i=1}^n \mathbb{P} (A_i).  
+\]
+
+\begin{question}
+    What about the variance?
+\end{question}
+
+Note that 
+\[
+    \binom{X}{2} = \# \text{ of pairs of events that both occur} = \sum_{i < j} I_i I_j.  
+\]
+Hence,
+\[
+    \mathbb{E} \left[ \binom{X}{2} \right] = \mathbb{E} \left[ \sum_{i < j} I_i I_j  \right] = \sum_{i < j} \mathbb{E} [I_i I_j] = \sum_{i < j} \mathbb{P} (A_i \cap A_j),    
+\]
+where 
+\[
+    \binom{X}{2} = \frac{X(X - 1)}{2},
+\]
+so 
+\[
+    \mathbb{E} \left[ \binom{X}{2} \right] = \mathbb{E} \left[ \frac{1}{2} (X^2 - X) \right] = \frac{1}{2} \mathbb{E} [X^2] - \frac{1}{2} \mathbb{E} [X].  
+\]
+Thus,
+\[
+    \Var(X) = \mathbb{E} [X^2] - \mathbb{E} [X]^2 = 2 \mathbb{E} \left[ \binom{X}{2} \right] + \mathbb{E} [X] - \mathbb{E} [X]^2. 
+\]
+
+\begin{eg}
+    \(X \sim \mathrm{Bin}(n, p)\). Let \(A_i = \left\{ i\text{-th trial successful}  \right\} \). Then, 
+    \begin{align*}
+        \mathbb{E} [X] &= \sum_{i=1}^n \mathbb{P} (A_i) = np. \\
+        \mathbb{E} \left[ \binom{X}{2} \right] &= \sum_{i < j} \mathbb{P} (A_i \cap A_j) = \sum_{i < j} \mathbb{P} (A_i) \mathbb{P} (A_j) = \binom{n}{2} p^2. \\
+        \Var(X) &= 2 \mathbb{E} \left[ \binom{X}{2} \right] + \mathbb{E} [X] - \mathbb{E} [X]^2 = 2 \binom{n}{2} p^2 + np - n^2 p^2 = np(1 - p).     
+    \end{align*}     
+\end{eg}
+
+\begin{eg}[Hat return problem]
+    \(n\) people, \(n\) hats, hats returned uniformly at random. \(X = \#\) of people getting own hats. \(A_i = \left\{ i\text{-th person gets own hat}  \right\} \). \(I_i = 1_{A_i}\), \(p_i = \mathbb{P} (A_i) = \frac{1}{n}\). Then,
+    \[
+        \mathbb{E} [X] = \sum_{i=1}^n p_i = n \cdot \frac{1}{n} = 1. 
+    \]      
+    Also,
+    \begin{align*}
+        \mathbb{E} \left[ \binom{X}{2} \right] &= \sum_{i < j} \mathbb{P} (A_i \cap A_j) = \sum_{i < j} \mathbb{P} (A_i) \mathbb{P} (A_j \mid A_i) = \sum_{i < j} \frac{1}{n} \cdot \frac{1}{n - 1} = \binom{n}{2} \cdot \frac{1}{n(n - 1)} = \frac{1}{2}.    
+    \end{align*}
+    Hence,
+    \[
+        \Var(X) = 2 \mathbb{E} \left[ \binom{X}{2} \right] + \mathbb{E} [X] - \mathbb{E} [X]^2 = 2 \cdot \frac{1}{2} + 1 - 1^2 = 1. 
+    \]
+\end{eg}
+
+\begin{eg}[Coupon collector problem]
+    \(n\) types of coupons. Each time, get uniformly random coupon, independent of previous coupons. The goal is to collect \(n\) types of coupons. Suppose \(X\) is the number of coupons collected before we get every type. \(X_i\) is the number of coupons needed to go from having \(i - 1\) types to having \(i\) types. Hence, \(X_i \sim \mathrm{Geom} \left( \frac{n - i + 1}{n} \right) \). Hence, \(X = \sum_{i=1}^n X_i \), and 
+    \[
+        \mathbb{E} [X] = \sum_{i=1}^n \mathbb{E} [X_i] = \sum_{i=1}^n \frac{n}{n - i + 1} = n \sum_{i^{\prime} = 1}^n \frac{1}{i^{\prime} } \thickapprox n \ln n.  
+    \]
+
+    Now let \(Y\) to be the number of types of coupons that we have a unique copy of when we complete our first set. We can relabel coupons in order they appear, i.e. type \(i\) means the \(i\)-th coupon we see. Now let \(A_i = \left\{ \text{coupon } i \text{ appears uniquely}   \right\} \), and \(I_i = 1_{A_i}\), then 
+    \[
+        Y = \sum_{i=1}^n I_i \implies \mathbb{E} [Y] = \sum_{i=1}^n \mathbb{P} (A_i).  
+    \]            
+    Note that 
+    \begin{align*}
+        A_i &= \left\{ \text{after the first copy of } i, \text{ we get } i+1, \dots , n \text{ before we get } i \text{ (again)}     \right\} \\
+        &= \left\{ \text{among } \left\{ i, i+1, \dots , n \right\} i \text{ is the last coupon we get}    \right\}. 
+    \end{align*}
+    By symmetry, any of those coupons are equally likely to be the last one, so 
+    \[
+        \mathbb{P} (A_i) = \frac{1}{n - i + 1}.
+    \]
+    Hence,
+    \[
+        \mathbb{E} [Y] = \sum_{i=1}^n \mathbb{P} (A_i) = \sum_{i=1}^n \frac{1}{n - i + 1} \thickapprox \ln n.  
+    \]
+    Also, 
+    \[
+        \mathbb{E} \left[ \binom{Y}{2} \right] = \sum_{i < j} \mathbb{P} (A_i \cap A_j)  
+    \]
+    Suppose 
+    \[
+        S_{i, j} = \left\{ \text{In } \left\{ i, i+1, \dots , j \right\}, \text{ coupon } i \text{ appears last after seeing coupon } i \text{ first time}      \right\}.
+    \]
+    Then 
+    \[
+        \mathbb{P} (S_{i, j}) = \frac{1}{j - i + 1}.
+    \]
+    Suppose 
+    \[
+        T_{i, j} = \left\{ \text{among } \left\{ i, j, j+1 \dots, n  \right\}, i \text{ and } j \text{ are the last 2 after coupon } j \text{ appears}      \right\}, 
+    \]
+    then 
+    \[
+        \mathbb{P} (T_{i, j}) = \frac{2}{\binom{n - j + 2}{2} \cdot 2!} = \frac{1}{\binom{n - j + 2}{2}}.
+    \]
+    And \(S_{i, j}\) and \(T_{i, j}\) depend on disjoint sets of coupons, so thet are independent. Thus,
+    \[
+        \mathbb{P} (A_i \cap A_j) = \mathbb{P} (S_{i, j} \cap T_{i, j}) = \mathbb{P} (S_{i, j}) \mathbb{P} (T_{i, j}) = \frac{1}{j - i + 1} \cdot \frac{2}{\binom{n - j + 2}{2}}.
+    \]  
+    Thus, 
+    \[
+        \mathbb{E} \left[ \binom{Y}{2} \right] = \sum_{i < j} \frac{1}{j - i + 1} \cdot \frac{1}{\binom{n - j + 2}{2}}.  
+    \]
+    \begin{remark}
+        When computing \(\mathbb{P} (A_i \cap A_j)\), we can observe \(A_i \cap A_j = S_{i, j} \cap T_{i, j}\) since after first getting coupon \(i\), coupon \(i+1, \dots , j\) should appear first than coupon \(i\) again, and after getting coupon \(j\), coupon \(i, j\) should be the last 2 appearing among \(i, j, j+1, \dots , n\).         
+    \end{remark}
+\end{eg}
+
+\paragraph{Generalization} \(X = \sum_{i=1}^n I_i \) where \(I_i = 1_{A_i}\), then 
+\[
+    \mathbb{E} \left[ \binom{X}{k} \right] = \mathbb{E} \left[ \# \text{ of } k\text{-sets of events all occuring}   \right] = \sum_{i_1 < i_2 < \dots < i_k} \mathbb{P} (A_{i_1} \cap \dots \cap A_{i_k}).  
+\]  
