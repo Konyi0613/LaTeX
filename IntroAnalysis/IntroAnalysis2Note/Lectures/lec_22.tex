@@ -1,0 +1,632 @@
+\lecture{22}{May 19.}{}
+\begin{lemma} \label{lm: separate points and no vanish is stronger}
+    Let \(A \subseteq C(X)\) be an algebra that separates points and does not vanish at any point. Then. for any two distinct points \(x, y \in X\) and any \(\alpha , \beta \in \mathbb{R} \), there exists function \(h \in A\) s.t. 
+    \[
+        h(x) = \alpha, \quad h(y) = \beta.
+    \]    
+\end{lemma}
+
+\begin{proof}
+    Since \(A\) separates points, there exists a function \(f \in A\) s.t. \(f(x) \neq f(y)\). We shall construct \(h\) by considering the possible values of \(f(x)\) and \(f(y)\). 
+
+    First suppose that \(f(x) \neq 0\) and \(f(y) \neq 0\). In this case we look for \(h\) in the form
+    \[
+        h = af + bf^2,
+    \]         
+    where \(a, b \in \mathbb{R}\) are constants to be chosen. Since \(A\) is an algebra, both \(f\) and \(f^2\) belong to \(A\), and hence \(h \in A\). 
+
+    We want \(h(x) = \alpha\) and \(h(y) = \beta\). Equivalently,
+    \[
+        a f(x) + b f(x)^2 = \alpha, \quad a f(y) + b f(y)^2 = \beta.
+    \]        
+    This is a linear system for the two unknowns \(a\) and \(b\):
+    \[
+        \begin{pmatrix}
+            f(x) & f(x)^2   \\
+            f(y) & f(y)^2  \\
+        \end{pmatrix} 
+        \begin{pmatrix}
+             a \\
+             b \\
+        \end{pmatrix} = 
+        \begin{pmatrix}
+             \alpha \\
+             \beta \\
+        \end{pmatrix}.
+    \]  
+    Its determinant is 
+    \[
+        f(x) f(y)^2 - f(y) f(x)^2 = f(x) f(y) (f(y) - f(x)).
+    \]
+    This determinant is nonzero because \(f(x), f(y) \neq 0\), and \(f(x) \neq f(y)\). Therefore the system has a unique solution \((a, b)\) to the system, and thus we can pick \(h = af + bf^2\) with this solution \((a, b)\). 
+
+    It remains to treat the case where one of \(f(x)\) and \(f(y)\) is zero. Since \(f(x) \neq f(y)\), they cannot be both zero. 
+
+    We claim that there exists \(g \in A\) s.t. the matrix 
+    \[
+        \begin{pmatrix}
+            g(x) & f(x)  \\
+            g(y) & f(y)  \\
+        \end{pmatrix}
+    \]        
+    has non-zero determinant. Indeed, if \(f(x) = 0\), then \(f(y) \neq 0\). Since \(A\) does not vanish at \(x\), there exists \(g \in A\) s.t. \(g(x) \neq 0\). Hence,
+    \[
+        \det \begin{pmatrix}
+            g(x) & f(x)  \\
+            g(y) & f(y)  \\
+        \end{pmatrix} = g(x) f(y) - g(y) f(x) = g(x) f(y) \neq 0.
+    \]      
+    Similarly, if \(f(y) = 0\), then \(f(x) \neq 0\). Since \(A\) does not vanish at \(y\), there exists \(g \in A\) s.t. \(g(y) \neq 0\). Therefore,
+    \[
+        \det \begin{pmatrix}
+            g(x) & f(x)  \\
+            g(y) & f(y)  \\
+        \end{pmatrix} = g(x) f(y) - g(y) f(x) = - g(y) f(x) \neq 0.
+    \]      
+    Now look for \(h\) in the form 
+    \[
+        h = ag + bf,
+    \] 
+    where \(a, b \in \mathbb{R}\) are to be chosen. Since \(A\) is a vector space and \(f, g \in A\), we have \(h \in A\). The interpolation conditions 
+    \[
+        h(x) = \alpha, \quad h(y) = \beta
+    \]    
+    are equivalent to the linear system 
+    \[
+        \begin{pmatrix}
+            g(x) & f(x)  \\
+            g(y) & f(y)  \\
+        \end{pmatrix} \begin{pmatrix}
+             a \\
+             b \\
+        \end{pmatrix} = \begin{pmatrix}
+             \alpha \\
+             \beta \\
+        \end{pmatrix}.
+    \]
+    By the determinant computation above, the coefficient matrix is invertible, and we're done.
+\end{proof}
+
+Now we can prove the \hyperref[thm: Stone-Weierstrass]{Stone-Weierstrass theorem}:
+Let \(X\) be a compact metric space, and let \(A \subseteq C(X)\) be an algebra of real-valued continuous functions. Suppose that \(A\) separates points and does not vanish at any point of \(X\). Then \(A\) is dense in \(C(X)\) with respect to the uniform norm. In other words, for every \(f \in C(X)\) and every \(\varepsilon > 0\), there exists \(g \in A\) s.t. 
+\[
+    \lVert f - g \rVert_X < \varepsilon. 
+\]         
+Here 
+\[
+    \lVert f \rVert_X \coloneqq \sup _{x \in X} \vert f(x) \vert  
+\]
+denotes the uniform norm on \(X\). 
+
+\begin{proof}
+    Let \(f \in C(X)\) and let \(\varepsilon > 0\). We shall prove that \(f \in \overline{A} \) where \(\overline{A} \) denotes the closure of \(A\) in the uniform norm. Since \(f\) is arbitrary, this will imply 
+    \[
+        \overline{A} = C(X),
+    \]      
+    and hence \(A\) is dense in \(C(X)\) (\(f \in \overline{A}\) implies there is a sequence of \(A\) converging to \(f\)).
+
+    By \autoref{lm: algebra uniform closure is a closed algebra and vector lattice}, \(\overline{A} \) is a closed vector lattice. In particular, if \(u_1, \dots , u_m \in \overline{A}\), then 
+    \[
+        u_1 \lor \dots \lor u_m \in \overline{A}, \quad u_1 \land \dots \land u_m \in \overline{A}.
+    \]    
+    We shall use this lattice property to combine finitely many local approximations. 
+
+    First, fix a point \(y \in X\). For each point \(x \in X\) with \(x \neq y\), \autoref{lm: separate points and no vanish is stronger} gives a function \(h_{x, y} \in A\) s.t. 
+    \[
+        h_{x, y}(x) = f(x), \quad h_{x, y}(y) = f(y).
+    \]     
+    Since \(h_{x, y}\) agrees with \(f\) at \(x\), by continuity it remains close to \(f\) in a neighborhood of \(x\). Since it also agrees with \(f\) at \(y\), it remains close to \(f\) in a neighborhood of \(y\). More precisely, define 
+    \[
+        U_{x, y} \coloneqq \left\{ z \in X: h_{x, y}(z) > f(z) - \varepsilon \right\}. 
+    \]         
+    Then, \(U_{x, y}\) is open, because \(h_{x, y} - f\) is continuous, and 
+    \[
+        U_{x, y} = (h_{x, y} - f)^{-1} ((-\varepsilon, \infty)),
+    \]  
+    and \((-\varepsilon, \infty)\) is open. Also, note that \(x, y \in U_{x, y}\). 
+
+    We claim that, for this fixed \(y\), the family 
+    \[
+        \left\{ U_{x, y} : x \in X, x \neq y \right\} 
+    \]   
+    covers \(X\). Indeed, if \(z \neq y\), then by taking \(x = z\) we have \(z \in U_{z, y}\). On the other hands, \(y \in U_{x, y}\) for all \(x \in X\). Hence the family covers \(X\). 
+
+    Since \(X\) is compact, there exist finitely many points 
+    \[
+        x_1, \dots , x_k \in X \setminus \left\{ y \right\} 
+    \]        
+    s.t. 
+    \[
+        X = U_{x_1, y} \cup \dots \cup U_{x_k, y}.
+    \]
+    Define 
+    \[
+        H_y \coloneqq h_{x_1, y} \lor h_{x_2, y} \lor \dots \lor h_{x_k, y}.
+    \]
+    Each \(h_{x_j, y} \in A\) and hence to \(\overline{A}\). Since \(\overline{A}\) is a vector lattice, it follows that \(H_y \in \overline{A}\). 
+
+    We record two important properties of \(H_y\). First, since every \(h_{x_j, y}\) agrees with \(f\) at \(y\), we have 
+    \[
+        h_{x_j, y}(y) = f(y) \quad \text{for } j = 1, \dots , k. 
+    \]        
+    Therefore, \(H_y(y) = f(y)\). Second, for every \(z \in X\), since the sets \(\left\{ U_{x_j, y} \right\} \) covers \(X\), there exists \(j\) s.t. \(z \in U_{x_j, y}\), i.e. 
+    \[
+        h_{x_j, y}(z) > f(z) - \varepsilon.
+    \]     
+    Since \(H_y \ge h_{x_j, y}\), we obtain 
+    \[
+        H_y(z) > f(z) - \varepsilon \quad \text{for every } z \in X. 
+    \] 
+    Hence, for each fixed \(y \in X\), we have constructed a function \(H_y \in \overline{A}\) s.t. \(H_y (y) = f(y)\) and \(H_y > f - \varepsilon\) on \(X\). We now use these functions \(H_y\) to obtain an upper bound as well. For each \(y \in X\), define 
+    \[
+        V_y \coloneqq \left\{ z \in X: H_y(z) < f(z) + \varepsilon \right\}. 
+    \]       
+    Since \(H_y - f\) is continuous, \(V_y\) is open. Moreovr, because \(H_y(y) = f(y)\), we have \(y \in V_y\). Thus, the family 
+    \[
+        \left\{ V_y: y \in X \right\} 
+    \]    
+    is an open cover of \(X\). By compactness, there exist finitely many points \(y_1, \dots , y_{\ell } \in X \) s.t. 
+    \[
+        X = V_{y_1} \cup \dots \cup V_{y_{\ell} }.
+    \]  
+    Define 
+    \[
+        g \coloneqq H_{y_1} \land H_{y_2} \dots \land H_{y_{\ell} }.
+    \]
+    Since each \(H_{y_i} \in \overline{A}\) and \(\overline{A}\) is a vector lattice, we have \(g \in \overline{A}\). 
+
+    We now vertify that \(g\) approximates \(f\) uniformly. First, for each \(i = 1, \dots , \ell\), the construction of \(H_{y_i}\) gives 
+    \[
+        H_{y_i}(z) > f(z) - \varepsilon \quad \text{for every } z \in X. 
+    \]      
+    Taking the minimum over \(i = 1, \dots , \ell\), we still have 
+    \[
+        g(z) > f(z) - \varepsilon \quad \text{for every } z \in X. 
+    \] 
+    On the other hand, let \(z \in X\). Since the sets \(V_{y_i}\) cover \(X\), there exists an index \(i\) such that \(z \in V_{y_i}\), i.e. 
+    \[
+        H_{y_i}(z) < f(z) + \varepsilon.
+    \]     
+    Becuase 
+    \[
+        g(z) = \min _{1 \le j \le \ell} H_{y_j}(z) \le H_{y_i}(z),
+    \]
+    we obtain \(g(z) < f(z) + \varepsilon\). Combining two estimates, we het 
+    \[
+        f(z) - \varepsilon < g(z) < f(z) + \varepsilon \quad \text{for every } z \in X. 
+    \] 
+    Equivalently, 
+    \[
+        \vert g(z) - f(z) \vert < \varepsilon \quad \text{for every } z \in X.  
+    \]
+    Therefore,
+    \[
+        \lVert g - f \rVert_X < \varepsilon. 
+    \]
+
+    We have shown that for every \(\varepsilon > 0\), there exists \(g \in \overline{A}\) s.t. \(\lVert g - f \rVert_X < \varepsilon \). This shows \(f \in \overline{\overline{A}} \). Since \(\overline{A}\) is closed, we have \(f \in \overline{A}\), and we're done.     
+\end{proof}
+
+\section{Polynomial approximation on compact subsets of \(\mathbb{R} ^n\)}
+\begin{corollary} \label{cl: polynomial dense in C(X)}
+    Let \(X \subseteq \mathbb{R} ^n\) be compact. Then the algebra of all polynomials 
+    \[
+        p(x_1, x_2, \dots , x_n)
+    \] 
+    in the \(n\) coordinate functions is dense in \(C(X)\).  
+\end{corollary}
+
+\begin{proof}
+    Let \(\mathcal{P} \) denote the set of all polynomial functions on \(X\). It is clear that \(\mathcal{P} \) is an algebra. 
+
+    The constant function \(1\) belongs to \(\mathcal{P}\), so \(\mathcal{P} \) does not vanish at any point of \(X\). 
+
+    Finally, \(\mathcal{P} \) separates points. Indeed, if \(x, y \in X\) are distinct, then \(x_i \neq y_i\) for at least one coordinate \(i\). The coordinate function \(p(z) = z_i\) belongs to \(\mathcal{P}\) and satisfies \(p(x) \neq p(y)\). Thus, \(\mathcal{P} \) satisfies the hypotheses of the Stone-Weierstrass theorem. Hence \(\mathcal{P}\) is dense in \(C(X)\).                  
+\end{proof}
+
+\section{Trigonometric polynomial approximation}
+Recall that a trigonometric polynomial is a function of the form 
+\[
+    f(t) = a_0 + \sum_{k=1}^n \left( a_k \cos kt + b_k \sin kt \right),  
+\]
+where \(a_0, a_k, b_k \in \mathbb{R}\). 
+
+\begin{corollary}
+    The set of all trigonometric polynomials is dense in 
+    \[
+        C_{\ast}  [-\pi , \pi ] \coloneqq \left\{ f \in C[-\pi , \pi]: f(-\pi ) = f(\pi ) \right\}. 
+    \]
+    Equivalently, trigonometric polynomials are dense in the space of continuous \(2 \pi\)-periodic functions.  
+\end{corollary}
+\begin{proof}
+    Let \(\mathcal{T} \mathcal{P} \) denote the set of trigonometric polynomial. It is clear that \(\mathcal{T} \mathcal{P} \) is a vector space. We first check that it is an algebra. 
+
+    Using the product-to-sum identities, 
+    \begin{align*}
+        \sin kt \sin lt &= \frac{1}{2} \cos ((k - l) t) - \frac{1}{2} \cos ((k + l) t), \\
+        \sin kt \cos lt &= \frac{1}{2} \sin ((k + l) t) + \frac{1}{2} \sin ((k - l) t), \\
+        \cos kt \cos lt &= \frac{1}{2} \cos ((k - l) t) + \frac{1}{2} \cos ((k + l) t),
+    \end{align*}  
+    we see that the product of two trigonometric polynomials is again a trigonometric polynomial. Therefore \(\mathcal{T} \mathcal{P} \) is an algebra. 
+
+    To apply the Stone-Weierstrass theorem, it is convenient to identify \(C_{\ast} [-\pi , \pi ]\) with the space of continuous functions on the unit circle. Let 
+    \[
+        T \coloneqq \left\{ (x_1, x_2) \in \mathbb{R} ^2: x_1^2 + x_2^2 = 1 \right\}
+    \] 
+    be the unit circle, and define 
+    \[
+        P: \mathbb{R} \to T, \quad P(t) = (\cos t, \sin t).
+    \]
+    Then \(P(s) = P(t)\) if and only if \(s - t \in 2 \pi \mathbb{Z} \). In particular, the interval \([-\pi , \pi ]\) parametrizes the unit circle, with the two endpoints \(-\pi \) and \(\pi \) identified. 
+
+    Every function \(g \in C(T)\) gives a function \(f \in C_{\ast} [-\pi , \pi ]\) by 
+    \[
+        f(t) = g(P(t)).
+    \]       
+    Conversely, every \(f \in C_{\ast} [-\pi , \pi ]\) arises this way from a unique function \(g \in C(T)\). This correspondence is linear, isometric, and preserves multiplication. 
+
+    Under this identification, the coordinate functions 
+    \[
+        x_1, x_2 : T \to \mathbb{R}
+    \]  
+    correspond respectively to \(\cos t, \sin t\). Therefore polynomial functions in \(x_1\) and \(x_2\) on \(T\) correspond exactly to trigonometric polynomials in \(t\). 
+
+    By \autoref{cl: polynomial dense in C(X)}, polynomial functions in \(x_1, x_2\) are dense in \(C(T)\). Hence, trigonometric polynomials are dense in \(C_{\ast}  [-\pi , \pi ]\).         
+\end{proof}
+
+\chapter{Foundations of Functional Analysis}
+
+This chapter introduces several fundamental ideas that play a central role in functional analysis. Broadly speaking, functional analysis studies normed vector spaces and bounded linear operators between them. Thus it combines linear algebra, which studies vector spaces and linear maps, with topology, which studies continuity, convergence, and compactness.
+
+Most of the topologies appearing in this chapter come from norms or metrics. Consequently, the metric space results developed earlier will be used throughout. Among these, compactness is especially important. We shall use the characterization of compactness in metric spaces by sequential compactness and open covers, as well as the Arzela-Ascoli theorem, which gives a powerful compactness criterion for families of continuous functions on compact metric spaces.
+
+The chapter is organized as follows. In Section 12.1, we study finite-dimensional normed vector spaces. We prove that any two norms on a finite-dimensional vector space are equivalent and derive several important consequences: finite-dimensional normed spaces are complete, their linear subspaces are closed, linear maps defined on them are continuous, and their closed and bounded subsets are compact. We also show that compactness of the closed unit ball characterizes finite-dimensionality. Along the way, we introduce bounded linear operators, as well as quotient and product spaces.
+
+The next section introduces the dual space of a normed vector space. We discuss basic examples and develop some elementary Hilbert space theory, including the Cauchy-Schwarz inequality and the Riesz representation theorem. We then study power series in Banach algebras. As an application of the geometric series, we show that the set of invertible operators on a Banach space is open and that the inverse map is continuous. Finally, we discuss the Baire category theorem, one of the basic structural results in the theory of complete metric spaces.
+
+\section{Finite-Dimensional Banach Spaces}
+
+The purpose of this section is to examine finite-dimensional normed vector spaces and to highlight the properties that distinguish them from infinite-dimensional normed vector spaces. In finite dimensions, the analytic structure is especially rigid. Every finite-dimensional normed vector space is complete, every finite-dimensional linear subspace of a normed vector space is closed, every linear map defined on a finite-dimensional normed vector space is continuous, and every closed and bounded subset is compact. These facts are familiar from Euclidean spaces, but they remain true for arbitrary norms because all norms on a finite dimensional vector space are equivalent.
+
+We shall also see that compactness of the closed unit ball is not merely a consequence
+of finite-dimensionality; it is a characterization of it. More precisely, a normed vector space is finite-dimensional if and only if its closed unit ball is compact. This fact explains one of the central di!erences between finite-dimensional linear algebra and infinite-dimensional functional analysis.
+
+Before proving these results, we first introduce bounded linear operators.
+
+The basic morphisms in functional analysis are bounded linear operators. These are the linear maps that are compatible with the norm structures on the domain and target spaces. In functional analysis one often says linear operator rather than linear map. The meaning is the same: a map between vector spaces that preserves addition and scalar multiplication. The terminology reflects the fact that many important vector spaces in analysis are spaces of functions, and the linear maps acting on them are often viewed as operators.
+
+If the domain and target are normed vector spaces, it is natural to require a linear operator to be continuous with respect to the norm topologies. For linear maps, this continuity condition is equivalent to a simple global estimate.
+
+\begin{definition}[Bounded linear operator]
+    Let \((X, \lVert \cdot \rVert_X )\) and \((Y, \lVert \cdot \rVert_Y )\) be real normed vector spaces. A linear operator \(A: X \to Y\) is called bounded if there exists a constant \(c > 0\) s.t. 
+    \begin{equation} \label{eq: bounded linear operator}
+        \lVert Ax \rVert_Y \le c \lVert x \rVert_X \quad \text{for all } x \in X. 
+    \end{equation}  
+\end{definition}
+
+\begin{remark}
+    The smallest constant \(c \ge 0\) for which \autoref{eq: bounded linear operator} holds is called the operaotr norm of \(A\). It is denoted by 
+    \[
+        \lVert A \rVert \coloneqq \lVert A \rVert_{\mathcal{L} (X, Y)} \coloneqq \sup _{x \in X \setminus \left\{ 0 \right\} } \frac{\lVert Ax \rVert_Y }{\lVert x \rVert_X }.  
+    \]
+    Equivalently, 
+    \[
+        \lVert A \rVert_{\mathcal{L} (X, Y)} = \sup _{\lVert x \rVert_X \le 1} \lVert A x \rVert_Y.  
+    \]
+\end{remark}   
+
+\begin{remark}
+    A bounded linear operator with values in \(Y = \mathbb{R}\) is called a bounded linear functional on \(X\).  
+\end{remark}
+
+The collection of all bounded linear operators from \(X\) to \(Y\) is denoted by 
+\[
+    \mathcal{L} (X, Y) \coloneqq \left\{ A: X \to Y \mid A \text{ is linear and bounded}  \right\}. 
+\]  
+With the operator norm, this becomes a normed vector space:
+\[
+    \left( \mathcal{L} (X, Y), \lVert \cdot \rVert_{\mathcal{L} (X, Y)}  \right). 
+\]
+The topology induced by this norm is called the \emph{uniform operator topology}.
+
+Convergence in this topology means convergence uniformly on the unit ball. More precisely, a sequence \(A_n \in \mathcal{L} (X, Y)\) converges to \(A \in \mathcal{L} (X, Y)\) if and only if 
+\[
+    \lVert A_n - A \rVert_{\mathcal{L} (X, Y)} \to 0, 
+\]  
+or equivalently,
+\[
+    \sup _{\lVert x \rVert_X \le 1} \lVert (A_n - A) x \rVert_Y \to 0.
+\]
+
+\begin{remark}
+    Many authors use the notation \(\mathcal{B} (X, Y)\) instead of \(\mathcal{L} (X, Y)\) for the space of bounded linear operators. 
+\end{remark}
+
+\begin{theorem}[Boundedness and continuity of linear maps] \label{thm: bounded linear operator TFAE}
+    Let \((X, \lVert \cdot \rVert_X )\) and \((Y, \lVert \cdot \rVert_Y )\) be real normed vector spaces, and let \(A: X \to Y\) be linear operator. Then the following statements are equivalent:
+    \begin{itemize}
+        \item [(i)] \(A\) is bounded. 
+        \item [(ii)] \(A\) is continuous on \(X\). 
+        \item [(iii)] \(A\) is continuous at \(0\).     
+    \end{itemize}   
+\end{theorem}
+
+\begin{proof}
+    We prove the implications 
+    \[
+        \text{(i)} \implies \text{(ii)} \implies \text{(iii)}  \implies  \text{(i)}. 
+    \]
+    First assume \(A\) is bounded. Then there exists a constant \(C \ge 0\) such that 
+    \[
+        \lVert Ax \rVert_Y \le C \lVert x \rVert_X \quad \text{for every } x \in X.   
+    \]  
+    Hence, for any \(x, x^{\prime} \in X\), linearity gives 
+    \[
+        Ax - Ax^{\prime} = A(x - x^{\prime}).
+    \] 
+    Therefore,
+    \[
+        \lVert Ax - Ax^{\prime} \rVert_Y = \lVert A (x - x^{\prime} ) \rVert_Y \le C \lVert X - X^{\prime} \rVert_X.   
+    \]
+    Thus, \(A\) is Lipschitz continuous. In particular, \(A\) is continuous on \(X\). Hence, (i) implies (ii). 
+
+    The implication (ii) \(\implies \) (iii) is immediate. 
+
+    It remains to prove that continuity at \(0\) implies boundedness. Assume that \(A\) is continuous at \(0\). Taking \(\varepsilon = 1\), there exists \(\delta > 0\) s.t. 
+    \[
+        \lVert u \rVert_X < \delta \implies \lVert A u \rVert_Y < 1.  
+    \]         
+    We shall show that this local estimate near \(0\) implies a global linear estimate for \(A\). 
+
+    Let \(x \in X\). If \(x = 0\), then \(\lVert Ax \rVert_Y = 0 \), so there is nothing to prove. Suppose \(x \neq 0\). Define 
+    \[
+        u \coloneqq \frac{\delta }{2 \lVert x \rVert_X } x.
+    \]      
+    Then 
+    \[
+        \lVert u \rVert_X = \frac{\delta}{2 \lVert x \rVert_X} \lVert x \rVert_X = \frac{\delta}{2} < \delta.  
+    \]
+    By the choice of \(\delta\), we have \(\lVert A u \rVert_Y < 1\). Using linearity of \(A\), we also have 
+    \[
+        Au = A \left( \frac{\delta}{2 \lVert x \rVert_X} x \right) = \frac{\delta}{2 \lVert x \rVert_X} Ax. 
+    \]   
+    Hence 
+    \[
+        \frac{\delta}{2 \lVert x \rVert_X} \lVert A x \rVert_Y = \lVert A u \rVert_Y < 1.  
+    \]
+    Therefore 
+    \[
+        \lVert Ax \rVert_Y < \frac{2}{\delta} \lVert x \rVert_X.  
+    \]
+    Thus, \(A\) is bounded, and we're done. 
+\end{proof}
+
+Recall that the \emph{kernel} and \emph{image} of a linear operator \(A: X \to Y\) are defined by 
+\[
+    \ker (A) \coloneqq \left\{ x \in X: Ax = 0 \right\} \subseteq X, 
+\] 
+and 
+\[
+    \Im (A) \coloneqq \left\{ Ax: x \in X \right\} \subseteq Y. 
+\]
+
+If \(X, Y\) are normed vector spaces and \(A: X \to Y\) is a bounded linear operator, then \(\ker (A)\) is a closed linear subspace of \(X\) since 
+\[
+    \ker (A) = A^{-1} (\left\{ 0 \right\} )
+\]    
+while \(A\) is bounded implies \(A\) is continuous and \(\left\{ 0 \right\} \) is closed. However, the image of a bounded linear operator need not be closed in \(Y\). 
+
+Since boundedness, continuity, closedness, convergence, and completeness are all defined using the norm, it is natural to ask when two different norms on the same vector space give essentially the same analytic and topological structure. This leads to the following definition.
+
+\begin{definition}[Equivalent norms]
+    Let \(X\) be a real vector space. Two norms \(\lVert \cdot \rVert \) and \(\lVert \cdot \rVert^{\prime}  \) on \(X\) are called \emph{equivalent} if there exists a constant \(c \ge 1\) s.t. 
+    \[
+        \frac{1}{c} \lVert x \rVert \le \lVert x \rVert^{\prime} \le c \lVert x \rVert \quad \text{for all } x \in X.    
+    \]     
+\end{definition}
+
+\begin{remark}
+    Equivalence of norms means that the two norms measure in size in the same way up to fixed multiplicative constants. In particular, equivalent norms define the same convergent sequences, the same Cauchy sequences, and the same open sets.
+\end{remark}
+
+\begin{exercise}
+    Let \(X\) be a real vector space. 
+    \begin{enumerate}[(i)]
+        \item Show that equivalence of norms defines an equivalence relation on the set of all norms on \(X\). 
+        \item Show that two norms \(\lVert \cdot \rVert \) and \(\lVert \cdot \rVert^{\prime}  \) on \(X\) are equivalent if and only if the identity maps 
+        \[
+            \mathrm{id}: (X, \lVert \cdot \rVert ) \to (X, \lVert \cdot \rVert^{\prime} )
+        \]
+        and 
+        \[
+           \mathrm{id}: (X, \lVert \cdot \rVert^{\prime} ) \to (X, \lVert \cdot \rVert ) 
+        \]
+        are bounded linear operators. 
+        \item Show that two norms \(\lVert \cdot \rVert \) and \(\lVert \cdot \rVert^{\prime}  \) on \(X\) are equivalent if and only if they induce the same topology on \(X\): 
+        \[
+            \mathcal{U} (X, \lVert \cdot \rVert ) = \mathcal{U} (X, \lVert \cdot \rVert^{\prime}  ).
+        \]
+        \item If \(\lVert \cdot \rVert \) and \(\lVert \cdot \rVert^{\prime}  \) are equivalent norms on \(X\), show that \((X, \lVert \cdot \rVert )\) is complete if and only if \((X, \lVert \cdot \rVert^{\prime})\) is complete.    
+    \end{enumerate} 
+\end{exercise}
+
+The fundamental structural fact about finite-dimensional normed vector spaces is that the choice of norm is essentially irrelevant: any two norms define the same notion of convergence, the same Cauchy sequences, and the same topology. This is one of the main reasons finite-dimensional analysis is much simpler than infinite-dimensional functional analysis.
+
+\begin{theorem}[Equivalence of norms in finite dimensions]
+    Let \(X\) be a finite-dimensional real vector space. Then for any two norms on \(X\) are equivalent.  
+\end{theorem}
+
+\begin{proof}
+    It is enough to prove that every norm on \(X\) is equivalent to one fixed norm. We shall compare an arbitrary norm on \(X\) with the Euclidean norm coming from a choice of basis. 
+
+    Let \(e_1, \dots , e_n\) be a basis of \(X\). Then every \(x \in X\) can be written uniquely as 
+    \[
+        x = \sum_{i=1}^n x_i e_i, \quad x_i \in \mathbb{R}. 
+    \]     
+    Using these coordinates, define 
+    \[
+        \lVert x \rVert_2 \coloneqq \left( \sum_{i=1}^n \vert x_i \vert^2   \right)^{\frac{1}{2}}. 
+    \]
+    This is the Euclidean coordinate norm on \(X\). 
+
+    Let \(\lVert \cdot \rVert \) be any norm on \(X\). We will show that there exist constants \(\delta > 0\) and \(C > 0\) s.t. 
+    \[
+        \delta \lVert x \rVert_x \le \lVert x \rVert \le C \lVert x \rVert_2 \quad \text{for all } x \in X.    
+    \]   
+    This will prove that \(\lVert \cdot \rVert \) and \(\lVert \cdot \rVert_2 \) are equivalent.
+
+    \textbf{Step 1. The norm \(\lVert \cdot \rVert \) is bounded above by a multiple of \(\lVert \cdot \rVert_2 \).} 
+    Define 
+    \[
+        C \coloneqq \left( \sum_{i=1}^n \lVert e_i \rVert^2   \right)^{\frac{1}{2}}. 
+    \]   
+    For \(x = \sum_{i=1}^n x_i e_i \), the triangle inequality gives 
+    \[
+        \lVert x \rVert = \left\lVert \sum_{i=1}^n x_i e_i  \right\rVert \le \sum_{i=1}^n \vert x_i \vert \lVert e_i \rVert.     
+    \] 
+    By the Cauchy-Schwarz inequality,
+    \[
+        \sum_{i=1}^n \vert x_i \vert \lVert e_i \rVert \le \left( \sum_{i=1}^n \vert x_i \vert^2   \right)^{\frac{1}{2}} \left( \sum_{i=1}^n \lVert e_i \rVert^2   \right)^{\frac{1}{2}}.     
+    \]
+    Therefore 
+    \[
+        \lVert x \rVert \le C \lVert x \rVert_2 \quad \text{for all } x \in X.   
+    \]
+    \textbf{Step 2. The norm \(\lVert \cdot \rVert \) is bounded below by a positive multiple of \(\lVert \cdot \rVert_2 \).} Consider the Euclidean unit sphere 
+    \[
+        S \coloneqq \left\{ x \in X: \lVert x \rVert_2 = 1  \right\}. 
+    \] 
+    Under the coordinate identification 
+    \[
+        x = \sum_{i=1}^n x_i e_i \leftrightarrow (x_1, \dots , x_n) \in \mathbb{R} ^n, 
+    \]
+    the set \(S\) corresponds to the usual unit sphere in \(\mathbb{R} ^n\). Therefore \(S\) is compact by the Heine-Borel theorem w.r.t. the Euclidean coordinate norm. 
+
+    Now define a map \(f: (X, \lVert \cdot \rVert_2 ) \to \mathbb{R}\) by \(f(x) = \lVert x \rVert \). By Step 1, the function \(f\) is continuous with respect to the Euclidean coordiante norm \(\lVert \cdot \rVert_2 \). Indeed, for \(x, y \in X\), 
+    \[
+        \vert f(x) - f(y) \vert = \left\vert \lVert x \rVert - \lVert y \rVert   \right\vert \le \lVert x - y \rVert  \le C \lVert x - y \rVert_2. 
+    \]        
+    Hence \(f\) is continuous on the compact set \(S\). It therefore attains its minimum on \(S\). Thus there exists \(x_0 \in S\) s.t. \(\lVert x_0 \rVert = \min _{x \in S} \lVert x \rVert \). Since \(x_0 \in S\), we have \(x_0 \neq 0\). Hence, because \(\lVert \cdot \rVert \) is a norm, \(\lVert x_0 \rVert > 0 \). \(\lVert x_0 \rVert > 0 \). Set \(\delta \coloneqq \lVert x_0 \rVert > 0\). Then \(\lVert x \rVert \ge \delta \) for every \(x \in S\). Now let \(x \in X\) be arbitrary. If \(x = 0\), then 
+    \[
+        \delta \lVert x \rVert_2 \le \lVert x \rVert.  
+    \]               
+    If \(x \neq 0\), then 
+    \[
+        \frac{x}{\lVert x \rVert_2} \in S.
+    \] 
+    Therefore 
+    \[
+        \left\lVert \frac{x}{\lVert x \rVert_2} \right\rVert \ge \delta. 
+    \]
+    Multiplying by \(\lVert x \rVert_2\), we obtain \(\lVert x \rVert \ge \delta \lVert x \rVert_2  \). 
+
+    Now we have 
+    \[
+        \delta \lVert x \rVert_2 \le \lVert x \rVert \le C \lVert x \rVert_2,   
+    \]  
+    and we're done.
+\end{proof}
+
+\begin{remark}
+    The essential finite-dimensional ingredient in the proof is the compactness of the Euclidean unit sphere. This compactness allows a continuous norm to attain a positive minimum on the unit sphere, which gives the lower bound needed for equivalence of norms. In infinite-dimensional normed spaces, the unit sphere is not compact in general, and norms on the same vector space need not be equivalent.
+\end{remark}
+
+\begin{corollary}
+    Every finite-dimensional normed vector space is complete.
+\end{corollary}
+
+\begin{proof}
+    Let \((X, \lVert \cdot \rVert )\) be a finite-dimensional normed vector space. Choose a basis \(e_1, \dots , e_n\) of \(X\). Then every \(x \in X\) can be written uniquely as \(x = \sum_{i=1}^n x_i e_i \), where \(x_i \in \mathbb{R}\). Define the Euclidean coordiante norm by 
+    \[
+        \lVert x \rVert_2 = \left( \sum_{i=1}^n \vert x_i \vert^2   \right)^{\frac{1}{2}}.  
+    \]     
+    With this norm, \(X\) is naturally identified with \(\mathbb{R} ^n\), and hence \((X, \lVert \cdot \rVert_2 )\) is complete. 
+
+    By the equivalence of norms in finite dimensions, the given norm \(\lVert \cdot \rVert \) is equivalent to \(\lVert \cdot \rVert_2 \). Thus there exists a constant \(C \ge 1\) such that 
+    \[
+        \frac{1}{C} \lVert x \rVert_2 \le \lVert x \rVert \le C \lVert x \rVert_2 \quad \text{for all } x \in X.    
+    \]      
+    It follows that a seuqnece is Cauchy with respect to \(\lVert \cdot \rVert \) if and only if it is Cauchy with respect to \(\lVert \cdot \rVert_2 \). Since \((X, \lVert \cdot \rVert_2 )\) is complete, every \(\lVert \cdot \rVert \)-Cauchy sequence converges in \(X\). Therefore \((X, \lVert \cdot \rVert )\) is complete.     
+\end{proof}
+
+\begin{corollary}
+   Let \(X\) be a normed vector space. Then every finite-dimensional linear subspace of \(X\) is closed in \(X\).    
+\end{corollary}
+\begin{proof}
+    Let \(Y \subseteq X\) be a finite-dimensional linear subspace. We equip \(Y\) with the norm inherited from \(X\), namely \(\lVert y \rVert_Y \coloneqq \lVert y \rVert_X  \) for all \(y \in Y\). By the previous corollary, the finite-dimensional normed vector space \((Y, \lVert \cdot \rVert_Y )\) is complete. 
+
+    We now show that \(Y\) is closed in \(X\). Let \((y_k)\) be a sequence in \(Y\) such that \(y_k \to x\) in \(X\). Then \((y_k)\) is a Cauchy sequence in \(X\). Since the norm on \(Y\) is the restriction of the norm on \(X\), it is also a Cauchy sequence in \(Y\). Because \(Y\) is complete, there exists \(y \in Y\) s.t. \(y_k \to y\) in \(Y\). Equivalently, \(\lVert y_k - y \rVert_X \to 0\), so \(y_k \to y\) in \(X\). But limits in a normed vector space are unique. Since \(y_n \to x\) in \(X\) and \(y_n \to y\) in \(X\), we must have \(x = y\). 
+
+    Now since \(x = y \in Y\), so we know \(Y\) is closed in \(X\).                              
+\end{proof}
+
+\begin{corollary}[Heine-Borel theorem in finite dimensions]
+    Let \(X\) be a finite-dimensional normed vector space, and let \(K \subseteq X\). Then \(K\) is compact if and only if \(K\) is closed and bounded.    
+\end{corollary}
+
+\begin{proof}
+    Choose a basis \(e_1, \dots , e_n\) of \(X\). Then every \(x \in X\) can be written uniquely as \(x = \sum_{i=1}^n x_i e_i \), where \(x_i \in \mathbb{R}\). Now we can define the Euclidean coordinate norm:
+    \[
+        \lVert x \rVert_2 = \left( \sum_{i=1}^n \vert x_i \vert^2   \right)^{\frac{1}{2}}. 
+    \]
+
+    By the equivalence of norms in finite dimensions, the given norm on \(X\) is equivalent to \(\lVert \cdot \rVert_2 \). Hence, the two norms induce the same topology on \(X\). In particuler, a subset of \(X\) is closed for one norm if and only if it is closed for the other, and a subset is compact for one norm if and only if it is compact for the other. Also, boundedness is the same for equivalent norms. 
+
+    Therefore, the statement reduces to the classical Heine-Borel theorem in \(\mathbb{R} ^n\), which says that a subset of \(\mathbb{R} ^n\) is compact if and only if it is closed and bounded. Hence, \(K \subseteq X\) is compact if and only if \(K\) is closed and bounded.             
+\end{proof}
+
+\begin{corollary}
+    Let \((X, \lVert X \rVert_X )\) and \((Y, \lVert \cdot \rVert_Y )\) be normed vector spaces. If \(\dim X < \infty\), then every linear operator \(A: X \to Y\) is bounded. Equivalently, every linear operator defined on a finite-dimensional normed vector space is continuous.   
+\end{corollary}
+
+\begin{proof}
+    Let \(A: X \to Y\) be linear. We define a new norm on \(X\) by 
+    \[
+        \lVert x \rVert_A \coloneqq \lVert x \rVert_X + \lVert Ax \rVert_Y, \quad x \in X.   
+    \]  
+    \begin{claim}
+        \(\lVert \cdot \rVert_A \) is a norm. 
+    \end{claim}
+
+    Since \(X\) is finite dimensional, all norms on \(X\) are equivalent. Therefore \(\lVert \cdot \rVert_A \) is equivalent to the given norm \(\lVert \cdot \rVert_X \). In particular, there exists a constant \(C > 0\) s.t. 
+    \[
+        \lVert x \rVert_A \le C \lVert x \rVert_X \quad \text{for all } x \in X.   
+    \]     
+    Hence,
+    \[
+         \lVert x \rVert_X + \lVert Ax \rVert_Y = \lVert x \rVert_A \le C \lVert x \rVert_X,
+    \]
+    and thus 
+    \[
+        \lVert Ax \rVert_Y \le (C - 1) \lVert x \rVert_X.  
+    \]
+    This shows \(A\) is bounded. 
+\end{proof}
+
+The preceding corollaries depend essentially on finite-dimensionality. The following examples illustrate what can fail in infinite-dimensional normed spaces. 
+
+\begin{eg}[Two natural norms need not be equivalent]
+    Let \(X \coloneqq C([0, 1])\) be the vector space of real-valued continuous functions on \([0, 1]\). Define two norms on \(X\) by 
+    \[
+        \lVert f \rVert_\infty \coloneqq \sup _{0 \le t \le 1} \vert f(t) \vert  
+    \]  
+    and 
+    \[
+        \lVert f \rVert_2 \coloneqq \left( \int _0^1 \vert f(t) \vert^2 \, \mathrm{d} t   \right)^{\frac{1}{2}}.  
+    \]
+    Both are norms on \(C([0, 1])\). However, they are not equivalent. 
+\end{eg}
+
+\begin{explanation}
+    Indeed, the space \(C([0, 1])\) is complete with respect to \(\lVert \cdot \rVert_\infty \), but it is not complete with respect to \(\lVert \cdot \rVert_2 \). For example, one may approximate the discontinuous function \(\chi _{\left[ \frac{1}{2}, 1 \right] }\) in the \(L^2\)-norm by continuous functions \(\left\{ f_n \right\} \):  
+    \[
+        f_n(t) \coloneqq \begin{dcases}
+            0, &\text{ if } t \le \frac{1}{2} - \frac{1}{n} ;\\
+            n \left( t - (\frac{1}{2} - \frac{1}{n}) \right) , &\text{ if } \frac{1}{2} - \frac{1}{n} \le t \le \frac{1}{2} ;\\
+            1, &\text{ if } t \ge \frac{1}{2}.
+        \end{dcases}
+    \]
+    Such a sequence is Cauchy in \(\lVert \cdot \rVert_2 \), but it cannot converge in \(C([0, 1])\) with respect to \(\lVert \cdot \rVert_2 \) since \(\chi _{\left[ \frac{1}{2}, 1 \right] }\) is discontinuous, because its natural \(L^2\)-limit is not continuous.
+
+    If the two norms \(\lVert \cdot \rVert_\infty  \) and \(\lVert \cdot \rVert_2 \) were equivalent, then completeness with respect to one would imply completeness with respect to the other. Therefore the two norms are not equivalent.           
+\end{explanation}
