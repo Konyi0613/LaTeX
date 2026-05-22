@@ -1,0 +1,242 @@
+\lecture{24}{May 21.}{}
+\section{Covariance, Variance of Sums, Correlation}
+\begin{question}
+    Given random variables \(X\) and \(Y\) on a probability space, what is the variance of \(X + Y\)?   
+\end{question}
+\begin{answer}
+    \begin{align*}
+        \Var(X + Y) &= \mathbb{E} \left[ (X + Y)^2 \right] - \mathbb{E} [X + Y]^2 \\
+        &= \mathbb{E} \left[ X^2 + 2 X Y + Y^2 \right] - \left( \mathbb{E} [X] + \mathbb{E}[Y] \right)^2 \\
+        &= \mathbb{E} [X^2] + 2 \mathbb{E} [X Y] + \mathbb{E} [Y^2] - \mathbb{E} [X]^2 - 2 \mathbb{E} [X] \mathbb{E} [Y] - \mathbb{E} [Y]^2 \\
+        &= \mathbb{E} [X^2] - \mathbb{E} [X]^2 + \mathbb{E} [Y^2] - \mathbb{E} [Y]^2 + 2 \left( \mathbb{E} [X Y] - \mathbb{E} [X] \mathbb{E} [Y] \right) \\
+        &= \Var(X) + \Var(Y) + 2 \left( \mathbb{E} [XY] - \mathbb{E} [X] \mathbb{E} [Y] \right).    
+    \end{align*}
+\end{answer}
+
+\begin{proposition}
+    Let \(X, Y\) be independent and let \(g, h : \mathbb{R} \to \mathbb{R} \) be arbitrary. Then 
+    \[
+        \mathbb{E} [g(x) h(y)] = \mathbb{E} [g(x)] \mathbb{E} [h(y)].
+    \]  
+\end{proposition}
+
+\begin{proof}
+    \begin{align*}
+        \mathbb{E} [g(x) h(y)] &= \iint_{\mathbb{R} ^2} g(x) h(y) f_{X, Y} (x, y) \, \mathrm{d} x \, \mathrm{d} y \\
+        &= \iint_{\mathbb{R} ^2} g(x) h(y) f_X(x) f_Y(y) \, \mathrm{d} x \, \mathrm{d} y \\
+        &= \left( \int _{\mathbb{R} } g(x) f_X(x) \, \mathrm{d} x  \right) \left( \int _{\mathbb{R} } h(y) f_Y(y) \, \mathrm{d} y  \right) \\
+        &= \mathbb{E} [g(x)] \mathbb{E} [h(y)].
+    \end{align*}
+\end{proof}
+
+\begin{corollary}
+    If \(X, Y\) are independent, then 
+    \[
+        \Var(X + Y) = \Var(X) + \Var(Y).
+    \] 
+\end{corollary}
+
+\begin{proof}
+    By independence, 
+    \[
+        \mathbb{E} [X Y] = \mathbb{E} [X] \mathbb{E} [Y].
+    \]
+    Thus,
+    \begin{align*}
+        \Var(X + Y) &= \Var(X) + \Var(Y) + 2 \left( \mathbb{E} [X Y] - \mathbb{E} [X] \mathbb{E} [Y] \right) \\
+        &= \Var(X) + \Var(Y). 
+    \end{align*}
+\end{proof}
+
+\begin{eg}
+    \(X \sim \mathrm{Bin}(n, p)\), and \(X = X_1 + \dots + X_n\), where \(X_i \sim \mathrm{Ber}(p) \) are independent. Then since
+    \[
+        \Var(X_i) = p(1 - p),
+    \]   
+    we have 
+    \[
+        \Var(X) = \Var\left( \sum_{i=1}^n X_i  \right) = \sum_{i=1}^n \Var(X_i) = n p (1 - p). 
+    \]
+\end{eg}
+
+\begin{eg}
+    \(X \sim N(\mu , \sigma _1^2)\) and \(Y \sim N(\mu _2, \sigma _2^2)\) are independent, then we know \(X + Y \sim N(\mu _1 + \mu _2, \sigma _1^2 + \sigma _2^2)\), and we can check 
+    \[
+        \Var(X + Y) = \Var(X) + \Var(Y) = \sigma _1^2 + \sigma _2^2.
+    \]   
+\end{eg}
+
+\begin{definition}
+    Given random variables \(X\) and \(Y\) in a probability space, the covariance of \(X\) and \(Y\) is defined as 
+    \[
+        \Cov(X, Y) = \mathbb{E} \left[ (X - \mathbb{E} [X])(Y - \mathbb{E} [Y]) \right]. 
+    \]    
+\end{definition}
+
+\begin{observation}
+    \begin{align*}
+        \Cov(X, Y) &= \mathbb{E} \left[ (X - \mathbb{E} ) (Y - \mathbb{E} [Y]) \right] \\
+        &= \mathbb{E} \left[ XY - X \mathbb{E} [Y] - \mathbb{E} [X] Y + \mathbb{E} [X] \mathbb{E} [Y]  \right] \\
+        &= \mathbb{E} [X Y] - \mathbb{E} [X] \mathbb{E} [Y] - \mathbb{E} [X] \mathbb{E} [Y] + \mathbb{E} [X] \mathbb{E} [Y] \\
+        &= \mathbb{E} [XY] - \mathbb{E} [X] \mathbb{E} [Y].  
+    \end{align*}
+
+    In particular, 
+    \begin{enumerate}[(i)]
+        \item \(\Var(X + Y) = \Var(X) + \Var(Y) + 2 \Cov(X, Y)\). 
+        \item If \(X, Y\) are independent, \(\Cov(X, Y) = 0\).   
+    \end{enumerate}
+\end{observation}
+
+\begin{remark}
+    \(\Cov(X, Y) = 0\) does not imply \(X, Y\) are independent.
+
+    For example, let \(X = -1, 0, 1\) with probability \(\frac{1}{3}\), respectively. Let 
+    \[
+        Y = \begin{dcases}
+            1, &\text{ if } X = 0;\\
+            0, &\text{ if } X \neq 0.
+        \end{dcases}
+    \]    
+    Then 
+    \[
+        \Cov(X, Y) = \mathbb{E} [X Y] - \mathbb{E} [X] \mathbb{E} [Y].
+    \]
+    Note that \(\mathbb{E} [X Y] = 0\), and \(\mathbb{E} [X] = 0\), so \(\Cov(X, Y) = 0\). However, we can show \(X, Y\) are not independent. 
+
+    Note that \(\mathbb{P} (X = 1, Y = 1) = 0\), and \(\mathbb{P} (X = 1) = \frac{1}{3}\), and \(\mathbb{P} (Y = 1) = \mathbb{P} (X = 0) = \frac{1}{3}\), so 
+    \[
+        \mathbb{P} (X = 1, Y = 1) \neq \mathbb{P} (X = 1) \mathbb{P} (Y = 1). 
+    \]      
+\end{remark}
+
+\begin{proposition}
+    Let \(X, Y, X_1, \dots, X_n, Y_1, \dots, Y_m\) be random variables, then 
+    \begin{enumerate}[(i)]
+        \item \(\Cov(X, Y) = \Cov(Y, X)\). 
+        \item \(\Cov(X, X) = \Var(X)\). 
+        \item \(\Cov(aX, Y) = a \Cov(X, Y)\) for every \(a \in \mathbb{R}\). 
+        \item \(\Cov \left( \sum_{i=1}^n X_i , \sum_{j=1}^m Y_j   \right) = \sum_{i=1}^n \sum_{j=1}^m \Cov(X_i, Y_j)   \).      
+    \end{enumerate} 
+\end{proposition}
+
+\begin{proof}
+    (i) to (iii) are immediate from the definition. Now we prove (iv). 
+    \begin{align*}
+        \Cov \left( \sum_{i=1}^n X_i, \sum_{j=1}^m Y_j   \right) &= \mathbb{E} \left[ \left( \sum_{i=1}^n X_i  \right) \left( \sum_{j=1}^m Y_j  \right)   \right] - \mathbb{E} \left[ \sum_{i=1}^n X_i  \right] \mathbb{E} \left[ \sum_{j=1}^m Y_j  \right] \\
+        &= \mathbb{E} \left[ \sum_{i=1}^n \sum_{j=1}^m X_i Y_j   \right] - \mathbb{E} \left[ \sum_{i=1}^n X_i  \right] \mathbb{E} \left[ \sum_{j=1}^m Y_j  \right] \\
+        &= \sum_{i=1}^n \sum_{j=1}^m \mathbb{E} [X_i Y_j] - \left( \sum_{i=1}^n \mathbb{E} [X_i]  \right) \left( \sum_{j=1}^m \mathbb{E} [Y_j]  \right) \\
+        &= \sum_{i=1}^n \sum_{j=1}^m \left( \mathbb{E} [X_i Y_j] - \mathbb{E} [X_i] \mathbb{E} [Y_j] \right) = \sum_{i=1}^n \sum_{j=1}^m \Cov(X_i, Y_j).         
+    \end{align*}
+\end{proof}
+
+\begin{corollary}
+    If \(X = \sum_{i=1}^n X_i \), then 
+    \[
+        \Var (X) = \sum_{i=1}^n \Var(X_i) + 2 \sum_{i < j} \Cov(X_i, X_j).  
+    \] 
+\end{corollary}
+
+\begin{proof}
+    \begin{align*}
+        \Var(X) &= \Cov(X, X) = \Cov \left( \sum_{i=1}^n X_i, \sum_{j=1}^n X_j   \right) = \sum_{i=1}^n \sum_{j=1}^n \Cov (X_i, X_j) \\
+        &= \sum_{i=1}^n \Cov(X_i, X_i) + \sum_{i \neq j} \Cov(X_i, X_j) \\
+        &= \sum_{i=1}^n \Var(X_i) + 2 \sum_{1 \le i < j \le n} \Cov(X_i, X_j).       
+    \end{align*}
+\end{proof}
+
+\begin{corollary}
+    If \(X_1, X_2, \dots , X_n\) are pairwise independent, 
+    \[
+        \Var \left( \sum_{i=1}^n X_i  \right) = \sum_{i=1}^n \Var(X_i).  
+    \] 
+\end{corollary}
+
+\begin{eg}
+    We collect independent samples \(X_1, X_2, \dots , X_n\) from some distribution \(X\) with mean \(\mu \) and variance \(\sigma ^2\). We define
+    \[
+        \overline{X} = \frac{1}{n} \sum_{i=1}^n X_i
+    \]
+    to be the sample mean, and
+    \[
+        S^2 = \frac{1}{n - 1} \sum_{i=1}^n \left( X_i - \overline{X} \right)^2 
+    \]
+    to be the sample variance, then 
+    \[
+        \mathbb{E} \left[ \overline{X} \right]  = \mathbb{E} \left[ \frac{1}{n} \sum_{i=1}^n X_i  \right] = \frac{1}{n} \sum_{i=1}^n \mathbb{E} [X_i] = \frac{1}{n} \sum_{i=1}^n \mu = \mu.   
+    \]    
+    We say \(\overline{X} \) is an unbiased estimator of \(\mu\) because it has the right value in expectation. Also,
+    \begin{align*}
+        \Var(\overline{X}) &= \Var \left( \frac{1}{n} \sum_{i=1}^n X_i  \right) = \frac{1}{n^2} \Var \left( \sum_{i=1}^n X_i  \right) \\
+        &= \frac{1}{n^2} \sum_{i=1}^n \Var(X_i) = \frac{1}{n} \sum_{i=1}^n \sigma ^2 = \frac{\sigma ^2}{n}.    
+    \end{align*}
+    \begin{align*}
+        \mathbb{E} [(n - 1) S^2] &= \mathbb{E} \left[ \sum_{i=1}^n \left( X_i - \overline{X} \right)^2   \right] = \mathbb{E} \left[ \sum_{i=1}^n \left( X_i^2 - 2 X_i \overline{X} + \left( \overline{X}  \right)^2    \right)   \right]  \\
+        &= \mathbb{E} \left[ \sum_{i=1}^n X_i^2 - 2 \overline{X} \sum_{i=1}^n X_i + n \left( \overline{X} \right)^2     \right] = \mathbb{E} \left[ \sum_{i=1}^n X_i^2 - n \left( \overline{X}^2 \right)   \right] \\
+        &= \sum_{i=1}^n \mathbb{E} [X_i^2] - n \mathbb{E} \left[ \left( \overline{X}  \right)^2  \right] = \sum_{i=1}^n \left( \Var(X_i) + \mathbb{E} [X_i]^2 \right) - n \left( \Var(\overline{X}) + \mathbb{E} [\overline{X}]^2 \right) \\
+        &= n \left( \sigma ^2 + \mu ^2 \right) - n \left( \frac{\sigma ^2}{n} + \mu ^2 \right) = (n - 1) \sigma ^2.         
+    \end{align*}
+
+    Thus, \(\mathbb{E} [S^2] = \sigma ^2\), i.e. \(S^2\) is an unbiased estimator of \(\sigma ^2\).    
+\end{eg}
+
+\begin{definition}
+    Given random variables \(X, Y\) on a probability space, with \(\sigma _X = \sqrt{\Var(X)} \) and \(\delta _Y = \sqrt{\Var(Y)} \), we define the correlation of \(X\) and \(Y\) as 
+    \[
+        \rho (X, Y) = \frac{\Cov(X, Y)}{\sigma _X \sigma _Y} = \frac{\Cov(X, Y)}{\sqrt{\Var(X) \Var(Y)} }.
+    \]     
+\end{definition}
+
+\begin{proposition}
+    For any random variables \(X, Y\), 
+    \[
+        -1 \le \rho (X, Y) \le 1.
+    \] 
+\end{proposition}
+
+\begin{proof}
+    Consider 
+    \begin{align*}
+        \Var \left( \frac{X}{\sigma _X} + \frac{Y}{\sigma _Y} \right) &= \Var \left( \frac{X}{\sigma _X} \right) + \Var \left( \frac{Y}{\sigma _Y } \right) + 2 \Cov \left( \frac{X}{\sigma _X}, \frac{Y}{\sigma _Y} \right) \\
+        &= \frac{\Var(X)}{\sigma _X^2} + \frac{\Var(Y)}{\sigma _Y^2} + \frac{2 \Cov(X, Y)}{\sigma _X \sigma _Y} = 2 + 2 \rho (X, Y).   
+    \end{align*}
+    Hence, 
+    \[
+        2 + 2 \rho (X, Y) \ge 0 \implies \rho (X, Y) \ge -1.
+    \]
+    Similarly, 
+    \[
+        0 \le \Var \left( \frac{X}{\sigma _X} - \frac{Y}{\sigma _Y} \right) = 2 - 2 \rho (X, Y) \implies \rho (X, Y) \le 1. 
+    \]
+    \begin{remark}
+        We discuss when the equality holds: Suppose \(\rho (X, Y) = 1\), then 
+        \[
+            \Var \left( \frac{X}{\sigma _X} - \frac{Y}{\sigma _Y} \right) = 0. 
+        \]
+        Hence,
+        \[
+            \frac{X}{\sigma _X} - \frac{Y}{\sigma _Y} = C \quad \text{for some constant } C. 
+        \]
+        This shows 
+        \[
+            Y = \frac{\sigma _Y}{\sigma _X} \cdot X - C \sigma _Y,
+        \]
+        i.e. \(Y = a X + b\) for some \(a > 0\). Similarly, if \(\rho (X, Y) = -1\), then 
+        \[
+            \Var \left( \frac{X}{\sigma _X} + \frac{Y}{\sigma _Y} \right) = 0, 
+        \]   
+        so \(Y = aX + b\) for some \(a < 0\).  
+    \end{remark}
+\end{proof}
+
+\begin{definition}
+    If \(\rho (X, Y) = 0\), we say \(X\) and \(Y\) are uncorrelated.    
+\end{definition}
+
+\begin{eg}
+    Let \(A, B\) be events in a probability space, and let \(I_A, I_B\) be their indicator random variables, then 
+    \begin{align*}
+        \Cov \left( I_A, I_B \right) &= \mathbb{E} [I_A I_B] - \mathbb{E} [I_A] \mathbb{E} [I_B] = \mathbb{E} [I_{A \cap B}] - \mathbb{E} [I_A] \mathbb{E} [I_B] \\
+        &= \mathbb{P} (A \cap B) - \mathbb{P} (A) \mathbb{P} (B) = \mathbb{P} (B) \left[ \mathbb{P} (A \mid B) - \mathbb{P} (A) \right]  
+    \end{align*} 
+\end{eg}

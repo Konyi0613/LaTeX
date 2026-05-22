@@ -1,0 +1,111 @@
+\lecture{21}{May 22.}{}
+\section{Edge Coloring}
+\begin{definition}
+    Given a graph \(G = (V, E)\), a proper \(k\)-edge-coloring is a map \(c: E \to [k]\) such that any pair of incident edges \((e, f \in E, e \cap f \neq \varnothing)\) receive disitnct colors.    
+\end{definition}
+
+\begin{definition}
+    The edge-chromatic number (chromatic index) \(\chi ^{\prime} (G)\) is the minimum \(k\) s.t. \(G\) has a proper \(k\)-edge-coloring.    
+\end{definition}
+
+\begin{observation}
+    In a proper edge-coloring, each color class is a matching, so proper edge-coloring is a decomposition into matchings.
+\end{observation}
+
+\begin{proposition}
+    For any graph \(G\), \(\chi ^{\prime} (G) \ge \Delta (G)\).  
+\end{proposition}
+
+\begin{proof}
+    The edges incident to a vertex of maximum degree must all receive distinct colors. 
+\end{proof}
+
+\begin{theorem}[Konig]
+    If \(G\) is bipartite, then \(\chi ^{\prime} (G) = \Delta (G)\).  
+\end{theorem}
+
+\begin{proof}
+    We have the following cases:
+
+    \textbf{Case 1:} \(G\) is \(\Delta \)-regular, i.e. every vertex has degree \(\Delta\). 
+
+    \begin{claim}
+        \(G\) has a perfect matching. 
+    \end{claim}    
+
+    \begin{explanation}
+        Applying Hall's theorem: \(\forall S \subseteq X\),
+        \[
+            \vert S \vert \Delta = e(S, N(S)) \le \vert N(S) \vert \Delta.  
+        \] 
+        Hence, \(G\) has a perfect matching. 
+    \end{explanation}
+
+    Hence, we can make this one color, remove, and repeat. 
+
+    \textbf{Case 2:} \(G\) is not \(\Delta \)-regular. 
+
+    We can embed\footnote{HW} \(G \subseteq G^{\prime}\), a \(\Delta \)-regular graph. (draw some edges on \(G\) to make it cbecome \(G^{\prime}\))    
+\end{proof}
+
+\paragraph{Line graphs}
+Given \(G=(V, E)\), the line graph \(L(G)\) has vertices \(V(L(G)) = E\) and edges 
+\[
+    E(L(G)) = \left\{ \left\{ e, f \right\}: e \cap f \neq \varnothing  \right\}. 
+\]   
+
+\begin{observation}
+    \(\chi^{\prime} (G) = \chi (L(G))\), i.e. proper edge-coloring of \(G\) corresponds to a proper (vertex)-coloring of \(L(G)\).     
+\end{observation}
+
+\begin{observation}
+    Every vertex in \(G\) gives a clique in \(L(G)\), and \(K_3\) in \(G\) gives \(K_3\) in \(L(G)\). Hence, \(\omega (L(G)) = \Delta (G)\) if \(\Delta (G) \ge 3\).          
+\end{observation}
+
+We therefore have 
+\begin{align*}
+    \chi ^{\prime} (G) &= \chi (L(G)) \le \Delta (L(G)) + 1 \le (2 \Delta (G) - 2) + 1 = 2 \Delta (G) - 1.
+\end{align*}
+Note that 
+\[
+    \Delta (L(G)) \le 2 \Delta (G) - 2
+\]
+since \(\Delta (L(G))\) is the maximum number of edges in \(G\) incident to the endpoint of an edge. 
+
+Hence,
+\[
+    \Delta (G) \le \chi ^{\prime} (G) \le 2 \Delta (G) - 1.
+\]
+
+\begin{theorem}[Vizing]
+    For any \(G\), 
+    \[
+      \Delta (G) \le \chi ^{\prime} (G) \le \Delta (G) + 1.  
+    \] 
+\end{theorem}
+
+\begin{definition}
+    A graph \(G\) is Type 1 if \(\chi ^{\prime} (G) = \Delta (G)\), and Type 2 if \(\chi ^{\prime} (G) = \Delta (G) + 1\).   
+\end{definition}
+
+\begin{eg}
+    All bipartite graphs are Type 1. Even cliques are Type 1. Odd cycles and odd cliques are Type 2.
+\end{eg}
+
+\begin{proof}[proof of Vizing]
+    Let \(v \in V(G)\), consider \(G^{\prime} = G - v\). By induction, we can \(\Delta (G^{\prime} ) + 1 \le (\Delta (G) + 1)\)-edge-color \(G^{\prime}\). 
+    
+    We need to color the edges incident to \(v\).      
+
+    \begin{lemma}
+        Let \(G\) be a graph, \(v \in V(G)\), \(k \in \mathbb{N}\). Then, if:
+        \begin{itemize}
+            \item \(d(v) \le k\). 
+            \item for each neighbor \(u\) of \(v\), \(d(u) \le k\). 
+            \item there is at most one neighbor \(u\) of \(v\) with \(d(u) = k\).       
+        \end{itemize}   
+        Then, \(G\) is \(k\)-edge-colorable iff \(G - v\) is \(k\)-edge-colorable.    
+    \end{lemma}
+
+    To deduce the theorem, we apply the lemma with \(k = \Delta (G) + 1\).  
+\end{proof}
