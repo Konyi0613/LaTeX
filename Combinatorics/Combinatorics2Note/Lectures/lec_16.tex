@@ -10,14 +10,96 @@
 \end{proof}
 
 \begin{theorem}[Unit flow decomposition]
-    Given \((\vv{D}, s, t, c)\) and any feasible integer-valued flow \(f\), we can decompose \(f\) into unit flow along \(s, t\)-paths (plus closed loops).     
+    Given a network $(\vv{D}, s, t, c)$ and any feasible integer-valued flow $f$, we can decompose $f$ into
+    \[
+        f = g_1 + g_2 + \dots + g_{\mathrm{val}(f)} + h_1 + h_2 + \dots + h_k,
+    \]
+    where each $g_i$ is a unit $s, t$-flow supported on an $s, t$-path, and each $h_j$ is a circulation supported on a directed cycle.
 \end{theorem}
+
 \begin{proof}
-    Keep the edges with positive flow.
+    Consider the directed subgraph
+    \[
+        H = (V, E_H), \qquad E_H = \left\{ e \in \vv{E} : f(e) > 0 \right\}.
+    \]
+    Since $f$ is integer-valued, every edge in $E_H$ carries at least one unit of flow.
+
+    Suppose $\mathrm{val}(f) > 0$.
+    Then there exists an $s, t$-path in $H$.
+    Indeed, starting from $s$, we repeatedly follow an outgoing edge with positive flow.
+    This process cannot terminate at an intermediate vertex:
+    if a vertex $v \neq s, t$ receives positive flow, then by flow conservation,
+    \[
+        \sum_{u} f(u, v)
+        =
+        \sum_{w} f(v, w),
+    \]
+    so there must also exist an outgoing edge from $v$ with positive flow.
+    Hence, we either eventually reach $t$, or encounter a directed cycle.
+
+    Let $P$ be an $s, t$-path in $H$.
+    Define
+    \[
+        \delta = \min_{e \in P} f(e).
+    \]
+    Since $f$ is integer-valued, we have $\delta \in \mathbb{Z}_{>0}$.
+    We now subtract $\delta$ units of flow along every edge of $P$.
+    That is, define a new flow
+    \[
+        f'(e)
+        =
+        \begin{cases}
+            f(e) - \delta, & e \in P, \\
+            f(e), & e \notin P.
+        \end{cases}
+    \]
+    Then $f'$ is still a feasible integer-valued flow, and
+    \[
+        \mathrm{val}(f')
+        =
+        \mathrm{val}(f) - \delta.
+    \]
+
+    Repeating this procedure, we eventually remove all positive $s, t$-flow.
+    What remains is a feasible flow of value $0$.
+    Such a flow consists only of directed cycles, since every vertex has equal inflow and outflow.
+
+    Therefore, the original flow $f$ can be decomposed into a sum of unit $s, t$-flows together with cycle flows.
 \end{proof}
 
-\paragraph{Baranyai's Theorem}
-Suppose the league has 22 teams. Every weekend some games are played: Every team plays at most once in a weekend. Besides, every pair of temas should play exactly once in the season. 
+\begin{remark}
+    The cycle flows do not contribute to the net flow value from $s$ to $t$.
+    Hence, after deleting all cycle parts, the remaining positive-flow edges form a collection of $\mathrm{val}(f)$ unit $s, t$-flows.
+\end{remark}
+
+\begin{center}
+\begin{tikzpicture}[>=stealth, node distance=1.8cm,
+    every node/.style={circle, draw, minimum size=7mm}]
+
+    \node (s) {$s$};
+    \node (a) [right of=s] {$a$};
+    \node (b) [right of=a] {$b$};
+    \node (t) [right of=b] {$t$};
+
+    \draw[->] (s) -- (a);
+    \draw[->] (a) -- (b);
+    \draw[->] (b) -- (t);
+
+    \node (x) [below of=a] {$x$};
+    \node (y) [below of=b] {$y$};
+
+    \draw[->] (a) -- (x);
+    \draw[->] (x) -- (y);
+    \draw[->] (y) -- (a);
+
+    \node[draw=none] at ($(a)!0.5!(b)+(0,0.5)$) {\small $s,t$-path};
+    \node[draw=none] at ($(x)!0.5!(y)+(0,-0.6)$) {\small directed cycle};
+
+\end{tikzpicture}
+\end{center}
+
+\section{Baranyai's Theorem}
+Suppose the league has 22 teams. Every weekend some games are played: Every team plays at most once in a weekend. Besides, every pair of teams should play exactly once in the season. 
 \begin{question}
     How long must the season be?
 \end{question}
