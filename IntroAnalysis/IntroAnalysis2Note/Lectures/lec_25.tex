@@ -1,0 +1,490 @@
+\chapter{Principles of Functional Analysis}
+\lecture{25}{May 28.}{}
+
+This chapter presents the most important general principles in functional analysis. These results explain why completeness is such a powerful assumption in the study of normed vector spaces. The first principle is the Uniform Boundedness Principle, also known as the Banach--Steinhaus Theorem. It says that a pointwise bounded family of bounded linear operators on a Banach space is automatically uniformly bounded in operator norm. The second principle is the Open Mapping Theorem. It says that a surjective bounded linear operator between Banach spaces maps open sets to open sets. Its most important consequence is the Inverse Operator Theorem: a bijective bounded linear operator between Banach spaces has a bounded inverse. An equivalent formulation is the Closed Graph Theorem, which says that a linear operator between Banach spaces is bounded if and only if its graph is closed. The third principle is the Hahn--Banach Theorem. It says that bounded linear functionals defined on a subspace of a normed vector space can be extended to the whole space without increasing their norm. This theorem is the main tool for producing linear functionals and separating points from closed subspaces.
+
+\section{The Baire Category Theorem}
+The Baire Category Theorem is the topological foundation behind the Uniform Boundedness Principle and the Open Mapping Theorem.
+
+\begin{definition}[Nowhere dense]
+    Let \(X\) be a metric space. A subset \(E \subseteq X\) is called nowhere dense if
+    \[
+        \mathrm{int}\!\left(\overline{E}\right) = \varnothing.
+    \]
+\end{definition}
+
+\begin{theorem}[Baire Category Theorem] \label{thm: baire category theorem}
+    Let \(X\) be a nonempty complete metric space. If
+    \[
+        X = \bigcup_{n=1}^{\infty} F_n,
+    \]
+    where each \(F_n \subseteq X\) is closed, then at least one of the sets \(F_n\) has nonempty interior. Equivalently, a nonempty complete metric space cannot be written as a countable union of closed nowhere dense subsets.
+\end{theorem}
+
+\begin{proof}
+    We prove the contrapositive. Suppose that each \(F_n\) is closed and has empty interior. We shall prove that
+    \[
+        X \neq \bigcup_{n=1}^{\infty} F_n.
+    \]
+    In other words, we will construct a point \(x \in X\) such that \(x \notin F_n\) for every \(n \in \mathbb{N}\).
+
+    The proof is based on the following idea. Since \(F_1\) has empty interior, it cannot contain any open ball. Hence we can find a small closed ball avoiding \(F_1\). Inside that ball, since \(F_2\) also has empty interior, we can find a smaller closed ball avoiding \(F_2\). Continuing in this way, we construct a nested sequence of closed balls whose radii tend to zero. Completeness will then guarantee that these balls contain a limiting point. By construction, that limiting point avoids every \(F_n\).
+
+    We begin the construction. Since \(F_1\) has empty interior, \(\mathrm{int}(F_1) = \varnothing\). Thus \(F_1\) contains no nonempty open ball. Since \(X\) is nonempty and \(X\) itself is open in the metric topology, it follows that \(F_1 \neq X\). Hence there exists a point \(y_1 \in X \setminus F_1\). Because \(F_1\) is closed, its complement \(X \setminus F_1\) is open. Therefore there exists \(\omega_1 > 0\) such that \(B_{\omega_1}(y_1) \subseteq X \setminus F_1\). Choose \(r_1 > 0\) so small that \(0 < r_1 < 1\) and \(r_1 < \omega_1\). Then
+    \[
+        \overline{B_{r_1}}(y_1) \subseteq B_{\omega_1}(y_1) \subseteq X \setminus F_1.
+    \]
+    Renaming \(y_1\) as \(x_1\), we have found a closed ball
+    \[
+        \overline{B_{r_1}}(x_1) \subseteq X \setminus F_1, \quad 0 < r_1 < 1.
+    \]
+
+    We now proceed inductively. Suppose that, for some \(n \geq 1\), we have already chosen a closed ball \(\overline{B_{r_n}}(x_n)\). Since \(F_{n+1}\) has empty interior, it cannot contain the nonempty open ball \(B_{r_n}(x_n)\). Therefore there exists a point \(y_{n+1} \in B_{r_n}(x_n) \setminus F_{n+1}\). Because \(F_{n+1}\) is closed, the complement \(X \setminus F_{n+1}\) is open. Hence there exists \(\omega_{n+1} > 0\) such that \(B_{\omega_{n+1}}(y_{n+1}) \subseteq X \setminus F_{n+1}\). Also, since \(y_{n+1} \in B_{r_n}(x_n)\), the open ball \(B_{r_n}(x_n)\) is a neighborhood of \(y_{n+1}\). Thus, by choosing the radius sufficiently small, we may ensure that the next closed ball lies inside both \(B_{r_n}(x_n)\) and \(X \setminus F_{n+1}\). More precisely, choose \(r_{n+1} > 0\) such that
+    \[
+        0 < r_{n+1} < \frac{1}{n+1}
+    \]
+    and \(\overline{B_{r_{n+1}}}(y_{n+1}) \subseteq B_{r_n}(x_n) \cap (X \setminus F_{n+1})\). Renaming \(y_{n+1}\) as \(x_{n+1}\), we obtain
+    \[
+        \overline{B_{r_{n+1}}}(x_{n+1}) \subseteq B_{r_n}(x_n) \setminus F_{n+1},
+    \]
+    with
+    \begin{equation} \label{eq: baire radius bound}
+        0 < r_{n+1} < \frac{1}{n+1}.
+    \end{equation}
+    By induction, we obtain a sequence of closed balls \(\overline{B_{r_1}}(x_1), \overline{B_{r_2}}(x_2), \overline{B_{r_3}}(x_3), \ldots\) such that
+    \begin{equation} \label{eq: baire ball nesting}
+        \overline{B_{r_{n+1}}}(x_{n+1}) \subseteq \overline{B_{r_n}}(x_n) \quad \text{for every } n \in \mathbb{N},
+    \end{equation}
+    and
+    \begin{equation} \label{eq: baire ball disjoint}
+        \overline{B_{r_n}}(x_n) \cap F_n = \varnothing \quad \text{for every } n \in \mathbb{N}.
+    \end{equation}
+    Moreover, by \autoref{eq: baire radius bound}, \(r_n \to 0\).
+
+    We claim that \((x_n)\) is a Cauchy sequence. Let \(m \geq n\). Since the balls are nested, \autoref{eq: baire ball nesting} implies that \(x_m \in \overline{B_{r_n}}(x_n)\). Therefore \(d(x_m, x_n) \leq r_n\). Since \(r_n \to 0\), it follows that for every \(\varepsilon > 0\), there exists \(N \in \mathbb{N}\) such that \(r_N < \varepsilon\). Hence, whenever \(m \geq n \geq N\),
+    \[
+        d(x_m, x_n) \leq r_n \leq r_N < \varepsilon.
+    \]
+    Thus \((x_n)\) is Cauchy. Since \(X\) is complete, there exists \(x \in X\) such that \(x_n \to x\).
+
+    We now show that this limit point avoids every \(F_n\). Fix \(n \in \mathbb{N}\). For every \(m \geq n\), the nestedness condition gives \(x_m \in \overline{B_{r_n}}(x_n)\). Since \(\overline{B_{r_n}}(x_n)\) is closed and \(x_m \to x\), we may pass to the limit and obtain \(x \in \overline{B_{r_n}}(x_n)\). But by \autoref{eq: baire ball disjoint}, the ball \(\overline{B_{r_n}}(x_n)\) is disjoint from \(F_n\). Hence \(x \notin F_n\). Since \(n \in \mathbb{N}\) was arbitrary, we conclude that
+    \[
+        x \notin \bigcup_{n=1}^{\infty} F_n.
+    \]
+    Therefore \(X \neq \bigcup_{n=1}^{\infty} F_n\). This proves the contrapositive. Consequently, if a nonempty complete metric space \(X\) is written as a countable union of closed sets, \(X = \bigcup_{n=1}^{\infty} F_n\), then at least one of the sets \(F_n\) must have nonempty interior.
+\end{proof}
+
+\section{The Uniform Boundedness Principle}
+Let \(X\) be a set. A family \(\{f_i\}_{i \in I}\) of functions \(f_i : X \to Y_i\), where each \(Y_i\) is a normed vector space, is called \textbf{pointwise bounded} if
+\[
+    \sup_{i \in I} \lVert f_i(x) \rVert_{Y_i} < \infty \quad \text{for every } x \in X.
+\]
+
+\begin{theorem}[Uniform Boundedness Principle] \label{thm: uniform boundedness principle}
+    Let \(X\) be a Banach space, let \(I\) be an index set, and, for each \(i \in I\), let \(Y_i\) be a normed vector space. Suppose \(A_i : X \to Y_i\) is a bounded linear operator for every \(i \in I\). If the family \(\{A_i\}_{i \in I}\) is pointwise bounded, that is,
+    \[
+        \sup_{i \in I} \lVert A_i x \rVert_{Y_i} < \infty \quad \text{for every } x \in X,
+    \]
+    then
+    \[
+        \sup_{i \in I} \lVert A_i \rVert < \infty.
+    \]
+\end{theorem}
+
+\begin{proof}
+    For \(n \in \mathbb{N}\), define
+    \[
+        F_n \coloneqq \left\{ x \in X : \sup_{i \in I} \lVert A_i x \rVert_{Y_i} \leq n \right\}.
+    \]
+    Each \(F_n\) is closed. Indeed, if \(x_m \in F_n\) and \(x_m \to x\), then for each \(i \in I\),
+    \[
+        \lVert A_i x \rVert_{Y_i} = \lim_{m \to \infty} \lVert A_i x_m \rVert_{Y_i} \leq n,
+    \]
+    and hence \(x \in F_n\). By pointwise boundedness,
+    \[
+        X = \bigcup_{n=1}^{\infty} F_n.
+    \]
+    Since \(X\) is complete, the Baire Category Theorem implies that some \(F_N\) has nonempty interior. Hence there exist \(x_0 \in X\) and \(\varepsilon > 0\) such that \(B_\varepsilon(x_0) \subseteq F_N\). Thus
+    \[
+        \lVert A_i x \rVert_{Y_i} \leq N \quad \text{for every } i \in I \text{ and every } x \in B_\varepsilon(x_0).
+    \]
+    We now show that this local uniform bound implies a uniform bound on operator norms. Let \(x \in X\) with \(x \neq 0\). Then both points
+    \[
+        x_0 + \frac{\varepsilon}{2} \frac{x}{\lVert x \rVert} \quad \text{and} \quad x_0 - \frac{\varepsilon}{2} \frac{x}{\lVert x \rVert}
+    \]
+    belong to \(B_\varepsilon(x_0)\). Hence, by the local uniform bound, for every \(i \in I\),
+    \[
+        \left\lVert A_i \!\left( x_0 + \frac{\varepsilon}{2} \frac{x}{\lVert x \rVert} \right) \right\rVert_{Y_i} \leq N, \qquad \left\lVert A_i \!\left( x_0 - \frac{\varepsilon}{2} \frac{x}{\lVert x \rVert} \right) \right\rVert_{Y_i} \leq N.
+    \]
+    Using the linearity of \(A_i\), we have
+    \[
+        A_i \!\left( x_0 + \frac{\varepsilon}{2} \frac{x}{\lVert x \rVert} \right) - A_i \!\left( x_0 - \frac{\varepsilon}{2} \frac{x}{\lVert x \rVert} \right) = A_i \!\left( \frac{\varepsilon x}{\lVert x \rVert} \right) = \frac{\varepsilon}{\lVert x \rVert} A_i x.
+    \]
+    Therefore, by the triangle inequality,
+    \[
+        \frac{\varepsilon}{\lVert x \rVert} \lVert A_i x \rVert_{Y_i} \leq 2N.
+    \]
+    Equivalently, \(\lVert A_i x \rVert_{Y_i} \leq \frac{2N}{\varepsilon} \lVert x \rVert\). Thus \(\lVert A_i \rVert \leq \frac{2N}{\varepsilon}\) for every \(i \in I\). Consequently, \(\sup_{i \in I} \lVert A_i \rVert < \infty\).
+\end{proof}
+
+\begin{corollary}[Pointwise limits of bounded operators] \label{cl: pointwise limits of bounded operators}
+    Let \(X\) be a Banach space and let \(Y\) be a normed vector space. Suppose \(A_n : X \to Y\) is a sequence of bounded linear operators such that, for every \(x \in X\), the limit
+    \[
+        Ax \coloneqq \lim_{n \to \infty} A_n x
+    \]
+    exists in \(Y\). Then \(A : X \to Y\) is a bounded linear operator, and
+    \[
+        \lVert A \rVert \leq \liminf_{n \to \infty} \lVert A_n \rVert.
+    \]
+\end{corollary}
+
+\begin{proof}
+    For each \(x \in X\), the sequence \((A_n x)\) converges, and hence is bounded. Therefore
+    \[
+        \sup_{n \in \mathbb{N}} \lVert A_n x \rVert_Y < \infty
+    \]
+    for every \(x \in X\). By the Uniform Boundedness Principle, \(\sup_{n \in \mathbb{N}} \lVert A_n \rVert < \infty\). The map \(A\) is linear because it is defined as a pointwise limit of linear maps. Moreover, for every \(x \in X\),
+    \[
+        \lVert Ax \rVert_Y = \lim_{n \to \infty} \lVert A_n x \rVert_Y = \liminf_{n \to \infty} \lVert A_n x \rVert_Y \leq \left( \liminf_{n \to \infty} \lVert A_n \rVert \right) \lVert x \rVert_X.
+    \]
+    Taking the supremum over \(\lVert x \rVert_X \leq 1\), we obtain \(\lVert A \rVert \leq \liminf_{n \to \infty} \lVert A_n \rVert\).
+\end{proof}
+
+\section{The Open Mapping Theorem}
+A map \(T : X \to Y\) between topological spaces is called \textbf{open} if \(T(U)\) is open in \(Y\) whenever \(U\) is open in \(X\).
+
+\begin{theorem}[Open Mapping Theorem] \label{thm: open mapping theorem}
+    Let \(X\) and \(Y\) be Banach spaces. If \(T : X \to Y\) is a surjective bounded linear operator, then \(T\) is open.
+\end{theorem}
+
+We prove the theorem in two steps.
+
+\begin{lemma} \label{lm: open mapping step 1}
+    Let \(X\) and \(Y\) be Banach spaces, and let \(T : X \to Y\) be a surjective bounded linear operator. Let \(B_X \coloneqq \{x \in X : \lVert x \rVert < 1\}\). Then there exists \(\delta > 0\) such that
+    \[
+        B_Y(0, \delta) \subseteq \overline{T(B_X)}.
+    \]
+\end{lemma}
+
+\begin{proof}
+    Since \(T\) is surjective, we have \(Y = T(X)\). Also,
+    \[
+        X = \bigcup_{n=1}^{\infty} n B_X,
+    \]
+    because for every \(x \in X\), one can choose \(n > \lVert x \rVert_X\), and then \(x \in n B_X\). Hence
+    \[
+        Y = T(X) = \bigcup_{n=1}^{\infty} T(n B_X) = \bigcup_{n=1}^{\infty} n T(B_X),
+    \]
+    where the last equality follows from the linearity of \(T\). Therefore
+    \[
+        Y = \bigcup_{n=1}^{\infty} \overline{n T(B_X)}.
+    \]
+    Indeed, since \(n T(B_X) \subseteq \overline{n T(B_X)}\), the inclusion \(Y \subseteq \bigcup_{n=1}^{\infty} \overline{n T(B_X)}\) follows, while the reverse inclusion holds because each \(\overline{n T(B_X)}\) is a subset of \(Y\). Each set \( \overline{n T(B_X)}\) is closed in \(Y\). Since \(Y\) is a Banach space, it is a complete metric space. Hence, by the Baire Category Theorem, there exists \(n_0 \in \mathbb{N}\) such that
+    \[
+        \mathrm{int}\!\left( \overline{n_0 T(B_X)} \right) \neq \varnothing.
+    \]
+    Since scalar multiplication by \(n_0\) is a homeomorphism of \(Y\), we have \( \overline{n_0 T(B_X)} = n_0 \overline{T(B_X)}\). Thus \(\overline{T(B_X)}\) also has nonempty interior.
+
+    Consequently, there exist \(y_0 \in Y\) and \(r > 0\) such that \(B_Y(y_0, r) \subseteq \overline{T(B_X)}\). We now show that this implies that \(\overline{T(B_X)}\) contains an open ball centered at the origin. Since \(B_X\) is convex and symmetric, the set \(T(B_X)\) is also convex and symmetric. Therefore its closure \(\overline{T(B_X)}\) is convex and symmetric.
+
+    Let \(y \in Y\) satisfy \(\lVert y \rVert_Y < r\). Then
+    \[
+        y_0 + y \in B_Y(y_0, r) \quad \text{and} \quad y_0 - y \in B_Y(y_0, r).
+    \]
+    Hence both \(y_0 + y\) and \(y_0 - y\) lie in \(\overline{T(B_X)}\). By symmetry of \(\overline{T(B_X)}\), \(-(y_0 - y) = -y_0 + y \in \overline{T(B_X)}\). Since \(\overline{T(B_X)}\) is convex,
+    \[
+        y = \frac{1}{2}(y_0 + y) + \frac{1}{2}(-y_0 + y) \in \overline{T(B_X)}.
+    \]
+    Thus \(B_Y(0, r) \subseteq \overline{T(B_X)}\). Taking \(\delta = r\) proves the lemma.
+\end{proof}
+
+\begin{lemma} \label{lm: open mapping step 2}
+    Let \(X\) and \(Y\) be Banach spaces, and let \(T : X \to Y\) be a bounded linear operator. Suppose that for some \(\delta > 0\),
+    \[
+        B_Y(0, \delta) \subseteq \overline{T(B_X)}.
+    \]
+    Then
+    \[
+        B_Y(0, \delta) \subseteq T(B_X).
+    \]
+\end{lemma}
+
+\begin{proof}
+    Let \(y \in Y\) satisfy \(\lVert y \rVert_Y < \delta\). Choose a number \(\sigma\) such that \(\lVert y \rVert_Y < \sigma < \delta\). We shall construct a sequence \((x_n)_{n=1}^{\infty}\) in \(X\) such that
+    \[
+        \sum_{n=1}^{\infty} \lVert x_n \rVert_X < 1 \quad \text{and} \quad y = \sum_{n=1}^{\infty} T x_n.
+    \]
+    Then \(x \coloneqq \sum_{n=1}^{\infty} x_n\) will belong to \(B_X\), and by continuity of \(T\), we will have \(Tx = y\).
+
+    We use the assumption \(B_Y(0, \delta) \subseteq \overline{T(B_X)}\) in the following scaled form. If \(z \in Y\) and \(a > 0\) satisfy \(\lVert z \rVert_Y < a\delta\), then \(\lVert z/a \rVert_Y < \delta\), so \(z/a \in \overline{T(B_X)}\). Therefore, for every \(\varepsilon > 0\), there exists \(u \in B_X\) such that \(\lVert z/a - Tu \rVert_Y < \varepsilon/a\). Setting \(x \coloneqq au\), we get \(\lVert x \rVert_X < a\) and
+    \[
+        \lVert z - Tx \rVert_Y = a\lVert z/a - Tu \rVert_Y < \varepsilon.
+    \]
+    Thus we have proved the following useful fact:
+    \[
+        \lVert z \rVert_Y < a\delta \implies \text{for every } \varepsilon > 0,\ \exists\, x \in X \text{ s.t. } \lVert x \rVert_X < a \text{ and } \lVert z - Tx \rVert_Y < \varepsilon.
+    \]
+
+    We now begin the construction. Since \(\lVert y \rVert_Y < \sigma = \delta \cdot \frac{\sigma}{\delta}\), we apply the above with \(z = y\), \(a = \frac{\sigma}{\delta}\), and \(\varepsilon = \frac{\delta - \sigma}{2}\). Thus there exists \(x_1 \in X\) such that
+    \[
+        \lVert x_1 \rVert_X < \frac{\sigma}{\delta} \quad \text{and} \quad \lVert y - T x_1 \rVert_Y < \frac{\delta - \sigma}{2}.
+    \]
+    Define \(r_1 \coloneqq y - T x_1\). Then \(\lVert r_1 \rVert_Y < \frac{\delta - \sigma}{2}\).
+
+    We now carry out the induction. Suppose that, for some \(n \geq 1\), we have already chosen \(x_1, \ldots, x_n \in X\) such that the remainder
+    \[
+        r_n \coloneqq y - \sum_{k=1}^n T x_k
+    \]
+    satisfies \(\lVert r_n \rVert_Y < \frac{\delta - \sigma}{2^n}\). Set \(a_n \coloneqq \frac{\delta - \sigma}{\delta \cdot 2^n}\). Then \(a_n \delta = \frac{\delta - \sigma}{2^n}\), and by the induction hypothesis, \(\lVert r_n \rVert_Y < a_n \delta\). Therefore we may apply the above with \(z = r_n\), \(a = a_n\), and \(\varepsilon = \frac{\delta - \sigma}{2^{n+1}}\). Hence there exists \(x_{n+1} \in X\) such that
+    \[
+        \lVert x_{n+1} \rVert_X < \frac{\delta - \sigma}{\delta \cdot 2^n} \quad \text{and} \quad \left\lVert y - \sum_{k=1}^{n+1} T x_k \right\rVert_Y < \frac{\delta - \sigma}{2^{n+1}}.
+    \]
+    This completes the induction.
+
+    We now estimate the series \(\sum x_n\). Using the above bounds,
+    \begin{align*}
+        \sum_{n=1}^{\infty} \lVert x_n \rVert_X = \lVert x_1 \rVert_X + \sum_{n=1}^{\infty} \lVert x_{n+1} \rVert_X < \frac{\sigma}{\delta} + \sum_{n=1}^{\infty} \frac{\delta - \sigma}{\delta \cdot 2^n} = \frac{\sigma}{\delta} + \frac{\delta - \sigma}{\delta} = 1.
+    \end{align*}
+    Thus the series \(\sum_{n=1}^{\infty} x_n\) is absolutely convergent in \(X\). Since \(X\) is Banach, it converges to some element \(x \coloneqq \sum_{n=1}^{\infty} x_n \in X\). Moreover, \(\lVert x \rVert_X \leq \sum_{n=1}^{\infty} \lVert x_n \rVert_X < 1\), hence \(x \in B_X\). Since \(T\) is bounded, it is continuous. Therefore
+    \[
+        Tx = T\!\left( \sum_{n=1}^{\infty} x_n \right) = \sum_{n=1}^{\infty} T x_n.
+    \]
+    On the other hand, the remainder estimate gives \(\left\lVert y - \sum_{k=1}^n T x_k \right\rVert_Y < \frac{\delta - \sigma}{2^n} \to 0\), hence \(\sum_{n=1}^{\infty} T x_n = y\). Consequently, \(Tx = y\), and since \(x \in B_X\), we have \(y \in T(B_X)\). This proves \(B_Y(0, \delta) \subseteq T(B_X)\).
+\end{proof}
+
+Now we can prove open mapping theorem.
+\begin{proof}[Proof of \autoref{thm: open mapping theorem}]
+    By \autoref{lm: open mapping step 1}, there exists \(\delta > 0\) such that \(B_Y(0, \delta) \subseteq \overline{T(B_X)}\). By \autoref{lm: open mapping step 2}, \(B_Y(0, \delta) \subseteq T(B_X)\).
+
+    Let \(U \subseteq X\) be open. We prove that \(T(U)\) is open. Choose \(y_0 \in T(U)\), say \(y_0 = Tx_0\) with \(x_0 \in U\). Since \(U\) is open, there exists \(\varepsilon > 0\) such that \(B_X(x_0, \varepsilon) \subseteq U\). We claim that \(B_Y(y_0, \delta\varepsilon) \subseteq T(U)\). Indeed, if \(\lVert y - y_0 \rVert_Y < \delta\varepsilon\), then \(\lVert \varepsilon^{-1}(y - y_0) \rVert_Y < \delta\). Hence there exists \(u \in X\) such that \(\lVert u \rVert_X < 1\) and \(Tu = \varepsilon^{-1}(y - y_0)\). Therefore \(y = y_0 + \varepsilon Tu = T(x_0 + \varepsilon u)\). Since \(x_0 + \varepsilon u \in B_X(x_0, \varepsilon) \subseteq U\), we get \(y \in T(U)\). Hence \(T(U)\) is open.
+\end{proof}
+
+\section{The Inverse Operator and Closed Graph Theorems}
+
+\begin{theorem}[Inverse Operator Theorem] \label{thm: inverse operator theorem}
+    Let \(X\) and \(Y\) be Banach spaces. If \(T : X \to Y\) is a bijective bounded linear operator, then \(T^{-1} : Y \to X\) is bounded.
+\end{theorem}
+
+\begin{proof}
+    Since \(T\) is surjective and bounded, the Open Mapping Theorem implies that \(T\) is open. Therefore, for every open set \(U \subseteq X\),
+    \[
+        (T^{-1})^{-1}(U) = T(U)
+    \]
+    is open in \(Y\). Hence \(T^{-1}\) is continuous. Since \(T^{-1}\) is linear, it is bounded.
+\end{proof}
+
+\begin{definition}[Graph of a linear operator]
+    Let \(X\) and \(Y\) be normed vector spaces, and let \(T : X \to Y\) be linear. The graph of \(T\) is
+    \[
+        \mathrm{graph}(T) \coloneqq \left\{ (x, Tx) : x \in X \right\} \subseteq X \times Y.
+    \]
+    We equip \(X \times Y\) with the norm
+    \[
+        \lVert (x, y) \rVert_{X \times Y} \coloneqq \lVert x \rVert_X + \lVert y \rVert_Y.
+    \]
+    If \(X\) and \(Y\) are Banach spaces, then \(X \times Y\) is Banach.
+\end{definition}
+
+\begin{theorem}[Closed Graph Theorem] \label{thm: closed graph theorem}
+    Let \(X\) and \(Y\) be Banach spaces. Let \(T : X \to Y\) be a linear operator. Then \(T\) is bounded if and only if \(\mathrm{graph}(T)\) is closed in \(X \times Y\).
+\end{theorem}
+
+\begin{proof}
+    First suppose that \(T\) is bounded. Let \((x_n, Tx_n) \to (x, y)\) in \(X \times Y\). Then \(x_n \to x\) in \(X\), and \(Tx_n \to y\) in \(Y\). Since \(T\) is continuous, \(Tx_n \to Tx\). Hence \(y = Tx\), and so \((x, y) \in \mathrm{graph}(T)\). Thus the graph is closed.
+
+    Conversely, suppose that \(\mathrm{graph}(T)\) is closed. Since \(X \times Y\) is Banach, the closed subspace \(\mathrm{graph}(T)\) is also Banach. Consider the projection
+    \[
+        \pi_X : \mathrm{graph}(T) \to X, \quad \pi_X(x, Tx) = x.
+    \]
+    This map is linear, bijective, and bounded because
+    \[
+        \lVert \pi_X(x, Tx) \rVert_X = \lVert x \rVert_X \leq \lVert x \rVert_X + \lVert Tx \rVert_Y.
+    \]
+    By the Inverse Operator Theorem, \(\pi_X^{-1}\) is bounded. Hence there exists \(C > 0\) such that
+    \[
+        \lVert (x, Tx) \rVert_{X \times Y} = \lVert \pi_X^{-1} x \rVert_{X \times Y} \leq C \lVert x \rVert_X.
+    \]
+    Therefore \(\lVert Tx \rVert_Y \leq C \lVert x \rVert_X\) for every \(x \in X\). Thus \(T\) is bounded.
+\end{proof}
+
+\begin{remark}
+    The Closed Graph Theorem is often used in the following form: to prove that a linear map \(T : X \to Y\) between Banach spaces is bounded, it suffices to prove that
+    \[
+        x_n \to x, \quad Tx_n \to y \implies Tx = y.
+    \]
+\end{remark}
+
+\section{The Hahn--Banach Theorem}
+We now turn to the extension theorem for bounded linear functionals.
+
+\begin{definition}[Sublinear function]
+    Let \(X\) be a real vector space. A function \(p : X \to \mathbb{R}\) is called sublinear if
+    \[
+        p(x + y) \leq p(x) + p(y) \quad \text{for all } x, y \in X,
+    \]
+    and
+    \[
+        p(\lambda x) = \lambda p(x) \quad \text{for all } x \in X,\ \lambda \geq 0.
+    \]
+\end{definition}
+
+\begin{theorem}[Hahn--Banach theorem, real form] \label{thm: hahn-banach real form}
+    Let \(X\) be a real vector space, let \(M \subseteq X\) be a linear subspace, and let \(p : X \to \mathbb{R}\) be sublinear. Suppose \(f : M \to \mathbb{R}\) is linear and satisfies
+    \[
+        f(x) \leq p(x) \quad \text{for every } x \in M.
+    \]
+    Then there exists a linear functional \(F : X \to \mathbb{R}\) such that
+    \[
+        F\vert_M = f \quad \text{and} \quad F(x) \leq p(x) \quad \text{for every } x \in X.
+    \]
+\end{theorem}
+
+\begin{proof}
+    We first prove the one-dimensional extension step. Let \(z \in X \setminus M\) and set \(M_1 \coloneqq M + \mathbb{R} z\). We seek an extension of the form
+    \[
+        f_1(x + tz) = f(x) + t\alpha, \quad x \in M,\ t \in \mathbb{R}.
+    \]
+    We need \(f(x) + t\alpha \leq p(x + tz)\) for all \(x \in M\), \(t \in \mathbb{R}\). For \(t > 0\), this is equivalent to \(\alpha \leq p(u + z) - f(u)\) for all \(u \in M\). For \(t < 0\), it is equivalent to \(\alpha \geq f(u) - p(u - z)\) for all \(u \in M\). Thus it suffices to choose \(\alpha\) such that
+    \[
+        f(u) - p(u - z) \leq \alpha \leq p(v + z) - f(v) \quad \text{for all } u, v \in M.
+    \]
+    Such an \(\alpha\) exists because
+    \[
+        f(u) + f(v) = f(u + v) \leq p(u + v) \leq p(u - z) + p(v + z),
+    \]
+    and hence \(f(u) - p(u - z) \leq p(v + z) - f(v)\). Therefore we may choose
+    \[
+        \alpha \in \left[ \sup_{u \in M}\!\left( f(u) - p(u - z) \right),\ \inf_{v \in M}\!\left( p(v + z) - f(v) \right) \right].
+    \]
+    With this choice of \(\alpha\), we have, for every \(x \in M\),
+    \begin{equation} \label{eq: hb one-dim pos}
+        f(x) + \alpha \leq p(x + z),
+    \end{equation}
+    and
+    \begin{equation} \label{eq: hb one-dim neg}
+        f(x) - \alpha \leq p(x - z).
+    \end{equation}
+    We now explain why these two inequalities, which correspond to the coefficients \(1\) and \(-1\) of the new direction \(z\), imply the desired estimate for all real coefficients \(t\). The important point is that \autoref{eq: hb one-dim pos} and \autoref{eq: hb one-dim neg} hold for every element of \(M\), not just for one fixed element.
+
+    Let \(x \in M\) and \(t \in \mathbb{R}\). If \(t > 0\), then \(x + tz = t(x/t + z)\) and \(x/t \in M\). Applying \autoref{eq: hb one-dim pos} to \(x/t\) and multiplying by \(t > 0\), using the linearity of \(f\) and the positive homogeneity of \(p\), gives \(f(x) + t\alpha \leq p(x + tz)\). If \(t < 0\), write \(t = -s\) where \(s > 0\). Then \(x + tz = s(x/s - z)\) and \(x/s \in M\). Applying \autoref{eq: hb one-dim neg} to \(x/s\) and multiplying by \(s > 0\), using the linearity of \(f\) and the positive homogeneity of \(p\), gives \(f(x) - s\alpha \leq p(x - sz)\). Since \(t = -s\), this is exactly \(f(x) + t\alpha \leq p(x + tz)\). If \(t = 0\), the desired inequality reduces to \(f(x) \leq p(x)\), which holds by assumption on \(M\). Thus
+    \[
+        f_1(x + tz) = f(x) + t\alpha \leq p(x + tz) \quad \text{for all } x \in M,\ t \in \mathbb{R}.
+    \]
+    Therefore \(f_1\) extends \(f\) and satisfies \(f_1 \leq p\) on \(M_1\).
+
+    Now let \(\mathcal{E}\) be the collection of all pairs \((N, g)\), where \(M \subseteq N \subseteq X\) is a linear subspace and \(g : N \to \mathbb{R}\) is a linear functional such that \(g\vert_M = f\) and \(g(x) \leq p(x)\) for every \(x \in N\). Thus \(\mathcal{E}\) consists of all possible extensions of \(f\) to larger subspaces, still dominated by \(p\). We define a partial order on \(\mathcal{E}\) by extension: for \((N_1, g_1), (N_2, g_2) \in \mathcal{E}\), we write \((N_1, g_1) \leq (N_2, g_2)\) if \(N_1 \subseteq N_2\) and \(g_2\vert_{N_1} = g_1\).
+
+    Notice first that \(\mathcal{E}\) is nonempty, because \((M, f) \in \mathcal{E}\).
+
+    We claim that every chain in \(\mathcal{E}\) has an upper bound. Let \(\mathcal{C} = \{(N_i, g_i)\}_{i \in I}\) be a chain in \(\mathcal{E}\). This means that for any \(i, j \in I\), either \((N_i, g_i) \leq (N_j, g_j)\) or \((N_j, g_j) \leq (N_i, g_i)\). Define \(N_{\mathcal{C}} \coloneqq \bigcup_{i \in I} N_i\). We first check that \(N_{\mathcal{C}}\) is a linear subspace of \(X\). Let \(x, y \in N_{\mathcal{C}}\) and \(a, b \in \mathbb{R}\). Then there exist \(i, j \in I\) such that \(x \in N_i\) and \(y \in N_j\). Since \(\mathcal{C}\) is a chain, the two subspaces \(N_i\) and \(N_j\) are comparable. For example, suppose \(N_i \subseteq N_j\). Then \(x, y \in N_j\), and since \(N_j\) is a linear subspace, \(ax + by \in N_j \subseteq N_{\mathcal{C}}\). The other case \(N_j \subseteq N_i\) is identical. Hence \(N_{\mathcal{C}}\) is a linear subspace.
+
+    We now define a functional \(g_{\mathcal{C}} : N_{\mathcal{C}} \to \mathbb{R}\) as follows. Given \(x \in N_{\mathcal{C}}\), choose \(i \in I\) such that \(x \in N_i\), and set \(g_{\mathcal{C}}(x) \coloneqq g_i(x)\). This definition is well-defined. Indeed, if \(x \in N_i \cap N_j\), then because \(\mathcal{C}\) is a chain, the pairs \((N_i, g_i)\) and \((N_j, g_j)\) are comparable. Suppose, for instance, that \((N_i, g_i) \leq (N_j, g_j)\). Then \(g_j\vert_{N_i} = g_i\), and therefore \(g_j(x) = g_i(x)\). The other case is the same. Hence \(g_{\mathcal{C}}(x)\) is independent of the choice of \(i\).
+
+    Next we verify that \(g_{\mathcal{C}}\) is linear. Let \(x, y \in N_{\mathcal{C}}\) and \(a, b \in \mathbb{R}\). Choose \(i, j \in I\) such that \(x \in N_i\) and \(y \in N_j\). Since \(\mathcal{C}\) is a chain, after possibly interchanging \(i\) and \(j\), we may assume that \((N_i, g_i) \leq (N_j, g_j)\). Then \(x, y \in N_j\), and hence \(ax + by \in N_j\). Therefore
+    \[
+        g_{\mathcal{C}}(ax + by) = g_j(ax + by) = a g_j(x) + b g_j(y) = a g_{\mathcal{C}}(x) + b g_{\mathcal{C}}(y).
+    \]
+    Thus \(g_{\mathcal{C}}\) is linear. Moreover, \(g_{\mathcal{C}}\) extends \(f\), since every \((N_i, g_i) \in \mathcal{E}\) satisfies \(M \subseteq N_i\) and \(g_i\vert_M = f\). Finally, \(g_{\mathcal{C}}(x) = g_i(x) \leq p(x)\) for any \(x \in N_i\). Therefore \((N_{\mathcal{C}}, g_{\mathcal{C}}) \in \mathcal{E}\). It is also an upper bound for \(\mathcal{C}\), because for every \(i \in I\), \(N_i \subseteq N_{\mathcal{C}}\) and \(g_{\mathcal{C}}\vert_{N_i} = g_i\).
+
+    Thus every chain in \(\mathcal{E}\) has an upper bound. By Zorn's lemma, there exists a maximal element \((N_0, g_0) \in \mathcal{E}\). We claim that \(N_0 = X\). Suppose, for contradiction, that \(N_0 \neq X\). Then there exists \(z \in X \setminus N_0\). Since \(z \notin N_0\), the subspace \(N_0 + \mathbb{R} z\) is strictly larger than \(N_0\). By the one-dimensional extension step, there exists a linear functional \(\widetilde{g} : N_0 + \mathbb{R} z \to \mathbb{R}\) such that \(\widetilde{g}\vert_{N_0} = g_0\) and \(\widetilde{g}(x) \leq p(x)\) for every \(x \in N_0 + \mathbb{R} z\). Therefore \((N_0 + \mathbb{R} z, \widetilde{g}) \in \mathcal{E}\). Moreover, \((N_0, g_0) < (N_0 + \mathbb{R} z, \widetilde{g})\), and this extension is strict because \(z \notin N_0\). This contradicts the maximality of \((N_0, g_0)\).
+
+    Hence \(N_0 = X\). Consequently, \(g_0 : X \to \mathbb{R}\) is a linear extension of \(f\) to all of \(X\), and it satisfies \(g_0(x) \leq p(x)\) for every \(x \in X\). This is the desired Hahn--Banach extension.
+\end{proof}
+
+\begin{theorem}[Hahn--Banach Extension Theorem] \label{thm: hahn-banach extension}
+    Let \(X\) be a real normed vector space, and let \(M \subseteq X\) be a linear subspace. If \(f : M \to \mathbb{R}\) is a bounded linear functional, then there exists \(F \in X^*\) such that
+    \[
+        F\vert_M = f \quad \text{and} \quad \lVert F \rVert_{X^*} = \lVert f \rVert_{M^*}.
+    \]
+\end{theorem}
+
+\begin{proof}
+    Define \(p(x) \coloneqq \lVert f \rVert_{M^*} \lVert x \rVert\) for \(x \in X\). Then \(p\) is sublinear. For \(x \in M\),
+    \[
+        f(x) \leq \vert f(x) \vert \leq \lVert f \rVert_{M^*} \lVert x \rVert = p(x).
+    \]
+    By the Hahn--Banach theorem, there exists a linear functional \(F : X \to \mathbb{R}\) such that \(F\vert_M = f\) and \(F(x) \leq p(x)\) for every \(x \in X\). Applying this inequality to \(-x\), we also get \(-F(x) \leq p(x)\). Therefore
+    \[
+        \vert F(x) \vert \leq \lVert f \rVert_{M^*} \lVert x \rVert \quad \text{for every } x \in X.
+    \]
+    Thus \(F\) is bounded and \(\lVert F \rVert_{X^*} \leq \lVert f \rVert_{M^*}\). The reverse inequality follows from \(F\vert_M = f\). Hence \(\lVert F \rVert_{X^*} = \lVert f \rVert_{M^*}\).
+\end{proof}
+
+\begin{remark}[Complex Hahn--Banach theorem]
+    The complex version is also true. If \(X\) is a complex normed vector space and \(M \subseteq X\) is a complex linear subspace, then every bounded complex-linear functional \(f : M \to \mathbb{C}\) extends to a bounded complex-linear functional \(F : X \to \mathbb{C}\) with
+    \[
+        F\vert_M = f, \quad \lVert F \rVert = \lVert f \rVert.
+    \]
+    One proves this by applying the real Hahn--Banach theorem to \(\mathrm{Re}\, f\) and then reconstructing the complex-linear functional.
+\end{remark}
+
+\section{Basic Consequences of Hahn--Banach}
+
+\begin{corollary}[Existence of norming functionals] \label{cl: existence of norming functionals}
+    Let \(X\) be a normed vector space and let \(x_0 \in X\), \(x_0 \neq 0\). Then there exists \(F \in X^*\) such that
+    \[
+        \lVert F \rVert = 1 \quad \text{and} \quad F(x_0) = \lVert x_0 \rVert.
+    \]
+\end{corollary}
+
+\begin{proof}
+    Let \(M = \mathrm{span}\{x_0\}\), and define \(f : M \to \mathbb{R}\) by \(f(tx_0) \coloneqq t \lVert x_0 \rVert\). Then
+    \[
+        \vert f(tx_0) \vert = \vert t \vert \lVert x_0 \rVert = \lVert tx_0 \rVert,
+    \]
+    so \(\lVert f \rVert = 1\). By the Hahn--Banach Extension Theorem, \(f\) extends to some \(F \in X^*\) with \(\lVert F \rVert = 1\). Since \(F(x_0) = f(x_0) = \lVert x_0 \rVert\), the result follows.
+\end{proof}
+
+\begin{corollary}[Dual norm formula] \label{cl: dual norm formula}
+    Let \(X\) be a normed vector space. Then for every \(x \in X\),
+    \[
+        \lVert x \rVert = \sup\!\left\{ \vert F(x) \vert : F \in X^*,\ \lVert F \rVert \leq 1 \right\}.
+    \]
+\end{corollary}
+
+\begin{proof}
+    For every \(F \in X^*\) with \(\lVert F \rVert \leq 1\), \(\vert F(x) \vert \leq \lVert x \rVert\). Thus
+    \[
+        \sup\!\left\{ \vert F(x) \vert : \lVert F \rVert \leq 1 \right\} \leq \lVert x \rVert.
+    \]
+    If \(x = 0\), equality is clear. If \(x \neq 0\), \autoref{cl: existence of norming functionals} gives \(F \in X^*\) such that \(\lVert F \rVert = 1\) and \(F(x) = \lVert x \rVert\). Hence equality holds.
+\end{proof}
+
+\begin{corollary}[Separation from a closed subspace] \label{cl: separation from closed subspace}
+    Let \(X\) be a normed vector space, let \(M \subseteq X\) be a closed linear subspace, and let \(x_0 \notin M\). Then there exists \(F \in X^*\) such that
+    \[
+        F\vert_M = 0 \quad \text{and} \quad F(x_0) \neq 0.
+    \]
+    More precisely, one can choose \(F \in X^*\) such that
+    \[
+        \lVert F \rVert = 1, \quad F(x_0) = \mathrm{dist}(x_0, M).
+    \]
+\end{corollary}
+
+\begin{proof}
+    Let \(d \coloneqq \mathrm{dist}(x_0, M) = \inf_{m \in M} \lVert x_0 - m \rVert\). Since \(M\) is closed and \(x_0 \notin M\), we have \(d > 0\). Let \(N \coloneqq M + \mathbb{R} x_0\). Define \(f : N \to \mathbb{R}\) by
+    \[
+        f(m + tx_0) \coloneqq td, \quad m \in M,\ t \in \mathbb{R}.
+    \]
+    This is well-defined and linear. Also, \(f\vert_M = 0\) and \(f(x_0) = d\). We claim that \(\lVert f \rVert \leq 1\). If \(t \neq 0\), then
+    \[
+        \lVert m + tx_0 \rVert = \vert t \vert \left\lVert x_0 + \frac{m}{t} \right\rVert \geq \vert t \vert d = \vert f(m + tx_0) \vert.
+    \]
+    The case \(t = 0\) is immediate. Thus \(\lVert f \rVert \leq 1\). By the Hahn--Banach Extension Theorem, extend \(f\) to \(F \in X^*\) with \(\lVert F \rVert = \lVert f \rVert \leq 1\). Since \(F(x_0) = d\) and \(F\) vanishes on \(M\), we have for every \(m \in M\),
+    \[
+        d = \vert F(x_0 - m) \vert \leq \lVert F \rVert \lVert x_0 - m \rVert.
+    \]
+    Taking the infimum over \(m \in M\), we get \(d \leq \lVert F \rVert \cdot d\). Since \(d > 0\), this implies \(\lVert F \rVert \geq 1\). Therefore \(\lVert F \rVert = 1\).
+\end{proof}
+
+\paragraph*{Summary.}
+The essential principles of this chapter are:
+\begin{itemize}
+    \item \textbf{The Baire Category Theorem:} completeness prevents a space from being too small in a countable-union sense.
+    \item \textbf{The Uniform Boundedness Principle:} pointwise bounded families of bounded linear operators on a Banach space are uniformly bounded in operator norm.
+    \item \textbf{The Open Mapping Theorem:} surjective bounded linear operators between Banach spaces are open.
+    \item \textbf{The Inverse Operator Theorem:} bijective bounded linear operators between Banach spaces have bounded inverses.
+    \item \textbf{The Closed Graph Theorem:} a linear operator between Banach spaces is bounded if and only if its graph is closed.
+    \item \textbf{The Hahn--Banach Theorem:} bounded linear functionals extend from subspaces to the whole space without increasing their norm.
+\end{itemize}
+Together, these results form the basic toolkit for working with Banach spaces. They show that completeness converts algebraic hypotheses into strong continuity and extension properties.

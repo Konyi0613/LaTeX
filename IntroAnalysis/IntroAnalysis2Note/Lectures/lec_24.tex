@@ -1,0 +1,595 @@
+\lecture{24}{May 26.}{}
+Now we proved the Riesz's representation theorem:
+    Let \(H\) be a Hilbert space and let \(\Lambda : H \to \mathbb{R}\) be a bounded linear functional. Then there exists a unique element \(y \in H\) such that 
+    \[
+        \Lambda (x) = \langle y, x \rangle \quad \text{for all } x \in H.  
+    \]  
+    This element \(y \in H\) satisfies 
+    \[
+        \lVert y \rVert = \sup _{0 \neq x \in H} \frac{\vert \langle y, x \rangle  \vert }{\lVert x \rVert } = \lVert \Lambda \rVert.  
+    \] 
+    Thus the map 
+    \[
+        H \to H^*, \quad y \mapsto \langle y, \cdot \rangle 
+    \]
+    is an isometry of normed vector spaces.
+
+\begin{proof}
+    We prove the existence first. If \(\Lambda = 0\), then we can pick \(y = 0\), and this is true. 
+
+    Hence, we assume that \(\Lambda \neq 0\) and define 
+    \[
+        E \coloneqq \left\{ x \in H: \Lambda (x) = 1 \right\}.
+    \]
+    Then \(E \neq \varnothing\). Indeed, since \(\Lambda \) is not the zero functional, there exists \(\xi \in H\) such that \(\Lambda (\xi ) \neq 0\). Hence, if we set 
+    \[
+        x \coloneqq \Lambda (\xi )^{-1} \xi,
+    \]    
+    then by linearity of \(\Lambda\), 
+    \[
+        \Lambda (x) = \Lambda \left( \Lambda (\xi )^{-1} \xi  \right) = \Lambda (\xi )^{-1} \Lambda (\xi ) = 1. 
+    \]
+    Thus, \(x \in E\), and thus \(E \neq \varnothing\). 
+
+    The set \(E\) is closed because it is the inverse image of the closed set \(\left\{ 1 \right\} \subseteq \mathbb{R} \) under the continuous map \(\Lambda : H \to \mathbb{R}\).
+
+    Finally, \(E\) is convex. To see this, let \(x, y \in E\) and let \(t \in [0, 1]\). Since \(x, y \in E\), we have \(\Lambda (x) = 1\) and \(\Lambda (y) = 1\), so by the linearity of \(\Lambda\), 
+    \[
+        \Lambda \left( tx + (1 - t)y \right) = t \Lambda (x) + (1 - t) \Lambda (y) = 1. 
+    \]            
+    This shows \(\Lambda\) is convex.
+
+    Now by \autoref{thm: projection theorem}, we know there exists an element \(x_0 \in E\) s.t. 
+    \[
+        \lVert x_0 \rVert \le \lVert x \rVert \quad \text{for all } x \in E.   
+    \]   
+
+    We prove that \(x \in H\) and \(\Lambda (x) = 0\) implies \(\langle x_0, x \rangle = 0 \). 
+
+    To see this, fix an element \(x \in H\) s.t. \(\Lambda (x) = 0\). Then \(x_0 + tx \in E\) for all \(t \in \mathbb{R}\). This implies 
+    \[
+        \lVert x_0 \rVert^2 \le \lVert x_0 + tx \rVert^2 = \lVert x_0 \rVert^2 + 2 t \langle x_0, x \rangle + t^2 \lVert x \rVert^2 \quad \text{for all } t \in \mathbb{R}.      
+    \]    
+    Thus the differentiable function 
+    \[
+        t \mapsto \lVert x_0 + tx \rVert^2 
+    \]
+    attains its minimum at \(t = 0\). Therefore its derivative vanishes at \(t = 0\), and hence 
+    \[
+        0 = \left. \frac{\mathrm{d}}{\mathrm{d}t} \right\vert_{t = 0} \lVert x_0 + tx \rVert^2 = 2 \langle x_0, x \rangle. 
+    \]
+    This shows \(\langle x_0, x \rangle = 0 \). 
+
+    Now define 
+    \[
+        y \coloneqq \frac{x_0}{\lVert x_0 \rVert^2 }.
+    \]
+    Fix an element \(x \in H\) and set \(\lambda \coloneqq \Lambda (x)\). Then 
+    \[
+        \Lambda (x - \lambda x_0) = \Lambda (x) - \lambda = 0.
+    \]  
+    Hence, it follows that 
+    \[
+        0 = \langle x_0, x - \lambda x_0 \rangle = \langle x_0, x \rangle - \lambda \lVert x_0 \rVert^2.   
+    \]
+    Therefore
+    \[
+        \langle y, x \rangle = \frac{\langle x_0, x \rangle }{\lVert x_0 \rVert^2 } = \lambda = \Lambda (x). 
+    \]
+
+    Now we show 
+    \[
+        \lVert y \rVert = \sup _{0 \neq x \in H} \frac{\vert \langle y, x \rangle  \vert }{\lVert x \rVert } = \lVert \Lambda  \rVert.  
+    \]
+    If \(y = 0\), then \(\Lambda = 0\), and so
+    \[
+        \lVert y \rVert = 0 = \lVert \Lambda \rVert.  
+    \]   
+    Hence assume that \(y \neq 0\). Then 
+    \[
+        \lVert y \rVert = \frac{\lVert y \rVert^2 }{\lVert y \rVert } = \frac{\Lambda (y)}{\lVert y \rVert } \le \sup _{0 \neq x \in H} \frac{\vert \Lambda (x) \vert }{\lVert x \rVert } = \lVert \Lambda \rVert.
+    \] 
+    Conversely, by the Cauchy-Schwarz inequality, 
+    \[
+        \vert \Lambda (x) \vert = \vert \langle y, x \rangle  \vert \le \lVert y \rVert \lVert x \rVert \quad \text{for all } x \in H. 
+    \]
+    Hence, \(\lVert \Lambda  \rVert \le \lVert y \rVert  \), and thus we have 
+    \[
+        \lVert y \rVert = \lVert \Lambda \rVert.  
+    \] 
+
+    Now we prove the uniqueness. Assume that \(y, z \in H\) both satisfy 
+    \[
+        \langle y, x \rangle = \langle z, x \rangle = \Lambda (x) \quad \text{for all } x \in H.   
+    \] 
+    Then
+    \[
+        \langle y - z, x \rangle = 0 \quad \text{for all } x \in H.  
+    \]
+    Taking \(x \coloneqq y - z\), we obtain 
+    \[
+        \lVert y - z \rVert^2 = \langle y - z, y - z \rangle = 0.  
+    \] 
+    Hence, \(y = z\), and we're done. 
+\end{proof}
+
+\section{Banach Algebras}
+We begin the discussion with a result about convergent series in a Banach space. It extends the basic assertion in first-year analysis that every absolutely convergent series of real numbers converges. We will use the following lemma to study power series in a Banach algebra. 
+
+\begin{lemma}[Convergent series] \label{lm: convergent series}
+    Let \((X, \lVert \cdot \rVert )\) be a Banach space and let \((x_i)_{i \in \mathbb{N} }\) be a sequence in \(X\) s.t. 
+    \[
+        \sum_{i=1}^{\infty} \lVert x_i \rVert < \infty.  
+    \]   
+    Then the sequence 
+    \[
+        \xi_n \coloneqq \sum_{i=1}^n x_i 
+    \]
+    converges in \(X\). Its limit is denoted by 
+    \[
+        \sum_{i=1}^{\infty} x_i \coloneqq \lim_{n \to \infty} \sum_{i=1}^n x_i.   
+    \] 
+\end{lemma}
+
+\begin{proof}
+    Define 
+    \[
+        s_n \coloneqq \sum_{i=1}^n \lVert x_i \rVert, \quad n \in \mathbb{N}.   
+    \]
+    This sequence is nondecreasing and converges by assumption. Moreover, for every pair of integers \(n > m \ge 1\), we have 
+    \[
+        \lVert \xi _n - \xi _m \rVert = \left\lVert \sum_{i=m+1}^n x_i  \right\rVert \le \sum_{i=m+1}^n \lVert x_i \rVert = s_n - s_m.   
+    \] 
+    Hence, \((\xi _n)\) is a Cauchy sequence in \(X\). Since \(X\) is complete, this sequence converges.  
+\end{proof}
+
+\begin{definition}[Banach algebra]
+    A real, respectively complex, Banach algebra is a pair consisting of a real, respectively complex, Banach space \((\mathcal{A} , \lVert \cdot \rVert )\) and a bilinear map 
+    \[
+        \mathcal{A} \times \mathcal{A} \to \mathcal{A}, \quad (a, b) \mapsto ab,
+    \] 
+    called the product, such that the product is associative, that is,
+    \[
+        (ab) c = a (bc) \quad \text{for all } a, b, c \in \mathcal{A}, 
+    \]
+    and satisfies 
+    \[
+        \lVert ab \rVert \le \lVert a \rVert \lVert b \rVert \quad \text{for all } a, b \in \mathcal{A}.    
+    \]
+\end{definition}
+
+\begin{remark}
+    A Banach algebra \(\mathcal{A} \) is called commutative if 
+    \[
+        ab = ba \quad \text{for all } a, b \in \mathcal{A}. 
+    \] 
+    It is called unital if there exists an element 
+    \[
+        1 \in \mathcal{A} \setminus \left\{ 0 \right\} 
+    \]
+    such that 
+    \[
+        1 a = a 1 = a \quad \text{for all } a \in \mathcal{A}. 
+    \]
+    The unit \(1\), if it exists, is uniquely determined by the product. 
+
+    An element \(a \in \mathcal{A}\) of a unital Banach algebra \(\mathcal{A}\) is called invertible if there exists an element \(b \in \mathcal{A}\) such that 
+    \[
+        ab = ba = 1.
+    \]   
+    The element \(b\), if it exists, is uniquely determined by \(a\). It is called the inverse of \(a\), and is denoted by \(a^{-1} \coloneqq b\). The invertible elements form a group \(\mathcal{G} \subseteq \mathcal{A}\).     
+\end{remark}
+
+\begin{eg}
+    The following are standard examples of Banach algebras. 
+    \begin{enumerate}
+        \item Let \(X\) be a Banach space. The archetypal example of a Banach algebra is the space
+        \[
+            \mathcal{L} (X) \coloneqq \mathcal{L} (X, X)
+        \]
+        of bounded linear operators from \(X\) to itself, equipped with the operator norm 
+        \[
+            \lVert T \rVert_{\mathrm{op}} \coloneqq \sup _{\lVert x \rVert_X \le 1} \lVert Tx \rVert_X.  
+        \] 
+        The product is given by composition:
+        \[
+            ST \coloneqq S \circ T, \quad S, T \in \mathcal{L} (X).
+        \]
+
+        We now explain why this is a Banach algebra. First, \(\mathcal{L} (X)\) is a Banach space. Indeed, since \(X\) is complete, the space of bounded linear maps from \(X\) to \(X\), equipped with the operator norm, is complete. More explicitly, if \((T_n)\) is a Cauchy sequence in \(\mathcal{L} (X)\), then for each \(x \in X\),
+        \[
+            \lVert T_n x - T_m x \rVert_X \le \lVert T_n - T_m \rVert_{\mathrm{op} } \lVert x \rVert_X.   
+        \]       
+        Thus, \((T_n x)\) is a Cauchy sequence in \(X\). Since \(X\) is complete, the limit 
+        \[
+            Tx \coloneqq \lim_{n \to \infty} T_n x 
+        \]   
+        exists for each \(x \in X\). One checks from the linearity of the \(T_n\)'s that \(T\) is linear. Moreover, since \((T_n)\) is Cauchy in operator norm, the sequence \((\lVert T_n \rVert_{\mathrm{op} } )\) is bounded; say 
+        \[
+            \lVert T_n \rVert_{\mathrm{op} } \le M \quad \text{for all } n.  
+        \]     
+        Therefore 
+        \[
+            \lVert T x \rVert_X = \lim_{n \to \infty} \lVert T_n x \rVert_X \le M \lVert x \rVert_X,    
+        \]
+        so \(T \in \mathcal{L} (X)\). Finally, one shows that \(T_n \to T\) in operator norm. Given \(\varepsilon > 0\), choose \(N\) s.t.
+        \[
+            \lVert T_n - T_m \rVert_{\mathrm{op} } < \varepsilon \quad \text{whenever } n, m \ge N.  
+        \]    
+        Then for every \(x \in X\) with \(\lVert x \rVert_X \le 1 \), 
+        \[
+            \lVert T_n x - T x \rVert_X = \lim_{m \to \infty} \lVert T_n x - T_m x \rVert_X \le \varepsilon.   
+        \]  
+        Taking the supremum over all \(\lVert x \rVert_X \le 1\), we obtain 
+        \[
+            \lVert T_n - T \rVert_{\mathrm{op} } \le \varepsilon \quad \text{for all } n \ge N.  
+        \] 
+        Hence, \(\mathcal{L} (X)\) is complete. Next, we verify the algebra structure. If \(S, T \in \mathcal{L} (X)\), then \(S T = S \circ T\) is again a bounded linear operator. Indeed, \(S T\) is linear, and for every \(x \in X\),
+        \[
+            \lVert S T x \rVert_X = \lVert S (Tx) \rVert_X \le \lVert S \rVert_{\mathrm{op} } \lVert T x \rVert_X \le \lVert S \rVert_{\mathrm{op} } \lVert T \rVert_{\mathrm{op} } \lVert x \rVert_X.       
+        \]     
+        Hence \(S T \in \mathcal{L} (X)\), and 
+        \[
+            \lVert S T \rVert_{\mathrm{op} } \le \lVert S \rVert_{\mathrm{op} } \lVert T \rVert_{\mathrm{op} }.   
+        \] 
+        This is precisely the submultiplicative estimate required in the definition of a Banach algebra. Note that the product is associative, which is trivial. The product is also bilinear, which is also trivial. Therefore \(\mathcal{L} (X)\), equipped with the operator norm and composition, is a Banach algebra. 
+
+        If \(X \neq \left\{ 0 \right\} \), then \(\mathcal{L} (X)\) is unital. Its unit is the identity operator 
+        \[
+            I_X : X \to X, \quad I_X x = x . 
+        \]   
+
+        This Banach algebra is usually noncommutative. In general, 
+        \[
+            S T \neq T S.
+        \]
+        For example, on \(X = \mathbb{R} ^2\), let 
+        \[
+            S = \begin{pmatrix}
+                1 & 0  \\
+                0 & 0  \\
+            \end{pmatrix}, \quad T = \begin{pmatrix}
+                0 & 1  \\
+                0 & 0 \\
+            \end{pmatrix}.
+        \] 
+        Then 
+        \[
+            ST = \begin{pmatrix}
+                0 & 1  \\
+                0 & 0  \\
+            \end{pmatrix}, \quad TS = \begin{pmatrix}
+                0 & 0  \\
+                0 & 0  \\
+            \end{pmatrix},
+        \]
+        so \(S T \neq T S\). Finally, the invertible elements of \(\mathcal{L} (X)\) are precisely the bijective bounded linear operators from \(X\) to itself. 
+        Also, for \(T \in \mathcal{L} (X)\), the inverse of \(T\), say \(T^{-1}\), is also linear and bounded, but the boundedness is untrivial: since \(X\) is a Banach space and \(T: X \to X\) is a bijective bounded linear operator, the Open Mapping Theorem implies that \(T^{-1}\) is also bounded. 
+
+        Therefore, the group of invertible elements of \(\mathcal{L} (X)\) is exactly the group of bounded linear isomorphisms of \(X\).
+
+        \item An example of commutative unital Banach algebra is the space of real-valued bounded continuous functions on a nonempty topological space, equipped with the supremum norm and pointwise multiplication. 
+    \end{enumerate}
+\end{eg}
+
+Let \(\mathcal{A} \) be a real Banach algebra and let 
+\[
+    f(z) = \sum_{n=0}^{\infty} c_n z^n 
+\] 
+be a power series with real coefficients \(c_n \in \mathbb{R}\) and convergence radius 
+\[
+    \rho \coloneqq \frac{1}{\limsup_{n \to \infty} \vert c_n \vert^{\frac{1}{n}}  } > 0.
+\] 
+Choose an element \(a \in \mathcal{A}\) with \(\lVert a \rVert < \rho \). Then the sequence \((c_n a^n)_{n \in \mathbb{N}}\) satisfies 
+\[
+    \sum_{n=0}^{\infty} \lVert c_n a^n \rVert \le \vert c_0 \vert \lVert 1 \rVert + \sum_{n=1}^{\infty} \vert c_n \vert \lVert a \rVert^n < \infty.     
+\]   
+Therefore, by \autoref{lm: convergent series}, the sequence 
+\[
+    \xi _n \coloneqq \sum_{i=0}^n c_i a^i 
+\] 
+converges. Denote the limit by
+\begin{equation} \label{eq: 12.28}
+    f(a) \coloneqq \sum_{n=0}^{\infty} c_n a^n, \quad a \in \mathcal{A}, \lVert a \rVert < \rho. 
+\end{equation} 
+When the power series \(f\) has complex coefficients, the definition extends to complex Banach algebras. 
+
+\begin{exercise}
+    The map 
+    \[
+        f : \left\{ a \in \mathcal{A} : \lVert a \rVert < \rho  \right\} \to \mathcal{A} 
+    \]
+    defined by \autoref{eq: 12.28} is continuous. 
+
+    Hint. For \(n \in \mathbb{N}\), define 
+    \[
+        f_n : \mathcal{A} \to \mathcal{A}, \quad f_n (a) \coloneqq \sum_{i=0}^n c_i a^i. 
+    \] 
+    Prove that \(f_n\) is continuous. Then prove that the sequence \((f_n)\) converges uniformly to \(f\) on the set 
+    \[
+        \left\{ a \in \mathcal{A} : \lVert a \rVert \le r  \right\} 
+    \] 
+    for every \(r < \rho \). 
+\end{exercise}
+
+\begin{theorem}[Inverse] \label{thm: inverse in Banach algebra}
+    Let \(\mathcal{A}\) be a real unital Banach algebra 
+    \begin{enumerate}
+        \item For every \(a \in \mathcal{A} \), the limit 
+        \[
+            r_a \coloneqq \lim_{n \to \infty} \lVert a^n \rVert^{\frac{1}{n}} = \inf _{n \in \mathbb{N} } \lVert a^n \rVert^{\frac{1}{n}} \le \lVert a \rVert    
+        \]
+        exists. It is called the spectral radius of \(a\). 
+        \item If \(a \in \mathcal{A} \) satisfies \(r_a < 1\), then the element \(1 - a\) is invertible and
+        \[
+            (1 - a)^{-1} = \sum_{n=0}^{\infty} a^n.
+        \]
+        \item The group \(\mathcal{G} \subseteq \mathcal{A} \) of invertible elements is an open subset of \(\mathcal{A} \), and the map 
+        \[
+            \mathcal{G} \to \mathcal{G},  \quad  a \mapsto a^{-1},
+        \]
+        is continuous. More precisely, if \(a \in \mathcal{G} \) and \(b \in \mathcal{A} \) satisfy 
+        \[
+            \lVert a - b \rVert \lVert a^{-1} \rVert < 1,  
+        \]  
+        then \(b \in \mathcal{G}\),
+        \[
+            b^{-1} = \sum_{n=0}^{\infty} \left( 1 - a^{-1} b \right)^n a^{-1},  
+        \] 
+        and
+        \[
+            \lVert b^{-1} - a^{-1} \rVert \le \frac{\lVert a - b \rVert \lVert a^{-1} \rVert^2  }{1 - \lVert a - b \rVert \lVert a^{-1} \rVert  }, \quad \lVert b^{-1} \rVert \le \frac{\lVert a^{-1} \rVert }{1 - \lVert a - b \rVert \lVert a^{-1} \rVert  }.
+        \]
+    \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+We prove the three assertions in order.
+    \begin{enumerate}
+        \item Fix \(a \in \mathcal{A} \). Since the norm in a Banach algebra is submultiplicative, we have 
+        \[
+            \lVert a^{m + n} \rVert \le \lVert a^m \rVert \lVert a^n \rVert \quad \text{for all } m, n \in \mathbb{N}.    
+        \]
+        Thus the sequence \(\alpha _n \coloneqq \lVert a^n \rVert \) is submultiplicative. We shall show that 
+        \[
+            \lim_{n \to \infty} \alpha _n^{\frac{1}{n}} = \inf _{n \in \mathbb{N}} \alpha _n^{\frac{1}{n}}. 
+        \] 
+        It is immediate that \(0 \le r \le \lVert a \rVert \) since the term \(n = 1\) gives \(r \le \lVert a \rVert \).
+
+        We claim that 
+        \[
+            \lim_{n \to \infty} \lVert a^n \rVert^{\frac{1}{n}} = r.  
+        \]   
+        Let \(\varepsilon > 0\). By the definition of the infimum, we may choose \(m \in \mathbb{N} \) s.t. 
+        \[
+            \lVert a^m \rVert^{\frac{1}{m}} < r + \varepsilon. 
+        \]  
+        Every sufficiently large integer \(n\) can be written uniquely in the form 
+        \[
+            n = qm+\ell , \quad q \in \mathbb{N} \cup \left\{ 0 \right\}, \quad 0 \le \ell \le m - 1. 
+        \] 
+        Using submultiplicativity, we have 
+        \[
+            \lVert a^n \rVert = \lVert a^{qm + \ell} \rVert \le \lVert a^m \rVert^q \lVert a^{\ell }  \rVert \le (r + \varepsilon)^{mq} \lVert a^{\ell }  \rVert. 
+        \]
+        Taking the \(n\)-th root gvies 
+        \[
+            \lVert a^n \rVert^{\frac{1}{n}} \le (r + \varepsilon)^{\frac{mq}{n}} \lVert a^{\ell } \rVert^{\frac{1}{n}} = (r + \varepsilon)^{1 - \frac{\ell}{n}} \lVert a^{\ell }  \rVert^{\frac{1}{n}} .  
+        \] 
+        Because \(\ell \) can take only finitely many values \(0, 1, \dots , m - 1\), the numbers \(\lVert a^{\ell }  \rVert \) are bounded. More precisely, set 
+        \[
+            C \coloneqq \max _{0 \le \ell \le m - 1} \lVert a^{\ell }  \rVert. 
+        \]   
+        Since \(0 \le \ell \le m - 1\), we have 
+        \[
+            1 - \frac{m}{n} \le 1 - \frac{\ell}{n} \le 1.
+        \] 
+        Therefore 
+        \[
+            (r + \varepsilon)^{1 - \frac{\ell}{n}} \le \max \left\{ r + \varepsilon, (r + \varepsilon )^{1 - \frac{m}{n}} \right\}. 
+        \]
+        Thus 
+        \[
+            \lVert a^n \rVert^{\frac{1}{n}} \le \max \left\{ (r + \varepsilon) C^{\frac{1}{n}}, (r + \varepsilon)^{1 - \frac{m}{n}} C^{\frac{1}{n}} \right\}.  
+        \]
+        Both terms on the right-hand side converge to \(r + \varepsilon\). Hence, 
+        \[
+            \limsup_{n \to \infty} \lVert a^n \rVert^{\frac{1}{n}} \le r + \varepsilon.  
+        \] 
+        Since \(\varepsilon > 0\) was arbitrary, it follows that 
+        \[
+            \limsup_{n \to \infty} \lVert a^n \rVert^{\frac{1}{n}} \le r.  
+        \] 
+        On the other hand, by the definition of \(r\),
+        \[
+            r \le \lVert a^n \rVert^{\frac{1}{n}} \quad \text{for every } n \in \mathbb{N} .  
+        \] 
+        Hence 
+        \[
+            r \le \liminf_{n \to \infty} \lVert a^n \rVert^{\frac{1}{n}}.  
+        \]
+        Combining the two inequalities, we obtain 
+        \[
+            \lim_{n \to \infty} \lVert a^n \rVert^{\frac{1}{n}} = r = \inf _{n \in \mathbb{N} } \lVert a^n \rVert^{\frac{1}{n}}.   
+        \]
+        This proves the existence of \(r_a\) nad the formula 
+        \[
+            r_a = \inf _{n \in \mathbb{N} } \lVert a^n \rVert^{\frac{1}{n}} \le \lVert a \rVert.  
+        \] 
+        \item Assume now that \(r_a < 1\). Choose a number \(\alpha \) such that \(r_a < \alpha < 1\). By the definition of \(r_a\), there exists \(N \in \mathbb{N}\) s.t. 
+        \[
+            \lVert a^n \rVert^{\frac{1}{n}} \le \alpha \quad \text{for all } n \ge N. 
+        \]
+        Equivalently, 
+        \[
+            \lVert a^n \rVert \le \alpha ^n \quad \text{for all } n \ge N.  
+        \]
+        Therefore
+        \[
+            \sum_{n=0}^{\infty} \lVert a^n \rVert < \infty.  
+        \]
+        Since \(\mathcal{A} \) is a Banach space, by \autoref{lm: convergent series}, \(\sum_{n=0}^{\infty} a^n \) converges in \(\mathcal{A} \). Denote its sum by 
+        \[
+            b \coloneqq \sum_{n=0}^{\infty} a^n. 
+        \] 
+        We claim that \(b = (1 - a)^{-1}\). Let \(b_N \coloneqq \sum_{n=0}^N a^n \). Then the usual finite geometric identity gives
+        \[
+            (1 - a) b_N = b_N (1 - a) = 1 - a^{N + 1}.
+        \]  
+        Since \(\lVert a^{N + 1} \rVert \to 0 \), we may pass to the limit and obtain 
+        \[
+            (1 - a) b = b(1 - a) = 1.
+        \] 
+        This shows \(b = (1 - a)^{-1}\), and we're done. 
+
+        \item Let \(a \in \mathcal{G} \) and \(b \in \mathcal{A} \) satisfy 
+        \[
+            \lVert a - b \rVert \lVert a^{-1} \rVert < 1.  
+        \]
+        We write 
+        \[
+            b = a - a \left( a^{-1} (a - b) \right) = a \left( 1 - a^{-1} (a - b) \right).  
+        \]
+        Set \(h \coloneqq a^{-1} (a - b)\). Then 
+        \[
+            \lVert h \rVert \le \lVert a^{-1} \rVert \lVert a - b \rVert < 1.   
+        \] 
+        By a. and 2., we know \(1 - h\) is invertible, and 
+        \[
+            (1 - h)^{-1} = \sum_{n=0}^\infty h^n.
+        \]  
+        Since \(b = a (1 - h)\), it follows that \(b\) is invertible, with 
+        \[
+            b^{-1} = (1 - h)^{-1} a^{-1}.
+        \]  
+        Therefore,
+        \begin{equation} \label{eq: 12.33}
+            b^{-1} = \sum_{n=0}^{\infty} \left( a^{-1} (a - b) \right)^n a^{-1}. 
+        \end{equation}
+        Equivalently, since 
+        \[
+            a^{-1} (a - b) = 1 - a^{-1} b,
+        \]
+        we may write 
+        \[
+            b^{-1} = \sum_{n=0}^{\infty} \left( 1 - a^{-1} b \right)^n a^{-1}.  
+        \]
+
+        This already shows that every \(b\) satisfying 
+        \[
+            \lVert a - b \rVert < \frac{1}{\lVert a^{-1} \rVert } 
+        \] 
+        is invertible. Hence 
+        \[
+            B \left( a, \frac{1}{\lVert a^{-1} \rVert } \right) \subseteq \mathcal{G}, 
+        \]
+        and therefore \(\mathcal{G} \) is open in \(\mathcal{A} \). 
+
+        It remains to estimate \(b^{-1}\) and \(b^{-1} - a^{-1}\). From \autoref{eq: 12.33}, we have 
+        \[
+            \lVert b^{-1} \rVert \le \sum_{n=0}^{\infty} \lVert h \rVert^n \lVert a^{-1} \rVert = \frac{\lVert a^{-1} \rVert }{1 - \lVert h \rVert }.   
+        \]     
+        Since 
+        \[
+            \lVert h \rVert \le \lVert a^{-1} \rVert \lVert a - b \rVert,
+        \]
+        we obtain 
+        \[
+            \lVert b^{-1} \rVert \le \frac{\lVert a^{-1} \rVert }{1 - \lVert a - b \rVert \lVert a^{-1} \rVert }. 
+        \]
+
+        Similarly, 
+        \[
+            b^{-1} - a^{-1} = \left( \sum_{n=0}^\infty h^n - a  \right) a^{-1} = \sum_{n=1}^{\infty} h^n a^{-1}.  
+        \]
+        Hence,
+        \[
+            \lVert b^{-1} - a^{-1} \rVert \le \sum_{n=1}^{\infty} \lVert h \rVert^n \lVert a^{-1} \rVert = \frac{\lVert h \rVert \lVert a^{-1} \rVert  }{1 - \lVert h \rVert }.   
+        \]
+        Using 
+        \[
+            \lVert h \rVert \le \lVert a^{-1} \rVert \lVert a - b \rVert,   
+        \]
+        we have 
+        \[
+            \lVert b^{-1} - a^{-1} \rVert \le \frac{\lVert a - b \rVert \lVert a^{-1} \rVert^2  }{1 - \lVert a - b \rVert \lVert a^{-1} \rVert  }. 
+        \]
+        This shows given any \(a \in \mathcal{A} \), for any \(b \in \mathcal{A} \) close enough to \(a \in \mathcal{G} \), \(b \in \mathcal{G} \) and \(\lVert b^{-1} - a^{-1} \rVert \) can be arbitrarily small, so the map \(\mathcal{G} \to \mathcal{G} \), \(a \mapsto a^{-1}\) is continuous.      
+    \end{enumerate}
+\end{proof}
+
+\begin{definition}[Invertible Operator]
+    Let \(X\) and \(Y\) be Banach spaces. A bounded linear operator \(A : X \to Y\) is called invertible if there exists a bounded linear operator \(B: Y \to X\) such that 
+    \[
+        BA = 1_X, \quad AB = 1_Y.
+    \]    
+    The operator \(B\) is uniquely determined by \(A\) and is denoted by \(B \eqqcolon A^{-1} \). It is called the inverse of \(A\).    
+\end{definition}
+
+\begin{remark}
+    When \(X = Y\), the space of invertible bounded linear operators in \(\mathcal{L} (X)\) is denoted by 
+    \[
+        \mathrm{Aut}(X) \coloneqq \left\{ A \in \mathcal{L} (X): \text{there exists } B \in \mathcal{L} (X) \text{ such that } AB = BA = 1   \right\}.  
+    \]  
+    The spectral radius of a bounded linear operator \(A \in \mathcal{L} (X)\) is the real number \(r_A \ge 0\) defined by 
+    \[
+        r_A \coloneqq \lim_{n \to \infty} \lVert A^n \rVert^{\frac{1}{n}} = \inf _{n \in \mathbb{N} } \lVert A^n \rVert^{\frac{1}{n}} \le \lVert A \rVert.   
+    \] 
+\end{remark}
+
+\begin{corollary}[Spectral radius]
+    Let \(X\) and \(Y\) be Banach spaces. Then the following hold. 
+    \begin{enumerate}
+        \item If \(A \in \mathcal{L} (X)\) has spectral radius \(r_A < 1\), then 
+        \[
+            1_X - A \in \mathrm{Aut}(X), \quad (1_X - A)^{-1} = \sum_{n=0}^{\infty} A^n.   
+        \]
+        \item \(\mathrm{Aut}(X) \) is an open subset of \(\mathcal{L} (X)\) with respect to the norm topology, and the map 
+        \[
+            \mathrm{Aut}(X) \to \mathrm{Aut}(X), \quad A \mapsto A^{-1},  
+        \]  
+        is continuous. 
+        \item Let \(A, P \in \mathcal{L} (X, Y)\) be bounded linear operators. Assume \(A\) is invertible and 
+        \[
+            \lVert P \rVert \lVert A^{-1} \rVert < 1.  
+        \]
+        Then \(A - P\) is invertible, 
+        \[
+            (A - P)^{-1} = \sum_{n=0}^{\infty} (A^{-1} P)^n A^{-1}, 
+        \] 
+        and 
+        \[
+            \left\lVert (A - P)^{-1} - A^{-1} \right\rVert \le \frac{\lVert P \rVert \lVert A^{-1} \rVert^2  }{1 - \lVert P \rVert \lVert A^{-1} \rVert  }. 
+        \]
+    \end{enumerate}  
+\end{corollary}
+
+\begin{proof}
+    Assertion 1. and 2. follow from \autoref{thm: inverse in Banach algebra} with \(\mathcal{A} = \mathcal{L} (X)\).
+
+    To prove part 3., observe that  
+    \[
+        \lVert A^{-1} P \rVert \le \lVert A^{-1} \rVert \lVert P \rVert < 1.   
+    \]  
+    Hence it follows from part 1. that the operator \(1_X - A^{-1} P\) is invertible and that its inverse is given by 
+    \[
+        \left( 1_X - A^{-1} P \right)^{-1} = \sum_{k=0}^{\infty} (A^{-1} P)^k.  
+    \] 
+    Multiplying this identity by \(A^{-1}\) on the right gives 
+    \[
+       \left( 1_X - A^{-1} P \right)^{-1} A^{-1} = \sum_{k=0}^{\infty} (A^{-1} P)^k A^{-1}, 
+    \] 
+    and note that 
+    \[
+        \left( 1_X - A^{-1} P \right)^{-1} A^{-1} = \left( A (1_X - A^{-1} P) \right)^{-1} = \left( A - P \right)^{-1}. 
+    \]
+    Hence,
+    \[
+       \left( A - P \right)^{-1} = \sum_{k=0}^{\infty} (A^{-1} P)^k A^{-1}. 
+    \]
+    Finally,
+    \begin{align*}
+        \lVert (A - P)^{-1} - A^{-1} \rVert &= \left\lVert \left( \sum_{k=0}^{\infty} (A^{-1} P)^k - 1_X \right) A^{-1}   \right\rVert \le \left\lVert A^{-1} \right\rVert \left\lVert \left( \sum_{k=0}^{\infty} (A^{-1} P)^k - 1_X \right) \right\rVert \\
+        &= \left\lVert A^{-1} \right\rVert \left\lVert \sum_{k=1}^{\infty} (A^{-1} P)^k   \right\rVert \le \frac{\lVert P \rVert \lVert A^{-1} \rVert^2  }{1 - \lVert P \rVert \lVert A^{-1} \rVert  }.
+    \end{align*}
+\end{proof}
