@@ -1,0 +1,216 @@
+\lecture{25}{May 26.}{}
+Recall that the conditional distribution of \(X\) given \(Y\) has pmf/pdf
+\begin{align*}
+    p_{X \mid Y} (x \mid y) &= \frac{p_{X, Y} (x, y)}{p_Y(y)} \\
+    f_{X \mid Y} (x \mid y) &= \frac{f_{X, Y} (x, y)}{f_Y(y)}.
+\end{align*}  
+
+Given the value of \(Y\), we get a new distribution -- the conditional distribution of \(X\) given \(Y\). Thus, we can computeits expectation or variance. 
+
+\begin{definition}[Discrete Case]
+    The conditional expectation of \(X\) given \(Y\) is defined as 
+    \[
+        \mathbb{E} \left[ X \mid Y = y \right] = \sum_{x} x p_{X \mid Y}(x \mid y).  
+    \]  
+\end{definition}
+
+\begin{definition}[Continuous Case]
+    If \(X, Y\) are continuous, the conditional expectation of \(X\) given \(Y = y\) is 
+    \[
+        \mathbb{E} [X \mid Y = y] = \int _{\mathbb{R}} x f_{X \mid Y} (x \mid y) \, \mathrm{d} x. 
+    \]   
+\end{definition}
+
+\begin{remark}
+    If \(X, Y\) are independent, then 
+    \[
+        \mathbb{E} [X \mid Y = y] = \mathbb{E} [X], \quad \text{for all } y \in \Im (Y), 
+    \] 
+    i.e. knowing the value of \(Y\) doesn't affect the distribution of \(X\) (since \(p_{X \mid Y}(x \mid y) = p_X(x),\) and \(f_{X \mid Y}(x \mid y) = f_X(x)\) if \(X, Y\) are independent).  
+\end{remark}
+
+\begin{eg}
+    Let \(X, Y\) be independent, and \(X, Y \sim \mathrm{Bin}(n, p)\). What is \(\mathbb{E} [X \mid X + Y = m]\)?   
+\end{eg}
+\begin{explanation}
+    We have to know \(p_{X \mid X+Y}(k \mid m)\) to solve this problem.
+
+    Note that 
+    \begin{align*}
+        p_{X \mid X + Y} (k \mid m) &= \mathbb{P} (X = k \mid X + Y = m) = \frac{\mathbb{P} \left( \left\{ X = k \right\} \cap \left\{ X + Y = m \right\}   \right) }{\mathbb{P} (X + Y = m)} \\
+        &= \frac{\mathbb{P} \left( \left\{ X = k \right\} \cap \left\{ Y = m - k \right\}   \right) }{\mathbb{P} (X + Y = m)}.
+    \end{align*} 
+    Now since \(X, Y \sim \mathrm{Bin}(n, p) \), independet, we know \(X + Y \sim \mathrm{Bin}(2n, p) \). Hence, 
+    \[
+        \mathbb{P} (X + Y = m) = \binom{2n}{m} p^m (1 - p)^{2n - m}.
+    \]  
+    Also,
+    \begin{align*}
+        \mathbb{P} \left( \left\{ X = k \right\} \cap \left\{ Y = m - k \right\}   \right) &= \mathbb{P} (X = k) \mathbb{P} (Y = m - k) \\
+        &= \binom{n}{k} p^k (1 - p)^{n - k} \binom{n}{m - k} p^{m - k} (1 - p)^{n - (m - k)}.
+    \end{align*}
+    Thus,
+    \begin{align*}
+        p_{X \mid X + Y} (k \mid m) &= \frac{\binom{n}{k} \binom{n}{m - k} p^m (1 - p)^{2n - m}}{\binom{2n}{m} p^m (1 - p)^{2n - m}} = \frac{\binom{n}{k} \binom{n}{m - k}}{\binom{2n}{m}}.
+    \end{align*}
+    This is a hyper geometric distribution, i.e. 
+    \[
+        X \mid X + Y = m \sim \mathrm{Hypergeometric}(2n, n, m). 
+    \]
+    Hence,
+    \[
+        \mathbb{E} [X \mid X + Y = m] = \frac{n}{2n} \cdot m = \frac{m}{2}.
+    \]
+\end{explanation}
+
+\begin{eg}
+    Let 
+    \[
+        f_{X, Y} (x, y) = \begin{dcases}
+            \frac{e^{- \frac{x}{y}} e^{-y}}{y}, &\text{ if } x, y > 0 ;\\
+            0, &\text{ otherwise} .
+        \end{dcases}
+    \]
+    What is \(\mathbb{E} [X \mid Y = y]\)? 
+\end{eg}
+
+\begin{explanation}
+    To compute 
+    \[
+        f_{X \mid Y} (x \mid y) = \frac{f_{X, Y} (x, y)}{f_Y(y)},
+    \]
+    we need to compute (for \(y > 0\)) 
+    \begin{align*}
+        f_Y(y) &= \int _{\mathbb{R}} f_{X, Y} (x, y) \, \mathrm{d} x = \int _0^{\infty} \frac{e^{- \frac{x}{y}} e^{-y}}{y} \, \mathrm{d} x = e^{-y} \int _0^{\infty} \frac{e^{- \frac{x}{y}}}{y} \, \mathrm{d} x \\
+        &= e^{-y} \left[ - e^{- \frac{x}{y}} \right]_0^{\infty} = e^{-y}.  
+    \end{align*}
+    Thus,
+    \[
+        f_Y(y) = \begin{dcases}
+            e^{-y}, &\text{ if } y > 0 ;\\
+            0, &\text{ if } y \le 0.
+        \end{dcases}
+    \]
+    This shows 
+    \[
+        f_{X \mid Y}(x \mid y) = \frac{f_{X, Y} (x, y)}{f_Y(y)} = \begin{dcases}
+            \frac{\left( \frac{e^{- \frac{x}{y}} e^{-y}}{y} \right) }{e^{-y}} = \frac{e^{- \frac{x}{y}}}{y}, &\text{ if } x, y > 0 ;\\
+            0, &\text{ if }  x \le 0 \text{ or } y \le 0 .
+        \end{dcases}
+    \]
+    That is, \(X \mid Y = y \sim \mathrm{Exp} \left( \frac{1}{y} \right)  \). This shows \(\mathbb{E} [X \mid Y = y] = y\). 
+\end{explanation}
+
+\begin{remark}
+    Observe that \(\mathbb{E} [X \mid Y = y]\) is a function of \(y\): 
+    \[
+        \mathbb{E} [X \mid Y = \cdot ] : \Im (Y) \to \mathbb{R}.
+    \]  
+    Thus, we can substitute the random variable \(Y\) itself to get a new random variable \(\mathbb{E} [X \mid Y]\). 
+\end{remark}
+
+\begin{proposition}
+    Given two random variables \(X, Y\), we have 
+    \[
+        \mathbb{E} \left[ \mathbb{E} [X \mid Y] \right] = \mathbb{E} [X]. 
+    \] 
+\end{proposition}
+
+\begin{proof}[proof of discrete case]
+    First,
+    \[
+        \mathbb{E} [X \mid Y = y] = \sum_{x} x p_{X \mid Y} (x, y). 
+    \]
+    Thus, 
+    \begin{align*}
+        \mathbb{E} [\mathbb{E} [X \mid Y]] &= \sum_{y} \mathbb{E} [X \mid Y = y] p_Y(y) = \sum_{y} \sum_{x} x p_{X \mid Y} (x, y) p_Y(y) \\
+        &= \sum_{y} \sum_{x}x p_{X, Y}(x, y) = \sum_{x} x \left( \sum_{y} p_{X, Y}(x, y)  \right) = \sum_{x} x p_X(x) = \mathbb{E} [X].          
+    \end{align*}
+\end{proof}
+
+\begin{eg}
+    A shop receives a random number \(N\) of customers each day, \(N \sim \mathrm{Poi}(500) \). Each customer spends a uniform amount of money between \(\$ 0\) and \(\$ 1000\), independently of \(N\) and all other customers. What is the expected daily income?    
+\end{eg}
+
+\begin{explanation}
+    Let \(X_i\) be the amount spent by the \(i\)-th customer, then \(X_i \sim \mathrm{Unif}([0, 1000]) \). Let \(X\) be the total daily income, then \(X = \sum_{i=1}^N X_i \). Hence, by previous proposition,
+    \begin{align*}
+        \mathbb{E} [X] &= \mathbb{E} [\mathbb{E} [X \mid N]],
+    \end{align*}
+    and 
+    \[
+        \mathbb{E} [X \mid N = n] = \mathbb{E} \left[ \sum_{i=1}^n X_i  \right]  = \sum_{i=1}^n \mathbb{E} [X_i] = 500n. 
+    \]
+    Hence,
+    \[
+        \mathbb{E} [X] = \mathbb{E} [\mathbb{E} [X \mid N]] = \mathbb{E} [500 N] = 500 \mathbb{E} [N] = 500 \cdot 500 = 250000.
+    \]
+\end{explanation}
+
+\begin{eg}
+    We have \(r\) big tech companies. The \(i\)-th company has \(n_i\) billion dollars. Two companies go to court for copyright infringement, with each company equally likely to win. The loser pays the winner \(\$ 1\) billion. This repeats until all but one company is bankrupt. What is the expected number of court cases? (If we choose the suing companies uniformly at random) 
+\end{eg}
+
+\begin{explanation}
+    We first regard the case \(r = 2\), and we let \(n_1 + n_2 = n\). Let \(X_i\) be the number of cases of company 1 starting with \(n_1 = i\). Let 
+    \[
+        Y = \begin{dcases}
+            1, &\text{ if first case is won by company 1}  ;\\
+            0, &\text{ if first case is lost by company 1} .
+        \end{dcases}
+    \]
+    Let \(A_i\) be the number of additional rounds after the first if \(n_1 = i\). Then 
+    \[
+        X_i = \begin{dcases}
+            0, &\text{ if } i = 0, n \text{ (a company is already bankrupt)}  ;\\
+            1 + A_i, &\text{ if } 1 \le i \le n - 1.
+        \end{dcases}
+    \]  
+    Let \(m_i = \mathbb{E} [X_i]\)  then by the proposition 
+    \begin{align*}
+        \mathbb{E} [X_i] &= \mathbb{E} \left[ \mathbb{E} [X_i \mid Y] \right] = \frac{1}{2} \mathbb{E} [X_i \mid Y = 1] + \frac{1}{2} \mathbb{E} [X_i \mid Y = 0] 
+    \end{align*} 
+    by the definition of expectation. 
+
+    Now note that for \(i \neq 0, n\) we have 
+    \[
+        \mathbb{E} [X_i \mid Y = 1] = \mathbb{E} [1 + A_i \mid Y = 1] = 1 + \mathbb{E} [A_i \mid Y = 1].
+    \]
+    But \(A_i \mid Y = 1 \sim X_{i + 1}\) (start with \(i\) billions and win first round). Thus,
+    \[
+        1 + \mathbb{E} [A_i \mid Y = 1] = 1 + \mathbb{E} [X_{i+1}] = 1 + m_{i+1}.
+    \] 
+    Similarly, 
+    \[
+        \mathbb{E} [X_i \mid Y = 0] = 1 + m_{i - 1}.
+    \]
+    Thus,
+    \[
+        m_i = \mathbb{E} [X_i] = \frac{1}{2} \left( 1 + m_{i + 1} \right) + \frac{1}{2} \left( 1 + m_{i - 1} \right).  
+    \]
+    Hence, 
+    \[
+        m_i = \begin{dcases}
+            1 + \frac{1}{2} m_{i + 1} + \frac{1}{2} m_{i - 1}, &\text{ if } 1 \le i \le n - 1 ;\\
+            0, &\text{ if }  i = 0, n.
+        \end{dcases}
+    \]
+    Solve the recurrence relation, we have \(m_i = i(n - i)\).
+
+    Now we consider the general cases: \(r\) companies. \(n = \sum_{i=1}^r n_i \). Let \(X_i = \#\) of court cases involving company \(i\), and let \(X\) be the number of total cases. Observe that 
+    \[
+        X = \frac{1}{2} \sum_{i=1}^r X_i. 
+    \]      
+    Thus,
+    \[
+        \mathbb{E} [X] = \frac{1}{2} \sum_{i=1}^r \mathbb{E} [X_i]. 
+    \]
+    Notice that \(X_i\) follows the two company situation since compny \(i\) doesn't really care about which company is suing it. Hence,
+    \[
+        \mathbb{E} [X_i] = n_i (n - n_i).
+    \]  
+    This shows 
+    \[
+        \mathbb{E} [X] = \frac{1}{2} \sum_{i=1}^r n_i (n - n_i) = \frac{1}{2} \left( n^2 - \sum_{i=1}^r n_i^2  \right).  
+    \]
+\end{explanation}

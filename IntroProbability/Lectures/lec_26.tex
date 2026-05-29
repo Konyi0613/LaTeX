@@ -1,0 +1,256 @@
+\lecture{26}{March 28.}{}
+\begin{eg}[Grading oral exams]
+    Professor sees \(n\) students one-by-one, in uniformly random order. Wants to give one A+, to the best student.
+
+    If the strategy of the professor is to give an A+ to the very first student,
+    \[
+        \mathbb{P} (\text{success} ) = \mathbb{P} \left( \text{best student is the first one}  \right) = \frac{1}{n}. 
+    \]
+
+    We can give a better strategy: See the first \(k\) students, and give no A+'s. Give an A+ to a student if they are better than everyone before them. 
+
+    Define 
+    \[
+        S = \begin{dcases}
+            1, &\text{ if we give A+ to the best student}  ;\\
+            0, &\text{ if not}  .
+        \end{dcases}
+    \]  
+    Then \(\mathbb{P} (\text{success} ) = \mathbb{E} [S]\). Let \(X\) be the position of the best student. Then 
+    \begin{align*}
+        \mathbb{P} (\text{success} ) &= \mathbb{E} [S] = \mathbb{E} [\mathbb{E} [S \mid X]] = \sum_{i=1}^n \mathbb{E} [S \mid X] \mathbb{P} (X = i) \\
+        &= \frac{1}{n} \sum_{i=1}^n \mathbb{E} [S \mid X_i = i] = \frac{1}{n} \sum_{i=1}^n \mathbb{P} (\text{best student gets A+} \mid \text{they are } i \text{-th}   ) \\
+        &= \frac{1}{n} \sum_{i=k+1}^n \mathbb{P} (\text{best student gets A+} \mid \text{they are } i \text{-th})  
+    \end{align*}  
+    since first \(k\) students are impossible to get A+.  Note that best strudent gets A+ \(\mid\) they are the \(i\)-th if and only if the best of the first \(i - 1\) students is in the first \(k\) positions, otherwise this student must be better than anyone before them, and they will be given A+ since their position is smaller than \(i\). Hence,
+    \[
+        \mathbb{P} (\text{best student gets A+} \mid \text{they are } i \text{-th}   ) = \frac{k}{i - 1}.
+    \]     
+    Thus,
+    \begin{align*}
+        \mathbb{P} (\text{success} ) &= \frac{1}{n} \sum_{i=k+1}^n \frac{k}{i - 1} = \frac{k}{n} \left( \sum_{i=1}^{n - 1} \frac{1}{i} - \sum_{i=1}^{k - 1} \frac{1}{i}   \right) \\
+        &\thickapprox \frac{k}{n} \left( \log n - \log k \right) = \frac{k}{n} \log \left( \frac{n}{k} \right) \quad \text{as } n, k \to \infty .   
+    \end{align*}
+    To find the optimize choice of \(k\), we have 
+    \[
+        \frac{\mathrm{d}}{\mathrm{d}k} \mathbb{P} (\text{success} ) = \frac{1}{n} \log \frac{n}{k} + \frac{k}{n} \cdot \frac{1}{\left( \frac{n}{k} \right) } \cdot \left( \frac{-n}{k^2} \right) = \frac{1}{n} \log \frac{n}{k} - \frac{1}{n} = 0  
+    \] 
+    which occurs when 
+    \[
+        \log \frac{n}{k} = 1 \implies \frac{n}{k} = e \implies k \thickapprox \frac{n}{e}.
+    \]
+\end{eg}
+
+\section{Moment Generating Functions}
+\begin{definition}
+    Given a random variable \(X\), its moment generating function (mgf) is
+    \[
+        M_X(t) = \mathbb{E} \left[ e^{tX} \right], \quad t \in \mathbb{R}.
+    \] 
+\end{definition}
+
+\begin{proposition}
+    Given a random variable \(X\) with moment generating function \(M_X\), and some \(n \in \mathbb{N} \), the \(n\)-th moment of \(X\) is 
+    \[
+        \mathbb{E} [X^n] = M_X^{(n)}(0) = \left. \frac{\mathrm{d}^n}{\mathrm{d}t^n} M_X(t) \right\vert_{t = 0}. 
+    \]     
+\end{proposition}
+
+\begin{proof}
+    \[
+        \left. \frac{\mathrm{d}^n}{\mathrm{d}t^n} M_X(t) \right\vert_{t = 0} = \left. \frac{\mathrm{d}^n}{\mathrm{d}t^n} \mathbb{E} \left[ e^{tX} \right]  \right\vert_{t = 0} = \left. \mathbb{E} \left[ \frac{\mathrm{d}^n}{\mathrm{d}t^n} e^{tX}  \right]  \right\vert_{t=0} = \mathbb{E} [X^n].  
+    \]
+    \begin{remark}
+        For all distributions we care about, we can exchange the expectation and differentiation.
+    \end{remark}
+\end{proof}
+
+\paragraph{Fact:} If two random vairables have the same moment generating function, then they have the same distribution.
+
+\begin{eg}
+    Let \(X \sim \mathrm{Bin}(n, p) \). Then 
+    \begin{align*}
+        M_X(t) &= \mathbb{E} \left[ e^{tX} \right] = \sum_{k=0}^n e^{tk} \binom{n}{k} p^k (1 - p)^{n - k} \\
+        &= \sum_{k=0}^n \binom{n}{k} \left( pe^t \right)^k (1 - p)^{n - k} = (1 - p + pe^t)^n.    
+    \end{align*} 
+    Thus,
+    \[
+        M_X ^{\prime} (t) = n(1 - p + pe^t)^{n - 1} p e^t.
+    \]
+    Hence,
+    \[
+        \mathbb{E} [X] = M_X^{\prime} (0) = n(1 - p + p)^{n - 1} p = np.
+    \]
+    Also,
+    \[
+        M_X^{\prime\prime} (t) = n(n - 1)(1 - p + pe^t)^{n - 2} p^2 e^{2t} + n (1 - p + p e^t)^{n - 1} p e^t.
+    \]
+    Thus,
+    \[
+        \mathbb{E} [X^2] = M_X^{\prime\prime} (0) = n(n - 1)p^2 + np,
+    \]
+    so 
+    \[
+        \Var(X) = \mathbb{E} [X^2] - \mathbb{E} [X]^2 = np - np^2.
+    \]
+\end{eg}
+
+\begin{eg}
+    \(X \sim \mathrm{Poi}(\lambda ) \). Then 
+    \[
+        \mathbb{E} [e^{tX}] = \sum_{k=0}^{\infty} e^{tk} \frac{e^{-\lambda } \lambda ^k}{k!} = e^{-\lambda } \sum_{k=0}^{\infty} \frac{(\lambda e^t)^k}{k!} = e^{-\lambda } \cdot e^{\lambda e^t} = e^{\lambda (e^t - 1)}.  
+    \] 
+    Hence,
+    \[
+        M_X ^{\prime} (t) = e^{\lambda (e^t - 1)} \cdot \lambda e^t \implies \mathbb{E} [X] = M_X^{\prime} (0) = \lambda.
+    \]
+    Also,
+    \[
+        M_X^{\prime\prime} (t) = \lambda ^2 e^{2 t} e^{\lambda (e^t - 1)} + \lambda e^t e^{\lambda (e^t - 1)}.
+    \]
+    Hence,
+    \[
+        \mathbb{E} [X^2] = M_X^{\prime\prime} (0) = \lambda ^2 + \lambda \implies \Var(X) = \mathbb{E} [X^2] - \left( \mathbb{E} [X] \right)^2 = \lambda . 
+    \]
+\end{eg}
+
+\begin{proposition}
+    If \(X\) and \(Y\) are independent, then 
+    \[
+        M_{X + Y}(t) = M_X(t) M_Y(t).
+    \]  
+\end{proposition}
+
+\begin{proof}
+    \begin{align*}
+        M_{X + Y}(t) &= \mathbb{E} [e^{t(X + Y)}] \mathbb{E} [e^{tX} \cdot e^{tY}] = \mathbb{E} [e^{tX}] \mathbb{E} [e^{tY}] = M_X(t) M_Y(t).
+    \end{align*}
+\end{proof}
+
+\begin{corollary}
+    If \(X \sim \mathrm{Poi}(\lambda _1) \) and \(Y \sim \mathrm{Poi}(\lambda _2) \) are independent, then \(X + Y \sim \mathrm{Poi}(\lambda _1 + \lambda _2) \).   
+\end{corollary}
+
+\begin{proof}
+    Note that 
+    \[
+        M_X(t) = e^{\lambda _1 (e^t - 1)}, \quad M_Y(t) = e^{\lambda _2 (e^t - 1)}.
+    \]
+    Since \(X, Y\) are independent,
+    \[
+        M_{X + Y}(t) = M_X(t) M_Y(t) = e^{(\lambda _1 + \lambda _2) (e^t - 1)}.
+    \] 
+    This si the moment generating function of Poisson random variable with rate \(\lambda _1 + \lambda _2\), and since the MGF is unique to the distribution, \(X + Y \sim \mathrm{Poi(\lambda _1 + \lambda _2)} \).  
+\end{proof}
+
+\begin{eg}
+    \(X \sim \mathrm{Exp}(\lambda ) \). Then, for \(t < \lambda\), we have 
+    \begin{align*}
+        M_X(t) &= \mathbb{E} [e^{tX}] = \int _{\mathbb{R} } e^{tx} f_X(x) \, \mathrm{d} x = \int _0^{\infty} e^{tx} \lambda e^{-\lambda x} \, \mathrm{d} x \\
+        &= \lambda \int _0^{\infty} e^{-(\lambda - t) x} \, \mathrm{d} x = \lambda \left[ \frac{e^{-(\lambda - t) x}}{-(\lambda - t)} \right]_{x = 0}^{\infty} = \frac{\lambda }{\lambda - t}.    
+    \end{align*} 
+    Thus,
+    \[
+        M_X^{\prime} (t) = \frac{\lambda }{(\lambda - t)^2} \implies \mathbb{E} [X] = M_X^{\prime} (0) = \frac{\lambda }{\lambda ^2} = \frac{1}{\lambda }.
+    \]
+    Also,
+    \[
+        M_X^{\prime\prime} (t) = \frac{2 \lambda }{(\lambda - t)^3} \implies \mathbb{E} [X^2] = M^{\prime\prime} (0) = \frac{2}{\lambda ^2} \implies \Var(X) = \frac{2}{\lambda ^2} = \frac{1}{\lambda ^2} = \frac{1}{\lambda ^2}.
+    \]
+
+\end{eg}
+
+\begin{eg}
+    \(Z \sim N(0, 1)\). Then 
+    \begin{align*}
+        M_Z(t) &= \mathbb{E} \left[ e^{tZ} \right] = \int _{-\infty }^{\infty } e^{tz} \cdot \frac{1}{\sqrt{2 \pi } } \cdot e^{-\frac{z^2}{2}} \, \mathrm{d} z \\
+        &= \frac{1}{\sqrt{2 \pi } } \int _{-\infty }^{\infty} e^{-\frac{1}{2} \left( z^2 - 2 t z \right) } \, \mathrm{d} z = \frac{1}{\sqrt{2 \pi } } \int _{-\infty }^{\infty } e^{-\frac{1}{2} \left( z - t \right)^2 } e^{\frac{1}{2} t^2} \, \mathrm{d} z \\
+        &= e^{\frac{1}{2} t^2} \frac{1}{\sqrt{2 \pi } } \int _{-\infty }^{\infty } e^{- \frac{1}{2} x^2} \, \mathrm{d} x = e^{\frac{1}{2} t^2},   
+    \end{align*} 
+    where the last equality holds since \(\frac{1}{\sqrt{2 \pi } } e^{- \frac{1}{2} x^2}\) is the density function of \(N(0, 1)\). To compute \(\Var(Z)\), we need 
+    \[
+      M_Z^{\prime} (t) = t e^{\frac{1}{2} t^2} \implies \mathbb{E} [Z] = M_Z^{\prime} (0) = 0.  
+    \]
+    Also,
+    \[
+        M_Z^{\prime\prime} (t) = e^{\frac{1}{2} t^2} + t^2 e^{\frac{1}{2} t^2} \implies \mathbb{E} [Z^2] = M_Z^{\prime\prime} (0) = 1 \implies \Var(Z) = 1 - 0^2 = 1.
+    \]
+\end{eg}
+
+\begin{eg}
+    \(X \sim N(\mu , \sigma ^2) \), then \(\frac{X - \mu }{\sigma } = Z \sim N(0, 1)\), and we have \(X = \mu + \sigma Z\). Note that 
+    \begin{align*}
+        M_X(t) &= \mathbb{E} \left[ e^{tX} \right] = \mathbb{E} \left[ e^{t(\mu + \sigma Z)} \right] = e^{t \mu } \mathbb{E} \left[ e^{(t \sigma) Z} \right] \\
+        &= e^{t \mu } M_Z(t \sigma ) = e^{t \mu } e^{\frac{1}{2} (t \sigma )^2} = e^{t \mu + \frac{1}{2} t^2 \sigma ^2}.   
+    \end{align*}   
+    Now let \(X \sim N(\mu _1, \sigma_1 ^2)\) and \(Y \sim N(\mu _2, \sigma _2^2)\), independent. We have 
+    \begin{align*}
+        M_{X + Y}(t) = M_X(t) M_Y(t) &= e^{t \mu _1 + \frac{1}{2} t^2 \sigma _1^2} \cdot e^{t \mu _2 + \frac{1}{2} t^2 \sigma _2^2} = e^{t(\mu _1 + \mu _2) + \frac{1}{2} t^2 (\sigma _1^2 + \sigma _2^2)} .
+    \end{align*} 
+    This is the mgf of \(N(\mu _1 + \mu _2, \sigma _1^2 + \sigma _2^2)\). 
+\end{eg}
+
+\begin{eg}
+    Let \(X_1, X_2, X_3, \dots \) be independent identically distributed random variables. Let \(N\) be an independent random variable taking non-negative integer values. Let \(X = \sum_{i=1}^N X_i \). Then 
+    \[
+        \mathbb{E} [X] = \mathbb{E} [N] \mathbb{E} [X_1].
+    \]   
+\end{eg}
+\begin{explanation}
+    We have 
+    \begin{align*}
+        M_X(t) &= \mathbb{E} [e^{tX}] = \mathbb{E} \left[ e^{t \sum_{i=1}^N X_i } \right] = \mathbb{E} \left[ \mathbb{E} \left[ e^{t \sum_{i=1}^n X_i } \mid N = n \right]  \right] \\
+        &= \mathbb{E} _{N = n} \left[ \mathbb{E} \left[ e^{t \sum_{i=1}^n X_i } \right]  \right] = \mathbb{E}_{N = n} \left[ \prod _{i=1}^n \mathbb{E} [e^{tX_i}] \right] \\
+        &= \mathbb{E} _{N = n} \left[ M_{X_1}(t)^n \right] = \mathbb{E} \left[ M_{X_1}(t)^N \right]      
+    \end{align*}
+    since \(X_1, X_2, \dots \) are i.i.d.\ and thus have same mgf. 
+    Note that 
+    \[
+        M_X^{\prime} (t) = \mathbb{E} \left[ \frac{\mathrm{d}}{\mathrm{d}t} M_{X_1}(t)^N  \right] = \mathbb{E} \left[ N M_{X_1} (t)^{N - 1} M_{X_1}^{\prime} (t) \right]. 
+    \]
+    Hence,
+    \begin{align*}
+        \mathbb{E} [X] &= M_X^{\prime} (0) = \mathbb{E} \left[ N \cdot M_{X_1}(0)^{N - 1} \cdot M_{X_1}^{\prime} (0) \right].
+    \end{align*}
+    Now since 
+    \[
+        M_{X_1}(0) = \mathbb{E} [e^{0 \cdot X_1}] = 1, \quad M_{X_1}^{\prime} (0) = \mathbb{E} [X_1],
+    \]
+    we have 
+    \[
+       \mathbb{E} \left[ N \cdot M_{X_1}(0)^{N - 1} \cdot M_{X_1}^{\prime} (0) \right] = \mathbb{E} [N \cdot 1 \cdot \mathbb{E} [X_1]] = \mathbb{E} [N] \cdot \mathbb{E} [X_1]. 
+    \]
+\end{explanation}
+
+\chapter{Limit Theorems}
+If \(X_1, X_2, X_3, \dots \) are independent and indentically distributed with distribution \(X\), \(\mathbb{E} [X] = \mu\), then we can define the sample means 
+\[
+    \overline{X_n} = \frac{1}{n} \sum_{i=1}^n X_i.  
+\]   
+\begin{question}
+    What can we say about the distribution of \(\overline{X_n} \)? 
+\end{question}
+
+Recall that 
+\[
+    \mathbb{E} \left[ \overline{X_n}  \right] = \mathbb{E} [X] = \mu, 
+\]
+and by independence,
+\[
+    \Var(\overline{X} _n) = \frac{1}{n} \Var(X).
+\]
+There are three types of results:
+\begin{enumerate}[(1)]
+    \item Weak Law of Large Numbers:
+    \[
+        \forall \varepsilon > 0, \quad \mathbb{P} \left( \left\vert \overline{X_n} - \mu   \right\vert \ge \varepsilon \right) \to 0 \quad \text{as } n \to \infty   
+    \]
+    \item Strong Law of Large Numbers:
+    \[
+        \mathbb{P} \left( \lim_{n \to \infty} \overline{X_n} = \mu   \right) = 1. 
+    \]
+    \item Central Limit Theorem: A \(n \to \infty\), 
+    \[
+        \frac{(\overline{X_n} - \mu) \sqrt{n} }{\sigma } \thickapprox N(0, 1).  
+    \]
+\end{enumerate}
