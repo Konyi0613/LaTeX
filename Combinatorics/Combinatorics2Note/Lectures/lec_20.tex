@@ -97,7 +97,7 @@ Given \(G = (V, E)\), and a set of lists \((L_v: v \in V)\). A proper list-color
 \end{claim}
 
 \begin{explanation}
-    Let \([2k - 1]\) be the set of all colors. Then there are \(\binom{2k - 1}{k}\) possible lists of \(k\) colors. We assign each such list to a vertex on each side. In a proper coloring of \(K_{m, m}\), no color appears on both sides. Thus, we have a partition \([2k - 1] = L \cupdot R\). WLOG, \(\vert L \vert \le k - 1\), then \(\exists v\) in the left with \(L_v \subseteq [2k - 1] \setminus L\) since \([2k - 1] \setminus L\) has \(\ge k\) colors. However, \(\varphi (v) \in L_v\) and \(\varphi (v) \in L\), which is impossible. 
+    Let \([2k - 1]\) be the set of all colors. Then there are \(\binom{2k - 1}{k}\) possible lists of \(k\) colors. We assign each such list to a vertex on each side. In a proper list coloring of \(K_{m, m}\), no color appears on both sides. Thus, we have a partition \([2k - 1] = L \cupdot R\), where \(L\) is the set of left colors and \(R\) is the set of right colors. WLOG, \(\vert L \vert \le k - 1\), then \(\exists v\) in the left with \(L_v \subseteq [2k - 1] \setminus L\) since \([2k - 1] \setminus L\) has \(\ge k\) colors. However, \(\varphi (v) \in L_v\) and \(\varphi (v) \in L\), which is impossible. 
 
     Thus, 
     \[
@@ -107,7 +107,7 @@ Given \(G = (V, E)\), and a set of lists \((L_v: v \in V)\). A proper list-color
 
 This claim shows \autoref{prop: choosability can be arbitrarily larger than chromatic number}. 
 
-\section{List-coloring plannar graph}
+\section{List-coloring planar graph}
 \begin{definition}
     A graph \(G\) is planar if it can be drawn in \(\mathbb{R} ^2\) without crossing edges. 
     %fig  
@@ -118,12 +118,14 @@ This claim shows \autoref{prop: choosability can be arbitrarily larger than chro
 \end{theorem}
 
 \begin{theorem}[Kuratowski]
-    \(G\) is planar iff \(G\) does not contain a subdivision\footnote{Basically, a subdicision of a graph is replacing some edges of the graph by paths - essentially a relaxion of a graph. But this isn't very important in this course, so we won't be formally defining it here.} of \(K_5\) or \(K_{3, 3}\).    
+    \(G\) is planar iff \(G\) does not contain a subdivision\footnote{Basically, a subdivision of a graph is replacing some edges of the graph by paths - essentially a relaxion of a graph. But this isn't very important in this course, so we won't be formally defining it here.} of \(K_5\) or \(K_{3, 3}\).    
 \end{theorem}
 
 \begin{theorem}[Four color theorem]
     If \(G\) is planar, then \(\chi (G) \le 4\).  
 \end{theorem}
+
+Before proving this, we can give an oservation.
 
 \begin{observation}
     \(e(G) \le 3 n - 6\) for all planar graph implies \(\mathrm{degen}(G) \le 5\), so \(\chi (G) \le 6\).   
@@ -200,7 +202,62 @@ Finally, every \(d\)-degenerate graph is \((d+1)\)-colorable: order the vertices
     \end{itemize}       
     By induction, we can color \(G_1\). In \(G_2\), restrict the lists of \(v_i, v_j\) to the colors they receive in \(G_1\). All other boundary vertices still have lists of size 3, internal vertices hace lists of size 5. By induction (with \(v_i, v_j\) playing the role of \(v_1, v_2\)), we can color \(G_2\), and we can combine them to get a coloring of \(G\). 
 
-    \textbf{Case 2:} There is no chord. In this case, we will consider \(G^{\prime} = G - v_3\). Let \(x, y \in L_{v_3} \setminus L_{v_2}\). If \(v\) is an internal neighbor of \(v_3\), it will becomes a boundary vertex of \(G^{\prime}\).  We delete \(x, y\) from \(L_v\) (if they appear), then still left with \(\ge 3\) colors in \(L_v\). By induction, we can properply color \(G^{\prime} \). We color \(v_3\) with one of \(x, y\), provided it is not used for \(v_4\). Thus, we have a proper list-coloring of \(G\).                        
+    \textbf{Case 2: the outer cycle has no chord.} We remove $v_3$. Since every
+    bounded face is a triangle and there are no chords of the outer cycle, the
+    neighbors of $v_3$ are
+    \[
+        v_2, u_1,u_2,\ldots,u_m, v_4,
+    \]
+    in order around $v_3$, where the $u_k$ are internal vertices of $G$. After
+    deleting $v_3$, those internal neighbors become part of the new outer face.
+    \vspace{-4em}
+    \begin{center}
+    \begin{tikzpicture}[scale=1, every node/.style={circle, fill=black, inner sep=1.5pt}]
+        \coordinate (v1) at (-2.7,-1.1);
+        \coordinate (v2) at (-1.3,-1.6);
+        \coordinate (v3) at (0,-1.25);
+        \coordinate (v4) at (1.3,-1.6);
+        \coordinate (v5) at (2.7,-1.1);
+        \coordinate (u1) at (-0.75,-0.15);
+        \coordinate (u2) at (0,0.25);
+        \coordinate (u3) at (0.75,-0.15);
+        \draw[thick] (v1) -- (v2) -- (v3) -- (v4) -- (v5);
+        \draw[thick] (v2) -- (u1) -- (u2) -- (u3) -- (v4);
+        \draw[gray] (v3) -- (u1);
+        \draw[gray] (v3) -- (u2);
+        \draw[gray] (v3) -- (u3);
+        \draw[gray] (v2) -- (u1);
+        \draw[gray] (u1) -- (u2);
+        \draw[gray] (u2) -- (u3);
+        \draw[gray] (u3) -- (v4);
+        \draw[very thick, dashed, red] (v3) circle[radius=0.25];
+        \draw[blue, very thick] (v2) -- (u1) -- (u2) -- (u3) -- (v4);
+        \foreach \p/\name in {v1/$v_1$,v2/$v_2$,v3/$v_3$,v4/$v_4$,v5/$v_5$,u1/$u_1$,u2/$u_2$,u3/$u_3$}
+            \node[label={[font=\small]\name}] at (\p) {};
+        \node[draw=none, fill=none, text=blue] at (0,0.9) {new outer boundary in $G-v_3$};
+    \end{tikzpicture}
+    \end{center}
+    \vspace{2em}
+
+    Choose two distinct colors
+    \[
+        x,y\in L_{v_3}\setminus L_{v_2}.
+    \]
+    This is possible because $|L_{v_3}|\ge 3$ and $L_{v_2}$ contains only one color.
+    For each internal neighbor $u_k$ of $v_3$, delete the colors $x$ and $y$ from
+    $L_{u_k}$. Each $u_k$ originally had at least $5$ colors, so after deleting at
+    most two colors it still has at least $3$ colors. Thus, in $G-v_3$, the newly
+    exposed boundary vertices $u_k$ satisfy the boundary-list condition.
+
+    By induction, $G-v_3$ has a proper list-coloring from these modified lists. Now
+    we color $v_3$. The color on $v_2$ is not $x$ or $y$ by construction, and none
+    of the internal neighbors $u_k$ uses $x$ or $y$ because those colors were
+    deleted from their lists. The only remaining neighbor of $v_3$ that might use
+    one of $x$ and $y$ is $v_4$. Since $x$ and $y$ are distinct, at least one of
+    them is different from the color on $v_4$. Assign that color to $v_3$.
+
+    This gives a proper list-coloring of $G$, completing the induction and hence
+    the proof of the theorem.                       
 
     This finishes the proof of the claim, which then implies the theoem.
 \end{proof}
