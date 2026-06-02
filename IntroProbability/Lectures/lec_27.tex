@@ -1,0 +1,260 @@
+\lecture{27}{Jun 2.}{}
+Recall the Markov's inequality: If \(X \ge 0\), then 
+\[
+    \mathbb{P} (X \ge a) \le \frac{\mathbb{E} [X]}{a},
+\] 
+the Chebyshev's inequality:
+\[
+    \mathbb{P} (\vert X - \mathbb{E} [X] \vert \ge a) \le \frac{\Var(X)}{a^2},
+\]
+and the First Borel-Cantelli lemma: If \(E_1, E_2, \dots \) are events with \(\sum_{n=1}^{\infty} \mathbb{P} (E_n) < \infty \), then 
+\[
+    \mathbb{P} \left( \limsup_{n \to \infty} E_n  \right) = 0. 
+\]  
+\section{Law of Large Numbers}
+Let \(X_1, X_2, \dots \) be independent and identically distributed. What can we say about 
+\[
+    \overline{X_n} = \frac{1}{n} \sum_{i=1}^n X_i ? 
+\] 
+
+\begin{theorem}[Weak Law of Large Numbers]
+    Let \(X_1, X_2, \dots \) be i.i.d.\ with \(\mathbb{E} [X_i] = \mu\) and \(\Var(X_i) = \sigma ^2\). Then for any \(\varepsilon > 0\),
+    \[
+        \lim_{n \to \infty} \mathbb{P} \left( \left\vert \overline{X_n} - \mu  \right\vert \ge \varepsilon \right) = 0.  
+    \]    
+\end{theorem}
+
+\begin{proof}
+    We know \(\mathbb{E} [\overline{X_n}] = \mu\) since 
+    \[
+        \mathbb{E} \left[ \frac{1}{n} \sum_{i=1}^n X_i  \right] = \frac{1}{n} \sum_{i=1}^n \mathbb{E} [X_i] = \frac{1}{n} n \mu = \mu,  
+    \] 
+    and 
+    \[
+        \Var(\overline{X_n}) = \Var\left( \frac{1}{n} \sum_{i=1}^n X_i  \right) = \frac{1}{n^2} \Var(\sum_{i=1}^n X_i) = \frac{1}{n^2} \sum_{i=1}^n \Var(X_i) = \frac{1}{n^2} n \sigma ^2 = \frac{\sigma ^2}{n}.  
+    \]
+    By Chebyshev,
+    \begin{align*}
+        \mathbb{P} \left( \vert \overline{X_n} - \mu  \vert \ge \varepsilon \right) &\le \frac{\Var(\overline{X_n} )}{\varepsilon ^2} = \frac{\sigma ^2}{n \varepsilon^2} \to 0. 
+    \end{align*}
+\end{proof}
+
+\begin{remark}
+    We need the independence to say 
+    \[
+        \Var \left( \sum_{i=1}^n X_i  \right) = \sum_{i=1}^n \Var(X_i),  
+    \]
+    but this is true with only pairwise independence. We can still prove the Weak Law of Large Number if the variance is infinite, but harder.
+\end{remark}
+
+\begin{theorem}[Strong Law of Large Numbers]
+    Let \(X_1, X_2, \dots \) be i.i.d.\ with \(\mathbb{E} [X_i] = \mu\) and \(\mathbb{E} [X_i^4] = K < \infty\), then 
+    \[
+        \mathbb{P} \left( \lim_{n \to \infty} \overline{X_n} = \mu \right) = 1. 
+    \]   
+\end{theorem}
+
+\begin{proof}
+    We consider the following cases:
+
+    \textbf{Case 1:} \(\mu = 0\). Let \(Y_n = \sum_{i=1}^n X_i \), then 
+    \begin{align*}
+        Y_n^4 &= \left( \sum_{i=1}^n X_i  \right)^4 = \sum_{i, j, k, \ell} X_i X_j X_k X_{\ell } \\
+        &= \sum_{i=1}^r X_i^4 + 4 \sum_{i \neq j} X_i X_j^3 + 6 \sum_{i < j} X_i^2 X_j^2 + 12 \sum_{i < j \neq k} X_i X_j X_k^2 + 24 \sum_{i < j < k < \ell} X_i X_j X_k X_{\ell}.
+    \end{align*} 
+
+    Hence,
+    \begin{align*}
+        \mathbb{E} [Y_n^4] &= \sum_{i=1}^n \mathbb{E} [X_i^4] + 4 \sum_{i \neq j} \mathbb{E} [X_i X_j^3] + 6 \mathbb{E} \sum_{i < j} \mathbb{E} [X_i^2 X_j^2] + 12 \sum_{i < j \neq k} \mathbb{E} [X_i X_j X_k^2] + 24 \sum_{i < j < k < \ell} \mathbb{E} [X_i X_j X_k X_{\ell}] \\
+        &= \sum_{i=1}^n \mathbb{E} [X_i^4] + 6 \sum_{i < j} \mathbb{E} [X_i^2] \mathbb{E} [X_j^2]       
+    \end{align*}
+    since by independence we have \(\mathbb{E} [X_i X_j] = \mathbb{E} [X_i] \mathbb{E} [X_j]\) and \(\mathbb{E} [X_i] = 0\).
+
+    Thus,
+    \[
+        \mathbb{E} [Y_n^4] = n \mathbb{E} [X_1^4] + 6 \binom{n}{2} \mathbb{E} [X_i^2]^2.
+    \]   
+    Note that 
+    \[
+        \mathbb{E} [X_1^4] = \mathbb{E} \left[ \left( X_1^2 \right)^2  \right] = \Var(X_1^2) + \mathbb{E} [X_1^2]^2 \ge \mathbb{E} [X_1^2]^2 
+    \]
+    since \(\Var(X_1^2) \ge 0\). Hence,
+    \[
+        \mathbb{E} [Y_n^4] \le \left( n + 6 \binom{n}{2} \right) \mathbb{E} [X_1^4] = 3 n^2 K. 
+    \] 
+    Let
+    \begin{align*}
+        E_n &= \left\{ \vert \overline{X_n}  \vert > \frac{1}{\log n} \right\} = \left\{ \left\vert \frac{1}{n} \sum_{i=1}^n X_i  \right\vert > \frac{1}{\log n}  \right\} \\
+        &= \left\{ \vert Y_n \vert > \frac{n}{\log n}  \right\} = \left\{ Y_n^4 > \frac{n^4}{\log^4 n} \right\}.   
+    \end{align*}
+
+    By Markov,
+    \begin{align*}
+        \mathbb{P}(E_n) &= \mathbb{P} \left( Y_n^4 > \frac{n^4}{\log ^4 n} \right) \le \frac{\mathbb{E} [Y_n^4]}{\left( \frac{n^4}{\log ^4 n} \right) } \le \frac{3 n^2 K}{\left( \frac{n^4}{\log ^4 n} \right) } = \frac{3 K \log ^4 n}{n^2}.
+    \end{align*}
+
+    Therefore 
+    \[
+        \sum_{n=1}^{\infty} \mathbb{P} (E_n) \le 3 K \sum_{n=1}^{\infty} \frac{\log ^4 n}{n^2} < \infty.  
+    \]
+    By the Borel-Cantelli lemma,
+    \[
+        \mathbb{P} \left( \limsup_{n \to \infty} E_n  \right) = 0. 
+    \]
+    Thus, with probability 1, only finitely many \(E_n\) occur. With probability 1, \(\exists N \in \mathbb{N} \) s.t. \(\forall n \ge N\), \(E_n\) doesn't occur, i.e. 
+    \[
+        \vert \overline{X_n} \vert \le \frac{1}{\log n}. 
+    \] 
+    Thus, with probability 1, \(\lim_{n \to \infty} \overline{X_n} = 0 = \mu\). 
+
+    \textbf{Case 2:} \(\mu \neq 0\), then let \(X_n^{\prime} = X_n - \mu\), then \(\mathbb{E} [X_n^{\prime} ] = 0\). Hence,
+    \[
+        \mathbb{P} \left( \lim_{n \to \infty} \overline{X_n^{\prime} } = 0   \right) = 1 \iff \mathbb{P} \left( \lim_{n \to \infty} \overline{X_n} - \mu  = 0\right) = 1 \iff \mathbb{P} \left( \lim_{n \to \infty} \overline{X_n} = \mu   \right) = 1.  
+    \]    
+\end{proof}
+
+\begin{remark}
+    We need independence to say 
+    \[
+        \mathbb{E} [X_i X_j X_k X_{\ell } ] = \mathbb{E} [X_i] \mathbb{E} [X_j] \mathbb{E} [X_k] \mathbb{E} [X_{\ell } ],
+    \]
+    so it is enough to have 4-independence.
+\end{remark}
+
+\section{Central Limit Theorem}
+\begin{theorem}[Central Limit Theorem]
+    Let \(X_1, X_2, \dots \) be i.i.d.\ random variables with \(\mathbb{E} [X_i] = \mu\) and \(\Var(X_i) = \sigma ^2\). Then 
+    \[
+        \frac{\sum_{i=1}^n X_i - n \mu  }{\sigma \sqrt{n} }
+    \]   
+    converges to \(N(0, 1)\) as \(n \to \infty\), i.e. for any \(a \in \mathbb{R}\), let \(Z \sim N(0, 1)\), then  
+    \[
+        \mathbb{P} \left( \frac{\sum_{i=1}^n X_i - n \mu }{\sigma \sqrt{n} } \le a \right) \to \mathbb{P} (Z \le a) = \Phi (a). 
+    \]  
+\end{theorem}
+
+\begin{proof}
+    We first give an observation:
+    \[
+        \frac{\sum_{i=1}^n X_i  - n \mu}{\sigma \sqrt{n} } \le a \iff \sum_{i=1}^n X_i - n \mu \le a \sigma \sqrt{n} \iff \overline{X_n} \le \frac{a \sigma }{\sqrt{n} }.   
+    \]
+    For our proof, we assume 
+    \begin{enumerate}
+        \item Moment generating function \(M_{X_i}(t)\) exists. 
+        \item Fact: If we have random variables \(Z_1, Z_2, \dots \) with mgf \(M_{Z_n}\) and cdf \(F_{Z_n}\), and random variables \(Z\) with \(M_Z, F_Z\), then if 
+        \[
+            \lim_{n \to \infty} M_{Z_n}(t) = M_Z(t) \quad \forall t, 
+        \]
+        then
+        \[
+            \lim_{n \to \infty} F_{Z_n}(a) = F_Z(a). 
+        \]
+        This is just the precise way of saying that the momoent generating function determines the distribution.
+    \end{enumerate}
+
+    Now we start the proof of central limit theorem.
+
+    \textbf{Case 1:} \(\mu = 0, \sigma ^2 = 1\). We want to show 
+    \[
+        \frac{\sum_{i=1}^n X_i}{\sqrt{n}} \to N(0, 1) \quad \text{ as } n \to \infty. 
+    \]  
+    By fact, it is enough to show 
+    \[
+        M_{\frac{\sum_{i=1}^n X_i }{\sqrt{n} }} (t) \to M_{N(0, 1)}(t) \quad \forall t.
+    \]
+    If \(Z \sim N(0, 1) \), then 
+    \[
+        M_Z(t) = e^{\frac{t^2}{2}}.
+    \] 
+    Let
+    \[
+        Z_n = \frac{\sum_{i=1}^n X_i }{\sqrt{n} } = \sum_{i=1}^n \frac{X_i}{\sqrt{n} }. 
+    \]
+    By independence,
+    \[
+        M_{Z_n}(t) = \prod_{i=1}^n M_{\frac{X_i}{\sqrt{n} }}(t) = \left( M_{\frac{X_1}{\sqrt{n} }} \right)^n. 
+    \]
+    Note that
+    \[
+        M_{\frac{X_1}{\sqrt{n} }} (t) = \mathbb{E} \left[ e^{t \frac{X_1}{\sqrt{n} }} = \mathbb{E} \left[ e^{\frac{t}{\sqrt{n}} X_1} \right]  \right] = M_{X_1} \left( \frac{t}{\sqrt{n} } \right).  
+    \]
+    Want to show 
+    \[
+        \lim_{n \to \infty} M_{X_1} \left( \frac{t}{\sqrt{n} } \right)^n = e^{\frac{t^2}{2}}.  
+    \]
+    Taking logarithm, it is equivalent to show 
+    \[
+        \lim_{n \to \infty} n \log M_{X_1} \left( \frac{t}{\sqrt{n} } \right) = \frac{t^2}{2}. 
+    \]
+    Let \(L(t) = \log M_{X_1}(t)\), we want to show 
+    \[
+        \lim_{n \to \infty} n L \left( \frac{t}{\sqrt{n} } \right) = \frac{t^2}{2}.  
+    \] 
+    Note that 
+    \[
+        L(0) = \log M_{X_1}(0) = \log \mathbb{E} \left[ e^{0 \cdot X_1} \right] = \log 1 = 0. 
+    \]
+    Also,
+    \[
+        L^{\prime} (t) = \frac{M_{X_1}^{\prime} (t)}{M_{X_1}(t)} \implies L^{\prime} (0) = \frac{M_{X_1}^{\prime} (0)}{M_{X_1}(0)} = \frac{\mathbb{E} [X_1]}{1} = \mu = 0.
+    \]
+    Thus, we can compute 
+    \[
+        L^{\prime\prime} (t) = \frac{M_{X_1}^{\prime} (t) M_{X_1}(t) - M_{X_1}^{\prime} (t)^2}{M_{X_1}(t)^2}.
+    \]
+    This gives 
+    \[
+        L^{\prime\prime} (0) = \frac{\mathbb{E} [X_1^2] \cdot 1 - \mathbb{E} [X_1]^2}{1^2} = \left( \sigma ^2 + \mu ^2 \right) - \mu ^2 = 1. 
+    \]
+    Hence,
+    \begin{align*}
+        \lim_{n \to \infty} n L \left( \frac{t}{\sqrt{n} } \right) &= \lim_{n \to \infty} \frac{L \left( \frac{t}{\sqrt{n} } \right) }{\left( \frac{1}{n} \right) } = \lim_{n \to \infty} \frac{L^{\prime} \left( \frac{t}{\sqrt{n} } \right) \cdot \left( -\frac{1}{2} \cdot \frac{t}{n^{\frac{3}{2}} } \right) }{\left( -\frac{1}{n^2} \right) } \\
+        &= \lim_{n \to \infty} \frac{L^{\prime} \left( \frac{t}{\sqrt{n} } t \right) }{\left( \frac{2}{\sqrt{n} } \right) } \overset{\text{L'H}}{=} \frac{t}{2} \lim_{n \to \infty} \frac{L^{\prime\prime} \left( \frac{t}{\sqrt{n} } \right) \cdot \left( -\frac{1}{2} \frac{t}{n^{\frac{3}{2}}} \right)  }{\left( -\frac{1}{2n^{\frac{3}{2}}} \right) } \\
+        &= \frac{t^2}{2} \lim_{n \to \infty} L^{\prime\prime} \left( \frac{t}{\sqrt{n} } \right) = \frac{t^2}{2} L^{\prime\prime} (0) = \frac{t^2}{2}.      
+    \end{align*}
+
+    Thus, we're done. 
+
+    \textbf{General Case:} Given \(X_i\) with \(\mathbb{E} [X_i] = \mu \) and \(\var(X_i) = \sigma ^2\). Let \(Y_i = \frac{X_i - \mu}{\sigma }\), then \(\mathbb{E} [Y_i] = 0\), and \(\Var(Y_i) = 1\). Thus, by the previous case, \(\forall a\), 
+    \[
+        \mathbb{P} \left( \frac{\sum_{i=1}^n Y_i }{\sqrt{n} } \le a \right) \to \Phi(a), 
+    \]        
+    while 
+    \[
+        \frac{\sum_{i=1}^n Y_i }{\sqrt{n} } = \frac{\sum_{i=1}^n (X_i - \mu)  }{\sigma \sqrt{n} } = \frac{\sum_{i=1}^n X_i - n \mu  }{\sigma \sqrt{n} }.
+    \]
+\end{proof}
+
+\begin{remark}
+\quad
+    \begin{enumerate}
+        \item Can show convergence is uniform for all \(a\), i.e. \(\forall \varepsilon > 0\), \(\exists N \in \mathbb{N}\) s.t. \(\forall a \in \mathbb{R}\) and \(n \ge N\), 
+        \[
+            \left\vert \mathbb{P} \left( \frac{\sum_{i=1}^n X_i - n \mu }{\sigma \sqrt{n} } \le a\right) - \Phi (a)  \right\vert \le \varepsilon. 
+        \]     
+        \item Convergence is quite fast
+        \item CLT holds more generally: If \(X_1, X_2, \dots \) are independent and 
+        \begin{itemize}
+            \item \(\exists M\) s.t. \(\mathbb{P} \left( \vert X_i \vert \le M  \right) = 1 \) for all \(i\). 
+            \item \(\sum_{n=1}^{\infty} \Var(X_n) = \infty \).    
+        \end{itemize}
+        Then,
+        \[
+            \frac{\sum_{i=1}^n \left( X_i - \mathbb{E} [X_i] \right)  }{\sqrt{\sum_{i=1}^n \var(X_i) } } \to N(0, 1).
+        \]
+    \end{enumerate}
+\end{remark}
+
+\begin{eg}
+    Roll a fair die 10 times, what is \(\mathbb{P} \left( \text{sum} \in [30, 40]  \right) \)? 
+\end{eg}
+\begin{explanation}
+    Let \(X_i\) be the outcome of the \(i\)-th roll. Then \(X_i \sim \mathrm{Unif}(\left\{1, 2, 3, 4, 5, 6 \right\} ) \), and \(\mathbb{E} [X_i] = 3.5, \Var(X_i) = \frac{35}{12}\). 
+
+    Hence,
+    \begin{align*}
+        \mathbb{P} \left( 30 \le \sum_{i=1}^{10} \le 40   \right) &= \mathbb{P} \left( 29.5 \le \sum_{i=1}^{10} X_i \le 40.5   \right) = \mathbb{P} \left( -5.5 \le \sum_{i=1}^{10} X_i - 10 \cdot 3.5 \le 5.5   \right) \\
+        &= \mathbb{P} \left( -\frac{5.5}{\sqrt{\frac{350}{120}} } \le \frac{\sum_{i=1}^{10} X_i - 35 }{\sqrt{\frac{350}{12}} } \le \frac{5.5}{\sqrt{\frac{350}{12}} }  \right) \\
+        &\thickapprox \Phi \left( \frac{3.5}{\sqrt{\frac{350}{12}} } \right) - \Phi \left( \frac{-5.5}{\sqrt{\frac{350}{12}} } \right) = 2 \Phi \left( \frac{5.5}{\sqrt{\frac{350}{12}} } \right) - 1 \thickapprox 0.692.      
+    \end{align*} 
+\end{explanation}
