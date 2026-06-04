@@ -1,0 +1,203 @@
+\chapter{Probabilistic Method in Combinatorics}
+\lecture{28}{Jun 4.}{}
+Combinatorics is the field that study discrete objects. For example, 
+\begin{itemize}
+    \item graphs 
+    \item set systems 
+    \item numbers
+\end{itemize}
+
+\paragraph{Extremal Combinatorics}
+\begin{question}
+    How big can an object be if it satisfies certain properties?
+\end{question}
+
+We can decompose this question into two parts:
+\begin{enumerate}
+    \item Give a lower bound, give a construction of an object with the property. 
+    \item Give an upper bound, prove that there is nothing better.
+\end{enumerate}
+
+\section{Sum-free sets}
+\begin{definition}
+    A set \(S \subseteq \mathbb{N} \) is sum-free if \(\nexists x, y, z \in S \) s.t. \(x + y = z\).    
+\end{definition}
+
+\begin{question}
+    How big can a sum-free set \(S \subseteq [n]\) be?
+\end{question}
+
+We can give some constructions:
+\begin{itemize}
+    \item odd numbers \(S = \left\{ 1, 3, 5, \dots , 2 \cdot \left\lceil \frac{n}{2} \right\rceil - 1 \right\} \). \(\vert S \vert = \left\lceil \frac{n}{2} \right\rceil  \).
+    \item Large numbers: \(S = \left\{ \left\lfloor \frac{n}{2} \right\rfloor + 1, \left\lfloor \frac{n}{2} \right\rfloor + 2, \dots , n  \right\} \). \(\vert S \vert = \left\lceil \frac{n}{2} \right\rceil  \).  
+\end{itemize}
+
+\begin{proposition}
+    If \(S \subseteq [n]\) is sum-free, then \(\vert S \vert \le \left\lceil \frac{n}{2} \right\rceil  \).
+\end{proposition}
+
+\begin{proof}
+    Let \(m = \max S \le n\). Then we can partition \(1, 2, \dots , m - 1\) into pairs summing to \(m\): \(\left\{ 1, m - 1 \right\}, \left\{ 2, m - 2 \right\}, \dots   \). Thus \(S\) can contain at most one element from each pair. Thus,
+    \[
+        \vert S \vert \le \text{\# of partitions} + m \text{ iteself} =   \left\lfloor \frac{m-1}{2} \right\rfloor + 1 = \left\lceil \frac{m}{2} \right\rceil \le \left\lceil \frac{n}{2} \right\rceil .
+    \]     
+\end{proof}
+
+\paragraph{Two-player version}
+\begin{itemize}
+    \item 1st player: Choose a set \(A \subseteq \mathbb{N} \) of \(n\) natural numbers. 
+    \item 2nd player: Find a large sum-free subset \(S \subseteq A\).   
+\end{itemize}
+
+\begin{definition}
+    Given a finite set \(A \subseteq \mathbb{N}\), let \(\sigma (A)\) be the size of the largest sum-free subset \(S \subseteq A\).    
+\end{definition}
+
+\begin{eg}
+    \(\sigma ([n]) = \left\lceil \frac{n}{2} \right\rceil \). 
+\end{eg}
+
+\begin{theorem}[Erdos, 1965]
+    For any set \(A \subseteq \mathbb{N} \) of \(n\) natural numbers, 
+    \[
+        \sigma (A) \ge \frac{n + 1}{3}.
+    \]  
+\end{theorem}
+
+\begin{proof}
+    Instead of constructing an object with the desired property, it is enough to prove the object exists. 
+
+    Consider a random object and show it has the property with positive probability. 
+
+    Let \(p\) be a prime, \(p = 3k + 2\) for some \(k \in \mathbb{N}\), \(p > \max A\). Consider \(\mathbb{Z} _p\) and observe \(I = \left\{ k+1, k+2, \dots , 2k+1 \right\} \subseteq \mathbb{Z} _p\) is sum-free. Thus, \(A \cap I\) is sum-free (in \(\mathbb{N}\)). However, \(A \cap I\) may be empty. 
+
+    We can take \(x \in \mathbb{Z} _p^{\times} = \left\{ 1, 2, \dots , p - 1 \right\} \) uniformly at random. Then for any \(a \in A\), \(x a \in \mathbb{Z} _p\) is also uniformly random in \(\mathbb{Z} _p^{\times}\). And 
+    \[
+        A_x = \left\{ a \in A: xa \in I \right\} 
+    \]          
+    is sum-free. This is because if \(a_1 + a_2 = a_3\) in \(\mathbb{N}\), then \(xa_1 + xa_2 = xa_3\) in \(\mathbb{N}\), then \(x a_1 + x a_2 = x a_3\) in \(\mathbb{Z} _p\), but these are in \(I\), which is sum-free. 
+
+    Now note that 
+    \begin{align*}
+        \mathbb{E} [\vert A_x \vert ] &= \mathbb{E} \left[ \sum_{a \in A} 1_{a, x}  \right], \quad \text{where } 1_{a,x} = \begin{dcases}
+            1, &\text{ if } ax \in I ;\\
+            0, &\text{ if } ax \notin I.
+        \end{dcases}  \\
+        &= \sum_{a \in A} \mathbb{P} (ax \in I) = \sum_{a \in A} \frac{\vert I \vert }{\vert \mathbb{Z} _p^{\times} \vert } = \sum_{a \in A} \frac{k + 1}{3k + 1} > \frac{1}{3} \vert A \vert = \frac{n}{3}.    
+    \end{align*}     
+    Since the average size of \(A_x\) is strictly bigger than \(\frac{n}{3}\), there must be some \(x\) for which \(\vert A_x \vert \ge \frac{n + 1}{3} \). This is sum-free, so 
+    \[
+        \sigma (A) \ge \vert A_x \vert \ge \frac{n + 1}{3}. 
+    \]    
+\end{proof}
+
+\begin{remark}
+    \quad 
+    \begin{itemize}
+        \item Bourgan (1990s) used Fourier techniques to improve the bound:
+        \[
+            \sigma (A) \ge \frac{n + 2}{3}.
+        \]
+        \item Eberhard-Green-Manners (2014): There is a set \(A \subseteq \mathbb{N}\) of size \(n\) for which 
+        \[
+            \sigma (A) \le \left( \frac{1}{3} + o(1) \right) n. 
+        \]  
+    \end{itemize}
+\end{remark}
+
+\section{The Crossing Number Inequality}
+\begin{definition}
+    A graph is a pair \((V, E)\) where \(V\) is a set of vertices and \(E \subseteq \binom{V}{2}\) is a set of edges, where every edge is an unordered pair of vertices.   
+\end{definition}
+
+A drawing of the graph is an embedding in the plane:
+\begin{itemize}
+    \item vertices \(\to \) paths of \(\mathbb{R}^2\) 
+    \item egdes \(\to \) closed curves between the endpoints.   
+\end{itemize}
+
+\begin{definition}
+    A crossing is an intersection of two edges in a drawing.
+\end{definition}
+
+\begin{definition}
+    A graph is planar if it can be drawn without crossings.
+\end{definition}
+
+\begin{question}
+    How many edges can a planar graph on \(n\) vertices have? 
+\end{question}
+
+\begin{remark}
+    A graph of \(n\) vertices can have at most \(\binom{n}{2}\) vertices.   
+\end{remark}
+
+\begin{theorem}[Euler]
+    A planar graph on \(n \ge 3\) vertices has at most \(3n - 6\) edges.   
+\end{theorem}
+
+\begin{question}
+    What is the minimum number of crossings in a graph with \(n\) vertices and \(m\) edges?  
+\end{question}
+
+\begin{notation}
+    We denote this number by \(\mathrm{cr}(n, m) \). 
+\end{notation}
+
+Thus, Euler shows if \(n \ge 3\), then \(\mathrm{cr}(n, m) = 0 \iff m \le 3n - 6 \).
+
+\begin{corollary}
+    For \(n \ge 3\), \(\mathrm{cr}(n, m) \ge m - 3n + 6 \). 
+\end{corollary}
+
+\begin{proof}
+    As long as our graph has a crossing, remove an edge in the crossing. Continue until no crossings left. Thus, we will end with \(\le 3n - 6\) edges, i.e. we will removed \(\ge m - 3n + 6\) edges, so there are \(\ge m - 3n + 6\) crossings.   
+\end{proof}
+
+\begin{theorem}[The crossing number inequality]
+    If \(m \ge 4n\), then 
+    \[
+        \mathrm{cr}(n, m) \ge \frac{m^3}{64 n^2}. 
+    \] 
+\end{theorem}
+
+\begin{proof}
+    Given a graph on \(n\) vertices and \(m\) edges, let \(K\) be the number of crossings in an optimal drawing of \(G\). Consider a random induced subgraph, where we keep each vertex independently with probability \(p\). Let \(X\) be the number of vertices in our random subgraph, \(Y\) be the number of edges, and \(Z\) be the number of crossings. Then \(\mathbb{E} [X] = np\), 
+    \[
+        \mathbb{E} [Y] = \mathbb{E} \left[ \sum_{e \in E} 1_{e \text{ surviving} }  \right] = \sum_{e \in E} \mathbb{P} \left( e \text{ surviving}  \right) = mp^2,   
+    \]         
+    and 
+    \[
+        \mathbb{E} [Z] = \sum_{\text{crossings}} \mathbb{P} (\text{crossing survives}) = K p^4. 
+    \]
+    The random graph has \(X\) vertices, \(Y\) edges, so number of crossings
+    \[
+        Z \ge \mathrm{cr}(X, Y) \ge Y - 3X + 6 \ge Y - 3 X. 
+    \]  
+    Thus, we always have \(Z - Y + 3X \ge 0\). This shows 
+    \[
+        \mathbb{E} [Z - Y + 3X] \ge 0.
+    \]
+    By linearity of expectation,
+    \[
+        \mathbb{E} [Z] - \mathbb{E} [Y] + \mathbb{E} [X] \ge 0.
+    \]
+    Thus,
+    \[
+        K p^4 - m p^2 + 3 n p \ge 0,
+    \]
+    which gives 
+    \[
+        K \ge \frac{mp - 3n}{p^3}.
+    \]
+    Now we want R.H.S. to be as large as possible, so we can set \(p = \frac{4n}{m} \le 1\), and thus 
+    \[
+        K \ge \frac{n}{\left( \frac{4n}{m} \right)^3 } = \frac{m^3}{64 n^2}.
+    \] 
+\end{proof}
+
+\begin{remark}
+    If \(m = \Theta \left( n^2 \right) \), then \(\mathrm{cr}(n, m) = \Theta \left( n^4 \right)  \).  
+\end{remark}
+
