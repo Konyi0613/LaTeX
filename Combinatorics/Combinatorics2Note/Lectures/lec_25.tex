@@ -1,0 +1,122 @@
+\lecture{25}{Jun 5.}{}
+
+Recall the primal program above is 
+\[
+    \begin{aligned}
+        \max~ & \vv{c}^T \vv{x}  \\
+            & A \vv{x} \le \vv{0}  \\
+            & \vv{x} \ge \vv{0},
+    \end{aligned}
+\]
+where the dual LP is 
+\[
+    \begin{aligned}
+        \min~ & \vv{b}^T \vv{y}  \\
+            & \vv{A}^T \vv{y} \ge \vv{e}  \\
+            & \vv{y} \ge \vv{0}.
+    \end{aligned}
+\]
+
+\begin{remark}
+    If some \(x_i\) can be negative, then the dual program above is not sufficient. 
+\end{remark}
+
+\begin{lemma}[Weak Duality]
+    If \(\vv{x}\) is feasible for the primal and \(\vv{y}\) is feasible for the dual, then 
+    \[
+        \vv{c}^T \vv{x} \le \vv{b}^T \vv{y}.
+    \]  
+\end{lemma}
+
+\begin{theorem}[Strong Duality]
+    Given a primal LP and its dual, there are four possibilitiws:
+    \begin{enumerate}[(i)]
+        \item both are infeasible. 
+        \item primal infeasible, dual unbounded. 
+        \item primla unbounded, dual infeasible. 
+        \item both are feasible and bounded, and if \(\vv{x}\) is optimal for the primal and \(y\) is optimal for the dual, then 
+        \[
+            \vv{c}^T \vv{x} = \vv{b}^T \vv{y}.
+        \]
+    \end{enumerate}
+\end{theorem}
+
+\begin{theorem}[Standard form]
+    Every linear program can be written in the form 
+    \[
+        \begin{aligned}
+            \max~ & \vv{c}^T \vv{x}  \\
+                & A \vv{x} = \vv{b}  \\
+                & \vv{x} \ge \vv{0}.
+        \end{aligned}
+    \]
+\end{theorem}
+\begin{proof}
+    If we have 
+    \[
+        a_{i1} x_1 + a_{i2} x_2 + \dots + a_{in} x_n \le b_i,
+    \]
+    we turn this into equation by intoducing a new slack variable 
+    \[
+        a_{i1} x_1 + a_{i2} x_2 + \dots + a_{in} x_n + z_i = b_i, \quad z_i \ge 0.
+    \]
+
+    If we have \(x_i \in \mathbb{R}\) instead of \(x_i \ge 0\). We replace \(x_i\) with \(x_i^+ - x_i^-\), where \(x_i^+ , x_i^- \ge 0\). (here \(x_i^+ = \max (x_i, 0), x_i^- = \max (-x_i, 0)\))    
+\end{proof}
+
+\section{Simplex method}
+
+LP with \(n\) variables, \(m\) equality constraints, where \(n \ge m\), has
+\begin{itemize}
+    \item feasible set is a polyhedron 
+    \item optimal value attained at a vertex
+    \item Simplex algorithm: walks along the vertices of this polyhedron. Keep moving to a neighboring vertex of higher objective value.
+\end{itemize}   
+
+Simplex solves primal and dual simultaneously maubtaub \(\vv{x}\) for the primal and \(\vv{y}\) for the dual, where
+\begin{itemize}
+    \item \(\vv{c}^T \vv{x} = \vv{b}^T \vv{y}\)
+    \item \(\vv{x}\) is feasible for primal.  
+\end{itemize} 
+
+Thus, we know we are optimal as soon as \(\vv{y}\) is feasible for the dual. 
+
+\begin{question}
+    How do we move between vertices?
+\end{question}
+\begin{answer}
+    Called "pivoting" in the algorithm, which specified by the "pivot rule".
+\end{answer}
+
+For every common pivot rule, there are examples where the Simplex algorithm takes exponential time. 
+
+\begin{question}[Open problem]
+    Is there a poly-time pivot rule?
+\end{question}
+
+%fig
+
+\paragraph{Interior Point Methods(Ellipsoid Algorithm)}
+Poly-time algorithm for solving LPs: move through the interior of the feasible set.
+
+\section{Integer linear programming}
+Linear programs with integer variables, which is very useful for combinatorial problrms (by using 0/1 indicator variables), and ILP is NP complete to solve.
+
+\paragraph{LP relaxion}
+Take an ILP, and forget that the variables should be integers, then LP can be solved efficiently, and we can bound on the original ILP problem.
+
+\begin{eg}[Fractional chromatic number]
+    Original problem is an ILP for computing \(\chi (G)\): 
+    \[
+        \begin{aligned}
+            \min~ & \sum_{I \in I(G)} \chi _I   \\
+                & \forall v \in V(G), \sum_{I \ni v} \chi _I \ge 1   \\
+                & \chi _I \in \left\{ 0, 1 \right\} \quad \forall I \in I(G). 
+        \end{aligned}
+    \]
+    Then we can relax it the last constraint to \(\chi _I \ge 0\) and \(\chi (G) \ge \chi _f (G)\), where \(\chi _f(G)\) is the fractional chromatic number.   
+\end{eg}
+
+\begin{eg}
+    \(\chi (C_5) = 3\), and \(\chi _I = \frac{1}{2}\) for all \(I, \vert I \vert = 2, \) and independent, is a relaxed estimation to \(\chi (C_5)\), which gives \(\sum_{I} \chi _I = \frac{5}{2} < 3 \), an lower bound for \(\chi (C_5)\).    
+\end{eg}
