@@ -1,0 +1,176 @@
+\documentclass[a4paper,oneside]{scrbook}
+\input{header.tex}
+\author{Kon Yi}
+\title{Introduction to Probability}
+
+\addbibresource{reference.bib}
+
+\usepackage{adjustbox}
+\usepackage{centernot}
+\usepackage{tikz-3dplot}
+
+
+% ── Dice macros for cover ────────────────────────────────────────────────────
+% Draw the pips of one die face.  The face itself is a 2 x 2 square.
+% Draw the pips of one die face.  The face itself is a 2 x 2 square.
+\newcommand{\drawpips}[1]{%
+  \pgfmathparse{#1==2 || #1==4 || #1==5 || #1==6}%
+  \ifnum\pgfmathresult>0
+    \fill[pip] ( .52, .52) circle[radius=.145];
+    \fill[pip] (-.52,-.52) circle[radius=.145];
+  \fi
+  \pgfmathparse{#1==3 || #1==4 || #1==5 || #1==6}%
+  \ifnum\pgfmathresult>0
+    \fill[pip] (-.52, .52) circle[radius=.145];
+    \fill[pip] ( .52,-.52) circle[radius=.145];
+  \fi
+  \pgfmathparse{#1==1 || #1==3 || #1==5}%
+  \ifnum\pgfmathresult>0
+    \fill[pip] (0,0) circle[radius=.145];
+  \fi
+  \ifnum#1=6
+    \fill[pip] ( .52,0) circle[radius=.145];
+    \fill[pip] (-.52,0) circle[radius=.145];
+  \fi
+}
+
+% x, y, viewing elevation, viewing azimuth, scale, top, left, right
+\newcommand{\flyingdie}[8]{%
+  \tdplotsetmaincoords{#3}{#4}%
+  \begin{scope}[
+    shift={(#1,#2)},
+    tdplot_main_coords,
+    scale=#5,
+    line join=round,
+    line cap=round,
+    pip/.style={black!86!green}
+  ]
+    % Exact-size black backing prevents anti-aliasing gaps without protruding
+    % beyond the silhouette of the die.
+    \begin{scope}[canvas is xy plane at z=1]
+      \fill[black] (-1,-1) rectangle (1,1);
+    \end{scope}
+    \begin{scope}[canvas is xz plane at y=1]
+      \fill[black] (-1,-1) rectangle (1,1);
+    \end{scope}
+    \begin{scope}[canvas is yz plane at x=1]
+      \fill[black] (-1,-1) rectangle (1,1);
+    \end{scope}
+
+    % Three visible faces, shaded separately to emphasize the rotation.
+    \begin{scope}[canvas is xy plane at z=1]
+      \path[draw=black,line width=.9pt,rounded corners=2pt,
+            top color=white,bottom color=green!5!white]
+        (-1,-1) rectangle (1,1);
+      \drawpips{#6}
+    \end{scope}
+    \begin{scope}[canvas is xz plane at y=1]
+      \path[draw=black,line width=.9pt,rounded corners=2pt,
+            top color=white,bottom color=green!13!white]
+        (-1,-1) rectangle (1,1);
+      \drawpips{#7}
+    \end{scope}
+    \begin{scope}[canvas is yz plane at x=1]
+      \path[draw=black,line width=.9pt,rounded corners=2pt,
+            top color=green!4!white,bottom color=green!20!white]
+        (-1,-1) rectangle (1,1);
+      \drawpips{#8}
+    \end{scope}
+  \end{scope}%
+}
+
+\begin{document}
+
+\begin{titlepage}
+\centering
+\vspace*{2.5cm}
+
+{\Huge\bfseries\sffamily Introduction to Probability\par}
+\vspace{1cm}
+{\Large\sffamily Kon Yi\par}
+\vspace{2cm}
+
+% The complete picture is only 15 cm by 9 cm, so it fits safely inside
+% the text area of an A4 title page.
+\begin{tikzpicture}[x=.96cm,y=.96cm]
+  \path[use as bounding box] (0,0) rectangle (15,9);
+  \begin{scope}
+  \clip[rounded corners=8pt] (0,0) rectangle (15,9);
+  \shade[top color=green!38!black,bottom color=green!72!black]
+    (0,0) rectangle (15,9);
+
+  % Quiet background glow and subtle concentric rings.
+  \shade[inner color=green!35!white,outer color=green!55!black,
+         opacity=.28] (7.5,4.5) ellipse[x radius=8.5,y radius=5.8];
+  \foreach \r/\o in {5.4/.07,4.1/.06,2.8/.05}{
+    \draw[white,line width=1.2pt,opacity=\o]
+      (7.5,4.3) circle[radius=\r];
+  }
+
+  % Sweeping trails suggest that the dice have just been thrown.
+  \draw[white,opacity=.20,line width=8pt,line cap=round]
+    (.7,.5) .. controls (2.1,2.7) and (3.3,4.6) .. (5.2,5.8);
+  \draw[white,opacity=.48,line width=1.4pt,line cap=round]
+    (.5,.25) .. controls (2.2,2.8) and (3.4,4.7) .. (5.4,6.0);
+  \draw[white,opacity=.15,line width=6pt,line cap=round]
+    (14.4,1.5) .. controls (13.1,3.5) and (11.9,5.2) .. (10.5,6.6);
+  \draw[white,opacity=.40,line width=1.2pt,line cap=round]
+    (14.6,1.25) .. controls (13.2,3.5) and (12.0,5.3) .. (10.4,6.8);
+
+  % Soft airborne shadows.
+  \begin{scope}[rotate around={-8:(4.6,2.6)}]
+    \shade[inner color=black,outer color=black,opacity=.22]
+      (4.6,2.6) ellipse[x radius=2.3,y radius=.4];
+  \end{scope}
+  \begin{scope}[rotate around={12:(10.65,4.7)}]
+    \shade[inner color=black,outer color=black,opacity=.19]
+      (10.65,4.7) ellipse[x radius=1.9,y radius=.32];
+  \end{scope}
+
+  % Two dice at different sizes and angles.
+  \flyingdie{4.35}{4.25}{68}{118}{1.35}{5}{3}{6}
+  \flyingdie{10.55}{6.25}{52}{142}{1.05}{4}{2}{1}
+
+  % Small highlights and particles complete the sense of motion.
+  \foreach \x/\y/\s in {
+    1.7/1.7/.06,2.3/2.7/.045,3.0/3.5/.035,
+    12.4/3.3/.055,13.0/2.6/.035,11.9/4.1/.03}{
+    \fill[white,opacity=.62] (\x,\y) circle[radius=\s];
+  }
+  \draw[white,opacity=.38,line width=.8pt]
+    (12.9,7.5) -- ++(.34,.34) (13.24,7.5) -- ++(-.34,.34);
+  \end{scope}
+
+  % Crisp border around the clipped artwork.
+  \draw[black,line width=2.4pt,rounded corners=8pt]
+    (.03,.03) rectangle (14.97,8.97);
+\end{tikzpicture}
+\end{titlepage}
+
+\chapter*{Preface}
+
+These notes were written for MATH 2502: Introduction to Probability Theory, taught by Professor Shagnik Das. The course follows A First Course in Probability by Sheldon M. Ross, and these notes are based on the material covered throughout the course.
+
+If you are interested in my experience taking this course, you can read my course review here:
+
+\href{https://konyi0613.github.io/posts/%E5%8F%B0%E5%A4%A7%E8%B3%87%E5%B7%A5%E5%A4%A7%E4%BA%8C%E4%B8%8B%E4%BF%AE%E8%AA%B2%E5%BF%83%E5%BE%97/}{link}
+
+\newpage
+
+\tableofcontents
+
+\lec{1}{34}
+
+\newpage
+%─────Appendix────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\appendix
+\appendixpage{}
+
+\input{appendix.tex}
+
+\newpage
+%─────Reference──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\pagestyle{plain}
+\printbibliography{}
+
+\end{document}

@@ -1,0 +1,349 @@
+% basics
+\usepackage{xeCJK}
+\setCJKmainfont{PingFang TC}
+\setsansfont{Latin Modern Sans}
+\newfontface\lmrfont{lmroman10-bold.otf}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[hyphens]{url}
+\usepackage[style=alphabetic,maxcitenames=1]{biblatex}
+\usepackage[colorlinks=true,linkcolor=cyan,urlcolor=magenta,citecolor=violet]{hyperref}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{emptypage}
+\usepackage{subcaption}
+\usepackage[usenames,dvipsnames,svgnames]{xcolor}
+\input{Math.tex}
+
+\usepackage{amsmath, amsfonts, mathtools, amsthm, amssymb, mathrsfs}
+\usepackage{geometry}
+\usepackage{cancel}
+\usepackage{systeme}
+
+\usepackage[inline, shortlabels]{enumitem}
+\usepackage{multicol}
+\setlength\multicolsep{0pt}
+
+\usepackage{caption}
+\captionsetup{belowskip=0pt}
+\geometry{a4paper,left=2.54cm,right=2.54cm,top=2.54cm,bottom=2.54cm}
+
+% for the big braces
+\usepackage{bigdelim}
+
+\definecolor{correct}{HTML}{009900}
+\newcommand\correct[2]{\ensuremath{\:}{\color{red}{#1}}\ensuremath{\to }{\color{correct}{#2}}\ensuremath{\:}}
+\newcommand\green[1]{{\color{correct}{#1}}}
+\newcommand\hide[1]{}
+
+% si unitx
+\usepackage{siunitx}
+\sisetup{locale = FR}
+\newcommand\mat[1]{\mathbf{#1}}
+
+% tikz
+\usepackage{tikz}
+\usetikzlibrary{intersections, angles, quotes, positioning}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{patterns}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.13}
+\usepgfplotslibrary{groupplots}
+\usepgfplotslibrary{fillbetween}
+
+\tikzset{
+	force/.style={thick, {Circle[length=2pt]}-stealth, shorten <=-1pt}
+}
+
+% Algorithm Env
+\usepackage[linesnumbered,lined,vlined,ruled,commentsnumbered,resetcount,algochapter]{algorithm2e}
+\SetKwComment{Comment}{// }{}
+\SetArgSty{textsl}
+\def\algocflineautorefname{Algorithm}
+\counterwithin{algocfline}{chapter}
+
+\makeatletter
+\def\itemautorefname{\@gobble}
+\makeatother
+
+% ── Theorem infrastructure ────────────────────────────────────────────────
+\usepackage{thmtools}
+
+% mdframed — for Note-only environments
+\usepackage[framemethod=TikZ]{mdframed}
+\mdfsetup{skipabove=1em,skipbelow=0em}
+
+\theoremstyle{definition}
+
+\declaretheoremstyle[
+	headfont=\bfseries\sffamily\color{TealBlue!70!black}, bodyfont=\normalfont,
+	mdframed={linewidth=2pt, rightline=false, topline=false, bottomline=false,
+		linecolor=TealBlue, nobreak=false}
+]{thmblueline}
+
+\declaretheoremstyle[
+	headfont=\bfseries\sffamily\color{SeaGreen!70!black}, bodyfont=\normalfont,
+	mdframed={linewidth=2pt, rightline=false, topline=false, bottomline=false,
+		linecolor=SeaGreen, backgroundcolor=SeaGreen!2, nobreak=false}
+]{thmgreen3box}
+
+\declaretheoremstyle[
+	headfont=\bfseries\sffamily\color{WildStrawberry!70!black}, bodyfont=\normalfont,
+	mdframed={linewidth=2pt, rightline=false, topline=false, bottomline=false,
+		linecolor=WildStrawberry, backgroundcolor=WildStrawberry!5, nobreak=false}
+]{thmpinkbox}
+
+\declaretheoremstyle[
+	headfont=\bfseries\sffamily\color{MidnightBlue!70!black}, bodyfont=\normalfont,
+	mdframed={linewidth=2pt, rightline=false, topline=false, bottomline=false,
+		linecolor=MidnightBlue, backgroundcolor=MidnightBlue!5, nobreak=false}
+]{thmblue2box}
+
+\declaretheoremstyle[
+	headfont=\bfseries\sffamily\color{Gray!70!black}, bodyfont=\normalfont,
+	mdframed={linewidth=2pt, rightline=false, topline=false, bottomline=false,
+		linecolor=Gray, backgroundcolor=Gray!5, nobreak=false}
+]{notgraybox}
+
+\declaretheoremstyle[
+	headfont=\bfseries\sffamily\color{Gray!70!black}, bodyfont=\normalfont,
+	mdframed={linewidth=2pt, rightline=false, topline=false, bottomline=false,
+		linecolor=Gray, nobreak=false}
+]{notgrayline}
+
+\declaretheoremstyle[
+	headfont=\bfseries\sffamily\color{Violet!70!black}, bodyfont=\normalfont,
+	mdframed={linewidth=2pt, rightline=false, topline=false, bottomline=false,
+		linecolor=Violet, backgroundcolor=Violet!1, nobreak=false}
+]{conjpurplebox}
+
+% tcolorbox — for Napkin-style environments
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable,skins,hooks}
+
+% Patch tcolorbox so text can continue after a non-breakable box
+\makeatletter
+\tcbset{
+	after app={%
+		\ifx\tcb@drawcolorbox\tcb@drawcolorbox@breakable
+		\else
+			\@endparenv
+		\fi
+	}
+}
+\appto\tcb@use@after@lastbox{\@endparenv\@doendpe}
+\makeatother
+
+\tcbset{
+	theorem box/.style={
+		enhanced, arc=9pt, outer arc=10pt,
+		colframe=blue, colback=TealBlue!5, boxrule=1pt,
+		before skip=12pt, after skip=14pt,
+		left=10pt, right=10pt
+	},
+	example box/.style={
+		enhanced, sharp corners, arc=9pt, outer arc=10pt,
+		colframe=RawSienna, colback=Salmon!5, boxrule=0.5pt,
+		before skip=12pt, after skip=14pt,
+		breakable, top=6pt, bottom=8pt,
+		left=10pt, right=10pt
+	},
+	ques box/.style={
+		boxrule=0pt, frame hidden, enhanced, sharp corners,
+		borderline west={3pt}{0pt}{black},
+		colback=RedViolet!5!gray!5,
+		before skip=8pt, after skip=12pt,
+		breakable, left=10pt, right=10pt
+	}
+}
+
+% Napkin theorem styles (tcolorbox-based)
+\declaretheoremstyle[
+	headfont=\sffamily\bfseries\color{MidnightBlue},
+	headpunct={\\[3pt]},
+	postheadspace={0pt},
+]{thmnapkinthm}
+
+\declaretheoremstyle[
+	headfont=\bfseries\color{RawSienna},
+	headpunct={\\[3pt]},
+	postheadspace={0pt},
+]{thmnapkineg}
+
+\declaretheoremstyle[
+	headfont=\bfseries,
+	bodyfont=\normalfont\small,
+]{thmnapkinques}
+
+% ── Napkin-style environments (tcolorbox) ────────────────────────────────
+\declaretheorem[style=thmnapkinthm, name=Theorem, numberwithin=section]{theorem}
+\tcolorboxenvironment{theorem}{theorem box}
+\declaretheorem[style=thmnapkinthm, name=Lemma, sibling=theorem]{lemma}
+\tcolorboxenvironment{lemma}{theorem box}
+\declaretheorem[style=thmnapkinthm, name=Proposition, sibling=theorem]{proposition}
+\tcolorboxenvironment{proposition}{theorem box}
+\declaretheorem[style=thmnapkinthm, name=Corollary, sibling=theorem]{corollary}
+\tcolorboxenvironment{corollary}{theorem box}
+
+\declaretheorem[style=thmnapkineg, name=Example, sibling=theorem]{eg}
+\tcolorboxenvironment{eg}{example box}
+
+\declaretheorem[style=thmnapkinques, name=Exercise, sibling=theorem]{exercise}
+\tcolorboxenvironment{exercise}{ques box}
+
+\declaretheorem[style=thmnapkinques, name=Question, sibling=theorem]{question}
+\tcolorboxenvironment{question}{ques box}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{abuse}[theorem]{Abuse of Notation}
+
+% ── Note-only environments (mdframed) ────────────────────────────────────
+\declaretheorem[style=thmpinkbox, name=Problem, numberwithin=section]{problem}
+\declaretheorem[style=thmpinkbox, name=Problem, numbered=no]{problem*}
+\declaretheorem[style=thmblue2box, name=Claim, numberwithin=section]{claim}
+\declaretheorem[style=conjpurplebox, name=Conjecture, numberwithin=section]{conjecture}
+
+\declaretheorem[style=thmblueline, numberwithin=section, name=Remark]{remark}
+\declaretheorem[style=thmblueline, numberwithin=section, name=Note]{note}
+\declaretheorem[style=notgrayline, numbered=no, name=As previously seen]{prev}
+\declaretheorem[style=notgrayline, numbered=no, name=Recall]{recall}
+\declaretheorem[style=notgrayline, numbered=no, name=Observation]{observation}
+\declaretheorem[style=thmgreen3box, numbered=no, name=Intuition]{intuition}
+\declaretheorem[style=notgraybox, numbered=no, name=Notation]{notation}
+
+\renewcommand\theHtheorem{\thesection.\arabic{theorem}}
+\renewcommand\theHproblem{\thesection.\arabic{problem}}
+\renewcommand\theHclaim{\thesection.\arabic{claim}}
+\renewcommand\theHconjecture{\thesection.\arabic{conjecture}}
+
+% ── Standard proof with black square ─────────────────────────────────────
+\renewcommand{\qedsymbol}{$\blacksquare$}
+
+% Napkin: subproof (nested proof, ■ distinguishes from outer)
+\newenvironment{subproof}[1][Proof]{%
+	\begin{proof}[#1]\renewcommand{\qedsymbol}{$\blacksquare$}}%
+	{\end{proof}}
+
+% Napkin: blue bold vocabulary term
+\newcommand{\vocab}[1]{\textbf{\color{blue} #1}}
+
+% Napkin: horizontal rule divider
+\newcommand{\hrulebar}{%
+	\par\hspace{\fill}\rule{0.95\linewidth}{.7pt}\hspace{\fill}%
+	\par\nointerlineskip\vspace{\baselineskip}%
+}
+
+% Napkin: green boxed moral / key takeaway
+\newenvironment{moral}{%
+	\begin{tcolorbox}[
+		boxrule=0.4pt, colframe=green!70!black, sharp corners,
+		standard jigsaw, opacityback=0,
+		left=10pt, right=10pt, top=3pt, bottom=3pt,
+		before skip=10pt, after skip=20pt]%
+	\bfseries\color{green!50!black}}%
+	{\end{tcolorbox}}
+
+\usepackage{etoolbox}
+
+% ── Page layout (KOMA-Script scrlayer-scrpage) ────────────────────────────
+\usepackage[headsepline]{scrlayer-scrpage}
+\renewcommand{\headfont}{}
+
+\makeatletter
+
+% Section/subsection: purple §, roman numeral subsections
+\renewcommand*{\sectionformat}{\color{purple}{\lmrfont§}\thesection\autodot\enskip}
+\renewcommand*{\subsectionformat}{\color{purple}{\lmrfont§}\thesubsection\autodot\enskip}
+\renewcommand{\thesubsection}{\thesection.\roman{subsection}}
+
+% Chapter: large purple number
+\addtokomafont{chapterprefix}{\raggedleft}
+\RedeclareSectionCommand[beforeskip=0.5em]{chapter}
+\renewcommand*{\chapterformat}{%
+	\mbox{\scalebox{1.5}{\chapappifchapterprefix{\nobreakspace}}%
+	\scalebox{2.718}{\color{purple}\thechapter\autodot}\enskip}}
+
+% Headers: chapter mark left, page number right
+\automark[section]{chapter}
+\ihead{\footnotesize\leftmark}
+\ohead{\footnotesize\thepage}
+\chead{}
+\ifoot{}\ofoot{}\cfoot{}
+
+\def\twodigits#1{\ifnum#1<10 0\fi\the#1}
+\def\dateparts#1 #2 #3 #4 #5\relax{
+	\marginpar{\footnotesize\textsf{\raggedright #1 #2 #3 #5}}
+}
+
+\def\@lecture{}%
+\newcommand{\lecture}[3]{
+	\ifthenelse{\isempty{#3}}{%
+		\global\def\@lecture{Lecture #1}%
+	}{%
+		\global\def\@lecture{Lecture #1: #3}%
+	}%
+	\section*{\@lecture}
+	\marginpar{\footnotesize\textsf{\raggedright #2}}
+}
+
+\usepackage{pgffor}
+\newcommand{\lec}[2]{%
+	\foreach \c in {#1,...,#2}{%
+		\IfFileExists{Lectures/lec_\c.tex}{%
+			\input{Lectures/lec_\c.tex}%
+		}{}%
+	}%
+}
+
+\makeatother
+
+% notes
+\usepackage[color=pink]{todonotes}
+\usepackage{marginnote}
+\let\marginpar\marginnote
+
+% Appendix
+\usepackage{appendix}
+\def\chapterautorefname{Section}
+\def\sectionautorefname{Section}
+\def\appendixautorefname{Appendix}
+\renewcommand\appendixname{Appendix}
+\renewcommand\appendixtocname{Appendix}
+\renewcommand\appendixpagename{Appendix}
+
+\makeatletter
+\patchcmd{\hyper@makecurrent}{%
+	\ifx\Hy@param\Hy@chapterstring
+		\let\Hy@param\Hy@chapapp
+	\fi
+}{%
+	\iftoggle{inappendix}{%
+		\@checkappendixparam{chapter}%
+		\@checkappendixparam{section}%
+		\@checkappendixparam{subsection}%
+		\@checkappendixparam{subsubsection}%
+		\@checkappendixparam{paragraph}%
+		\@checkappendixparam{subparagraph}%
+	}{}%
+}{}{\errmessage{failed to patch}}
+
+\newcommand*{\@checkappendixparam}[1]{%
+	\def\@checkappendixparamtmp{#1}%
+	\ifx\Hy@param\@checkappendixparamtmp
+		\let\Hy@param\Hy@appendixstring
+	\fi
+}
+\makeatother
+
+\newtoggle{inappendix}
+\togglefalse{inappendix}
+
+\apptocmd{\appendix}{\toggletrue{inappendix}}{}{\errmessage{failed to patch}}
+\apptocmd{\subappendices}{\toggletrue{inappendix}}{}{\errmessage{failed to patch}}
+
+\setcounter{tocdepth}{1}

@@ -1,0 +1,242 @@
+% napkin-style.sty
+% Adapted from Evan Chen's "An Infinitely Large Napkin"
+% https://web.evanchen.cc/napkin.html
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{napkin-style}[2025/07/28 Napkin-inspired style for math notes]
+
+%%fakesection FONTS AND ENCODING
+\usepackage{lmodern}
+\ExplSyntaxOn
+\sys_if_engine_luatex:T { \usepackage{luatex85} }
+\sys_if_engine_pdftex:T { \usepackage[T1]{fontenc} }
+\ExplSyntaxOff
+
+%%fakesection MATHEMATICS
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{stmaryrd}
+
+%%fakesection GENERAL UTILITIES
+\usepackage[usenames,svgnames,dvipsnames]{xcolor}
+\usepackage{textcomp}
+\usepackage{enumerate}
+\usepackage{microtype}
+\usepackage[normalem]{ulem}
+\usepackage{wasysym}
+\usepackage{multirow}
+\usepackage{derivative}
+
+%%fakesection HYPERLINKS
+\usepackage[pdfusetitle]{hyperref}
+\hypersetup{
+    linkcolor={red!50!black},
+    citecolor={green!50!black},
+    urlcolor={blue!80!black},
+    colorlinks,
+}
+\usepackage[nameinlink]{cleveref}
+
+%%fakesection COMMUTATIVE DIAGRAMS
+\usepackage{tikz-cd}
+\usetikzlibrary{arrows,arrows.meta}
+% Larger hook arrow tip (see https://tex.stackexchange.com/questions/514451)
+\pgfdeclarearrow{
+    name=xGlyph,
+    cache=false,
+    bending mode=none,
+    parameters={\tikzcd@glyph@len,\tikzcd@glyph@shorten},
+    setup code={%
+        \pgfarrowssettipend{\tikzcd@glyph@len\advance\pgf@x by\tikzcd@glyph@shorten}},
+    defaults={
+        glyph axis=axis_height,
+        glyph length=+1.55ex,
+        glyph shorten=+-0.1ex},
+    drawing code={%
+        \pgfpathrectangle{\pgfpoint{+0pt}{+-1.5ex}}{\pgfpoint{+\tikzcd@glyph@len}{+3ex}}%
+        \pgfusepathqclip%
+        \pgftransformxshift{+\tikzcd@glyph@len}%
+        \pgftransformyshift{+-\tikzcd@glyph@axis}%
+        \pgftext[right,base]{\tikzcd@glyph}}}
+\tikzcdset{
+    arrow style=tikz,
+    diagrams={>={Latex}},
+    tikzcd left hook/.tip={xGlyph[glyph math command=supset, swap, glyph axis=5.7pt]},
+    tikzcd right hook/.tip={xGlyph[glyph math command=supset, glyph axis=5.7pt]},
+    surjective head arrow/.tip={tikzcd to[sep=-1.5pt]tikzcd to},
+    surjective head/.style={-surjective head arrow}
+}
+
+%%fakesection PAGE LAYOUT (KOMA-Script)
+\usepackage[headsepline]{scrlayer-scrpage}
+\renewcommand{\headfont}{}
+\addtolength{\textheight}{2cm}
+\setlength{\footskip}{0.5in}
+\setlength{\headsep}{10pt}
+
+\def\twodigits#1{\ifnum#1<10 0\fi\the#1}
+\def\shortdate{\leavevmode\hbox{\the\year-\twodigits\month-\twodigits\day}}
+
+% Detect scrbook vs scrartcl and set up headers/chapter formatting accordingly
+\newif\ifnapkin@book
+\@ifclassloaded{scrbook}{\napkin@booktrue}{\napkin@bookfalse}
+
+\ifnapkin@book
+    \automark[section]{chapter}
+    \rohead{\footnotesize\thepage}
+    \rehead{\footnotesize\textbf{\sffamily\@title}}
+    \lehead{\footnotesize\thepage}
+    \lohead{\footnotesize\leftmark}
+    \chead{}
+    \rofoot{}\refoot{}\lefoot{}\lofoot{}
+    % Chapter and part display
+    \addtokomafont{chapterprefix}{\raggedleft}
+    \RedeclareSectionCommand[beforeskip=0.5em]{chapter}
+    \renewcommand*{\chapterformat}{%
+        \mbox{\scalebox{1.5}{\chapappifchapterprefix{\nobreakspace}}%
+        \scalebox{2.718}{\color{purple}\thechapter\autodot}\enskip}}
+    \addtokomafont{partprefix}{\rmfamily}
+    \renewcommand*{\partformat}{\color{purple}\scalebox{2.5}{\thepart}}
+\else
+    \automark[section]{section}
+    \rohead{\footnotesize\thepage}
+    \rehead{\footnotesize\textbf{\sffamily\@title}}
+    \lehead{\footnotesize\thepage}
+    \lohead{\footnotesize\leftmark}
+    \chead{}
+    \rofoot{}\refoot{}\lefoot{}\lofoot{}
+\fi
+
+%%fakesection SECTION FORMATTING (purple § prefix)
+\renewcommand*{\sectionformat}{\color{purple}\S\thesection\autodot\enskip}
+\renewcommand*{\subsectionformat}{\color{purple}\S\thesubsection\autodot\enskip}
+\renewcommand{\thesubsection}{\thesection.\roman{subsection}}
+
+%%fakesection THEOREM ENVIRONMENTS
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable,skins,hooks}
+
+% Patch tcolorbox so text can continue after a non-breakable box
+% (see https://tex.stackexchange.com/questions/568782)
+\tcbset{
+    after app={%
+        \ifx\tcb@drawcolorbox\tcb@drawcolorbox@breakable
+        \else
+            \@endparenv
+        \fi
+    }
+}
+\appto\tcb@use@after@lastbox{\@endparenv\@doendpe}
+
+\usepackage{thmtools}
+
+\theoremstyle{definition}
+\declaretheoremstyle[
+    headfont=\sffamily\bfseries\color{MidnightBlue},
+    headpunct={\\[3pt]},
+    postheadspace={0pt},
+]{thmtheorem}
+
+\declaretheoremstyle[
+    headfont=\bfseries\color{RawSienna},
+    headpunct={\\[3pt]},
+    postheadspace={0pt},
+]{thmexample}
+
+\declaretheoremstyle[
+    headfont=\bfseries\sffamily\color{ForestGreen!70!black},
+    bodyfont=\normalfont,
+    headpunct={ --- },
+]{thmremark}
+
+\declaretheoremstyle[
+    headfont=\bfseries,
+    bodyfont=\normalfont\small,
+]{thmques}
+
+% Box styles
+\tcbset{
+    theorem box/.style={
+        enhanced, arc=9pt, outer arc=10pt,
+        colframe=blue, colback=TealBlue!5, boxrule=1pt,
+        before skip=12pt, after skip=14pt,
+        left=10pt, right=10pt
+    },
+    remark box/.style={
+        boxrule=0pt, frame hidden, sharp corners, enhanced,
+        borderline west={2pt}{0pt}{ForestGreen},
+        colback=ForestGreen!5,
+        before skip=8pt, after skip=12pt,
+        breakable, left=10pt, right=10pt
+    },
+    example box/.style={
+        enhanced, sharp corners, arc=9pt, outer arc=10pt,
+        colframe=RawSienna, colback=Salmon!5, boxrule=0.5pt,
+        before skip=12pt, after skip=14pt,
+        breakable, top=6pt, bottom=8pt,
+        left=10pt, right=10pt
+    },
+    ques box/.style={
+        boxrule=0pt, frame hidden, enhanced, sharp corners,
+        borderline west={3pt}{0pt}{black},
+        colback=RedViolet!5!gray!5,
+        before skip=8pt, after skip=12pt,
+        breakable, left=10pt, right=10pt
+    }
+}
+
+% Declare theorems (numbered within section)
+\declaretheorem[style=thmtheorem, name=Theorem,    numberwithin=section]{theorem}
+\tcolorboxenvironment{theorem}{theorem box}
+\declaretheorem[style=thmtheorem, name=Lemma,      sibling=theorem]{lemma}
+\tcolorboxenvironment{lemma}{theorem box}
+\declaretheorem[style=thmtheorem, name=Proposition, sibling=theorem]{proposition}
+\tcolorboxenvironment{proposition}{theorem box}
+\declaretheorem[style=thmtheorem, name=Corollary,  sibling=theorem]{corollary}
+\tcolorboxenvironment{corollary}{theorem box}
+\declaretheorem[style=thmexample, name=Example,    sibling=theorem]{example}
+\tcolorboxenvironment{example}{example box}
+\declaretheorem[style=thmques,    name=Question,   sibling=theorem]{ques}
+\tcolorboxenvironment{ques}{ques box}
+\declaretheorem[style=thmques,    name=Exercise,   sibling=theorem]{exercise}
+\tcolorboxenvironment{exercise}{ques box}
+\declaretheorem[style=thmremark,  name=Remark,     sibling=theorem]{remark}
+\tcolorboxenvironment{remark}{remark box}
+
+\theoremstyle{definition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{abuse}[theorem]{Abuse of Notation}
+
+\newenvironment{subproof}[1][Proof]{%
+    \begin{proof}[#1]\renewcommand{\qedsymbol}{$\blacksquare$}}%
+    {\end{proof}}
+
+%%fakesection NAPKIN SPECIAL COMMANDS
+
+% Red "prototypical example" callout
+\newcommand{\prototype}[1]{%
+    \emph{{\color{red} Prototypical example for this section:} #1}\par\medskip
+}
+
+% Green boxed "moral" / key takeaway
+\newenvironment{moral}{%
+    \begin{tcolorbox}[
+        boxrule=0.4pt, colframe=green!70!black, sharp corners,
+        standard jigsaw, opacityback=0,
+        left=10pt, right=10pt, top=3pt, bottom=3pt,
+        before skip=10pt, after skip=20pt]%
+    \bfseries\color{green!50!black}}%
+    {\end{tcolorbox}}
+
+% Blue bold vocabulary term
+\newcommand{\vocab}[1]{\textbf{\color{blue} #1}}
+
+% Horizontal rule divider
+\newcommand{\hrulebar}{%
+    \par\hspace{\fill}\rule{0.95\linewidth}{.7pt}\hspace{\fill}%
+    \par\nointerlineskip\vspace{\baselineskip}%
+}
+
+\pdfstringdefDisableCommands{\def\Spec{\text{Spec }}\def\sigma{σ}}

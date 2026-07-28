@@ -1,0 +1,245 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{bbding,combelow,textcomp,amsfonts,amsthm,amsmath,amssymb,graphicx,color,hyperref,etoolbox}
+\usepackage[utf8x]{inputenc}
+\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+
+\newtoggle{story}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Customisation options --- update as necessary
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Course details: title, semester, instructors
+
+\newcommand{\courseTitle}{Introduction to Probability Theory (Math 2502)}
+\newcommand{\semester}{Spring 2026}
+\newcommand{\instructorA}{Shagnik Das}
+\newcommand{\instructorB}{}
+
+%% Sheet number
+
+\newcommand{\sheetNumber}{4}
+
+
+%% Submission details
+
+\newcommand{\dueDate}{13:00, Apr 28th.}
+\newcommand{\lateWarning}{Submissions that are late will receive no credit.}
+
+
+%% Display irrelevant footnotes?  \toggletrue for yes, \togglefalse for no
+
+\toggletrue{story}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End of customisation options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pdfpagewidth 8.5in
+\pdfpageheight 11in
+\topmargin -1in
+\headheight 0in
+\headsep 0in
+\textheight 8.5in
+\textwidth 6.5in
+\oddsidemargin 0in
+\evensidemargin 0in
+\headheight 77pt
+\headsep 0in
+\footskip .75in
+
+\makeatletter
+\newcommand{\buildtitle}[4]{
+\begin{flushleft}
+{\large
+#1
+\hfill{}
+#2
+\par
+#3
+}
+\end{flushleft}
+\vskip 4pt
+\begin{center}
+{\large\bfseries#4\par}
+\end{center}
+\bigskip
+}
+\makeatother
+
+\renewcommand{\thesection}{\normalsize\arabic{section}}
+
+\renewcommand{\deg}{\textrm{deg}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\ceil}[1]{\left \lceil #1 \right \rceil}
+
+\newcommand{\hint}{\begin{flushright} [Hint at \url{\hintURL}.] \end{flushright}}
+
+\newcommand{\card}[1]{\left| #1 \right|}
+\newcommand{\mb}[1]{\mathbb{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+
+
+\newcommand{\story}[1]{\iftoggle{story}{\footnote{#1}}{}}
+\newcommand{\storymark}[1][42]{\iftoggle{story}{\footnotemark[#1]}{}}
+\newcommand{\storytext}[2][42]{\iftoggle{story}{\footnotetext[#1]{#2}}{}}
+
+\newcommand{\bonus}[2]{\paragraph{Bonus (#1 pt\ifstrequal{#1}{1}{}{s})} #2}
+
+
+\begin{document}
+
+
+\buildtitle{\courseTitle{}}{\semester}{\instructorA{} \hfill \instructorB{}}{Exercise Sheet \sheetNumber{}}
+
+\vspace{-0.2in}
+
+\begin{center}
+
+{B13902024 Chang, Yi-Kuei \\ \bf Due date: \dueDate \\ \lateWarning}
+
+\end{center}
+
+\noindent You should try to solve all of the exercises below --- each problem is worth $10$ points. Make sure to clearly justify your answers, defining everything precisely and stating any results you are using. You should then submit your solutions in Gradescope on NTU COOL, either as a typed PDF or a clear scan of your handwritten answers, and should indicate where in the file the solutions to each exercise are. If you have difficulties with Gradescope, please send your solutions by e-mail.
+
+\paragraph{Exercise 1}  There are three prisoners, who will each receive a uniformly random hat, either white or black, independently of each other. Each prisoner can see the hats of their fellow prisoners, but not their own. The warden will then take each prisoner aside and ask them the colour of their hat; the prisoner can either guess a colour, or choose to pass. The prisoners win (as a group) if somebody guesses correctly, and nobody guesses incorrectly. The prisoners lose if anybody guesses incorrectly, or if everybody passes.
+
+Before the prisoners are given the hats, they are allowed to discuss and agree upon a strategy. However, once the hats are distributed, they cannot communicate with each other in any way.
+
+\begin{itemize}
+	\item[(a)] Show that no matter what strategy the prisoners use, they cannot win with probability more than $75\%$.
+	\item[(b)] Find a strategy with which the probability of winning is $75\%$.
+\end{itemize}
+
+\paragraph{Solution:} Suppose the 3 prisoners are \(P_1, P_2, P_3\), and \(P = \left\{ P_1, P_2, P_3 \right\} \), and let the sample space
+\[
+	S = \left\{ WWW, WWB, WBW, WBB, BWW, BWB, BBW, BBB \right\}. 
+\] 
+\begin{itemize}
+	\item [(a)] Any strategy \(Q\) can be represented as \((f_1, f_2, f_3)\), where 
+	\[
+		f_i: \left\{ WW, WB, BW, BB \right\} \to \left\{ B, W, P \right\}  
+	\]
+	since the decision of each prisoner can only be based on the colors of the hats of the other two prisoners. Specifically, \(f_i(AB) = X\) for \(A, B \in \left\{ W, B \right\} \) and \(X \in \left\{ B, W, P \right\} \) means when \(P_i\) sees \(P \setminus P_i\) have hats of color \(A\) and \(B\) (in prisoner's index order from small to big), then \(P_i\) will guess \(X\) where \(X \in \left\{ B, W \right\} \) means he will guess \(B, W\), respectively and \(X = P\) means he will pass. We define \(w(Q)\) to be the event of winning under strategy \(Q\). We want to show that \(\mb{P}(w(Q)) \leq 0.75\) for any strategy \(Q\).
+	
+	If for some \(1 \le i \le 3\) we have \(f_i(AB) = X\) where \(X \neq P\), then we know we will win when \(P_i\) gets hat of color \(X\) and the other two prisoners get hats of color \(A\) and \(B\). However, we will lose when \(P_i\) gets hat of color different from \(X\) and the other two prisoners get hats of color \(A\) and \(B\). Thus, if \(f_i(x), f_i(y) \neq P\) for \(x \neq y\), then \(w(Q)\) can have at most 6 elements. This means \(\mathbb{P} (w(Q)) \le \frac{6}{8} = 75 \%\). Now if for any \(1 \le i \le 3\) we have 
+	\[
+		\left\vert (f_i)^{-1}(\left\{ P \right\} ) \right\vert \ge 3, 
+	\]        
+	then we have the following cases:
+	\begin{itemize}
+		\item Case 1: \(P_1, P_2, P_3\) always pass, then \(\mathbb{P} (w(Q)) = 0 \% \le 75 \%\). 
+		\item Case 2: Exactly two of \(P\) always pass. WLOG, suppose \(P_1, P_2\) always pass, then \(P_3\) can only guess one color at most, let \(f_3(CD) = X\) for \(C, D \in \left\{ W, B \right\} \) and \(X \neq P\), so we can win at most when \(P_3\) gets \(X\) and \(P_1, P_2\) gets \(C, D\), thus \(\mathbb{P} (w(Q)) \le \frac{1}{8} = 12.5 \% \le 75 \%\).
+		\item Case 3: Exactly one of \(P\) always pass. WLOG, suppose \(P_1\) always pass, then \(P_2\) and \(P_3\) can only guess one color at most, let \(f_2(CD) = X\) and \(f_3(EF) = Y\) for \(C, D, E, F \in \left\{ W, B \right\}\) and \(X, Y \neq P\), so we can win at most when \(P_1 P_2 P_3 \in \left\{ CXD, EFY \right\} \). Note that \(CXD\) may be the same as \(EFY\), so
+		\[
+			\mathbb{P} (w(Q)) \le \frac{2}{8} \le 75\%.
+		\]
+		\item Case 4: No one always pass, then let
+		\[
+			f_1(AB) = X, f_2(CD) = Y, f_3(EF) = Z,
+		\]
+		where \(A, B, C, D, E, F \in \left\{ W, B \right\} \) and \(X, Y, Z \neq P\). We can win at most when \(P_1 P_2 P_3 \in \left\{ AXB, CYE, EFZ \right\} \). Note that \(AXB\), \(CYE\) and \(EFZ\) may not be distinct, so
+		\[
+			\mathbb{P} (w(Q)) \le \frac{3}{8} \le 75\%.
+		\]
+	\end{itemize}
+	This shows no matter what strategy \(Q\) we use, we have \(\mathbb{P} (w(Q)) \le 75 \%\).
+	\item [(b)] Our strategy is as follows: for any \(P_i\), if he sees prisoners of \(P \setminus P_i\) have hats of different colors, then he will guess the other color, otherwise he will pass. More formally, we can define the strategy \(Q\) as \((f_1, f_2, f_3)\) where
+	\[
+	f_i(AB) = \begin{cases}
+		B & A = W, B = W, \\
+		W & A = B, B = B, \\
+		P & \text{otherwise}.
+	\end{cases}
+	\]
+	Then we can win when \(P_1 P_2 P_3 \in \left\{WWB, WBW, WBB, BWW, BWB, BBW \right\} \), so
+	\[
+		\mathbb{P} (w(Q)) = \frac{6}{8} = 75 \%.
+	\]
+\end{itemize}
+
+\paragraph{Exercise 2}  Let $X$ be a random variable, and suppose we can write $X = \sum_{i=1}^n X_i$ for some (not necessarily independent) random variables $X_1, X_2, \hdots, X_n$.
+\begin{itemize}
+	\item[(a)] Find a formula for $\mb{E}[X^2]$ in terms of the expectations of the random variables $X_i^2$ and $X_i X_j$, $i \neq j$.
+	\item[(b)] Use your result from part (a) to calculate the variance of a hypergeometric random variable with parameters $N$, $m$, and $n$.\footnote{Recall that $N$ is the total number of balls, $m$ is the number of `good' balls, and $n$ is the number of balls we select (without replacement).}
+\end{itemize}
+
+\paragraph{Solution:}
+\begin{itemize}
+	\item [(a)] We have 
+	\begin{align*}
+		\mathbb{E} [X^2] &= \mathbb{E} \left[ \left( \sum_{i=1}^n X_i \right)^2 \right] = \mathbb{E} \left[ \sum_{i=1}^n X_i^2 + 2\sum_{1 \le i < j \le n} X_i X_j \right] \\
+		&= \sum_{i=1}^n \mathbb{E} [X_i^2] + 2\sum_{1 \le i < j \le n} \mathbb{E} [X_i X_j]
+	\end{align*}
+	by linearity of expectation.
+	\item [(b)] Let \(X \sim \mathrm{Hypergeometric}(N, m, n) \), then we can write \(X = \sum_{i=1}^n X_i\) where \(X_i\) is the indicator random variable of the event that the \(i\)-th selected ball is good. Then we have \(\mathbb{E} [X_i^2] = \mathbb{E} [X_i] = \frac{m}{N}\) since \(X_i\) takes value only \(0\) and \(1\) and each ball has equal probaiblity to be the \(i\)-th selected ball, and for \(i \neq j\), we have
+	\[
+		\mathbb{E} [X_i X_j] = \mathbb{P} (X_i = 1, X_j = 1) = \frac{\binom{m}{2} \binom{N - m}{n - 2}}{\binom{N}{n}}
+	\]
+	since we need to select 2 good balls and \(n - 2\) bad balls from the total \(N\) balls to make both \(X_i\) and \(X_j\) equal to \(1\).
+	Thus, by part (a), we have
+	\begin{align*}
+		\mathrm{Var} (X) &= \mathbb{E} [X^2] - \mathbb{E} [X]^2 = \sum_{i=1}^n \mathbb{E} [X_i^2] + 2\sum_{1 \le i < j \le	 n} \mathbb{E} [X_i X_j] - \mathbb{E} [X]^2 \\
+		&= n \cdot \frac{m}{N} + 2\binom{n}{2} \cdot \frac{\binom{m}{2} \binom{N - m}{n - 2}}{\binom{N}{n}} - \mathbb{E} [X]^2.
+	\end{align*} 
+	Note that 
+	\[
+		\mathbb{E} [X] = \mathbb{E} \left[ \sum_{i=1}^n X_i \right] = \sum_{i=1}^n \mathbb{E} [X_i] = n \cdot \frac{m}{N}.
+	\]
+	Thus, we have
+	\begin{align*}
+		\mathrm{Var} (X) &= n \cdot \frac{m	}{N} + 2\binom{n}{2} \cdot \frac{\binom{m}{2} \binom{N - m}{n - 2}}{\binom{N}{n}} - n^2 \cdot \frac{m^2}{N^2}
+	\end{align*}	
+\end{itemize}
+
+\paragraph{Exercise 3}  In a variant of chess called Dice Chess, there are three dice, each of which has the six different kinds of chess pieces (king, queen, rook, bishop, knight, pawn) on its faces. Starting with White, a player rolls the three dice at the start of her turn. For each type that she rolls, if she can make a legal move with a piece of that type, she must make one. After this, the other player takes her turn, repeating the same process.
+\begin{itemize}
+	\item[(a)] Given that in the starting position, only pawns and knights can move, what is the expected number of turns it takes for a player to be able to make the first move?
+	\item[(b)] What is the probability that White makes the first move?
+\end{itemize}
+
+\paragraph{Solution:}
+\begin{itemize}
+	\item [(a)] Suppose \(D_1, D_2, D_3\) are the outcomes of three dice, then 
+	\begin{align*}
+		\mathbb{P} (\text{can move after a roll}) &= \mathbb{P} (\left\{ D_1, D_2, D_3 \right\} \cap \left\{ \text{pawn, knight}  \right\} \neq \varnothing   ) \\
+		&= 1 - \mathbb{P} (\left\{ D_1, D_2, D_3 \right\} \subseteq \left\{ \text{king, queen, rook, bishop}  \right\}  ) \\
+		&= 1 - \frac{\left\vert \left\{ \text{king, queen, rook, bishop}  \right\}^3 \right\vert }{\left\vert \left\{ \text{king, queen, rook, bishop, knight, pawn} \right\}^3 \right\vert  }\\
+		&= 1 - \frac{4^3}{6^3} = \frac{19}{27}.
+	\end{align*} 
+	Note that if after a roll we cannot move then the configuration of the chess board is unchanged. Hence, it is equivalent to compute \(\mathbb{E} \left[ \mathrm{Geom} \left( \frac{19}{27} \right)   \right] = \frac{1}{\frac{19}{27}} = \frac{27}{19}\). 
+	\item [(b)] Since White can only move in the odd turn, so it is equivalent to compute 
+	\begin{align*}
+		\sum_{k=0}^{\infty} \mathbb{P} \left( \mathrm{Geom} \left( \frac{19}{27} \right)   = 2k + 1 \right) &= \sum_{k=0}^{\infty} \frac{19}{27} \left( 1 - \frac{19}{27} \right)^{2k} = \frac{19}{27} \sum_{k=0}^{\infty} \left( \left( 1 - \frac{19}{27} \right)^2  \right)^k \\
+		&= \frac{19}{27} \cdot \frac{1}{1 - \left( 1 - \frac{19}{27} \right)^2} = \frac{19}{27} \cdot \frac{1}{\left( 1 + 1 - \frac{19}{27} \right) \left( 1 - (1 - \frac{19}{27}) \right)  } \\
+		&= \frac{19}{27} \cdot \frac{1}{\left( 2 - \frac{19}{27} \right)\frac{19}{27}  } = \frac{1}{\frac{35}{27}} = \frac{27}{35}. 
+	\end{align*}
+\end{itemize}
+
+\paragraph{Exercise 4}  $X$ is a random variable whose cumulative distribution function $F_X$ is given by
+\[ F_X(x) = \begin{cases}
+	0 & x \le 0, \\
+	x^2 & 0 \le x \le 1, \\
+	1 & 1 \le x.
+\end{cases} \]
+Determine the expectation and variance of $X$.
+
+\paragraph{Solution:} Note that 
+\[
+	f_X(x) = F_X^{\prime} (x) = \begin{cases}
+		0 & x \le 0, \\
+		2x & 0 \le x \le 1, \\
+		0 & 1 \le x.
+	\end{cases},
+\]
+and thus 
+\[
+	\mathbb{E} [X] = \int_{-\infty}^{\infty} x f_X(x) \mathrm{d}x = \int_0^1 2x^2 \mathrm{d}x = \frac{2}{3},
+\]
+and thus 
+\begin{align*}
+	\mathrm{Var} (X) &= \mathbb{E} [X^2] - \mathbb{E} [X]^2 = \mathbb{E} [X^2] - \frac{4}{9} = \int _{-\infty}^{\infty} x^2 f_X(x) \, \mathrm{d} x - \frac{4}{9} \\
+	&= \int _0^1 x^2 \cdot 2x \, \mathrm{d}x - \frac{4}{9} = \frac{1}{2} - \frac{4}{9} = \frac{1}{18}.
+\end{align*}
+\end{document}

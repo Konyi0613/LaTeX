@@ -1,0 +1,575 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{bbding,combelow,textcomp,amsfonts,amsthm,amsmath,amssymb,graphicx,color,hyperref,etoolbox}
+\usepackage[utf8x]{inputenc}
+\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+
+\newtoggle{story}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Customisation options --- update as necessary
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Course details: title, semester, instructors
+
+\newcommand{\courseTitle}{Introduction to Probability Theory (Math 2502)}
+\newcommand{\semester}{Spring 2026}
+\newcommand{\instructorA}{Shagnik Das}
+\newcommand{\instructorB}{}
+
+%% Sheet number
+
+\newcommand{\sheetNumber}{6}
+
+
+%% Submission details
+
+\newcommand{\dueDate}{13:00, May 26th.}
+\newcommand{\lateWarning}{Submissions that are late will receive no credit.}
+
+
+%% Display irrelevant footnotes?  \toggletrue for yes, \togglefalse for no
+
+\toggletrue{story}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End of customisation options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pdfpagewidth 8.5in
+\pdfpageheight 11in
+\topmargin -1in
+\headheight 0in
+\headsep 0in
+\textheight 8.5in
+\textwidth 6.5in
+\oddsidemargin 0in
+\evensidemargin 0in
+\headheight 77pt
+\headsep 0in
+\footskip .75in
+
+\makeatletter
+\newcommand{\buildtitle}[4]{
+\begin{flushleft}
+{\large
+#1
+\hfill{}
+#2
+\par
+#3
+}
+\end{flushleft}
+\vskip 4pt
+\begin{center}
+{\large\bfseries#4\par}
+\end{center}
+\bigskip
+}
+\makeatother
+
+\renewcommand{\thesection}{\normalsize\arabic{section}}
+
+\renewcommand{\deg}{\textrm{deg}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\ceil}[1]{\left \lceil #1 \right \rceil}
+
+\newcommand{\hint}{\begin{flushright} [Hint at \url{\hintURL}.] \end{flushright}}
+
+\newcommand{\card}[1]{\left| #1 \right|}
+\newcommand{\mb}[1]{\mathbb{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+
+
+\newcommand{\story}[1]{\iftoggle{story}{\footnote{#1}}{}}
+\newcommand{\storymark}[1][42]{\iftoggle{story}{\footnotemark[#1]}{}}
+\newcommand{\storytext}[2][42]{\iftoggle{story}{\footnotetext[#1]{#2}}{}}
+
+\newcommand{\bonus}[2]{\paragraph{Bonus (#1 pt\ifstrequal{#1}{1}{}{s})} #2}
+
+
+\begin{document}
+
+
+\buildtitle{\courseTitle{}}{\semester}{\instructorA{} \hfill \instructorB{}}{Exercise Sheet \sheetNumber{}}
+
+\vspace{-0.2in}
+
+\begin{center}
+
+{B13902024 Chang, Yi-Kuei \\ \bf Due date: \dueDate \\ \lateWarning}
+
+\end{center}
+
+\noindent You should try to solve all of the exercises below --- each problem is worth $10$ points. Make sure to clearly justify your answers, defining everything precisely and stating any results you are using. You should then submit your solutions in Gradescope on NTU COOL, either as a typed PDF or a clear scan of your handwritten answers, and should indicate where in the file the solutions to each exercise are. If you have difficulties with Gradescope, please send your solutions by e-mail.
+
+\paragraph{Exercise 1}  There is a chess match consisting of 12 games between Grandmaster Ju Wenjun and Grandmaster Vaishali R. Ju Wenjun wins the first game and loses the second. Thereafter, she is very much a confidence-based player, in the sense that her probability of winning a game is proportional to the number of games she has won so far. More precisely, for $k \ge 2$,
+\[ \mb{P}\left( \textrm{Ju Wenjun wins game } k+1 \; | \textrm{ Ju Wenjun has won } x \textrm{ of the first } k \textrm{ games }\right) = \frac{x}{k}. \]
+Let $X$ be the random variable counting the number of games Ju Wenjun will win in the 12-game match. Determine $\mb E[X]$ and $\textrm{Var}(X)$.
+
+\paragraph{Solution:}
+Let $X_k$ denote the number of games Ju Wenjun has won after $k$ games have been played. We are given the initial conditions:
+\[
+X_1 = 1, \quad X_2 = 1
+\]
+We want to find the expected value $\mathbb{E}[X_{12}]$ and the variance $\text{Var}(X_{12})$.
+
+For $k \ge 2$, the conditional probabilities describing the transition from game $k$ to game $k+1$ are given by:
+\[
+\mathbb{P}(X_{k+1} = x + 1 \mid X_k = x) = \frac{x}{k}
+\]
+\[
+\mathbb{P}(X_{k+1} = x \mid X_k = x) = 1 - \frac{x}{k} = \frac{k - x}{k}
+\]
+
+\subsection*{1. Distribution of $X_k$}
+
+\textbf{Claim:} For any $k \ge 2$, $X_k$ is uniformly distributed over the integers $\{1, 2, \dots, k-1\}$. That is,
+\[
+\mathbb{P}(X_k = j) = \frac{1}{k-1} \quad \text{for } j = 1, 2, \dots, k-1
+\]
+
+\begin{proof}
+We prove the claim by mathematical induction on $k$.
+
+\paragraph{Base Case:} For $k = 2$, since $X_2 = 1$ deterministically, we have:
+\[
+\mathbb{P}(X_2 = 1) = 1 = \frac{1}{2-1}
+\]
+Thus, the base case holds.
+
+\paragraph{Inductive Step:} Assume that the claim holds for some $k \ge 2$. That is, 
+\[
+\mathbb{P}(X_k = j) = \frac{1}{k-1} \quad \text{for } j = 1, 2, \dots, k-1
+\]
+We want to show that for $k+1$:
+\[
+\mathbb{P}(X_{k+1} = j) = \frac{1}{k} \quad \text{for } j = 1, 2, \dots, k
+\]
+
+We analyze this by partitioning into three cases based on the value of $j$:
+
+\begin{description}
+    \item[Case 1: $2 \le j \le k-1$.] 
+    By the law of total probability, the event $X_{k+1} = j$ can occur either if Ju Wenjun had $j$ wins and lost the $(k+1)$-th game, or if she had $j-1$ wins and won the $(k+1)$-th game:
+    \begin{align*}
+        \mathbb{P}(X_{k+1} = j) &= \mathbb{P}(X_k = j)\mathbb{P}(X_{k+1} = j \mid X_k = j) + \mathbb{P}(X_k = j-1)\mathbb{P}(X_{k+1} = j \mid X_k = j-1) \\
+        &= \left( \frac{1}{k-1} \cdot \frac{k-j}{k} \right) + \left( \frac{1}{k-1} \cdot \frac{j-1}{k} \right) \\
+        &= \frac{1}{k(k-1)} \left( (k-j) + (j-1) \right) \\
+        &= \frac{k-1}{k(k-1)} = \frac{1}{k}
+    \end{align*}
+
+    \item[Case 2: $j = k$.]
+    Ju Wenjun can only reach $k$ wins after $k+1$ games if she already had $k-1$ wins after $k$ games and wins the $(k+1)$-th game:
+    \begin{align*}
+        \mathbb{P}(X_{k+1} = k) &= \mathbb{P}(X_k = k-1)\mathbb{P}(X_{k+1} = k \mid X_k = k-1) \\
+        &= \frac{1}{k-1} \cdot \frac{k-1}{k} = \frac{1}{k}
+    \end{align*}
+
+    \item[Case 3: $j = 1$.]
+    Ju Wenjun can only have exactly $1$ win after $k+1$ games if she had $1$ win after $k$ games and loses the $(k+1)$-th game:
+    \begin{align*}
+        \mathbb{P}(X_{k+1} = 1) &= \mathbb{P}(X_k = 1)\mathbb{P}(X_{k+1} = 1 \mid X_k = 1) \\
+        &= \frac{1}{k-1} \cdot \frac{k-1}{k} = \frac{1}{k}
+    \end{align*}
+\end{description}
+
+Combining all three cases, we have shown that $\mathbb{P}(X_{k+1} = j) = \frac{1}{k}$ for all $j \in \{1, 2, \dots, k\}$. This completes the inductive step.
+\end{proof}
+
+\subsection*{2. Computation of Expectation and Variance for $k=12$}
+
+Applying the proven claim to the $12$-game match ($k = 12$), $X_{12}$ is uniformly distributed over $\{1, 2, \dots, 11\}$:
+\[
+\mathbb{P}(X_{12} = j) = \frac{1}{11} \quad \text{for } j = 1, 2, \dots, 11
+\]
+
+\paragraph{Expected Value:}
+Using the identity for the sum of the first $n$ integers $\sum_{j=1}^n j = \frac{n(n+1)}{2}$:
+\[
+\mathbb{E}[X_{12}] = \sum_{j=1}^{11} j \cdot \mathbb{P}(X_{12} = j) = \frac{1}{11} \sum_{j=1}^{11} j = \frac{1}{11} \cdot \frac{11 \cdot 12}{2} = 6
+\]
+
+\paragraph{Variance:}
+Using the formula $\text{Var}(X_{12}) = \mathbb{E}[X_{12}^2] - (\mathbb{E}[X_{12}])^2$, and the identity for the sum of squares $\sum_{j=1}^n j^2 = \frac{n(n+1)(2n+1)}{6}$:
+\begin{align*}
+    \text{Var}(X_{12}) &= \left( \sum_{j=1}^{11} j^2 \cdot \frac{1}{11} \right) - 6^2 \\
+    &= \frac{1}{11} \cdot \left( \frac{11 \cdot 12 \cdot 23}{6} \right) - 36 \\
+    &= \frac{11 \cdot 12 \cdot 23}{11 \cdot 6} - 36 \\
+    &= 2 \cdot 23 - 36 \\
+    &= 46 - 36 = 10
+\end{align*}
+
+\subsection*{Conclusion}
+The expected number of wins in the 12-game match is \textbf{6}, and the variance is \textbf{10}.
+
+\paragraph{Exercise 2}  Two friends are meant to meet at the library to study together for their probability exam. Their arrival times are independent and uniformly distributed between 6pm and 7pm. Let $W$ denote the amount of time the first friend to arrive has to wait for the second friend. Determine $\mb E[W]$ and $\mb P \left( W \ge 15 \right)$.
+
+\paragraph{Solution:}
+Let $F_1$ and $F_2$ denote the arrival times of the two friends, measured in minutes past 6:00 pm. Based on the problem statement, $F_1$ and $F_2$ are independent and identically distributed (\textit{i.i.d.}) continuous random variables uniformly distributed over the interval $[0, 60]$. 
+Thus, we have:
+\[
+F_1, F_2 \overset{\text{i.i.d.}}{\sim} \text{Unif}[0, 60]
+\]
+The marginal probability density functions (PDFs) are given by:
+\[
+f_{F_1}(x) = \frac{1}{60}, \quad x \in [0, 60] \quad \text{and} \quad f_{F_2}(y) = \frac{1}{60}, \quad y \in [0, 60]
+\]
+By independence, their joint probability density function $f_{F_1, F_2}(x, y)$ is:
+\[
+f_{F_1, F_2}(x, y) = f_{F_1}(x) \cdot f_{F_2}(y) = \frac{1}{3600}, \quad (x, y) \in [0, 60] \times [0, 60]
+\]
+Let $W$ denote the waiting time of the first friend to arrive for the second friend. This can be mathematically expressed as the absolute difference between their arrival times:
+\[
+W = |F_1 - F_2|, \quad \text{where } 0 \le W \le 60
+\]
+
+---
+
+\subsubsection*{1. Calculating the Expected Waiting Time $\mathbb{E}[W]$}
+
+By the law of the unconscious statistician (LOTUS), the expected value of $W$ is:
+\[
+\mathbb{E}[W] = \int_{0}^{60} \int_{0}^{60} |x - y| \, f_{F_1, F_2}(x, y) \, dx \, dy
+\]
+Substituting the joint PDF yields:
+\[
+\mathbb{E}[W] = \int_{0}^{60} \int_{0}^{60} |x - y| \cdot \frac{1}{3600} \, dx \, dy
+\]
+To evaluate this, we split the inner integral to remove the absolute value sign based on the regions $x \ge y$ and $x < y$:
+\[
+\mathbb{E}[W] = \frac{1}{3600} \int_{0}^{60} \left( \int_{y}^{60} (x - y) \, dx + \int_{0}^{y} (y - x) \, dx \right) dy
+\]
+Evaluating the inner integrals with respect to $x$:
+\begin{align*}
+\int_{y}^{60} (x - y) \, dx &= \left[ \frac{1}{2}x^2 - xy \right]_{y}^{60} = (1800 - 60y) - \left( \frac{1}{2}y^2 - y^2 \right) = 1800 - 60y + \frac{1}{2}y^2 \\
+\int_{0}^{y} (y - x) \, dx &= \left[ yx - \frac{1}{2}x^2 \right]{0}^{y} = \left( y^2 - \frac{1}{2}y^2 \right) - 0 = \frac{1}{2}y^2
+\end{align*}
+Summing the two inner integral results:
+\[
+\left( 1800 - 60y + \frac{1}{2}y^2 \right) + \frac{1}{2}y^2 = y^2 - 60y + 1800
+\]
+Now, substituting this back into the outer integral with respect to $y$:
+\begin{align*}
+\mathbb{E}[W] &= \frac{1}{3600} \int_{0}^{60} \left( y^2 - 60y + 1800 \right) dy \\
+&= \frac{1}{3600} \left[ \frac{1}{3}y^3 - 30y^2 + 1800y \right]_{0}^{60} \\
+&= \frac{1}{3600} \left( \frac{1}{3}(60)^3 - 30(60)^2 + 1800(60) \right) \\
+&= \frac{1}{3600} \left( \frac{1}{3} \cdot 216000 - 30 \cdot 3600 + 108000 \right) \\
+&= \frac{1}{3600} \left( 72000 - 108000 + 108000 \right) \\
+&= \frac{72000}{3600} = 20
+\end{align*}
+Thus, the expected waiting time is \textbf{20 minutes}.
+
+---
+
+\subsubsection*{2. Calculating the Probability $\mathbb{P}(W \ge 15)$}
+
+We want to find the probability that the waiting time is at least 15 minutes:
+\[
+\mathbb{P}(W \ge 15) = \mathbb{P}(|F_1 - F_2| \ge 15)
+\]
+This event can be decomposed into two disjoint scenarios: either friend 1 arrives at least 15 minutes after friend 2, or friend 2 arrives at least 15 minutes after friend 1.
+\[
+\mathbb{P}(W \ge 15) = \mathbb{P}(\{F_1 \ge F_2 + 15\} \cup \{F_2 \ge F_1 + 15\})
+\]
+By the axioms of probability for disjoint events and by symmetry (since $F_1, F_2$ are i.i.d.):
+\[
+\mathbb{P}(W \ge 15) = \mathbb{P}(F_1 \ge F_2 + 15) + \mathbb{P}(F_2 \ge F_1 + 15) = 2 \, \mathbb{P}(F_1 \ge F_2 + 15)
+\]
+We express this probability as a double integral over the region where $x \ge y + 15$ within the $[0, 60] \times [0, 60]$ square. The bounds for $y$ range from $0$ to $45$ (since $x \le 60 \implies y + 15 \le 60 \implies y \le 45$), and the bounds for $x$ range from $y + 15$ to $60$:
+\[
+\mathbb{P}(W \ge 15) = 2 \int_{0}^{45} \int_{y+15}^{60} f_{F_1, F_2}(x, y) \, dx \, dy
+\]
+Substituting the joint PDF:
+\begin{align*}
+\mathbb{P}(W \ge 15) &= 2 \int_{0}^{45} \int_{y+15}^{60} \frac{1}{3600} \, dx \, dy \\
+&= \frac{1}{1800} \int_{0}^{45} \Big[ x \Big]_{y+15}^{60} \, dy \\
+&= \frac{1}{1800} \int_{0}^{45} \left( 60 - (y + 15) \right) dy \\
+&= \frac{1}{1800} \int_{0}^{45} (45 - y) \, dy
+\end{align*}
+Evaluating the final definite integral:
+\begin{align*}
+\mathbb{P}(W \ge 15) &= \frac{1}{1800} \left[ 45y - \frac{1}{2}y^2 \right]_{0}^{45} \\
+&= \frac{1}{1800} \left( 45(45) - \frac{1}{2}(45)^2 \right) \\
+&= \frac{1}{1800} \left( \frac{1}{2}(45)^2 \right) \\
+&= \frac{2025}{3600} = \frac{9}{16}
+\end{align*}
+Thus, the probability that the first friend to arrive waits at least 15 minutes is $\mathbf{\frac{9}{16}}$ (or \textbf{0.5625}).
+
+\paragraph{Exercise 3}  The number of daily visitors to a popular chess website follows a Poisson distribution with rate $\lambda$. One of the ways this website makes a profit is by showing ads to its users. Each visitor clicks on an ad with probability $p$, independently of all other visitors. Letting $X$ denote the number of times an ad is clicked on in a day, determine $\mb{P}(X = k)$ for all $k \ge 0$, and deduce the value of $\mb{E}[X]$.
+
+\paragraph{Solution:} Suppose \(P\) is the number of visitors to the website, then \(P \sim \mathrm{Poi}(\lambda) \). For any \(k \ge 0\), then by total law of probability and countable additivity:
+
+\begin{align*}
+\mathbb{P}(X=k) &= \sum_{s=0}^{\infty} \mathbb{P}(P=s, X=k) = \sum_{s=0}^{\infty} \mathbb{P}(X=k \mid P=s) \mathbb{P}(P=s) \\
+&= \sum_{s=k}^{\infty} \binom{s}{k} p^k (1-p)^{s-k} \cdot \frac{e^{-\lambda} \lambda^s}{s!} = \sum_{s=k}^{\infty} \frac{s!}{k!(s-k)!} p^k (1-p)^{s-k} \cdot \frac{e^{-\lambda} \lambda^s}{s!} \\
+&= \frac{p^k e^{-\lambda}}{k!} \sum_{s=k}^{\infty} \frac{(1-p)^{s-k} \lambda^s}{(s-k)!} = \frac{p^k e^{-\lambda}}{k!} \sum_{m=0}^{\infty} \frac{(1-p)^m \lambda^{m+k}}{m!} \\
+&= \frac{\lambda^k p^k e^{-\lambda}}{k!} \sum_{m=0}^{\infty} \frac{\big((1-p)\lambda\big)^m}{m!} = \frac{(\lambda p)^k e^{-\lambda}}{k!} \cdot e^{(1-p)\lambda} = \frac{(\lambda p)^k e^{-\lambda + \lambda - p\lambda}}{k!} = \frac{(\lambda p)^k e^{-p\lambda}}{k!}
+\end{align*}
+
+This shows \(X \sim \mathrm{Poi}(\lambda p) \). Hence,
+\[
+    \mathbb{E} [X] = \lambda p.
+\]  
+
+\paragraph{Exercise 4} On Saturday, three siblings, Alpha, Beta, and Omega, will run up the 101. Their running times, measured in minutes, are independent; Alpha's is exponentially distributed with rate $\frac{1}{27}$, Beta's is exponentially distributed with rate $\frac{1}{33}$, and Omega's is uniformly distributed over $(25, 35)$.
+
+Let $X$ denote the time the fastest sibling takes, $Y$ the time the second-fastest sibling takes, and $Z$ the time the slowest sibling takes. Determine $\mb{E}[X]$, $\mb{E}[Y]$, and $\mb{E}[Z]$.
+
+\paragraph{Solution:}
+Let \(A, B, O\) be the running times of Alpha, Beta, and Omega, respectively. Thus, 
+\[
+A\sim \mathrm{Exp}\!\left(\frac1{27}\right),\qquad
+B\sim \mathrm{Exp}\!\left(\frac1{33}\right),\qquad
+O\sim \mathrm{Unif}(25,35),
+\]
+and assume that $A,B,O$ are independent.  Let
+\[
+X=\min(A,B,O),\qquad
+Y=\text{the middle value of } \{A,B,O\},\qquad
+Z=\max(A,B,O).
+\]
+Write
+\[
+\lambda_A=\frac1{27},\qquad
+\lambda_B=\frac1{33},\qquad
+\lambda=\lambda_A+\lambda_B=\frac{20}{297}.
+\]
+We will compute $\mathbb E[X]$, $\mathbb E[Y]$, and $\mathbb E[Z]$.
+
+Note that for a non-negative random variable \(T\), we have 
+\[
+    \mathbb{E} [T] = \int _0^{\infty} \mathbb{P} (T \ge t) \, dt - \int _0^{\infty} \mathbb{P} (T \le -t) \, dt = \int _0^{\infty} \mathbb{P} (T \ge t) \, dt.   
+\]
+
+\medskip
+
+\noindent\textbf{Step 1: The expectation of $X$.}
+
+Since $X=\min(A,B,O)$ and the variables are independent,
+\[
+\mathbb P(X>t)=\mathbb P(A>t)\mathbb P(B>t)\mathbb P(O>t).
+\]
+Now
+\[
+\mathbb P(A>t)=e^{-\lambda_A t},\qquad
+\mathbb P(B>t)=e^{-\lambda_B t},
+\]
+and for $O\sim \mathrm{Unif}(25,35)$,
+\[
+\mathbb P(O>t)=
+\begin{cases}
+1, & 0\le t<25,\\[2mm]
+\dfrac{35-t}{10}, & 25\le t\le 35,\\[2mm]
+0, & t>35.
+\end{cases}
+\]
+Therefore
+\[
+\mathbb P(X>t)=
+\begin{cases}
+e^{-\lambda t}, & 0\le t<25,\\[2mm]
+e^{-\lambda t}\dfrac{35-t}{10}, & 25\le t\le 35,\\[2mm]
+0, & t>35.
+\end{cases}
+\]
+Using $\mathbb E[X]=\int_0^\infty \mathbb P(X>t)\,dt$, we get
+\[
+\mathbb E[X]
+=
+\int_0^{25} e^{-\lambda t}\,dt
++
+\frac1{10}\int_{25}^{35}(35-t)e^{-\lambda t}\,dt.
+\]
+A direct computation gives
+\[
+\mathbb E[X]
+=
+\frac{1-e^{-25\lambda}}{\lambda}
++
+\frac{e^{-25\lambda}(10\lambda-1)+e^{-35\lambda}}{10\lambda^2}.
+\]
+Substituting $\lambda=\frac{20}{297}$,
+\[
+\mathbb E[X]
+=
+\frac{297}{20}
++
+\frac{88209}{4000}
+\left(
+e^{-700/297}-e^{-500/297}
+\right).
+\]
+
+\medskip
+
+\noindent\textbf{Step 2: The expectation of $Z$.}
+
+Since $Z=\max(A,B,O)$,
+\[
+\mathbb E[Z]=\int_0^\infty \mathbb P(Z>t)\,dt.
+\]
+We determine $\mathbb P(Z>t)$ piecewise.
+
+Note that 
+\[
+    \mathbb{P} (Z \le t) = \mathbb{P} (\max \left\{ A, B, O \right\} \le t) = \mathbb{P} (A \le t, B \le t, O \le t) = \mathbb{P} (A \le t) \mathbb{P} (B \le t) \mathbb{P} (O \le t)
+\]
+by independence.
+
+If $0\le t<25$, then $O>t$ is always true, so $Z>t$ always. Hence
+\[
+\mathbb P(Z>t)=1.
+\]
+
+If $25\le t\le 35$, then
+\[
+\mathbb P(Z\le t)=\mathbb P(A\le t)\mathbb P(B\le t)\mathbb P(O\le t)
+=(1-e^{-\lambda_A t})(1-e^{-\lambda_B t})\frac{t-25}{10},
+\]
+so
+\[
+\mathbb P(Z>t)
+=
+1-(1-e^{-\lambda_A t})(1-e^{-\lambda_B t})\frac{t-25}{10}.
+\]
+
+If $t > 35$, then $O\le t$ is always true, hence
+\begin{align*}
+    \mathbb P(Z>t) &= 1 - \mathbb{P} (Z \le t) = 1 - \mathbb{P} (A \le t, B \le t, O \le t)\\ 
+    &= 1 - \mathbb{P} (A \le t) \mathbb{P} (B \le t) \mathbb{P} (O \le t) \\
+    &= 1-(1-e^{-\lambda_A t}) \cdot (1-e^{-\lambda_B t}) \cdot 1 = e^{-\lambda_A t}+e^{-\lambda_B t}-e^{-\lambda t}.
+\end{align*}
+
+Therefore
+\begin{align*}
+\mathbb E[Z]
+&=
+\int_0^{25}1\,dt
++\int_{25}^{35}\left[1-(1-e^{-\lambda_A t})(1-e^{-\lambda_B t})\frac{t-25}{10}\right]dt \\
+&\qquad
++\int_{35}^{\infty}\left(e^{-\lambda_A t}+e^{-\lambda_B t}-e^{-\lambda t}\right)dt.
+\end{align*}
+Now for any $r>0$,
+\[
+\int_{25}^{35}\frac{t-25}{10}e^{-rt}\,dt+\int_{35}^{\infty}e^{-rt}\,dt
+=
+\frac{e^{-25r}-e^{-35r}}{10r^2}.
+\]
+Using this with $r=\lambda_A,\lambda_B,\lambda$, we obtain
+\[
+\mathbb E[Z]
+=
+30
++
+\frac{e^{-25\lambda_A}-e^{-35\lambda_A}}{10\lambda_A^2}
++
+\frac{e^{-25\lambda_B}-e^{-35\lambda_B}}{10\lambda_B^2}
+-
+\frac{e^{-25\lambda}-e^{-35\lambda}}{10\lambda^2}.
+\]
+Substituting $\lambda_A=\frac1{27}$, $\lambda_B=\frac1{33}$, and $\lambda=\frac{20}{297}$ gives
+\[
+\mathbb E[Z]
+=
+30
++
+\frac{729}{10}\left(e^{-25/27}-e^{-35/27}\right)
++
+\frac{1089}{10}\left(e^{-25/33}-e^{-35/33}\right)
+-
+\frac{88209}{4000}\left(e^{-500/297}-e^{-700/297}\right).
+\]
+
+\medskip
+
+\noindent\textbf{Step 3: The expectation of $Y$.}
+
+Since $X,Y,Z$ are the order statistics of $A,B,O$,
+\[
+X+Y+Z=A+B+O.
+\]
+Taking expectations and using linearity,
+\[
+\mathbb E[X]+\mathbb E[Y]+\mathbb E[Z]
+=
+\mathbb E[A]+\mathbb E[B]+\mathbb E[O].
+\]
+Now
+\[
+\mathbb E[A]=27,\qquad \mathbb E[B]=33,\qquad \mathbb E[O]= \int _{25}^{35} t \cdot \frac{1}{10} \, \mathrm{d} t = 30,
+\]
+so
+\[
+\mathbb E[X]+\mathbb E[Y]+\mathbb E[Z]=90.
+\]
+Hence
+\[
+\mathbb E[Y]=90-\mathbb E[X]-\mathbb E[Z].
+\]
+Substituting the formulas found above,
+\[
+\mathbb E[Y]
+=
+\frac{903}{20}
+-
+\frac{729}{10}\left(e^{-25/27}-e^{-35/27}\right)
+-
+\frac{1089}{10}\left(e^{-25/33}-e^{-35/33}\right)
++
+\frac{88209}{2000}\left(e^{-500/297}-e^{-700/297}\right).
+\]
+
+\medskip
+
+\noindent\textbf{Final answers.}
+\[
+\boxed{
+\mathbb E[X]
+=
+\frac{297}{20}
++
+\frac{88209}{4000}
+\left(
+e^{-700/297}-e^{-500/297}
+\right)
+}
+\]
+\[
+\boxed{
+\mathbb E[Y]
+=
+\frac{903}{20}
+-
+\frac{729}{10}\left(e^{-25/27}-e^{-35/27}\right)
+-
+\frac{1089}{10}\left(e^{-25/33}-e^{-35/33}\right)
++
+\frac{88209}{2000}\left(e^{-500/297}-e^{-700/297}\right)
+}
+\]
+\[
+\boxed{
+\mathbb E[Z]
+=
+30
++
+\frac{729}{10}\left(e^{-25/27}-e^{-35/27}\right)
++
+\frac{1089}{10}\left(e^{-25/33}-e^{-35/33}\right)
+-
+\frac{88209}{4000}\left(e^{-500/297}-e^{-700/297}\right)
+}
+\]
+
+% \newpage
+
+% \section*{Hints}  The following QR codes contain hints for some of the homework exercises.  You should be able to decode them using any QR code scanner, including this one: \url{https://zxing.org/w/decode.jspx}.
+
+% \paragraph{Exercise ?} Also available at \url{https://i.ibb.co/???????/S??E?.png}.
+
+\begin{center}
+% \includegraphics[scale=0.5]{Hints/S??E?.png}
+\end{center}
+
+\end{document}

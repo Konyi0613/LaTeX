@@ -1,0 +1,444 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{bbding,combelow,textcomp,amsfonts,amsthm,amsmath,amssymb,graphicx,color,hyperref,etoolbox, mathtools}
+\usepackage[utf8x]{inputenc}
+\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+
+\newtoggle{story}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Customisation options --- update as necessary
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Course details: title, semester, instructors
+
+\newcommand{\courseTitle}{Introduction to Probability Theory (Math 2502)}
+\newcommand{\semester}{Spring 2026}
+\newcommand{\instructorA}{Shagnik Das}
+\newcommand{\instructorB}{}
+
+%% Sheet number
+
+\newcommand{\sheetNumber}{7}
+
+
+%% Submission details
+
+\newcommand{\dueDate}{13:00, Jun 4th.}
+\newcommand{\lateWarning}{Submissions that are late will receive no credit.}
+
+
+%% Display irrelevant footnotes?  \toggletrue for yes, \togglefalse for no
+
+\toggletrue{story}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End of customisation options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pdfpagewidth 8.5in
+\pdfpageheight 11in
+\topmargin -1in
+\headheight 0in
+\headsep 0in
+\textheight 8.5in
+\textwidth 6.5in
+\oddsidemargin 0in
+\evensidemargin 0in
+\headheight 77pt
+\headsep 0in
+\footskip .75in
+
+\makeatletter
+\newcommand{\buildtitle}[4]{
+\begin{flushleft}
+{\large
+#1
+\hfill{}
+#2
+\par
+#3
+}
+\end{flushleft}
+\vskip 4pt
+\begin{center}
+{\large\bfseries#4\par}
+\end{center}
+\bigskip
+}
+\makeatother
+
+\renewcommand{\thesection}{\normalsize\arabic{section}}
+
+\renewcommand{\deg}{\textrm{deg}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\ceil}[1]{\left \lceil #1 \right \rceil}
+
+\newcommand{\hint}{\begin{flushright} [Hint at \url{\hintURL}.] \end{flushright}}
+
+\newcommand{\card}[1]{\left| #1 \right|}
+\newcommand{\mb}[1]{\mathbb{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+
+
+\newcommand{\story}[1]{\iftoggle{story}{\footnote{#1}}{}}
+\newcommand{\storymark}[1][42]{\iftoggle{story}{\footnotemark[#1]}{}}
+\newcommand{\storytext}[2][42]{\iftoggle{story}{\footnotetext[#1]{#2}}{}}
+
+\newcommand{\bonus}[2]{\paragraph{Bonus (#1 pt\ifstrequal{#1}{1}{}{s})} #2}
+
+
+\begin{document}
+
+
+\buildtitle{\courseTitle{}}{\semester}{\instructorA{} \hfill \instructorB{}}{Exercise Sheet \sheetNumber{}}
+
+\vspace{-0.2in}
+
+\begin{center}
+
+{B13902024 Chang, Yi-Kuei \\ \bf Due date: \dueDate \\ \lateWarning}
+
+\end{center}
+
+\noindent You should try to solve all of the exercises below --- each problem is worth $10$ points. Make sure to clearly justify your answers, defining everything precisely and stating any results you are using. You should then submit your solutions in Gradescope on NTU COOL, either as a typed PDF or a clear scan of your handwritten answers, and should indicate where in the file the solutions to each exercise are. If you have difficulties with Gradescope, please send your solutions by e-mail.
+
+\paragraph{Exercise 1} Let $U$ be uniform on $(0,2\pi)$, and let $Z$, independent of $U$, be exponential with rate $\lambda = 1$. Define $X = \sqrt{2Z} \cos U$ and $Y = \sqrt{2Z} \sin U$. 
+\begin{itemize}
+	\item[(a)] What is the (marginal) distribution of $X$?
+	\item[(b)] Are $X$ and $Y$ independent?
+\end{itemize}
+
+\paragraph{Solution:}
+
+We are given $f_U(t) = \frac{1}{2\pi}$ for $t \in (0, 2\pi)$, and $f_Z(t) = e^{-t}$ for $t \geq 0$ (zero otherwise).
+
+\begin{itemize}
+    \item[(a)] We first compute the joint density $f_{X,Y}(x,y)$.
+
+    For every $(x,y) \in \mathbb{R}^2$, there exists a unique $(z,u)$ with $z > 0$ and $u \in (0,2\pi)$ such that $(x,y) = (\sqrt{2z}\cos u,\, \sqrt{2z}\sin u)$, since $(x,y)$ determines its polar coordinates uniquely (a.e.). We denote this inverse mapping by $(z,u) = (Z(x,y),\, U(x,y))$.
+
+    Define $g : \mathbb{R}_{>0} \times (0,2\pi) \to \mathbb{R}^2$ by
+    \[
+        g(z,u) = \bigl(\sqrt{2z}\cos u,\; \sqrt{2z}\sin u\bigr).
+    \]
+    Its Jacobian matrix is
+    \[
+        J(z,u) = \begin{pmatrix} \dfrac{\cos u}{\sqrt{2z}} & -\sqrt{2z}\sin u \\[8pt] \dfrac{\sin u}{\sqrt{2z}} & \sqrt{2z}\cos u \end{pmatrix},
+    \]
+    so $\det J(z,u) = \cos^2 u + \sin^2 u = 1$.
+
+    By the change-of-variables formula,
+    \[
+        f_{X,Y}(x,y) = f_{Z,U} \bigl(Z(x,y),\, U(x,y)\bigr) \cdot | \det J|^{-1} = f_{Z,U} \bigl(Z(x,y),\, U(x,y)\bigr).
+    \]
+    Since $Z$ and $U$ are independent, $f_{Z,U}(z,u) = f_Z(z)\,f_U(u)$. Since $Z(x,y) = \frac{x^2+y^2}{2} \geq 0$, we have
+	\begin{align*}
+		f_{X,Y}(x,y) &= f_{Z, U}(Z(x, y), U(x, y)) = f_Z(Z(x, y)) f_U(U(x, y)) \\
+		&= e^{-Z(x, y)} \cdot \frac{1}{2 \pi} = e^{-\frac{x^2+y^2}{2}} \cdot \frac{1}{2\pi} = \frac{1}{2\pi}\,e^{-\frac{x^2+y^2}{2}}.
+	\end{align*}
+    Marginalizing over $y$:
+    \begin{align*}
+        f_X(x) &= \int_{-\infty}^{\infty} f_{X,Y}(x,y)\,dy = \int_{-\infty}^{\infty} \frac{1}{2\pi}\,e^{-\frac{x^2+y^2}{2}}\,dy \\
+        &= \frac{1}{\sqrt{2\pi}}\,e^{-\frac{x^2}{2}} \int_{-\infty}^{\infty} \frac{1}{\sqrt{2\pi}}\,e^{-\frac{y^2}{2}}\,dy = \frac{1}{\sqrt{2\pi}}\,e^{-\frac{x^2}{2}},
+    \end{align*}
+    where the last equality holds because $\frac{1}{\sqrt{2\pi}}e^{-y^2/2}$ is the pdf of $N(0,1)$ and therefore integrates to $1$. Hence $X \sim N(0,1)$.
+
+    \item[(b)] Since
+    \[
+        f_{X,Y}(x,y) = \frac{1}{2\pi}\,e^{-\frac{x^2+y^2}{2}} = \frac{1}{\sqrt{2\pi}}\,e^{-\frac{x^2}{2}} \cdot \frac{1}{\sqrt{2\pi}}\,e^{-\frac{y^2}{2}} = f_X(x) \cdot f_Y(y),
+    \]
+    the joint density factors into a product of a function of $x$ alone and a function of $y$ alone, so $X$ and $Y$ are independent.
+\end{itemize}
+
+\paragraph{Exercise 2}  Let $N \sim \textrm{Poi}(\lambda)$, and let $X \sim \textrm{Bin}(N,p)$, for some constant $p \in (0,1)$. Calculate $\mathbb{E}[X]$ and $\textrm{Var}(X)$.
+\paragraph{Solution:}
+
+\textbf{Computing $\mathbb{E}[X]$.} By the law of total expectation,
+\[
+    \mathbb{E}[X] = \mathbb{E}[\mathbb{E}[X \mid N]] = \sum_{n=0}^{\infty} \mathbb{E}[X \mid N=n] \cdot \mathbb{P}(N=n).
+\]
+Since $\mathbb{P}(N=n) = \frac{\lambda^n e^{-\lambda}}{n!}$ and $\mathbb{E}[X \mid N=n] = \mathbb{E}[\mathrm{Bin}(n,p)] = np$, we have
+\begin{align*}
+    \mathbb{E}[X] &= \sum_{n=0}^{\infty} np \cdot \frac{\lambda^n e^{-\lambda}}{n!} = p\lambda \sum_{n=1}^{\infty} \frac{\lambda^{n-1} e^{-\lambda}}{(n-1)!} = p\lambda \sum_{k=0}^{\infty} \frac{\lambda^k e^{-\lambda}}{k!} = p\lambda,
+\end{align*}
+since $\frac{\lambda^k e^{-\lambda}}{k!}$ is the pmf of $\mathrm{Poi}(\lambda)$ and sums to $1$.
+
+\textbf{Computing $\mathrm{Var}(X)$.} By the law of total expectation,
+\[
+    \mathbb{E}[X^2] = \mathbb{E}[\mathbb{E}[X^2 \mid N]] = \sum_{n=0}^{\infty} \mathbb{E}[X^2 \mid N=n] \cdot \frac{\lambda^n e^{-\lambda}}{n!}.
+\]
+We compute $\mathbb{E}[X^2 \mid N=n]$ directly:
+\begin{align*}
+    \mathbb{E}[X^2 \mid N=n] &= \sum_{k=0}^n k^2 \mathbb{P} (\mathrm{Bin}(n, p) = k) = \sum_{k=0}^{n} k^2 \binom{n}{k} p^k (1-p)^{n-k} \\
+	&= \sum_{k=1}^{n} k^2 \cdot \frac{n!}{k!\,(n-k)!} p^k (1-p)^{n-k} = \sum_{k=1}^{n} nk \cdot \frac{(n-1)!}{(k-1)!\,(n-k)!} p^k (1-p)^{n-k} \\
+    &= np \sum_{k=1}^{n} k \binom{n-1}{k-1} p^{k-1}(1-p)^{n-k}.
+\end{align*}
+Substituting $r = k-1$:
+\begin{align*}
+    \mathbb{E}[X^2 \mid N=n] &= np \sum_{r=0}^{n-1} (r+1) \binom{n-1}{r} p^r (1-p)^{n-1-r} \\
+    &= np \left( \sum_{r=0}^{n-1} r \binom{n-1}{r} p^r (1-p)^{n-1-r} + \sum_{r=0}^{n-1} \binom{n-1}{r} p^r (1-p)^{n-1-r} \right).
+\end{align*}
+Note that
+\[
+	\sum_{r=0}^{n-1} \binom{n-1}{r} p^r (1-p)^{n-1-r} = \bigl(p+(1-p)\bigr)^{n-1} = 1
+\]
+by binomial theorem and
+\[
+	\sum_{r=0}^{n-1} r \binom{n-1}{r} p^r (1-p)^{n-1-r} = \mathbb{E}[\mathrm{Bin}(n-1,p)] = (n-1)p.
+\]
+Thus,
+\[
+    \mathbb{E}[X^2 \mid N=n] = np\bigl((n-1)p + 1\bigr).
+\]
+Substituting back and simplifying:
+\begin{align*}
+    \mathbb{E}[X^2] &= \sum_{n=1}^{\infty} np\bigl((n-1)p+1\bigr) \frac{\lambda^n e^{-\lambda}}{n!} = p\lambda \sum_{n=1}^{\infty} \bigl((n-1)p+1\bigr) \frac{\lambda^{n-1} e^{-\lambda}}{(n-1)!} \\
+    &= p\lambda \left( p \sum_{n=1}^{\infty} (n-1) \frac{\lambda^{n-1} e^{-\lambda}}{(n-1)!} + \sum_{n=1}^{\infty} \frac{\lambda^{n-1} e^{-\lambda}}{(n-1)!} \right) \\
+    &= p\lambda \left( p \sum_{n=2}^{\infty} \frac{\lambda^{n-1} e^{-\lambda}}{(n-2)!} + 1 \right) = p\lambda \left( p\lambda \sum_{k=0}^{\infty} \frac{\lambda^k e^{-\lambda}}{k!} + 1 \right) = p\lambda(p\lambda + 1).
+\end{align*}
+Hence,
+\[
+    \mathrm{Var}(X) = \mathbb{E}[X^2] - \bigl(\mathbb{E}[X]\bigr)^2 = p\lambda(p\lambda+1) - (p\lambda)^2 = p\lambda.
+\]
+
+\paragraph{Exercise 3}  A business consultant lives in Hsinchu, and has $N$ clients, with $a$ based in Taipei, $b$ based in Taichung, and $c$ based in Kaohsiung (where $a + b + c = N$). Every week, she must visit every client once, and she chooses to do so in an uniformly random order. She takes the high speed rail from Hsinchu to her first client, and then, whenever her next client is in a different city from the previous one, she again takes the train to the next meeting. Each journey with the high speed rail costs \$2500, no matter which cities she is travelling between.\story{Normally travelling between Taipei and Taichung or between Taichung and Kaohsiung would be much cheaper than travelling between Taipei and Kaohsiung, but the Taiwan High Speed Rail heard that this problem would be included on this week's homework, and decided to charge a flat fare for all her trips to make your calculations easier.\footnotemark[2]}\footnotetext[2]{Since she was charging her travel expenses to her clients anyway, our business consultant didn't mind.} At the end of the week, she takes the train to return home to Hsinchu.\footnote[3]{During the week, she stays in hotels in whichever city she happens to be in, in order to minimise the amount of travel she has to do.}
+
+Let $X$ denote the amount she spends on train tickets in a given week.
+\begin{itemize}
+	\item[(a)] What is $\mathbb{E}[X]$?
+	\item[(b)] What is $\textrm{Var}(X)$?
+\end{itemize}
+
+\paragraph{Solution:}
+
+\begin{itemize}
+    \item[(a)] Suppose $C_1 = \text{Taipei}$, $C_2 = \text{Taichung}$, $C_3 = \text{Kaohsiung}$.
+
+    We can think of we have a fair dice of 3 faces, with each face labeled with $C_1$, $C_2$, $C_3$. Now given that we have rolled $N$ times of this dice and we have $a$ times $C_1$, $b$ times $C_2$, $c$ times $C_3$, then if we let $S$ be the number of streaks in this $N$ rolls, we can transform the result of $N$ rolls into an order of visiting $N$ clients, and $S+1$ is the number of times the business consultant has to take the train. (The beginning of each streak means you have to take train from previous city to the current one. In particular, for the beginning of the first streak, i.e.\ the city of the first client, the business consultant has to take train from Hsinchu to that city. Also, at the end of the week the business consultant has to take train to return to Hsinchu. Thus, the number of times the business consultant has to take the train is $S+1$.)
+
+    Now let $A = \#$ of clients in $C_1$, $B = \#$ of clients in $C_2$, $C = \#$ of clients in $C_3$. We have $X = 2500(S+1) \mid A=a, B=b, C=c$, and thus
+    \[
+        \mathbb{E}[X] = \mathbb{E}[2500(S+1) \mid A=a, B=b, C=c] = 2500\bigl(\mathbb{E}[S \mid A=a, B=b, C=c] + 1\bigr)
+    \]
+    by the linearity of expectation. Now we compute $\mathbb{E}[S \mid A=a, B=b, C=c]$.
+
+    Note that $S = 1 + \displaystyle\sum_{i=1}^{N-1} I_i$ where
+    \[
+        I_i = \begin{cases} 1, & \text{if the $i$-th client and $(i+1)$-th client are in different city,} \\ 0, & \text{otherwise,} \end{cases}
+    \]
+    since $I_i = 1$ if and only if a streak starts in the $(i+1)$-th roll and there must be a streak starts at first roll. Hence,
+    \[
+        \mathbb{E}[S \mid A=a, B=b, C=c] = 1 + \sum_{i=1}^{N-1} \mathbb{E}[I_i \mid A=a, B=b, C=c]
+    \]
+    by linearity of expectation. Now we denote the $i$-th roll by $R_i$.
+
+    Now since $\forall\, 1 \leq i \leq N-1$,
+    \begin{align*}
+        \mathbb{E}[I_i \mid A=a, B=b, C=c] &= 1 \cdot \mathbb{P}(R_i \neq R_{i+1} \mid A=a, B=b, C=c) \\
+        &= \sum_{j=1}^{3} \mathbb{P}(R_i = C_j,\, R_{i+1} \neq C_j \mid A=a, B=b, C=c),
+    \end{align*}
+    and the $a$ $C_1$'s, $b$ $C_2$'s, and $c$ $C_3$'s are equally likely to be in each roll, so
+    \[
+        \mathbb{P}(R_i = C_1,\, R_{i+1} \neq C_1 \mid A=a, B=b, C=c) = \frac{a}{N} \cdot \frac{N-a}{N-1}.
+    \]
+    Thus, similarly we can compute
+    \begin{align*}
+        \sum_{j=1}^{3} \mathbb{P}(R_i = C_j,\, R_{i+1} \neq C_j \mid A=a, B=b, C=c)
+        &= \frac{a}{N} \cdot \frac{N-a}{N-1} + \frac{b}{N} \cdot \frac{N-b}{N-1} + \frac{c}{N} \cdot \frac{N-c}{N-1} \\
+        &= \frac{a(N-a)+b(N-b)+c(N-c)}{N(N-1)} \\
+        &= \frac{N(a+b+c)-a^2-b^2-c^2}{N(N-1)} \\
+        &= \frac{N^2-a^2-b^2-c^2}{N(N-1)}.
+    \end{align*}
+    Hence,
+    \[
+        \mathbb{E}[I_i \mid A=a, B=b, C=c] = \frac{N^2-a^2-b^2-c^2}{N(N-1)} \quad \forall\, 1 \leq i \leq N-1,
+    \]
+    and thus
+    \begin{align*}
+        \mathbb{E}[S \mid A=a, B=b, C=c] &= 1 + \sum_{i=1}^{N-1} \frac{N^2-a^2-b^2-c^2}{N(N-1)} \\
+        &= 1 + (N-1)\cdot\frac{N^2-a^2-b^2-c^2}{N(N-1)} \\
+        &= 1 + N - \frac{a^2+b^2+c^2}{N}.
+    \end{align*}
+    Thus,
+    \[
+        \mathbb{E}[X] = 2500\bigl(\mathbb{E}[S \mid A=a, B=b, C=c]+1\bigr) = 2500 \left(2 + N - \frac{a^2+b^2+c^2}{N}\right).
+    \]
+
+    \item[(b)] Now $X = 2500 \left(2 + \sum_{i=1}^{N-1} I_i\right) \mid A=a, B=b, C=c$.
+
+    Hence
+    \begin{align*}
+        \mathrm{Var}(X)
+        &= 2500^2\,\mathrm{Var} \left(2 + \sum_{i=1}^{N-1} I_i \;\middle|\; A=a, B=b, C=c\right) \\
+        &= 2500^2\,\mathrm{Var} \left(\sum_{i=1}^{N-1} I_i \;\middle|\; A=a, B=b, C=c\right).
+    \end{align*}
+    Now we let $I_i' = I_i \mid A=a, B=b, C=c$ $\forall\, 1 \leq i \leq N-1$. Hence, we want to compute
+    \[
+        \mathrm{Var} \left(\sum_{i=1}^{N-1} I_i'\right) = \sum_{i=1}^{N-1} \mathrm{Var}(I_i') + 2\sum_{1 \leq i < j \leq N-1} \mathrm{Cov}(I_i', I_j').
+    \]
+
+    Note that we have computed $\mathbb{E}[I_i'] = \dfrac{N^2-a^2-b^2-c^2}{N(N-1)}$ $\forall\, 1 \leq i \leq N-1$.
+
+    Now we compute $\mathbb{E}[I_i'^2]$ for $1 \leq i \leq N-1$. Note that $\mathbb{E}[I_i'^2] = \mathbb{E}[I_i']$ since $I_i'$ only takes value $1$ and $0$.
+
+    Now it remains to compute $\mathbb{E}[I_i'I_j']$ for $i < j$. Note that
+    \[
+        \mathbb{E}[I_i'I_j'] = \mathbb{P}(R_i \neq R_{i+1},\, R_j \neq R_{j+1} \mid A=a, B=b, C=c)
+    \]
+    since
+    \[
+        I_i'I_j' = \begin{cases} 1, & \text{if } R_i \neq R_{i+1} \text{ and } R_j \neq R_{j+1}, \\ 0, & \text{otherwise.} \end{cases}
+    \]
+
+    We have 2 cases:
+
+    \textbf{Case 1}: $j = i+1$, then we can first pick the result of $R_{i+1}$, and $R_i$, $R_{i+2}$ can not be same as it. Thus, if $R_{i+1} = C_1$, then we have to consider all possibility of legal $R_i$, $R_{i+2}$, and use the law of total probability:
+    \begin{align*}
+        &\mathbb{P}(R_i \neq R_{i+1},\, R_{i+1} \neq R_{i+2},\, R_{i+1} = C_1 \mid A=a, B=b, C=c) \\
+        &= \frac{a}{N} \cdot \Bigl(\frac{b(b-1)}{(N-1)(N-2)} + \frac{c(c-1)}{(N-1)(N-2)}
+           + \frac{bc}{(N-1)(N-2)} + \frac{bc}{(N-1)(N-2)}\Bigr) \\
+        &= \frac{a}{N(N-1)(N-2)}\bigl(b(b-1) + c(c-1) + 2bc\bigr).
+    \end{align*}
+    Similarly, we can compute the case $R_{i+1} = C_2$ and $R_{i+1} = C_3$, and thus
+    \begin{align*}
+        &\mathbb{P}(R_i \neq R_{i+1},\, R_{i+1} \neq R_{i+2} \mid A=a, B=b, C=c) \\
+        &= \frac{a}{N(N-1)(N-2)}\bigl(b(b-1)+c(c-1)+2bc\bigr) \\
+        &\quad + \frac{b}{N(N-1)(N-2)}\bigl(a(a-1)+c(c-1)+2ac\bigr) \\
+        &\quad + \frac{c}{N(N-1)(N-2)}\bigl(a(a-1)+b(b-1)+2ab\bigr).
+    \end{align*}
+
+    \textbf{Case 2}: $j > i+1$, then we should consider the subcases and use law of total probability:
+
+    \textit{Subcase 1}: $R_i = R_j$, $R_{i+1} = R_{j+1}$.
+    \begin{align*}
+        &\mathbb{P}(R_i \neq R_{i+1},\, R_j \neq R_{j+1},\, R_i = R_j,\, R_{i+1} = R_{j+1} \mid A=a, B=b, C=c) \\
+        &= \frac{a(a-1)}{N(N-1)}\cdot\frac{b(b-1)}{(N-2)(N-3)}
+         + \frac{a(a-1)}{N(N-1)}\cdot\frac{c(c-1)}{(N-2)(N-3)} \\
+        &\quad + \frac{b(b-1)}{N(N-1)}\cdot\frac{a(a-1)}{(N-2)(N-3)}
+         + \frac{b(b-1)}{N(N-1)}\cdot\frac{c(c-1)}{(N-2)(N-3)} \\
+        &\quad + \frac{c(c-1)}{N(N-1)}\cdot\frac{a(a-1)}{(N-2)(N-3)}
+         + \frac{c(c-1)}{N(N-1)}\cdot\frac{b(b-1)}{(N-2)(N-3)}.
+    \end{align*}
+
+    \textit{Subcase 2}: $R_i = R_j$, $R_{i+1} \neq R_{j+1}$.
+    \begin{align*}
+        &\mathbb{P}(R_i \neq R_{i+1},\, R_j \neq R_{j+1},\, R_i = R_j,\, R_{i+1} \neq R_{j+1} \mid A=a, B=b, C=c) \\
+        &= 2 \Bigl(
+            \frac{a(a-1)}{N(N-1)}\cdot\frac{bc}{(N-2)(N-3)} \\
+        &\qquad + \frac{b(b-1)}{N(N-1)}\cdot\frac{ac}{(N-2)(N-3)}
+         + \frac{c(c-1)}{N(N-1)}\cdot\frac{ab}{(N-2)(N-3)}\Bigr).
+    \end{align*}
+
+    \textit{Subcase 3}: $R_{i+1} = R_{j+1}$, $R_i \neq R_j$. Same as Subcase 2.
+
+    \textit{Subcase 4}: $R_i = R_{j+1}$, $R_{i+1} = R_j$. Same as Subcase 1.
+
+    \textit{Subcase 5}: $R_i \neq R_j$, $R_i \neq R_{j+1}$, $R_{i+1} \neq R_j$, $R_{i+1} \neq R_{j+1}$. This is impossible since this means $R_i = R_{i+1}$. (We only have 3 types of result for each roll.)
+
+    Thus, for $j > i+1$,
+    \begin{align*}
+        &\mathbb{P}(R_i \neq R_{i+1},\, R_j \neq R_{j+1} \mid A=a, B=b, C=c) \\
+        &= 2 \Bigl(
+            \frac{a(a-1)}{N(N-1)}\cdot\frac{b(b-1)}{(N-2)(N-3)}
+          + \frac{a(a-1)}{N(N-1)}\cdot\frac{c(c-1)}{(N-2)(N-3)} \\
+        &\qquad + \frac{b(b-1)}{N(N-1)}\cdot\frac{a(a-1)}{(N-2)(N-3)}
+          + \frac{b(b-1)}{N(N-1)}\cdot\frac{c(c-1)}{(N-2)(N-3)} \\
+        &\qquad + \frac{c(c-1)}{N(N-1)}\cdot\frac{a(a-1)}{(N-2)(N-3)}
+          + \frac{c(c-1)}{N(N-1)}\cdot\frac{b(b-1)}{(N-2)(N-3)}\Bigr) \\
+        &\quad + 4 \Bigl(
+            \frac{a(a-1)}{N(N-1)}\cdot\frac{bc}{(N-2)(N-3)}
+          + \frac{b(b-1)}{N(N-1)}\cdot\frac{ac}{(N-2)(N-3)} \\
+        &\qquad + \frac{c(c-1)}{N(N-1)}\cdot\frac{ab}{(N-2)(N-3)}\Bigr) \\
+        &= 4 \Bigl(
+            \frac{a(a-1)}{N(N-1)}\cdot\frac{b(b-1)}{(N-2)(N-3)}
+          + \frac{a(a-1)}{N(N-1)}\cdot\frac{c(c-1)}{(N-2)(N-3)} \\
+          &\quad + \frac{b(b-1)}{N(N-1)}\cdot\frac{c(c-1)}{(N-2)(N-3)} \Bigr) \\
+        &\quad + 4 \Bigl(
+            \frac{a(a-1)}{N(N-1)}\cdot\frac{bc}{(N-2)(N-3)} + \frac{b(b-1)}{N(N-1)}\cdot\frac{ac}{(N-2)(N-3)} \\
+        &\qquad + \frac{c(c-1)}{N(N-1)}\cdot\frac{ab}{(N-2)(N-3)}\Bigr)
+    \end{align*}
+
+    Hence,
+    \begin{align*}
+        &\mathrm{Var} \left(\sum_{i=1}^{N-1} I_i'\right) = \sum_{i=1}^{N-1} \mathrm{Var}(I_i') + 2 \sum_{1 \leq i < j \leq N-1} \mathrm{Cov}(I_i', I_j') \\
+        &= \sum_{i=1}^{N-1} \Bigl(\mathbb{E}[I_i'^2] - \mathbb{E}[I_i']^2\Bigr) + 2\sum_{1 \leq i < j \leq N-1} \Bigl(\mathbb{E}[I_i'I_j'] - \mathbb{E}[I_i']\mathbb{E}[I_j']\Bigr) \\
+        &= 2 \Bigl(\sum_{1 \leq i < j \leq N-1} \mathbb{E}[I_i'I_j']
+         + \sum_{1 \leq i < j \leq N-1} \frac{N^2-a^2-b^2-c^2}{N(N-1)}\Bigr) \\
+        &= 2 \sum_{1 \leq i < j \leq N-1} \mathbb{E}[I_i'I_j']
+         + 2\binom{N-1}{2}\frac{N^2-a^2-b^2-c^2}{N(N-1)} \\
+        &= 2 \Bigl(\sum_{1 \leq i \leq N-2}\mathbb{E}[I_i'I_{i+1}']
+         + \sum_{\substack{1 \leq i < j \leq N-1 \\ j > i+1}}\mathbb{E}[I_i'I_j']\Bigr) + 2\binom{N-1}{2}\frac{N^2-a^2-b^2-c^2}{N(N-1)} \\
+        &= 2\Biggl[(N-2)\Bigl(
+            \frac{a}{N(N-1)(N-2)}\bigl(b(b-1)+c(c-1)+2bc\bigr) \\
+        &\quad\quad + \frac{b}{N(N-1)(N-2)}\bigl(a(a-1)+c(c-1)+2ac\bigr) \\
+        &\quad\quad + \frac{c}{N(N-1)(N-2)}\bigl(a(a-1)+b(b-1)+2ab\bigr)\Bigr) \\
+        &\quad + \Bigl(\binom{N-1}{2}-(N-2)\Bigr)\Bigl(
+            4\Bigl(
+              \frac{a(a-1)}{N(N-1)}\cdot\frac{b(b-1)}{(N-2)(N-3)} \\
+        &\qquad\quad + \frac{a(a-1)}{N(N-1)}\cdot\frac{c(c-1)}{(N-2)(N-3)} + \frac{b(b-1)}{N(N-1)}\cdot\frac{c(c-1)}{(N-2)(N-3)}\Bigr) \\
+        &\qquad + 4\Bigl(
+              \frac{a(a-1)}{N(N-1)}\cdot\frac{bc}{(N-2)(N-3)}
+            + \frac{b(b-1)}{N(N-1)}\cdot\frac{ac}{(N-2)(N-3)} \\
+        &\qquad\quad + \frac{c(c-1)}{N(N-1)}\cdot\frac{ab}{(N-2)(N-3)}
+          \Bigr)\Bigr)\Biggr] + 2 \binom{N - 1}{2} \frac{N^2 - a^2 - b^2 - c^2}{N(N - 1)}.
+    \end{align*}
+    Thus,
+    \begin{align*}
+        \mathrm{Var}(X) &= 6250000 \cdot 2 \Biggl[ \Biggl[
+          (N-2)\Bigl(
+            \frac{a}{N(N-1)(N-2)}\bigl(b(b-1)+c(c-1)+2bc\bigr) \\
+        &\quad + \frac{b}{N(N-1)(N-2)}\bigl(a(a-1)+c(c-1)+2ac\bigr) \\
+        &\quad + \frac{c}{N(N-1)(N-2)}\bigl(a(a-1)+b(b-1)+2ab\bigr)\Bigr) \\
+        &\quad + \Bigl(\binom{N-1}{2}-(N-2)\Bigr)\Bigl(
+            4 \Bigl(
+            \frac{a(a-1)}{N(N-1)}\cdot\frac{b(b-1)}{(N-2)(N-3)} \\
+          &\quad + \frac{a(a-1)}{N(N-1)}\cdot\frac{c(c-1)}{(N-2)(N-3)} + \frac{b(b-1)}{N(N-1)}\cdot\frac{c(c-1)}{(N-2)(N-3)} \Bigr) \\
+        &\quad + 4 \Bigl(
+            \frac{a(a-1)}{N(N-1)}\cdot\frac{bc}{(N-2)(N-3)} + \frac{b(b-1)}{N(N-1)}\cdot\frac{ac}{(N-2)(N-3)} \\
+        &\qquad + \frac{c(c-1)}{N(N-1)}\cdot\frac{ab}{(N-2)(N-3)}\Bigr)\Bigr)\Biggr] + 2 \binom{N - 1}{2} \frac{N^2 - a^2 - b^2 - c^2}{N(N - 1)} \Biggr].
+    \end{align*}
+\end{itemize}
+
+\paragraph{Exercise 4}  Let $X$ and $Y$ be random variables. Define the functions
+\[ f(y) = \mathbb{E}[X|Y=y] \quad \textrm{and} \quad g(y) = \textrm{Var}(X|Y=y) = \mathbb{E} \left[ \left( X - \mathbb{E}[X | Y=y] \right)^2 | Y = y \right]. \]
+
+ Prove that
+\[ \textrm{Var}(X) = \mathbb{E}[ g(Y) ] + \textrm{Var}( f(Y) ). \]
+
+\paragraph{Solution:}
+
+Note that
+\begin{align*}
+    g(y) &= \mathbb{E}\left[X^2 - 2\mathbb{E}[X \mid Y=y]\,X + \mathbb{E}[X \mid Y=y]^2 \;\middle|\; Y=y\right] \\
+         &= \mathbb{E}[X^2 \mid Y=y] - 2\mathbb{E}[X \mid Y=y]\,\mathbb{E}[X \mid Y=y] + \mathbb{E}[X \mid Y=y]^2 \\
+         &= \mathbb{E}[X^2 \mid Y=y] - \mathbb{E}[X \mid Y=y]^2.
+\end{align*}
+Taking expectations,
+\[
+    \mathbb{E}[g(Y)] = \mathbb{E}\left[\mathbb{E}[X^2 \mid Y] - \mathbb{E}[X \mid Y]^2\right]
+    = \mathbb{E}\left[\mathbb{E}[X^2 \mid Y]\right] - \mathbb{E}\left[\mathbb{E}[X \mid Y]^2\right]
+    = \mathbb{E}[X^2] - \mathbb{E}\left[\mathbb{E}[X \mid Y]^2\right].
+\]
+For the variance of $f(Y) = \mathbb{E}[X \mid Y]$,
+\begin{align*}
+    \mathrm{Var}(f(Y)) &= \mathrm{Var}(\mathbb{E}[X \mid Y]) \\
+    &= \mathbb{E}\left[\mathbb{E}[X \mid Y]^2\right] - \left(\mathbb{E}\left[\mathbb{E}[X \mid Y]\right]\right)^2 \\
+    &= \mathbb{E}\left[\mathbb{E}[X \mid Y]^2\right] - \mathbb{E}[X]^2.
+\end{align*}
+Thus,
+\begin{align*}
+    \mathbb{E}[g(Y)] + \mathrm{Var}(f(Y))
+    &= \mathbb{E}[X^2] - \mathbb{E}\left[\mathbb{E}[X \mid Y]^2\right] + \mathbb{E}\left[\mathbb{E}[X \mid Y]^2\right] - \mathbb{E}[X]^2 \\
+    &= \mathbb{E}[X^2] - \mathbb{E}[X]^2 \\
+    &= \mathrm{Var}(X).
+\end{align*}
+
+
+% \newpage
+
+% \section*{Hints}  The following QR codes contain hints for some of the homework exercises.  You should be able to decode them using any QR code scanner, including this one: \url{https://zxing.org/w/decode.jspx}.
+
+% \paragraph{Exercise ?} Also available at \url{https://i.ibb.co/???????/S??E?.png}.
+
+\end{document}
