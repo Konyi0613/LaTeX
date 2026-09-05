@@ -1,6 +1,19 @@
 % basics
-\usepackage{xeCJK}
-\setCJKmainfont{PingFang TC}
+\usepackage{iftex}
+\ifXeTeX
+  \usepackage{fontspec}
+  \usepackage{xeCJK}
+  \setCJKmainfont{Noto Serif CJK TC}[BoldFont=Noto Serif CJK TC Bold]
+  \setCJKsansfont{Noto Sans CJK TC}[BoldFont=Noto Sans CJK TC Bold]
+  \setCJKmonofont{Noto Sans Mono CJK TC}
+\else\ifLuaTeX
+  \usepackage{luatexja-fontspec}
+  \setmainjfont{Noto Serif CJK TC}[BoldFont=Noto Serif CJK TC Bold]
+  \setsansjfont{Noto Sans CJK TC}[BoldFont=Noto Sans CJK TC Bold]
+  \setmonojfont{Noto Sans Mono CJK TC}
+\else
+  \PackageError{header}{This template requires XeLaTeX or LuaLaTeX}{}
+\fi\fi
 \setsansfont{Latin Modern Sans}
 \newfontface\lmrfont{lmroman10-bold.otf}
 
@@ -236,6 +249,16 @@
 \newcommand{\hrulebar}{%
 	\par\hspace{\fill}\rule{0.95\linewidth}{.7pt}\hspace{\fill}%
 	\par\nointerlineskip\vspace{\baselineskip}%
+}
+
+% Source marker: \source{slides p1}
+\newcommand{\source}[1]{%
+	\par\vspace{0.5em}%
+	\noindent
+	{\color{Gray}\rule[0.55ex]{1.5em}{0.6pt}}\enspace
+	{\small\sffamily\bfseries\color{Gray!70!black}#1}\enspace
+	{\color{Gray}\leaders\hrule height 0.6pt\hfill\kern0pt}%
+	\par\nobreak\vspace{0.3em}%
 }
 
 % Napkin: green boxed moral / key takeaway

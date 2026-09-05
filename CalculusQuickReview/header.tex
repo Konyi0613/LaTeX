@@ -1,18 +1,29 @@
-% basics
+% ── 中文 ──────────────────────────────────────────────────────
 \usepackage{iftex}
+% Noto Serif CJK TC 是繁體明體，風格與新細明體相近。
 \ifXeTeX
   \usepackage{fontspec}
   \usepackage{xeCJK}
-  \setCJKmainfont{Noto Serif CJK TC}[BoldFont=Noto Serif CJK TC Bold]
-  \setCJKsansfont{Noto Sans CJK TC}[BoldFont=Noto Sans CJK TC Bold]
+  \setCJKmainfont{Noto Serif CJK TC}[
+    BoldFont=Noto Serif CJK TC Bold
+  ]
+  \setCJKsansfont{Noto Sans CJK TC}[
+    BoldFont=Noto Sans CJK TC Bold
+  ]
   \setCJKmonofont{Noto Sans Mono CJK TC}
 \else\ifLuaTeX
   \usepackage{luatexja-fontspec}
-  \setmainjfont{Noto Serif CJK TC}[BoldFont=Noto Serif CJK TC Bold]
-  \setsansjfont{Noto Sans CJK TC}[BoldFont=Noto Sans CJK TC Bold]
+  \setmainjfont{Noto Serif CJK TC}[
+    BoldFont=Noto Serif CJK TC Bold
+  ]
+  \setsansjfont{Noto Sans CJK TC}[
+    BoldFont=Noto Sans CJK TC Bold
+  ]
   \setmonojfont{Noto Sans Mono CJK TC}
 \else
-  \PackageError{header}{This template requires XeLaTeX or LuaLaTeX}{}
+  \PackageError{solution_template}
+    {This template requires XeLaTeX or LuaLaTeX}
+    {Set the first-line TeX program to xelatex or lualatex.}
 \fi\fi
 \setsansfont{Latin Modern Sans}
 \newfontface\lmrfont{lmroman10-bold.otf}
@@ -251,16 +262,6 @@
 	\par\nointerlineskip\vspace{\baselineskip}%
 }
 
-% Source marker: \source{slides p1}
-\newcommand{\source}[1]{%
-	\par\vspace{0.5em}%
-	\noindent
-	{\color{Gray}\rule[0.55ex]{1.5em}{0.6pt}}\enspace
-	{\small\sffamily\bfseries\color{Gray!70!black}#1}\enspace
-	{\color{Gray}\leaders\hrule height 0.6pt\hfill\kern0pt}%
-	\par\nobreak\vspace{0.3em}%
-}
-
 % Napkin: green boxed moral / key takeaway
 \newenvironment{moral}{%
 	\begin{tcolorbox}[
@@ -297,31 +298,6 @@
 \ohead{\footnotesize\thepage}
 \chead{}
 \ifoot{}\ofoot{}\cfoot{}
-
-\def\twodigits#1{\ifnum#1<10 0\fi\the#1}
-\def\dateparts#1 #2 #3 #4 #5\relax{
-	\marginpar{\footnotesize\textsf{\raggedright #1 #2 #3 #5}}
-}
-
-\def\@lecture{}%
-\newcommand{\lecture}[3]{
-	\ifthenelse{\isempty{#3}}{%
-		\global\def\@lecture{Lecture #1}%
-	}{%
-		\global\def\@lecture{Lecture #1: #3}%
-	}%
-	\section*{\@lecture}
-	\marginpar{\footnotesize\textsf{\raggedright #2}}
-}
-
-\usepackage{pgffor}
-\newcommand{\lec}[2]{%
-	\foreach \c in {#1,...,#2}{%
-		\IfFileExists{Lectures/lec_\c.tex}{%
-			\input{Lectures/lec_\c.tex}%
-		}{}%
-	}%
-}
 
 \makeatother
 
