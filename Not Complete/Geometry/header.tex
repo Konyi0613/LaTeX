@@ -2,39 +2,48 @@
 \usepackage{iftex}
 \ifXeTeX
   \usepackage{fontspec}
-  \usepackage{xeCJK}
-  \IfFontExistsTF{Noto Serif CJK TC}{%
-    \setCJKmainfont{Noto Serif CJK TC}[BoldFont=Noto Serif CJK TC Bold]%
-    \setCJKsansfont{Noto Sans CJK TC}[BoldFont=Noto Sans CJK TC Bold]%
-    \setCJKmonofont{Noto Sans Mono CJK TC}%
-  }{% Fallback to macOS system CJK fonts when Noto CJK is not installed
-    \setCJKmainfont{Songti TC}%
-    \setCJKsansfont{PingFang TC}%
-    \setCJKmonofont{PingFang TC}%
-  }
 \else\ifLuaTeX
-  \usepackage{luatexja-fontspec}
-  \IfFontExistsTF{Noto Serif CJK TC}{%
-    \setmainjfont{Noto Serif CJK TC}[BoldFont=Noto Serif CJK TC Bold]%
-    \setsansjfont{Noto Sans CJK TC}[BoldFont=Noto Sans CJK TC Bold]%
-    \setmonojfont{Noto Sans Mono CJK TC}%
-  }{% Fallback to macOS system CJK fonts when Noto CJK is not installed
-    \setmainjfont{Songti TC}%
-    \setsansjfont{PingFang TC}%
-    \setmonojfont{PingFang TC}%
-  }
+  \usepackage{fontspec}
 \else
   \PackageError{header}{This template requires XeLaTeX or LuaLaTeX}{}
 \fi\fi
-\IfFontExistsTF{Latin Modern Sans}{%
-  \setsansfont{Latin Modern Sans}%
-}{% Load Latin Modern Sans by file name (shipped with TeX Live, not always registered)
-  \setsansfont{lmsans10-regular.otf}[%
-    BoldFont       = lmsans10-bold.otf,%
-    ItalicFont     = lmsans10-oblique.otf,%
-    BoldItalicFont = lmsans10-boldoblique.otf,%
-  ]%
+
+% CJK fonts: prefer Noto CJK TC, fall back to fonts shipped with macOS,
+% and skip the CJK setup entirely if neither is installed.
+\newif\ifCJKfonts
+\IfFontExistsTF{Noto Serif CJK TC}{%
+  \CJKfontstrue
+  \def\cjkserif{Noto Serif CJK TC}\def\cjkserifbold{Noto Serif CJK TC Bold}%
+  \def\cjksans{Noto Sans CJK TC}\def\cjksansbold{Noto Sans CJK TC Bold}%
+  \def\cjkmono{Noto Sans Mono CJK TC}%
+}{%
+  \IfFontExistsTF{Songti TC}{%
+    \CJKfontstrue
+    \def\cjkserif{Songti TC}\def\cjkserifbold{Songti TC Bold}%
+    \def\cjksans{Heiti TC}\def\cjksansbold{Heiti TC Medium}%
+    \def\cjkmono{Heiti TC}%
+  }{\CJKfontsfalse}%
 }
+\ifCJKfonts
+  \ifXeTeX
+    \usepackage{xeCJK}
+    \setCJKmainfont{\cjkserif}[BoldFont=\cjkserifbold]
+    \setCJKsansfont{\cjksans}[BoldFont=\cjksansbold]
+    \setCJKmonofont{\cjkmono}
+  \else
+    \usepackage{luatexja-fontspec}
+    \setmainjfont{\cjkserif}[BoldFont=\cjkserifbold]
+    \setsansjfont{\cjksans}[BoldFont=\cjksansbold]
+    \setmonojfont{\cjkmono}
+  \fi
+\fi
+
+% Latin Modern Sans is not installed as a system font; load the OTF files
+% that ship with TeX Live instead.
+\setsansfont{lmsans10-regular.otf}[
+  BoldFont       = lmsans10-bold.otf,
+  ItalicFont     = lmsans10-oblique.otf,
+  BoldItalicFont = lmsans10-boldoblique.otf]
 \newfontface\lmrfont{lmroman10-bold.otf}
 
 \usepackage[utf8]{inputenc}
@@ -170,23 +179,6 @@
 \appto\tcb@use@after@lastbox{\@endparenv\@doendpe}
 \makeatother
 
-% `splitsafe' — use instead of `breakable' on any tcolorbox with a background.
-%
-% tcolorbox splits a breakable box across a page with \vsplit.  XeTeX carries
-% the current colour in a stack driven by \special{color push/pop}, and that
-% stack does not survive \vsplit: the continuation segment starts with whatever
-% colour was set last, which is the `colback' just painted for that segment.
-% Its body text is then drawn in the background colour, i.e. invisibly — the
-% text is still in the PDF and pdftotext finds it, but nothing is readable.
-% LuaTeX's native \pdfcolorstack is split-safe, so the same source is fine
-% there.  Keep such boxes whole under XeTeX instead; they then move to the next
-% page as a unit, exactly as the unbreakable `theorem box' already does.
-\ifXeTeX
-	\tcbset{splitsafe/.style={unbreakable}}
-\else
-	\tcbset{splitsafe/.style={breakable}}
-\fi
-
 \tcbset{
 	theorem box/.style={
 		enhanced, arc=9pt, outer arc=10pt,
@@ -198,7 +190,7 @@
 		enhanced, sharp corners, arc=9pt, outer arc=10pt,
 		colframe=RawSienna, colback=Salmon!5, boxrule=0.5pt,
 		before skip=12pt, after skip=14pt,
-		splitsafe, top=6pt, bottom=8pt,
+		breakable, top=6pt, bottom=8pt,
 		left=10pt, right=10pt
 	},
 	ques box/.style={
@@ -206,7 +198,7 @@
 		borderline west={3pt}{0pt}{black},
 		colback=RedViolet!5!gray!5,
 		before skip=8pt, after skip=12pt,
-		splitsafe, left=10pt, right=10pt
+		breakable, left=10pt, right=10pt
 	}
 }
 

@@ -1,0 +1,208 @@
+\chapter{Geometry of curves}
+\begin{definition}
+    Let \(I = (\alpha , \beta ) \subseteq \mathbb{R} \) be an open interval. A \(C^k\) parametrized curve in \(\mathbb{R} ^n\) is a \(C^k\) map \(\gamma : I \to \mathbb{R} ^n, t \to \gamma (t) = (\gamma _1(t), \gamma _2(t), \dots , \gamma _n(t))\).     
+\end{definition}
+
+In the following, we usually assume \(\gamma \in C^{\infty} \). 
+
+\begin{eg}
+    \begin{align*}
+        \text{A unit circle} &= \left\{ (x, y) \mid x^2 + y^2 = 1 \right\} = \left\{ (\cos t, \sin t) \mid t \in \mathbb{R} \right\} = \left\{ (\cos 2t, \sin 2t) \mid t \in \mathbb{R} \right\}.    
+    \end{align*}
+    A unit circle has two different parametrizations.
+\end{eg}
+
+\begin{definition}
+    The velocity of a parametrized curve is \(\gamma ^{\prime} (t)\) and its speed is \(\lVert \gamma ^{\prime} (t) \rVert \). The curve is regular if \(\gamma ^{\prime} (t) \neq 0\) for all \(t \in I\).   
+\end{definition}
+
+\begin{eg}
+    Consider the curve \(\gamma (t) = (t^2, t^3)\). \(\gamma \) is a smooth curve, and 
+    \[
+        \gamma ^{\prime} (t) = (2t, 3t^2), \quad \lVert \gamma ^{\prime} (t) \rVert = \sqrt{4t^2 + 9t^4} = \sqrt{t^2 \underbrace{(4 + 9t^2)}_{>0}}.   
+    \]  
+    Also,
+    \[
+        \gamma ^{\prime} (t) = 0 \iff \lVert \gamma ^{\prime} (t) \rVert = 0 \iff t = 0, 
+    \]
+    and the curve is not regular at \(t = 0\). 
+
+    If we paramatrize this curve, we know 
+    \[
+        \gamma (t) = (t^2, t^3) \implies \gamma (t) \in \left\{ (x, y) \mid y^2 = x^3 \right\}.
+    \]
+    \begin{center}
+        \begin{tikzpicture}[scale=1.15, >=Stealth]
+            \draw[->, gray] (-0.45, 0) -- (2.25, 0) node[right] {$x$};
+            \draw[->, gray] (0, -2.4) -- (0, 2.5) node[above] {$y$};
+            \draw[very thick, TealBlue, domain=-1.3:0, samples=80, variable=\parameter]
+                plot ({(\parameter)^2}, {(\parameter)^3});
+            \draw[very thick, TealBlue, domain=0:1.3, samples=80, variable=\parameter]
+                plot ({(\parameter)^2}, {(\parameter)^3});
+            \draw[->, very thick, TealBlue, domain=-1.1:-0.9, samples=15, variable=\parameter]
+                plot ({(\parameter)^2}, {(\parameter)^3});
+            \draw[->, very thick, TealBlue, domain=0.9:1.1, samples=15, variable=\parameter]
+                plot ({(\parameter)^2}, {(\parameter)^3});
+            \fill[TealBlue] (0, 0) circle (1.8pt);
+            \node[above left, font=\small] at (0, 0) {$t=0$};
+            \node[right, font=\small] at (1.3, -1.45) {$t<0$};
+            \node[right, font=\small] at (1.3, 1.45) {$t>0$};
+            \node[right] at (1.9, 0.55) {$y^2=x^3$};
+        \end{tikzpicture}
+
+        \small The cusp at the origin, where $\gamma'(0)=0$.
+        Arrows indicate increasing $t$.
+    \end{center}
+\end{eg}
+
+\begin{definition}
+    Let \(I, J \subseteq \mathbb{R}\) be open intervals. A regular change of parameter is a smooth bijection \(\phi : J \to I\) with smooth inverse and \(\phi ^{\prime} (u) \neq 0\) on \(J\). The curve \(\widetilde{\gamma } = \gamma \circ \phi \) is a reparametrization of \(\gamma \).      
+\end{definition}
+
+\begin{remark}
+    If \(\gamma \) is regular then \(\widetilde{\gamma} \) is also regular since 
+    \[
+        \widetilde{\gamma }^{\prime} (u) = \gamma ^{\prime} (\phi (u)) \phi ^{\prime} (u) \neq 0. 
+    \]  
+\end{remark}
+
+\begin{definition}[Arc length]
+    For a \(C^1 \) curve \(\gamma : [a, b] \to \mathbb{R} ^n\), its length is 
+    \[
+        L(\gamma ) = \int _a^b \lVert \gamma ^{\prime} (t) \rVert \, \mathrm{d} t.  
+    \]  
+\end{definition}
+
+\begin{proposition}
+    Let \(\widetilde{\gamma} = \gamma \circ \phi\), where \(\phi : [c, d] \to [a, b]\) is a regular change of parameter. Then \(L(\widetilde{\gamma} ) = L(\gamma )\).   
+\end{proposition}
+
+\begin{eg}
+    For \(\gamma (t) = (a \cos t, a \sin t, b t)\), where \(0 \le t \le T\) and \((a, b) \neq (0, 0)\) and \(a, b > 0\). Then \(\gamma \) is called a helix.     
+
+\begin{center}
+        \begin{tikzpicture}[
+            x={(1cm,-0.35cm)}, y={(0.8cm,0.45cm)}, z={(0cm,1cm)},
+            scale=1.25, >=Stealth
+        ]
+            \draw[->, gray] (0, 0, 0) -- (1.8, 0, 0) node[below right] {$x$};
+            \draw[->, gray] (0, 0, 0) -- (0, 1.8, 0) node[right] {$y$};
+            \draw[->, gray] (0, 0, 0) -- (0, 0, 3.8) node[above] {$z$};
+            \draw[dashed, gray, domain=0:360, samples=100, variable=\angle]
+                plot ({cos(\angle)}, {sin(\angle)}, 0);
+            \draw[dashed, gray] (1, 0, 0) -- (1, 0, pi);
+            \draw[very thick, TealBlue, domain=0:720, samples=241, variable=\angle]
+                plot ({cos(\angle)}, {sin(\angle)}, {pi*\angle/720});
+            \draw[->, very thick, TealBlue, domain=100:140, samples=20, variable=\angle]
+                plot ({cos(\angle)}, {sin(\angle)}, {pi*\angle/720});
+            \draw[->, very thick, TealBlue, domain=460:500, samples=20, variable=\angle]
+                plot ({cos(\angle)}, {sin(\angle)}, {pi*\angle/720});
+            \fill[TealBlue] (1, 0, 0) circle (1.8pt)
+                node[below, font=\small] {$t=0$};
+            \fill[TealBlue] (1, 0, pi) circle (1.8pt)
+                node[right, font=\small] {$t=4\pi$};
+        \end{tikzpicture}
+
+        \small A helix with $a=1$, $b=\tfrac14$, and $T=4\pi$.
+        Arrows indicate increasing $t$; the dashed circle is its projection onto the $xy$-plane.
+    \end{center}
+    We know 
+    \begin{align*}
+        \gamma ^{\prime} (t) &= (-a \sin t, a \cos t, b) \\
+        \lVert \gamma ^{\prime} (t) \rVert &= \sqrt{a^2 \sin ^2 t + a^2 \cos ^2 t + b^2} = \sqrt{a^2 + b^2}. \\
+        \int _0^T \lVert \gamma ^{\prime} (t) \rVert \, \mathrm{d} t &= \sqrt{a^2 + b^2} T.      
+    \end{align*}
+\end{eg}
+
+Now suppose \(\gamma \) is regular. Define the arc-length function measured from \(t_0\) is 
+\[
+    s(t) = \int _{t_0}^{t} \lVert \gamma ^{\prime} (u) \rVert \, \mathrm{d} u, \quad \frac{\mathrm{d}s}{\mathrm{d}t} = \lVert \gamma ^{\prime} (t) \rVert > 0.    
+\]
+
+\begin{proposition}
+    Every regular curve on an open interval admits an orientation preserving parametrization by arc-length \(\left\lVert \frac{\mathrm{d} \widetilde{\gamma} }{\mathrm{d} s}  \right\rVert = 1 \) where \(\widetilde{\gamma} = \gamma (t(s))\).  
+\end{proposition}
+
+\begin{proof}
+    Suppose \(\gamma : (a, b) \to \mathbb{R} ^n\) is regular, and \(t_0 \in (a, b)\), and we have 
+    \[
+        \frac{\mathrm{d}s}{\mathrm{d}t} = \lVert \gamma ^{\prime} (t) \rVert > 0 \text{ on } (a, b). 
+    \]
+    Assume \(\gamma \) is restriction of a smooth curve, so \(t\) is a function of \(s\). Thus
+    \[
+        1 = \frac{\mathrm{d}s}{\mathrm{d}s} = \frac{\mathrm{d}s}{\mathrm{d}t} \frac{\mathrm{d}t}{\mathrm{d}s} = \lVert \gamma ^{\prime} (t) \rVert \frac{\mathrm{d}t}{\mathrm{d}s} \implies \frac{\mathrm{d} t}{\mathrm{d} s} = \frac{1}{\lVert \gamma ^{\prime} (t) \rVert }.  
+    \]
+
+    Hence, 
+    \[
+        \widetilde{\gamma} (s) = \gamma (t(s)),
+    \]
+    and by chain rule
+    \[
+        \frac{\mathrm{d} \widetilde{\gamma} }{\mathrm{d}s} = \frac{\mathrm{d} \gamma }{\mathrm{d} t} \frac{\mathrm{d}t}{\mathrm{d}s} = \gamma ^{\prime} (t) \cdot \frac{1}{\lVert \gamma ^{\prime} (t) \rVert } \implies \left\lVert \frac{\mathrm{d} \widetilde{\gamma} }{\mathrm{d}s}  \right\rVert = 1.   
+    \]
+\end{proof}
+
+Suppose \(\gamma\) is a regular \(C^2\) curve. After reparametrizing by arc length, write \(\gamma : J \to \mathbb{R}^n\), where \(J\) is an open interval with parameter \(s\), and \(\lVert \gamma^{\prime}(s) \rVert = 1\). For each \(s \in J\), the derivative \(\gamma^{\prime}(s)\) is a tangent vector to the curve at \(\gamma(s)\), pointing in the direction of increasing \(s\). Since it has length one, we call it the \emph{unit tangent vector} and denote it by \(T(s)\). Thus, \(T\) is the vector-valued \(C^1\) function assigning to each parameter value its unit tangent vector:
+\[
+    T : J \to \mathbb{R}^n, \qquad
+    T(s) = \gamma^{\prime}(s) = (T_1(s), \dots, T_n(s)),
+\]
+where each \(T_j : J \to \mathbb{R}\) is a scalar-valued \(C^1\) function. The derivative of \(T\) is a vector, defined by a limit in \(\mathbb{R}^n\) and computed componentwise:
+\[
+    T^{\prime}(s)
+    = \lim_{h \to 0} \frac{T(s+h)-T(s)}{h}
+    = (T_1^{\prime}(s), \dots, T_n^{\prime}(s))
+    = \gamma^{\prime\prime}(s).
+\]
+
+For any \(C^1\) vector-valued functions \(U,V : J \to \mathbb{R}^n\), their Euclidean inner product is the scalar-valued function
+\[
+    s \longmapsto \langle U(s), V(s) \rangle
+    = \sum_{j=1}^n U_j(s)V_j(s) \in \mathbb{R}.
+\]
+Thus, differentiating the inner product means differentiating a finite sum of products of real-valued functions. Applying the ordinary product rule to each summand gives
+\begin{align*}
+    \frac{\mathrm{d}}{\mathrm{d}s} \langle U(s), V(s) \rangle
+    &= \sum_{j=1}^n \bigl(U_j^{\prime}(s)V_j(s) + U_j(s)V_j^{\prime}(s)\bigr) \\
+    &= \langle U^{\prime}(s), V(s) \rangle
+       + \langle U(s), V^{\prime}(s) \rangle.
+\end{align*}
+
+In particular, \(\langle T(s), T(s) \rangle = \lVert T(s) \rVert^2 = 1\). Taking \(U=V=T\) in the formula above, we obtain
+\begin{align*}
+    0 &= \frac{\mathrm{d}}{\mathrm{d}s} \langle T(s), T(s) \rangle \\
+      &= \langle T^{\prime}(s), T(s) \rangle + \langle T(s), T^{\prime}(s) \rangle \\
+      &= 2\langle T^{\prime}(s), T(s) \rangle,
+\end{align*}
+where the last equality uses the symmetry of the Euclidean inner product. Hence
+\[
+    \langle T^{\prime}(s), T(s) \rangle
+    = \langle \gamma^{\prime\prime}(s), \gamma^{\prime}(s) \rangle = 0.
+\]
+Thus, \(T^{\prime}(s)\) is orthogonal to the unit tangent \(T(s)\). This includes the possibility \(T^{\prime}(s)=0\). Since \(T\) has constant length, its derivative describes only a change in direction. The magnitude of this change per unit arc length is the curvature, defined below.
+
+\begin{definition}
+    For a unit speed \(C^2\) regular curve, the curvature is
+    \[
+        \kappa(s) = \lVert T^{\prime} (s) \rVert = \lVert \gamma ^{\prime\prime} (s) \rVert.  
+    \] 
+\end{definition}
+
+\begin{remark}
+    If \(\gamma (t)\) is regular, then 
+    \[
+        \kappa (t) = \left\lVert \frac{\mathrm{d}T}{\mathrm{d}s}  \right\rVert = \left\lVert \frac{\mathrm{d}T}{\mathrm{d}t} \frac{\mathrm{d}t}{\mathrm{d}s} \right\rVert  = \frac{\left\lVert \frac{\mathrm{d}T}{\mathrm{d}t}  \right\rVert }{\lVert \gamma ^{\prime} (s) \rVert }
+    \] 
+\end{remark}
+
+\begin{proposition}
+    Let \(\gamma :I \to \mathbb{R}^3 \) be a regular \(C^2\) curve. Then 
+    \[
+        \kappa = \frac{\sqrt{\lVert \gamma ^{\prime}  \rVert \lVert \gamma ^{\prime\prime}  \rVert^2 - \langle \gamma ^{\prime} , \gamma ^{\prime\prime}  \rangle^2   } }{\lVert \gamma ^{\prime} (t) \rVert^3 },
+    \]  
+    and when \(n = 3\), we have 
+    \[
+        \kappa = \frac{\lVert \gamma ^{\prime} \times \gamma ^{\prime\prime}  \rVert }{\lVert \gamma  \rVert^3 }.
+    \] 
+\end{proposition}
