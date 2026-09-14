@@ -1,0 +1,297 @@
+\chapter{The Everyday Loop}\label{ch:git-loop}
+
+Ninety per cent of Git use is six commands in a cycle: change something, look at
+what changed, stage it, commit it, and occasionally undo. This chapter is that
+cycle.
+
+\section{Starting a Repository}\label{sec:git-init}
+
+\begin{keys}[0.32]
+	\cmd{git init}                     & Turn this directory into a repository      \\
+	\cmd{git init -b main}             & \dots{} with a named initial branch        \\
+	\cmd{git clone <url>}              & Copy an existing repository, history and all \\
+	\cmd{git clone <url> mydir}        & \dots{} into a directory of your choosing  \\
+	\cmd{git clone -{}-depth 1 <url>}  & A \vocab{shallow} clone: latest commit only \\
+	\cmd{git clone -{}-branch v2 <url>} & Start on a particular branch or tag       \\
+\end{keys}
+
+\begin{note}
+	\cmd{git init} creates one directory, \file{.git/}, and changes nothing else.
+	Deleting \file{.git/} turns the project back into ordinary files with no
+	history --- which is worth knowing both as reassurance and as a warning.
+\end{note}
+
+\section{\texorpdfstring{\cmd{status} and the Index}{status and the Index}}\label{sec:git-status}
+
+\begin{shell}
+$ git status
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+
+Changes to be committed:            # index vs HEAD
+        modified:   Chapters/git_1_model.tex
+
+Changes not staged for commit:      # working tree vs index
+        modified:   CSTools.tex
+
+Untracked files:                    # in neither
+        Chapters/git_2_loop.tex
+\end{shell}
+
+Those three headings are exactly the three trees of
+\autoref{sec:git-threetrees}, which is why that section came first.
+
+\begin{keys}[0.30]
+	\cmd{git status}            & The full report                                 \\
+	\cmd{git status -s}         & Short: two columns, index then working tree     \\
+	\cmd{git status -sb}        & \dots{} with the branch line                    \\
+\end{keys}
+
+\begin{keys}[0.16]
+	\texttt{M\phantom{M}} & Modified, staged            \\
+	\texttt{\phantom{M}M} & Modified, not staged        \\
+	\texttt{MM}           & Staged, then modified again \\
+	\texttt{A\phantom{A}} & Newly added                 \\
+	\texttt{D\phantom{D}} & Deleted                     \\
+	\texttt{R\phantom{R}} & Renamed                     \\
+	\texttt{??}           & Untracked                   \\
+\end{keys}
+
+\begin{moral}
+	\cmd{git status} is the command to run when you do not know what to do next.
+	It reports the state \emph{and} suggests the command --- which file to add,
+	how to unstage, how to abort a merge. Read it rather than searching the web.
+\end{moral}
+
+\section{Staging}\label{sec:git-add}
+
+\begin{keys}[0.30]
+	\cmd{git add file.tex}       & Stage one file                                 \\
+	\cmd{git add Chapters/}      & Stage a directory                              \\
+	\cmd{git add -A}             & Stage everything, deletions included           \\
+	\cmd{git add -u}             & Stage changes to \emph{tracked} files only     \\
+	\cmd{git add -p}             & Stage \emph{parts} of files, interactively     \\
+	\cmd{git rm file}            & Delete it and stage the deletion               \\
+	\cmd{git rm -{}-cached file} & Stop tracking it, keep it on disk              \\
+	\cmd{git mv old new}         & Rename, and stage the rename                   \\
+\end{keys}
+
+\cmd{git add -p} is the command that justifies the index existing at all. It
+walks through each change and asks:
+
+\begin{shell}
+$ git add -p
+diff --git a/parser.c b/parser.c
+@@ -40,7 +40,7 @@ int parse_line(const char *s)
+-    while (*s != '\n') {
++    while (s && *s != '\n') {          # the bug fix
+(1/2) Stage this hunk [y,n,q,a,d,s,e,?]? y
+@@ -88,3 +88,6 @@
++/* TODO: rewrite this whole function */   # an unrelated note
+(2/2) Stage this hunk [y,n,q,a,d,s,e,?]? n
+\end{shell}
+
+\begin{keys}[0.16]
+	\key{y} & Stage this hunk                      \\
+	\key{n} & Do not                               \\
+	\key{s} & Split it into smaller hunks          \\
+	\key{e} & Edit the hunk by hand                \\
+	\key{q} & Stop                                 \\
+	\key{?} & Explain every key                    \\
+\end{keys}
+
+\begin{moral}
+	One commit, one idea. \cmd{git add -p} is how you get there when an afternoon's
+	work touched four unrelated things --- and a history of single-idea commits is
+	what makes \autoref{sec:git-bisect} and \cmd{git revert} work at all.
+\end{moral}
+
+\section{Committing}\label{sec:git-commit}
+
+\begin{keys}[0.32]
+	\cmd{git commit}               & Open your editor for the message            \\
+	\cmd{git commit -m "..."}      & Message on the command line                 \\
+	\cmd{git commit -a}            & Stage all tracked changes, then commit      \\
+	\cmd{git commit -{}-amend}     & Replace the last commit (\autoref{sec:git-amend}) \\
+	\cmd{git commit -v}            & Show the diff in the editor while you write \\
+\end{keys}
+
+\begin{note}
+	\cmd{git commit -v} puts the full staged diff below the message in your editor.
+	It costs nothing, and it catches the debug \cmd{printf} you forgot to remove
+	roughly once a month. Turn it on permanently with
+	\cmd{git config --global commit.verbose true}.
+\end{note}
+
+A commit message has a standard shape, and it is worth following:
+
+\begin{conf}
+Fix crash when config file is missing
+
+fopen's return value was never checked, so a missing app.conf
+produced a NULL FILE* that parse_line dereferenced.
+
+Add the check and report the error with perror.
+
+Closes #42
+\end{conf}
+
+\begin{keys}[0.30]
+	First line                & A summary under about 50 characters              \\
+	Imperative mood           & ``Fix crash'', not ``Fixed'' or ``Fixes''        \\
+	A blank line              & Git relies on it to separate subject from body   \\
+	The body                  & \emph{Why}, not what --- the diff already says what \\
+	Wrap at 72 characters     & So that \cmd{git log} is readable in a terminal  \\
+\end{keys}
+
+\begin{moral}
+	The audience for a commit message is you, in eight months, running
+	\cmd{git log -S} on a line that makes no sense. ``Update'' and ``fix stuff''
+	are not messages; they are the absence of one. The imperative mood is not
+	fussiness --- it makes the subject read as \emph{what applying this commit
+		does}, which is how \cmd{git revert} and \cmd{git cherry-pick} generate their
+	own messages.
+\end{moral}
+
+\section{\texorpdfstring{\cmd{diff}: Three Comparisons}{diff: Three Comparisons}}\label{sec:git-diff}
+
+\begin{keys}[0.34]
+	\cmd{git diff}                  & Working tree vs index --- what is \emph{not} staged \\
+	\cmd{git diff -{}-staged}       & Index vs \texttt{HEAD} --- what \emph{is} staged    \\
+	\cmd{git diff HEAD}             & Working tree vs \texttt{HEAD} --- everything        \\
+	\cmd{git diff main..feature}    & Between two branches                                \\
+	\cmd{git diff a1b2c3d}          & Against an old commit                               \\
+	\cmd{git diff -{}- file.tex}    & Restricted to one file                              \\
+	\cmd{git diff -{}-stat}         & Just the summary of how much changed                \\
+	\cmd{git diff -w}               & Ignore whitespace. Invaluable after reformatting    \\
+	\cmd{git diff -{}-word-diff}    & Word-level rather than line-level. Good for prose   \\
+\end{keys}
+
+\begin{note}
+	The output is the unified diff of \autoref{sec:sh-compare}, so nothing new has
+	to be learnt to read it. \cmd{--word-diff} is worth remembering for \LaTeX{}:
+	a reflowed paragraph produces a line diff that shows everything as changed and
+	a word diff that shows the three words you actually edited.
+\end{note}
+
+\section{Reading History}\label{sec:git-log}
+
+\begin{keys}[0.34]
+	\cmd{git log}                     & The full history, newest first             \\
+	\cmd{git log -{}-oneline}         & One line per commit                        \\
+	\cmd{git log -{}-oneline -{}-graph -{}-all} & \dots{} with the branch topology  \\
+	\cmd{git log -5}                  & The last five                              \\
+	\cmd{git log -{}-stat}            & With a summary of files changed            \\
+	\cmd{git log -p}                  & With the full diff of each commit          \\
+	\cmd{git log -{}- file.tex}       & Only commits touching a file               \\
+	\cmd{git log -S'fopen'}           & Commits that added or removed that string  \\
+	\cmd{git log -{}-author=Kon}      & By author                                  \\
+	\cmd{git log -{}-since='2 weeks'} & By date                                    \\
+	\cmd{git log main..feature}       & On \cmd{feature} but not on \cmd{main}     \\
+	\cmd{git show <sha>}              & One commit in full                         \\
+\end{keys}
+
+\begin{eg}
+	The invocation worth aliasing:
+\begin{shell}
+$ git log --oneline --graph --all --decorate
+* 3f8a2b1 (HEAD -> feature) Add config validation
+* 9c4e7d2 Extract parse_line
+| * bc91a17 (origin/main, main) First day content only
+|/
+* b68711b Week1 Finish
+\end{shell}
+	The graph column shows where \cmd{feature} left \cmd{main}, and
+	\cmd{--decorate} puts the branch names on the commits they point at --- the
+	diagram from \autoref{sec:git-notation}, drawn in ASCII.
+\end{eg}
+
+\section{\texorpdfstring{\file{.gitignore}}{.gitignore}}\label{sec:git-ignore}
+
+\begin{conf}
+# build products
+build/
+*.o
+*.pdf
+
+# LaTeX intermediates
+*.aux
+*.log
+*.synctex.gz
+
+# editor and OS noise
+.DS_Store
+*.swp
+
+# but keep this one
+!doc/manual.pdf
+\end{conf}
+
+\begin{keys}[0.26]
+	\texttt{build/}          & A directory and everything in it                  \\
+	\texttt{*.o}             & A glob, matched at any depth                      \\
+	\texttt{/secrets.txt}    & Only at the repository root                       \\
+	\texttt{!keep.pdf}       & A negation: track this despite an earlier rule    \\
+	\texttt{doc/**/tmp}      & Any depth between the two components              \\
+\end{keys}
+
+\begin{note}
+	\file{.gitignore} only affects \emph{untracked} files. A file already committed
+	goes on being tracked no matter what you add to the ignore list ---
+	\cmd{git rm --cached} removes it from tracking while leaving it on disk.
+	\cmd{git check-ignore -v file} says which rule, in which file, is ignoring
+	something.
+\end{note}
+
+\begin{moral}
+	Never commit build products, dependencies, or secrets. The first two make every
+	diff unreadable; the third cannot be undone by deleting the file later, because
+	the old commit still contains it (\autoref{sec:git-bigfiles}).
+\end{moral}
+
+\section{Undoing}\label{sec:git-undo}
+
+Four commands with four different meanings. Choosing between them is a matter
+of asking \emph{which of the three trees do I want to change?}
+
+\begin{keys}[0.38]
+	\cmd{git restore file}             & Working tree $\leftarrow$ index. Discard unstaged edits \\
+	\cmd{git restore -{}-staged file}  & Index $\leftarrow$ \texttt{HEAD}. Unstage, keep the edits \\
+	\cmd{git restore -{}-source=HEAD\textasciitilde{}2 file} & Take a file from an old commit \\
+	\cmd{git reset -{}-soft HEAD\textasciitilde{}}  & Undo the commit, keep everything staged \\
+	\cmd{git reset HEAD\textasciitilde{}}           & Undo the commit and unstage; files untouched \\
+	\cmd{git reset -{}-hard HEAD\textasciitilde{}}  & Undo the commit and \textbf{destroy} the changes \\
+	\cmd{git revert <sha>}             & A \emph{new} commit undoing an old one    \\
+	\cmd{git clean -n} / \cmd{git clean -fd} & List / delete untracked files        \\
+\end{keys}
+
+\begin{intuition}
+	\cmd{reset} moves the branch pointer backwards and rewrites history;
+	\cmd{revert} leaves history alone and adds a commit that cancels an earlier
+	one. So \cmd{reset} is for mistakes nobody else has seen, and \cmd{revert} is
+	for anything already pushed.
+\end{intuition}
+
+\begin{note}[The only genuinely dangerous one]
+	\cmd{git reset --hard} and \cmd{git clean -fd} destroy uncommitted work, and
+	that work was never in a commit, so \autoref{sec:git-reflog} cannot bring it
+	back. Every other command in this part is recoverable. Run \cmd{git clean -n}
+	first, always --- it prints exactly what \cmd{-f} would delete.
+\end{note}
+
+\begin{eg}
+\begin{shell}
+$ git restore CSTools.tex             # throw away today's edits to one file
+$ git restore --staged CSTools.tex    # "I added the wrong file"
+$ git reset --soft HEAD~              # "I committed too early"
+$ git revert bc91a17                  # "that pushed commit was wrong"
+$ git commit --amend                  # "the message had a typo"
+\end{shell}
+\end{eg}
+
+\begin{tryit}
+	In a scratch repository, make a change, run \cmd{git status}, stage it, run
+	\cmd{git status} again, and match each heading to the diagram in
+	\autoref{sec:git-threetrees}. Then unstage with \cmd{git restore --staged} and
+	watch the file move back across the boundary.
+\end{tryit}

@@ -1,0 +1,246 @@
+\chapter{GitHub}\label{ch:git-github}
+
+Git is the version control system; GitHub is a website that hosts Git
+repositories and adds a collaboration layer on top --- pull requests, issues,
+code review, continuous integration. The distinction matters: everything in
+this chapter is GitHub's invention, not Git's, and GitLab, Gitea and Bitbucket
+do the same things with different names.
+
+\section{Repositories, Forks and Clones}\label{sec:gh-repos}
+
+\begin{keys}[0.22]
+	\vocab{Repository} & A project on GitHub: the Git repository plus issues, pull requests and settings \\
+	\vocab{Clone}      & A local copy on your machine. Pure Git                        \\
+	\vocab{Fork}       & \emph{Your} copy of someone else's repository, on GitHub. A GitHub concept \\
+\end{keys}
+
+\begin{intuition}
+	Fork when you cannot push to the original --- which is the normal situation
+	for contributing to a project you do not maintain. You fork on GitHub, clone
+	your fork, push branches to it, and open a pull request asking the original to
+	take your changes. When you \emph{can} push, skip the fork and branch directly.
+\end{intuition}
+
+\begin{shell}
+$ git clone git@github.com:Konyi0613/LaTeX.git
+$ cd LaTeX
+$ git remote add upstream git@github.com:original/LaTeX.git   # for a fork
+$ git remote -v
+origin      git@github.com:Konyi0613/LaTeX.git (fetch)
+upstream    git@github.com:original/LaTeX.git   (fetch)
+\end{shell}
+
+\section{Authentication}\label{sec:gh-auth}
+
+GitHub stopped accepting passwords for Git operations in 2021. There are three
+replacements.
+
+\begin{keys}[0.26]
+	\vocab{SSH key}     & A key pair; the public half goes to GitHub. No expiry, no typing \\
+	\vocab{Personal access token} & A password-shaped secret with scopes and an expiry date, used over HTTPS \\
+	\vocab{\cmd{gh} CLI} & Logs in once and acts as a credential helper for everything else \\
+\end{keys}
+
+\begin{shell}
+$ ssh-keygen -t ed25519 -C "you@example.com"    # see sec. 15.2
+$ cat ~/.ssh/id_ed25519.pub                     # paste into GitHub settings
+$ ssh -T git@github.com                         # check it worked
+Hi Konyi0613! You've successfully authenticated.
+\end{shell}
+
+\begin{note}[This machine]
+	Authentication here is already handled by the third route: \cmd{gh} is
+	registered as Git's credential helper for \texttt{github.com}, so HTTPS pushes
+	find a token without prompting. \cmd{gh auth status} shows the account and
+	scopes. An SSH key is still worth having --- it works when \cmd{gh} is not
+	installed, which is every server you will ever log into.
+\end{note}
+
+\begin{moral}
+	Never put a token in a URL, a script, or a commit. GitHub scans public pushes
+	for its own token formats and revokes what it finds, which is a kindness rather
+	than a solution --- \autoref{sec:git-bigfiles} covers what to do when a secret
+	is already in the history.
+\end{moral}
+
+\section{Pull Requests}\label{sec:gh-pr}
+
+\begin{definition}[Pull request]
+	A request to merge one branch into another, with a description, a discussion,
+	a running diff and whatever automated checks the project has configured. It is
+	a GitHub object, not a Git one --- underneath it is just two branches.
+\end{definition}
+
+The full cycle:
+
+\begin{shell}
+$ git switch -c fix-config-crash        # 1. branch
+$ # ... edit, commit ...
+$ git push -u origin fix-config-crash   # 2. push the branch
+$ gh pr create --fill                   # 3. open the PR
+$ # ... review happens, you push more commits ...
+$ gh pr merge --squash --delete-branch  # 4. merge and tidy up
+\end{shell}
+
+\begin{keys}[0.26]
+	\vocab{Merge commit}  & Keeps every commit and records the branch. Full history  \\
+	\vocab{Squash merge}  & Combines the branch into one commit on \cmd{main}. Tidy history, loses the detail \\
+	\vocab{Rebase merge}  & Replays each commit onto \cmd{main}. Linear history, no merge commit \\
+\end{keys}
+
+\begin{note}
+	Squash merging pairs well with a habit of committing untidily while you work:
+	the mess stays in the pull request, where it is reviewable, and \cmd{main} gets
+	one clean commit per change. The cost is that \cmd{git log} on \cmd{main} can
+	no longer show you how the work was built up. Most projects pick one of the
+	three and apply it consistently; find out which before your first PR.
+\end{note}
+
+\begin{note}[Draft pull requests]
+	Open a PR as a draft as soon as you push the branch, not when the work is
+	finished. It gives the change a URL, runs CI on every push, and tells your
+	colleagues what you are doing --- with no implication that it is ready.
+\end{note}
+
+\section{Reviewing Code}\label{sec:gh-review}
+
+\begin{keys}[0.26]
+	\textbf{Comment}         & Feedback without a verdict                            \\
+	\textbf{Approve}         & Fine to merge                                         \\
+	\textbf{Request changes} & Blocks merging until resolved                         \\
+	\textbf{Suggestion}      & A concrete edit the author can apply with one click    \\
+\end{keys}
+
+\begin{keys}[0.34]
+	\cmd{gh pr list}                & Open pull requests                               \\
+	\cmd{gh pr view 42}             & One, in the terminal                             \\
+	\cmd{gh pr view 42 -{}-web}     & \dots{} in the browser                           \\
+	\cmd{gh pr diff 42}             & Its diff                                         \\
+	\cmd{gh pr checkout 42}         & Check the branch out locally --- run it, don't just read it \\
+	\cmd{gh pr review 42 -{}-approve} & Approve from the command line                  \\
+	\cmd{gh pr checks 42}           & Whether CI passed                                \\
+\end{keys}
+
+\begin{moral}
+	\cmd{gh pr checkout} is the command that makes reviews useful. Reading a diff
+	catches style and obvious mistakes; checking the branch out, building it, and
+	running it catches the things that matter. A review that never left the browser
+	has only checked what the diff shows.
+\end{moral}
+
+\begin{note}
+	Review the \emph{change}, not the person, and say which comments are blocking
+	and which are preferences. ``Consider extracting this'' and ``this will
+	deadlock'' need to be distinguishable, or the author has to guess.
+\end{note}
+
+\section{Issues and Projects}\label{sec:gh-issues}
+
+\begin{keys}[0.34]
+	\cmd{gh issue list}                    & Open issues                              \\
+	\cmd{gh issue create -t "..." -b "..."} & Create one                              \\
+	\cmd{gh issue view 17}                 & Read one                                 \\
+	\cmd{gh issue close 17}                & Close it                                 \\
+	\cmd{gh issue list -{}-label bug -{}-assignee @me} & Filter                       \\
+\end{keys}
+
+\begin{note}[Closing keywords]
+	A commit message or pull request body containing \texttt{Closes \#42},
+	\texttt{Fixes \#42} or \texttt{Resolves \#42} closes that issue automatically
+	when the change lands on the default branch --- and links the two permanently,
+	so anyone reading the issue later finds the commit that fixed it. This is worth
+	more than the automation: it is free documentation.
+\end{note}
+
+\section{The \texorpdfstring{\cmd{gh}}{gh} Command-Line Tool}\label{sec:gh-cli}
+
+\begin{keys}[0.34]
+	\cmd{gh auth login}, \cmd{gh auth status} & Sign in; check who you are          \\
+	\cmd{gh repo clone owner/name}      & Clone without typing a URL                 \\
+	\cmd{gh repo create -{}-public}     & Create a repository from here              \\
+	\cmd{gh repo view -{}-web}          & Open it in a browser                       \\
+	\cmd{gh pr create -{}-fill}         & Open a PR using the commits as the description \\
+	\cmd{gh pr status}                  & Your PRs, and those awaiting your review   \\
+	\cmd{gh run list}, \cmd{gh run watch} & Actions runs; follow one live            \\
+	\cmd{gh release create v1.0}        & Cut a release                              \\
+	\cmd{gh browse}                     & Open the current file or line on GitHub    \\
+\end{keys}
+
+\begin{note}
+	\cmd{gh} 2.93 is installed here. \cmd{gh browse} deserves particular mention:
+	run from a repository it opens the project page, and \cmd{gh browse
+		Chapters/git\_1\_model.tex} opens that file --- which is the fastest way to get
+	a shareable link to a specific line of code.
+\end{note}
+
+\section{GitHub Actions}\label{sec:gh-actions}
+
+\begin{definition}[Actions]
+	GitHub's continuous integration. A workflow is a YAML file, stored in the
+	repository under \file{.github/workflows}, describing jobs to run on a hosted
+	machine when something happens: a push, a pull request, a schedule, or a
+	manual trigger.
+\end{definition}
+
+\begin{conf}
+# .github/workflows/build.yml
+name: Build the note
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install TeX Live
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-xetex texlive-latex-extra latexmk
+
+      - name: Compile
+        run: latexmk -xelatex -interaction=nonstopmode -output-directory=build CSTools.tex
+
+      - name: Upload the PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: CSTools.pdf
+          path: build/CSTools.pdf
+\end{conf}
+
+\begin{keys}[0.24]
+	\texttt{on}        & What triggers the workflow                                 \\
+	\texttt{jobs}      & Independent units; they run in parallel by default          \\
+	\texttt{runs-on}   & Which hosted machine                                        \\
+	\texttt{steps}     & Run in order; each is a \texttt{run} command or a \texttt{uses} action \\
+	\texttt{uses}      & A reusable action from the marketplace --- pin the version  \\
+\end{keys}
+
+\begin{moral}
+	The first workflow worth writing for any project is the one that proves it
+	still builds. For this note that is one \cmd{latexmk} invocation, and it means
+	a broken \LaTeX{} file is caught by the pull request rather than by you, three
+	commits later.
+\end{moral}
+
+\section{Pages, Releases and \texorpdfstring{\file{README}}{README} Conventions}\label{sec:gh-pages}
+
+\begin{keys}[0.26]
+	\file{README.md}        & Shown on the repository's front page. What this is, how to build it, how to use it \\
+	\file{LICENSE}          & Without one, nobody may legally reuse your work        \\
+	\file{CONTRIBUTING.md}  & How to submit a change                                 \\
+	\file{.github/}         & Workflows, issue templates, PR templates               \\
+	\vocab{Releases}        & Tagged versions with notes and attached binaries       \\
+	\vocab{Pages}           & Static hosting from a branch or an Actions job         \\
+\end{keys}
+
+\begin{note}
+	The \file{README} is the only documentation most people will ever read.
+	Four things earn their space: what the project is in one sentence, how to
+	install or build it, a minimal working example, and where to ask questions.
+	Badges are decoration; the build instructions are not.
+\end{note}

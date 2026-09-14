@@ -1,0 +1,196 @@
+\chapter{Worked Makefiles}\label{ch:mk-worked}
+
+Three Makefiles worth stealing. Each uses only what Part~\ref{part:make} has
+covered, and each is short enough to read in one sitting.
+
+\section{A Multi-File C Project}\label{sec:mk-cproject}
+
+Sources in \file{src/}, headers in \file{include/}, everything generated under
+\file{build/}, header dependencies maintained by the compiler.
+
+\begin{makecode}
+# ---- configuration (override any of these on the command line) -----------
+CC       ?= gcc
+CPPFLAGS ?= -Iinclude -MMD -MP
+CFLAGS   ?= -Wall -Wextra -Wpedantic -std=c17 -O2 -g
+LDFLAGS  ?=
+LDLIBS   ?= -lm
+PREFIX   ?= /usr/local
+
+TARGET   := app
+BUILD    := build
+SRC      := $(wildcard src/*.c)
+OBJ      := $(patsubst src/%.c,$(BUILD)/%.o,$(SRC))
+DEP      := $(OBJ:.o=.d)
+
+# ---- build ---------------------------------------------------------------
+all: $(TARGET)
+
+$(TARGET): $(OBJ)
+    $(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
+$(BUILD)/%.o: src/%.c | $(BUILD)
+    $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+
+$(BUILD):
+    mkdir -p $@
+
+# ---- variants ------------------------------------------------------------
+debug: CFLAGS := -Wall -Wextra -std=c17 -O0 -g -fsanitize=address,undefined
+debug: LDFLAGS += -fsanitize=address,undefined
+debug: clean all
+
+# ---- housekeeping --------------------------------------------------------
+run: $(TARGET)
+    ./$(TARGET)
+
+test: $(TARGET)
+    ./tests/run.sh
+
+install: $(TARGET)
+    install -d $(DESTDIR)$(PREFIX)/bin
+    install -m 755 $(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
+
+clean:
+    rm -rf $(BUILD) $(TARGET)
+
+print-%:
+    @echo '$* = [$($*)]'
+
+-include $(DEP)
+
+.PHONY: all debug run test install clean
+\end{makecode}
+
+\begin{note}
+	Every idea in Part~\ref{part:make} is here: \texttt{?=} for configurability
+	(\autoref{sec:mk-condassign}), automatic variables
+	(\autoref{sec:mk-auto}), a pattern rule (\autoref{sec:mk-pattern}), an
+	order-only prerequisite for the output directory
+	(\autoref{sec:mk-orderonly}), generated dependencies
+	(\autoref{sec:mk-depgen}) and \texttt{.PHONY}
+	(\autoref{sec:mk-phonyt}). It works unchanged for one source file or fifty,
+	and it is correct under \cmd{make -j}.
+\end{note}
+
+\begin{note}
+	\texttt{debug} depends on \texttt{clean} deliberately. As
+	\autoref{sec:mk-override} warned, changing a flag changes no timestamp, so
+	without the \cmd{clean} you would link sanitiser-instrumented objects against
+	ordinary ones. The alternative --- a separate output directory per variant, as
+	in \autoref{sec:mk-static} --- avoids the rebuild but costs more Makefile.
+\end{note}
+
+\section{A \texorpdfstring{\LaTeX{}}{LaTeX} Document}\label{sec:mk-latex}
+
+\LaTeX{} is a bad fit for make's model. The number of runs needed is not known
+in advance: a document with cross-references needs at least two passes, three if
+the table of contents shifts a page, plus \cmd{biber} somewhere in the middle.
+Make cannot express ``repeat until the \file{.aux} file stops changing''.
+
+\cmd{latexmk} can, so the honest Makefile delegates to it:
+
+\begin{makecode}
+MAIN  := CSTools
+ENGINE := -xelatex
+FLAGS := -interaction=nonstopmode -synctex=1 -output-directory=build
+
+all: $(MAIN).pdf
+
+$(MAIN).pdf: $(wildcard *.tex) $(wildcard Chapters/*.tex) reference.bib
+    latexmk $(ENGINE) $(FLAGS) $(MAIN).tex
+
+watch:
+    latexmk $(ENGINE) $(FLAGS) -pvc $(MAIN).tex
+
+clean:
+    latexmk -C -output-directory=build $(MAIN).tex
+
+.PHONY: all watch clean
+\end{makecode}
+
+\begin{note}
+	The prerequisites are still worth listing, even though \cmd{latexmk} does its
+	own dependency tracking: they let \cmd{make} skip the whole thing when nothing
+	has changed, and they make \cmd{make -n} honest about whether a build is
+	needed.
+\end{note}
+
+\begin{moral}
+	When a tool already solves the recurrence problem --- \cmd{latexmk},
+	\cmd{cargo}, \cmd{go build} --- make's job is to call it, not to reimplement
+	it. A Makefile that runs \cmd{xelatex} three times and hopes is worse than the
+	one line it replaced.
+\end{moral}
+
+\begin{remark}
+	The one place a Makefile earns its keep in a \LaTeX{} project is generated
+	figures --- diagrams compiled from source, plots produced by a script, images
+	converted between formats. Those \emph{are} a timestamp problem, and
+	\autoref{sec:mk-pipeline} is the shape to use.
+\end{remark}
+
+\section{A Small Data Pipeline}\label{sec:mk-pipeline}
+
+Nothing about make is specific to compilers. Any process that turns files into
+other files fits, and a pipeline is where the incremental rebuild is most
+valuable --- the steps are slow and you will run them repeatedly.
+
+\begin{makecode}
+RAW   := $(wildcard data/raw/*.csv)
+CLEAN := $(patsubst data/raw/%.csv,data/clean/%.csv,$(RAW))
+FIGS  := $(patsubst data/clean/%.csv,figures/%.png,$(CLEAN))
+
+all: report.pdf
+
+# stage 1: clean each raw file
+data/clean/%.csv: data/raw/%.csv scripts/clean.py | data/clean
+    python3 scripts/clean.py $< $@
+
+# stage 2: one figure per cleaned file
+figures/%.png: data/clean/%.csv scripts/plot.py | figures
+    python3 scripts/plot.py $< $@
+
+# stage 3: everything feeds the report
+report.pdf: report.tex $(FIGS) summary.csv
+    latexmk -xelatex -interaction=nonstopmode report.tex
+
+summary.csv: $(CLEAN) scripts/summarise.py
+    python3 scripts/summarise.py $(CLEAN) > $@
+
+data/clean figures:
+    mkdir -p $@
+
+clean:
+    rm -rf data/clean figures summary.csv report.pdf
+
+.PHONY: all clean
+\end{makecode}
+
+\begin{note}
+	Notice that \file{scripts/clean.py} is a prerequisite of the files it produces.
+	Editing the script rebuilds everything downstream of it, which is exactly
+	right and is the step people leave out. Without that edge, fixing a bug in the
+	cleaning code leaves the old, wrong output in place and make reports success.
+\end{note}
+
+\begin{eg}
+	Adding one raw file to \file{data/raw/} and running \cmd{make} cleans it,
+	plots it, regenerates \file{summary.csv} --- because the summary depends on all
+	the cleaned files --- and rebuilds the report. Nothing else runs. With
+	\cmd{make -j4}, the per-file stages overlap.
+\end{eg}
+
+\begin{moral}
+	If you find yourself keeping a note of which script to re-run after which
+	change, you have a dependency graph in your head. Write it down as a Makefile
+	and stop remembering it.
+\end{moral}
+
+\begin{tryit}
+	Take any multi-step process you currently run by hand --- a build, a document,
+	a data set --- and write the graph before writing any rules. Name the files at
+	each stage and draw the arrows between them, as on
+	\autopageref{sec:mk-graph}. The Makefile is then a transcription, and it will
+	take about ten minutes.
+\end{tryit}

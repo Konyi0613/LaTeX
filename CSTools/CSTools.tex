@@ -1,0 +1,247 @@
+\documentclass[a4paper,oneside]{scrbook}
+\input{header.tex}
+\input{toolstyle.tex}
+\author{Kon Yi}
+\title{A Tutorial of CS Tools \\ Vim, the Unix Shell, Make, GDB and Git}
+
+\addbibresource{reference.bib}
+
+\usepackage{adjustbox}
+\usepackage{centernot}
+
+\begin{document}
+
+\maketitle
+
+%─────Front matter────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\chapter*{Preface}\label{ch:preface}
+
+Every computer science course teaches you a language. Almost none of them teach
+you the tools you will spend the next decade typing into. You are expected to
+absorb Vim, the shell, \texttt{make}, a debugger and Git by osmosis, from
+watching someone else's screen or from whichever Stack Overflow answer happened
+to work --- and the result is that most people plateau early, using perhaps five
+percent of each tool for years.
+
+This note is an attempt to fix that for five tools at once. It is not
+comprehensive; each of the five has a manual running to hundreds of pages, and
+those manuals are excellent and free. What this note offers instead is the
+\emph{model}: the handful of ideas inside each tool that make the rest of its
+commands predictable rather than arbitrary.
+
+Those models turn out to rhyme. Vim composes small operators with small motions.
+The shell composes small programs with pipes. \texttt{make} composes small rules
+into a dependency graph. Git composes small commits into a history you can
+rearrange. GDB is the odd one out --- it composes nothing --- but it earns its
+place by being the tool that answers the question the other four provoke:
+\emph{what is this program actually doing?} In every case the tool is not a bag
+of features but a grammar, and in every case the reward for learning the grammar
+is that you stop memorising commands and start deriving them. That shared shape
+is the real argument for putting these five in one document.
+
+\paragraph{How to read this.}
+The five parts are largely independent and can be read in any order. They do
+lean on each other where it helps, and those places are usually the interesting
+ones: \cmd{sed}'s substitution command and Vim's \cmd{:s} are the same command
+with the same ancestor; a unified diff is read identically in
+\autoref{sec:sh-compare} and \autoref{sec:git-diff}; \texttt{make} is at its best
+when it delegates to a tool that already solves the problem; and GDB runs
+perfectly well inside the editor of Part~\ref{part:vim}. Within a part, the
+chapters are ordered and do build on one another.
+
+Everything here was written and checked on one ordinary Linux machine, and the
+versions are listed in \autoref{app:machine}. Where a part describes a
+configuration --- \autoref{ch:vim-setup} in particular --- it describes the one
+actually installed there, rather than an idealised one.
+
+Do not try to memorise the tables. Every part explains its own notation before
+using it --- a whole chapter for Vim, whose notation is the densest, and a first
+section for the rest --- and every part ends with material meant to be used
+rather than read. The reference cards in the appendices exist so that you can
+\emph{stop} holding it all in your head. Pick three or four commands per chapter,
+use them until they become involuntary, and come back for more. These tools have
+a learning curve that is not steep so much as \emph{long}, and the only approach
+that reliably fails is trying to climb it all at once.
+
+\paragraph{Sources.}
+Where this note is thin, the manuals are not, and all of them are free. Vim's
+own help files \cite{vimdoc} and Neovim's \cite{nvimdoc} are readable inside the
+editor with \cmd{:help}; \cmd{man} and \cmd{info} cover the shell and its tools;
+and the GNU manuals for \texttt{make} \cite{gnumake} and GDB \cite{gdbmanual}
+are the authoritative references for Parts \ref{part:make} and~\ref{part:gdb}.
+For book-length treatments, Drew Neil's \emph{Practical Vim}
+\cite{neil2015practicalvim} and Chacon and Straub's \emph{Pro Git}
+\cite{chacon2014progit} are the standard recommendations, and Miller's
+\emph{Recursive Make Considered Harmful} \cite{miller1998recursive} is worth the
+twenty minutes it takes to read.
+
+\newpage
+
+\tableofcontents
+
+%─────Part I──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\setpartpreamble[uc][0.85\textwidth]{%
+	\vspace{2em}
+	\noindent
+	Vim is not an editor with a strange set of shortcuts. It is a small
+	\emph{language} for describing edits, and the keyboard is its alphabet. Once
+	you can read \key{c} \key{i} \key{(} as \emph{``change inside parentheses''},
+	the hundreds of commands collapse into a grammar of perhaps thirty words.
+
+	\medskip\noindent
+	\autoref{ch:vim-notation} is that alphabet, and it is not optional ---
+	everything afterwards, and every Vim answer you will ever read online, is
+	written in the notation it defines. Chapters \ref{ch:vim-modal}
+	to~\ref{ch:vim-buffers} cover Vim proper, which works unchanged in Vim,
+	Neovim, and the Vim emulation layer of almost every other editor, so the
+	investment never expires. \autoref{ch:vim-neovim} covers what Neovim adds on
+	top, and \autoref{ch:vim-setup} walks through the configuration actually
+	installed on this machine, so the abstractions have something concrete to
+	point at.
+}
+\part{Vim and Neovim}\label{part:vim}
+
+\input{Chapters/vim_1_notation.tex}
+\input{Chapters/vim_2_modal.tex}
+\input{Chapters/vim_3_motions.tex}
+\input{Chapters/vim_4_grammar.tex}
+\input{Chapters/vim_5_editing.tex}
+\input{Chapters/vim_6_buffers.tex}
+\input{Chapters/vim_7_neovim.tex}
+\input{Chapters/vim_8_setup.tex}
+
+%─────Part II─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\setpartpreamble[uc][0.85\textwidth]{%
+	\vspace{2em}
+	\noindent
+	The shell is a programming language you have already been typing into. Every
+	command you run is a line of it, and the things that look like syntax errors
+	--- unexpected globbing, a variable that lost its spaces, a pipeline that
+	silently swallowed an error --- are what happens when you use a language
+	without having learnt it.
+
+	\medskip\noindent
+	The organising idea is composition through text. Each program does one narrow
+	thing and speaks the same universal interface: lines of characters in, lines of
+	characters out. \autoref{ch:sh-cmdline} covers the language itself --- how to
+	read a transcript, and what the shell does to your line before any program ever
+	sees it. \autoref{ch:sh-fs} and \autoref{ch:sh-text} are the tools;
+	\autoref{ch:sh-pipes} is the plumbing that makes them a language rather than a
+	list; and by \autoref{ch:sh-script} the same constructs have become scripts you
+	can commit.
+}
+\part{The Unix Shell}\label{part:shell}
+
+\input{Chapters/sh_1_commandline.tex}
+\input{Chapters/sh_2_filesystem.tex}
+\input{Chapters/sh_3_text.tex}
+\input{Chapters/sh_4_pipes.tex}
+\input{Chapters/sh_5_processes.tex}
+\input{Chapters/sh_6_scripting.tex}
+\input{Chapters/sh_7_tools.tex}
+
+%─────Part III────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\setpartpreamble[uc][0.85\textwidth]{%
+	\vspace{2em}
+	\noindent
+	\texttt{make} is older than most of the languages it builds, and it has
+	outlived a long line of intended replacements. The reason is that it solves a
+	problem that never went away: given a pile of files, some of which are derived
+	from others, rebuild exactly what is out of date and nothing else.
+
+	\medskip\noindent
+	That is a statement about a \emph{dependency graph}, not about C. The same
+	machinery compiles a program, typesets a document, or regenerates a figure from
+	a data file --- and the reason Makefiles have a reputation for being cryptic is
+	that people learn the syntax before the graph. \autoref{ch:mk-why} does it in
+	the other order, after fixing this part's notation in
+	\autoref{sec:mk-notation}. Chapters \ref{ch:mk-anatomy}
+	to~\ref{ch:mk-patterns} then build up the syntax until one rule covers every
+	source file; \autoref{ch:mk-phony} and \autoref{ch:mk-running} cover the
+	conventions and the tooling; and \autoref{ch:mk-worked} assembles three
+	Makefiles worth stealing.
+}
+\part{Make and Makefiles}\label{part:make}
+
+\input{Chapters/mk_1_why.tex}
+\input{Chapters/mk_2_anatomy.tex}
+\input{Chapters/mk_3_variables.tex}
+\input{Chapters/mk_4_patterns.tex}
+\input{Chapters/mk_5_phony.tex}
+\input{Chapters/mk_6_running.tex}
+\input{Chapters/mk_7_worked.tex}
+
+%─────Part IV─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\setpartpreamble[uc][0.85\textwidth]{%
+	\vspace{2em}
+	\noindent
+	Almost everyone debugs by inserting print statements. It works, it is
+	universal, and it is also the reason a great many people spend an afternoon on
+	a bug that a debugger would have located in ninety seconds. The cost of
+	\texttt{printf} debugging is invisible precisely because you never see the
+	faster path.
+
+	\medskip\noindent
+	GDB lets you stop a running program at any point and ask it questions: what is
+	this variable, who called this function, what is at this address, what changed
+	this value. \autoref{ch:gdb-prepare} fixes the notation and gets you to a
+	prompt; chapters \ref{ch:gdb-exec} and~\ref{ch:gdb-break} are about stopping in
+	the right place, which on a real program is most of the skill; chapters
+	\ref{ch:gdb-stack} and~\ref{ch:gdb-data} are what to ask once you are there.
+	\autoref{ch:gdb-failures} then works through the failures you will actually
+	meet --- segfaults, corrupted memory, deadlocks, and code that misbehaves only
+	when optimised --- including the ones for which the right answer is a different
+	tool entirely.
+}
+\part{GDB}\label{part:gdb}
+
+\input{Chapters/gdb_1_prepare.tex}
+\input{Chapters/gdb_2_execution.tex}
+\input{Chapters/gdb_3_breakpoints.tex}
+\input{Chapters/gdb_4_stack.tex}
+\input{Chapters/gdb_5_data.tex}
+\input{Chapters/gdb_6_failures.tex}
+\input{Chapters/gdb_7_comfort.tex}
+
+%─────Part V──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\setpartpreamble[uc][0.85\textwidth]{%
+	\vspace{2em}
+	\noindent
+	Nearly all confusion about Git is confusion about its model, not its commands.
+	People who have memorised \texttt{git pull} and \texttt{git push} without ever
+	being told what a commit \emph{is} will eventually hit a merge conflict, a
+	detached \texttt{HEAD} or a bad rebase, and have no way to reason about what
+	they are looking at.
+
+	\medskip\noindent
+	So \autoref{ch:git-model} spends its whole length on the model --- commits as
+	snapshots, branches as movable pointers, the three trees --- before running a
+	single useful command. Everything afterwards follows from it: chapters
+	\ref{ch:git-loop} to~\ref{ch:git-remotes} on daily work,
+	\autoref{ch:git-github} on the collaboration layer GitHub adds, and
+	\autoref{ch:git-recovery} on the fact that in Git almost nothing is ever
+	really lost, provided you know where to look.
+}
+\part{Git and GitHub}\label{part:git}
+
+\input{Chapters/git_1_model.tex}
+\input{Chapters/git_2_loop.tex}
+\input{Chapters/git_3_branching.tex}
+\input{Chapters/git_4_remotes.tex}
+\input{Chapters/git_5_github.tex}
+\input{Chapters/git_6_team.tex}
+\input{Chapters/git_7_recovery.tex}
+
+\newpage
+%─────Appendix────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\appendix
+\appendixpage{}
+
+\input{appendix.tex}
+
+\newpage
+%─────Reference──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\pagestyle{plain}
+\printbibliography{}
+
+\end{document}

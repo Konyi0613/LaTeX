@@ -1,0 +1,335 @@
+\chapter{Branching and Merging}\label{ch:git-branch}
+
+A branch is a file containing a hash (\autoref{sec:git-refs}). Everything in
+this chapter follows from that, including the parts that frighten people.
+
+\section{Creating and Switching}\label{sec:git-branch}
+
+\begin{keys}[0.34]
+	\cmd{git branch}                  & List local branches; \texttt{*} marks the current \\
+	\cmd{git branch -a}               & Include remote-tracking branches                  \\
+	\cmd{git branch -v}               & \dots{} with each one's latest commit             \\
+	\cmd{git switch feature}          & Move to an existing branch                        \\
+	\cmd{git switch -c feature}       & Create it and move there                          \\
+	\cmd{git switch -c fix main}      & \dots{} starting from \cmd{main} rather than here \\
+	\cmd{git switch -}                & Back to the previous branch                       \\
+	\cmd{git branch -d feature}       & Delete it --- refuses if unmerged                 \\
+	\cmd{git branch -D feature}       & Delete it anyway                                  \\
+	\cmd{git branch -m old new}       & Rename                                            \\
+\end{keys}
+
+\begin{note}
+	\cmd{git switch} and \cmd{git restore} were introduced in Git 2.23 to split the
+	two unrelated jobs that \cmd{git checkout} had been doing --- moving between
+	branches, and throwing away file changes. \cmd{git checkout} still works and
+	you will see it everywhere; the newer pair is clearer, and much harder to use
+	by accident.
+\end{note}
+
+\begin{eg}
+	Branching costs nothing, so branch for everything:
+\begin{shell}
+$ git switch -c fix-config-crash
+Switched to a new branch 'fix-config-crash'
+$ # ... edit, commit, edit, commit ...
+$ git switch main
+$ git merge fix-config-crash
+$ git branch -d fix-config-crash
+\end{shell}
+\end{eg}
+
+\section{Fast-Forward and Three-Way Merges}\label{sec:git-merge}
+
+\begin{definition}[Fast-forward]
+	When the target branch is a direct ancestor of the one being merged, there is
+	nothing to combine: Git simply moves the pointer forward. No merge commit is
+	created.
+\end{definition}
+
+\begin{center}
+	\begin{tikzpicture}[
+			x=1mm, y=1mm, font=\footnotesize\ttfamily,
+			c/.style={draw=Gray!60, circle, inner sep=1.5pt, fill=Gray!5, minimum size=6.5mm},
+			ref/.style={draw=SeaGreen!60!black, rounded corners=2pt, inner sep=2pt,
+					fill=SeaGreen!8, font=\scriptsize\ttfamily},
+			e/.style={-{Stealth[length=4pt]}, Gray!70!black}
+		]
+		% before
+		\node[font=\scriptsize\sffamily, Gray!60!black] at (-14, 4) {before};
+		\node[c] (a) at (  0,  4) {A};
+		\node[c] (b) at ( 18,  4) {B};
+		\node[c] (c) at ( 36,  4) {C};
+		\draw[e] (b) -- (a); \draw[e] (c) -- (b);
+		\node[ref] at (  0, 16) {main};
+		\node[ref] at ( 36, 16) {feature};
+		% after
+		\node[font=\scriptsize\sffamily, Gray!60!black] at (-14, -22) {after};
+		\node[c] (a2) at (  0, -22) {A};
+		\node[c] (b2) at ( 18, -22) {B};
+		\node[c] (c2) at ( 36, -22) {C};
+		\draw[e] (b2) -- (a2); \draw[e] (c2) -- (b2);
+		\node[ref] at ( 36, -10) {main, feature};
+	\end{tikzpicture}
+\end{center}
+
+When both branches have moved on, Git makes a \vocab{merge commit} with two
+parents:
+
+\begin{center}
+	\begin{tikzpicture}[
+			x=1mm, y=1mm, font=\footnotesize\ttfamily,
+			c/.style={draw=Gray!60, circle, inner sep=1.5pt, fill=Gray!5, minimum size=6.5mm},
+			m/.style={draw=MidnightBlue!60, circle, inner sep=1.5pt,
+					fill=MidnightBlue!8, minimum size=6.5mm},
+			ref/.style={draw=SeaGreen!60!black, rounded corners=2pt, inner sep=2pt,
+					fill=SeaGreen!8, font=\scriptsize\ttfamily},
+			e/.style={-{Stealth[length=4pt]}, Gray!70!black}
+		]
+		\node[c] (a) at (  0,   0) {A};
+		\node[c] (b) at ( 18,   0) {B};
+		\node[c] (d) at ( 40,  10) {D};
+		\node[c] (c) at ( 40, -10) {C};
+		\node[m] (m) at ( 62,   0) {M};
+		\draw[e] (b) -- (a);
+		\draw[e] (d) -- (b);
+		\draw[e] (c) -- (b);
+		\draw[e] (m) -- (d);
+		\draw[e] (m) -- (c);
+		\node[ref] at ( 62,  12) {main};
+		\node[ref] at ( 40, -21) {feature};
+	\end{tikzpicture}
+\end{center}
+
+\begin{keys}[0.34]
+	\cmd{git merge feature}          & Merge \cmd{feature} into the current branch \\
+	\cmd{git merge -{}-no-ff feature} & Always make a merge commit, even if it could fast-forward \\
+	\cmd{git merge -{}-squash feature} & Take the changes as one uncommitted lump   \\
+	\cmd{git merge -{}-abort}         & Give up and return to where you started    \\
+\end{keys}
+
+\begin{note}
+	\cmd{--no-ff} is worth knowing. A fast-forward loses the fact that a group of
+	commits belonged to one branch; a merge commit records it, so
+	\cmd{git log --graph} keeps showing the shape of the work. Many teams require
+	it, and GitHub's ``Create a merge commit'' button does exactly this.
+\end{note}
+
+\section{Conflicts}\label{sec:git-conflict}
+
+\begin{definition}[Conflict]
+	Both sides changed the same region of the same file, and Git will not guess.
+	It writes both versions into the file with markers and stops, leaving you to
+	produce the correct result.
+\end{definition}
+
+\begin{conf}
+<<<<<<< HEAD
+    timeout = 30;
+=======
+    timeout = 60;
+>>>>>>> feature
+\end{conf}
+
+\begin{keys}[0.30]
+	\texttt{<{}<{}<{}<{}<{}<{}< HEAD}   & Everything below is \emph{your} current branch   \\
+	\texttt{=======}        & The divider                                      \\
+	\texttt{>{}>{}>{}>{}>{}>{}> feature} & Everything above is the branch being merged      \\
+\end{keys}
+
+The procedure is always the same:
+
+\begin{enumerate}[(1)]
+	\item \cmd{git status} lists the conflicted files.
+	\item Open each one, delete the markers, and leave the text you actually want
+	      --- which may be either side, both, or something new.
+	\item \cmd{git add} the file to say it is resolved.
+	\item \cmd{git commit} when they are all done, or \cmd{git merge --abort} to
+	      walk away.
+\end{enumerate}
+
+\begin{keys}[0.32]
+	\cmd{git status}                 & Which files are still conflicted              \\
+	\cmd{git diff}                   & The remaining conflicts, in a combined diff   \\
+	\cmd{git checkout -{}-ours file} & Take your side wholesale                      \\
+	\cmd{git checkout -{}-theirs file} & Take theirs wholesale                       \\
+	\cmd{git merge -{}-abort}        & Undo the whole merge                          \\
+	\cmd{git mergetool}              & Open a three-way merge tool --- \cmd{nvim -d} by default with \cmd{merge.tool=vimdiff} \\
+\end{keys}
+
+\begin{note}
+	``Ours'' and ``theirs'' mean the opposite of what you expect during a
+	\emph{rebase}: rebasing replays your commits on top of the other branch, so
+	\cmd{--ours} is the branch you are rebasing onto. Check with
+	\cmd{git status}, which names both sides explicitly, rather than trusting the
+	words.
+\end{note}
+
+\begin{moral}
+	A conflict is not an error and not a failure. It is Git declining to guess,
+	which is the correct behaviour. The way to have fewer of them is to merge
+	\emph{more} often, not less: two branches that diverge for a month conflict
+	badly, and two that sync daily barely conflict at all.
+\end{moral}
+
+\section{Rebase}\label{sec:git-rebase}
+
+\begin{definition}[Rebase]
+	Replay a series of commits onto a different base. Git takes each commit on
+	your branch, computes its diff, and applies it to the new starting point ---
+	producing \emph{new} commits with new hashes.
+\end{definition}
+
+\begin{center}
+	\begin{tikzpicture}[
+			x=1mm, y=1mm, font=\footnotesize\ttfamily,
+			c/.style={draw=Gray!60, circle, inner sep=1.5pt, fill=Gray!5, minimum size=6.5mm},
+			n/.style={draw=WildStrawberry!60, circle, inner sep=1.5pt,
+					fill=WildStrawberry!8, minimum size=6.5mm},
+			ref/.style={draw=SeaGreen!60!black, rounded corners=2pt, inner sep=2pt,
+					fill=SeaGreen!8, font=\scriptsize\ttfamily},
+			e/.style={-{Stealth[length=4pt]}, Gray!70!black}
+		]
+		\node[c] (a) at (  0,  0) {A};
+		\node[c] (b) at ( 18,  0) {B};
+		\node[c] (d) at ( 36,  0) {D};
+		\node[n] (c) at ( 54,  0) {C'};
+		\draw[e] (b) -- (a); \draw[e] (d) -- (b); \draw[e] (c) -- (d);
+		\node[ref] at ( 36, 12) {main};
+		\node[ref] at ( 54, -12) {feature};
+		\node[font=\scriptsize\sffamily, Gray!60!black, align=left]
+		at (95, 0) {C became C'\\ --- same change,\\ new commit};
+	\end{tikzpicture}
+\end{center}
+
+\begin{keys}[0.34]
+	\cmd{git rebase main}            & Replay this branch on top of \cmd{main}      \\
+	\cmd{git rebase -{}-continue}    & After resolving a conflict                   \\
+	\cmd{git rebase -{}-skip}        & Drop the commit being applied                \\
+	\cmd{git rebase -{}-abort}       & Return to where you started                  \\
+	\cmd{git pull -{}-rebase}        & Fetch, then rebase rather than merge         \\
+\end{keys}
+
+\begin{intuition}
+	Merge preserves what happened; rebase produces what you wish had happened. A
+	merge records that two lines of work existed and came together. A rebase makes
+	it look as though you had started from the latest \cmd{main} all along, giving
+	a linear history that is far easier to read and to bisect.
+\end{intuition}
+
+\begin{moral}[The golden rule]
+	\textbf{Never rebase commits that other people have.} Rebasing creates new
+	commits with new hashes; anyone who had the old ones now has a divergent
+	history, and merging the two duplicates every commit. Rebase your own
+	unpublished work freely; once it is pushed to a shared branch, merge instead.
+\end{moral}
+
+\section{Interactive Rebase}\label{sec:git-irebase}
+
+\cmd{git rebase -i} is where a messy series of commits becomes a clean one.
+
+\begin{shell}
+$ git rebase -i main
+\end{shell}
+
+Your editor opens with the commits to be replayed, oldest first:
+
+\begin{conf}
+pick 9c4e7d2 Extract parse_line
+pick 3f8a2b1 fix typo
+pick 7b1e4a9 Add config validation
+pick 2d8c5f0 oops, forgot the header
+
+# Commands:
+#  p, pick   = use commit
+#  r, reword = use commit, but edit the message
+#  e, edit   = use commit, but stop for amending
+#  s, squash = meld into previous commit, keep both messages
+#  f, fixup  = meld into previous commit, discard this message
+#  d, drop   = remove commit
+#  (lines may be reordered; they are applied top to bottom)
+\end{conf}
+
+Editing it into this:
+
+\begin{conf}
+pick 9c4e7d2 Extract parse_line
+fixup 3f8a2b1 fix typo
+pick 7b1e4a9 Add config validation
+fixup 2d8c5f0 oops, forgot the header
+\end{conf}
+
+turns four commits into two clean ones, each self-contained.
+
+\begin{keys}[0.30]
+	\cmd{reword}     & Fix a message without touching the content                  \\
+	\cmd{squash}     & Combine, and edit the joined message                         \\
+	\cmd{fixup}      & Combine, discarding this commit's message. The common case   \\
+	\cmd{drop}       & Remove a commit entirely                                     \\
+	\cmd{edit}       & Stop there so you can amend or split it                      \\
+	Reorder lines    & Reorder the commits                                          \\
+\end{keys}
+
+\begin{note}
+	\cmd{git commit --fixup=<sha>} marks a commit as a fix for an earlier one, and
+	\cmd{git rebase -i --autosquash main} then pre-arranges the list for you. Set
+	\cmd{git config --global rebase.autosquash true} and the workflow becomes: fix
+	something, mark it, and squash the whole series before opening a pull request.
+\end{note}
+
+\begin{moral}
+	Commit early and often while working --- including ``wip'' and ``oops''. Then
+	tidy the series with an interactive rebase before anyone else sees it. You get
+	both a safety net while you work and a readable history afterwards.
+\end{moral}
+
+\section{\texorpdfstring{\cmd{cherry-pick}}{cherry-pick}}\label{sec:git-cherry}
+
+\begin{keys}[0.34]
+	\cmd{git cherry-pick <sha>}       & Apply one commit here                        \\
+	\cmd{git cherry-pick a1b2..c3d4}  & A range                                      \\
+	\cmd{git cherry-pick -n <sha>}    & Apply it but do not commit                   \\
+	\cmd{git cherry-pick -{}-abort}   & Undo                                         \\
+\end{keys}
+
+\begin{eg}
+	The standard use is a hotfix that belongs on two branches: commit it on
+	\cmd{main}, then cherry-pick it onto the release branch. As with rebase, the
+	result is a \emph{new} commit with a different hash --- the same change,
+	recorded twice.
+\end{eg}
+
+\section{Stashing}\label{sec:git-stash}
+
+\begin{keys}[0.32]
+	\cmd{git stash}                  & Put working-tree changes aside; clean the tree \\
+	\cmd{git stash -u}               & Include untracked files                        \\
+	\cmd{git stash push -m "wip"}    & \dots{} with a label                           \\
+	\cmd{git stash list}             & What is stashed                                \\
+	\cmd{git stash pop}              & Reapply the newest and remove it from the list \\
+	\cmd{git stash apply stash@\{2\}} & Reapply a particular one, keeping it          \\
+	\cmd{git stash drop}             & Discard one                                    \\
+	\cmd{git stash show -p}          & The diff it holds                              \\
+\end{keys}
+
+\begin{note}
+	Stashing is for the interruption: you are half-way through something and must
+	switch branches now. It is not storage --- an unlabelled stash from three weeks
+	ago is indistinguishable from the other four. If work is worth keeping for more
+	than an hour, commit it on a branch instead; branches are free
+	(\autoref{sec:git-refs}) and they have names.
+\end{note}
+
+\section{Worktrees}\label{sec:git-worktree}
+
+\begin{keys}[0.34]
+	\cmd{git worktree add ../hotfix main} & A second working directory, on another branch \\
+	\cmd{git worktree list}               & Which ones exist                              \\
+	\cmd{git worktree remove ../hotfix}   & Tidy up                                       \\
+\end{keys}
+
+\begin{moral}
+	A worktree is the better answer to ``I need to look at \cmd{main} while I am in
+	the middle of this''. It gives you a second directory sharing one object
+	database --- no stash, no switching, and your build outputs stay where they
+	are. For a project with a long compile, this alone is worth the chapter.
+\end{moral}

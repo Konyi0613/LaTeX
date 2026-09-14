@@ -1,0 +1,175 @@
+\chapter{Remotes and Collaboration}\label{ch:git-remotes}
+
+Everything so far worked with no network. Git is \vocab{distributed}: your clone
+is a complete repository with the full history, and a remote is just another
+clone you have agreed to exchange commits with.
+
+\section{Remotes}\label{sec:git-remote}
+
+\begin{definition}[Remote]
+	A named URL of another repository. \cmd{origin} is the conventional name for
+	the one you cloned from; \cmd{upstream} is the convention for the original
+	project when you are working from a fork.
+\end{definition}
+
+\begin{keys}[0.36]
+	\cmd{git remote -v}                   & List remotes and their URLs             \\
+	\cmd{git remote add upstream <url>}   & Add one                                 \\
+	\cmd{git remote remove upstream}      & Remove one                              \\
+	\cmd{git remote show origin}          & What it has, and how your branches track it \\
+	\cmd{git remote set-url origin <url>} & Change where it points                  \\
+\end{keys}
+
+\begin{shell}
+$ git remote -v
+origin    git@github.com:Konyi0613/LaTeX.git (fetch)
+origin    git@github.com:Konyi0613/LaTeX.git (push)
+\end{shell}
+
+\begin{definition}[Remote-tracking branch]
+	A local, read-only record of where a branch stood on the remote when you last
+	fetched --- written \cmd{origin/main}. It is not the remote's branch, and it
+	does not update by itself: it is a cached snapshot.
+\end{definition}
+
+\begin{note}
+	The distinction explains \emph{``Your branch is ahead of 'origin/main' by 2
+		commits''}. Git is comparing your \cmd{main} against its own cached
+	\cmd{origin/main}, not against the server. If someone else pushed five minutes
+	ago, Git does not know until you fetch.
+\end{note}
+
+\section{\texorpdfstring{\cmd{fetch} versus \cmd{pull}}{fetch versus pull}}\label{sec:git-fetch}
+
+\begin{keys}[0.34]
+	\cmd{git fetch}                & Download new commits; change nothing else     \\
+	\cmd{git fetch -{}-all}        & From every remote                             \\
+	\cmd{git fetch -{}-prune}      & \dots{} and delete remote-tracking branches that are gone \\
+	\cmd{git pull}                 & \cmd{fetch}, then \cmd{merge}                 \\
+	\cmd{git pull -{}-rebase}      & \cmd{fetch}, then \cmd{rebase}                \\
+\end{keys}
+
+\begin{moral}
+	\cmd{git fetch} is always safe. It updates your remote-tracking branches and
+	touches neither your working tree nor your branch, so you can look before
+	deciding. \cmd{git pull} is \cmd{fetch} plus an immediate merge, which is why
+	it is the command that occasionally produces a conflict you were not expecting.
+\end{moral}
+
+\begin{shell}
+$ git fetch
+$ git log --oneline HEAD..origin/main     # what did they do?
+$ git diff HEAD origin/main               # and what does it change?
+$ git merge origin/main                   # now decide
+\end{shell}
+
+\section{\texorpdfstring{\cmd{push} and Tracking}{push and Tracking}}\label{sec:git-push}
+
+\begin{keys}[0.38]
+	\cmd{git push}                          & Push the current branch to its upstream \\
+	\cmd{git push -u origin feature}        & Push and set the upstream for next time \\
+	\cmd{git push origin -{}-delete feature} & Delete a branch on the remote          \\
+	\cmd{git push -{}-tags}                 & Push tags, which \cmd{push} does not do \\
+	\cmd{git push -{}-force-with-lease}     & Overwrite the remote branch, but only if nobody else has pushed \\
+	\cmd{git push -{}-force}                & Overwrite unconditionally               \\
+\end{keys}
+
+\begin{note}[Which force to use]
+	After an interactive rebase your local history no longer matches the remote and
+	a plain push is rejected. \cmd{--force} overwrites whatever is there, including
+	a colleague's commits pushed in the meantime. \cmd{--force-with-lease} refuses
+	unless the remote is still where you last saw it --- the same operation, with a
+	check. There is no reason to use plain \cmd{--force} on a shared branch.
+\end{note}
+
+\begin{note}
+	\texttt{fatal: The current branch has no upstream branch} means Git does not
+	know where to push. \cmd{git push -u origin feature} sets it once; thereafter
+	plain \cmd{git push} works. Setting
+	\cmd{git config --global push.autoSetupRemote true} makes Git do it for you.
+\end{note}
+
+\section{Merge or Rebase on Pull}\label{sec:git-pullstrat}
+
+Default \cmd{git pull} merges, and on a shared branch this litters history with
+merge commits saying nothing but ``I synced'':
+
+\begin{shell}
+Merge branch 'main' of github.com:Konyi0613/LaTeX
+Merge branch 'main' of github.com:Konyi0613/LaTeX
+Merge branch 'main' of github.com:Konyi0613/LaTeX
+\end{shell}
+
+\begin{shell}
+$ git config --global pull.rebase true       # rebase instead of merging
+$ git config --global rebase.autoStash true  # stash and restore automatically
+\end{shell}
+
+\begin{moral}
+	Rebase when pulling, merge when integrating. Pulling other people's commits
+	onto your unpushed work is exactly the case the golden rule of
+	\autoref{sec:git-rebase} permits --- your commits are not published yet.
+	Bringing a finished branch into \cmd{main} is the case for a merge commit,
+	because the fact that it was a branch is worth recording.
+\end{moral}
+
+\section{Tags and Releases}\label{sec:git-tags}
+
+\begin{definition}[Tag]
+	A name permanently attached to one commit. Unlike a branch, it does not move.
+	A \vocab{lightweight} tag is just a ref; an \vocab{annotated} tag is a real
+	object with an author, a date and a message, and is what releases should use.
+\end{definition}
+
+\begin{keys}[0.36]
+	\cmd{git tag}                        & List tags                                \\
+	\cmd{git tag -a v1.0 -m "Release 1.0"} & Create an annotated tag                \\
+	\cmd{git tag v1.0-beta}              & A lightweight tag                        \\
+	\cmd{git tag -a v0.9 a1b2c3d}        & Tag an older commit                      \\
+	\cmd{git show v1.0}                  & The tag and the commit it names          \\
+	\cmd{git push origin v1.0}           & Push one tag                             \\
+	\cmd{git push -{}-follow-tags}       & Push commits and their annotated tags    \\
+	\cmd{git tag -d v1.0}                & Delete locally                           \\
+	\cmd{git describe -{}-tags}          & ``v1.0-14-ga1b2c3d'': the nearest tag, plus distance \\
+\end{keys}
+
+\begin{note}
+	\cmd{git describe} is how build systems stamp a version into a binary without
+	anyone maintaining a version number by hand. It reads as: fourteen commits
+	after \texttt{v1.0}, at commit \texttt{a1b2c3d}.
+\end{note}
+
+\section{Submodules and Subtrees}\label{sec:git-sub}
+
+Two ways to put one repository inside another.
+
+\begin{keys}[0.38]
+	\cmd{git submodule add <url> lib/foo} & Add a submodule                          \\
+	\cmd{git clone -{}-recurse-submodules <url>} & Clone, fetching them too          \\
+	\cmd{git submodule update -{}-init -{}-recursive} & Populate them after a plain clone \\
+	\cmd{git submodule update -{}-remote}  & Move them to their latest commits       \\
+	\cmd{git subtree add -{}-prefix=lib/foo <url> main -{}-squash} & Add a subtree    \\
+\end{keys}
+
+\begin{intuition}
+	A \vocab{submodule} records a \emph{pointer}: the parent repository stores only
+	the URL and one commit hash, and the files live in a separate repository. A
+	\vocab{subtree} copies the other project's files into yours, so a plain clone
+	gets everything.
+\end{intuition}
+
+\begin{note}
+	Submodules have a deserved reputation. A clone that omits
+	\cmd{--recurse} leaves empty directories; a commit inside a
+	submodule is invisible until the parent's pointer is also committed; and
+	switching branches routinely leaves submodules on the wrong commit. They are
+	right when the dependency is genuinely a separate project with its own
+	history; for vendoring a library you do not develop, a subtree or a package
+	manager causes less trouble.
+\end{note}
+
+\begin{moral}
+	Before reaching for either, ask whether your language's package manager solves
+	it. Submodules are a version-control answer to a dependency-management
+	question, and they are usually the wrong shape for it.
+\end{moral}

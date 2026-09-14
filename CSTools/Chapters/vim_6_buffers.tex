@@ -1,0 +1,156 @@
+\chapter{Files, Buffers, Windows and Tabs}\label{ch:vim-buffers}
+
+\section{Buffers, Windows and Tab Pages}\label{sec:vim-bwt}
+
+Vim's window model confuses newcomers because its three nouns do not mean what
+they mean elsewhere.
+
+\begin{definition}[Buffer, window, tab page]
+	A \vocab{buffer} is a file loaded into memory. A \vocab{window} is a viewport
+	onto a buffer. A \vocab{tab page} is a \emph{layout} of windows. So one buffer
+	may be shown in several windows, a window always shows exactly one buffer, and
+	a tab page is not ``an open file'' --- it is a saved arrangement of splits.
+\end{definition}
+
+\begin{intuition}
+	Coming from a conventional editor, the instinct is to use one tab per file.
+	Resist it. In Vim, \emph{buffers} are your open files and tabs are workspaces:
+	one tab for the code, one for the tests, each with its own splits.
+\end{intuition}
+
+\section{Working with Buffers}\label{sec:vim-buffercmds}
+
+\begin{keys}[0.24]
+	\cmd{:e file}      & Edit a file, loading it into a new buffer     \\
+	\cmd{:ls} / \cmd{:buffers} & List the buffers and their numbers    \\
+	\cmd{:b 3}         & Switch to buffer 3                            \\
+	\cmd{:b part}      & Switch by (unique) substring of the name      \\
+	\cmd{:bn} / \cmd{:bp} & Next / previous buffer                     \\
+	\key{<C-\textasciicircum{}>}       & Toggle with the alternate (last) buffer       \\
+	\cmd{:bd}          & Delete (close) the buffer                     \\
+	\cmd{:ball}        & Open every buffer in a split                  \\
+\end{keys}
+
+\begin{note}
+	\key{<C-\textasciicircum{}>} --- the same key as \key{<C-6>} --- toggles between the two files
+	you are actually working on. If you learn one command from this chapter, this
+	is the one.
+\end{note}
+
+\section{Splits and Window Commands}\label{sec:vim-windows}
+
+All window commands live behind the \key{<C-w>} prefix.
+
+\begin{keys}[0.24]
+	\key{<C-w>} \key{s} & Split horizontally (\cmd{:split})                \\
+	\key{<C-w>} \key{v} & Split vertically (\cmd{:vsplit})                 \\
+	\key{<C-w>} \key{h} \key{j} \key{k} \key{l} & Move to the window in that direction \\
+	\key{<C-w>} \key{w} & Cycle to the next window                         \\
+	\key{<C-w>} \key{c} & Close this window                                \\
+	\key{<C-w>} \key{o} & Close every \emph{other} window                   \\
+	\key{<C-w>} \key{q} & Quit this window                                 \\
+	\key{<C-w>} \key{H} \key{J} \key{K} \key{L} & Move the window itself to the far left/bottom/top/right \\
+	\key{<C-w>} \key{=} & Equalise all window sizes                        \\
+	\key{<C-w>} \key{\_} / \key{<C-w>} \key{|} & Maximise height / width   \\
+	\key{<C-w>} \key{+} \key{-} \key{<} \key{>} & Resize by one row/column \\
+	\key{<C-w>} \key{T} & Move this window into a new tab page              \\
+\end{keys}
+
+\begin{eg}
+	To compare two parts of one long file, \cmd{:vsplit} and then scroll the two
+	windows independently --- both are views of the same buffer, so edits appear in
+	both immediately. Add \cmd{:set scrollbind} in each to lock them together.
+\end{eg}
+
+\section{Tab Pages}\label{sec:vim-tabs}
+
+\begin{keys}[0.24]
+	\cmd{:tabnew}           & New tab page                    \\
+	\cmd{:tabe file}        & Open a file in a new tab         \\
+	\key{g} \key{t} / \key{g} \key{T} & Next / previous tab    \\
+	\key{3} \key{g} \key{t} & Go to tab 3                     \\
+	\cmd{:tabclose}         & Close this tab page             \\
+	\cmd{:tabonly}          & Close all others                \\
+\end{keys}
+
+\hrulebar
+
+\section{The Quickfix and Location Lists}\label{sec:vim-quickfix}
+
+The quickfix list is a buffer of file:line:message entries --- compiler errors,
+grep hits, linter output --- that you can step through with the cursor landing
+in the right place each time.
+
+\begin{keys}[0.24]
+	\cmd{:make}       & Run \cmd{'makeprg'} and capture the errors        \\
+	\cmd{:grep pat}   & Run grep and capture the hits                     \\
+	\cmd{:copen} / \cmd{:cclose} & Open / close the quickfix window       \\
+	\cmd{:cn} / \cmd{:cp} & Jump to the next / previous entry             \\
+	\cmd{:cfirst} / \cmd{:clast} & First / last entry                     \\
+	\cmd{:cdo s/a/b/g} & Run a command on every entry's line              \\
+	\cmd{:cfdo \%s/a/b/ge \textbar{} update} & Run it once per \emph{file} and save \\
+\end{keys}
+
+There is a second, window-local copy of the same machinery --- the
+\vocab{location list} --- with \cmd{:lopen}, \cmd{:lnext} and so on. Language
+servers typically put diagnostics there.
+
+\begin{moral}
+	\cmd{:grep} $\to$ \cmd{:cdo s/\dots/\dots/g} $\to$ \cmd{:cfdo update} is a
+	project-wide refactor in three commands, with each substitution reviewable
+	before you save.
+\end{moral}
+
+\section{Files, Filters and the Shell}\label{sec:vim-shellio}
+
+\begin{keys}[0.30]
+	\cmd{:r file}          & Read a file in below the cursor            \\
+	\cmd{:r !date}         & Read the output of a shell command         \\
+	\cmd{:!ls}             & Run a shell command, show the output       \\
+	\cmd{:\%!sort}         & Filter the whole buffer through \texttt{sort} \\
+	\cmd{:\%!jq .}         & \dots{} or pretty-print it as JSON          \\
+	\cmd{:cd \%:h}         & Change directory to the current file's folder \\
+	\cmd{:sav newname}     & Save as, and continue editing the new file \\
+	\cmd{:Explore} / \cmd{:Ex} & Open the built-in \texttt{netrw} file browser \\
+\end{keys}
+
+\begin{note}[Filename modifiers]
+	Inside an Ex command, \cmd{\%} is the current file. Modifiers trim it:
+	\cmd{\%:h} is its directory, \cmd{\%:t} the basename, \cmd{\%:r} the name
+	without extension, \cmd{\%:e} the extension, \cmd{\%:p} the absolute path.
+	So \cmd{:!pdflatex \%} compiles the file you are editing, and \cmd{:e \%:r.pdf}
+	opens the result.
+\end{note}
+
+\section{Diff Mode}\label{sec:vim-diff}
+
+\begin{keys}[0.30]
+	\cmd{nvim -d a.txt b.txt} & Open two files side by side in diff mode \\
+	\cmd{:diffthis}           & Add the current window to the diff       \\
+	\cmd{:diffoff!}           & Leave diff mode                          \\
+	\key{]} \key{c} / \key{[} \key{c} & Next / previous hunk             \\
+	\key{d} \key{o}           & \vocab{Obtain} the hunk from the other window \\
+	\key{d} \key{p}           & \vocab{Put} this hunk into the other window   \\
+	\cmd{:diffupdate}         & Recompute the diff                       \\
+\end{keys}
+
+\begin{remark}
+	Setting \texttt{nvim} as your Git merge tool gives you a three-way diff in the
+	editor you already know. Neovim's \cmd{'diffopt'} defaults include the
+	\texttt{linematch} algorithm, which aligns changed lines within a hunk far
+	better than Vim's.
+\end{remark}
+
+\section{Sessions}\label{sec:vim-sessions}
+
+\begin{keys}[0.30]
+	\cmd{:mksession! s.vim}  & Save the current layout to a file          \\
+	\cmd{nvim -S s.vim}      & Restore it                                 \\
+	\cmd{:source s.vim}      & Restore it from inside Neovim              \\
+\end{keys}
+
+\begin{note}
+	The \texttt{persistence.nvim} plugin (part of LazyVim) does this automatically
+	per directory: \key{<leader>} \key{q} \key{s} restores the session for the
+	current project, so reopening a repository puts back every split and buffer.
+\end{note}

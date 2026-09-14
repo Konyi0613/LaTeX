@@ -1,0 +1,175 @@
+\chapter{Working on a Team}\label{ch:git-team}
+
+The commands do not change when a second person appears. What changes is that
+your history becomes something other people read, your mistakes become
+something other people inherit, and the conventions you follow stop being a
+matter of taste.
+
+\section{Branching Models}\label{sec:git-models}
+
+\begin{keys}[0.26]
+	\vocab{Trunk-based}  & Everyone commits to \cmd{main}, behind feature flags, several times a day. Needs strong tests \\
+	\vocab{GitHub Flow}  & One long-lived branch (\cmd{main}); short feature branches merged through pull requests. The common default \\
+	\vocab{Git Flow}     & \cmd{main}, \cmd{develop}, plus \cmd{feature/}, \cmd{release/} and \cmd{hotfix/} branches. Designed for versioned, shipped software \\
+\end{keys}
+
+\begin{moral}
+	GitHub Flow is the right default for almost every project: one protected
+	\cmd{main} that always works, short-lived branches, and pull requests as the
+	only way in. Git Flow was written in 2010 for software released in versions on
+	a schedule; applied to a web service deployed twice a day it is pure overhead,
+	and its own author has since said so.
+\end{moral}
+
+\begin{note}
+	The variable that actually matters is branch \emph{lifetime}. A branch alive
+	for two days conflicts trivially; one alive for two months conflicts
+	catastrophically, whatever the model is called. If you take one thing from this
+	chapter, take that --- merge early and often, in both directions.
+\end{note}
+
+\section{Commit Hygiene}\label{sec:git-hygiene}
+
+\begin{definition}[Atomic commit]
+	A commit containing exactly one logical change --- complete, self-contained,
+	and leaving the project in a working state.
+\end{definition}
+
+\begin{keys}[0.30]
+	One idea per commit    & So that \cmd{revert} and \cmd{cherry-pick} work on it alone \\
+	It builds              & So that \cmd{bisect} is not defeated by broken commits      \\
+	Message says \emph{why} & The diff already says what                                 \\
+	No unrelated formatting & A whitespace change buried in a logic commit hides the logic \\
+	No generated files      & \autoref{sec:git-ignore}                                   \\
+\end{keys}
+
+\begin{note}[Conventional Commits]
+	Many projects use a structured subject line:
+\begin{conf}
+feat(parser): accept quoted values in config files
+fix(io): check fopen's return value
+docs: explain the three trees
+refactor!: rename parse_line to parse_entry
+\end{conf}
+	The prefix is machine-readable, so tooling can generate changelogs and decide
+	version numbers; \texttt{!} marks a breaking change. It is a convention, not a
+	Git feature --- adopt it if your project has, and do not impose it on a project
+	that has not.
+\end{note}
+
+\begin{moral}
+	Reformatting and refactoring belong in their own commits, always. A reviewer
+	faced with one commit that reindents four hundred lines and also changes a
+	conditional cannot see the conditional --- and neither will you, in a year,
+	running \cmd{git log -S}.
+\end{moral}
+
+\section{Protecting \texorpdfstring{\cmd{main}}{main}}\label{sec:git-protect}
+
+\begin{keys}[0.34]
+	Require a pull request      & No direct pushes to \cmd{main}                    \\
+	Require approvals           & At least one reviewer who is not the author       \\
+	Require status checks       & CI must pass before merging                       \\
+	Require branches up to date & Rebase or merge \cmd{main} in before merging out  \\
+	Forbid force pushes         & History on \cmd{main} cannot be rewritten         \\
+	Forbid deletion             & The branch cannot be removed                      \\
+\end{keys}
+
+\begin{note}
+	These are GitHub branch-protection rules, configured in the repository
+	settings, not Git features --- Git itself will happily let anyone force-push
+	over anything. The rules are the mechanism that makes ``never rewrite published
+	history'' (\autoref{sec:git-rebase}) enforceable rather than merely agreed.
+\end{note}
+
+\begin{moral}
+	Turn on ``require status checks'' before ``require two approvals''. A machine
+	that reliably runs the tests catches more defects than a second human who is
+	skimming, and it never gets tired on a Friday afternoon.
+\end{moral}
+
+\section{Keeping a Fork in Sync}\label{sec:git-fork}
+
+A fork does not update itself. The routine:
+
+\begin{shell}
+$ git remote add upstream git@github.com:original/project.git   # once
+$ git fetch upstream
+$ git switch main
+$ git merge upstream/main          # or: git rebase upstream/main
+$ git push origin main
+\end{shell}
+
+\begin{keys}[0.32]
+	\cmd{gh repo sync}              & The same thing, in one command                \\
+	\cmd{git fetch upstream}        & Get their commits                             \\
+	\cmd{git rebase upstream/main}  & Replay \emph{your} branch on top of theirs    \\
+\end{keys}
+
+\begin{moral}
+	Never work on \cmd{main} in a fork. Keep it a clean mirror of upstream, and
+	branch from it for every change. The moment \cmd{main} has your commits on it,
+	syncing becomes a merge instead of a fast-forward, and stays awkward forever.
+\end{moral}
+
+\section{Hooks}\label{sec:git-hooks}
+
+\begin{definition}[Hook]
+	An executable script in \file{.git/hooks/} that Git runs at a defined moment.
+	A non-zero exit status from a \texttt{pre-} hook cancels the operation.
+\end{definition}
+
+\begin{keys}[0.30]
+	\texttt{pre-commit}      & Before a commit is made. Linting, formatting, quick tests \\
+	\texttt{commit-msg}      & Check or rewrite the message                              \\
+	\texttt{pre-push}        & Before pushing. The full test suite                       \\
+	\texttt{post-checkout}   & After switching branches. Regenerate something            \\
+	\texttt{pre-receive}     & On the server, before accepting a push                    \\
+\end{keys}
+
+\begin{bashcode}
+#!/usr/bin/env bash
+# .git/hooks/pre-commit -- refuse to commit a debug print
+set -euo pipefail
+
+if git diff --cached --name-only -z | xargs -0 grep -nE 'DEBUG_PRINT|TODO:REMOVE'
+then
+  echo "refusing: debug markers in staged changes" >&2
+  exit 1
+fi
+\end{bashcode}
+
+\begin{note}
+	\file{.git/hooks/} is not part of the repository, so hooks are not shared and
+	not versioned --- a deliberate security decision, since cloning a repository
+	must not execute its author's scripts. To share them, commit the scripts to a
+	tracked directory and point Git at it:
+	\cmd{git config core.hooksPath .githooks}. The \texttt{pre-commit} framework
+	automates exactly this.
+\end{note}
+
+\begin{moral}
+	Keep hooks fast and keep them advisory. A \texttt{pre-commit} hook that takes
+	thirty seconds trains everyone to use \cmd{git commit --no-verify}, at which
+	point it is worse than nothing. Put the quick checks in a hook and the slow
+	ones in CI, where waiting is free.
+\end{moral}
+
+\section{Licences and Repository Hygiene}\label{sec:git-meta}
+
+\begin{keys}[0.26]
+	\file{LICENSE}         & Without one, default copyright applies: nobody may legally reuse it \\
+	\file{README.md}       & What it is, how to build, a minimal example          \\
+	\file{CONTRIBUTING.md} & How to propose a change; what the review expects     \\
+	\file{CODE\_OF\_CONDUCT.md} & Expected behaviour, and who to contact          \\
+	\file{CHANGELOG.md}    & What changed between versions, for humans            \\
+	\file{.editorconfig}   & Indentation and line endings, enforced by the editor \\
+\end{keys}
+
+\begin{note}
+	``No licence'' is not ``public domain'' --- it is ``all rights reserved''.
+	A public repository with no \file{LICENSE} cannot legally be used by anyone,
+	which is almost never what the author intended. MIT and BSD-2 are permissive
+	and short; the GPL family requires derived works to stay open; CC~BY-SA suits
+	prose and lecture notes better than any software licence does.
+\end{note}

@@ -1,0 +1,277 @@
+\chapter{Inspecting and Changing Data}\label{ch:gdb-data}
+
+You are stopped in the right frame. Now the actual work: finding out what the
+program thinks is true.
+
+\section{\texorpdfstring{\cmd{print} and Format Letters}{print and Format Letters}}\label{sec:gdb-print}
+
+\cmd{print} evaluates an expression in the language of the current frame ---
+real C, with your program's variables, operators and functions.
+
+\begin{keys}[0.26]
+	\cmd{print n}              & A variable                                        \\
+	\cmd{print a[i]}           & An array element                                  \\
+	\cmd{print c->next->name}  & A chain of dereferences                           \\
+	\cmd{print n * 2 + 1}      & Arithmetic                                        \\
+	\cmd{print s == NULL}      & A comparison: prints 1 or 0                       \\
+	\cmd{print sizeof(struct node)} & Ask the type system                          \\
+	\cmd{print func(3)}        & Call it (\autoref{sec:gdb-force})                 \\
+\end{keys}
+
+A slash and a letter changes the representation:
+
+\begin{keys}[0.16]
+	\cmd{/x} & Hexadecimal                        \\
+	\cmd{/d} & Signed decimal                     \\
+	\cmd{/u} & Unsigned decimal                   \\
+	\cmd{/o} & Octal                              \\
+	\cmd{/t} & Binary --- for flags and masks     \\
+	\cmd{/c} & As a character                     \\
+	\cmd{/f} & As a float                         \\
+	\cmd{/s} & As a string                        \\
+	\cmd{/a} & As an address, with the nearest symbol \\
+\end{keys}
+
+\begin{gdbcode}
+(gdb) print flags
+$1 = 37
+(gdb) print/x flags
+$2 = 0x25
+(gdb) print/t flags
+$3 = 100101
+(gdb) print/a main
+$4 = 0x1149 <main>
+\end{gdbcode}
+
+\begin{note}
+	\cmd{print/t} is the one to remember. Bit flags read as decimal are
+	meaningless; in binary the answer is usually visible at a glance.
+\end{note}
+
+Several settings make output readable, and belong in your \file{.gdbinit}:
+
+\begin{keys}[0.30]
+	\cmd{set print pretty on}      & One struct member per line, indented         \\
+	\cmd{set print array on}       & Arrays one element per line                  \\
+	\cmd{set print elements 0}     & Do not truncate long arrays or strings       \\
+	\cmd{set print null-stop on}   & Stop printing a char array at the first NUL  \\
+	\cmd{set print union off}      & Do not expand unions inside structs          \\
+	\cmd{set pagination off}       & Do not stop every screenful                  \\
+\end{keys}
+
+\begin{gdbcode}
+(gdb) set print pretty on
+(gdb) print *cfg
+$5 = {
+  name = 0x555555556004 "server",
+  port = 8080,
+  timeout = 30,
+  next = 0x0
+}
+\end{gdbcode}
+
+\section{\texorpdfstring{\cmd{x}: Examining Memory}{x: Examining Memory}}\label{sec:gdb-x}
+
+\cmd{print} shows a \emph{value}; \cmd{x} shows the \emph{bytes at an address},
+which is what you need when the value is not what its type claims.
+
+\begin{center}
+	\ttfamily\large
+	x/\{count\}\{format\}\{size\} \{address\}
+\end{center}
+
+\begin{keys}[0.22]
+	\cmd{x/16xb buf}   & 16 bytes, in hex                                  \\
+	\cmd{x/8xw buf}    & 8 words (4 bytes each), in hex                    \\
+	\cmd{x/4xg \$sp}   & 4 giants (8 bytes each) from the stack pointer    \\
+	\cmd{x/s s}        & As a NUL-terminated string                        \\
+	\cmd{x/10c buf}    & 10 characters                                     \\
+	\cmd{x/5i \$pc}    & 5 instructions                                    \\
+	\cmd{x/20dw arr}   & 20 words as signed decimal                        \\
+\end{keys}
+
+Sizes are \cmd{b}yte, \cmd{h}alfword (2), \cmd{w}ord (4) and \cmd{g}iant (8).
+
+\begin{gdbcode}
+(gdb) x/16xb buf
+0x7fffffffe2a0: 0x68 0x65 0x6c 0x6c 0x6f 0x00 0xff 0xff
+0x7fffffffe2a8: 0xff 0xff 0xff 0xff 0x00 0x00 0x00 0x00
+(gdb) x/s buf
+0x7fffffffe2a0: "hello"
+\end{gdbcode}
+
+\begin{note}
+	\cmd{x} remembers its format, so a bare \cmd{x} after the above shows the next
+	16 bytes in the same layout --- and \key{<CR>} repeats it. Walking a buffer is
+	one command and then the Enter key.
+\end{note}
+
+\begin{moral}
+	Reach for \cmd{x} when you distrust the type. A \texttt{char *} that prints as
+	garbage, a struct whose fields look implausible, a buffer you suspect was
+	overrun --- \cmd{x/32xb} shows what is really there, with no interpretation
+	layered on top.
+\end{moral}
+
+\section{Types}\label{sec:gdb-types}
+
+\begin{keys}[0.26]
+	\cmd{ptype cfg}          & The full definition of the variable's type        \\
+	\cmd{ptype struct node}  & \dots{} of a named type                           \\
+	\cmd{whatis cfg}         & Just the type name, without expanding it          \\
+	\cmd{ptype/o struct node} & With byte offsets and sizes --- shows the padding \\
+	\cmd{print sizeof(cfg)}  & Its size                                          \\
+	\cmd{info types node}    & Which types match a pattern                       \\
+\end{keys}
+
+\begin{gdbcode}
+(gdb) ptype/o struct node
+/* offset      |    size */  type = struct node {
+/*      0      |       8 */    char *name;
+/*      8      |       4 */    int port;
+/* XXX  4-byte hole      */
+/*     16      |       8 */    struct node *next;
+                               /* total size (bytes):   24 */
+                             }
+\end{gdbcode}
+
+\begin{note}
+	\cmd{ptype/o} is how you see padding, which matters when a struct is written to
+	a file or sent over a socket. The four-byte hole above is why
+	\cmd{sizeof(struct node)} is 24 and not 20 --- and why writing the struct
+	verbatim produces a format that differs between compilers.
+\end{note}
+
+\section{\texorpdfstring{\cmd{display}}{display}}\label{sec:gdb-display}
+
+\begin{keys}[0.26]
+	\cmd{display i}        & Print \texttt{i} automatically at every stop       \\
+	\cmd{display/x flags}  & \dots{} with a format                              \\
+	\cmd{display/i \$pc}   & The next instruction, every time                   \\
+	\cmd{info display}     & What is being displayed                            \\
+	\cmd{undisplay 1}      & Stop displaying it                                 \\
+\end{keys}
+
+\begin{gdbcode}
+(gdb) display i
+1: i = 0
+(gdb) display total
+2: total = 0
+(gdb) next
+15              total += weight[i];
+1: i = 0
+2: total = 0
+(gdb) next
+14          for (int i = 0; i < n; i++) {
+1: i = 0
+2: total = 12
+\end{gdbcode}
+
+\begin{moral}
+	Two or three \cmd{display}s turn stepping into a live view of the variables you
+	care about. Set them once, then hold \key{<CR>} and watch --- it is the closest
+	GDB gets to a graphical debugger's watch pane, and it is faster to set up.
+\end{moral}
+
+\section{Changing Variables and Registers}\label{sec:gdb-set}
+
+\begin{keys}[0.28]
+	\cmd{set var n = 42}       & Assign to a variable                             \\
+	\cmd{set var p = 0}        & Make a pointer null, to test the error path      \\
+	\cmd{set var s[0] = 'X'}   & Modify one element                               \\
+	\cmd{set var \$rax = 1}    & Assign to a register                             \\
+	\cmd{print n = 42}         & Assigns too, and shows the result                \\
+\end{keys}
+
+\begin{note}
+	Use \cmd{set var}, not bare \cmd{set}. \cmd{set width = 80} is GDB's own
+	\cmd{set width} setting, not an assignment to your variable named
+	\texttt{width}; \cmd{set var width = 80} is unambiguous. This bites people
+	roughly once, memorably.
+\end{note}
+
+\begin{eg}
+	Testing an error path that is hard to trigger for real:
+\begin{gdbcode}
+(gdb) break write_output
+(gdb) run
+Breakpoint 1, write_output (f=0x5555555592a0, n=1024) at io.c:55
+(gdb) set var f = 0            # pretend the file failed to open
+(gdb) continue
+error: cannot write output     # good -- the check works
+\end{gdbcode}
+\end{eg}
+
+\section{Pointers, Arrays and Structs}\label{sec:gdb-agg}
+
+\begin{keys}[0.28]
+	\cmd{print *p}           & Dereference                                        \\
+	\cmd{print p->field}     & A member through a pointer                         \\
+	\cmd{print *arr@10}      & Ten elements starting at \texttt{arr}              \\
+	\cmd{print *p@n}         & \texttt{n} elements --- \texttt{n} may be a variable \\
+	\cmd{print arr[3]@4}     & Elements 3 to 6                                    \\
+	\cmd{print (struct node *)ptr} & Cast, when the type was lost                 \\
+	\cmd{print \{int\}0x7fff2a0} & Read that address as an \texttt{int}           \\
+	\cmd{print *node->next->next} & Follow a list by hand                         \\
+\end{keys}
+
+\begin{definition}[The \texttt{@} operator]
+	\texttt{expr@n} means ``treat this as the first of \texttt{n} consecutive
+	elements''. It exists because a pointer in C carries no length, so GDB cannot
+	know how much of a dynamically allocated array to print.
+\end{definition}
+
+\begin{gdbcode}
+(gdb) print arr
+$1 = (int *) 0x5555555592a0        # just an address: no length information
+(gdb) print *arr@5
+$2 = {3, 1, 4, 1, 5}
+(gdb) print *arr@n                 # n is the program's own length variable
+$3 = {3, 1, 4, 1, 5, 9, 2, 6}
+\end{gdbcode}
+
+\begin{moral}
+	\texttt{*p@n} is the command that makes GDB usable on C. Without it every
+	heap array prints as a bare address, and half the state of your program is
+	invisible.
+\end{moral}
+
+\section{Convenience Variables and Value History}\label{sec:gdb-convvar}
+
+\begin{keys}[0.26]
+	\cmd{\$1}, \cmd{\$2}   & Earlier results. Every \cmd{print} numbers its output  \\
+	\cmd{\$}               & The most recent value                                  \\
+	\cmd{\$\$}             & The one before that                                    \\
+	\cmd{\$\$3}            & Three back                                             \\
+	\cmd{set \$i = 0}      & A convenience variable --- yours, not the program's     \\
+	\cmd{set \$p = head}   & Useful for walking a data structure                    \\
+	\cmd{show values}      & The last ten history entries                           \\
+\end{keys}
+
+\begin{eg}[Walking a linked list]
+\begin{gdbcode}
+(gdb) set $n = head
+(gdb) print $n->name
+$1 = 0x555555556004 "first"
+(gdb) set $n = $n->next
+(gdb) print $n->name
+$2 = 0x55555555600a "second"
+\end{gdbcode}
+	Now the last two lines repeat with \key{<CR>} --- two keystrokes per node. For
+	a longer list, a loop does it in one command:
+\begin{gdbcode}
+(gdb) set $n = head
+(gdb) while $n != 0
+ >printf "%s -> ", $n->name
+ >set $n = $n->next
+ >end
+first -> second -> third ->
+\end{gdbcode}
+\end{eg}
+
+\begin{note}
+	Convenience variables are typeless and persist across \cmd{run}, which makes
+	them the right place to stash an address you want to keep watching across
+	several runs of the program. They never collide with your program's own names,
+	because your program cannot have a variable beginning with \texttt{\$}.
+\end{note}

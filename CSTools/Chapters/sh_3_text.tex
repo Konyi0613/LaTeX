@@ -1,0 +1,339 @@
+\chapter{Viewing and Processing Text}\label{ch:sh-text}
+
+Unix's founding bet was that if every program reads and writes plain text, then
+a small number of general tools can be combined to solve problems nobody
+anticipated. The tools in this chapter are that bet's payoff. Each does one
+narrow thing; \autoref{ch:sh-pipes} is where they become a language.
+
+\section{Reading Files}\label{sec:sh-view}
+
+\begin{keys}[0.24]
+	\cmd{cat file}        & Print the whole file                                       \\
+	\cmd{cat -n file}     & \dots{} with line numbers                                  \\
+	\cmd{cat a b > c}     & Concatenate --- which is what the name is short for        \\
+	\cmd{head file}       & The first ten lines                                        \\
+	\cmd{head -n 3 file}  & The first three                                            \\
+	\cmd{tail file}       & The last ten lines                                         \\
+	\cmd{tail -n +5 file} & From line five to the end                                  \\
+	\cmd{tail -f log}     & Print new lines as they are appended, forever              \\
+	\cmd{less file}       & Page through it interactively                              \\
+\end{keys}
+
+\cmd{less} is a pager, and its keys will look familiar:
+
+\begin{keys}[0.20]
+	\key{<Space>} / \key{b}    & Forward / back one screen                      \\
+	\key{j} \key{k}            & Down / up one line                             \\
+	\key{g} / \key{G}          & Start / end of file                            \\
+	\key{/}\texttt{pat}, \key{n}, \key{N} & Search, next match, previous match  \\
+	\key{-N}                   & Toggle line numbers                            \\
+	\key{F}                    & Follow, like \cmd{tail -f}; \key{<C-c>} stops  \\
+	\key{q}                    & Quit                                           \\
+\end{keys}
+
+\begin{note}
+	These are Vim's keys, not a coincidence: \cmd{less}, \cmd{man}, \cmd{git log}
+	and most things that paginate use the same bindings. Part~\ref{part:vim} has
+	already taught you how to read a log file.
+\end{note}
+
+\begin{moral}
+	\cmd{cat file | grep x} works but wastes a process; \cmd{grep x file} is the
+	same thing. This gets called ``useless use of \cmd{cat}'' often enough to be a
+	running joke. It is harmless --- but \cmd{cat} on a 2\,GB log is not, and
+	\cmd{less} is what you wanted.
+\end{moral}
+
+\section{Slicing Lines}\label{sec:sh-slice}
+
+\begin{keys}[0.28]
+	\cmd{wc -l file}            & Count lines; \cmd{-w} words, \cmd{-c} bytes       \\
+	\cmd{cut -d: -f1 /etc/passwd} & Field 1, with \texttt{:} as the delimiter       \\
+	\cmd{cut -c1-10 file}       & Characters 1 to 10 of every line                  \\
+	\cmd{paste a b}             & Join two files side by side, line for line        \\
+	\cmd{tr 'a-z' 'A-Z'}        & Translate characters                              \\
+	\cmd{tr -d '\textbackslash r'} & Delete characters --- this one strips Windows line endings \\
+	\cmd{tr -s ' '}             & Squeeze repeats into one                          \\
+	\cmd{column -t}             & Align whitespace-separated input into columns     \\
+	\cmd{nl file}               & Number the lines                                  \\
+	\cmd{rev}                   & Reverse each line's characters                    \\
+\end{keys}
+
+\begin{note}
+	\cmd{tr} reads only from standard input --- it takes no filename. This is
+	deliberate: it is a \vocab{filter}, meant to sit in the middle of a pipeline
+	(\autoref{sec:sh-pipes}), and \cmd{tr -d '\textbackslash r' < old > new} is how
+	you feed it a file.
+\end{note}
+
+\begin{eg}
+	The users on this system, one per line:
+\begin{shell}
+$ cut -d: -f1 /etc/passwd | head -3
+root
+daemon
+bin
+\end{shell}
+	\cmd{cut} is the right tool exactly when fields are separated by a single
+	character. When they are separated by \emph{runs} of whitespace, it is the
+	wrong tool and \cmd{awk} is the right one.
+\end{eg}
+
+\section{Ordering}\label{sec:sh-sort}
+
+\begin{keys}[0.24]
+	\cmd{sort file}          & Sort lines alphabetically                          \\
+	\cmd{sort -n}            & Numerically --- \texttt{10} after \texttt{9}, not before \\
+	\cmd{sort -h}            & By human-readable size: \texttt{2K}, \texttt{1M}, \texttt{3G} \\
+	\cmd{sort -r}            & Reverse                                            \\
+	\cmd{sort -u}            & Sort and remove duplicates                         \\
+	\cmd{sort -k2}           & By the second field                                \\
+	\cmd{sort -t: -k3 -n}    & By field 3, colon-separated, numerically           \\
+	\cmd{uniq}               & Collapse \emph{adjacent} duplicate lines           \\
+	\cmd{uniq -c}            & \dots{} and prefix each with its count             \\
+	\cmd{uniq -d}            & Only the lines that were duplicated                \\
+	\cmd{shuf}               & Shuffle; \cmd{shuf -n 1} picks one at random       \\
+\end{keys}
+
+\begin{note}
+	\cmd{uniq} only removes \emph{adjacent} duplicates, so it is nearly always
+	preceded by \cmd{sort}. This looks like a design flaw and is not: it makes
+	\cmd{uniq} a streaming filter that needs no memory, and the sort you would
+	have needed anyway is written explicitly.
+\end{note}
+
+\begin{eg}[The counting idiom]
+	This pipeline appears everywhere, and is worth recognising on sight:
+\begin{shell}
+$ sort access.log | uniq -c | sort -rn | head
+   842 /index.html
+   311 /about
+    97 /contact
+\end{shell}
+	Sort so duplicates become adjacent; count them; sort those counts numerically,
+	largest first; take the top few. \emph{What are the most frequent lines?} ---
+	in four words.
+\end{eg}
+
+\section{Comparing}\label{sec:sh-compare}
+
+\begin{keys}[0.24]
+	\cmd{diff a b}        & Line-by-line differences                              \\
+	\cmd{diff -u a b}     & Unified format --- what Git and \cmd{patch} both speak \\
+	\cmd{diff -r d1 d2}   & Recursively, over two directories                     \\
+	\cmd{cmp a b}         & Byte-for-byte; silent when identical                  \\
+	\cmd{comm -12 a b}    & Lines common to two \emph{sorted} files               \\
+	\cmd{patch < fix.diff} & Apply a diff                                         \\
+	\cmd{vimdiff a b}     & The same comparison, editable (\autoref{sec:vim-diff}) \\
+\end{keys}
+
+\begin{eg}[Reading a unified diff]
+\begin{shell}
+$ diff -u old.txt new.txt
+--- old.txt
++++ new.txt
+@@ -1,3 +1,3 @@
+ unchanged context line
+-a line that was removed
++a line that was added
+ unchanged context line
+\end{shell}
+	\texttt{-{}-{}-} is the old file and \texttt{+++} the new; \texttt{@@} gives
+	the line ranges of the \vocab{hunk}; then \texttt{-} for removed, \texttt{+}
+	for added, and a leading space for context. This is exactly what
+	\cmd{git diff} prints, so \autoref{sec:git-diff} needs no further explanation.
+\end{eg}
+
+\section{Regular Expressions}\label{sec:sh-regex}
+
+\begin{definition}[Regular expression]
+	A pattern language for matching text. Unlike a glob
+	(\autoref{sec:sh-glob}), which is expanded by the shell against filenames, a
+	regular expression is interpreted by the \emph{program} you hand it to, and
+	matches anywhere inside a line.
+\end{definition}
+
+The unhappy part is that there are three dialects in common use:
+
+\begin{keys}[0.24]
+	\vocab{BRE} & Basic. \cmd{grep} and \cmd{sed} by default. \texttt{+}, \texttt{?}, \texttt{|}, \texttt{(} must be backslash-escaped to have their special meaning \\
+	\vocab{ERE} & Extended. \cmd{grep -E}, \cmd{sed -E}, \cmd{awk}. Those characters work unescaped \\
+	\vocab{PCRE} & Perl-compatible. \cmd{grep -P}, \cmd{rg}, and most programming languages. Adds \texttt{\textbackslash d}, \texttt{\textbackslash w}, lookaround, non-greedy \texttt{*?} \\
+\end{keys}
+
+\begin{moral}
+	Use \cmd{grep -E} and \cmd{sed -E} habitually. The escaping rules of BRE exist
+	for compatibility with 1975 and cost you a backslash every few characters for
+	no benefit.
+\end{moral}
+
+The atoms are common to all three:
+
+\begin{keys}[0.20]
+	\texttt{.}                & Any single character                           \\
+	\texttt{*}                & Zero or more of the preceding item             \\
+	\texttt{+}                & One or more                                    \\
+	\texttt{?}                & Zero or one                                    \\
+	\texttt{\{2,5\}}          & Between two and five                           \\
+	\texttt{[abc]}, \texttt{[a-z]} & One character from a set or range         \\
+	\texttt{[\textasciicircum{}abc]} & One character not in the set            \\
+	\texttt{\textasciicircum{}} & Start of line                                \\
+	\texttt{\$}               & End of line                                    \\
+	\texttt{(ab|cd)}          & Group, and alternation                         \\
+	\texttt{\textbackslash .} & A literal dot                                  \\
+	\texttt{\textbackslash b} & A word boundary                                \\
+\end{keys}
+
+\begin{note}[The same symbol, two meanings]
+	In a glob, \texttt{*} means ``any run of characters''. In a regular expression
+	it means ``any number of \emph{the thing before me}''. So the glob
+	\texttt{*.txt} is the regular expression
+	\texttt{.*\textbackslash .txt\$} --- and \texttt{*.txt} as a regular
+	expression means something else entirely. Mixing these up is the single most
+	common regular-expression mistake.
+\end{note}
+
+\begin{remark}
+	Regular expressions are greedy: they match as much as they can.
+	\texttt{<.*>} against \texttt{<a> and <b>} matches the whole string, not
+	\texttt{<a>}. In PCRE, \texttt{<.*?>} is the non-greedy form; in ERE the usual
+	fix is to exclude the delimiter, \texttt{<[\textasciicircum{}>]*>}.
+\end{remark}
+
+\section{\texorpdfstring{\cmd{grep}}{grep}}\label{sec:sh-grep}
+
+\cmd{grep} prints the lines of its input that match a pattern. That is all it
+does, and it is probably the command you will run most often for the rest of
+your career.
+
+\begin{keys}[0.24]
+	\cmd{grep pat file}     & Lines containing \texttt{pat}                       \\
+	\cmd{grep -i}           & Ignore case                                         \\
+	\cmd{grep -v}           & Invert: lines that do \emph{not} match              \\
+	\cmd{grep -n}           & Prefix each with its line number                    \\
+	\cmd{grep -r pat dir}   & Recurse into a directory                            \\
+	\cmd{grep -l}           & Print only the names of matching files              \\
+	\cmd{grep -c}           & Print only a count                                  \\
+	\cmd{grep -w}           & Match whole words only                              \\
+	\cmd{grep -F}           & Fixed strings: no pattern language at all           \\
+	\cmd{grep -E}           & Extended regular expressions                        \\
+	\cmd{grep -A3 -B1}      & Show 3 lines after and 1 before each match          \\
+	\cmd{grep -o}           & Print only the matching part, not the whole line    \\
+\end{keys}
+
+\begin{eg}
+\begin{shell}
+$ grep -rn 'TODO' --include='*.tex' .        # every TODO in the note, with line numbers
+$ grep -c '^$' report.tex                    # how many blank lines?
+$ grep -o '[a-z]*@[a-z.]*' contacts.txt      # pull out just the addresses
+$ ps aux | grep -v grep | grep nvim          # find a process, minus grep itself
+\end{shell}
+\end{eg}
+
+\begin{note}
+	\cmd{grep} sets its exit status to 0 if it matched and 1 if it did not, which
+	makes it usable as a test: \cmd{if grep -q pat file; then ...} with \cmd{-q}
+	for silence. \autoref{sec:sh-status} builds on this.
+\end{note}
+
+\begin{remark}
+	\cmd{rg} (ripgrep, installed here) is \cmd{grep -r} done properly: it is
+	several times faster, recurses by default, skips anything in
+	\file{.gitignore}, and uses PCRE-ish syntax throughout. For searching a source
+	tree, prefer it. For a pipeline or a script that must run anywhere, use
+	\cmd{grep} --- it is on every Unix machine in existence.
+\end{remark}
+
+\section{\texorpdfstring{\cmd{sed}}{sed}}\label{sec:sh-sed}
+
+\cmd{sed} is a \vocab{stream editor}: it reads a line, applies your commands,
+prints the result, and repeats. You will use perhaps three of its features ever,
+and one of them constantly.
+
+\begin{center}
+	\ttfamily\large
+	sed [-E] [-n] [-i] '\{address\}\{command\}' \{file\}
+\end{center}
+
+\begin{keys}[0.30]
+	\cmd{sed 's/old/new/'}       & Replace the first match on each line          \\
+	\cmd{sed 's/old/new/g'}      & Replace every match                           \\
+	\cmd{sed 's/old/new/2'}      & Replace only the second match on each line    \\
+	\cmd{sed -E 's/(a)(b)/\textbackslash 2\textbackslash 1/'} & Swap two capture groups \\
+	\cmd{sed -n '5p'}            & Print only line 5 (\cmd{-n} suppresses the default printing) \\
+	\cmd{sed -n '10,20p'}        & Print lines 10 to 20                          \\
+	\cmd{sed '/pat/d'}           & Delete matching lines                         \\
+	\cmd{sed '1d'}               & Delete the first line --- a header, usually   \\
+	\cmd{sed -i.bak 's/a/b/g'}   & Edit the file in place, keeping a backup      \\
+\end{keys}
+
+\begin{note}
+	If this looks familiar, it should: Vim's \cmd{:\%s/old/new/g}
+	(\autoref{sec:vim-subst}) and \cmd{:g/pat/d} (\autoref{sec:vim-global}) are the
+	same commands with the same syntax. Both inherited them from \texttt{ed}, and
+	learning either teaches you the other.
+\end{note}
+
+\begin{note}[\cmd{-i} is not portable]
+	GNU \cmd{sed} accepts \cmd{sed -i 's/a/b/'}; BSD and macOS \cmd{sed} require an
+	argument, \cmd{sed -i '' 's/a/b/'}. Writing \cmd{sed -i.bak} works on both and
+	leaves you a backup, which is the right answer for a command that edits files
+	irreversibly.
+\end{note}
+
+\begin{eg}
+	The delimiter need not be a slash --- any character works, which spares you
+	from escaping paths:
+\begin{shell}
+$ sed 's|/usr/local|/opt|g' config.ini
+\end{shell}
+\end{eg}
+
+\section{\texorpdfstring{\cmd{awk}}{awk}}\label{sec:sh-awk}
+
+\cmd{awk} is a complete programming language, but you can get most of its value
+from one sentence: \emph{for each line, split it into fields, and if the line
+	matches a condition, do something.}
+
+\begin{center}
+	\ttfamily\large
+	awk '\{pattern\} \{ \{action\} \}' \{file\}
+\end{center}
+
+Either part may be omitted: with no pattern the action runs on every line; with
+no action the line is printed.
+
+\begin{keys}[0.20]
+	\texttt{\$0}         & The whole line                                        \\
+	\texttt{\$1}, \texttt{\$2} & The first and second fields                     \\
+	\texttt{NF}          & The number of fields --- so \texttt{\$NF} is the last  \\
+	\texttt{NR}          & The current line number                               \\
+	\texttt{-F:}         & Use \texttt{:} as the field separator                 \\
+	\texttt{BEGIN\{\}}   & Run before the first line                             \\
+	\texttt{END\{\}}     & Run after the last                                    \\
+\end{keys}
+
+\begin{eg}
+\begin{shell}
+$ awk '{print $1}' access.log            # first field of every line
+$ awk -F: '$3 >= 1000 {print $1}' /etc/passwd    # human users only
+$ awk 'NF' file.txt                      # drop blank lines: NF is 0, which is false
+$ awk '{s += $2} END {print s}' data     # sum the second column
+$ awk 'length > 79' report.tex           # lines over 79 characters
+\end{shell}
+\end{eg}
+
+\begin{intuition}
+	Choose between the three by what the input looks like. If you want
+	\emph{lines that match}, use \cmd{grep}. If you want \emph{the same
+		substitution everywhere}, use \cmd{sed}. If the input has \emph{columns} ---
+	and you want to compare, compute with, or reorder them --- use \cmd{awk}. Most
+	one-liners that get uncomfortable in \cmd{sed} are two clear words of
+	\cmd{awk}.
+\end{intuition}
+
+\begin{moral}
+	When an \cmd{awk} program grows past one line, stop and write it in a real
+	language. The tools in this chapter are for the middle of a pipeline; they are
+	not a place to build software.
+\end{moral}

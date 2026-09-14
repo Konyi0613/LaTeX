@@ -1,0 +1,221 @@
+\chapter{Breakpoints and Watchpoints}\label{ch:gdb-break}
+
+Stepping from \cmd{main} is fine for a twenty-line program. For anything larger
+the skill is stopping in the right place --- and, more often, stopping on the
+right \emph{iteration} of the right place.
+
+\section{Setting Breakpoints}\label{sec:gdb-break}
+
+\begin{keys}[0.32]
+	\cmd{break main}            & On entry to a function                            \\
+	\cmd{break parser.c:42}     & On a line of a file                               \\
+	\cmd{break 42}              & Line 42 of the current file                       \\
+	\cmd{break *0x401136}       & At a machine address                              \\
+	\cmd{break +2}, \cmd{break -3} & Relative to the current line                   \\
+	\cmd{tbreak main}           & Temporary: deleted once it fires                  \\
+	\cmd{rbreak \textasciicircum{}parse\_} & On every function matching a regular expression \\
+	\cmd{break parse if n > 100} & Conditional (\autoref{sec:gdb-cond})             \\
+\end{keys}
+
+\begin{gdbcode}
+(gdb) break parser.c:42
+Breakpoint 1 at 0x1185: file parser.c, line 42.
+(gdb) run
+Breakpoint 1, parse_line (s=0x5555555592a0 "name=value") at parser.c:42
+42          while (*s != '\n') {
+\end{gdbcode}
+
+\begin{note}
+	A breakpoint on a \emph{function} lands after the prologue --- after the stack
+	frame is set up --- so that arguments and locals are already readable. This is
+	what you want, and it is why the reported line is usually the first statement
+	rather than the opening brace.
+\end{note}
+
+\begin{note}[Breakpoints before the program exists]
+	Setting a breakpoint in a shared library that has not been loaded yet gets you
+	\texttt{Make breakpoint pending on future shared library load? (y or [n])}.
+	Answer yes; GDB will set it when the library arrives. \cmd{set breakpoint
+		pending on} in your \file{.gdbinit} (\autoref{sec:gdb-gdbinit}) stops it asking.
+\end{note}
+
+\section{Conditions and Ignore Counts}\label{sec:gdb-cond}
+
+This is the section that makes breakpoints useful on real programs.
+
+\begin{keys}[0.32]
+	\cmd{break parse if i == 500} & Stop only when the condition holds              \\
+	\cmd{condition 2 n > 100}     & Add or change a condition on breakpoint 2       \\
+	\cmd{condition 2}             & Remove the condition                            \\
+	\cmd{ignore 2 499}            & Skip the next 499 hits of breakpoint 2          \\
+	\cmd{break f if \$\_streq(s, "bad")} & String comparison, via a convenience function \\
+	\cmd{break f if p == 0}       & Stop when a pointer is null                     \\
+\end{keys}
+
+\begin{eg}
+	A loop of ten thousand iterations corrupts something around the five hundredth.
+	Stepping is hopeless; a condition is instant:
+\begin{gdbcode}
+(gdb) break process if i == 500
+(gdb) run
+Breakpoint 1, process (i=500, buf=0x5555555592a0) at work.c:88
+88          buf[i] = table[index];
+(gdb) print index
+$1 = 1048577                   # the table has 1024 entries
+\end{gdbcode}
+\end{eg}
+
+\begin{note}
+	A condition is evaluated by GDB every time the breakpoint is hit, which means
+	the program stops, GDB evaluates, and the program resumes --- thousands of
+	times. On a hot path this is genuinely slow. \cmd{ignore} is much faster when
+	you simply want the $n$th hit, because GDB only counts.
+\end{note}
+
+\begin{moral}
+	When a bug happens on ``some later iteration'', do not step. Put a condition on
+	the loop variable, or an \cmd{ignore} count on the breakpoint, and arrive at
+	the failure directly.
+\end{moral}
+
+\section{Listing, Disabling and Deleting}\label{sec:gdb-manage}
+
+\begin{keys}[0.32]
+	\cmd{info breakpoints}   & List them all, with hit counts                       \\
+	\cmd{disable 2}          & Keep it, stop using it                               \\
+	\cmd{enable 2}           & Turn it back on                                      \\
+	\cmd{enable once 2}      & Fire once more, then disable itself                  \\
+	\cmd{delete 2}           & Remove it                                            \\
+	\cmd{delete}             & Remove all of them, without asking                   \\
+	\cmd{clear parser.c:42}  & Delete by location rather than number                \\
+\end{keys}
+
+\begin{gdbcode}
+(gdb) info breakpoints
+Num     Type           Disp Enb Address            What
+1       breakpoint     keep y   0x0000000000001185 in parse_line at parser.c:42
+        stop only if n > 100
+        breakpoint already hit 3 times
+2       hw watchpoint  keep y                      total
+3       breakpoint     del  y   0x0000000000001149 in main at main.c:5
+\end{gdbcode}
+
+\begin{note}
+	Prefer \cmd{disable} to \cmd{delete} while you are working. Numbers are never
+	reused within a session, so a deleted breakpoint you want back has to be
+	retyped, whereas a disabled one is \cmd{enable 2}. \cmd{info breakpoints} also
+	shows hit counts, which answers ``did that code run at all?'' without any
+	stepping.
+\end{note}
+
+\section{Watchpoints}\label{sec:gdb-watch}
+
+\begin{definition}[Watchpoint]
+	A breakpoint on \emph{data} rather than on code: it stops the program whenever
+	a given expression changes value, whatever line did it.
+\end{definition}
+
+\begin{keys}[0.32]
+	\cmd{watch total}        & Stop when \texttt{total} changes                      \\
+	\cmd{watch *ptr}         & Stop when the pointed-to memory changes               \\
+	\cmd{watch -l total}     & Watch the \emph{location}, not the expression         \\
+	\cmd{rwatch total}       & Stop when it is read                                  \\
+	\cmd{awatch total}       & Stop on read or write                                 \\
+	\cmd{watch a[i] if i > 5} & Conditional, like a breakpoint                       \\
+	\cmd{info watchpoints}   & List them                                             \\
+\end{keys}
+
+\begin{gdbcode}
+(gdb) watch config.timeout
+Hardware watchpoint 2: config.timeout
+(gdb) continue
+Hardware watchpoint 2: config.timeout
+Old value = 30
+New value = 0
+reset_defaults (c=0x555555558040) at config.c:71
+71          c->timeout = 0;
+\end{gdbcode}
+
+\begin{moral}
+	``This value is wrong and I have no idea who wrote it'' is precisely what a
+	watchpoint answers, and it answers it in one command. It is the most
+	under-used feature in GDB.
+\end{moral}
+
+\begin{note}[Hardware and software watchpoints]
+	Modern processors have a handful of debug registers --- typically four --- that
+	watch an address in hardware at full speed. GDB uses them when it can, and
+	says \texttt{Hardware watchpoint}. Exceed the supply, or watch something too
+	large, and you get a \emph{software} watchpoint: GDB single-steps the entire
+	program and re-evaluates after every instruction. That is correct and perhaps a
+	thousand times slower, so it is worth noticing which kind you got.
+\end{note}
+
+\begin{note}[Scope]
+	A watchpoint on a local variable dies with its frame, and GDB tells you:
+	\texttt{Watchpoint 2 deleted because the program has left the block}. To follow
+	a specific object rather than a name, watch its address: \cmd{watch -l
+		*\&buf[3]}.
+\end{note}
+
+\section{Catchpoints}\label{sec:gdb-catch}
+
+\begin{keys}[0.32]
+	\cmd{catch throw}           & Every C++ exception, where it is thrown           \\
+	\cmd{catch catch}           & \dots{} where it is caught                        \\
+	\cmd{catch syscall write}   & A particular system call                          \\
+	\cmd{catch signal SIGPIPE}  & A signal (\autoref{sec:sh-signals})               \\
+	\cmd{catch exec}, \cmd{catch fork} & Process creation                           \\
+	\cmd{catch load libfoo.so}  & A shared library being loaded                     \\
+\end{keys}
+
+\begin{eg}
+	\cmd{catch throw} is the standard way to debug a C++ exception whose origin is
+	unknown: the stack at the \cmd{throw} is intact, while by the time it reaches
+	your handler the frames in between are gone. Similarly,
+	\cmd{catch syscall openat} finds which file a program is failing to open
+	without any \cmd{strace}.
+\end{eg}
+
+\section{Breakpoint Command Lists}\label{sec:gdb-cmdlist}
+
+A breakpoint can carry a script, which turns GDB into an instrumentation tool
+that needs no recompilation.
+
+\begin{gdbcode}
+(gdb) break parse_line
+(gdb) commands
+Type commands for breakpoint(s) 1, one per line.
+End with a line saying just "end".
+>silent
+>printf "parse_line(%s) depth=%d\n", s, depth
+>continue
+>end
+(gdb) run
+parse_line(name=value) depth=0
+parse_line(host=local) depth=1
+parse_line((null)) depth=2
+Program received signal SIGSEGV, Segmentation fault.
+\end{gdbcode}
+
+\begin{keys}[0.26]
+	\cmd{silent}      & Suppress GDB's usual ``Breakpoint 1, \dots'' announcement  \\
+	\cmd{printf}      & C-style formatting, with the program's own variables       \\
+	\cmd{continue}    & Do not stop; carry straight on                             \\
+	\cmd{bt 3}        & Print the top three frames and carry on                    \\
+	\cmd{end}         & Finish the list                                            \\
+\end{keys}
+
+\begin{moral}
+	This is print-statement debugging without the recompile, and without leaving
+	the statements in your source afterwards. When the edit--compile--run cycle is
+	slow, or the program is already running in production, it is the fastest tool
+	you have.
+\end{moral}
+
+\begin{tryit}
+	Take any program with a recursive function. Put a breakpoint on it with a
+	command list of \cmd{silent}, a \cmd{printf} of its argument, and
+	\cmd{continue}. You now have a call trace, produced without touching the
+	source, and the last line before the crash is where to look.
+\end{tryit}

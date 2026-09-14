@@ -1,0 +1,179 @@
+\chapter{The Stack and the Source}\label{ch:gdb-stack}
+
+You are stopped. The first question is always the same: how did I get here?
+
+\section{Reading a Backtrace}\label{sec:gdb-bt}
+
+\begin{definition}[Call stack]
+	The chain of function calls currently in progress. Each entry is a
+	\vocab{frame}, holding that call's arguments, its local variables, and the
+	address to return to. Frame \texttt{\#0} is where the program is now; the
+	numbers increase towards \cmd{main}.
+\end{definition}
+
+\begin{keys}[0.26]
+	\cmd{backtrace} (\cmd{bt}) & Print the whole stack                            \\
+	\cmd{bt 5}                 & The innermost five frames                        \\
+	\cmd{bt -5}                & The outermost five                               \\
+	\cmd{bt full}              & \dots{} with every frame's local variables       \\
+	\cmd{bt -frame-arguments all} & Print full argument values, not summaries     \\
+	\cmd{where}                & A synonym for \cmd{bt}                           \\
+\end{keys}
+
+\begin{gdbcode}
+(gdb) bt
+#0  0x00005555555551a9 in parse_line (s=0x0) at parser.c:42
+#1  0x0000555555555241 in read_config (path=0x7fffffffe5c1 "app.conf")
+    at config.c:18
+#2  0x00005555555552c8 in main (argc=2, argv=0x7fffffffe3b8) at main.c:11
+\end{gdbcode}
+
+Read it from the bottom. \cmd{main} called \cmd{read\_config} with a filename;
+that called \cmd{parse\_line} with \texttt{s=0x0}; and \texttt{0x0} is
+\texttt{NULL}, which is the bug. The arguments printed in each frame are
+usually enough to locate the fault without looking at a single line of source.
+
+\begin{moral}
+	\cmd{bt} is the first command after any crash, and often the last. The frame
+	that is \emph{wrong} is rarely frame \texttt{\#0} --- frame \texttt{\#0} is
+	merely where the wrongness became fatal. Look for the frame that passed the bad
+	value, which is usually one or two up.
+\end{moral}
+
+\begin{note}[Frames you cannot read]
+	\texttt{??} in a backtrace means no debug information for that frame ---
+	a stripped library (\autoref{sec:gdb-symbols}), or a corrupted stack. If
+	\emph{every} frame is \texttt{??} and the addresses look implausible, the stack
+	itself has been overwritten, and \autoref{sec:gdb-stackoverflow} is the
+	relevant section.
+\end{note}
+
+\section{Selecting Frames}\label{sec:gdb-frame}
+
+The \vocab{selected frame} is the one that \cmd{print}, \cmd{info locals} and
+\cmd{list} refer to. Moving between frames is how you inspect the caller's
+variables.
+
+\begin{keys}[0.26]
+	\cmd{frame 2} (\cmd{f 2}) & Select frame 2                                     \\
+	\cmd{up}                  & One frame outwards, towards \cmd{main}             \\
+	\cmd{down}                & One frame inwards                                  \\
+	\cmd{up 3}                & Three at once                                      \\
+	\cmd{frame}               & Which frame am I in?                               \\
+	\cmd{info frame}          & Its addresses, saved registers, return address     \\
+\end{keys}
+
+\begin{eg}
+\begin{gdbcode}
+(gdb) frame 1
+#1  0x0000555555555241 in read_config (path=0x7fffffffe5c1 "app.conf")
+    at config.c:18
+18          parse_line(next_line(f));
+(gdb) print f
+$1 = (FILE *) 0x0
+\end{gdbcode}
+	One \cmd{frame 1} and the real bug appears: \cmd{fopen} failed, nobody checked,
+	and \cmd{next\_line} was handed a null \texttt{FILE~*}. The crash was two
+	frames and one function away from its cause.
+\end{eg}
+
+\begin{note}
+	Selecting a frame changes nothing about the program --- it only changes which
+	frame's names GDB resolves. \cmd{up} and \cmd{down} are safe to use freely, and
+	\cmd{frame 0} returns you to the innermost.
+\end{note}
+
+\section{Viewing Source}\label{sec:gdb-list}
+
+\begin{keys}[0.26]
+	\cmd{list} (\cmd{l})      & Ten lines around the current one                   \\
+	\cmd{list}                & Again: the next ten                                \\
+	\cmd{list 40,60}          & An explicit range                                  \\
+	\cmd{list parse\_line}    & Around a function                                  \\
+	\cmd{list parser.c:42}    & Around a line of a file                            \\
+	\cmd{list -}              & The ten lines before the last listing              \\
+	\cmd{set listsize 20}     & Show more at a time                                \\
+	\cmd{directory ../src}    & Where to look for sources GDB cannot find          \\
+	\cmd{info source}         & Which file the current frame came from             \\
+\end{keys}
+
+\begin{note}
+	\texttt{No such file or directory} when listing means the binary records a path
+	that no longer exists --- you moved the tree, or built it in a container.
+	\cmd{directory} adds a search path, and \cmd{set substitute-path /build /home/konyi/src}
+	rewrites a prefix, which is the usual fix for a binary built elsewhere.
+\end{note}
+
+\begin{moral}
+	If you find yourself typing \cmd{list} more than twice, open the TUI instead
+	(\autoref{sec:gdb-tui}). \key{<C-x>} \key{a} turns on a source window that
+	follows the program automatically, and the \cmd{list} command becomes
+	unnecessary.
+\end{moral}
+
+\section{Locals and Arguments}\label{sec:gdb-localargs}
+
+\begin{keys}[0.26]
+	\cmd{info locals}      & Every local variable in the selected frame            \\
+	\cmd{info args}        & Its arguments                                         \\
+	\cmd{info all-registers} & Every register, including floating point            \\
+	\cmd{bt full}          & \cmd{info locals} for every frame at once             \\
+	\cmd{info functions parse} & Functions whose names match                       \\
+	\cmd{info variables}   & Global and static variables                           \\
+	\cmd{info scope parse\_line} & What is in scope there, and where each lives     \\
+\end{keys}
+
+\begin{gdbcode}
+(gdb) info args
+s = 0x0
+len = 128
+(gdb) info locals
+i = 0
+buf = "\000\000\000..."
+p = 0x7fffffffe2a0 "name=value"
+\end{gdbcode}
+
+\begin{note}
+	\cmd{bt full} is the single most informative command for a crash you cannot
+	reproduce: it captures every frame with every local in one block of text, which
+	is exactly what to paste into a bug report. Pair it with
+	\cmd{set pagination off} so it does not stop every screenful.
+\end{note}
+
+\section{Inlined and Optimised Frames}\label{sec:gdb-optimised}
+
+At \cmd{-O2} the stack GDB shows and the stack the machine has are no longer the
+same thing, and it is worth knowing how the difference presents itself.
+
+\begin{keys}[0.34]
+	\texttt{<optimized out>}        & The variable has no storage at this point. It may be in a register that has since been reused, or eliminated entirely \\
+	\texttt{\dots{} (inlined)}      & GDB reconstructed this frame from debug info; no real call happened          \\
+	A missing frame                 & A tail call: the compiler reused the caller's frame                          \\
+	A line that ``executes twice''  & Instructions from several source lines interleaved                           \\
+\end{keys}
+
+\begin{gdbcode}
+(gdb) bt
+#0  hash (key=<optimized out>) at hash.c:12
+#1  0x000055555555529a in lookup (t=0x5555555592a0, key=0x4006f4 "port")
+    at table.c:30
+#2  table_get (t=0x5555555592a0, key=0x4006f4 "port") at table.c:44
+\end{gdbcode}
+
+Note that frame \texttt{\#1} and \texttt{\#2} share an address: \cmd{lookup} was
+inlined into \cmd{table\_get}, and GDB is showing you the source-level call that
+the machine no longer makes.
+
+\begin{keys}[0.32]
+	\cmd{info frame}             & Is this a real frame or a reconstructed one?     \\
+	\cmd{set print frame-info source-and-location} & More detail on each frame      \\
+	\cmd{p \$rdi}, \cmd{p \$rsi} & Read arguments from registers when names fail    \\
+	\cmd{disassemble /s}         & What is actually executing                       \\
+\end{keys}
+
+\begin{moral}
+	Rebuild at \cmd{-Og} or \cmd{-O0} before fighting an optimised backtrace. If
+	the bug then disappears, that is not a dead end --- it is strong evidence of
+	undefined behaviour, and \autoref{sec:gdb-companions} will find it far faster
+	than reading disassembly would.
+\end{moral}

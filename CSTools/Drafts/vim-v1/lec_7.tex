@@ -1,0 +1,294 @@
+\chapter{The Setup on This Machine}\label{ch:setup}
+
+The previous chapter described the pieces in the abstract. This one describes
+the Neovim installation these notes were written in, so that the abstractions
+have somewhere concrete to land. At the time of writing that is Neovim 0.9.5
+running \vocab{LazyVim} with VimTeX and LuaSnip added on top.
+
+\section{LazyVim}
+
+\begin{definition}[Distribution]
+	A pre-assembled configuration: a plugin manager, a curated plugin set, and a
+	consistent set of keybindings, packaged so it can be installed in one step and
+	then overridden piecemeal. \texttt{LazyVim} \cite{lazyvim} is the most widely used one.
+\end{definition}
+
+The layout it expects is small:
+
+\begin{vimcode}
+~/.config/nvim/
+  init.lua                 # entry point; requires config.lazy
+  lazy-lock.json           # pinned plugin commits
+  lua/config/lazy.lua      # bootstraps lazy.nvim and imports LazyVim
+  lua/config/options.lua   # your option overrides
+  lua/config/keymaps.lua   # your mappings
+  lua/config/autocmds.lua  # your autocommands
+  lua/plugins/*.lua        # one file per plugin or topic; merged automatically
+\end{vimcode}
+
+Every file under \file{lua/plugins/} is imported and its specs are merged with
+LazyVim's. Declaring the same plugin again \emph{extends} the existing spec
+rather than replacing it, which is how you change one option without forking
+the whole configuration:
+
+\begin{luacode}
+-- lua/plugins/ui.lua: adjust a plugin LazyVim already installs
+return {
+  {
+    "folke/tokyonight.nvim",
+    opts = { transparent = true },
+  },
+}
+\end{luacode}
+
+\begin{note}[Discovering the keymap]
+	LazyVim binds several hundred keys and you are not meant to memorise them.
+	Press \key{<Space>} and stop --- \texttt{which-key} pops up a menu of every
+	continuation, grouped and labelled. \key{<leader>} \key{s} \key{k} searches
+	all mappings, and \cmd{:verbose nmap <keys>} says which file defined one.
+\end{note}
+
+\subsection{Keys worth knowing first}
+
+Verified against the LazyVim installed here; the leader is \key{<Space>}.
+
+\begin{keys}[0.26]
+	\key{<leader>} \key{<Space>} & Find files in the project root        \\
+	\key{<leader>} \key{/}       & Grep across the project               \\
+	\key{<leader>} \key{e}       & File explorer                         \\
+	\key{<leader>} \key{,}       & Switch buffer                         \\
+	\key{<S-h>} / \key{<S-l>}    & Previous / next buffer                \\
+	\key{<leader>} \key{`}       & Toggle with the alternate buffer      \\
+	\key{<leader>} \key{b} \key{d} & Delete this buffer, keep the window \\
+	\key{<C-h>} \key{<C-j>} \key{<C-k>} \key{<C-l>} & Move between windows (no \key{<C-w>} prefix) \\
+	\key{<leader>} \key{-} / \key{<leader>} \key{|} & Split below / right \\
+	\key{<C-/>}                  & Toggle a floating terminal            \\
+	\key{<C-s>}                  & Save, from any mode                   \\
+	\key{<leader>} \key{q} \key{q} & Quit everything                     \\
+	\key{<leader>} \key{q} \key{s} & Restore this directory's session    \\
+	\key{<leader>} \key{l}       & Open the \cmd{:Lazy} dashboard        \\
+	\key{<leader>} \key{u} \key{i} & Inspect highlight groups under the cursor \\
+\end{keys}
+
+Code-related, active whenever a language server is attached:
+
+\begin{keys}[0.26]
+	\key{K}                        & Hover documentation             \\
+	\key{g} \key{d} / \key{g} \key{D} & Definition / declaration      \\
+	\key{g} \key{r}                & References                      \\
+	\key{g} \key{I} / \key{g} \key{y} & Implementation / type definition \\
+	\key{g} \key{K}                & Signature help                  \\
+	\key{<leader>} \key{c} \key{a} & Code action                     \\
+	\key{<leader>} \key{c} \key{r} & Rename symbol                   \\
+	\key{<leader>} \key{c} \key{f} & Format buffer or selection      \\
+	\key{<leader>} \key{c} \key{d} & Line diagnostics in a float     \\
+	\key{]} \key{d} / \key{[} \key{d} & Next / previous diagnostic   \\
+	\key{]} \key{e} / \key{[} \key{e} & Next / previous \emph{error} \\
+	\key{<leader>} \key{x} \key{x} & Diagnostics list (Trouble)      \\
+	\key{<leader>} \key{s} \key{r} & Project-wide search and replace (grug-far) \\
+	\key{g} \key{c} \key{c} / \key{g} \key{c} & Comment a line / a motion \\
+	\key{<A-j>} / \key{<A-k>}      & Move the current line or selection down / up \\
+	\key{s}                        & Flash jump: type two characters, then a label \\
+\end{keys}
+
+\begin{note}
+	LazyVim also remaps \key{j} and \key{k} to \key{g} \key{j} and \key{g} \key{k}
+	when no count is given, so cursor movement follows display lines in wrapped
+	prose but \key{5} \key{j} still means five real lines. This is exactly the
+	behaviour you want in a \LaTeX{} buffer.
+\end{note}
+
+\hrulebar
+
+\section{VimTeX}\label{sec:vimtex}
+
+\texttt{vimtex} \cite{vimtex} turns Neovim into a \LaTeX{} IDE: background compilation, forward
+and inverse search with the PDF viewer, a document outline, \LaTeX-aware motions
+and text objects, and error parsing into the quickfix list.
+
+The configuration in use here, from \file{lua/plugins/latex.lua}:
+
+\begin{luacode}
+{
+  "lervag/vimtex",
+  ft = { "tex" },                          -- load only for .tex buffers
+  init = function()
+    vim.g.vimtex_view_method = "zathura"   -- forward search into Zathura
+    vim.g.vimtex_compiler_progname = "nvr" -- inverse search back into Neovim
+    vim.g.vimtex_compiler_method = "latexmk"
+    vim.g.vimtex_compiler_latexmk = {
+      backend = "nvim",
+      build_dir = "build",                 -- keep aux files out of the repo
+      callback = 1,
+      continuous = 1,                      -- recompile on every write
+      executable = "latexmk",
+      options = {
+        "-xelatex",                        -- required: this template needs XeTeX
+        "-shell-escape",
+        "-interaction=nonstopmode",
+        "-synctex=1",                      -- enables forward/inverse search
+      },
+    },
+  end,
+}
+\end{luacode}
+
+\begin{note}
+	VimTeX's options must be set \emph{before} the plugin loads, which is why they
+	go in \texttt{init} rather than \texttt{config} or \texttt{opts} --- setting
+	\texttt{vim.g.vimtex\_*} after the fact silently does nothing. This is the
+	single most common VimTeX configuration mistake.
+\end{note}
+
+\subsection{Commands}
+
+VimTeX's prefix is \key{<localleader>} \key{l}, and since LazyVim leaves
+\cmd{maplocalleader} at its default, that is \key{\textbackslash} \key{l}.
+
+\begin{keys}[0.26]
+	\key{\textbackslash} \key{l} \key{l} & Start / stop continuous compilation \\
+	\key{\textbackslash} \key{l} \key{v} & Forward search: jump Zathura to the cursor's line \\
+	\key{\textbackslash} \key{l} \key{k} & Stop the compiler                   \\
+	\key{\textbackslash} \key{l} \key{e} & Show compilation errors             \\
+	\key{\textbackslash} \key{l} \key{q} & Open the raw log                    \\
+	\key{\textbackslash} \key{l} \key{c} & Clean auxiliary files               \\
+	\key{\textbackslash} \key{l} \key{t} & Table of contents                   \\
+	\key{\textbackslash} \key{l} \key{i} & Info about the current document     \\
+	\key{\textbackslash} \key{l} \key{s} & Toggle which file counts as the main one \\
+\end{keys}
+
+With \texttt{continuous = 1}, \key{\textbackslash} \key{l} \key{l} once per
+session is enough: every \cmd{:w} triggers a rebuild and Zathura reloads. In the
+other direction, \key{<C-click>} in Zathura jumps Neovim to the corresponding
+source line --- that is what \texttt{nvr} is for.
+
+\subsection{\LaTeX-aware editing}
+
+These are the reason to use VimTeX even if you compile in a separate terminal:
+
+\begin{keys}[0.26]
+	\key{i} \key{e} / \key{a} \key{e} & Inside / around an \texttt{environment} \\
+	\key{i} \key{\$} / \key{a} \key{\$} & Inside / around inline math          \\
+	\key{i} \key{c} / \key{a} \key{c} & Inside / around a command              \\
+	\key{i} \key{d} / \key{a} \key{d} & Inside / around a delimiter pair       \\
+	\key{i} \key{m} / \key{a} \key{m} & Inside / around a math group           \\
+	\key{c} \key{s} \key{e}           & Change the surrounding environment's name \\
+	\key{d} \key{s} \key{e}           & Delete the surrounding environment, keep the body \\
+	\key{c} \key{s} \key{c} / \key{d} \key{s} \key{c} & Change / delete the surrounding command \\
+	\key{c} \key{s} \key{\$} / \key{d} \key{s} \key{\$} & Change / delete surrounding math \\
+	\key{c} \key{s} \key{d} / \key{d} \key{s} \key{d} & Change / delete surrounding delimiters \\
+	\key{t} \key{s} \key{s}           & Toggle the starred form of an environment \\
+	\key{t} \key{s} \key{f}           & Toggle between \cmd{\textbackslash frac} and \cmd{/} \\
+	\key{t} \key{s} \key{d}           & Toggle \cmd{\textbackslash left\textbackslash right} on a delimiter pair \\
+	\key{]} \key{]} in Insert mode    & Close the innermost open environment or delimiter \\
+	\key{\%}                          & Extended to match \cmd{\textbackslash begin}/\cmd{\textbackslash end}, \cmd{\textbackslash if}/\cmd{\textbackslash fi} \\
+\end{keys}
+
+\begin{eg}
+	The cursor is somewhere inside a \texttt{theorem} environment that should have
+	been a \texttt{lemma}. Press \key{c} \key{s} \key{e}, type \texttt{lemma},
+	\key{<CR>} --- both the \cmd{\textbackslash begin} and the
+	\cmd{\textbackslash end} are rewritten. To delete a stray
+	\cmd{\textbackslash textbf\{\dots\}} but keep the text inside it, \key{d}
+	\key{s} \key{c}. To wrap the visual selection in a new environment, \key{<F6>}.
+\end{eg}
+
+\section{LuaSnip}
+
+\texttt{LuaSnip} \cite{luasnip} expands abbreviations into templates with tab
+stops. The
+snippets here live in \file{lua/snippets/tex.lua} and are loaded by
+
+\begin{luacode}
+require("luasnip.loaders.from_lua").load({ paths = "~/.config/nvim/lua/snippets" })
+\end{luacode}
+
+A snippet is a table of \vocab{nodes}: literal text, numbered insert points, and
+the formatting that stitches them together.
+
+\begin{luacode}
+local ls = require("luasnip")
+local s, t, i = ls.snippet, ls.text_node, ls.insert_node
+local fmta = require("luasnip.extras.fmt").fmta
+
+return {
+  -- type "dm" -> a display-math block, cursor at <1>
+  s({ trig = "dm", name = "display Math" }, fmta([[
+\[
+    <content>
+\]<cursor>
+]], { content = i(1), cursor = i(2, "$0") })),
+
+  -- type "rmk" -> a remark environment
+  s({ trig = "rmk" }, fmta([[
+\begin{<remark>}
+    <content>
+\end{<remark>}
+]], { remark = t("remark"), content = i(1) })),
+}
+\end{luacode}
+
+\texttt{fmta} takes a template string in which \texttt{<name>} marks a hole ---
+angle brackets rather than the usual braces, precisely so that \LaTeX's own
+braces need no escaping. \texttt{i(1)}, \texttt{i(2)}, \dots{} are the tab stops,
+visited in order; \key{<Tab>} moves forward and \key{<S-Tab>} back.
+
+\begin{keys}[0.30]
+	\key{<Tab>}       & Expand the trigger, or jump to the next tab stop \\
+	\key{<S-Tab>}     & Jump to the previous tab stop                    \\
+	\key{<C-e>}       & Cycle through a choice node                      \\
+	\cmd{:LuaSnipListAvailable} & List what is loaded for this filetype  \\
+\end{keys}
+
+\begin{note}[Reloading while you write snippets]
+	\texttt{from\_lua} caches. After editing the snippet file, re-run the loader
+	\begin{vimcode}
+:lua require("luasnip.loaders.from_lua").load({
+  paths = "~/.config/nvim/lua/snippets" })
+	\end{vimcode}
+	or just restart --- otherwise you will be testing the old version and
+	concluding your snippet is broken.
+\end{note}
+
+\begin{remark}
+	Three separate files in this configuration call a LuaSnip loader:
+	\begin{itemize}[nosep, leftmargin=*]
+		\item \file{init.lua} --- absolute path, works;
+		\item \file{lua/plugins/luasnip-snippets.lua} --- absolute path, works;
+		\item \file{lua/plugins/latex.lua} --- \emph{relative} path,
+		      \file{./lua/snippets}.
+	\end{itemize}
+	The last one resolves against the current working directory rather than the
+	config directory, so it finds nothing unless Neovim was started from
+	\file{\textasciitilde/.config/nvim}. Harmless, since the other two use the
+	absolute path, but worth collapsing into a single loader call the next time you
+	touch the file.
+\end{remark}
+
+\section{The \texorpdfstring{\LaTeX{}}{LaTeX} Workflow, End to End}
+
+\begin{enumerate}[(1)]
+	\item \cmd{nvim Vim.tex} --- VimTeX loads on the \texttt{tex} filetype.
+	\item \key{\textbackslash} \key{l} \key{l} starts \texttt{latexmk} in continuous
+	      mode; the PDF appears in Zathura.
+	\item Write. Every \cmd{:w} (or \key{<C-s>}) recompiles in the background;
+	      errors land in the quickfix list, reachable with \key{]} \key{q}.
+	\item \key{\textbackslash} \key{l} \key{v} jumps the viewer to the cursor;
+	      \key{<C-click>} in the viewer jumps the cursor back.
+	\item \key{\textbackslash} \key{l} \key{t} opens the table of contents to
+	      navigate between sections.
+	\item \key{\textbackslash} \key{l} \key{c} cleans up before committing.
+\end{enumerate}
+
+\begin{note}
+	This template requires XeTeX or LuaTeX --- it loads \texttt{fontspec} and
+	\texttt{xeCJK} for the CJK fonts. That is why \texttt{vimtex\_compiler\_latexmk}
+	passes \cmd{-xelatex}; with the default \texttt{pdflatex} the header aborts
+	immediately with an explicit error.
+\end{note}
+
+\begin{moral}
+	A configuration is a tool you maintain, not a possession you collect. Read
+	\cmd{:checkhealth} when something breaks, \cmd{:verbose} when something is
+	mysterious, and delete anything you have not used in a month.
+\end{moral}

@@ -1,0 +1,207 @@
+\chapter{The Grammar: Operators and Text Objects}\label{ch:vim-grammar}
+
+This is the chapter that makes Vim worth learning. Everything so far has been
+vocabulary; here is the syntax that multiplies it.
+
+\section{Operator \texttt{+} Motion \texttt{=} Action}\label{sec:vim-sentence}
+
+Almost every editing command in Vim parses as
+\[
+	\underbrace{\texttt{[count]}}_{\text{how many}}\;
+	\underbrace{\texttt{operator}}_{\text{verb}}\;
+	\underbrace{\texttt{[count]}}_{\text{how many}}\;
+	\underbrace{\texttt{motion or text object}}_{\text{noun}}
+\]
+Reading \key{d} \key{2} \key{w} as ``delete two words'' is not a mnemonic
+invented after the fact --- it is how the command is actually parsed. The
+payoff is combinatorial: $n$ operators and $m$ nouns give you $nm$ commands
+to memorise, but only $n + m$ things to learn.
+
+\begin{moral}
+	Never memorise a Vim command as an atom. Decompose it. \key{c} \key{i} \key{"}
+	is not ``the change-string command'', it is \emph{change} $+$ \emph{inside}
+	$+$ \emph{quotes}, and each piece is reusable.
+\end{moral}
+
+\section{The Operators}\label{sec:vim-operators}
+
+\begin{keys}[0.16]
+	\key{d}          & \vocab{Delete} (and store in a register)                \\
+	\key{c}          & \vocab{Change}: delete, then enter Insert mode          \\
+	\key{y}          & \vocab{Yank} (copy)                                     \\
+	\key{>} / \key{<} & Indent / dedent by \cmd{'shiftwidth'}                  \\
+	\key{=}          & Re-indent using the current indent rules                \\
+	\key{g} \key{u} / \key{g} \key{U} & Lowercase / uppercase                  \\
+	\key{g} \key{\textasciitilde}     & Toggle case                            \\
+	\key{g} \key{q} & Reformat (hard-wrap) to \cmd{'textwidth'}                \\
+	\key{!}          & Filter through an external shell command                \\
+\end{keys}
+
+Doubling an operator applies it to the current line: \key{d} \key{d} deletes a
+line, \key{y} \key{y} yanks one, \key{>} \key{>} indents one, \key{g} \key{q}
+\key{q} rewraps one. Capitalising usually means ``to the end of the line'':
+\key{D} $=$ \key{d} \key{\$}, \key{C} $=$ \key{c} \key{\$}, \key{Y} $=$ \key{y}
+\key{y} in Vim but \key{y} \key{\$} in Neovim, which is the more consistent
+choice.
+
+\begin{eg}
+	Combining the operators above with the motions of \autoref{ch:vim-motions}:
+	\begin{keys}[0.16]
+		\key{d} \key{w}        & Delete to the start of the next word           \\
+		\key{d} \key{e}        & Delete to the end of this word                 \\
+		\key{c} \key{\$}       & Change to end of line                          \\
+		\key{y} \key{\}}       & Yank to the end of the paragraph               \\
+		\key{d} \key{G}        & Delete from here to the end of the file        \\
+		\key{>} \key{i} \key{\{} & Indent everything inside the braces          \\
+		\key{g} \key{U} \key{i} \key{w} & Uppercase the word under the cursor   \\
+		\key{g} \key{q} \key{a} \key{p} & Rewrap the current paragraph          \\
+		\key{!} \key{i} \key{p} \cmd{sort<CR>} & Sort the current block of lines \\
+	\end{keys}
+\end{eg}
+
+\section{Counts}\label{sec:vim-counts}
+
+A count multiplies the noun: \key{3} \key{w} moves three words, \key{d} \key{3}
+\key{w} deletes three. Counts placed before the operator multiply too, and if
+both are given they are multiplied together --- \key{2} \key{d} \key{3} \key{w}
+deletes six words.
+
+\begin{keys}[0.16]
+	\key{5} \key{j}      & Down five lines                          \\
+	\key{3} \key{d} \key{d} & Delete three lines                    \\
+	\key{2} \key{f} \key{,} & Jump to the second comma ahead        \\
+	\key{4} \key{>} \key{>} & Indent four lines                     \\
+	\key{20} \key{i} \key{-} \key{<Esc>} & Insert a rule of twenty hyphens \\
+\end{keys}
+
+\begin{note}
+	Counts are where \cmd{'relativenumber'} pays for itself: the line you want is
+	labelled with exactly the number you need to type.
+\end{note}
+
+\hrulebar
+
+\section{Text Objects}\label{sec:vim-textobj}
+
+Motions are relative to the cursor. \vocab{Text objects} instead name a
+structure the cursor happens to be \emph{inside}, which makes them independent
+of where in that structure you are standing.
+
+\begin{definition}[Text object]
+	A noun of the form \key{i}\texttt{x} (\vocab{inner}: the contents) or
+	\key{a}\texttt{x} (\vocab{a}, or \vocab{around}: the contents plus their
+	delimiters or trailing whitespace). They are valid after an operator or in
+	Visual mode, but not on their own in Normal mode.
+\end{definition}
+
+\begin{keys}[0.16]
+	\key{i} \key{w} / \key{a} \key{w}  & Word / word plus trailing space           \\
+	\key{i} \key{W} / \key{a} \key{W}  & WORD                                      \\
+	\key{i} \key{s} / \key{a} \key{s}  & Sentence                                  \\
+	\key{i} \key{p} / \key{a} \key{p}  & Paragraph                                 \\
+	\key{i} \key{"} / \key{a} \key{"}  & Inside / including the double quotes      \\
+	\key{i} \key{'}, \key{i} \key{`}   & Likewise for other quote characters       \\
+	\key{i} \key{(} or \key{i} \key{b} & Inside the parentheses                    \\
+	\key{i} \key{\{} or \key{i} \key{B} & Inside the braces                        \\
+	\key{i} \key{[}, \key{i} \key{<}   & Inside brackets, angle brackets           \\
+	\key{i} \key{t} / \key{a} \key{t}  & Inside / including an XML or HTML tag     \\
+\end{keys}
+
+\begin{eg}
+	The cursor is anywhere inside the string on the line
+	\texttt{print("hello world")}.
+	\begin{keys}[0.16]
+		\key{c} \key{i} \key{"} & Replace the string, keeping the quotes      \\
+		\key{d} \key{a} \key{"} & Delete the string \emph{and} the quotes     \\
+		\key{d} \key{i} \key{(} & Empty the call's argument list              \\
+		\key{y} \key{a} \key{(} & Copy \texttt{("hello world")}               \\
+		\key{d} \key{a} \key{p} & Delete the whole paragraph                  \\
+	\end{keys}
+	Note that none of these depend on the cursor being at a particular column ---
+	that independence is the whole point.
+\end{eg}
+
+\begin{remark}
+	Neovim's \texttt{mini.ai} plugin (shipped with LazyVim, \autoref{ch:vim-setup})
+	extends this set considerably: \key{i} \key{f} for a function body, \key{i}
+	\key{a} for an argument, \key{i} \key{n} \key{(} for the \emph{next}
+	parenthesis pair, and Treesitter-aware objects that understand the actual
+	syntax tree of the language. Same grammar, better nouns.
+\end{remark}
+
+\section{Repeat: the Dot Command}\label{sec:vim-dot}
+
+\begin{keys}[0.16]
+	\key{.} & Repeat the last change                          \\
+	\key{u} & Undo it                                         \\
+	\key{;} & Repeat the last \key{f}/\key{t} motion          \\
+	\key{n} & Repeat the last search                          \\
+\end{keys}
+
+\key{.} repeats the last \emph{change}, not the last motion, and it is the
+cheapest form of automation in the editor. The characteristic Vim workflow is
+\vocab{one change, then dot-and-next}:
+
+\begin{eg}
+	Rename every \texttt{oldName} in a function to \texttt{newName}:
+	\begin{enumerate}[(1)]
+		\item Put the cursor on one and press \key{*} to search for it.
+		\item \key{c} \key{g} \key{n} \texttt{newName} \key{<Esc>} --- change the next
+		      match. (\key{g} \key{n} is a text object meaning ``the next search match''.)
+		\item Press \key{.} for each remaining occurrence, and \key{n} to skip one.
+	\end{enumerate}
+	This beats \cmd{:\%s/oldName/newName/g} whenever you want to inspect each site
+	rather than trust a pattern.
+\end{eg}
+
+\begin{note}[Making changes dot-repeatable]
+	\key{.} replays a single Insert-mode session. So \key{c} \key{w} \texttt{foo}
+	\key{<Esc>} repeats cleanly, but if you move with the arrow keys \emph{during}
+	Insert mode, Vim breaks the undo block and \key{.} will only replay the
+	fragment after the move. Leave Insert mode to move.
+\end{note}
+
+\begin{tryit}
+	Take a list of ten lines and put a semicolon at the end of each. Do it as
+	\key{A} \key{;} \key{<Esc>} \key{j}, then \key{.} \key{j}, \key{.} \key{j},
+	\dots{} Then do the same thing with \key{q} \key{q} (\autoref{sec:vim-macros}) and
+	compare.
+\end{tryit}
+
+\hrulebar
+
+\section{Composition Table}\label{sec:vim-compose}
+
+The point of the grammar is that you never learn this table --- you derive it.
+It is printed once, here, so you can see the shape of the thing: the rows are
+operators, the columns are nouns, and every cell is a command you already know
+how to build.
+
+\begin{center}
+	\small
+	\renewcommand{\arraystretch}{1.4}
+	\begin{tabular}{@{}l c c c c c@{}}
+		\toprule
+		                   & \key{w}               & \key{\$}               & \key{i} \key{(}                & \key{a} \key{p}                & \key{G}               \\
+		\midrule
+		\key{d} delete     & \key{d} \key{w}       & \key{d} \key{\$}       & \key{d} \key{i} \key{(}        & \key{d} \key{a} \key{p}        & \key{d} \key{G}       \\
+		\key{c} change     & \key{c} \key{w}       & \key{c} \key{\$}       & \key{c} \key{i} \key{(}        & \key{c} \key{a} \key{p}        & \key{c} \key{G}       \\
+		\key{y} yank       & \key{y} \key{w}       & \key{y} \key{\$}       & \key{y} \key{i} \key{(}        & \key{y} \key{a} \key{p}        & \key{y} \key{G}       \\
+		\key{>} indent     & \key{>} \key{w}       & ---                    & \key{>} \key{i} \key{(}        & \key{>} \key{a} \key{p}        & \key{>} \key{G}       \\
+		\key{g} \key{U} up & \key{g} \key{U} \key{w} & \key{g} \key{U} \key{\$} & \key{g} \key{U} \key{i} \key{(} & \key{g} \key{U} \key{a} \key{p} & \key{g} \key{U} \key{G} \\
+		\bottomrule
+	\end{tabular}
+\end{center}
+
+Five operators and five nouns give twenty-five commands. Add \key{e}, \key{\}},
+\key{i} \key{"}, \key{f}\texttt{x} and \key{\%} to the columns and the same five
+operators give fifty. Learning \key{i} \key{t} (inside an HTML tag) one
+afternoon silently teaches you \key{d} \key{i} \key{t}, \key{c} \key{i} \key{t},
+\key{y} \key{i} \key{t} and \key{>} \key{i} \key{t} at no extra cost --- and
+that is the whole argument for spending a week on this chapter.
+
+\begin{moral}
+	If you catch yourself hunting for ``the command that does $X$'', stop and ask
+	instead: \emph{what is the verb, and what is the noun?} Vim almost certainly
+	has both already.
+\end{moral}

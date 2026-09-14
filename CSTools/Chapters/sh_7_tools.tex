@@ -1,0 +1,204 @@
+\chapter{Everyday Tools}\label{ch:sh-tools}
+
+The previous chapters were about the shell as a language. This one is a short
+tour of the programs you will reach for around it --- not because they are
+conceptually deep, but because not knowing them costs an hour every time they
+come up.
+
+\section{Archives and Compression}\label{sec:sh-archive}
+
+Unix separates two jobs that most systems merge: \cmd{tar} bundles many files
+into one, and \cmd{gzip} makes one file smaller. That is why the common
+extension is \file{.tar.gz} --- it went through both.
+
+\begin{keys}[0.30]
+	\cmd{tar czf out.tar.gz dir/}  & \textbf{C}reate a gzipped archive              \\
+	\cmd{tar xzf in.tar.gz}        & E\textbf{x}tract one                           \\
+	\cmd{tar tzf in.tar.gz}        & Lis\textbf{t} the contents without extracting  \\
+	\cmd{tar xzf in.tar.gz -C dst} & Extract somewhere other than here              \\
+	\cmd{tar cJf out.tar.xz dir/}  & \texttt{xz} instead --- smaller, slower        \\
+	\cmd{gzip file} / \cmd{gunzip file.gz} & Compress or decompress in place        \\
+	\cmd{zip -r out.zip dir/} / \cmd{unzip in.zip} & For talking to other operating systems \\
+\end{keys}
+
+\begin{note}
+	Modern GNU \cmd{tar} detects the compression itself, so \cmd{tar xf anything}
+	works. The letters are still worth knowing because you will read them in other
+	people's scripts: \texttt{c}reate, e\texttt{x}tract, \texttt{t}est/list, with
+	\texttt{z} for gzip, \texttt{j} for bzip2, \texttt{J} for xz, \texttt{v} for
+	verbose and \texttt{f} for ``the next word is the filename''.
+\end{note}
+
+\begin{moral}
+	Always run \cmd{tar tzf} before \cmd{tar xzf} on an archive you did not make.
+	A well-behaved archive contains a single top-level directory; a badly made one
+	unpacks two hundred files into your current directory, and you will be cleaning
+	up by hand.
+\end{moral}
+
+\section{Remote Work}\label{sec:sh-remote}
+
+\begin{keys}[0.32]
+	\cmd{ssh user@host}                & Log in to a remote machine                 \\
+	\cmd{ssh user@host 'cmd'}          & Run one command and come straight back     \\
+	\cmd{ssh -p 2222 user@host}        & A non-default port                         \\
+	\cmd{ssh-keygen -t ed25519}        & Make a key pair --- do this once           \\
+	\cmd{ssh-copy-id user@host}        & Install your public key there              \\
+	\cmd{scp file user@host:\textasciitilde/} & Copy a file up                      \\
+	\cmd{scp user@host:remote.txt .}   & \dots{} and back down                      \\
+	\cmd{rsync -avz src/ user@host:dst/} & Sync a tree, transferring only differences \\
+	\cmd{rsync -avzn src/ dst/}        & \cmd{-n} is a dry run: show what would happen \\
+\end{keys}
+
+\begin{note}[The trailing slash]
+	\cmd{rsync -a src/ dst/} copies the \emph{contents} of \file{src} into
+	\file{dst}. \cmd{rsync -a src dst/} copies the directory itself, producing
+	\file{dst/src}. One character, two quite different results, and this is the
+	most-consulted line in \cmd{rsync}'s manual.
+\end{note}
+
+\begin{eg}[\file{\textasciitilde/.ssh/config}]
+	Configure a host once and stop typing its details:
+\begin{shell}
+Host lab
+    HostName compute.university.edu
+    User konyi
+    Port 2222
+    IdentityFile ~/.ssh/id_ed25519
+\end{shell}
+	After which \cmd{ssh lab}, \cmd{scp file lab:} and \cmd{rsync -a dir lab:} all
+	work. Keys must be private: \cmd{chmod 600} on the key file, or SSH refuses to
+	use it (\autoref{sec:sh-perms}).
+\end{eg}
+
+\begin{moral}
+	Use keys, not passwords. \cmd{ssh-keygen} once and \cmd{ssh-copy-id} per host
+	is five minutes of setup that removes a password prompt from every remote
+	command you will run for years --- and it is the same key GitHub will want in
+	\autoref{sec:gh-auth}.
+\end{moral}
+
+\section{Fetching Things}\label{sec:sh-net}
+
+\begin{keys}[0.30]
+	\cmd{curl URL}                 & Print the response to standard output          \\
+	\cmd{curl -O URL}              & Save it under its remote name                  \\
+	\cmd{curl -o out.json URL}     & Save it under a name you choose                \\
+	\cmd{curl -L URL}              & Follow redirects --- needed more often than not \\
+	\cmd{curl -I URL}              & Headers only                                   \\
+	\cmd{curl -fsSL URL}           & Fail loudly, stay quiet otherwise: the flags every install script uses \\
+	\cmd{wget URL}                 & Save to a file by default                      \\
+	\cmd{wget -r -np URL}          & Mirror a site, without climbing to the parent  \\
+\end{keys}
+
+\begin{eg}
+	\cmd{curl} writes to standard output, so it composes with
+	\autoref{ch:sh-pipes} like any other filter:
+\begin{shell}
+$ curl -s https://api.github.com/repos/neovim/neovim | jq -r '.stargazers_count'
+86214
+\end{shell}
+	\cmd{jq} is to JSON what \cmd{awk} is to columns, and it is installed here.
+\end{eg}
+
+\begin{note}
+	\cmd{curl -fsSL URL | bash} is how a great many projects tell you to install
+	them. It runs code you have not read, as you, from a server you do not
+	control. At minimum, drop the pipe and read the script first --- the
+	instruction to pipe it straight into a shell is a convenience for the project,
+	not for you.
+\end{note}
+
+\section{Terminal Multiplexing}\label{sec:sh-tmux}
+
+\begin{definition}[Multiplexer]
+	A program that runs a terminal session inside itself, so that the session
+	survives your disconnecting --- and so that one window can hold many shells.
+	\cmd{tmux} is the current standard; \cmd{screen} is its ancestor.
+\end{definition}
+
+\begin{keys}[0.30]
+	\cmd{tmux}                    & Start a new session                             \\
+	\cmd{tmux new -s work}        & \dots{} with a name                             \\
+	\cmd{tmux ls}                 & List sessions                                   \\
+	\cmd{tmux attach -t work}     & Reattach to one                                 \\
+	\key{<C-b>} \key{d}           & Detach --- the session keeps running            \\
+	\key{<C-b>} \key{c}           & New window                                      \\
+	\key{<C-b>} \key{n} / \key{p} & Next / previous window                          \\
+	\key{<C-b>} \key{\%} / \key{"} & Split vertically / horizontally                \\
+	\key{<C-b>} arrow             & Move between panes                              \\
+	\key{<C-b>} \key{[}           & Copy mode: scroll back, with Vim keys           \\
+\end{keys}
+
+\begin{eg}
+	The reason to care is SSH. Start \cmd{tmux} on the remote machine, launch a
+	six-hour job, press \key{<C-b>} \key{d}, and close your laptop. Tomorrow,
+	\cmd{ssh lab} and \cmd{tmux attach} put you back in front of it, output and
+	all. Without a multiplexer, closing the connection sends \texttt{SIGHUP} and
+	the job dies (\autoref{sec:sh-signals}).
+\end{eg}
+
+\begin{note}
+	\key{<C-b>} is the \emph{prefix}: press and release it, then press the command
+	key. It is a two-key sequence, exactly like Vim's \key{<C-w>} window commands
+	(\autoref{sec:vim-windows}), and many people remap it to \key{<C-a>} or
+	\key{<C-Space>} for comfort.
+\end{note}
+
+\section{A Handful of One-Liners}\label{sec:sh-recipes}
+
+Every one of these is built from pieces already covered. They are collected
+here because recognising the shape is most of the skill.
+
+\begin{shell}
+# the ten largest things in this directory
+du -sh * | sort -rh | head
+
+# how many lines of LaTeX have I written?
+find . -name '*.tex' -not -path './build/*' | xargs wc -l | tail -1
+
+# most frequent lines in a log, commonest first
+sort access.log | uniq -c | sort -rn | head
+
+# every TODO in the project, with file and line number
+grep -rn 'TODO' --include='*.tex' .
+
+# which files changed in the last hour
+find . -type f -mmin -60
+
+# rename every .jpeg to .jpg
+for f in *.jpeg; do mv -- "$f" "${f%.jpeg}.jpg"; done
+
+# strip Windows line endings from every file in a tree
+find . -type f -name '*.txt' -exec sed -i 's/\r$//' {} +
+
+# a quick backup, timestamped
+cp report.tex "report.$(date +%F).tex"
+
+# wait for a port to open, then carry on
+until nc -z localhost 8080; do sleep 1; done
+
+# what is using this port?
+lsof -i :8080
+
+# disk usage of every subdirectory, sorted, human-readable
+du -h --max-depth=1 . | sort -h
+
+# find files tracked by neither git nor .gitignore
+git status --porcelain | grep '^??'
+\end{shell}
+
+\begin{moral}
+	None of these were memorised; each was assembled from four or five commands
+	that each do one thing. That is what Part~\ref{part:shell} was for. When you
+	next face a task like these, do not search for the incantation --- name the
+	steps, and the pipeline will write itself.
+\end{moral}
+
+\begin{tryit}
+	Take the first recipe and build it up one stage at a time, as in
+	\autoref{sec:sh-pipes}: \cmd{du -sh *}, then \cmd{| sort -rh}, then
+	\cmd{| head}. Then change it to answer a question of your own --- the ten
+	largest \emph{files} anywhere below here, rather than the ten largest entries
+	in this directory. The answer is a \cmd{find} away, and you already know it.
+\end{tryit}

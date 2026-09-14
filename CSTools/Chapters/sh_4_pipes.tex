@@ -1,0 +1,267 @@
+\chapter{Streams, Pipes and Redirection}\label{ch:sh-pipes}
+
+\autoref{ch:sh-text} gave you a box of tools that each do one narrow thing.
+This chapter is the plumbing that turns them into a language --- and it is the
+part of Unix that has been copied by every system built since.
+
+\section{Standard Input, Output and Error}\label{sec:sh-streams}
+
+\begin{definition}[Standard streams]
+	Every process starts with three open file descriptors. \vocab{Standard input}
+	(fd~0) is where it reads from, \vocab{standard output} (fd~1) is where its
+	results go, and \vocab{standard error} (fd~2) is where its complaints go.
+	By default all three are your terminal.
+\end{definition}
+
+\begin{intuition}
+	A program does not know or care what is on the other end of those three
+	descriptors. It might be your keyboard, a file, or another program --- and the
+	program is written identically either way. That indifference is the entire
+	mechanism behind everything in this chapter.
+\end{intuition}
+
+Splitting output from errors looks fussy until the first time it saves you:
+
+\begin{shell}
+$ ls real.txt missing.txt
+ls: cannot access 'missing.txt': No such file or directory     # this went to fd 2
+real.txt                                                       # this went to fd 1
+$ ls real.txt missing.txt 2>/dev/null
+real.txt
+$ ls real.txt missing.txt > out.txt
+ls: cannot access 'missing.txt': No such file or directory     # errors still appear
+\end{shell}
+
+\begin{note}
+	The second case is why error messages appear on screen even when you have
+	redirected output to a file: they were never on fd~1. This is a feature ---
+	a pipeline's data stays clean while its diagnostics still reach you.
+\end{note}
+
+\section{Redirection}\label{sec:sh-redirect}
+
+Redirection attaches a stream to a file instead of the terminal. It is handled
+by the shell before the program starts, so the program never sees the
+\texttt{>}.
+
+\begin{keys}[0.24]
+	\texttt{> file}        & Send stdout to \file{file}, \textbf{destroying} its contents \\
+	\texttt{>{}> file}       & Append to \file{file} instead                                \\
+	\texttt{< file}        & Take stdin from \file{file}                                  \\
+	\texttt{2> file}       & Send stderr to \file{file}                                   \\
+	\texttt{2>{}> file}      & Append stderr                                                \\
+	\texttt{2>\&1}         & Send stderr wherever stdout is currently going               \\
+	\texttt{\&> file}      & Both streams to one file (Bash and Zsh)                      \\
+	\texttt{> /dev/null}   & Discard --- \file{/dev/null} accepts anything and keeps none \\
+	\texttt{n> file}       & Redirect an arbitrary descriptor                             \\
+\end{keys}
+
+\begin{note}[Order matters for \texttt{2>\&1}]
+	\texttt{cmd > out.txt 2>\&1} sends both streams to the file. \texttt{cmd 2>\&1
+		> out.txt} does \emph{not}: redirections are applied left to right, so stderr
+	is pointed at the terminal (where stdout is at that moment) and only then is
+	stdout moved to the file. The second form is almost always a bug, and it is
+	subtle enough to survive code review.
+\end{note}
+
+\begin{moral}
+	\texttt{>} truncates before the command even runs. So \cmd{sort file > file}
+	empties the file and then sorts nothing, and there is no recovery. Write to a
+	new name, or use a tool with an in-place option such as \cmd{sed -i}.
+\end{moral}
+
+\section{Pipes and Filters}\label{sec:sh-pipes}
+
+\begin{definition}[Pipe]
+	\texttt{a | b} connects \texttt{a}'s standard output directly to \texttt{b}'s
+	standard input. Both run \emph{at the same time}, with the kernel buffering
+	between them --- no temporary file is created, and \texttt{b} can start
+	producing output before \texttt{a} has finished.
+\end{definition}
+
+\begin{definition}[Filter]
+	A program that reads standard input and writes standard output, so that it can
+	sit in the middle of a pipeline. \cmd{grep}, \cmd{sort}, \cmd{sed}, \cmd{tr},
+	\cmd{uniq}, \cmd{wc} and \cmd{awk} are all filters, which is why they combine.
+\end{definition}
+
+\begin{eg}
+	Reading a pipeline is a matter of reading it left to right, one arrow at a
+	time:
+\begin{shell}
+$ ps aux | grep nvim | awk '{print $2}' | xargs kill
+\end{shell}
+	List every process; keep the lines mentioning \cmd{nvim}; take the second
+	column of each, which is the process ID; hand those IDs to \cmd{kill}. Four
+	single-purpose programs, no temporary files, no program aware of the others.
+\end{eg}
+
+\begin{note}
+	The exit status of a pipeline is the status of its \emph{last} command, so a
+	failure in the middle is silently ignored. \cmd{set -o pipefail}
+	(\autoref{sec:sh-robust}) changes this, and any script with a pipeline in it
+	should set it.
+\end{note}
+
+\begin{tryit}
+	Build this up one stage at a time, pressing \key{<CR>} after each addition, and
+	watch the output narrow:
+	\cmd{cut -d: -f7 /etc/passwd}, then \cmd{| sort}, then \cmd{| uniq -c}, then
+	\cmd{| sort -rn}. You have just answered ``which login shells are in use here,
+	and how popular is each''.
+\end{tryit}
+
+\section{\texorpdfstring{\cmd{tee} and \cmd{xargs}}{tee and xargs}}\label{sec:sh-teexargs}
+
+Two commands exist to patch the two places where pipes fall short.
+
+\cmd{tee} solves ``I want this both on screen and in a file'':
+
+\begin{keys}[0.26]
+	\cmd{cmd | tee log.txt}       & Write to the file \emph{and} pass through       \\
+	\cmd{cmd | tee -a log.txt}    & Append rather than overwrite                    \\
+	\cmd{cmd | tee /dev/tty | c2} & Show the intermediate stage of a pipeline       \\
+	\cmd{echo x | sudo tee /etc/f} & Write to a root-owned file --- \cmd{sudo cmd > file} does not work, because the shell opens the file, not \cmd{sudo} \\
+\end{keys}
+
+\cmd{xargs} solves the opposite problem: many programs take filenames as
+\emph{arguments}, not on standard input.
+
+\begin{keys}[0.30]
+	\cmd{... | xargs rm}             & Turn input lines into arguments            \\
+	\cmd{... | xargs -n 1 cmd}       & One argument per invocation                \\
+	\cmd{... | xargs -I\{\} cp \{\} /bak} & Place the argument somewhere specific \\
+	\cmd{... | xargs -P 4 cmd}       & Run four invocations in parallel           \\
+	\cmd{find . -print0 | xargs -0}  & Separate with NUL bytes, not whitespace    \\
+\end{keys}
+
+\begin{note}[Filenames with spaces]
+	By default \cmd{xargs} splits on whitespace, so a file named
+	\file{my file.txt} arrives as two arguments and the wrong things get deleted. The fix is the
+	\cmd{-print0}/\cmd{-0} pair: NUL is the one byte a filename cannot contain.
+	Make it a habit --- \cmd{find . -name '*.log' -print0 | xargs -0 rm} --- or
+	sidestep the issue entirely with \cmd{find -exec}
+	(\autoref{sec:sh-find}).
+\end{note}
+
+\section{Here-Documents and Here-Strings}\label{sec:sh-heredoc}
+
+When the input you want to pipe in is text you are writing right now, there is
+no need for a file.
+
+\begin{bashcode}
+# here-document: everything up to the terminator becomes stdin
+cat > config.yml <<EOF
+name: $PROJECT      # expanded, because EOF is unquoted
+port: 8080
+EOF
+
+# quoted terminator: nothing is expanded
+cat > script.sh <<'EOF'
+echo "$HOME stays literal"
+EOF
+
+# <<- strips leading TABS, so the heredoc can be indented with its block
+if true; then
+    cat <<-EOF
+    indented in the source, flush left in the output
+    EOF
+fi
+
+# here-string: one line, no terminator needed
+grep -q root <<< "$line"
+\end{bashcode}
+
+\begin{moral}
+	Quote the terminator --- \texttt{<{}<'EOF'} --- whenever the body contains
+	\texttt{\$} signs you want to survive, which is every time you are generating a
+	shell script, a Makefile, or anything else with variables of its own.
+\end{moral}
+
+\section{Command and Process Substitution}\label{sec:sh-subst}
+
+\begin{keys}[0.26]
+	\texttt{\$(cmd)}   & \vocab{Command substitution}: replaced by \texttt{cmd}'s output \\
+	\texttt{`cmd`}     & The old spelling. Does not nest, and escaping inside it is unreadable --- do not use it \\
+	\texttt{<(cmd)}    & \vocab{Process substitution}: replaced by a \emph{filename} that yields \texttt{cmd}'s output \\
+	\texttt{>(cmd)}    & The same, for writing into                                      \\
+	\texttt{\$((expr))} & \vocab{Arithmetic expansion}                                   \\
+\end{keys}
+
+\begin{shell}
+$ echo "built on $(date +%F) by $(whoami)"
+built on 2026-09-14 by konyi
+$ files=$(ls *.tex | wc -l)
+$ echo $((files * 2))
+16
+\end{shell}
+
+Process substitution is the less known of the two, and it solves a real problem:
+comparing the output of two commands, when \cmd{diff} insists on filenames.
+
+\begin{shell}
+$ diff <(sort a.txt) <(sort b.txt)
+$ diff <(ls dir1) <(ls dir2)
+\end{shell}
+
+\begin{note}
+	Without it you would write two temporary files and remember to delete them.
+	\texttt{<(cmd)} expands to something like \file{/dev/fd/63} --- a real path,
+	which \cmd{diff} opens and reads perfectly happily. It is a Bash and Zsh
+	feature, not POSIX, so a script declaring \cmd{\#!/bin/sh} cannot use it.
+\end{note}
+
+\begin{moral}
+	Always quote command substitution: \texttt{"\$(cmd)"}. Unquoted, its output
+	goes through word splitting and globbing like any other expansion
+	(\autoref{sec:sh-anatomy}), and a filename with a space in it will take your
+	script apart.
+\end{moral}
+
+\section{Exit Status and the Logical Operators}\label{sec:sh-status}
+
+Every command returns a number when it finishes. Zero means success; anything
+else is a failure, and which number often says which failure.
+
+\begin{keys}[0.20]
+	\texttt{\$?}          & The exit status of the last command                     \\
+	\texttt{0}            & Success --- the only value that means it                \\
+	\texttt{1}            & General failure                                         \\
+	\texttt{2}            & Usually a usage error                                   \\
+	\texttt{126}          & Found, but not executable                               \\
+	\texttt{127}          & Command not found                                       \\
+	\texttt{130}          & Terminated by \key{<C-c>} --- that is $128 + 2$, the signal number \\
+\end{keys}
+
+\begin{note}
+	Zero-means-success looks backwards until you see why: there is one way to
+	succeed and many ways to fail, so the failures get the numbers.
+\end{note}
+
+Statuses are what the logical operators test:
+
+\begin{keys}[0.26]
+	\texttt{a ; b}     & Run \texttt{a}, then \texttt{b}, regardless                  \\
+	\texttt{a \&\& b}  & Run \texttt{b} only if \texttt{a} \emph{succeeded}           \\
+	\texttt{a || b}    & Run \texttt{b} only if \texttt{a} \emph{failed}              \\
+	\texttt{!\ a}      & Invert the status                                            \\
+	\texttt{a \&}      & Run \texttt{a} in the background (\autoref{sec:sh-jobs})     \\
+\end{keys}
+
+\begin{eg}
+\begin{shell}
+$ mkdir build && cd build           # only cd if the mkdir worked
+$ make || echo "build failed"       # report only on failure
+$ grep -q TODO file && echo "still unfinished"
+$ command -v rg >/dev/null || echo "ripgrep is not installed"
+\end{shell}
+	The last is the standard way for a script to check whether a tool exists
+	before relying on it.
+\end{eg}
+
+\begin{moral}
+	\texttt{\&\&} between commands is the cheapest error handling there is. In a
+	script, \cmd{cd build \&\& make} cannot run \cmd{make} in the wrong directory,
+	whereas \cmd{cd build; make} happily will --- and that difference has destroyed
+	real work.
+\end{moral}

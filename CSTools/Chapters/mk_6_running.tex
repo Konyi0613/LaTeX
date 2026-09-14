@@ -1,0 +1,188 @@
+\chapter{Running and Debugging Make}\label{ch:mk-running}
+
+A Makefile that works is only half the job. The other half is knowing what make
+is doing when it does something you did not expect --- which, given that its
+entire reasoning is invisible, needs tooling.
+
+\section{Command-Line Options}\label{sec:mk-flags}
+
+\begin{keys}[0.24]
+	\cmd{make}             & Build the default goal (\autoref{sec:mk-goal})        \\
+	\cmd{make target}      & Build one target                                      \\
+	\cmd{make -j8}         & Run up to eight recipes at once                       \\
+	\cmd{make -n}          & \vocab{Dry run}: print the recipes, run none          \\
+	\cmd{make -B}          & Rebuild everything, ignoring timestamps               \\
+	\cmd{make -k}          & Keep going after an error, building what still can be \\
+	\cmd{make -C dir}      & Change to \file{dir} first                            \\
+	\cmd{make -f build.mk} & Use a file not named \file{Makefile}                  \\
+	\cmd{make -s}          & Silent: do not echo recipes                           \\
+	\cmd{make -r}          & Drop the built-in rule database                       \\
+	\cmd{make -t}          & \vocab{Touch} targets instead of building them        \\
+	\cmd{make -q}          & Ask only whether the target is up to date; say so in the exit status \\
+\end{keys}
+
+\begin{moral}
+	\cmd{make -n} first, whenever a Makefile is unfamiliar or you are about to run
+	a target called something like \texttt{deploy}. It prints exactly what would
+	run and touches nothing.
+\end{moral}
+
+\begin{note}
+	\cmd{make -B} is the blunt instrument for ``it should have rebuilt and it did
+	not''. It is a diagnostic, not a fix: if \cmd{-B} produces a working binary and
+	a plain \cmd{make} does not, you have a missing edge in the graph, and
+	\autoref{sec:mk-depgen} is where to look.
+\end{note}
+
+\section{Parallel Builds}\label{sec:mk-parallel}
+
+\cmd{make -j} is the reason to have written a correct dependency graph. Make
+can run any two recipes simultaneously when neither depends on the other, and on
+a modern machine that is most of them.
+
+\begin{shell}
+$ time make
+real    0m48.2s
+$ make clean && time make -j8
+real    0m9.7s
+\end{shell}
+
+\begin{keys}[0.24]
+	\cmd{make -j}          & Unlimited jobs. Rarely what you want --- it will start hundreds \\
+	\cmd{make -j8}         & Eight at a time                                        \\
+	\cmd{make -j\$(nproc)} & One per core                                           \\
+	\cmd{make -l4}         & Start new jobs only while the load average is below 4   \\
+	\cmd{make -O}          & Group each job's output, so the log stays readable      \\
+\end{keys}
+
+\begin{moral}
+	Parallel make is where an incomplete dependency graph finally shows itself. A
+	serial build hides a missing edge, because the accidental order happens to be
+	right; with \cmd{-j8} the order changes every run, and the build fails
+	intermittently. \emph{A Makefile that only works without \cmd{-j} is not
+		working.}
+\end{moral}
+
+\begin{eg}[The classic race]
+\begin{makecode}
+all: parser.o lexer.o        # both need parser.h, which is generated
+
+parser.h parser.c: grammar.y
+    bison -d -o parser.c $<
+\end{makecode}
+	Serially, \file{parser.o} is built first and generates the header before
+	\file{lexer.o} needs it. In parallel both start at once and one of them fails
+	--- sometimes. The fix is to state the edge that was always true:
+\begin{makecode}
+lexer.o parser.o: parser.h
+\end{makecode}
+\end{eg}
+
+\begin{note}
+	Two recipes writing the same file is the other common parallel bug, and
+	\cmd{-j1} will never reveal it. If a build fails only occasionally under
+	\cmd{-j}, do not retry until it passes --- the graph is wrong, and the same
+	gap will eventually produce a silently stale binary.
+\end{note}
+
+\section{Printing from Inside a Makefile}\label{sec:mk-trace}
+
+\begin{keys}[0.30]
+	\texttt{\$(info \dots)}    & Print a message while reading the file; expansion continues \\
+	\texttt{\$(warning \dots)} & The same, prefixed with the file and line number            \\
+	\texttt{\$(error \dots)}   & Print and stop immediately                                  \\
+\end{keys}
+
+\begin{makecode}
+$(info SRC is [$(SRC)])
+$(info OBJ is [$(OBJ)])
+
+ifndef PREFIX
+$(error PREFIX is not set -- try `make PREFIX=/usr/local')
+endif
+\end{makecode}
+
+\begin{note}
+	These run at \emph{read} time, not when a recipe runs, so they fire even for
+	targets you did not ask for. That is what makes them the right tool for
+	inspecting a variable: the square brackets in \texttt{[\$(SRC)]} are there so
+	you can see leading and trailing whitespace, which is the usual reason a list
+	is not what you expected.
+\end{note}
+
+\begin{eg}[A general variable-printing rule]
+\begin{makecode}
+print-%:
+    @echo '$* = [$($*)]'
+\end{makecode}
+\begin{shell}
+$ make print-CFLAGS
+CFLAGS = [-Wall -Wextra -std=c17 -g]
+$ make print-OBJ
+OBJ = [main.o parser.o util.o]
+\end{shell}
+	Worth keeping in every Makefile you maintain.
+\end{eg}
+
+\section{Inspecting the Database}\label{sec:mk-inspect}
+
+\begin{keys}[0.30]
+	\cmd{make -p}             & Every variable, rule and built-in, with their origins \\
+	\cmd{make -p | less}      & \dots{} which is several thousand lines, so page it   \\
+	\cmd{make -d}             & Full decision trace: why each target was or was not rebuilt \\
+	\cmd{make --debug=b}      & Basic tracing only --- much more readable than \cmd{-d} \\
+	\cmd{make --debug=v}      & Verbose: which files were considered                  \\
+	\cmd{make --trace}        & Print each recipe with the line that caused it        \\
+	\cmd{make -n -p}          & Inspect without building anything                     \\
+\end{keys}
+
+\begin{eg}
+	\cmd{make --debug=b} answers the question that matters most often:
+\begin{shell}
+$ make --debug=b app
+Considering target file 'main.o'.
+ Prerequisite 'parser.h' is newer than target 'main.o'.
+Must remake target 'main.o'.
+\end{shell}
+	or, in the case you are usually investigating:
+\begin{shell}
+Considering target file 'main.o'.
+ Prerequisite 'main.c' is older than target 'main.o'.
+No need to remake target 'main.o'.
+\end{shell}
+	The second output, when you were expecting a rebuild, says the graph is missing
+	an edge rather than that make is broken.
+\end{eg}
+
+\begin{note}
+	\cmd{make --trace} is the gentler everyday tool: it annotates each recipe with
+	the Makefile line and the target that triggered it, which is usually enough to
+	find the rule responsible without wading through \cmd{-d}.
+\end{note}
+
+\section{Error Messages You Will Meet}\label{sec:mk-errors}
+
+\begin{keys}[0.34]
+	\texttt{missing separator}          & A recipe line begins with spaces instead of a tab (\autoref{sec:mk-tab}) \\
+	\texttt{No rule to make target 'x'} & \file{x} is needed, does not exist, and no rule matches. Usually a misspelt filename \\
+	\texttt{nothing to be done for 'all'} & The target exists and is up to date, but its recipe is empty --- often a missing tab again, or a phony target you forgot to declare \\
+	\texttt{'x' is up to date}          & Make is right and you meant a phony target (\autoref{sec:mk-phonyt}) \\
+	\texttt{Recursive variable references itself} & \texttt{=} where you wanted \texttt{:=} (\autoref{sec:mk-assign}) \\
+	\texttt{commands commence before first target} & A tab-indented line before any rule --- usually a continuation that lost its backslash \\
+	\texttt{Circular x <- y dependency dropped} & The graph has a cycle; make breaks it and carries on, so the result is unpredictable \\
+	\texttt{Error 1 (ignored)}          & A recipe failed on a line prefixed with \texttt{-} \\
+	\texttt{warning: overriding recipe for target 'x'} & Two rules give \texttt{x} a recipe; the later one wins and the earlier is discarded \\
+\end{keys}
+
+\begin{note}
+	\texttt{make: *** [Makefile:12: app] Error 1} is not a make error at all ---
+	it is make reporting that the command on line 12 exited non-zero. The real
+	message is above it, from the compiler. Scroll up.
+\end{note}
+
+\begin{moral}
+	Nearly every confusing make session resolves to one of three questions: is it a
+	tab? is the target phony? and is the edge actually in the graph?
+	\cmd{cat -A}, \texttt{.PHONY}, and \cmd{make --debug=b} answer them in that
+	order.
+\end{moral}

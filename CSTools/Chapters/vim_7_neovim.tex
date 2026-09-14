@@ -1,0 +1,352 @@
+\chapter{Neovim}\label{ch:vim-neovim}
+
+Everything up to this point is Vim, and works identically in Neovim. This
+chapter is about what Neovim adds.
+
+\section{What Neovim Changes}\label{sec:nvim-diff}
+
+Neovim began in 2014 as a fork of Vim aimed at a refactored, more hackable
+codebase. The user-visible consequences are these:
+
+\begin{keys}[0.26]
+	\vocab{Lua}              & A real programming language for configuration and plugins, alongside Vimscript \\
+	\vocab{Built-in LSP}     & A Language Server Protocol client in core: completion, go-to-definition, rename, diagnostics \\
+	\vocab{Treesitter}       & Incremental parsing, giving syntax-aware highlighting, indentation and text objects \\
+	\vocab{Terminal emulator} & A real shell inside a buffer                                                  \\
+	\vocab{Async jobs}       & Plugins can run external processes without blocking the UI                     \\
+	\vocab{Remote UI}        & The editor is decoupled from its front end, via a documented RPC API           \\
+	\vocab{Better defaults}  & Sensible options on by default; see \cmd{:help nvim-defaults}                  \\
+\end{keys}
+
+\begin{remark}
+	Vim has since gained its own versions of some of these (\texttt{+terminal},
+	\texttt{+job}, Vim9script). The practical difference today is the ecosystem:
+	almost all new plugin development targets Neovim's Lua API.
+\end{remark}
+
+\begin{note}[Checking your installation]
+	\cmd{:version} prints the build. \cmd{:checkhealth} is more useful --- it runs
+	every installed module's self-test and reports missing providers, absent
+	external tools, and misconfigured plugins. Run it first whenever something
+	behaves strangely.
+\end{note}
+
+\section{Configuration in Lua}\label{sec:nvim-lua}
+
+Neovim reads \file{\textasciitilde/.config/nvim/init.lua} at startup (or
+\file{init.vim}, but not both). Any Lua file under
+\file{\textasciitilde/.config/nvim/lua/} is importable as a module:
+\file{lua/config/options.lua} becomes \texttt{require("config.options")}.
+
+\subsection{Options}
+
+\begin{luacode}
+vim.opt.number = true            -- :set number
+vim.opt.relativenumber = true    -- :set relativenumber
+vim.opt.shiftwidth = 2           -- :set shiftwidth=2
+vim.opt.expandtab = true
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+vim.opt.undofile = true
+vim.opt.scrolloff = 8
+
+-- list-like options support append/remove
+vim.opt.clipboard:append("unnamedplus")
+vim.opt.shortmess:append("c")
+
+-- buffer- and window-local variants
+vim.opt_local.conceallevel = 0
+\end{luacode}
+
+\begin{note}
+	\texttt{vim.opt} wraps options in a table-like object that understands lists
+	and sets, which is why \texttt{:append()} works. \texttt{vim.o},
+	\texttt{vim.bo} and \texttt{vim.wo} are the plain scalar forms for global,
+	buffer-local and window-local options respectively.
+\end{note}
+
+\section{Mappings and Autocommands}\label{sec:nvim-keymaps}
+
+\subsection{Key mappings}
+
+\begin{luacode}
+-- vim.keymap.set(mode, lhs, rhs, opts)
+vim.keymap.set("n", "<leader>w", "<cmd>write<cr>", { desc = "Save file" })
+vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window" })
+vim.keymap.set("v", "<", "<gv", { desc = "Dedent and keep selection" })
+vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+
+-- a Lua function as the right-hand side
+vim.keymap.set("n", "<leader>d", function()
+  vim.diagnostic.open_float()
+end, { desc = "Line diagnostics" })
+
+-- delete a mapping
+vim.keymap.del("n", "<leader>w")
+\end{luacode}
+
+The \texttt{mode} argument is \texttt{"n"} Normal, \texttt{"i"} Insert,
+\texttt{"v"} Visual, \texttt{"x"} Visual-only, \texttt{"t"} Terminal,
+\texttt{"c"} Command-line, or a table of several. Useful options are
+\texttt{desc} (shown by \texttt{which-key}), \texttt{silent},
+\texttt{buffer = 0} to scope the mapping to the current buffer, and
+\texttt{remap = true} on the rare occasion you want the right-hand side itself
+remapped.
+
+\begin{definition}[Leader]
+	\key{<leader>} is a user-chosen prefix key, letting you invent mappings without
+	colliding with built-ins. It is \key{<Space>} in most modern configurations
+	(LazyVim included), with \key{<localleader>} --- used for filetype-specific
+	mappings such as VimTeX's --- set to \key{\textbackslash}. Set them
+	\emph{before} loading any plugin:
+\begin{luacode}
+vim.g.mapleader = " "
+vim.g.maplocalleader = "\\"
+\end{luacode}
+\end{definition}
+
+\subsection{Autocommands}
+
+An \vocab{autocommand} runs code when an event fires --- opening a file,
+changing filetype, writing, entering Insert mode.
+
+\begin{luacode}
+-- Highlight the yanked region briefly
+vim.api.nvim_create_autocmd("TextYankPost", {
+  callback = function()
+    vim.highlight.on_yank({ timeout = 200 })
+  end,
+})
+
+-- Disable conceal in LaTeX buffers, so raw math delimiters stay visible
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "tex",
+  callback = function()
+    vim.opt_local.conceallevel = 0
+  end,
+})
+
+-- Groups make a config reloadable without stacking duplicates
+local group = vim.api.nvim_create_augroup("MyConfig", { clear = true })
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group = group,
+  pattern = "*.lua",
+  callback = function() vim.lsp.buf.format() end,
+})
+\end{luacode}
+
+\begin{note}
+	\cmd{:autocmd} with no argument lists everything currently registered, and
+	\cmd{:verbose autocmd BufWritePre} says which file defined each one --- the
+	fastest way to find out which plugin is reformatting your code behind your
+	back. The same \cmd{:verbose} trick works for options (\cmd{:verbose set
+		shiftwidth?}) and mappings (\cmd{:verbose nmap <leader>w}).
+\end{note}
+
+\section{Talking to Vim from Lua}\label{sec:nvim-api}
+
+\begin{keys}[0.34]
+	\texttt{vim.cmd("colorscheme x")} & Run an Ex command                          \\
+	\texttt{vim.cmd.colorscheme("x")} & The same, in method form                    \\
+	\texttt{vim.fn.expand("\%:p")}    & Call any Vimscript function                 \\
+	\texttt{vim.g.foo}                & Global variables (\cmd{g:foo})              \\
+	\texttt{vim.b}, \texttt{vim.w}, \texttt{vim.t} & Buffer, window, tab variables  \\
+	\texttt{vim.api.nvim\_*}          & The full RPC API --- buffers, windows, extmarks \\
+	\texttt{vim.uv}                   & The libuv event loop: timers, filesystem, processes \\
+	\texttt{vim.system(\{"ls"\})}     & Run a process asynchronously                \\
+	\texttt{vim.notify("msg")}        & Emit a notification                         \\
+	\texttt{vim.inspect(tbl)}         & Pretty-print a table                        \\
+\end{keys}
+
+\begin{eg}
+	At the command line, \cmd{:lua} runs a line of Lua and \cmd{:=} prints an
+	expression: \cmd{:=vim.opt.shiftwidth:get()} or
+	\cmd{:=vim.api.nvim\_buf\_get\_name(0)}. For anything longer, \cmd{:Lazy} has
+	a REPL-like scratch buffer, and \cmd{:source \%} re-runs the Lua file you are
+	editing.
+\end{eg}
+
+\hrulebar
+
+\section{The Built-in Terminal}\label{sec:nvim-terminal}
+
+\begin{keys}[0.30]
+	\cmd{:terminal}               & Open a shell in the current window        \\
+	\cmd{:split \textbar{} terminal} & \dots{} in a horizontal split          \\
+	\key{i} / \key{a}             & Enter Terminal mode (keys go to the shell) \\
+	\key{<C-\textbackslash>} \key{<C-n>} & Back to Normal mode                \\
+	\cmd{:terminal make}          & Run a command and keep its output in a buffer \\
+\end{keys}
+
+A terminal buffer is an ordinary buffer once you are in Normal mode, so every
+motion, search and yank applies to the scrollback. That alone justifies using
+it over a separate terminal window when you want to copy a stack trace into
+your code.
+
+\begin{note}
+	LazyVim binds \key{<C-/>} to a floating toggleable terminal, and
+	\key{<leader>} \key{f} \key{t} to one rooted at the project directory.
+\end{note}
+
+\section{Treesitter}\label{sec:nvim-treesitter}
+
+\begin{definition}[Treesitter]
+	An incremental parser generator. Neovim keeps a real \emph{syntax tree} of each
+	buffer, updated on every keystroke, rather than the regex-based approximation
+	that classical Vim syntax files use.
+\end{definition}
+
+What that buys you:
+
+\begin{keys}[0.30]
+	Highlighting  & Correct on nested and embedded languages --- Lua inside Vimscript, code blocks inside Markdown \\
+	Indentation   & Derived from the tree instead of heuristics                                                    \\
+	Text objects  & \key{a} \key{f} for a function, \key{i} \key{c} for a class, via \texttt{nvim-treesitter-textobjects} \\
+	Incremental selection & Grow the Visual selection node by node up the tree                                      \\
+	Folding       & \cmd{'foldexpr'} set from the tree structure                                                    \\
+	Navigation    & Jump to the next function or class, and to matching structural pairs                            \\
+\end{keys}
+
+\begin{keys}[0.30]
+	\cmd{:TSInstall lua}     & Install a parser                                  \\
+	\cmd{:TSUpdate}          & Update every installed parser                     \\
+	\cmd{:InspectTree}       & Show the live syntax tree for this buffer         \\
+	\cmd{:Inspect}           & Report every highlight group under the cursor     \\
+\end{keys}
+
+\begin{eg}
+	\cmd{:Inspect} is the tool to reach for when a colour looks wrong: it names
+	the Treesitter capture, the syntax group and the extmark responsible for the
+	character under the cursor, which turns ``my theme is broken'' into a specific
+	highlight group you can override.
+\end{eg}
+
+\section{LSP: Language Servers}\label{sec:nvim-lsp}
+
+\begin{definition}[Language Server Protocol]
+	A JSON-RPC protocol, originally from VS Code, that lets one language-analysis
+	server (\texttt{lua\_ls}, \texttt{pyright}, \texttt{texlab}, \texttt{clangd})
+	serve any editor that speaks it. Neovim ships the client; you supply the
+	servers.
+\end{definition}
+
+The default mappings once a server attaches to a buffer:
+
+\begin{keys}[0.26]
+	\key{K}                & Hover documentation                       \\
+	\key{g} \key{d}        & Go to definition                          \\
+	\key{g} \key{D}        & Go to declaration                         \\
+	\key{g} \key{r}        & List references                           \\
+	\key{g} \key{i}        & Go to implementation                      \\
+	\key{<C-o>}            & Jump back afterwards                      \\
+	\key{<leader>} \key{c} \key{a} & Code action (LazyVim binding)     \\
+	\key{<leader>} \key{c} \key{r} & Rename symbol                     \\
+	\key{<C-s>} in Insert mode     & Signature help                    \\
+\end{keys}
+
+Diagnostics are handled by a separate module, \texttt{vim.diagnostic}, so they
+work with linters that are not language servers:
+
+\begin{keys}[0.38]
+	\key{]} \key{d} / \key{[} \key{d} & Next / previous diagnostic       \\
+	\cmd{:=vim.diagnostic.open\_float()} & Show the full message         \\
+	\cmd{:=vim.diagnostic.setloclist()}  & Send them to the location list \\
+	\cmd{:LspInfo}         & Which servers are attached to this buffer  \\
+	\cmd{:LspLog}          & The client's log, for when they are not    \\
+	\cmd{:Mason}           & Install and manage servers, linters, formatters \\
+\end{keys}
+
+A minimal hand-rolled setup, for reference --- distributions do this for you:
+
+\begin{luacode}
+require("lspconfig").lua_ls.setup({
+  on_attach = function(_, bufnr)
+    local map = function(keys, fn, desc)
+      vim.keymap.set("n", keys, fn, { buffer = bufnr, desc = desc })
+    end
+    map("gd", vim.lsp.buf.definition, "Goto definition")
+    map("K", vim.lsp.buf.hover, "Hover")
+    map("<leader>rn", vim.lsp.buf.rename, "Rename")
+    map("<leader>ca", vim.lsp.buf.code_action, "Code action")
+  end,
+  settings = { Lua = { diagnostics = { globals = { "vim" } } } },
+})
+\end{luacode}
+
+\begin{remark}
+	Neovim 0.11 added \texttt{vim.lsp.config()} and \texttt{vim.lsp.enable()},
+	which remove the need for \texttt{nvim-lspconfig} as a plugin, and made
+	\key{g} \key{r} \key{n} (rename), \key{g} \key{r} \key{a} (code action) and
+	\key{g} \key{r} \key{r} (references) default mappings. The machine these notes
+	were written on runs 0.9.5, where the \texttt{lspconfig} form above still
+	applies --- check \cmd{:version} before copying configuration off the internet,
+	because this is the API that has moved fastest.
+\end{remark}
+
+\section{Completion and Snippets}\label{sec:nvim-cmp}
+
+Neovim's built-in completion is \key{<C-n>} / \key{<C-p>} (words in the buffer),
+\key{<C-x>} \key{<C-f>} (filenames) and \key{<C-x>} \key{<C-o>} (omni-completion,
+which the LSP client provides). Most setups layer a plugin on top ---
+\texttt{nvim-cmp} or \texttt{blink.cmp} --- that merges LSP, buffer, path and
+snippet sources into one popup, and \texttt{LuaSnip} for expandable templates.
+\autoref{ch:vim-setup} shows this configuration as it actually stands on this
+machine.
+
+\section{Plugins and \texttt{lazy.nvim}}\label{sec:nvim-plugins}
+
+\begin{definition}[\texttt{lazy.nvim}]
+	The current standard plugin manager. Plugins are declared as Lua tables ---
+	``specs'' --- and it handles cloning, updating, lockfiles and, as the name
+	suggests, deferring a plugin's load until it is needed.
+\end{definition}
+
+\begin{luacode}
+return {
+  -- 1. minimal: just clone it
+  { "tpope/vim-surround" },
+
+  -- 2. with options; lazy.nvim calls require("gitsigns").setup(opts)
+  { "lewis6991/gitsigns.nvim", opts = { current_line_blame = true } },
+
+  -- 3. lazy-loaded on a filetype, with dependencies and keymaps
+  {
+    "nvim-telescope/telescope.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    cmd = "Telescope",
+    keys = {
+      { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find files" },
+    },
+  },
+
+  -- 4. disable something a distribution enabled
+  { "folke/trouble.nvim", enabled = false },
+}
+\end{luacode}
+
+The loading triggers are \texttt{event} (any autocommand event, such as
+\texttt{VeryLazy} or \texttt{BufReadPost}), \texttt{ft} (filetype),
+\texttt{cmd}, and \texttt{keys}. A plugin declaring none of them loads at
+startup.
+
+\begin{keys}[0.26]
+	\cmd{:Lazy}        & The plugin dashboard                              \\
+	\cmd{:Lazy sync}   & Install, clean and update to match the spec       \\
+	\cmd{:Lazy update} & Update, writing \file{lazy-lock.json}             \\
+	\cmd{:Lazy restore} & Roll every plugin back to the lockfile           \\
+	\cmd{:Lazy profile} & Per-plugin startup timings                       \\
+	\cmd{:Lazy log}    & What changed in the last update                   \\
+\end{keys}
+
+\begin{note}
+	\file{lazy-lock.json} pins every plugin to an exact commit. Commit it to
+	version control with your config: \cmd{:Lazy restore} then reproduces a working
+	editor exactly, which is what you want after an update breaks something at an
+	inconvenient moment.
+\end{note}
+
+\begin{moral}
+	Plugins are the fun part and the trap. Every one is code that runs on every
+	keystroke and one more thing to debug at 2am. Add them one at a time, and only
+	after you have felt the absence they fill.
+\end{moral}

@@ -1,0 +1,351 @@
+\chapter{Shell Scripting}\label{ch:sh-script}
+
+A shell script is a file containing the commands you would have typed. That is
+its whole appeal --- the step from ``I did this by hand'' to ``this is
+automated'' is copying your history into a file --- and also its whole danger,
+since the shell was designed for interactive use, where a mistake is visible
+immediately. This chapter covers the language, and then the handful of settings
+that make it safe to leave running unattended.
+
+\section{Shebangs and Executable Scripts}\label{sec:sh-shebang}
+
+\begin{definition}[Shebang]
+	The first line of a script, beginning \texttt{\#!}, naming the interpreter that
+	should run it. The kernel reads those two bytes, and runs the named program
+	with the script as its argument.
+\end{definition}
+
+\begin{bashcode}
+#!/bin/bash           # this exact shell
+#!/bin/sh             # POSIX only: no arrays, no [[ ]], no process substitution
+#!/usr/bin/env bash   # the first bash on PATH -- more portable
+#!/usr/bin/env python3
+\end{bashcode}
+
+\begin{shell}
+$ chmod +x deploy.sh     # without this you get "Permission denied"
+$ ./deploy.sh            # the ./ is required: . is not on PATH
+\end{shell}
+
+\begin{note}
+	\texttt{\#!/usr/bin/env bash} is the portable form, because \cmd{bash} lives in
+	\file{/bin} on Linux and \file{/opt/homebrew/bin} on an Apple Silicon Mac,
+	while \cmd{env} is in \file{/usr/bin} everywhere. The cost is that it obeys
+	\texttt{PATH}, so it picks up whichever \cmd{bash} the caller happens to have.
+\end{note}
+
+\begin{moral}
+	Declare \cmd{bash} if you use Bash features. Writing \texttt{\#!/bin/sh} and
+	then using \texttt{[[ ]]} or arrays produces a script that runs on your machine
+	--- where \file{/bin/sh} may be a symlink to \cmd{bash} --- and fails on a
+	Debian server where it is \cmd{dash}.
+\end{moral}
+
+\section{Variables, Expansion and Arrays}\label{sec:sh-vars}
+
+\begin{bashcode}
+name="Kon Yi"          # no spaces around = -- "name = x" tries to RUN name
+readonly PI=3.14159    # cannot be changed afterwards
+local tmp="$1"         # inside a function only: not visible outside
+
+echo "${name}"         # braces: always safe, required before adjacent text
+echo "${name}_final"   # without braces this looks for $name_final
+\end{bashcode}
+
+Parameter expansion has a small sublanguage of its own, and it replaces a
+surprising amount of \cmd{sed}:
+
+\begin{keys}[0.26]
+	\texttt{\$\{v:-default\}} & Use \texttt{default} if \texttt{v} is unset or empty \\
+	\texttt{\$\{v:=default\}} & \dots{} and assign it as well                        \\
+	\texttt{\$\{v:?message\}} & Abort with \texttt{message} if unset --- a cheap assertion \\
+	\texttt{\$\{\#v\}}        & Its length                                           \\
+	\texttt{\$\{v\#prefix\}}  & Strip the shortest matching prefix                   \\
+	\texttt{\$\{v\#\#prefix\}} & Strip the longest matching prefix                   \\
+	\texttt{\$\{v\%suffix\}}  & Strip the shortest matching suffix                   \\
+	\texttt{\$\{v\%\%suffix\}} & Strip the longest matching suffix                   \\
+	\texttt{\$\{v/old/new\}}  & Replace the first match                              \\
+	\texttt{\$\{v//old/new\}} & Replace every match                                  \\
+\end{keys}
+
+\begin{eg}
+\begin{shell}
+$ f=/home/konyi/report.tex
+$ echo "${f##*/}"        # everything after the last slash -> basename
+report.tex
+$ echo "${f%/*}"         # everything before the last slash -> dirname
+/home/konyi
+$ echo "${f%.tex}.pdf"   # swap the extension
+/home/konyi/report.pdf
+$ echo "${VERBOSE:-0}"   # a default for an unset variable
+0
+\end{shell}
+	The mnemonic for the direction: on a US keyboard \texttt{\#} is left of
+	\texttt{\$} and strips from the left; \texttt{\%} is right of it and strips from
+	the right.
+\end{eg}
+
+Arrays are Bash-only, and indexed from zero:
+
+\begin{bashcode}
+files=(a.txt b.txt "with space.txt")
+echo "${files[0]}"        # a.txt
+echo "${#files[@]}"       # 3 -- the number of elements
+for f in "${files[@]}"; do echo "$f"; done   # quoted [@]: one word each
+\end{bashcode}
+
+\begin{moral}
+	\texttt{"\$\{arr[@]\}"} with the quotes is the only correct way to iterate an
+	array. \texttt{\$\{arr[*]\}} joins everything into one string, and the unquoted
+	forms split on spaces --- so the element \texttt{with space.txt} becomes two
+	iterations.
+\end{moral}
+
+\section{Arguments}\label{sec:sh-args}
+
+\begin{keys}[0.20]
+	\texttt{\$0}          & The script's own name                                   \\
+	\texttt{\$1}, \texttt{\$2} & The first and second arguments                     \\
+	\texttt{\$\{10\}}     & The tenth --- braces required past nine                 \\
+	\texttt{\$\#}         & How many arguments were given                           \\
+	\texttt{"\$@"}        & All of them, \emph{each as a separate word}             \\
+	\texttt{"\$*"}        & All of them, joined into one word                       \\
+	\texttt{shift}        & Discard \texttt{\$1}; everything moves down one         \\
+\end{keys}
+
+\begin{moral}
+	Use \texttt{"\$@"}, never \texttt{\$*}, and never either without quotes. The
+	quoted \texttt{"\$@"} is the only form that passes arguments through unchanged
+	when one of them contains a space.
+\end{moral}
+
+\begin{bashcode}
+#!/usr/bin/env bash
+# usage: backup.sh [-v] SOURCE DEST
+
+verbose=0
+while getopts "vh" opt; do
+  case "$opt" in
+    v) verbose=1 ;;
+    h) echo "usage: $0 [-v] SOURCE DEST"; exit 0 ;;
+    *) exit 2 ;;                # getopts already printed the error
+  esac
+done
+shift $((OPTIND - 1))           # drop the options, leaving the operands
+
+if [[ $# -ne 2 ]]; then
+  echo "error: expected 2 arguments, got $#" >&2
+  exit 2
+fi
+
+src=$1
+dest=$2
+(( verbose )) && echo "copying $src -> $dest"
+cp -r -- "$src" "$dest"
+\end{bashcode}
+
+\begin{note}
+	Usage errors go to standard error (\texttt{>\&2}) and exit non-zero, so that a
+	caller can tell success from failure and a pipeline is not polluted with your
+	complaints. This is the same discipline every tool in \autoref{ch:sh-text}
+	follows.
+\end{note}
+
+\section{Conditionals}\label{sec:sh-cond}
+
+\begin{keys}[0.24]
+	\texttt{[ ... ]}   & The POSIX test. It is a \emph{command} named \texttt{[}, which is why the spaces are mandatory \\
+	\texttt{[[ ... ]]} & Bash's version: safer, supports \texttt{\&\&}, \texttt{||}, \texttt{=\textasciitilde} \\
+	\texttt{(( ... ))} & Arithmetic. \texttt{\$} is not needed on variable names    \\
+\end{keys}
+
+\begin{keys}[0.24]
+	\texttt{-f f}      & \file{f} exists and is a regular file                      \\
+	\texttt{-d d}      & \file{d} exists and is a directory                         \\
+	\texttt{-e p}      & \file{p} exists, whatever it is                            \\
+	\texttt{-r}, \texttt{-w}, \texttt{-x} & \dots{} and is readable, writable, executable \\
+	\texttt{-s f}      & \file{f} exists and is not empty                           \\
+	\texttt{-z "\$v"}  & The string is empty                                        \\
+	\texttt{-n "\$v"}  & The string is not empty                                    \\
+	\texttt{"\$a" = "\$b"} & Strings are equal                                      \\
+	\texttt{-eq -ne -lt -le -gt -ge} & Numeric comparison                           \\
+	\texttt{"\$v" =\textasciitilde{} re} & Matches a regular expression (\texttt{[[ ]]} only) \\
+\end{keys}
+
+\begin{bashcode}
+if [[ -f "$config" ]]; then
+  source "$config"
+elif [[ -f /etc/defaults.conf ]]; then
+  source /etc/defaults.conf
+else
+  echo "no configuration found" >&2
+  exit 1
+fi
+
+case "$1" in
+  start)        systemctl start app ;;
+  stop)         systemctl stop app ;;
+  restart)      "$0" stop && "$0" start ;;
+  *.tar.gz)     tar xzf "$1" ;;        # patterns are GLOBS, not regexes
+  *)            echo "unknown: $1" >&2; exit 2 ;;
+esac
+\end{bashcode}
+
+\begin{note}
+	Prefer \texttt{[[ ]]} in Bash scripts. Inside it, an unquoted empty variable
+	does not fall apart --- \texttt{[ \$x = y ]} with \texttt{x} unset expands to
+	\texttt{[ = y ]}, which is a syntax error, while \texttt{[[ \$x = y ]]} is
+	simply false. Quote anyway; but the brackets give you a second line of defence.
+\end{note}
+
+\section{Loops and Reading Input}\label{sec:sh-loops}
+
+\begin{bashcode}
+for f in *.tex; do
+  echo "processing $f"
+done
+
+for i in {1..5}; do echo "$i"; done
+for (( i = 0; i < 5; i++ )); do echo "$i"; done
+
+while read -r line; do            # -r: do not mangle backslashes
+  echo "[$line]"
+done < input.txt
+
+# the safe way to loop over find's results
+while IFS= read -r -d '' file; do
+  echo "$file"
+done < <(find . -name '*.log' -print0)
+
+until ping -c1 -W1 example.com &>/dev/null; do
+  echo "waiting for network..."
+  sleep 2
+done
+\end{bashcode}
+
+\begin{moral}
+	Never write \cmd{for f in \$(ls)}. The output of \cmd{ls} is split on
+	whitespace, so any filename with a space becomes several iterations, and any
+	name containing a \texttt{*} is then globbed. \cmd{for f in *} does the right
+	thing, needs no subprocess, and is shorter.
+\end{moral}
+
+\begin{note}
+	\texttt{IFS= read -r} is the incantation for reading a line \emph{exactly}:
+	clearing \texttt{IFS} stops leading and trailing whitespace being trimmed, and
+	\texttt{-r} stops backslashes being interpreted. Use it every time; the bare
+	\cmd{read} is almost never what you want.
+\end{note}
+
+\section{Functions}\label{sec:sh-func}
+
+\begin{bashcode}
+log() {
+  printf '[%s] %s\n' "$(date +%T)" "$*" >&2
+}
+
+die() {
+  log "FATAL: $*"
+  exit 1
+}
+
+file_size() {
+  local f=$1                     # local: invisible outside this function
+  [[ -f $f ]] || return 1        # return status, not a value
+  stat -c%s "$f"                 # "return a value" by printing it
+}
+
+size=$(file_size report.pdf) || die "report.pdf is missing"
+log "report.pdf is $size bytes"
+\end{bashcode}
+
+\begin{note}
+	Shell functions do not return values, they return \emph{statuses} --- a number
+	from 0 to 255, where 0 means success. To hand back data, print it and let the
+	caller capture it with \texttt{\$(...)}. And declare every internal variable
+	\cmd{local}, or it silently becomes global and collides with the caller's.
+\end{note}
+
+\section{Writing Robust Scripts}\label{sec:sh-robust}
+
+By default the shell is relentlessly forgiving: a failing command is ignored, an
+unset variable expands to nothing, and a broken pipeline reports success. Those
+defaults are right for an interactive session, where you can see what happened,
+and wrong for everything else.
+
+\begin{bashcode}
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+\end{bashcode}
+
+\begin{keys}[0.20]
+	\cmd{set -e} & Exit as soon as any command fails                                \\
+	\cmd{set -u} & Treat an unset variable as an error, instead of an empty string  \\
+	\cmd{set -o pipefail} & A pipeline fails if \emph{any} stage failed, not just the last \\
+	\cmd{IFS=\$'\textbackslash n\textbackslash t'} & Split fields on newlines and tabs only, never spaces \\
+\end{keys}
+
+\begin{eg}
+	What each one prevents:
+\begin{bashcode}
+cd /nonexistent      # without -e, the script carries on...
+rm -rf ./*           # ...and deletes the contents of the WRONG directory
+
+rm -rf "$PREFIX/lib" # with PREFIX unset and no -u, this is rm -rf /lib
+
+grep pat file | sort # without pipefail, a missing file still "succeeds"
+\end{bashcode}
+\end{eg}
+
+\begin{note}[\cmd{set -e} is not magic]
+	It does not fire inside a condition, or on the left of \texttt{\&\&}, or
+	anywhere its status is being tested --- which is correct, but means it is a
+	safety net rather than a guarantee. Check explicitly where it matters:
+	\cmd{cmd || die "cmd failed"}.
+\end{note}
+
+Clean up after yourself with a trap:
+
+\begin{bashcode}
+tmp=$(mktemp -d)                      # never invent your own temp filenames
+trap 'rm -rf "$tmp"' EXIT             # runs however the script ends
+trap 'echo interrupted >&2; exit 130' INT TERM
+\end{bashcode}
+
+\begin{moral}
+	Those four lines --- the shebang, \cmd{set -euo pipefail}, \cmd{mktemp}, and a
+	\cmd{trap ... EXIT} --- are the difference between a script you run yourself
+	and a script you can put in a cron job. Type them before you type anything
+	else.
+\end{moral}
+
+\section{Debugging Scripts}\label{sec:sh-debug}
+
+\begin{keys}[0.26]
+	\cmd{bash -n script.sh}  & Check the syntax without running anything            \\
+	\cmd{bash -x script.sh}  & Print every command, after expansion, as it runs     \\
+	\cmd{set -x} / \cmd{set +x} & Turn tracing on and off around one suspect region \\
+	\cmd{PS4='+\$LINENO: '}  & Prefix trace lines with the line number              \\
+	\cmd{shellcheck script.sh} & Static analysis. Catches most of this chapter's traps \\
+\end{keys}
+
+\begin{eg}
+	Tracing shows you the command \emph{after} every expansion of
+	\autoref{sec:sh-anatomy} has been applied, which is exactly the information a
+	quoting bug hides:
+\begin{shell}
+$ bash -x backup.sh a.txt "my dir"
++ src=a.txt
++ dest='my dir'
++ cp -r -- a.txt 'my dir'
+\end{shell}
+	The quotes in the trace are the shell telling you where the word boundaries
+	really are.
+\end{eg}
+
+\begin{moral}
+	Run \cmd{shellcheck} on every script you write. It is not installed here
+	(\cmd{apt install shellcheck}), it takes a second, and it reliably finds the
+	unquoted variable you were about to spend an hour on.
+\end{moral}

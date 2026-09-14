@@ -1,0 +1,289 @@
+\chapter{The Filesystem}\label{ch:sh-fs}
+
+Unix presents everything as a file in one tree: your documents, your keyboard,
+your disks, the running kernel's own state. That claim is repeated so often it
+has stopped meaning anything, so here is the version that matters in practice:
+there is exactly one namespace, it starts at \file{/}, and the commands in this
+chapter are how you move through it.
+
+\section{Paths}\label{sec:sh-paths}
+
+\begin{definition}[Absolute and relative paths]
+	An \vocab{absolute} path begins at the root of the tree and so starts with
+	\file{/}. A \vocab{relative} path begins wherever you currently are, and does
+	not.
+\end{definition}
+
+\begin{keys}[0.18]
+	\file{/}          & The root of the whole tree                                     \\
+	\file{.}          & The current directory                                          \\
+	\file{..}         & The parent directory                                           \\
+	\file{\textasciitilde}   & Your home directory; \file{\textasciitilde konyi} is someone else's \\
+	\file{-}          & As an argument to \cmd{cd}, the previous directory             \\
+\end{keys}
+
+\begin{eg}
+	From \file{/home/konyi/Documents}, the file \file{/home/konyi/Documents/LaTeX/CSTools.tex}
+	can be named \file{LaTeX/CSTools.tex}, \file{./LaTeX/CSTools.tex}, or
+	\file{\textasciitilde/Documents/LaTeX/CSTools.tex}. All three are the same
+	file; which you use is a question of what you want to stay true when you move.
+\end{eg}
+
+The parts of a path have names, because commands use them:
+
+\begin{shell}
+$ basename /home/konyi/notes.tex     # the last component
+notes.tex
+$ dirname /home/konyi/notes.tex      # everything before it
+/home/konyi
+$ realpath ../Documents              # resolve to an absolute path
+/home/konyi/Documents
+\end{shell}
+
+\begin{note}
+	A leading dot makes a file \vocab{hidden}: it is not listed by \cmd{ls} and not
+	matched by \texttt{*}. This is not a permission or a security feature --- it is
+	a naming convention that \cmd{ls} honours, which is why your home directory
+	looks empty until you run \cmd{ls -a}.
+\end{note}
+
+\section{Navigating}\label{sec:sh-navigate}
+
+\begin{keys}[0.22]
+	\cmd{pwd}         & Print the working directory                                 \\
+	\cmd{cd dir}      & Change to \file{dir}                                        \\
+	\cmd{cd}          & With no argument, go home                                   \\
+	\cmd{cd -}        & Back to where you just were                                 \\
+	\cmd{cd ..}       & Up one level                                                \\
+	\cmd{pushd dir} / \cmd{popd} & Change directory onto a stack, and come back     \\
+	\cmd{dirs -v}     & Show the directory stack                                    \\
+\end{keys}
+
+\begin{note}
+	\cmd{cd} must be a shell \emph{builtin}, not a program. A child process cannot
+	change its parent's working directory, so if \cmd{cd} were an ordinary command
+	it would change its own directory and then exit, accomplishing nothing.
+	\cmd{type cd} confirms it. The same reasoning explains \cmd{export} and
+	\cmd{source}.
+\end{note}
+
+\begin{tryit}
+	Run \cmd{cd /tmp}, then \cmd{cd \textasciitilde}, then \cmd{cd -} a few times.
+	The last one toggles, which makes it the \key{<C-\textasciicircum{}>} of the
+	shell (\autoref{sec:vim-buffercmds}) --- the fastest way to bounce between two
+	directories you are working in.
+\end{tryit}
+
+\section{Listing and Inspecting}\label{sec:sh-inspect}
+
+\begin{keys}[0.22]
+	\cmd{ls}          & List the current directory                                  \\
+	\cmd{ls -l}       & Long form: permissions, owner, size, date                   \\
+	\cmd{ls -a}       & Include hidden files                                        \\
+	\cmd{ls -lh}      & Human-readable sizes --- \texttt{4.0K} rather than \texttt{4096} \\
+	\cmd{ls -lt}      & Newest first; add \cmd{-r} to reverse                       \\
+	\cmd{ls -ld dir}  & The directory itself, not its contents                      \\
+	\cmd{tree -L 2}   & The tree, two levels deep                                   \\
+	\cmd{stat file}   & Everything the filesystem knows about one file              \\
+	\cmd{file x}      & Guess what a file actually \emph{is}, ignoring its name     \\
+	\cmd{du -sh dir}  & How big is this directory, in total                         \\
+	\cmd{df -h}       & How full are the mounted filesystems                        \\
+\end{keys}
+
+\begin{eg}[Reading \cmd{ls -l}]
+\begin{shell}
+$ ls -l notes.tex
+-rw-rw-r-- 1 konyi konyi 4096 Sep 14 17:23 notes.tex
+\end{shell}
+	Left to right: the type and permissions (\autoref{sec:sh-perms}); the link
+	count; the owning user; the owning group; the size in bytes; the modification
+	time; the name. The very first character is the type --- \texttt{-} for a
+	regular file, \texttt{d} for a directory, \texttt{l} for a symbolic link.
+\end{eg}
+
+\begin{note}
+	\cmd{file} is the honest answer to ``what is this''. Extensions are a
+	convention that nothing enforces, so \cmd{file mystery.txt} reporting
+	\texttt{PNG image data} is not a contradiction --- it is the point.
+\end{note}
+
+\section{Creating and Destroying}\label{sec:sh-manipulate}
+
+\begin{keys}[0.26]
+	\cmd{touch f}         & Create \file{f} if absent; update its timestamp if present \\
+	\cmd{mkdir d}         & Make a directory                                           \\
+	\cmd{mkdir -p a/b/c}  & Make the whole chain, and do not complain if it exists      \\
+	\cmd{cp a b}          & Copy                                                       \\
+	\cmd{cp -r src dst}   & Copy a directory and everything in it                      \\
+	\cmd{cp -i a b}       & Ask before overwriting                                     \\
+	\cmd{mv a b}          & Move --- which is also how you rename                      \\
+	\cmd{rm f}            & Delete a file                                              \\
+	\cmd{rm -r d}         & Delete a directory and its contents                        \\
+	\cmd{rmdir d}         & Delete a directory, but only if it is empty                \\
+\end{keys}
+
+\begin{note}[There is no undo]
+	\cmd{rm} does not move anything to a wastebasket. The file is gone, and the
+	only recovery is your backups --- or, for a file you are tracking,
+	Part~\ref{part:git}. Three habits make this survivable:
+	\begin{enumerate}[(i)]
+		\item Prefer \cmd{rm -i} while you are learning, or alias it so.
+		\item Run \cmd{ls} on a glob before you run \cmd{rm} on it. The shell expands
+		      both the same way, so what \cmd{ls} printed is exactly what \cmd{rm} will
+		      delete.
+		\item Never put a space in \cmd{rm -rf ./}\,\texttt{*}. \cmd{rm -rf . /}\,\texttt{*}
+		      is a different and much worse command.
+	\end{enumerate}
+\end{note}
+
+\begin{moral}
+	\cmd{mv} is rename, copy-then-delete, and move-between-directories all at once,
+	because on Unix a filename is just an entry in a directory pointing at the
+	data. Renaming rewrites the entry and never touches the file.
+\end{moral}
+
+\section{Hard and Symbolic Links}\label{sec:sh-links}
+
+That last observation has a consequence: a file's data can have more than one
+name.
+
+\begin{definition}[Hard and symbolic links]
+	A \vocab{hard link} is an additional directory entry pointing at the same data.
+	The file is deleted only when the last one goes. A \vocab{symbolic link} (or
+	\vocab{symlink}) is a small file whose contents are a \emph{path} --- a
+	signpost, which can point at something that does not exist.
+\end{definition}
+
+\begin{keys}[0.26]
+	\cmd{ln target name}     & Create a hard link                                  \\
+	\cmd{ln -s target name}  & Create a symbolic link --- the common case           \\
+	\cmd{ls -l}              & Symlinks show as \texttt{name -> target}            \\
+	\cmd{readlink -f name}   & Follow it to the real file                          \\
+	\cmd{unlink name}        & Remove the link, never the target                   \\
+\end{keys}
+
+\begin{eg}
+	Dotfile management is the usual reason to care. Keep the real files in a Git
+	repository and symlink them into place:
+\begin{shell}
+$ ln -s ~/dotfiles/nvim ~/.config/nvim
+$ ls -l ~/.config/nvim
+lrwxrwxrwx 1 konyi konyi 22 Jul 30 ~/.config/nvim -> /home/konyi/dotfiles/nvim
+\end{shell}
+	Now the configuration is versioned, but Neovim still finds it exactly where it
+	expects.
+\end{eg}
+
+\begin{note}
+	Use an \emph{absolute} target for a symlink unless you have thought carefully.
+	A relative target is resolved from the link's own directory, not from where you
+	were standing when you created it, which is the cause of most broken symlinks.
+\end{note}
+
+\section{Permissions and Ownership}\label{sec:sh-perms}
+
+Every file carries an owner, a group, and nine permission bits: read, write and
+execute, for the user, the group and everyone else.
+
+\begin{center}
+	\ttfamily\large
+	- \quad rw- \quad rw- \quad r-{}-
+\end{center}
+\begin{center}
+	\small type \quad\quad user \quad\quad group \quad\quad other
+\end{center}
+
+\begin{keys}[0.18]
+	\texttt{r} & Read: see the contents. On a directory, list its entries               \\
+	\texttt{w} & Write: change the contents. On a directory, create or delete entries   \\
+	\texttt{x} & Execute: run it. On a directory, \emph{enter} it or pass through it    \\
+\end{keys}
+
+\begin{note}
+	The directory cases are the ones that surprise people. \texttt{x} without
+	\texttt{r} on a directory lets you open a file inside it if you already know
+	the name, but not list what is there. And deleting a file needs \texttt{w} on
+	the \emph{directory}, not on the file --- which is why you can delete something
+	you have no permission to read.
+\end{note}
+
+\begin{keys}[0.28]
+	\cmd{chmod u+x script.sh}     & Give the owner execute permission               \\
+	\cmd{chmod go-w file}         & Take write away from group and others           \\
+	\cmd{chmod 644 file}          & Octal: \texttt{rw-r-{}-r-{}-}                   \\
+	\cmd{chmod 755 dir}           & Octal: \texttt{rwxr-xr-x}                       \\
+	\cmd{chmod -R u+rwX dir}      & Recursive; capital \texttt{X} means ``\texttt{x} only where it makes sense'' \\
+	\cmd{chown user:group file}   & Change ownership --- usually needs \cmd{sudo}   \\
+	\cmd{umask}                   & Which permissions are \emph{removed} from new files \\
+\end{keys}
+
+The octal form is three digits, one per class, each the sum of
+$\texttt{r}=4$, $\texttt{w}=2$, $\texttt{x}=1$:
+
+\begin{keys}[0.18]
+	\texttt{600} & \texttt{rw-{}-{}-{}-{}-{}-{}-} --- private. SSH keys must be this \\
+	\texttt{644} & \texttt{rw-r-{}-r-{}-} --- the default for a file                 \\
+	\texttt{755} & \texttt{rwxr-xr-x} --- the default for a directory or a program   \\
+	\texttt{777} & Everything for everyone. Essentially always the wrong answer      \\
+\end{keys}
+
+\begin{moral}
+	When a script will not run, the question is almost never the code.
+	\cmd{ls -l} it: if there is no \texttt{x}, \cmd{chmod +x} it; if there is,
+	check the shebang (\autoref{sec:sh-shebang}).
+\end{moral}
+
+\section{Finding Files}\label{sec:sh-find}
+
+\cmd{find} walks a directory tree and applies tests to everything it meets. Its
+syntax is unlike every other Unix command --- long options with one dash,
+arguments that read as a sentence --- and it is worth the adjustment.
+
+\begin{center}
+	\ttfamily\large
+	find \{where\} \{tests\} [\{action\}]
+\end{center}
+
+\begin{keys}[0.30]
+	\cmd{find . -name '*.tex'}       & By name, case-sensitively. Quote the pattern! \\
+	\cmd{find . -iname '*.PDF'}      & Case-insensitively                            \\
+	\cmd{find . -type f}             & Regular files only (\cmd{d} for directories)  \\
+	\cmd{find . -mtime -7}           & Modified in the last seven days               \\
+	\cmd{find . -size +10M}          & Larger than ten megabytes                     \\
+	\cmd{find . -empty}              & Empty files and directories                   \\
+	\cmd{find . -maxdepth 2}         & Do not descend further than two levels        \\
+	\cmd{find . -path '*/build/*' -prune -o -print} & Skip a subtree entirely        \\
+\end{keys}
+
+Tests combine, and the default between them is \emph{and}:
+
+\begin{shell}
+$ find . -type f -name '*.log' -size +1M          # big log files
+$ find . -type f -newer Makefile                  # changed since Makefile did
+$ find . -name '*.aux' -delete                    # find and remove
+$ find . -name '*.tex' -exec wc -l {} +           # run a command on the results
+\end{shell}
+
+\begin{note}
+	In \cmd{-exec}, \texttt{\{\}} stands for each file found. Ending with
+	\texttt{+} batches as many files as will fit into one invocation; ending with
+	\texttt{\textbackslash;} runs the command once per file. Prefer \texttt{+}: it
+	is dramatically faster on large trees, for the same reason \cmd{xargs} exists
+	(\autoref{sec:sh-teexargs}).
+\end{note}
+
+\begin{moral}
+	Always quote \cmd{find}'s patterns. \cmd{find . -name *.c} lets the shell
+	expand the glob first (\autoref{sec:sh-glob}), and \cmd{find} then receives
+	filenames where it expected a pattern --- producing either the wrong answer or
+	\texttt{paths must precede expression}, which is \cmd{find}'s way of saying
+	exactly this.
+\end{moral}
+
+\begin{remark}
+	\cmd{fd} is a modern alternative with saner defaults: \cmd{fd '\textbackslash.tex\$'}
+	does what most \cmd{find} invocations are reaching for, respects
+	\file{.gitignore}, and is faster. It is not installed here, and \cmd{find} is
+	on every machine you will ever log into, so learn \cmd{find} first and treat
+	\cmd{fd} as a luxury.
+\end{remark}

@@ -1,0 +1,400 @@
+\chapter{The Shell and the Command Line}\label{ch:sh-cmdline}
+
+You have been programming in the shell since the first time you typed
+\cmd{ls}. Most people never find this out, and it costs them: they treat the
+command line as a place where incantations either work or mysteriously do not,
+rather than as a small language with rules that can be learnt in an afternoon.
+
+This chapter is that language's syntax. Nothing here is a tool for getting work
+done --- chapters \ref{ch:sh-fs} onwards are --- but almost every surprising
+thing the shell will ever do to you is explained by \autoref{sec:sh-what} and
+\autoref{sec:sh-quoting}.
+
+\section{Reading Shell Transcripts}\label{sec:sh-notation}
+
+Part~\ref{part:shell} shows a great deal of terminal output, and the boxes it
+appears in follow one convention throughout.
+
+\begin{shell}
+$ echo hello          # a line beginning with "$ " is what YOU type
+hello                 # a line with no prompt is what the computer printed
+$ whoami
+konyi
+\end{shell}
+
+\begin{keys}[0.20]
+	\texttt{\$}   & The prompt of an ordinary user. Your real prompt probably shows a path and a Git branch; it is shortened here to keep the examples readable \\
+	\texttt{\#}   & The prompt of the \texttt{root} user. A transcript using it is doing something that requires administrative rights \\
+	\texttt{>}    & A continuation prompt: the shell is waiting because the previous line was incomplete \\
+	\texttt{\# \dots} & After a command, a comment. The shell ignores it, and so may you \\
+\end{keys}
+
+\begin{note}
+	Never type the \texttt{\$}. It is the prompt, not part of the command. This is
+	the most common mistake made when copying examples out of documentation, and
+	the error you get --- \texttt{command not found: \$} --- is at least a clear
+	one.
+\end{note}
+
+Command syntax is described the way manual pages describe it, and that notation
+is worth ten minutes on its own:
+
+\begin{keys}[0.24]
+	\texttt{FILE}, \texttt{<file>}  & A placeholder you must replace with something real \\
+	\texttt{[OPTION]}               & Square brackets: optional                          \\
+	\texttt{a|b}                    & A vertical bar: choose one                         \\
+	\texttt{FILE...}                & An ellipsis: may be repeated                       \\
+	\texttt{[FILE]...}              & Optional, and repeatable --- zero or more files    \\
+\end{keys}
+
+\begin{eg}
+	The synopsis line \texttt{ls [OPTION]... [FILE]...} says: the command is
+	\cmd{ls}; it takes any number of options, all optional; then any number of
+	filenames, also optional. So \cmd{ls}, \cmd{ls -l}, \cmd{ls -l src/} and
+	\cmd{ls -la a.txt b.txt} are all valid, and the manual told you so in eighteen
+	characters.
+\end{eg}
+
+\begin{notation}
+	Inline, this note writes commands as \cmd{grep -n TODO}, file and directory
+	paths as \file{/usr/local/bin}, and environment variables as \texttt{PATH}.
+	Keystrokes keep the keycap convention of \autoref{ch:vim-notation}, so
+	\key{<C-c>} means Control held with \texttt{c}. Longer transcripts appear in
+	the framed boxes shown above.
+\end{notation}
+
+\section{What a Shell Is}\label{sec:sh-what}
+
+\begin{definition}[Shell]
+	A program that reads a line of text, transforms it according to a fixed set of
+	rules, and then runs whatever program the result names. It is a
+	read--evaluate--print loop for the operating system.
+\end{definition}
+
+The word \emph{transforms} is doing all the work in that definition, and it is
+the single idea this part is built on.
+
+\begin{intuition}
+	The shell does not pass your command to a program. It \vocab{rewrites} your
+	command, and passes the \emph{result} to a program. When you type
+	\cmd{ls *.txt}, the program \cmd{ls} never sees an asterisk --- the shell
+	has already replaced it with a list of filenames. Every shell surprise you will
+	ever have is an expansion that happened when you did not expect it, or failed
+	to happen when you did.
+\end{intuition}
+
+\begin{eg}
+	\cmd{ls *.txt} in a directory holding \file{a.txt} and \file{b.txt} runs the
+	program \cmd{ls} with two arguments, \texttt{a.txt} and \texttt{b.txt}. In an
+	empty directory, Bash leaves the asterisk alone and \cmd{ls} is asked for a
+	file literally named \texttt{*.txt}; Zsh instead refuses and reports
+	\texttt{no matches found}. Same command, three outcomes, and none of them
+	involve \cmd{ls} understanding wildcards.
+\end{eg}
+
+The loop runs in four stages, and keeping them separate in your head is most of
+the battle:
+
+\begin{keys}[0.16]
+	\textbf{Read}    & Take one line of input                                            \\
+	\textbf{Expand}  & Apply the expansions of \autoref{sec:sh-anatomy}, in a fixed order \\
+	\textbf{Execute} & Split the result into words; the first is the command, the rest are its arguments \\
+	\textbf{Wait}    & Run it, collect its exit status, print the prompt again           \\
+\end{keys}
+
+\subsection*{Interactive, login, and script shells}
+
+The same binary behaves differently depending on how it was started, which is
+why a command can work when you type it and fail in a script.
+
+\begin{keys}[0.24]
+	\vocab{Interactive} & Reading from a terminal, printing a prompt. Loads \file{\textasciitilde/.bashrc} or \file{\textasciitilde/.zshrc} \\
+	\vocab{Login}       & The first shell of a session. Loads \file{\textasciitilde/.profile}, \file{\textasciitilde/.bash\_profile} or \file{\textasciitilde/.zprofile} \\
+	\vocab{Non-interactive} & Running a script. Loads almost nothing --- no aliases, often a different \texttt{PATH} \\
+\end{keys}
+
+\begin{note}
+	This is why an alias defined in \file{\textasciitilde/.bashrc} is invisible
+	inside a script, and why a script that works in your terminal can fail from
+	\texttt{cron}. \autoref{sec:sh-startup} covers which file to put what in.
+\end{note}
+
+\section{Bash, Zsh, and Which One You Are Running}\label{sec:sh-which}
+
+``The shell'' is a family, not a program:
+
+\begin{keys}[0.16]
+	\texttt{sh}   & The POSIX standard. On most Linux systems \file{/bin/sh} is really \texttt{dash}, a small fast shell with no extras \\
+	\texttt{bash} & The GNU shell; the default on most Linux distributions and the assumed target of most scripts online \\
+	\texttt{zsh}  & Bash-compatible for most purposes, with much better interactive features. The default on macOS, and the login shell on this machine \\
+	\texttt{fish} & Friendlier still, but deliberately \emph{not} POSIX-compatible: scripts written for it do not run elsewhere \\
+\end{keys}
+
+\begin{shell}
+$ echo $SHELL         # your login shell, from /etc/passwd
+/bin/zsh
+$ ps -p $$ -o comm=   # the shell you are actually in right now
+zsh
+$ zsh --version
+zsh 5.9 (x86_64-ubuntu-linux-gnu)
+\end{shell}
+
+\begin{note}
+	\texttt{\$SHELL} and ``the shell I am in'' are different questions.
+	\texttt{\$SHELL} is a setting; \texttt{\$\$} is the current process. If you run
+	\cmd{bash} from inside Zsh, \texttt{\$SHELL} still says \texttt{zsh} and it is
+	lying to you.
+\end{note}
+
+\begin{remark}[Differences that will bite you]
+	Zsh is close enough to Bash that most of this part applies unchanged, but three
+	divergences matter:
+	\begin{enumerate}[(i)]
+		\item Unquoted \texttt{\$var} is \emph{not} word-split in Zsh, so a script that
+		      accidentally relies on splitting works in Bash and breaks in Zsh --- or, more
+		      often, the reverse.
+		\item A glob that matches nothing is an error in Zsh, but is passed through
+		      literally in Bash.
+		\item Arrays are indexed from~1 in Zsh and from~0 in Bash.
+	\end{enumerate}
+	The fix is not to choose a side. It is to put \cmd{\#!/bin/bash} at the top of
+	every script (\autoref{sec:sh-shebang}) so that what runs it is never in doubt.
+\end{remark}
+
+\section{Anatomy of a Command}\label{sec:sh-anatomy}
+
+A command line is a list of \vocab{words} separated by whitespace. The first
+word names what to run; the rest are handed to it as arguments.
+
+\begin{center}
+	\ttfamily\large
+	\{command\}\quad[\{options\}]\quad[\{arguments\}]
+\end{center}
+
+\begin{keys}[0.22]
+	\texttt{-l}            & A short option: one dash, one letter                          \\
+	\texttt{-la}           & Bundled short options --- identical to \texttt{-l -a}         \\
+	\texttt{--all}         & A long option: two dashes, a whole word                        \\
+	\texttt{--color=auto}  & A long option with a value. \texttt{--color auto} usually works too \\
+	\texttt{-n 5}          & A short option with a value, as a separate word                \\
+	\texttt{-{}-}          & ``No more options'': everything after this is an argument, even if it starts with a dash \\
+\end{keys}
+
+\begin{eg}
+	To delete a file that is genuinely named \file{-rf}, \cmd{rm -rf} is a
+	catastrophe and \cmd{rm -{}- -rf} is the fix. The same trick rescues
+	\cmd{grep -{}- -v file.txt} when you are searching for a literal
+	\texttt{-v}.
+\end{eg}
+
+\subsection*{The order of expansions}
+
+Between reading and executing, the shell applies these transformations, in this
+order. The order is not trivia: it is why \cmd{echo \{1..3\}.txt} works on files
+that do not exist, and why an unquoted variable holding a \texttt{*} will glob.
+
+\begin{keys}[0.30]
+	1. Brace expansion        & \texttt{\{a,b\}} $\to$ \texttt{a b} (\autoref{sec:sh-glob})       \\
+	2. Tilde expansion        & \texttt{\textasciitilde} $\to$ your home directory                 \\
+	3. Parameter expansion    & \texttt{\$HOME} $\to$ its value                                    \\
+	4. Command substitution   & \texttt{\$(date)} $\to$ that command's output                      \\
+	5. Arithmetic expansion   & \texttt{\$((2+2))} $\to$ \texttt{4}                                \\
+	6. Word splitting         & The result is cut at spaces --- \emph{only} for unquoted expansions \\
+	7. Pathname expansion     & \texttt{*} and friends become filenames                            \\
+	8. Quote removal          & The quotes themselves are stripped before the program sees anything \\
+\end{keys}
+
+\begin{eg}
+	With \texttt{f="my file.txt"}, the line \cmd{rm \$f} expands to \texttt{\$f} at
+	step~3, is split into \emph{two} words at step~6, and deletes \file{my} and
+	\file{file.txt}. \cmd{rm "\$f"} skips step~6 entirely and deletes the one file
+	you meant. This is the most consequential pair of quotation marks in this part.
+\end{eg}
+
+\section{Quoting and Escaping}\label{sec:sh-quoting}
+
+Quoting exists to switch expansions off. There are three mechanisms and they
+differ only in how much they disable.
+
+\begin{keys}[0.24]
+	\texttt{'single'}      & Disables \emph{everything}. Every character is literal; even a backslash. The only thing you cannot put inside is another single quote \\
+	\texttt{"double"}      & Disables globbing and word splitting, but keeps \texttt{\$}, \texttt{`}, \texttt{\textbackslash} and \texttt{!} working \\
+	\texttt{\textbackslash x} & Disables whatever the next single character would have done \\
+	\texttt{\$'...'}       & ANSI-C quoting: like single quotes, but \texttt{\textbackslash n}, \texttt{\textbackslash t} become real newlines and tabs \\
+\end{keys}
+
+\begin{shell}
+$ name="Kon Yi"
+$ echo $name        # unquoted: two words, but echo joins them so this looks fine
+Kon Yi
+$ touch $name       # unquoted: creates TWO files
+$ ls
+Kon  Yi
+$ touch "$name"     # quoted: creates one
+$ ls
+Kon  Kon Yi  Yi
+\end{shell}
+
+\begin{eg}[Single versus double]
+\begin{shell}
+$ echo "today is $(date +%A)"
+today is Monday
+$ echo 'today is $(date +%A)'
+today is $(date +%A)
+\end{shell}
+	Use single quotes whenever you mean the characters themselves --- a regular
+	expression, an \cmd{awk} program, a password --- and double quotes whenever you
+	want a variable expanded but nothing else.
+\end{eg}
+
+\begin{moral}
+	Quote every variable expansion --- \texttt{"\$var"}, \texttt{"\$@"},
+	\texttt{"\$(cmd)"} --- unless you have a specific reason not to. The unquoted
+	form is not shorter; it is a different operation that happens to look the same
+	most of the time.
+\end{moral}
+
+\section{Globbing and Brace Expansion}\label{sec:sh-glob}
+
+\begin{definition}[Glob]
+	A pattern that the shell replaces with a list of matching \emph{existing}
+	filenames. Globs are not regular expressions (\autoref{sec:sh-regex}) and the
+	two use overlapping symbols to mean different things.
+\end{definition}
+
+\begin{keys}[0.20]
+	\texttt{*}        & Any run of characters, including none --- but never a leading dot \\
+	\texttt{?}        & Exactly one character                                             \\
+	\texttt{[abc]}    & One character from the set                                        \\
+	\texttt{[a-z]}    & One character from the range                                      \\
+	\texttt{[!abc]}   & One character \emph{not} in the set (\texttt{[\textasciicircum{}abc]} also works) \\
+	\texttt{**}       & Any number of directory levels, where enabled                     \\
+\end{keys}
+
+\begin{note}
+	\texttt{*} does not match a leading dot, so \cmd{rm *} leaves
+	\file{.gitignore} alone and \cmd{ls *} does not list \file{.bashrc}. This is a
+	deliberate safety feature and a frequent source of confusion. \texttt{**}
+	needs \cmd{shopt -s globstar} in Bash; it is on by default in Zsh.
+\end{note}
+
+\vocab{Brace expansion} looks similar and is completely different: it is pure
+text generation, it happens first, and it does not care whether the files exist.
+
+\begin{shell}
+$ echo {a,b,c}.txt
+a.txt b.txt c.txt
+$ echo file{1..5}
+file1 file2 file3 file4 file5
+$ echo {01..10..3}
+01 04 07 10
+$ mkdir -p project/{src,test,docs}
+$ cp config.yml{,.bak}        # expands to: cp config.yml config.yml.bak
+\end{shell}
+
+\begin{eg}
+	That last line is worth memorising. \texttt{config.yml\{,.bak\}} expands to two
+	words --- the original and the original with a suffix --- so the file is
+	backed up without typing its name twice. It generalises:
+	\cmd{mv report.tex\{,.old\}}.
+\end{eg}
+
+\begin{moral}
+	Globs are expanded by the \emph{shell}, before the program runs. So
+	\cmd{find . -name *.c} is a bug: the shell substitutes the \texttt{.c} files in
+	your current directory and \cmd{find} receives something it was never meant to
+	see. Write \cmd{find . -name '*.c'} and let \cmd{find} do its own matching.
+\end{moral}
+
+\section{Line Editing and History}\label{sec:sh-readline}
+
+The shell's input line is itself a tiny editor, and it is the same editor
+everywhere: GNU Readline, in Emacs mode by default.
+
+\begin{keys}[0.20]
+	\key{<C-a>} / \key{<C-e>} & Start / end of line                                   \\
+	\key{<C-w>}               & Delete the word before the cursor                     \\
+	\key{<C-u>} / \key{<C-k>} & Delete to start / end of line                         \\
+	\key{<C-y>}               & Paste back what you just deleted                      \\
+	\key{<C-r>}               & Search backwards through history incrementally        \\
+	\key{<C-l>}               & Clear the screen                                      \\
+	\key{<C-c>}               & Abandon this line                                     \\
+	\key{<C-d>}               & End of input --- on an empty line, log out            \\
+	\key{<M-.>}               & Insert the last argument of the previous command      \\
+\end{keys}
+
+\begin{note}
+	\key{<C-w>}, \key{<C-u>} and \key{<C-r>} also work at any password prompt and
+	inside Vim's Insert mode (\autoref{sec:vim-insert}). They are Readline
+	bindings, not shell commands, which is why they turn up everywhere.
+\end{note}
+
+History is addressable:
+
+\begin{keys}[0.20]
+	\cmd{history}     & Print the history, numbered                        \\
+	\texttt{!!}       & The previous command --- \cmd{sudo !!} is the classic \\
+	\texttt{!\$}      & The last argument of the previous command          \\
+	\texttt{!42}      & Command number 42                                  \\
+	\texttt{!grep}    & The most recent command starting with \texttt{grep} \\
+	\texttt{\textasciicircum{}old\textasciicircum{}new} & Rerun the last command with the first \texttt{old} replaced \\
+\end{keys}
+
+\begin{tryit}
+	Run \cmd{mkdir -p /tmp/demo/a/b}, then \cmd{cd !\$} --- you are now in the
+	directory you just made, without retyping the path. Then press \key{<C-r>} and
+	type \texttt{mkdir}: the search finds the earlier command, and \key{<CR>} runs
+	it again.
+\end{tryit}
+
+\begin{remark}[Vi mode]
+	\cmd{set -o vi} switches Readline to modal editing, giving you \key{<Esc>} and
+	the motions of \autoref{ch:vim-motions} on the command line; \cmd{set -o emacs}
+	switches back. Worth trying once Part~\ref{part:vim} has become reflex ---
+	though the Emacs bindings above are so widespread that most people keep both.
+\end{remark}
+
+\section{Getting Help}\label{sec:sh-help}
+
+\begin{keys}[0.24]
+	\cmd{man ls}          & The manual page for \cmd{ls}                              \\
+	\cmd{man 5 passwd}    & Section 5's \texttt{passwd} --- the \emph{file format}, not the command \\
+	\cmd{man -k compress} & Search every manual page description; also spelled \cmd{apropos} \\
+	\cmd{ls --help}       & The short version, for GNU tools                          \\
+	\cmd{help cd}         & For shell \emph{builtins}, which have no man page of their own \\
+	\cmd{type ls}         & What is this name: builtin, alias, function, or file?      \\
+	\cmd{command -v rg}   & Where would this run from? Script-friendly                 \\
+	\cmd{info coreutils}  & The full GNU manuals, where man pages are only a summary   \\
+\end{keys}
+
+Manual pages are numbered by section, and the number matters:
+
+\begin{keys}[0.16]
+	1 & User commands --- \cmd{ls}, \cmd{grep}      \\
+	2 & System calls --- \cmd{open}, \cmd{fork}     \\
+	3 & Library functions --- \cmd{printf}, \cmd{malloc} \\
+	5 & File formats --- \file{/etc/passwd}, \file{crontab} \\
+	7 & Conventions and overviews --- \cmd{man 7 glob}, \cmd{man 7 signal} \\
+	8 & Administration commands --- \cmd{mount}, \cmd{systemctl} \\
+\end{keys}
+
+\begin{eg}
+	\cmd{man 7 glob} documents the globbing rules of \autoref{sec:sh-glob} in one
+	page, and \cmd{man 7 signal} lists every signal name for
+	\autoref{sec:sh-signals}. The section-7 pages are the most under-read
+	documentation on a Unix system.
+\end{eg}
+
+\begin{note}
+	\cmd{type} is the one to reach for when a command behaves oddly. If
+	\cmd{type ls} reports \texttt{ls is an alias for ls --color=auto}, that
+	explains why the output looks different inside a pipe --- and \cmd{\textbackslash ls}
+	or \cmd{command ls} bypasses the alias.
+\end{note}
+
+\begin{moral}
+	Man pages are terse rather than difficult. Read the \textsc{synopsis}, skim
+	\textsc{description}, then jump straight to \textsc{examples} at the bottom ---
+	most GNU pages have them, and they answer the actual question about four times
+	out of five.
+\end{moral}

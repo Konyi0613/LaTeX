@@ -1,0 +1,1124 @@
+\chapter{Learning to Answer Yes/No}
+\lecture{2}{16 Sep.}{}
+
+\begin{prev}
+    \autoref{sec:components} ended with a complete frame for the learning
+    problem: an algorithm \(\mathcal{A}\) takes the data \(\mathcal{D}\) and a
+    hypothesis set \(\mathcal{H}\), and returns a final hypothesis \(g\) which we
+    hope satisfies \(g \approx f\). Nothing in that frame said what a single
+    \(h \in \mathcal{H}\) computes, nor how \(\mathcal{A}\) searches.
+\end{prev}
+
+This chapter fills that gap in the simplest interesting case, where the output
+is a yes/no answer, and gets both an \(\mathcal{H}\) and an \(\mathcal{A}\)
+out of it --- our first concrete learning model.
+
+\section{Perceptron Hypothesis Set}\label{sec:perceptron-set}
+
+\source{slides p.2--6}
+
+\subsection{The Credit Approval Problem Revisited}
+
+Put the credit approval problem of \autoref{sec:components} back into the flow,
+this time with the applicant record written out.
+
+\begin{center}
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tikzpicture}
+            \node[mlbox, minimum width=4.2cm] (f) at (0,2.25)
+                {unknown target function\\
+                 \(f\colon \mathcal{X} \to \mathcal{Y}\)\\[2pt]
+                 {\scriptsize (ideal credit approval formula)}};
+            \node[mlbox, minimum width=5.2cm] (D) at (0,0)
+                {training examples\\
+                 \(\mathcal{D}\colon (\bm{x}_1, y_1), \dots ,
+                 (\bm{x}_N, y_N)\)\\[2pt]
+                 {\scriptsize (historical records in bank)}};
+            \node[mlop, minimum width=2.4cm] (A) at (5.4,0)
+                {learning\\algorithm\\\(\mathcal{A}\)};
+            \node[mlbox, minimum width=4.4cm] (g) at (10.2,0)
+                {final hypothesis\\
+                 \(g \approx f\)\\[2pt]
+                 {\scriptsize (`learned' formula to be used)}};
+            \node[mlbox, minimum width=3.4cm] (H) at (5.4,-2.25)
+                {hypothesis set\\
+                 \(\mathcal{H}\)\\[2pt]
+                 {\scriptsize (set of candidate formulas)}};
+            \node[mlbox, minimum width=4.8cm] (tab) at (8.3,2.7)
+                {\scriptsize\textbf{Applicant Information}\\[3pt]
+                 \scriptsize
+                 \begin{tabular}{@{}lr@{}}
+                     age               & 23 years\\
+                     gender            & female\\
+                     annual salary     & NTD 1,000,000\\
+                     year in residence & 1 year\\
+                     year in job       & 0.5 year\\
+                     current debt      & 200,000\\
+                 \end{tabular}};
+            \draw[mlarrow] (f) -- (D);
+            \draw[mlarrow] (D) -- (A);
+            \draw[mlarrow] (A) -- (g);
+            \draw[mlarrow] (H) -- (A);
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{center}
+
+\begin{question}
+    What hypothesis set can we use?
+\end{question}
+
+\subsection{Features of a Customer}
+
+The bank
+holds a customer record of \(d\) numbers,
+\[
+    \bm{x} = (x_1, x_2, \dots , x_d),
+\]
+the \vocab{features} of the customer --- age, annual salary, year in job,
+current debt, and so on --- and it must answer yes or no.
+
+\begin{notation}
+    From this chapter on, an input \(\bm{x}\) is a vector of \(d\) real
+    features, written in bold. In \autoref{sec:components} the input was an
+    abstract element of \(\mathcal{X}\); giving it coordinates is exactly the
+    step that lets us write down formulas for \(h\).
+\end{notation}
+
+\subsection{The Perceptron}
+
+\begin{center}
+    \begin{tabular}{@{}lr@{}}
+        \toprule
+        age           & 23 years\\
+        annual salary & NTD 1,000,000\\
+        year in job   & 0.5 year\\
+        current debt  & 200,000\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+The simplest thing one can do with \(d\) numbers is to weigh them against each
+other. Give each feature \(x_i\) an importance \(w_i\), form a weighted
+\emph{score} \(\sum_{i=1}^d w_i x_i\), and compare it against a threshold:
+\begin{align*}
+    \text{approve credit if} \quad & \sum_{i=1}^d w_i x_i > \text{threshold};\\
+    \text{deny credit if} \quad & \sum_{i=1}^d w_i x_i < \text{threshold}.
+\end{align*}
+A positive \(w_i\) means the feature speaks in the customer's favour (annual
+salary), a negative one means it speaks against (current debt), and a large
+\(\abs{w_i}\) means the feature matters a lot.
+
+Since the answer is yes or no, take
+\[
+    \mathcal{Y} = \left\{ +1 \ (\text{good}),\ -1 \ (\text{bad}) \right\},
+\]
+and ignore the boundary case of a score exactly equal to the threshold, i.e.\
+treat \(0\) as ignored. Then the rule above is a single formula.
+
+\begin{definition}[Perceptron]\label{def:perceptron}
+    For a weight vector \(w_1, \dots , w_d\) and a threshold, the hypothesis
+    \[
+        h(\bm{x}) = \sign \left( \left( \sum_{i=1}^d w_i x_i \right)
+        - \text{threshold} \right)
+    \]
+    is called a \vocab{perceptron}, for historical reasons. The hypothesis set
+    \(\mathcal{H}\) of this chapter is the set of all such \(h\), i.e.\ one
+    \(h\) for every choice of weights and threshold.
+\end{definition}
+
+\subsection{Vector Form}
+
+The threshold is an eyesore: it is a parameter of the same kind as the weights,
+but it sits outside the sum. The standard repair is to absorb it as the weight
+of a constant feature:
+\begin{align*}
+    h(\bm{x}) &= \sign \left( \left( \sum_{i=1}^d w_i x_i \right)
+        - \text{threshold} \right)\\
+    &= \sign \left( \left( \sum_{i=1}^d w_i x_i \right)
+        + \underbrace{(-\text{threshold})}_{w_0} \cdot
+        \underbrace{(+1)}_{x_0} \right)\\
+    &= \sign \left( \sum_{i=0}^d w_i x_i \right)\\
+    &= \sign \left( \bm{w}^\top \bm{x} \right).
+\end{align*}
+
+\begin{notation}
+    From now on \(\bm{w} = (w_0, w_1, \dots , w_d)^\top\) and
+    \(\bm{x} = (x_0, x_1, \dots , x_d)^\top\) are the `tall' versions, with
+    \(x_0 \equiv 1\) always. Each tall \(\bm{w}\) \emph{is} a hypothesis \(h\),
+    so from here on we say `the hypothesis \(\bm{w}\)' and mean
+    \(h(\bm{x}) = \sign(\bm{w}^\top \bm{x})\).
+\end{notation}
+
+The gain is not only cosmetic: everything below manipulates \(\bm{w}\) as a
+vector, and a stray additive constant would have to be carried through every
+one of those manipulations.
+
+\subsection{Perceptrons in \(\mathbb{R}^2\)}
+
+\begin{question}
+    What do perceptrons \(h\) `look like'?
+\end{question}
+
+Take \(d = 2\), so that
+\[
+    h(\bm{x}) = \sign \left( w_0 + w_1 x_1 + w_2 x_2 \right).
+\]
+The set where the score vanishes, \(w_0 + w_1 x_1 + w_2 x_2 = 0\), is a line;
+\(h\) says \(+1\) on one side of it and \(-1\) on the other. So:
+
+\begin{itemize}
+    \item customer features \(\bm{x}\) are points on the plane (or points in
+        \(\mathbb{R}^d\));
+    \item labels \(y\) are drawn as \(\circ\) for \(+1\) and \(\times\) for
+        \(-1\);
+    \item a hypothesis \(h\) is a line (or a hyperplane in \(\mathbb{R}^d\)),
+        positive on one side and negative on the other;
+    \item a different line classifies the customers differently.
+\end{itemize}
+
+\begin{center}
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tikzpicture}
+            \foreach \dx/\ax/\bx in {0/1.9/2.2, 5.0/1.7/2.5}{
+                \begin{scope}[xshift=\dx cm]
+                    \fill[neghalf] (0,0) -- (\ax,0) -- (\bx,3.6) -- (0,3.6)
+                        -- cycle;
+                    \fill[poshalf] (\ax,0) -- (4,0) -- (4,3.6) -- (\bx,3.6)
+                        -- cycle;
+                    \draw[sepline] (\ax,0) -- (\bx,3.6);
+                    \draw[black!45] (0,0) rectangle (4,3.6);
+                    \foreach \p in {(0.5,0.7), (0.8,2.3), (1.3,1.2),
+                        (0.6,3.2), (1.5,2.9)}{
+                        \node[dneg] at \p {\(\times\)};}
+                    \foreach \p in {(2.6,1.0), (3.2,2.2), (2.5,3.0),
+                        (3.4,1.6), (2.9,2.6)}{
+                        \node[dpos] at \p {};}
+                \end{scope}
+            }
+            \node[font=\small] at (2,-0.5) {one hypothesis \(\bm{w}\)};
+            \node[font=\small] at (7,-0.5) {another hypothesis
+                \(\bm{w}^{\prime}\)};
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{center}
+
+\begin{moral}
+    perceptrons \(\iff\) linear (binary) classifiers.
+\end{moral}
+
+\begin{exercise}[Fun Time]
+    Consider using a perceptron to detect spam messages. Assume that each email
+    is represented by the frequency of keyword occurrence, and that an output of
+    \(+1\) indicates spam. Which keywords below should have large \emph{positive}
+    weights in a good perceptron for the task?
+    \begin{enumerate}[(1)]
+        \item coffee, tea, hamburger, steak;
+        \item free, drug, fantastic, deal;
+        \item machine, learning, statistics, textbook;
+        \item national, Taiwan, university, coursera.
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (2). The occurrence of a keyword with a positive weight increases the `spam
+    score', and hence those keywords should be the ones that often appear in
+    spam.
+\end{proof}
+
+\section{Perceptron Learning Algorithm (PLA)}\label{sec:pla}
+
+\source{slides p.7--12}
+
+Half of the learning model is still missing.
+
+\begin{question}
+    \(\mathcal{H} = \) all possible perceptrons, \(g = ?\)
+\end{question}
+
+\subsection{Selecting \texorpdfstring{\(g\)}{g} from
+\texorpdfstring{\(\mathcal{H}\)}{H}}
+
+\begin{itemize}
+    \item What we \emph{want} is \(g \approx f\). This is hard to even check,
+        because \(f\) is unknown.
+    \item What is \emph{almost necessary} is \(g \approx f\) on \(\mathcal{D}\),
+        ideally \(g(\bm{x}_n) = f(\bm{x}_n) = y_n\) for every \(n\). This we can
+        check, because \(\mathcal{D}\) is in front of us.
+    \item What makes it \emph{difficult} is that \(\mathcal{H}\) is of infinite
+        size, so we cannot look at the candidates one by one.
+    \item The \emph{idea} that resolves this: start from some \(g_0\), and
+        `correct' its mistakes on \(\mathcal{D}\).
+\end{itemize}
+
+\begin{center}
+    \begin{tikzpicture}[font=\small]
+        \fill[poshalf] (0,0.8) -- (3.4,2.8) -- (3.4,3.4) -- (0,3.4) -- cycle;
+        \fill[neghalf] (0,0.8) -- (3.4,2.8) -- (3.4,0) -- (0,0) -- cycle;
+        \draw[sepline] (0,0.8) -- (3.4,2.8);
+        \draw[black!45] (0,0) rectangle (3.4,3.4);
+        \foreach \p in {(1.0,2.4), (1.8,3.0), (2.6,3.2), (2.2,2.6),
+            (0.5,1.8)}{\node[dpos] at \p {};}
+        \foreach \p in {(0.4,0.4), (1.2,0.6), (2.0,1.2), (2.8,1.6),
+            (1.6,0.3)}{\node[dneg] at \p {\(\times\)};}
+        % a mistake: a +1 example sitting on the negative side
+        \node[dpos] at (3.0,2.0) {};
+        \draw[SeaGreen!60!black, thick] (2.78,1.78) rectangle (3.22,2.22);
+        % ... which the algorithm will try to correct by pushing the line
+        \foreach \x in {2.4,2.7,3.0}{
+            \draw[-{Stealth[length=1.4mm]}, SeaGreen!60!black]
+                ({\x},{0.8+2.0*\x/3.4}) -- ++(0.09,-0.26);}
+    \end{tikzpicture}
+\end{center}
+
+Infinitely many candidates are no obstacle if we never enumerate them, but
+instead walk from one to the next. By the previous subsection we may represent
+\(g_0\) by its weight vector \(\bm{w}_0\), so the walk happens in
+\(\mathbb{R}^{d+1}\) rather than in the abstract set \(\mathcal{H}\).
+
+\subsection{The Algorithm}
+
+\begin{algorithm}[H]
+    \caption{Perceptron Learning Algorithm (PLA)}\label{alg:pla}
+    \KwIn{training examples
+        \(\mathcal{D} = \left\{ (\bm{x}_n, y_n) \right\}_{n=1}^{N}\)}
+    \KwOut{\(\bm{w}_{\mathrm{PLA}}\), returned as \(g\)}
+    \(\bm{w}_0 \gets\) some initial vector, say \(\bm{0}\)\;
+    \For{\(t = 0, 1, 2, \dots\)}{
+        \lIf{\(\bm{w}_t\) makes no mistake on \(\mathcal{D}\)}{
+            \Return \(\bm{w}_t\) as \(\bm{w}_{\mathrm{PLA}}\)}
+        find a mistake of \(\bm{w}_t\), called \((\bm{x}_{n(t)}, y_{n(t)})\),
+        i.e.\ one with
+        \(\sign \left( \bm{w}_t^\top \bm{x}_{n(t)} \right) \neq y_{n(t)}\)\;
+        (try to) correct the mistake by
+        \(\bm{w}_{t+1} \gets \bm{w}_t + y_{n(t)} \bm{x}_{n(t)}\)\;
+    }
+\end{algorithm}
+
+That is it --- a fault confessed is half redressed. :-)
+
+The update rule looks arbitrary until one draws it. A mistake at
+\((\bm{x}, y)\) with \(y = +1\) means \(\bm{w}^\top \bm{x} < 0\), i.e.\
+\(\bm{w}\) and \(\bm{x}\) point more than \(90^\circ\) apart; adding \(\bm{x}\)
+swings \(\bm{w}\) \emph{towards} \(\bm{x}\). A mistake with \(y = -1\) means
+\(\bm{w}^\top \bm{x} > 0\); subtracting \(\bm{x}\) swings \(\bm{w}\)
+\emph{away} from \(\bm{x}\). Either way the correction is
+\(\bm{w} + y\bm{x}\).
+
+\begin{center}
+    \begin{adjustbox}{max width=0.85\textwidth}
+        \begin{tikzpicture}[font=\small]
+            % y = +1 : w and x more than 90 degrees apart
+            \begin{scope}
+                \draw[wvec] (0,0) -- (2.2,0.2) node[below right] {\(\bm{w}\)};
+                \draw[-{Stealth[length=2.2mm]}, thick]
+                    (0,0) -- (-0.5,2.2) node[above left] {\(\bm{x}\)};
+                \draw[wvec, draw=SeaGreen!60!black]
+                    (0,0) -- (1.7,2.4) node[above right]
+                    {\(\bm{w} + y\bm{x}\)};
+                \draw[dashed, black!55] (2.2,0.2) -- (1.7,2.4);
+                \draw[dashed, black!55] (-0.5,2.2) -- (1.7,2.4);
+                \node at (0.8,-1.0) {\(y = +1\): swing \(\bm{w}\) towards
+                    \(\bm{x}\)};
+            \end{scope}
+            % y = -1 : w and x less than 90 degrees apart
+            \begin{scope}[xshift=6.4cm]
+                \draw[wvec] (0,0) -- (0.3,2.2) node[above left] {\(\bm{w}\)};
+                \draw[-{Stealth[length=2.2mm]}, thick]
+                    (0,0) -- (2.2,0.6) node[below right] {\(\bm{x}\)};
+                \draw[wvec, draw=SeaGreen!60!black]
+                    (0,0) -- (-1.9,1.6) node[above left]
+                    {\(\bm{w} + y\bm{x}\)};
+                \draw[dashed, black!55] (0.3,2.2) -- (-1.9,1.6);
+                \node at (0.2,-1.0) {\(y = -1\): swing \(\bm{w}\) away from
+                    \(\bm{x}\)};
+            \end{scope}
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{center}
+
+\subsection{Practical Implementation of PLA}
+
+\autoref{alg:pla} says ``find a mistake'' without saying \emph{which} one, and a
+literal implementation would rescan \(\mathcal{D}\) from the beginning after
+every correction. Cyclic PLA removes both vaguenesses at once: fix an order on
+the examples, keep a cursor into it, and let ``the next mistake'' mean
+\emph{the next mistake the cursor runs into}, continuing from where the last
+correction happened and wrapping around at the end of the list.
+
+Written out, with \(\pi(1), \dots , \pi(N)\) the chosen order:
+
+\begin{algorithm}[H]
+    \caption{Cyclic PLA}\label{alg:cyclic-pla}
+    \KwIn{training examples
+        \(\mathcal{D} = \left\{ (\bm{x}_n, y_n) \right\}_{n=1}^{N}\)
+        and a fixed order \(\pi(1), \dots , \pi(N)\) of \(1, \dots , N\)}
+    \KwOut{\(\bm{w}_{\mathrm{PLA}}\), returned as \(g\)}
+    \(\bm{w} \gets \bm{0}\)\;
+    \(i \gets 1\) \Comment*[r]{cursor: where the next scan resumes}
+    \(c \gets 0\) \Comment*[r]{examples seen in a row with no mistake}
+    \While{\(c < N\)}{
+        \(n \gets \pi(i)\)\;
+        \eIf{\(\sign \left( \bm{w}^\top \bm{x}_n \right) \neq y_n\)}{
+            \(\bm{w} \gets \bm{w} + y_n \bm{x}_n\)
+                \Comment*[r]{a mistake: correct it}
+            \(c \gets 0\) \Comment*[r]{the clean run is broken}
+        }{
+            \(c \gets c + 1\) \Comment*[r]{this one is already right}
+        }
+        \(i \gets (i \bmod N) + 1\) \Comment*[r]{advance, wrapping around}
+    }
+    \Return \(\bm{w}\) as \(\bm{w}_{\mathrm{PLA}}\)\;
+\end{algorithm}
+
+Two points deserve spelling out.
+
+\begin{itemize}
+    \item \textbf{When does the loop end?} When \(c\) reaches \(N\), i.e.\ when
+        \(N\) examples in a row have been checked and none of them was a
+        mistake. Since the cursor moves cyclically, any \(N\) consecutive visits
+        run through every example exactly once --- so \(c = N\) says precisely
+        that a full cycle passed without encountering a mistake, which is to say
+        that the current \(\bm{w}\) is correct on all of \(\mathcal{D}\). There
+        is no need for the scan to be aligned with the start of the list.
+    \item \textbf{Why reset \(c\) to \(0\) after every correction?} Because a
+        correction changes \(\bm{w}\), and the new \(\bm{w}\) may well be wrong
+        on examples the cursor has already walked past --- exactly what happens
+        to \(\bm{x}_{15}\) in the run below. Everything checked before the
+        correction was checked against a \emph{different} hypothesis and no
+        longer counts, so the tally has to start over.
+\end{itemize}
+
+The order \(\pi\) may be the naïve cycle \(1, \dots , N\), or a precomputed
+random cycle. Note also that the loop counter here is not the \(t\) of
+\autoref{alg:pla}: this loop turns once per example \emph{examined}, whereas
+\(t\) --- and the \(T\) bounded in \autoref{thm:pla-halts} --- counts only the
+examples actually \emph{corrected}.
+
+\subsection{Seeing is Believing}
+
+Run it on a small separable data set of \(N = 20\) examples. Each frame shows
+the hypothesis \(\bm{w}_t\) that PLA currently holds --- its line, and the two
+shaded sides it calls \(+1\) (blue) and \(-1\) (red) --- together with the
+example \(\bm{x}_{n(t)}\) it still gets wrong, circled. A mistake is visible as
+a \(\circ\) sitting in the red half or a \(\times\) sitting in the blue half.
+
+Every frame is drawn with the origin \(O\) at its centre, so that all three
+vectors can be read off from there: the circled \(\bm{x}_{n(t)}\) (black), the
+current \(\bm{w}_t\) (solid, the one whose line is shaded) and the
+\(\bm{w}_{t+1}\) the correction is about to produce (dashed) --- which is the
+line drawn in the next frame. All three are at \(0.6\) of their true length so
+that they stay beside the data; the dotted continuation of \(\bm{x}_{n(t)}\)
+runs on to the example itself.
+
+\begin{center}
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tikzpicture}[font=\small]
+            \begin{scope}[xshift=0.00cm, yshift=0.00cm]
+                \path (-2.450,-2.450) rectangle (2.450,2.450);
+                \fill[poshalf] (-2.450,-2.450) -- (0.704,-2.450) -- (-1.746,2.450) -- (-2.450,2.450) -- cycle;
+                \fill[neghalf] (0.704,-2.450) -- (2.450,-2.450) -- (2.450,2.450) -- (-1.746,2.450) -- cycle;
+                \draw[sepline] (0.704,-2.450) -- (-1.746,2.450);
+                \draw[black!35, thin] (-2.450,0.000) -- (2.450,0.000);
+                \draw[black!35, thin] (0.000,-2.450) -- (0.000,2.450);
+                \draw[black!45] (-2.450,-2.450) rectangle (2.450,2.450);
+                \fill[black] (0,0) circle (1pt);
+                \foreach \p in {(-1.460,1.460), (-0.626,1.772), (-1.668,0.313), (-0.104,1.043), (-0.938,0.313), (-1.668,-0.730), (0.313,1.564), (-1.147,1.147), (0.730,1.877), (-0.417,0.626)}{\node[dneg] at \p {\(\times\)};}
+                \foreach \p in {(1.355,-0.938), (0.626,-1.564), (1.772,0.104), (0.209,-1.251), (1.564,1.147), (1.043,-0.104), (1.877,-1.355), (0.626,-0.417), (-0.417,-1.668), (1.668,1.668)}{\node[dpos] at \p {};}
+                \node[font=\scriptsize, below left, inner sep=0.5pt] at (0,0) {\(O\)};
+                \draw[SeaGreen!60!black, thick] (1.668,1.668) circle (0.19);
+                \draw[wvec] (0,0) -- (-1.251,-0.626);
+                \node[font=\scriptsize, inner sep=1pt] at (-1.039,-1.418) {\(\bm{w}_t\)};
+                \draw[densely dotted, black!45] (1.001,1.001) -- (1.668,1.668);
+                \draw[-{Stealth[length=1.8mm]}, thick, black] (0,0) -- (1.001,1.001);
+                \node[font=\scriptsize, inner sep=1pt] at (1.468,0.534) {\(\bm{x}_{20}\)};
+                \draw[densely dashed, black!55] (-1.251,-0.626) -- (-0.250,0.375);
+                \node[font=\scriptsize, inner sep=1pt] at (-1.272,0.015) {\(y\bm{x}\)};
+                \draw[wvec, densely dashed, draw=Purple!55] (0,0) -- (-0.250,0.375);
+                \node[font=\scriptsize, inner sep=1pt] at (0.061,0.686) {\(\bm{w}_{t+1}\)};
+                \node[font=\scriptsize] at (0.000,-2.650) {update 1: \(\bm{x}_{20}\) is a mistake};
+            \end{scope}
+            \begin{scope}[xshift=5.30cm, yshift=0.00cm]
+                \path (-2.450,-2.450) rectangle (2.450,2.450);
+                \fill[poshalf] (2.450,1.633) -- (2.450,2.450) -- (-2.450,2.450) -- (-2.450,-1.633) -- cycle;
+                \fill[neghalf] (-2.450,-2.450) -- (2.450,-2.450) -- (2.450,1.633) -- (-2.450,-1.633) -- cycle;
+                \draw[sepline] (2.450,1.633) -- (-2.450,-1.633);
+                \draw[black!35, thin] (-2.450,0.000) -- (2.450,0.000);
+                \draw[black!35, thin] (0.000,-2.450) -- (0.000,2.450);
+                \draw[black!45] (-2.450,-2.450) rectangle (2.450,2.450);
+                \fill[black] (0,0) circle (1pt);
+                \foreach \p in {(-1.460,1.460), (-0.626,1.772), (-1.668,0.313), (-0.104,1.043), (-0.938,0.313), (-1.668,-0.730), (0.313,1.564), (-1.147,1.147), (0.730,1.877), (-0.417,0.626)}{\node[dneg] at \p {\(\times\)};}
+                \foreach \p in {(1.355,-0.938), (0.626,-1.564), (1.772,0.104), (0.209,-1.251), (1.564,1.147), (1.043,-0.104), (1.877,-1.355), (0.626,-0.417), (-0.417,-1.668), (1.668,1.668)}{\node[dpos] at \p {};}
+                \node[font=\scriptsize, below left, inner sep=0.5pt] at (0,0) {\(O\)};
+                \draw[SeaGreen!60!black, thick] (-0.104,1.043) circle (0.19);
+                \draw[wvec] (0,0) -- (-0.250,0.375);
+                \node[font=\scriptsize, inner sep=1pt] at (-0.830,-0.205) {\(\bm{w}_t\)};
+                \draw[densely dotted, black!45] (-0.063,0.626) -- (-0.104,1.043);
+                \draw[-{Stealth[length=1.8mm]}, thick, black] (0,0) -- (-0.063,0.626);
+                \node[font=\scriptsize, inner sep=1pt] at (0.757,0.626) {\(\bm{x}_{4}\)};
+                \draw[densely dashed, black!55] (-0.250,0.375) -- (-0.188,-0.250);
+                \node[font=\scriptsize, inner sep=1pt] at (0.481,0.063) {\(y\bm{x}\)};
+                \draw[wvec, densely dashed, draw=Purple!55] (0,0) -- (-0.188,-0.250);
+                \node[font=\scriptsize, inner sep=1pt] at (-0.374,-0.946) {\(\bm{w}_{t+1}\)};
+                \node[font=\scriptsize] at (0.000,-2.650) {update 2: \(\bm{x}_{4}\) is a mistake};
+            \end{scope}
+            \begin{scope}[xshift=10.60cm, yshift=0.00cm]
+                \path (-2.450,-2.450) rectangle (2.450,2.450);
+                \fill[poshalf] (-2.450,-2.450) -- (-0.209,-2.450) -- (-2.450,-0.769) -- cycle;
+                \fill[neghalf] (-0.209,-2.450) -- (2.450,-2.450) -- (2.450,2.450) -- (-2.450,2.450) -- (-2.450,-0.769) -- cycle;
+                \draw[sepline] (-0.209,-2.450) -- (-2.450,-0.769);
+                \draw[black!35, thin] (-2.450,0.000) -- (2.450,0.000);
+                \draw[black!35, thin] (0.000,-2.450) -- (0.000,2.450);
+                \draw[black!45] (-2.450,-2.450) rectangle (2.450,2.450);
+                \fill[black] (0,0) circle (1pt);
+                \foreach \p in {(-1.460,1.460), (-0.626,1.772), (-1.668,0.313), (-0.104,1.043), (-0.938,0.313), (-1.668,-0.730), (0.313,1.564), (-1.147,1.147), (0.730,1.877), (-0.417,0.626)}{\node[dneg] at \p {\(\times\)};}
+                \foreach \p in {(1.355,-0.938), (0.626,-1.564), (1.772,0.104), (0.209,-1.251), (1.564,1.147), (1.043,-0.104), (1.877,-1.355), (0.626,-0.417), (-0.417,-1.668), (1.668,1.668)}{\node[dpos] at \p {};}
+                \node[font=\scriptsize, below left, inner sep=0.5pt] at (0,0) {\(O\)};
+                \draw[SeaGreen!60!black, thick] (1.668,1.668) circle (0.19);
+                \draw[wvec] (0,0) -- (-0.188,-0.250);
+                \node[font=\scriptsize, inner sep=1pt] at (-0.898,-0.660) {\(\bm{w}_t\)};
+                \draw[densely dotted, black!45] (1.001,1.001) -- (1.668,1.668);
+                \draw[-{Stealth[length=1.8mm]}, thick, black] (0,0) -- (1.001,1.001);
+                \node[font=\scriptsize, inner sep=1pt] at (1.468,0.534) {\(\bm{x}_{20}\)};
+                \draw[densely dashed, black!55] (-0.188,-0.250) -- (0.813,0.751);
+                \node[font=\scriptsize, inner sep=1pt] at (0.596,-0.033) {\(y\bm{x}\)};
+                \draw[wvec, densely dashed, draw=Purple!55] (0,0) -- (0.813,0.751);
+                \node[font=\scriptsize, inner sep=1pt] at (0.311,1.041) {\(\bm{w}_{t+1}\)};
+                \node[font=\scriptsize] at (0.000,-2.650) {update 3: \(\bm{x}_{20}\) is a mistake};
+            \end{scope}
+            \begin{scope}[xshift=0.00cm, yshift=-5.62cm]
+                \path (-2.450,-2.450) rectangle (2.450,2.450);
+                \fill[poshalf] (2.262,-2.450) -- (2.450,-2.450) -- (2.450,2.450) -- (-2.262,2.450) -- cycle;
+                \fill[neghalf] (-2.450,-2.450) -- (2.262,-2.450) -- (-2.262,2.450) -- (-2.450,2.450) -- cycle;
+                \draw[sepline] (2.262,-2.450) -- (-2.262,2.450);
+                \draw[black!35, thin] (-2.450,0.000) -- (2.450,0.000);
+                \draw[black!35, thin] (0.000,-2.450) -- (0.000,2.450);
+                \draw[black!45] (-2.450,-2.450) rectangle (2.450,2.450);
+                \fill[black] (0,0) circle (1pt);
+                \foreach \p in {(-1.460,1.460), (-0.626,1.772), (-1.668,0.313), (-0.104,1.043), (-0.938,0.313), (-1.668,-0.730), (0.313,1.564), (-1.147,1.147), (0.730,1.877), (-0.417,0.626)}{\node[dneg] at \p {\(\times\)};}
+                \foreach \p in {(1.355,-0.938), (0.626,-1.564), (1.772,0.104), (0.209,-1.251), (1.564,1.147), (1.043,-0.104), (1.877,-1.355), (0.626,-0.417), (-0.417,-1.668), (1.668,1.668)}{\node[dpos] at \p {};}
+                \node[font=\scriptsize, below left, inner sep=0.5pt] at (0,0) {\(O\)};
+                \draw[SeaGreen!60!black, thick] (-0.104,1.043) circle (0.19);
+                \draw[wvec] (0,0) -- (0.813,0.751);
+                \node[font=\scriptsize, inner sep=1pt] at (0.984,1.388) {\(\bm{w}_t\)};
+                \draw[densely dotted, black!45] (-0.063,0.626) -- (-0.104,1.043);
+                \draw[-{Stealth[length=1.8mm]}, thick, black] (0,0) -- (-0.063,0.626);
+                \node[font=\scriptsize, inner sep=1pt] at (-0.529,0.159) {\(\bm{x}_{4}\)};
+                \draw[densely dashed, black!55] (0.813,0.751) -- (0.876,0.125);
+                \node[font=\scriptsize, inner sep=1pt] at (1.521,0.619) {\(y\bm{x}\)};
+                \draw[wvec, densely dashed, draw=Purple!55] (0,0) -- (0.876,0.125);
+                \node[font=\scriptsize, inner sep=1pt] at (1.062,-0.570) {\(\bm{w}_{t+1}\)};
+                \node[font=\scriptsize] at (0.000,-2.650) {update 4: \(\bm{x}_{4}\) is a mistake};
+            \end{scope}
+            \begin{scope}[xshift=5.30cm, yshift=-5.62cm]
+                \path (-2.450,-2.450) rectangle (2.450,2.450);
+                \fill[poshalf] (1.095,-2.450) -- (2.450,-2.450) -- (2.450,2.450) -- (0.395,2.450) -- cycle;
+                \fill[neghalf] (-2.450,-2.450) -- (1.095,-2.450) -- (0.395,2.450) -- (-2.450,2.450) -- cycle;
+                \draw[sepline] (1.095,-2.450) -- (0.395,2.450);
+                \draw[black!35, thin] (-2.450,0.000) -- (2.450,0.000);
+                \draw[black!35, thin] (0.000,-2.450) -- (0.000,2.450);
+                \draw[black!45] (-2.450,-2.450) rectangle (2.450,2.450);
+                \fill[black] (0,0) circle (1pt);
+                \foreach \p in {(-1.460,1.460), (-0.626,1.772), (-1.668,0.313), (-0.104,1.043), (-0.938,0.313), (-1.668,-0.730), (0.313,1.564), (-1.147,1.147), (0.730,1.877), (-0.417,0.626)}{\node[dneg] at \p {\(\times\)};}
+                \foreach \p in {(1.355,-0.938), (0.626,-1.564), (1.772,0.104), (0.209,-1.251), (1.564,1.147), (1.043,-0.104), (1.877,-1.355), (0.626,-0.417), (-0.417,-1.668), (1.668,1.668)}{\node[dpos] at \p {};}
+                \node[font=\scriptsize, below left, inner sep=0.5pt] at (0,0) {\(O\)};
+                \draw[SeaGreen!60!black, thick] (0.209,-1.251) circle (0.19);
+                \draw[wvec] (0,0) -- (0.876,0.125);
+                \node[font=\scriptsize, inner sep=1pt] at (0.876,0.945) {\(\bm{w}_t\)};
+                \draw[densely dotted, black!45] (0.125,-0.751) -- (0.209,-1.251);
+                \draw[-{Stealth[length=1.8mm]}, thick, black] (0,0) -- (0.125,-0.751);
+                \node[font=\scriptsize, inner sep=1pt] at (-0.667,-0.963) {\(\bm{x}_{14}\)};
+                \draw[densely dashed, black!55] (0.876,0.125) -- (1.001,-0.626);
+                \node[font=\scriptsize, inner sep=1pt] at (1.614,-0.431) {\(y\bm{x}\)};
+                \draw[wvec, densely dashed, draw=Purple!55] (0,0) -- (1.001,-0.626);
+                \node[font=\scriptsize, inner sep=1pt] at (1.229,-1.476) {\(\bm{w}_{t+1}\)};
+                \node[font=\scriptsize] at (0.000,-2.650) {update 5: \(\bm{x}_{14}\) is a mistake};
+            \end{scope}
+            \begin{scope}[xshift=10.60cm, yshift=-5.62cm]
+                \path (-2.450,-2.450) rectangle (2.450,2.450);
+                \fill[poshalf] (-1.531,-2.450) -- (2.450,-2.450) -- (2.450,2.450) -- (1.531,2.450) -- cycle;
+                \fill[neghalf] (-2.450,-2.450) -- (-1.531,-2.450) -- (1.531,2.450) -- (-2.450,2.450) -- cycle;
+                \draw[sepline] (-1.531,-2.450) -- (1.531,2.450);
+                \draw[black!35, thin] (-2.450,0.000) -- (2.450,0.000);
+                \draw[black!35, thin] (0.000,-2.450) -- (0.000,2.450);
+                \draw[black!45] (-2.450,-2.450) rectangle (2.450,2.450);
+                \fill[black] (0,0) circle (1pt);
+                \foreach \p in {(-1.460,1.460), (-0.626,1.772), (-1.668,0.313), (-0.104,1.043), (-0.938,0.313), (-1.668,-0.730), (0.313,1.564), (-1.147,1.147), (0.730,1.877), (-0.417,0.626)}{\node[dneg] at \p {\(\times\)};}
+                \foreach \p in {(1.355,-0.938), (0.626,-1.564), (1.772,0.104), (0.209,-1.251), (1.564,1.147), (1.043,-0.104), (1.877,-1.355), (0.626,-0.417), (-0.417,-1.668), (1.668,1.668)}{\node[dpos] at \p {};}
+                \node[font=\scriptsize, below left, inner sep=0.5pt] at (0,0) {\(O\)};
+                \draw[wvec] (0,0) -- (1.001,-0.626);
+                \node[font=\scriptsize, inner sep=1pt] at (1.881,-0.626) {\(\bm{w}_{\mathrm{PLA}}\)};
+                \node[font=\scriptsize] at (0.000,-2.650) {after 5 updates: none left};
+            \end{scope}
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{center}
+
+Because the three share one scale, the dashed segment joining the two weight
+tips is the step \(y_{n(t)} \bm{x}_{n(t)}\) --- parallel to
+\(\bm{x}_{n(t)}\) and of the same drawn length --- so the update rule is
+literally the triangle that closes:
+\[
+    \bm{w}_{t+1} = \bm{w}_t + y_{n(t)} \bm{x}_{n(t)} .
+\]
+The run is started from an initial \(\bm{w}_0\) that is merely a guess --- taking
+\(\bm{w}_0 = \bm{0}\), as \autoref{alg:pla} suggests, would leave the first frame
+with no line to look at --- so already the first frame shows a genuine
+classifier, and a genuinely bad one. Each \(\bm{w}_t\) is perpendicular to its
+own line and points into the \(+1\) side, so watch it swing towards a circled
+\(\circ\) and away from a circled \(\times\). A correction made for one example
+happily breaks another: here \(\bm{x}_{20}\) has to be corrected twice, in
+updates \(1\) and \(3\), and so does \(\bm{x}_4\), in updates \(2\) and \(4\).
+After five corrections no mistake is left and the algorithm stops.
+
+It works like a charm in fewer than \(20\) lines of code. But watching it work
+once is not a guarantee, and two kinds of issue are left open.
+
+\begin{question}[Some remaining issues of PLA]
+    \textbf{Algorithmic}: does it \emph{halt}, with no mistake?
+    \begin{itemize}
+        \item naïve cyclic: ??
+        \item random cyclic: ??
+        \item other variant: ??
+    \end{itemize}
+    \textbf{Learning}: is \(g \approx f\)?
+    \begin{itemize}
+        \item on \(\mathcal{D}\), if it halts: yes, since then there is no
+            mistake;
+        \item outside \(\mathcal{D}\): ??
+        \item if not halting: ??
+    \end{itemize}
+\end{question}
+
+To be shown: if \((\dots)\), then after `enough' corrections any PLA variant
+halts.
+
+The rest of the chapter settles the first question and postpones the
+``outside \(\mathcal{D}\)'' half of the second one to \emph{Why can machines
+learn?}
+
+\begin{exercise}[Fun Time]
+    Let us try to think about why PLA may work. Let \(n = n(t)\). According to
+    the rule
+    \[
+        \sign \left( \bm{w}_t^\top \bm{x}_n \right) \neq y_n, \qquad
+        \bm{w}_{t+1} \gets \bm{w}_t + y_n \bm{x}_n,
+    \]
+    which formula is true?
+    \begin{enumerate}[(1)]
+        \item \(\bm{w}_{t+1}^\top \bm{x}_n = y_n\);
+        \item \(\sign \left( \bm{w}_{t+1}^\top \bm{x}_n \right) = y_n\);
+        \item \(y_n \bm{w}_{t+1}^\top \bm{x}_n \ge y_n \bm{w}_t^\top \bm{x}_n\);
+        \item \(y_n \bm{w}_{t+1}^\top \bm{x}_n < y_n \bm{w}_t^\top \bm{x}_n\).
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (3). Simply multiply the update rule by \(y_n \bm{x}_n\):
+    \[
+        y_n \bm{w}_{t+1}^\top \bm{x}_n
+        = y_n \bm{w}_t^\top \bm{x}_n + y_n^2 \norm{\bm{x}_n}^2
+        \ge y_n \bm{w}_t^\top \bm{x}_n,
+    \]
+    since \(y_n^2 = 1\). Note that (1) and (2) are \emph{too strong}: one
+    correction need not fix the very mistake it was made for. All we get is that
+    the quantity \(y_n \bm{w}^\top \bm{x}_n\), which is positive exactly when
+    \(\bm{x}_n\) is classified correctly, moves in the right direction. The rule
+    somewhat `tries to correct the mistake'.
+\end{proof}
+
+\section{Guarantee of PLA}\label{sec:pla-guarantee}
+
+\source{slides p.13--16}
+
+\subsection{Linear Separability}
+
+If PLA halts, then by construction there are no mistakes left, so
+\(\mathcal{D}\) must have admitted a perfect \(\bm{w}\) in the first place. That
+is a \emph{necessary} condition for halting, and it deserves a name.
+
+\begin{definition}[Linear separability]\label{def:sep}
+    A data set \(\mathcal{D}\) is \vocab{linearly separable} if there exists a
+    \(\bm{w}\) that makes no mistake on it, i.e.\
+    \(y_n = \sign(\bm{w}^\top \bm{x}_n)\) for every \(n\).
+\end{definition}
+
+\begin{center}
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tikzpicture}[font=\small]
+            % --- linearly separable
+            \begin{scope}
+                \fill[neghalf] (0,0) -- (1.5,0) -- (1.8,3.2) -- (0,3.2)
+                    -- cycle;
+                \fill[poshalf] (1.5,0) -- (3.2,0) -- (3.2,3.2) -- (1.8,3.2)
+                    -- cycle;
+                \draw[sepline] (1.5,0) -- (1.8,3.2);
+                \draw[black!45] (0,0) rectangle (3.2,3.2);
+                \foreach \p in {(0.5,2.6), (0.9,1.6), (0.4,0.8), (1.2,2.9),
+                    (0.7,2.0)}{\node[dneg] at \p {\(\times\)};}
+                \foreach \p in {(2.3,2.6), (2.7,1.5), (2.0,0.9), (2.9,2.3),
+                    (2.4,1.9)}{\node[dpos] at \p {};}
+                \node[align=center, font=\scriptsize, anchor=north]
+                    at (1.6,-0.38) {linearly separable};
+            \end{scope}
+            % --- not separable: noise
+            \begin{scope}[xshift=4.0cm]
+                \fill[poshalf] (0,3.2) -- (3.2,0) -- (3.2,3.2) -- cycle;
+                \fill[neghalf] (0,3.2) -- (3.2,0) -- (0,0) -- cycle;
+                \draw[sepline] (0,3.2) -- (3.2,0);
+                \draw[black!45] (0,0) rectangle (3.2,3.2);
+                \foreach \p in {(1.5,2.4), (2.2,2.8), (2.6,1.6), (1.9,1.9),
+                    (2.9,2.4)}{\node[dpos] at \p {};}
+                \foreach \p in {(0.5,0.9), (1.2,1.0), (0.8,1.9), (1.8,0.6),
+                    (0.4,2.0)}{\node[dneg] at \p {\(\times\)};}
+                \node[dneg] at (2.4,2.1) {\(\times\)};
+                \node[dpos] at (0.9,0.7) {};
+                \node[align=center, font=\scriptsize, anchor=north]
+                    at (1.6,-0.38) {not linearly separable\\(noise)};
+            \end{scope}
+            % --- not separable: circular
+            \begin{scope}[xshift=8.0cm]
+                \fill[neghalf] (0,0) rectangle (3.2,3.2);
+                \fill[poshalf] (1.6,1.6) circle (1.0);
+                \draw[sepline] (1.6,1.6) circle (1.0);
+                \draw[black!45] (0,0) rectangle (3.2,3.2);
+                \foreach \p in {(1.6,1.6), (1.2,1.9), (2.0,1.3), (1.5,1.1),
+                    (2.1,1.9)}{\node[dpos] at \p {};}
+                \foreach \p in {(0.4,0.5), (2.9,0.6), (0.5,2.9), (2.9,2.8),
+                    (1.6,3.0), (0.3,1.6)}{\node[dneg] at \p {\(\times\)};}
+                \node[align=center, font=\scriptsize, anchor=north]
+                    at (1.6,-0.38) {not linearly separable\\(circular)};
+            \end{scope}
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{center}
+
+The converse is the real question.
+
+\begin{question}
+    Assume a linearly separable \(\mathcal{D}\). Does PLA always halt?
+\end{question}
+
+It does, and the proof is two facts about what a single correction does.
+
+\subsection{Two Facts}
+
+\subsubsection*{Fact 1: \texorpdfstring{\(\bm{w}_t\)}{w\_t} gets more aligned
+with \texorpdfstring{\(\bm{w}_f\)}{w\_f}}
+
+Restating \autoref{def:sep} gives the premise the whole argument runs on:
+\[
+    \mathcal{D} \text{ linearly separable}
+    \iff
+    \text{exists perfect } \bm{w}_f \text{ such that }
+    y_n = \sign \left( \bm{w}_f^\top \bm{x}_n \right) .
+\]
+Fix such a \(\bm{w}_f\). Being \vocab{perfect} buys more than ``no mistakes'':
+every example is not merely on the correct side of \(\bm{w}_f\)'s line but
+strictly \emph{away} from it, so the worst example over the whole (finite) data
+set still has room to spare:
+\[
+    y_{n(t)} \bm{w}_f^\top \bm{x}_{n(t)}
+    \ge \min_n y_n \bm{w}_f^\top \bm{x}_n > 0 .
+\]
+That strictly positive number is the entire engine of the proof, because it is
+paid out afresh at every single correction.
+
+\begin{lemma}[\(\bm{w}_f^\top \bm{w}_t\) goes up]\label{lem:align}
+    Updating with any mistake \((\bm{x}_{n(t)}, y_{n(t)})\) gives
+    \[
+        \bm{w}_f^\top \bm{w}_{t+1}
+        \ge \bm{w}_f^\top \bm{w}_t + \min_n y_n \bm{w}_f^\top \bm{x}_n
+        > \bm{w}_f^\top \bm{w}_t .
+    \]
+\end{lemma}
+
+\begin{proof}
+    Expand the update and apply the displayed bound above:
+    \begin{align*}
+        \bm{w}_f^\top \bm{w}_{t+1}
+        &= \bm{w}_f^\top \left( \bm{w}_t + y_{n(t)} \bm{x}_{n(t)} \right)\\
+        &\ge \bm{w}_f^\top \bm{w}_t + \min_n y_n \bm{w}_f^\top \bm{x}_n\\
+        &> \bm{w}_f^\top \bm{w}_t + 0 . \qedhere
+    \end{align*}
+\end{proof}
+
+So \(\bm{w}_t\) \emph{appears} more aligned with \(\bm{w}_f\) after an update
+--- really? Not yet. An inner product can grow for two quite different reasons:
+because the angle between the two vectors shrank, which is what we want, or
+merely because \(\bm{w}_t\) got longer, which would mean nothing at all.
+\autoref{lem:align} on its own cannot tell these apart. The second fact closes
+exactly that hole.
+
+\subsubsection*{Fact 2: \texorpdfstring{\(\bm{w}_t\)}{w\_t} does not grow too
+fast}
+
+Here the premise is the other half of how PLA is built --- it touches
+\(\bm{w}_t\) \emph{only} when there is a mistake to fix, and a mistake is
+precisely a negative agreement:
+\[
+    \bm{w}_t \text{ changed only when mistake}
+    \iff \sign \left( \bm{w}_t^\top \bm{x}_{n(t)} \right) \neq y_{n(t)}
+    \iff y_{n(t)} \bm{w}_t^\top \bm{x}_{n(t)} \le 0 .
+\]
+
+\begin{lemma}[\(\norm{\bm{w}_t}^2\) is limited]\label{lem:norm}
+    A mistake `limits' the growth of \(\norm{\bm{w}_t}^2\), even when the update
+    uses the `longest' \(\bm{x}_n\):
+    \[
+        \norm{\bm{w}_{t+1}}^2
+        \le \norm{\bm{w}_t}^2 + \max_n \norm{y_n \bm{x}_n}^2 .
+    \]
+\end{lemma}
+
+\begin{proof}
+    The cross term is the one to watch, and the characterisation of a mistake
+    above says it is never positive:
+    \begin{align*}
+        \norm{\bm{w}_{t+1}}^2
+        &= \norm{\bm{w}_t + y_{n(t)} \bm{x}_{n(t)}}^2\\
+        &= \norm{\bm{w}_t}^2 + 2 y_{n(t)} \bm{w}_t^\top \bm{x}_{n(t)}
+            + \norm{y_{n(t)} \bm{x}_{n(t)}}^2\\
+        &\le \norm{\bm{w}_t}^2 + 0 + \norm{y_{n(t)} \bm{x}_{n(t)}}^2\\
+        &\le \norm{\bm{w}_t}^2 + \max_n \norm{y_n \bm{x}_n}^2 . \qedhere
+    \end{align*}
+\end{proof}
+
+\begin{intuition}
+    Updating only on a mistake is what makes the algorithm work. A mistake means
+    \(\bm{w}_t\) and \(y_{n(t)} \bm{x}_{n(t)}\) disagree, so the correction is
+    never a step in the direction \(\bm{w}_t\) already points: it turns
+    \(\bm{w}_t\) rather than stretching it.
+\end{intuition}
+
+Now put the two together. Each fact describes a \emph{single} correction, so
+apply each of them once per correction and let the bounds telescope. Start PLA
+from \(\bm{w}_0 = \bm{0}\) and suppose it has made \(T\) corrections.
+
+Chaining \autoref{lem:align} through \(t = 0, 1, \dots , T-1\) adds the same
+positive amount \(T\) times over:
+\[
+    \bm{w}_f^\top \bm{w}_T
+    \ge \underbrace{\bm{w}_f^\top \bm{w}_0}_{=\, 0}
+        + T \min_n y_n \bm{w}_f^\top \bm{x}_n
+    = T \min_n y_n \bm{w}_f^\top \bm{x}_n ,
+\]
+so the inner product grows at least \emph{linearly} in \(T\). Chaining
+\autoref{lem:norm} the same way,
+\[
+    \norm{\bm{w}_T}^2
+    \le \underbrace{\norm{\bm{w}_0}^2}_{=\, 0}
+        + T \max_n \norm{y_n \bm{x}_n}^2
+    = T \max_n \norm{\bm{x}_n}^2 ,
+\]
+where \(\norm{y_n \bm{x}_n} = \norm{\bm{x}_n}\) because \(\abs{y_n} = 1\). So
+the \emph{squared} length grows at most linearly, which means \(\norm{\bm{w}_T}\)
+itself grows at most like \(\sqrt{T}\).
+
+Dividing the first by the second is what finally answers the `(really?)'. The
+quantity
+\[
+    \frac{\bm{w}_f^\top}{\norm{\bm{w}_f}} \frac{\bm{w}_T}{\norm{\bm{w}_T}}
+\]
+is an inner product of two \emph{unit} vectors, i.e.\ the cosine of the angle
+between \(\bm{w}_f\) and \(\bm{w}_T\); dividing by \(\norm{\bm{w}_T}\) has
+removed precisely the loophole that made \autoref{lem:align} inconclusive, so if
+this grows, the angle really does shrink. Feeding in the two displays --- the
+numerator is bounded below, the denominator above --- gives
+\[
+    \frac{\bm{w}_f^\top \bm{w}_T}{\norm{\bm{w}_f} \norm{\bm{w}_T}}
+    \ge \frac{T \min_n y_n \bm{w}_f^\top \bm{x}_n}
+             {\norm{\bm{w}_f} \sqrt{T \max_n \norm{\bm{x}_n}^2}}
+    = \sqrt{T} \cdot \text{constant} ,
+\]
+the constant being built from \(\bm{w}_f\) and the data alone: every appearance
+of \(T\) has collected into the \(T / \sqrt{T} = \sqrt{T}\) out front.
+
+That is already the whole theorem. The left-hand side is a cosine and so never
+exceeds \(1\), while the right-hand side grows without bound as \(T\) does; the
+two can hold together only for finitely many \(T\). PLA therefore corrects only
+finitely many mistakes --- it halts. All that is left is to name the constant,
+which is what the next exercise does.
+
+\begin{exercise}[Fun Time]
+    Let us upper-bound \(T\), the number of mistakes that PLA `corrects'.
+    Define
+    \[
+        R^2 = \max_n \norm{\bm{x}_n}^2, \qquad
+        \rho = \min_n y_n \frac{\bm{w}_f^\top}{\norm{\bm{w}_f}} \bm{x}_n .
+    \]
+    We want to show \(T \le \square\). Express the upper bound \(\square\) by the
+    two terms above.
+    \begin{enumerate}[(1)]
+        \item \(R/\rho\);
+        \item \(R^2/\rho^2\);
+        \item \(R/\rho^2\);
+        \item \(\rho^2/R^2\).
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (2), and the calculation is exactly \autoref{thm:pla-halts} below: naming
+    the two quantities turns the anonymous constant of the previous page into
+    \(\rho/R\), and a cosine's ceiling of \(1\) then caps \(T\) at
+    \(1/(\rho/R)^2 = R^2/\rho^2\).
+\end{proof}
+
+\subsection{The Guarantee}
+
+\begin{theorem}[PLA halts]\label{thm:pla-halts}
+    Let \(\mathcal{D}\) be linearly separable, let \(\bm{w}_f\) be a perfect
+    weight vector for it, and put
+    \[
+        R^2 = \max_n \norm{\bm{x}_n}^2, \qquad
+        \rho = \min_n y_n \frac{\bm{w}_f^\top}{\norm{\bm{w}_f}} \bm{x}_n > 0 .
+    \]
+    Then PLA started from \(\bm{w}_0 = \bm{0}\) makes at most
+    \[
+        T \le \frac{R^2}{\rho^2}
+    \]
+    corrections, and in particular it halts.
+\end{theorem}
+
+\begin{proof}
+    Everything has been derived already; naming \(R\) and \(\rho\) is all that
+    is left. Note first that \(\rho > 0\): it is \(\min_n y_n
+    \bm{w}_f^\top \bm{x}_n / \norm{\bm{w}_f}\), and that minimum was shown
+    strictly positive in Fact~1 because \(\bm{w}_f\) is perfect. With this
+    notation the two chained bounds read
+    \[
+        \bm{w}_f^\top \bm{w}_T \ge T \min_n y_n \bm{w}_f^\top \bm{x}_n
+        = T \rho \norm{\bm{w}_f} ,
+        \qquad
+        \norm{\bm{w}_T}^2 \le T \max_n \norm{\bm{x}_n}^2 = T R^2 ,
+    \]
+    so that
+    \[
+        \frac{\bm{w}_f^\top \bm{w}_T}{\norm{\bm{w}_f} \norm{\bm{w}_T}}
+        \ge \frac{T \rho \norm{\bm{w}_f}}{\norm{\bm{w}_f} \sqrt{T R^2}}
+        = \sqrt{T} \cdot \frac{\rho}{R} .
+    \]
+    The anonymous constant was therefore \(\rho/R\) all along. By
+    \autoref{rmk:cauchy} the left-hand side is at most \(1\), so
+    \(\sqrt{T} \rho / R \le 1\), i.e.\ \(T \le R^2 / \rho^2\). Since the
+    right-hand side is a finite number fixed by \(\mathcal{D}\) and
+    \(\bm{w}_f\), PLA cannot correct mistakes forever.
+\end{proof}
+
+\begin{remark}[Is it really a cosine in \(\mathbb{R}^{d+1}\)?]\label{rmk:cauchy}
+    We have been calling
+    \(\bm{w}_f^\top \bm{w}_T / (\norm{\bm{w}_f} \norm{\bm{w}_T}\)) a cosine,
+    which is obvious for \(d = 2\) but deserves a word once \(\bm{w}\) lives in
+    \(\mathbb{R}^{d+1}\) for large \(d\). It is still a cosine, for two
+    reasons, and the proof needs only the weaker of them.
+    \begin{itemize}
+        \item \textbf{What the proof actually uses} is only that the quantity
+            never exceeds \(1\), and that is the Cauchy--Schwarz inequality
+            \(\abs{\bm{u}^\top \bm{v}} \le \norm{\bm{u}} \norm{\bm{v}}\), valid
+            in \(\mathbb{R}^m\) for every \(m\). No geometry is required.
+        \item \textbf{Geometrically} it is a cosine in the ordinary sense too.
+            Two vectors always span a subspace of dimension at most \(2\); inside
+            that plane they make an ordinary angle, and
+            \(\bm{u}^\top \bm{v} / (\norm{\bm{u}} \norm{\bm{v}})\) is its cosine.
+            Indeed this is how the angle between two vectors is \emph{defined}
+            in any dimension --- Cauchy--Schwarz is exactly the statement that
+            makes the definition legitimate, by putting the ratio in
+            \([-1, 1]\) so that an \(\arccos\) exists.
+    \end{itemize}
+    So the picture of \(\bm{w}_t\) slowly rotating towards \(\bm{w}_f\) survives
+    intact in any number of dimensions.
+\end{remark}
+
+\begin{remark}
+    Both constants have a geometric reading, and the bound is more memorable
+    through it. \(R\) is the radius of the data: the distance from the origin to
+    the farthest example. And since \(\bm{w}_f / \norm{\bm{w}_f}\) is a unit
+    normal of the perfect separating hyperplane, \(\rho\) is the smallest signed
+    distance from an example to that hyperplane --- the \emph{margin}. So
+    \[
+        T \le \left( \frac{\text{radius of the data}}{\text{margin}} \right)^2 :
+    \]
+    the more comfortably the data separates, the sooner PLA is done. This
+    quantity returns as the central object of the chapter on support vector
+    machines, which does not merely tolerate a large margin but goes looking for
+    one.
+\end{remark}
+
+\section{Non-Separable Data}\label{sec:nonsep}
+
+\source{slides p.17--22}
+
+\subsection{What We Have and What We Lack}
+
+\begin{itemize}
+    \item \textbf{Guarantee}: as long as \(\mathcal{D}\) is linearly separable
+        and we correct by mistake, the inner product of \(\bm{w}_f\) and
+        \(\bm{w}_t\) grows fast while the length of \(\bm{w}_t\) grows slowly;
+        the PLA lines get more and more aligned with \(\bm{w}_f\), so PLA halts.
+    \item \textbf{Pros}: simple to implement, fast, and works in any dimension
+        \(d\).
+    \item \textbf{Cons}: it \emph{assumes} a linearly separable \(\mathcal{D}\)
+        in order to halt --- and that property is unknown in advance, with the
+        circularity that if we already knew \(\bm{w}_f\) we would not need PLA
+        at all. Moreover we are not fully sure how long halting takes, since
+        \(\rho\) depends on the unknown \(\bm{w}_f\), though in practice it is
+        fast.
+\end{itemize}
+
+\begin{question}
+    What if \(\mathcal{D}\) is not linearly separable?
+\end{question}
+
+In practice the usual reason is not that the truth is curved, but that the data is \vocab{noisy}: the
+recorded \(y_n\) is sometimes simply wrong, or two customers with identical
+records behaved differently. The learning flow gains one term.
+
+\begin{center}
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tikzpicture}
+            \node[mlbox, minimum width=4.2cm] (f) at (0,2.25)
+                {unknown target function\\
+                 \(f\colon \mathcal{X} \to \mathcal{Y}\)
+                 \textcolor{WildStrawberry}{\(+\) noise}\\[2pt]
+                 {\scriptsize (ideal credit approval formula)}};
+            \node[mlbox, minimum width=5.2cm] (D) at (0,0)
+                {training examples\\
+                 \(\mathcal{D}\colon (\bm{x}_1, y_1), \dots ,
+                 (\bm{x}_N, y_N)\)\\[2pt]
+                 {\scriptsize (historical records in bank)}};
+            \node[mlop, minimum width=2.4cm] (A) at (5.4,0)
+                {learning\\algorithm\\\(\mathcal{A}\)};
+            \node[mlbox, minimum width=4.4cm] (g) at (10.2,0)
+                {final hypothesis\\
+                 \(g \approx f\)\\[2pt]
+                 {\scriptsize (`learned' formula to be used)}};
+            \node[mlbox, minimum width=3.4cm] (H) at (5.4,-2.25)
+                {hypothesis set\\
+                 \(\mathcal{H}\)\\[2pt]
+                 {\scriptsize (set of candidate formulas)}};
+            \draw[mlarrow] (f) -- (D);
+            \draw[mlarrow] (D) -- (A);
+            \draw[mlarrow] (A) -- (g);
+            \draw[mlarrow] (H) -- (A);
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{center}
+
+\begin{question}
+    How can we at least get \(g \approx f\) on a noisy \(\mathcal{D}\)?
+\end{question}
+
+\subsection{A Line with Noise Tolerance}
+
+\begin{center}
+    \begin{tikzpicture}[font=\small]
+        \fill[poshalf] (0,3.4) -- (3.4,0) -- (3.4,3.4) -- cycle;
+        \fill[neghalf] (0,3.4) -- (3.4,0) -- (0,0) -- cycle;
+        \draw[sepline] (0,3.4) -- (3.4,0);
+        \draw[black!45] (0,0) rectangle (3.4,3.4);
+        \foreach \p in {(1.6,2.6), (2.3,3.0), (2.8,1.7), (2.0,2.0),
+            (3.1,2.6), (2.5,2.4)}{\node[dpos] at \p {};}
+        \foreach \p in {(0.5,0.9), (1.3,1.0), (0.8,2.0), (1.9,0.6),
+            (0.4,2.1), (1.1,0.4)}{\node[dneg] at \p {\(\times\)};}
+        % the handful of examples the best line still gets wrong
+        \foreach \p in {(2.6,2.0), (1.8,2.4)}{\node[dneg] at \p {\(\times\)};}
+        \foreach \p in {(0.9,0.7), (1.5,1.3)}{\node[dpos] at \p {};}
+    \end{tikzpicture}
+\end{center}
+
+If the noise is `little', then \(y_n = f(\bm{x}_n)\) \emph{usually}, and
+therefore \(g \approx f\) on \(\mathcal{D}\) means \(y_n = g(\bm{x}_n)\)
+\emph{usually}. That suggests giving up on perfection and asking for the fewest
+mistakes instead:
+\[
+    \bm{w}_g \gets \argmin_{\bm{w}} \sum_{n=1}^{N}
+    \big\llbracket\, y_n \neq \sign \left( \bm{w}^\top \bm{x}_n \right)
+    \,\big\rrbracket .
+\]
+
+\begin{remark}
+    This is exactly the right thing to ask for and, unfortunately, NP-hard to
+    solve. The obstruction is the Iverson bracket: the objective counts, so it
+    is piecewise constant, and there is no slope anywhere to follow downhill.
+    Much of \emph{How can machines learn?} is about replacing this count with a
+    smoother surrogate; here we take the cheaper route instead and modify the
+    algorithm rather than the objective.
+\end{remark}
+
+\subsection{The Pocket Algorithm}
+
+\begin{question}
+    Can we modify PLA to get an `approximately good' \(g\)?
+\end{question}
+
+The fix is almost embarrassingly simple. PLA already wanders among candidate
+lines; it just has no memory, and on non-separable data it wanders forever. So
+give it a pocket: keep the best line seen so far, and keep wandering.
+
+\begin{algorithm}[H]
+    \caption{Pocket Algorithm}\label{alg:pocket}
+    \KwIn{training examples \(\mathcal{D}\), an iteration budget}
+    \KwOut{\(\hat{\bm{w}}\), called \(\bm{w}_{\mathrm{POCKET}}\) and returned as
+        \(g\)}
+    initialize the pocket weights \(\hat{\bm{w}}\)\;
+    \For{\(t = 0, 1, \dots\) until enough iterations}{
+        find a (random) mistake of \(\bm{w}_t\), called
+        \((\bm{x}_{n(t)}, y_{n(t)})\)\;
+        (try to) correct the mistake by
+        \(\bm{w}_{t+1} \gets \bm{w}_t + y_{n(t)} \bm{x}_{n(t)}\)\;
+        \lIf{\(\bm{w}_{t+1}\) makes fewer mistakes on \(\mathcal{D}\) than
+            \(\hat{\bm{w}}\)}{\(\hat{\bm{w}} \gets \bm{w}_{t+1}\)}
+    }
+    \Return \(\hat{\bm{w}}\) as \(g\)\;
+\end{algorithm}
+
+Note what changed and what did not. The update rule is untouched --- the black
+lines of PLA are still there --- and the only additions are the pocket and the
+iteration budget, which is now needed because there is no ``no more mistakes''
+to stop on.
+
+\begin{moral}
+    A simple modification of PLA to find (somewhat) `best' weights.
+\end{moral}
+
+\begin{exercise}[Fun Time]
+    Should we use pocket or PLA? Since we do not know whether \(\mathcal{D}\) is
+    linearly separable in advance, we may decide to just go with pocket instead
+    of PLA. If \(\mathcal{D}\) is actually linearly separable, what is the
+    difference between the two?
+    \begin{enumerate}[(1)]
+        \item pocket on \(\mathcal{D}\) is slower than PLA;
+        \item pocket on \(\mathcal{D}\) is faster than PLA;
+        \item pocket on \(\mathcal{D}\) returns a better \(g\) in approximating
+            \(f\) than PLA;
+        \item pocket on \(\mathcal{D}\) returns a worse \(g\) in approximating
+            \(f\) than PLA.
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (1). Because pocket needs to check whether \(\bm{w}_{t+1}\) is better than
+    \(\hat{\bm{w}}\) in each iteration --- a full pass over \(\mathcal{D}\) ---
+    it is slower than PLA. On a linearly separable \(\mathcal{D}\),
+    \(\bm{w}_{\mathrm{POCKET}}\) ends up the same as \(\bm{w}_{\mathrm{PLA}}\),
+    both making no mistakes; so the price of not knowing in advance is time, not
+    quality.
+\end{proof}
+
+\hrulebar
+
+\subsection*{Summary}
+
+\begin{description}
+    \item[Perceptron Hypothesis Set] hyperplanes / linear classifiers in
+        \(\mathbb{R}^d\).
+    \item[Perceptron Learning Algorithm (PLA)] correct mistakes and improve
+        iteratively.
+    \item[Guarantee of PLA] no mistake eventually, if linearly separable.
+    \item[Non-Separable Data] hold somewhat `best' weights in a pocket.
+\end{description}
+
+We now own one complete learning model, \(\mathcal{H}\) and \(\mathcal{A}\)
+both. It answers a \emph{yes/no} question, from a vector of \emph{real}
+features, given \emph{labelled} examples handed over \emph{all at once}. Every
+one of those emphasised choices can be varied, and the next chapter takes stock
+of the resulting zoo of learning problems.

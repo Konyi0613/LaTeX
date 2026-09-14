@@ -1,0 +1,437 @@
+\chapter{Reading Vim Keystrokes}\label{ch:vim-notation}
+
+Vim's manual, every tutorial, every plugin README and every answer you will
+ever read online describe commands in a compact notation --- \texttt{dw},
+\texttt{ci"}, \texttt{<C-w>v}, \texttt{"a3dd}, \texttt{:\%s/old/new/gc} --- and
+almost none of them explain it. That notation is not decoration. It is a
+precise description of what your fingers do, and once you can read it, most of
+Vim's documentation becomes usable without a tutorial in between.
+
+This chapter contains no commands worth memorising. It is the key to the
+rest of Part~\ref{part:vim}, and it is short. Read it once now, and come back to
+\autoref{sec:vim-legend} whenever a line of this note looks like line noise.
+
+\section{Sequences, Not Chords}\label{sec:vim-sequences}
+
+The single most important thing to understand: \vocab{Vim commands are
+	sequences of keypresses, not simultaneous chords.}
+
+In a conventional editor, ``delete line'' might be \key{<C-S-k>} --- hold
+Control, hold Shift, tap \texttt{k}, release. In Vim it is \key{d} \key{d}:
+press \texttt{d}, release it, press \texttt{d} again. Nothing is held down.
+
+\begin{notation}
+	When this note prints two or more keycaps side by side, like \key{d} \key{w}
+	or \key{g} \key{U} \key{i} \key{w}, it means \emph{press them one after
+		another, in that order}. The gaps between keycaps are there for legibility;
+	they do not mean pause.
+\end{notation}
+
+\begin{remark}[Does timing matter?]
+	For built-in commands, no --- Vim will wait indefinitely between \key{d} and
+	its motion. For \emph{user-defined mappings} it can: if \key{j} \key{k} is
+	mapped to \key{<Esc>}, then after you press \key{j} Vim waits
+	\cmd{'timeoutlen'} milliseconds (1000 by default) to see whether a \key{k} is
+	coming. That delay is the only place typing speed changes the meaning of a
+	sequence. See \cmd{:help 'timeout'}.
+\end{remark}
+
+\section{Keycaps, Literal Characters and Case}\label{sec:vim-keycaps}
+
+A keycap in this note shows the \emph{character you must produce}, not the
+physical key you press. \key{\$} means ``produce a dollar sign'', which on a US
+layout is Shift held with \texttt{4}; we never write that as \key{<S-4>},
+because Vim does not think of it that way and neither should you.
+
+\begin{moral}
+	Case is significant, always. \key{d} and \key{D} are different commands, not
+	the same command shouted.
+\end{moral}
+
+The relationship between a lowercase command and its uppercase partner is not
+random. Two patterns cover most of them:
+
+\begin{keys}[0.30]
+	\emph{``to the end of the line''} & \key{D} $=$ \key{d} \key{\$}, \key{C} $=$ \key{c} \key{\$}, \key{Y} $=$ \key{y} \key{\$} in Neovim \\
+	\emph{``the bigger version''}     & \key{w} moves a word, \key{W} a whitespace-delimited WORD; \key{f} searches forward, \key{F} backward; \key{p} pastes after, \key{P} before \\
+\end{keys}
+
+Digits are a special case. In Normal mode \key{1} through \key{9} are never
+commands --- they begin a \vocab{count} (\autoref{sec:vim-shape}). \key{0} is the
+exception: on its own it is the motion ``go to column zero'', but typed after
+another digit it is just part of the number, which is why \key{1} \key{0}
+\key{j} means ``down ten lines'' and not ``down one line, then column zero''.
+
+The punctuation keys used throughout Part~\ref{part:vim}, with the character
+they stand for:
+
+\begin{keys}[0.30]
+	\key{\$} \key{\textasciicircum{}} \key{\%} \key{\&} \key{*} & Produced with Shift on a US layout                       \\
+	\key{\{} \key{\}} \key{[} \key{]} \key{(} \key{)}           & Braces, brackets, parentheses --- always distinguished    \\
+	\key{;} \key{,} \key{.} \key{:}                             & Semicolon, comma, period, colon --- four different commands \\
+	\key{`} and \key{'}                                         & Backtick and apostrophe --- also two different commands   \\
+	\key{"}                                                     & One double-quote character, the register prefix          \\
+\end{keys}
+
+\begin{note}
+	\key{;} and \key{:} are a common beginner trap, as are \key{`} and \key{'}.
+	If a command ``does nothing'', check which of the pair you actually typed.
+\end{note}
+
+\section{Modifier Notation: \texorpdfstring{\texttt{<C-x>}, \texttt{<S-x>}, \texttt{<M-x>}}{Control, Shift, Meta}}\label{sec:vim-modifiers}
+
+Modifiers \emph{are} chords, and they are the only chords Vim uses. Vim writes
+them inside angle brackets, and so does this note --- because that spelling is
+also exactly what you type into a mapping.
+
+\begin{keys}[0.22]
+	\key{<C-x>} & Hold \textbf{Control}, press \texttt{x}. Sometimes written \texttt{CTRL-X} in the manual. \\
+	\key{<S-x>} & Hold \textbf{Shift}, press \texttt{x} --- i.e.\ \texttt{X}                                \\
+	\key{<M-x>} & Hold \textbf{Meta} / \textbf{Alt}. \key{<A-x>} is a synonym                               \\
+	\key{<D-x>} & Hold \textbf{Command}. macOS GUI builds only                                              \\
+	\key{<C-S-x>} & Control \emph{and} Shift together                                                       \\
+\end{keys}
+
+\begin{note}[Case inside a modifier]
+	\key{<C-a>} and \key{<C-A>} are the \emph{same} key. Control strips the case
+	bit, so a terminal cannot tell them apart, and Vim treats both spellings as
+	\texttt{CTRL-A}. \key{<C-S-a>} is genuinely different --- but most terminal
+	emulators cannot transmit it at all, which is why you rarely see it in
+	configurations meant to be portable.
+\end{note}
+
+\begin{remark}[Why some Control keys are secretly other keys]
+	This is inherited from ASCII, not invented by Vim. Control-plus-letter
+	produces the control code at that letter's position in the alphabet, and four
+	of those codes already have names:
+	\begin{keys}[0.22]
+		\key{<C-i>} & \emph{is} \key{<Tab>}    \\
+		\key{<C-m>} & \emph{is} \key{<CR>}     \\
+		\key{<C-[>} & \emph{is} \key{<Esc>}    \\
+		\key{<C-h>} & \emph{is} \key{<BS>}     \\
+	\end{keys}
+	They are indistinguishable at the terminal, so remapping one remaps the other.
+	This is why \key{<C-i>} (jump forward) cannot be given a new meaning without
+	breaking \key{<Tab>}, and it is a question that comes up constantly on
+	mailing lists. Neovim in a modern terminal can sometimes separate them; see
+	\cmd{:help tui-modifyOtherKeys}.
+\end{remark}
+
+\section{Named Keys and Their Aliases}\label{sec:vim-namedkeys}
+
+Keys with no printable character get a name in angle brackets. Vim accepts
+several spellings for some of them; this note picks one and uses it
+everywhere.
+
+\begin{keys}[0.22]
+	\key{<Esc>}   & Escape. Also \key{<C-[>}                                     \\
+	\key{<CR>}    & Enter / Return. Also spelled \texttt{<Enter>}, \texttt{<Return>}, \texttt{<NL>} \\
+	\key{<Tab>}   & Tab. Also \key{<C-i>}                                        \\
+	\key{<BS>}    & Backspace. Also \key{<C-h>}                                  \\
+	\key{<Space>} & The space bar                                                \\
+	\key{<Del>}   & Forward delete                                               \\
+	\key{<Up>} \key{<Down>} \key{<Left>} \key{<Right>} & Arrow keys              \\
+	\key{<Home>} \key{<End>} \key{<PageUp>} \key{<PageDown>} & As labelled       \\
+	\key{<F1>}--\key{<F12>} & Function keys                                      \\
+	\key{<lt>}    & A literal \texttt{<}, needed when \texttt{<} would otherwise open a key name \\
+	\key{<Bar>}   & A literal \texttt{|}, needed where \texttt{|} separates commands \\
+	\key{<Nop>}   & ``Do nothing'' --- the target for disabling a key            \\
+\end{keys}
+
+\begin{eg}
+	To make \key{<Space>} do nothing before using it as a leader, a configuration
+	writes \cmd{vim.keymap.set("n", "<Space>", "<Nop>")}. The angle-bracket names
+	are literal strings there --- you type the characters
+	\texttt{<}, \texttt{S}, \texttt{p}, \texttt{a}, \texttt{c}, \texttt{e},
+	\texttt{>}, not the space bar.
+\end{eg}
+
+\begin{moral}
+	Angle brackets have two jobs, and context tells them apart: inside a mapping
+	or a config file they are \emph{literal text} describing a key; in this note's
+	keycaps they are a \emph{picture} of the key you press.
+\end{moral}
+
+\section{\texorpdfstring{\texttt{<leader>} and \texttt{<localleader>}}{leader and localleader}}\label{sec:vim-leader}
+
+\begin{definition}[Leader]
+	\key{<leader>} is not a key. It is a placeholder for whatever key the variable
+	\cmd{mapleader} currently holds, expanded when a mapping is \emph{defined}.
+	Its purpose is to give you a private prefix that no built-in command uses, so
+	your own mappings cannot collide with Vim's.
+\end{definition}
+
+Vim's factory default is \key{\textbackslash}. Essentially every modern
+configuration --- LazyVim included --- changes it to \key{<Space>}, on the
+grounds that it is the largest, most easily reached key on the board and does
+nothing useful in Normal mode.
+
+\key{<localleader>} is the same idea for mappings that only make sense in one
+kind of file: \LaTeX{} commands in a \texttt{.tex} buffer, test-running commands
+in a \texttt{.py} buffer. It stays at \key{\textbackslash} in most setups,
+including this machine's (\autoref{ch:vim-setup}).
+
+\begin{keys}[0.30]
+	\cmd{:echo mapleader}        & What is my leader? (errors if never set)       \\
+	\cmd{:echo maplocalleader}   & Likewise for the local leader                  \\
+	\cmd{:verbose nmap <Space>}  & Every mapping starting with Space, and where each was defined \\
+\end{keys}
+
+\begin{notation}
+	Throughout Part~\ref{part:vim}, \key{<leader>} means \key{<Space>} and
+	\key{<localleader>} means \key{\textbackslash}, matching the configuration
+	described in \autoref{ch:vim-setup}. So \key{<leader>} \key{f} \key{f} is
+	three presses: space, \texttt{f}, \texttt{f}.
+\end{notation}
+
+\begin{note}
+	Because the leader is expanded at definition time, changing
+	\cmd{mapleader} halfway through a configuration leaves earlier mappings on the
+	old key and later ones on the new. This is why every config sets it on the
+	first line, before any plugin loads.
+\end{note}
+
+\section{The Shape of a Normal-Mode Command}\label{sec:vim-shape}
+
+Almost every Normal-mode command fits one template. Learn the template and you
+can parse commands you have never seen.
+
+\begin{center}
+	\ttfamily\large
+	["\{reg\}]\quad[\{count\}]\quad\{operator\}\quad[\{count\}]\quad\{motion\}
+\end{center}
+
+Square brackets mark optional slots; braces mark something you must supply.
+Reading left to right:
+
+\begin{keys}[0.22]
+	\texttt{"\{reg\}}   & \emph{Optional.} Which register to use --- a double-quote followed by one character. Omitted, the unnamed register is used (\autoref{sec:vim-registers}). \\
+	\texttt{[\{count\}]} & \emph{Optional.} A number, repeating what follows                                                                 \\
+	\texttt{\{operator\}} & The verb: \key{d}, \key{c}, \key{y}, \key{>}, \key{g} \key{U}, \dots{}                                            \\
+	\texttt{[\{count\}]} & \emph{Optional again.} A second count multiplies with the first                                                   \\
+	\texttt{\{motion\}} & The noun: a motion (\autoref{ch:vim-motions}) or a text object (\autoref{sec:vim-textobj})                          \\
+\end{keys}
+
+\begin{eg}[Parsing \texttt{"a3d2w}]
+	\begin{keys}[0.16]
+		\key{"} \key{a} & into register \texttt{a}                                \\
+		\key{3}         & three times \dots{}                                     \\
+		\key{d}         & \dots{} delete \dots{}                                  \\
+		\key{2}         & \dots{} two \dots{}                                     \\
+		\key{w}         & \dots{} words                                           \\
+	\end{keys}
+	Six keypresses: \emph{delete six words into register \texttt{a}}. The counts
+	multiply, $3 \times 2 = 6$.
+\end{eg}
+
+Two abbreviations complete the picture, and both were mentioned in
+\autoref{sec:vim-keycaps}:
+
+\begin{keys}[0.22]
+	Doubling      & An operator typed twice acts on the whole line: \key{d} \key{d}, \key{y} \key{y}, \key{>} \key{>} \\
+	Capitalising  & The uppercase form usually means ``to end of line'': \key{D}, \key{C}                              \\
+\end{keys}
+
+Commands that are not operators take only a count:
+
+\begin{center}
+	\ttfamily\large
+	[\{count\}]\quad\{command\}
+\end{center}
+
+so \key{5} \key{j} is ``down five lines'' and \key{3} \key{x} is ``delete three
+characters''.
+
+\begin{remark}[Operator-pending mode]
+	Between the operator and the motion, Vim is in a mode of its own, waiting for
+	the noun. You never enter it deliberately, but its existence explains two
+	things: why \key{d} alone appears to hang (it is waiting), and why plugins can
+	invent new nouns like \key{i} \key{f} that work with every operator at once.
+\end{remark}
+
+\section{The Shape of an Ex Command}\label{sec:vim-excmd}
+
+Commands typed after \key{:} follow a different template:
+
+\begin{center}
+	\ttfamily\large
+	:[\{range\}]\quad\{command\}[!]\quad[\{arguments\}]\quad<CR>
+\end{center}
+
+\begin{keys}[0.22]
+	\texttt{\{range\}}     & \emph{Optional.} Which lines to act on. Omitted, most commands act on the current line \\
+	\texttt{\{command\}}   & The command name, which may be abbreviated                                            \\
+	\texttt{!}             & \emph{Optional.} ``Force'' --- overwrite, discard, do not ask                          \\
+	\texttt{\{arguments\}} & Whatever the command takes                                                            \\
+	\key{<CR>}             & Required. Nothing runs until you press Enter                                          \\
+\end{keys}
+
+Ranges are worth knowing in their own right:
+
+\begin{keys}[0.22]
+	\cmd{.}          & The current line (the default)                       \\
+	\cmd{\$}         & The last line of the file                            \\
+	\cmd{\%}         & The whole file --- shorthand for \cmd{1,\$}          \\
+	\cmd{1,5}        & Lines 1 to 5                                         \\
+	\cmd{.,+3}       & From here to three lines on                          \\
+	\cmd{'<,'>}      & The last Visual selection; typed for you by pressing \key{:} in Visual mode \\
+	\cmd{'a,'b}      & From mark \texttt{a} to mark \texttt{b}              \\
+	\cmd{/pat/}      & The next line matching \texttt{pat}                  \\
+\end{keys}
+
+\begin{notation}[Abbreviations in the manual]
+	Vim's help writes Ex commands as \cmd{:s[ubstitute]} or \cmd{:w[rite]}. The
+	bracketed tail is the part you may omit: \cmd{:s}, \cmd{:su}, \cmd{:subs} and
+	\cmd{:substitute} are all the same command. This note writes out whichever
+	form is clearer in context and does not use the bracket convention.
+\end{notation}
+
+\begin{eg}[Parsing \cmd{:\%s/old/new/gc}]
+	\begin{keys}[0.16]
+		\cmd{:}       & enter Command-line mode                                       \\
+		\cmd{\%}      & range: every line in the file                                 \\
+		\cmd{s}       & command: \texttt{substitute}                                  \\
+		\cmd{/old/new/} & arguments: pattern, then replacement                        \\
+		\cmd{g}       & flag: every match on each line, not just the first            \\
+		\cmd{c}       & flag: confirm each one                                        \\
+		\key{<CR>}    & run it                                                        \\
+	\end{keys}
+\end{eg}
+
+\section{Placeholders}\label{sec:vim-placeholder}
+
+Where a command needs an argument that varies, this note follows Vim's own
+convention: \textbf{braces mean required, square brackets mean optional.}
+
+\begin{keys}[0.24]
+	\texttt{\{motion\}}  & Replace with any motion: \key{w}, \key{\$}, \key{i} \key{(}, \dots{} \\
+	\texttt{\{char\}}    & Replace with one literal character                                  \\
+	\texttt{\{reg\}}     & Replace with one register name                                      \\
+	\texttt{\{pattern\}} & Replace with a search pattern                                       \\
+	\texttt{[count]}     & Optionally, a number                                                \\
+	\texttt{x}           & In examples only: stands for ``some particular character''          \\
+	\dots{}              & Elision: keystrokes omitted because they vary                       \\
+\end{keys}
+
+\begin{eg}
+	\key{f}\texttt{\{char\}} is the general form; \key{f} \key{,} is one instance
+	of it. \key{<C-v>} \dots{} \key{I} \texttt{text} \key{<Esc>} means: start a
+	blockwise selection, extend it however you like, then press \key{I}, type the
+	text, and press \key{<Esc>}.
+\end{eg}
+
+\section{How Vim Names Keys in \texorpdfstring{\cmd{:help} and \cmd{:map}}{help and map}}\label{sec:vim-helpnames}
+
+Vim's help files are organised by \emph{mode plus key}, and the mode is a
+prefix on the topic name. This is the single most useful thing to know about
+\cmd{:help}, and \autoref{sec:vim-help} returns to it:
+
+\begin{keys}[0.26]
+	\cmd{:help x}          & The Normal-mode command \key{x} --- no prefix       \\
+	\cmd{:help i\_CTRL-r}  & \key{<C-r>} in \textbf{I}nsert mode                 \\
+	\cmd{:help v\_o}       & \key{o} in \textbf{V}isual mode                     \\
+	\cmd{:help c\_CTRL-r}  & \key{<C-r>} on the \textbf{c}ommand line            \\
+	\cmd{:help o\_v}       & \key{v} in \textbf{o}perator-pending mode           \\
+	\cmd{:help t\_CTRL-\textbackslash{}} & \key{<C-\textbackslash>} in \textbf{t}erminal mode \\
+	\cmd{:help 'number'}   & An \emph{option} --- single quotes                  \\
+	\cmd{:help :write}     & An \emph{Ex command} --- leading colon              \\
+	\cmd{:help CTRL-W\_v}  & A two-key command, joined with an underscore        \\
+\end{keys}
+
+Note that the manual writes \texttt{CTRL-R} where this note prints
+\key{<C-r>}. They are the same key; \texttt{CTRL-R} is the prose spelling and
+\texttt{<C-r>} is the spelling you type into a mapping.
+
+The \cmd{:map} family prints mappings in a table whose first column is a set of
+mode letters, and whose annotations are easy to misread:
+
+\begin{keys}[0.22]
+	\texttt{n} \texttt{i} \texttt{v} \texttt{x} \texttt{s} \texttt{o} \texttt{t} \texttt{c} & The mode: Normal, Insert, Visual+Select, Visual, Select, operator-pending, Terminal, Command-line \\
+	\texttt{*}  & The right-hand side is \emph{not} remappable (\cmd{noremap})           \\
+	\texttt{\&} & Only script-local mappings are remapped                                \\
+	\texttt{@}  & The mapping is buffer-local                                            \\
+\end{keys}
+
+\begin{eg}
+	\cmd{:verbose nmap <leader>w} prints the mapping \emph{and} the file and line
+	that defined it. When a key does something you did not ask for, this is the
+	command that names the culprit. The same \cmd{:verbose} prefix works on
+	\cmd{:set} (\cmd{:verbose set shiftwidth?}) and on \cmd{:autocmd}.
+\end{eg}
+
+\section{Five Commands, Read Aloud}\label{sec:vim-worked}
+
+Nothing below needs to be understood yet --- the chapters that follow explain
+every piece. The exercise is purely to show that the notation always decomposes.
+
+\begin{eg}[1. \texttt{dw}]
+	\key{d} \key{w} $=$ operator \key{d} (delete) $+$ motion \key{w} (to the start
+	of the next word). \emph{Delete a word.}
+\end{eg}
+
+\begin{eg}[2. \texttt{ci"}]
+	\key{c} \key{i} \key{"} $=$ operator \key{c} (change) $+$ text object
+	\key{i} \key{"} (inside the double quotes). \emph{Replace the contents of a
+		string, leaving the quotes.} Note that \key{i} here is not ``insert'' --- inside
+	a text object it means \emph{inner}.
+\end{eg}
+
+\begin{eg}[3. \texttt{"a3dd}]
+	\key{"} \key{a} (register \texttt{a}) $+$ \key{3} (count) $+$ \key{d} \key{d}
+	(delete, doubled, so linewise). \emph{Cut three lines into register}
+	\texttt{a}.
+\end{eg}
+
+\begin{eg}[4. \texttt{<C-w>v}]
+	\key{<C-w>} is a chord --- Control held with \texttt{w} --- and it is the
+	prefix for every window command. Then \key{v}. \emph{Split the window
+		vertically.} Two presses, the first of which is a chord and the second of which
+	is not.
+\end{eg}
+
+\begin{eg}[5. \texttt{qqA;<Esc>jq} then \texttt{5@q}]
+	\begin{keys}[0.16]
+		\key{q} \key{q}      & start recording a macro into register \texttt{q} \\
+		\key{A}              & append at end of line (enters Insert mode)       \\
+		\key{;}              & type a semicolon                                 \\
+		\key{<Esc>}          & leave Insert mode                                \\
+		\key{j}              & move down one line                               \\
+		\key{q}              & stop recording                                   \\
+		\key{5} \key{@} \key{q} & replay the macro five times                   \\
+	\end{keys}
+	\emph{Put a semicolon at the end of six consecutive lines.} Eleven keypresses,
+	none of them held down, and every one of them a command you will meet again.
+\end{eg}
+
+\section{Legend for Part I}\label{sec:vim-legend}
+
+Every typographic device used from here on:
+
+\begin{keys}[0.30]
+	\key{d} \key{w}                & A keystroke sequence. Press in order, nothing held \\
+	\key{<C-w>}                    & A chord: Control held with \texttt{w}              \\
+	\cmd{:write}                   & An Ex command, typed after \key{:}                 \\
+	\cmd{'ignorecase'}             & An option name --- Vim writes these in single quotes \\
+	\file{\textasciitilde/.config/nvim/} & A file path                                   \\
+	\texttt{vim.opt.number}        & Lua or Vimscript code, inline                      \\
+	\vocab{text object}            & A term being defined for the first time            \\
+	\texttt{\{motion\}}, \texttt{[count]} & Required and optional placeholders          \\
+\end{keys}
+
+Boxes carry a consistent meaning:
+
+\begin{keys}[0.26]
+	\textbf{Definition} & A term you will need again                          \\
+	\textbf{Note}       & A caveat or a detail that is easy to get wrong       \\
+	\textbf{Remark}     & Background: why something is the way it is           \\
+	\textbf{Intuition}  & The mental model, stated plainly                     \\
+	\textbf{Example}    & A concrete case, usually with keystrokes             \\
+	\textbf{Try it}     & A drill to do at the keyboard before reading on      \\
+	\textbf{Moral}      & The one sentence worth remembering from the section  \\
+\end{keys}
+
+\begin{moral}
+	If a line of Vim notation looks unreadable, it is almost always because you are
+	trying to read it as one symbol. Split it into register, count, verb, noun ---
+	and it will read as a sentence.
+\end{moral}

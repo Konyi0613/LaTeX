@@ -1,0 +1,237 @@
+\chapter{Variables and Expansion}\label{ch:mk-vars}
+
+Make has variables for the same reason every language does, and one extra: they
+are how you stop writing \cmd{gcc -Wall -Wextra -g} in four places and
+discovering later that one of them says \cmd{-Wall} only.
+
+\section{Recursive versus Simple Assignment}\label{sec:mk-assign}
+
+There are two assignment operators and they are not interchangeable.
+
+\begin{keys}[0.20]
+	\texttt{=}   & \vocab{Recursive}. The right-hand side is stored unexpanded and re-expanded at every use \\
+	\texttt{:=}  & \vocab{Simple}. The right-hand side is expanded once, now, and the result is stored \\
+\end{keys}
+
+\begin{makecode}
+# recursive: expanded when used
+CFLAGS  = -Wall $(EXTRA)
+EXTRA   = -O2
+# $(CFLAGS) is "-Wall -O2" -- EXTRA was defined later, and that is fine
+
+# simple: expanded here and now
+SOURCES := $(wildcard *.c)
+# the directory is scanned once, not once per reference
+\end{makecode}
+
+\begin{note}[The trap]
+	Recursive assignment re-expands \emph{every time}. Writing
+	\cmd{SOURCES = \$(shell find ...)} with \texttt{=} therefore runs \cmd{find}
+	again at every reference, possibly dozens of times in one build. Worse, a recursive
+	variable that refers to itself is a fatal error:
+\begin{makecode}
+CFLAGS = $(CFLAGS) -g     # *** Recursive variable references itself.
+CFLAGS := $(CFLAGS) -g    # fine: the right side is the OLD value
+\end{makecode}
+\end{note}
+
+\begin{moral}
+	Use \texttt{:=} by default. Reach for \texttt{=} only when you genuinely need
+	late binding --- when the right-hand side mentions a variable that a later
+	target-specific assignment will change.
+\end{moral}
+
+\section{Conditional and Appending Assignment}\label{sec:mk-condassign}
+
+\begin{keys}[0.20]
+	\texttt{?=}  & Assign only if the variable is not already set. Lets a caller override without editing the file \\
+	\texttt{+=}  & Append, keeping the flavour of the original assignment          \\
+	\texttt{!=}  & Assign the output of a shell command (GNU make 4.0 and later)    \\
+\end{keys}
+
+\begin{makecode}
+CC      ?= gcc                  # `make CC=clang' wins; otherwise gcc
+PREFIX  ?= /usr/local
+
+CFLAGS  := -Wall -Wextra
+CFLAGS  += -std=c17             # append
+CFLAGS  += -g                   # append again
+
+GIT_REV != git rev-parse --short HEAD
+\end{makecode}
+
+\begin{note}
+	\texttt{?=} is how a Makefile stays configurable. A user building your project
+	can write \cmd{make CC=clang CFLAGS=-O3} and never touch the file --- and
+	packagers, who build thousands of projects, rely on exactly this.
+\end{note}
+
+\section{Automatic Variables}\label{sec:mk-auto}
+
+Inside a recipe, make defines a handful of variables describing the rule it is
+currently running. They are what make pattern rules possible at all, and they
+are the least readable part of the language.
+
+\begin{keys}[0.16]
+	\texttt{\$@}  & The target                                                    \\
+	\texttt{\$<}  & The \emph{first} prerequisite                                 \\
+	\texttt{\$\textasciicircum{}} & \emph{All} prerequisites, duplicates removed  \\
+	\texttt{\$+}  & All prerequisites, duplicates kept, original order            \\
+	\texttt{\$?}  & Only the prerequisites newer than the target                  \\
+	\texttt{\$*}  & The \vocab{stem}: what \texttt{\%} matched (\autoref{sec:mk-pattern}) \\
+	\texttt{\$(@D)}, \texttt{\$(@F)} & The target's directory and filename parts  \\
+\end{keys}
+
+\begin{eg}
+	The same rule, spelled out and then with automatic variables:
+\begin{makecode}
+app: main.o util.o
+    gcc -o app main.o util.o
+
+app: main.o util.o
+    gcc -o $@ $^
+\end{makecode}
+	Read it as \emph{``make the target out of all the prerequisites''}. The second
+	form cannot fall out of step with its own prerequisite list, which is the real
+	argument for it.
+\end{eg}
+
+\begin{note}
+	\texttt{\$<} and \texttt{\$\textasciicircum{}} differ in exactly the case that
+	matters. Compiling one source into one object wants \texttt{\$<}, because the
+	prerequisites include headers and \cmd{gcc -c} must not be handed
+	\file{parser.h}. Linking wants \texttt{\$\textasciicircum{}}, because every
+	object belongs on the command line.
+\begin{makecode}
+main.o: main.c parser.h
+    gcc -c -o $@ $<            # just main.c
+app: main.o parser.o
+    gcc -o $@ $^               # both objects
+\end{makecode}
+\end{note}
+
+\section{Functions and Substitution References}\label{sec:mk-funcs}
+
+Make has a small functional language for manipulating lists of words. A call is
+written as a dollar sign, a parenthesis, the function name, and its arguments;
+the arguments are almost always filenames.
+
+\begin{keys}[0.32]
+	\texttt{\$(wildcard *.c)}            & Expand a glob against the filesystem      \\
+	\texttt{\$(patsubst \%.c,\%.o,\$(SRC))} & Pattern substitution over a list       \\
+	\texttt{\$(SRC:.c=.o)}               & The same thing, in shorthand              \\
+	\texttt{\$(subst a,b,\$(TXT))}       & Plain textual substitution                \\
+	\texttt{\$(filter \%.c,\$(FILES))}   & Keep the words that match                 \\
+	\texttt{\$(filter-out main.o,\$(OBJ))} & Drop the words that match               \\
+	\texttt{\$(sort \$(LIST))}           & Sort, and remove duplicates               \\
+	\texttt{\$(words \$(LIST))}          & How many words                            \\
+	\texttt{\$(dir \$(F))}, \texttt{\$(notdir \$(F))} & Directory and filename parts \\
+	\texttt{\$(basename \$(F))}, \texttt{\$(suffix \$(F))} & Without and only the extension \\
+	\texttt{\$(addprefix build/,\$(OBJ))} & Prepend to every word                    \\
+	\texttt{\$(shell date +\%F)}         & Run a shell command, take its output      \\
+	\texttt{\$(foreach v,\$(LIST),\dots)} & Loop over a list                         \\
+\end{keys}
+
+\begin{eg}[The idiom you will use every time]
+\begin{makecode}
+SRC := $(wildcard src/*.c)
+OBJ := $(SRC:.c=.o)
+# or, equivalently and more explicitly:
+OBJ := $(patsubst %.c,%.o,$(SRC))
+\end{makecode}
+	Two lines, and the object list maintains itself. Adding a source file to
+	\file{src/} needs no edit at all.
+\end{eg}
+
+\begin{note}
+	\texttt{\$(wildcard)} sees the filesystem \emph{when the Makefile is read}. If
+	a rule generates a \texttt{.c} file during the build, that file will not be in
+	\texttt{\$(SRC)} --- make already made up its mind. Generated sources need
+	their names written out, or a second invocation of make.
+\end{note}
+
+\begin{remark}
+	Make's functions are whitespace-sensitive in a way that catches everyone once:
+	\cmd{\$(filter \%.c, \$(FILES))} with a space after the comma passes
+	\emph{``space plus the list''} as the second argument. Do not put spaces after
+	the commas in a function call.
+\end{remark}
+
+\section{Conventional Variables}\label{sec:mk-conv}
+
+Make's built-in rules (\autoref{sec:mk-implicit}) use a fixed set of variable
+names, and so does every Makefile anyone else will read. Use these names and a
+great deal works for free.
+
+\begin{keys}[0.20]
+	\texttt{CC}        & The C compiler. Defaults to \texttt{cc}                     \\
+	\texttt{CXX}       & The C++ compiler                                            \\
+	\texttt{CFLAGS}    & Flags for the C compiler                                    \\
+	\texttt{CXXFLAGS}  & Flags for the C++ compiler                                  \\
+	\texttt{CPPFLAGS}  & Preprocessor flags --- \cmd{-I}, \cmd{-D}. Used by both     \\
+	\texttt{LDFLAGS}   & Linker flags --- \cmd{-L}, \cmd{-Wl,\dots}                  \\
+	\texttt{LDLIBS}    & Libraries to link --- \cmd{-lm}, \cmd{-lpthread}            \\
+	\texttt{ARFLAGS}   & Flags for \cmd{ar}                                          \\
+	\texttt{PREFIX}    & Where \texttt{install} should put things                    \\
+\end{keys}
+
+\begin{note}
+	\texttt{LDFLAGS} and \texttt{LDLIBS} are not the same, and the split is not
+	pedantry. \texttt{LDFLAGS} says \emph{where} to look and goes early on the
+	command line; \texttt{LDLIBS} says \emph{what} to link and must come after the
+	object files, because the GNU linker resolves symbols in the order it is given
+	them. Putting \cmd{-lm} in \texttt{LDFLAGS} produces
+	\texttt{undefined reference to `sqrt'} on a program that plainly links the
+	maths library.
+\end{note}
+
+\begin{makecode}
+CC       := gcc
+CPPFLAGS := -Iinclude -DNDEBUG
+CFLAGS   := -Wall -Wextra -std=c17 -O2
+LDFLAGS  := -Llib
+LDLIBS   := -lm
+
+app: $(OBJ)
+    $(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+\end{makecode}
+
+\section{Overriding from Outside}\label{sec:mk-override}
+
+Variables can be set in four places. Later entries win:
+
+\begin{keys}[0.30]
+	1. The Makefile           & \cmd{CFLAGS := -O2}                               \\
+	2. The environment        & \cmd{CFLAGS=-O3 make} --- but only for variables not set in the file, unless \cmd{make -e} \\
+	3. The command line       & \cmd{make CFLAGS=-O3} --- beats the Makefile      \\
+	4. \texttt{override}      & \cmd{override CFLAGS += -g} --- beats even the command line \\
+\end{keys}
+
+\begin{eg}
+\begin{shell}
+$ make                          # CFLAGS as written in the file
+$ make CFLAGS='-O0 -g'          # override for this build
+$ make -e                       # let the environment win everywhere
+$ make CC=clang -j8             # a different compiler, eight jobs
+\end{shell}
+\end{eg}
+
+\begin{note}[Target-specific variables]
+	A variable can be given a different value for one target and everything it
+	depends on --- which is how a debug build is usually expressed:
+\begin{makecode}
+debug: CFLAGS += -O0 -g -fsanitize=address
+debug: app
+\end{makecode}
+	\cmd{make debug} then builds \texttt{app} with the extra flags. Note the
+	caveat from \autoref{sec:mk-model}: if the objects already exist from a normal
+	build, make sees no changed timestamps and rebuilds nothing. Run
+	\cmd{make clean} first, or give the debug build its own output directory.
+\end{note}
+
+\begin{moral}
+	Every value that someone might reasonably want to change --- compiler, flags,
+	install prefix, output directory --- belongs in a variable at the top of the
+	file, assigned with \texttt{?=}. It costs one line and saves the next person
+	from editing your recipes.
+\end{moral}

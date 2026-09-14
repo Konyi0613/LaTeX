@@ -1,0 +1,232 @@
+\chapter{When Things Go Wrong}\label{ch:git-recovery}
+
+The most useful fact about Git is one nobody tells beginners: \emph{almost
+	nothing is ever really lost}. A commit that no branch points at is still in the
+object database, and Git keeps a log of every position every branch has held.
+This chapter is how to get things back, and how to find the commit that broke
+something.
+
+\section{\texorpdfstring{\cmd{reflog}: the Safety Net}{reflog: the Safety Net}}\label{sec:git-reflog}
+
+\begin{definition}[Reflog]
+	A local journal of every value \texttt{HEAD} and each branch has taken --- every
+	commit, checkout, merge, rebase and reset --- with a timestamp. It is private
+	to your clone and is never pushed.
+\end{definition}
+
+\begin{shell}
+$ git reflog
+3f8a2b1 HEAD@{0}: reset: moving to HEAD~3
+9c4e7d2 HEAD@{1}: commit: Add config validation
+7b1e4a9 HEAD@{2}: commit: Extract parse_line
+2d8c5f0 HEAD@{3}: checkout: moving from main to feature
+bc91a17 HEAD@{4}: commit: First day content only
+\end{shell}
+
+\begin{moral}
+	Every ``I destroyed my work with \cmd{git reset --hard}'' has the same answer:
+	\cmd{git reflog}, find the hash from before the mistake, and
+	\cmd{git reset --hard <that hash>}. The commits were never deleted --- only the
+	branch pointer moved, and the reflog remembers where it was.
+\end{moral}
+
+\begin{keys}[0.34]
+	\cmd{git reflog}                 & \texttt{HEAD}'s history                        \\
+	\cmd{git reflog show main}       & One branch's history                           \\
+	\cmd{git reflog -{}-date=iso}    & With real timestamps                           \\
+	\cmd{git reset -{}-hard HEAD@\{2\}} & Go back to where you were two moves ago     \\
+	\cmd{git switch -c rescue HEAD@\{1\}} & Safer: give that position a new branch    \\
+\end{keys}
+
+\begin{note}
+	The one thing the reflog cannot recover is work that was never committed.
+	\cmd{git reset --hard} with unstaged changes, or \cmd{git clean -fd}, destroys
+	those permanently --- which is why \autoref{sec:git-undo} singled them out.
+	Reflog entries also expire, after 90 days by default.
+\end{note}
+
+\section{Recovering Lost Commits}\label{sec:git-recover}
+
+\begin{keys}[0.34]
+	\cmd{git reflog}                  & Almost always enough                          \\
+	\cmd{git fsck -{}-lost-found}     & Find unreachable objects the reflog missed    \\
+	\cmd{git show <sha>}              & Check you have the right one                  \\
+	\cmd{git switch -c rescue <sha>}  & Give it a name and it is safe                 \\
+	\cmd{git cherry-pick <sha>}       & Take just that commit onto your branch        \\
+\end{keys}
+
+\begin{eg}[A deleted branch]
+\begin{shell}
+$ git branch -D feature
+Deleted branch feature (was 9c4e7d2).
+$ # ...five minutes later...
+$ git switch -c feature 9c4e7d2      # the hash was in the message
+$ git reflog | grep feature          # or find it here
+\end{shell}
+	Git printed the hash when it deleted the branch, precisely so this is possible.
+\end{eg}
+
+\section{Fixing the Last Commit}\label{sec:git-amend}
+
+\begin{keys}[0.34]
+	\cmd{git commit -{}-amend}              & Redo the last commit with what is staged now \\
+	\cmd{git commit -{}-amend -m "..."}     & Change only the message                      \\
+	\cmd{git commit -{}-amend -{}-no-edit}  & Add staged changes, keep the message         \\
+	\cmd{git commit -{}-amend -{}-author="A <a@b.c>"} & Fix the author                     \\
+\end{keys}
+
+\begin{note}
+	\cmd{--amend} does not edit the commit --- it makes a new one with a new hash
+	and moves the branch to it (\autoref{sec:git-objects}). So it is subject to the
+	golden rule: amending a pushed commit requires a force push, and anyone who
+	already pulled has the old one.
+\end{note}
+
+\section{Splitting and Reordering}\label{sec:git-split}
+
+\begin{shell}
+$ git rebase -i HEAD~4
+\end{shell}
+
+Mark the commit to divide with \cmd{edit}; when the rebase stops there:
+
+\begin{shell}
+$ git reset HEAD~          # undo the commit, keep the changes unstaged
+$ git add -p               # stage the first idea only
+$ git commit -m "Extract parse_line"
+$ git add -A               # stage the rest
+$ git commit -m "Add config validation"
+$ git rebase --continue
+\end{shell}
+
+\begin{moral}
+	This is \cmd{git add -p} (\autoref{sec:git-add}) doing the same job after the
+	fact. A commit you made in a hurry is not permanent --- until you push it,
+	the history is a draft.
+\end{moral}
+
+\section{\texorpdfstring{\cmd{bisect}}{bisect}}\label{sec:git-bisect}
+
+\begin{definition}[Bisect]
+	A binary search over history. You tell Git one commit where the bug exists and
+	one where it does not; Git checks out the midpoint, you test and report, and it
+	halves the range each time. A thousand commits take about ten tests.
+\end{definition}
+
+\begin{shell}
+$ git bisect start
+$ git bisect bad                   # the current commit is broken
+$ git bisect good v1.0             # this tag was fine
+Bisecting: 312 revisions left to test after this (roughly 8 steps)
+[9c4e7d2...] Extract parse_line
+
+$ make && ./run-tests.sh           # test this one
+$ git bisect good                  # ...it passed
+Bisecting: 156 revisions left to test after this (roughly 7 steps)
+
+$ # ...repeat...
+9c4e7d2f8a1b is the first bad commit
+    Author: ...
+    Date:   ...
+    Extract parse_line
+
+$ git bisect reset                 # back to where you started
+\end{shell}
+
+\begin{keys}[0.34]
+	\cmd{git bisect start}          & Begin                                          \\
+	\cmd{git bisect bad} / \cmd{good} & Report the current commit                    \\
+	\cmd{git bisect skip}           & Cannot test this one --- it does not build     \\
+	\cmd{git bisect run ./test.sh}  & Automate it: exit 0 is good, non-zero is bad   \\
+	\cmd{git bisect log}            & What has been decided so far                   \\
+	\cmd{git bisect reset}          & Stop and return                                \\
+\end{keys}
+
+\begin{moral}
+	\cmd{git bisect run} is the whole thing in one command: write a script that
+	exits 0 when the program behaves, and Git finds the guilty commit unattended.
+	This is the payoff for the commit discipline of \autoref{sec:git-hygiene} ---
+	bisect is only as good as the guarantee that each commit builds.
+\end{moral}
+
+\section{Archaeology}\label{sec:git-blame}
+
+\begin{keys}[0.34]
+	\cmd{git blame file.c}           & Who last changed each line, and in which commit \\
+	\cmd{git blame -L 40,60 file.c}  & Just those lines                                \\
+	\cmd{git blame -w -C file.c}     & Ignore whitespace; follow moved code            \\
+	\cmd{git log -S'fopen'}          & Commits that added or removed that string       \\
+	\cmd{git log -G'regex'}          & \dots{} matching a regular expression           \\
+	\cmd{git log -L 40,60:file.c}    & The history of those lines specifically         \\
+	\cmd{git log -{}-follow file.c}  & Across renames                                  \\
+	\cmd{git show <sha>}             & The commit blame pointed at                     \\
+\end{keys}
+
+\begin{note}
+	\cmd{git blame} is badly named --- its use is not finding someone to blame but
+	finding the commit message that explains why a line is the way it is. The
+	workflow is \cmd{blame} to get the hash, then \cmd{git show} to read the
+	reasoning. This is the moment that repays every good commit message you ever
+	wrote.
+\end{note}
+
+\begin{note}
+	\cmd{git log -S} (the ``pickaxe'') answers a question \cmd{blame} cannot: when
+	did this string appear or disappear? If a call to \cmd{fopen} used to be
+	checked and no longer is, \cmd{blame} shows only the current line, while
+	\cmd{log -S'if (!f)'} finds the commit that removed the check.
+\end{note}
+
+\section{Rewriting History Safely}\label{sec:git-rewrite}
+
+\begin{keys}[0.34]
+	\cmd{git commit -{}-amend}          & The last commit                              \\
+	\cmd{git rebase -i <base>}          & Any recent series                            \\
+	\cmd{git filter-repo}               & Wholesale surgery across all history         \\
+	\cmd{git push -{}-force-with-lease} & Publish the rewrite, safely                  \\
+\end{keys}
+
+\begin{moral}[The golden rule, again]
+	Rewriting is safe on commits nobody else has, and disruptive on commits they
+	do. Before rewriting a shared branch: tell the team, do it, and have everyone
+	run \cmd{git fetch \&\& git reset --hard origin/main} --- not \cmd{git pull},
+	which would merge the old history back in and duplicate every commit.
+\end{moral}
+
+\section{Large Files and Secrets}\label{sec:git-bigfiles}
+
+\begin{note}[Deleting is not enough]
+	Committing a password and then deleting it in the next commit removes it from
+	the working tree only. The old commit still contains it, and
+	\cmd{git log -p} still shows it. The same applies to a 500\,MB file: every
+	clone of the repository will download it forever.
+\end{note}
+
+\begin{keys}[0.36]
+	\cmd{git filter-repo -{}-path secrets.env -{}-invert-paths} & Remove a file from all history \\
+	\cmd{git filter-repo -{}-replace-text rules.txt} & Redact strings throughout       \\
+	\cmd{git lfs track "*.psd"}      & Large File Storage: keep a pointer, store the blob elsewhere \\
+	\cmd{git count-objects -vH}      & How big is this repository, really            \\
+\end{keys}
+
+\begin{moral}
+	If a credential reached a remote, treat it as compromised and \textbf{rotate
+		it}. Rewriting history is worth doing afterwards, but it does not
+	un-distribute what other people already cloned, and it does not un-index what a
+	scanner already found. Rotate first; clean second.
+\end{moral}
+
+\begin{note}
+	\cmd{git filter-repo} replaced the old \cmd{filter-branch}, which was slow and
+	notoriously easy to misuse. It is a separate install
+	(\cmd{pip install git-filter-repo}). Whatever you use, do it on a fresh clone
+	and keep the original until you have checked the result.
+\end{note}
+
+\begin{tryit}
+	In a scratch repository, make three commits, then \cmd{git reset --hard HEAD~3}
+	and confirm the work has apparently vanished. Now \cmd{git reflog}, find the
+	hash, and \cmd{git reset --hard <it>}. Doing this once, deliberately, is what
+	turns Git from something you are careful around into something you can
+	experiment in.
+\end{tryit}

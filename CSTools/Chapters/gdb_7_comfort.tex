@@ -1,0 +1,267 @@
+\chapter{Making GDB Comfortable}\label{ch:gdb-comfort}
+
+Out of the box GDB is a bare prompt with no source on screen and no memory of
+your preferences. Twenty lines of configuration fix both, and are worth writing
+once.
+
+\section{The TUI}\label{sec:gdb-tui}
+
+\begin{definition}[TUI]
+	GDB's built-in Text User Interface: a split terminal with the source, the
+	registers or the disassembly above and the command prompt below. It is part of
+	GDB, needs nothing installed, and follows the program as it runs.
+\end{definition}
+
+\begin{keys}[0.30]
+	\cmd{gdb -tui ./app}     & Start with it on                                     \\
+	\key{<C-x>} \key{a}      & Toggle it at any time                                \\
+	\key{<C-x>} \key{1}      & One window: source                                   \\
+	\key{<C-x>} \key{2}      & Two windows: source and disassembly                  \\
+	\cmd{layout src}         & Source only                                          \\
+	\cmd{layout asm}         & Disassembly                                          \\
+	\cmd{layout split}       & Both                                                 \\
+	\cmd{layout regs}        & Add the registers                                    \\
+	\key{<C-x>} \key{o}      & Move focus between windows                           \\
+	\key{<C-l>}              & Redraw, when the display gets corrupted              \\
+	\cmd{focus cmd}          & Give the arrow keys back to the command line         \\
+	\cmd{tui reg general}    & Which register group to show                         \\
+\end{keys}
+
+\begin{note}
+	The first thing everyone hits: with focus in the source window, the arrow keys
+	scroll the source instead of walking the command history. \cmd{focus cmd}, or
+	\key{<C-x>} \key{o}, gives them back. The second thing: program output and the
+	TUI share a terminal and will corrupt each other --- \key{<C-l>} redraws, and
+	\cmd{set inferior-tty /dev/pts/3} sends the program's output to a separate
+	terminal for good.
+\end{note}
+
+\begin{moral}
+	If you do nothing else in this chapter, learn \key{<C-x>} \key{a}. Seeing the
+	current line highlighted in context, updating as you step, is the difference
+	between GDB feeling archaic and feeling like a debugger.
+\end{moral}
+
+\section{\texorpdfstring{\file{.gdbinit} and User Commands}{.gdbinit and User Commands}}\label{sec:gdb-gdbinit}
+
+GDB reads \file{\textasciitilde/.gdbinit} at startup, and then \file{./.gdbinit}
+from the current directory if it is trusted.
+
+\begin{gdbcode}
+# ~/.gdbinit
+set confirm off                  # do not ask "are you sure" for everything
+set pagination off               # do not stop every screenful
+set history save on              # remember commands between sessions
+set history size 10000
+set print pretty on              # structs one member per line
+set print array on
+set print elements 0             # never truncate
+set disassembly-flavor intel     # if you prefer Intel syntax
+set breakpoint pending on        # do not ask about future shared libraries
+set backtrace limit 100          # tame runaway recursion
+
+# a source window by default
+tui enable
+\end{gdbcode}
+
+\begin{note}
+	A project-local \file{.gdbinit} is read only if its directory appears in GDB's
+	auto-load safe path, which is a security measure --- otherwise
+	cloning a repository and running \cmd{gdb} in it would execute someone else's
+	commands. Add \cmd{set auto-load safe-path /} to your global file if you trust
+	everything you check out, and understand what you are turning off.
+\end{note}
+
+User-defined commands make a repeated inspection into one word:
+
+\begin{gdbcode}
+define plist
+  set $n = $arg0
+  while $n != 0
+    printf "%s\n", $n->name
+    set $n = $n->next
+  end
+end
+document plist
+Walk a linked list from the given head, printing each name.
+end
+
+define bpl
+  break $arg0
+  commands
+    silent
+    printf "hit %s\n", "$arg0"
+    bt 3
+    continue
+  end
+end
+\end{gdbcode}
+
+\begin{keys}[0.26]
+	\cmd{\$arg0}, \cmd{\$arg1} & The command's arguments                            \\
+	\cmd{\$argc}               & How many were given                                \\
+	\cmd{document name}        & Text for \cmd{help name}                           \\
+	\cmd{source debug.gdb}     & Load a file of commands mid-session                \\
+	\cmd{define hook-run}      & Run automatically before every \cmd{run}           \\
+\end{keys}
+
+\begin{moral}
+	Every project accumulates two or three inspections you do constantly --- print
+	this tree, dump that ring buffer, check those invariants. Put them in a
+	\file{.gdbinit} beside the source and commit it. It is documentation that
+	executes.
+\end{moral}
+
+\section{Pretty-Printers and Python}\label{sec:gdb-python}
+
+GDB embeds Python, and the most visible use is \vocab{pretty-printers}:
+functions that decide how a type is displayed.
+
+\begin{gdbcode}
+(gdb) print v                                    # without a pretty-printer
+$1 = {_M_impl = {<std::allocator<int>> = {...}, _M_start = 0x5555555592a0,
+  _M_finish = 0x5555555592ac, _M_end_of_storage = 0x5555555592b0}}
+(gdb) print v                                    # with one
+$2 = std::vector of length 3, capacity 4 = {1, 2, 3}
+\end{gdbcode}
+
+\begin{note}
+	For the C++ standard library these ship with GCC and are usually loaded
+	automatically --- \cmd{info pretty-printer} lists what is active, and
+	\cmd{set print pretty-printer off} turns them off when you need to see the raw
+	struct. For your own types, a printer is a short Python class registered
+	against a type name; \cmd{help python} and the GDB manual's \emph{Pretty
+		Printing} chapter have the pattern.
+\end{note}
+
+\begin{keys}[0.38]
+	\cmd{python print(gdb.parse\_and\_eval("n"))} & Read a program value from Python \\
+	\cmd{python gdb.execute("bt")}                & Run a GDB command from Python    \\
+	\cmd{info pretty-printer}                     & What is registered                \\
+	\cmd{source printers.py}                      & Load a Python script              \\
+\end{keys}
+
+\section{Front Ends, and GDB from Neovim}\label{sec:gdb-frontends}
+
+\begin{keys}[0.30]
+	\cmd{gdb -tui}       & Built in, always available, no setup                    \\
+	\cmd{cgdb}           & A curses front end with a better source window          \\
+	\cmd{gdbgui}         & A browser front end                                     \\
+	\texttt{nvim-dap}    & Debug Adapter Protocol client for Neovim                \\
+	\texttt{termdebug}   & Ships \emph{with} Vim and Neovim --- \cmd{:packadd termdebug} \\
+\end{keys}
+
+\begin{eg}[\texttt{termdebug}]
+	The lowest-effort way to debug inside the editor of Part~\ref{part:vim}: it is
+	already installed, and needs no plugin.
+\begin{vimcode}
+:packadd termdebug
+:Termdebug ./app
+\end{vimcode}
+	Neovim splits into a GDB window, a program-output window and your source. Then
+	\cmd{:Break} sets a breakpoint on the current line, \cmd{:Run}, \cmd{:Step},
+	\cmd{:Over} and \cmd{:Finish} drive it, and \cmd{:Evaluate} prints the
+	expression under the cursor --- while the source buffer stays an ordinary
+	Neovim buffer with all the motions of \autoref{ch:vim-motions}.
+\end{eg}
+
+\begin{note}
+	\texttt{nvim-dap} is the fuller answer --- a proper debug adapter with a
+	variables pane, breakpoint signs in the gutter and per-language configuration
+	--- and it is a plugin to add through \texttt{lazy.nvim}
+	(\autoref{sec:nvim-plugins}). It is not installed on this machine. Start with
+	\texttt{termdebug}, which costs nothing, and add \texttt{nvim-dap} if you find
+	yourself debugging daily.
+\end{note}
+
+\section{A Worked Debugging Session}\label{sec:gdb-session}
+
+Everything in Part~\ref{part:gdb}, on one bug. The program counts words in a
+file and reports zero for a file that plainly has some.
+
+\begin{ccode}
+int count_words(const char *path) {
+    FILE *f = fopen(path, "r");
+    char buf[64];
+    int n = 0;
+    while (fgets(buf, sizeof buf, f)) {
+        for (char *p = strtok(buf, " \n"); p; p = strtok(NULL, " \n"))
+            n++;
+    }
+    fclose(f);
+    return n;
+}
+\end{ccode}
+
+\begin{gdbcode}
+$ gcc -g -O0 -o wc main.c && gdb -q ./wc
+(gdb) break count_words
+(gdb) run input.txt
+Breakpoint 1, count_words (path=0x7fffffffe5c9 "input.txt") at main.c:6
+6           FILE *f = fopen(path, "r");
+(gdb) next
+8           int n = 0;
+(gdb) print f
+$1 = (FILE *) 0x5555555592a0          # the file opened fine
+(gdb) display n                       # watch the counter as we go
+1: n = 0
+(gdb) break 10 if n > 0               # stop as soon as it counts anything
+(gdb) continue
+Continuing.
+1: n = 0                              # ...it never does
+[Inferior 1 (process 41233) exited normally]
+\end{gdbcode}
+
+The loop body never runs, so \cmd{fgets} returned \texttt{NULL} the first time.
+Second run, with the attention one line earlier:
+
+\begin{gdbcode}
+(gdb) run input.txt
+(gdb) break 9
+(gdb) continue
+Breakpoint 2, count_words (...) at main.c:9
+9           while (fgets(buf, sizeof buf, f)) {
+(gdb) print sizeof buf
+$2 = 64
+(gdb) print fgets(buf, 64, f)
+$3 = 0x0                              # NULL on the very first read
+(gdb) print ftell(f)
+$4 = 0                                # ...yet we are at the start of the file
+(gdb) print feof(f)
+$5 = 0
+(gdb) print ferror(f)
+$6 = 1                                # the stream is in an error state
+\end{gdbcode}
+
+\begin{note}
+	\cmd{print fgets(...)} and \cmd{print ferror(f)} are \emph{calling} those
+	functions in the live process (\autoref{sec:gdb-force}). Being able to
+	interrogate a C library from the prompt --- with the program's own \texttt{FILE
+		*} in hand --- is what makes GDB more than a viewer.
+\end{note}
+
+The stream errored without reaching end of file, which points at the mode.
+\cmd{print path} shows \texttt{"input.txt"}, and a look at the caller resolves it:
+the caller opened the same file earlier, closed it, and passed the stale name
+while an \cmd{fopen} failure elsewhere left \texttt{errno} set. The fix is the
+check that was never there:
+
+\begin{ccode}
+FILE *f = fopen(path, "r");
+if (!f) { perror(path); return -1; }
+\end{ccode}
+
+\begin{moral}
+	Note what the session did \emph{not} involve: no recompiling with print
+	statements, no guessing, and no reading of the whole program. Establish where
+	it stops being right, look at the state there, and walk outwards one frame at a
+	time. That loop is the entire method, and the commands in
+	Part~\ref{part:gdb} are only its vocabulary.
+\end{moral}
+
+\begin{tryit}
+	Write a ten-line C program with a deliberate null dereference. Compile it with
+	\cmd{gcc -g -O0}, run \cmd{gdb -q ./a.out}, then \cmd{run}, \cmd{bt},
+	\cmd{info locals}. You have now done the thing that most people avoid for
+	years, and it took under a minute.
+\end{tryit}

@@ -1,0 +1,319 @@
+\chapter{Version Control and Git's Model}\label{ch:git-model}
+
+Nearly all confusion about Git is confusion about its model, not its commands.
+People who have memorised \cmd{git pull} and \cmd{git push} without ever being
+told what a commit \emph{is} will eventually hit a merge conflict, a detached
+\texttt{HEAD} or a bad rebase, and have no way to reason about what they are
+looking at.
+
+So this chapter runs no useful commands at all. It is about four ideas ---
+snapshots, objects, the three trees, and refs --- and everything in
+Part~\ref{part:git} follows from them.
+
+\section{Notation for Part V}\label{sec:git-notation}
+
+Git is driven from the shell, so transcripts keep the convention of
+\autoref{sec:sh-notation}: \texttt{\$} is what you type, everything else is
+output.
+
+\begin{shell}
+$ git status
+On branch main
+nothing to commit, working tree clean
+\end{shell}
+
+Commit graphs are drawn with the newest commit on the right, which is the
+opposite of how \cmd{git log} prints them and the same as how everyone draws
+them on a whiteboard:
+
+\begin{center}
+	\begin{tikzpicture}[
+			x=1mm, y=1mm, font=\footnotesize\ttfamily,
+			c/.style={draw=Gray!60, circle, inner sep=2pt, fill=Gray!5, minimum size=7mm},
+			ref/.style={draw=SeaGreen!60!black, rounded corners=2pt, inner sep=2.5pt,
+					fill=SeaGreen!8, font=\scriptsize\ttfamily},
+			e/.style={-{Stealth[length=4pt]}, Gray!70!black}
+		]
+		\node[c] (a) at (  0, 0) {A};
+		\node[c] (b) at ( 22, 0) {B};
+		\node[c] (d) at ( 44, 0) {C};
+		\draw[e] (b) -- (a);
+		\draw[e] (d) -- (b);
+		\node[ref] (m) at ( 44, 16) {main};
+		\node[ref] (h) at ( 44, 28) {HEAD};
+		\draw[e, SeaGreen!60!black] (m) -- (d);
+		\draw[e, SeaGreen!60!black] (h) -- (m);
+	\end{tikzpicture}
+\end{center}
+
+\begin{keys}[0.26]
+	\texttt{A}, \texttt{B}, \texttt{C} & Commits, oldest on the left            \\
+	\cmd{main}, \cmd{feature}          & Branches --- names pointing at a commit \\
+	\cmd{HEAD}                         & Where you are now                       \\
+	\texttt{a1b2c3d}                   & An abbreviated commit hash              \\
+	\texttt{<sha>}, \texttt{<branch>}  & Placeholders, as in \autoref{sec:sh-notation} \\
+\end{keys}
+
+\begin{note}
+	The arrows point from a commit to its \emph{parent}, backwards in time. That is
+	the direction the data actually goes: a commit records what came before it, and
+	nothing records what comes after. Almost every surprising property of Git ---
+	why history is cheap to rewrite, why a branch is free, why a lost commit is
+	still there --- follows from that one arrow direction.
+\end{note}
+
+\section{Why Version Control}\label{sec:git-why}
+
+The obvious answer is backups, and it is the least interesting one. What a
+version control system actually gives you:
+
+\begin{keys}[0.24]
+	\textbf{A safety net}    & Any change can be undone, including the one you made three weeks ago \\
+	\textbf{A record}        & Every line has an author, a date, and a message saying why           \\
+	\textbf{Parallel work}   & Several people, or several of your own ideas, on the same files      \\
+	\textbf{Bisection}       & ``It worked in March'' becomes a mechanical search (\autoref{sec:git-bisect}) \\
+	\textbf{A shared truth}  & One authoritative history, rather than \file{report\_final\_v3\_FINAL.tex} \\
+\end{keys}
+
+\begin{intuition}
+	The real change is psychological. With history you can afford to try things ---
+	delete a section, restructure a module, rewrite an algorithm --- because the
+	cost of being wrong is one command. Without it, every experiment is a
+	negotiation with your own nerve.
+\end{intuition}
+
+\section{Snapshots, Not Diffs}\label{sec:git-snapshots}
+
+This is the design decision that makes Git different from what came before.
+
+\begin{definition}[Commit]
+	A complete \emph{snapshot} of every tracked file at one moment, together with
+	its author, its date, its message, and a pointer to the commit or commits that
+	came before it.
+\end{definition}
+
+Older systems --- CVS, Subversion --- stored a list of files and, for each, the
+sequence of changes made to it. Git stores the whole tree, every time.
+
+\begin{intuition}
+	That sounds wasteful and is not: a file that did not change between two commits
+	is not stored twice, it is \emph{referenced} twice, because Git identifies
+	content by its hash. Storing snapshots rather than diffs means any commit can
+	be reconstructed without replaying history, which is why \cmd{git checkout} of
+	a five-year-old commit is instant.
+\end{intuition}
+
+\begin{note}
+	\cmd{git diff} shows you a diff, so it is easy to conclude that Git stores
+	diffs. It does not: the diff is computed on demand by comparing two snapshots.
+	This is why Git can show a diff between \emph{any} two commits, related or not.
+\end{note}
+
+\section{The Object Database}\label{sec:git-objects}
+
+Everything Git stores is one of four kinds of object, each named by the SHA-1
+hash of its own contents.
+
+\begin{keys}[0.20]
+	\vocab{blob}   & The contents of a file. No name, no permissions --- just bytes \\
+	\vocab{tree}   & A directory: a list of names, each with a mode and a pointer to a blob or another tree \\
+	\vocab{commit} & A pointer to one tree, plus parents, author, date and message  \\
+	\vocab{tag}    & An annotated name for a commit                                 \\
+\end{keys}
+
+\begin{center}
+	\begin{tikzpicture}[
+			x=1mm, y=1mm, font=\footnotesize\ttfamily,
+			o/.style={draw=Gray!60, rounded corners=2pt, inner sep=3.5pt, fill=Gray!5},
+			e/.style={-{Stealth[length=4pt]}, Gray!70!black}
+		]
+		\node[o] (c)  at (  0,  0) {commit};
+		\node[o] (t)  at ( 30,  0) {tree};
+		\node[o] (b1) at ( 66, 10) {blob \textit{main.c}};
+		\node[o] (t2) at ( 66, -8) {tree \textit{src/}};
+		\node[o] (b2) at (104, -8) {blob \textit{util.c}};
+		\draw[e] (c) -- (t);
+		\draw[e] (t) -- (b1);
+		\draw[e] (t) -- (t2);
+		\draw[e] (t2) -- (b2);
+	\end{tikzpicture}
+\end{center}
+
+\begin{eg}
+	You can look at any of them directly:
+\begin{shell}
+$ git cat-file -t HEAD           # what kind of object is this?
+commit
+$ git cat-file -p HEAD           # print it
+tree 4b825dc642cb6eb9a060e54bf8d69288fbee4904
+parent 8f3a1c9e2b7d4a5f6c8e9d0a1b2c3d4e5f6a7b8c
+author Kon Yi <you@example.com> 1757808000 +0800
+committer Kon Yi <you@example.com> 1757808000 +0800
+
+    Week1 Finish
+$ git cat-file -p HEAD^{tree}    # the directory it points at
+100644 blob a3f2e1d...    README.md
+040000 tree 9c4b8a2...    Chapters
+\end{shell}
+	That is the entire format. A commit is a small text file naming a tree; a tree
+	is a list naming blobs and other trees.
+\end{eg}
+
+\begin{definition}[Content addressing]
+	An object's name \emph{is} the hash of its contents. Two identical files
+	anywhere in history are one blob. Changing a byte changes the hash, which
+	changes the tree that names it, which changes the commit --- so a commit hash
+	certifies the entire tree beneath it.
+\end{definition}
+
+\begin{moral}
+	This is why history cannot be quietly altered: editing an old commit gives it a
+	new hash, which changes every descendant's hash too. ``Rewriting history''
+	(\autoref{sec:git-rewrite}) does not modify commits --- it makes new ones and
+	moves the branch.
+\end{moral}
+
+\section{The Three Trees}\label{sec:git-threetrees}
+
+Git manages three versions of your project at once, and almost every confusing
+Git message is about the boundary between two of them.
+
+\begin{center}
+	\begin{tikzpicture}[
+			x=1mm, y=1mm, font=\footnotesize\sffamily,
+			t/.style={draw=Gray!60, rounded corners=3pt, inner sep=5pt,
+					fill=Gray!5, minimum width=30mm, align=center},
+			e/.style={-{Stealth[length=4pt]}, Gray!70!black},
+			lbl/.style={font=\scriptsize\ttfamily, Gray!60!black}
+		]
+		\node[t] (w) at (  0, 0) {Working tree\\[1pt]\scriptsize the files on disk};
+		\node[t] (i) at ( 52, 0) {Index\\[1pt]\scriptsize the next commit};
+		\node[t] (h) at (104, 0) {HEAD\\[1pt]\scriptsize the last commit};
+		\draw[e] (w) -- node[lbl, above]{git add} (i);
+		\draw[e] (i) -- node[lbl, above]{git commit} (h);
+		\draw[e, SeaGreen!60!black] (h.south) to[out=-90,in=-90,looseness=0.45]
+		node[lbl, below, pos=0.5]{git checkout / git restore} (w.south);
+	\end{tikzpicture}
+\end{center}
+
+\begin{keys}[0.24]
+	\vocab{Working tree} & The actual files in your directory. What your editor sees \\
+	\vocab{Index} (or \vocab{staging area}) & A draft of the next commit. \cmd{git add} copies from the working tree into it \\
+	\vocab{HEAD}         & The commit you last committed or checked out             \\
+\end{keys}
+
+\begin{intuition}
+	The index is the feature people find pointless until they need it, and then
+	cannot do without. It lets you decide \emph{what} to commit separately from
+	\emph{what you have changed} --- so a session that fixed a bug and also
+	reformatted a function becomes two clean commits instead of one muddled one.
+	\cmd{git add -p} (\autoref{sec:git-add}) is where this pays off.
+\end{intuition}
+
+\begin{note}
+	Now \cmd{git status} reads as a report on two boundaries:
+	\emph{``Changes to be committed''} is index versus \texttt{HEAD};
+	\emph{``Changes not staged for commit''} is working tree versus index; and
+	\emph{``Untracked files''} are in neither. \cmd{git diff} compares working tree
+	with index, and \cmd{git diff --staged} compares index with \texttt{HEAD}.
+	Nothing else needs to be memorised --- it all falls out of the diagram.
+\end{note}
+
+\section{Refs, \texorpdfstring{\texttt{HEAD}}{HEAD}, and What a Branch Really Is}\label{sec:git-refs}
+
+\begin{definition}[Branch]
+	A file containing forty hex digits. That is not a simplification: a branch is a
+	\vocab{ref} --- a name pointing at one commit --- stored in
+	\file{.git/refs/heads/}, and committing moves the pointer forward.
+\end{definition}
+
+\begin{shell}
+$ cat .git/refs/heads/main
+bc91a17e5f3d2c1b0a9876543210fedcba987654
+$ cat .git/HEAD
+ref: refs/heads/main
+\end{shell}
+
+\begin{moral}
+	Branches are free. Creating one writes 41 bytes; deleting one removes them.
+	Nothing is copied, no files move, and there is no reason to hesitate before
+	making one. If you come from Subversion, where a branch was a server-side copy
+	of the tree, this is the single biggest adjustment.
+\end{moral}
+
+\texttt{HEAD} is one more level of indirection: it normally holds the \emph{name}
+of a branch rather than a commit. So committing updates \texttt{HEAD}'s branch,
+and \cmd{git switch} rewrites \texttt{HEAD} to name a different one.
+
+\begin{definition}[Detached \texttt{HEAD}]
+	The state where \texttt{HEAD} holds a commit hash directly instead of a branch
+	name --- after \cmd{git checkout <sha>}, or checking out a tag. Commits made
+	there belong to no branch, so moving away leaves them unreferenced and
+	apparently lost.
+\end{definition}
+
+\begin{note}
+	This is the state that alarms people, and it is harmless as long as you
+	understand it. Nothing is broken; you are simply standing on a commit with no
+	name attached. \cmd{git switch -c fix} gives the current position a name and
+	you are back on ordinary ground --- and even if you walk away first,
+	\autoref{sec:git-reflog} finds it again.
+\end{note}
+
+\begin{keys}[0.22]
+	\cmd{HEAD}          & Where you are                                       \\
+	\cmd{HEAD\textasciitilde{}1}, \cmd{HEAD\textasciitilde{}3} & One, three commits back along first parents \\
+	\cmd{HEAD\textasciicircum{}}, \cmd{HEAD\textasciicircum{}2} & The first, second parent of a merge \\
+	\cmd{main@\{yesterday\}} & Where \cmd{main} pointed yesterday               \\
+	\cmd{a1b2c3d}       & A commit by hash; seven characters is usually enough \\
+	\cmd{v1.0}          & A tag                                                \\
+	\cmd{origin/main}   & A \vocab{remote-tracking} branch: where \cmd{main} was on the remote when you last fetched \\
+\end{keys}
+
+\section{First-Time Setup}\label{sec:git-config}
+
+\begin{shell}
+$ git config --global user.name  "Kon Yi"
+$ git config --global user.email "you@example.com"
+$ git config --global init.defaultBranch main
+$ git config --global core.editor "nvim"
+$ git config --global pull.rebase true         # see sec. 33.4
+$ git config --global --list                   # check what you have
+\end{shell}
+
+\begin{keys}[0.30]
+	\cmd{-{}-global}        & \file{\textasciitilde/.gitconfig} --- all your repositories \\
+	\cmd{-{}-local}         & \file{.git/config} --- this repository only. The default    \\
+	\cmd{-{}-system}        & Every user on the machine                                  \\
+	\cmd{-{}-list -{}-show-origin} & Every setting, and which file set it                \\
+\end{keys}
+
+\begin{note}
+	The name and email are baked into every commit you make and cannot be changed
+	afterwards without rewriting history. Set them before your first commit. If
+	you use a different address for work, a conditional include keeps them apart:
+\begin{conf}
+# ~/.gitconfig
+[user]
+    name = Kon Yi
+    email = personal@example.com
+
+[includeIf "gitdir:~/work/"]
+    path = ~/.gitconfig-work
+\end{conf}
+\end{note}
+
+\begin{note}[This machine]
+	Git 2.43 is installed, with \cmd{user.name} set to \texttt{Konyi0613} and
+	credentials handled by the GitHub CLI --- \cmd{gh auth git-credential} is
+	registered as the credential helper for \texttt{github.com}, so pushing needs
+	no password prompt. \autoref{sec:gh-auth} covers what that arrangement is
+	doing.
+\end{note}
+
+\begin{tryit}
+	In any repository you have, run \cmd{git cat-file -p HEAD}, then
+	\cmd{git cat-file -p HEAD\textasciicircum{}\{tree\}}, then \cmd{cat .git/HEAD}.
+	Three commands, and the abstraction is gone: a commit really is a short text
+	file naming a tree, and a branch really is a file with a hash in it.
+\end{tryit}

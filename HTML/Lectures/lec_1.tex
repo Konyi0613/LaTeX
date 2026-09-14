@@ -1,0 +1,816 @@
+\chapter{The Learning Problem}
+\lecture{1}{9 Sep.}{}
+
+\section{Course Introduction}
+
+\source{slides p.1--5}
+
+Machine learning is a mixture of theoretical and practical tools, so any course
+about it has to decide how to mix them. There are two natural extremes, and both
+of them fail in their own way.
+
+\begin{itemize}
+    \item \emph{Theory oriented}: derive everything deeply, so that every
+        statement rests on a proof and the understanding is solid. The cost is
+        that it is less interesting to a general audience --- one may finish such
+        a course able to prove a generalization bound, yet unable to fit a model
+        to a real data set.
+    \item \emph{Techniques oriented}: flash over the sexiest techniques broadly,
+        so that the coverage looks shiny. The cost is that there are simply too
+        many techniques: they become hard to choose between, and hard to use
+        properly, because nothing tells you \emph{why} one of them should work
+        here and not there.
+\end{itemize}
+
+\begin{moral}
+    Our approach: \vocab{foundation oriented}.
+\end{moral}
+
+By \emph{foundation} we mean the part that does not change when the fashionable
+technique changes. Concretely, the course is a mixture of philosophical
+illustrations, key theory, core techniques, usage in practice, and hopefully
+jokes; the selecting principle is always \emph{what every machine learning user
+should know}. The payoff of insisting on foundations is that they transfer: a
+student who owns them can pick up a future or untaught technique, or go read
+deeper theory, without being taught each one explicitly.
+
+The material is organized \vocab{story-like}, as a sequence of questions, each
+one asked only after the previous one has been answered:
+
+\begin{enumerate}
+    \item \textbf{When} can machines learn? (illustrative + technical)
+    \item \textbf{Why} can machines learn? (theoretical + illustrative)
+    \item \textbf{How} can machines learn? (technical + practical)
+    \item \textbf{How} can machines learn \textbf{better}? (practical + theoretical)
+\end{enumerate}
+
+\begin{note}
+    The four questions above are the backbone of the \emph{foundations} half of
+    the story. The NTU version continues it with three more chapters, each one a
+    different answer to ``where do good features come from'':
+    \begin{enumerate}[start=5]
+        \item How can machines learn by \emph{embedding numerous} features?
+            (support vector machines)
+        \item How can machines learn by \emph{combining predictive} features?
+            (aggregation, boosting, trees and forests)
+        \item How can machines learn by \emph{distilling hidden} features?
+            (neural networks and deep learning)
+    \end{enumerate}
+\end{note}
+
+This first chapter sits entirely inside question~1, and it is the most basic
+piece of it: before asking when machines \emph{can} learn, we must say what the
+learning problem even \emph{is}. That is the plan of the chapter: we first ask
+what machine learning is (\autoref{sec:what-is-ml}), then look at where it
+already lives (\autoref{sec:applications}), then cut it into its formal
+components (\autoref{sec:components}), and finally place it next to the
+neighbouring fields it is often confused with (\autoref{sec:other-fields}).
+
+\begin{exercise}[Fun Time]
+    Which of the following descriptions of this course is true?
+    \begin{enumerate}[(1)]
+        \item the course will be taught in Taiwanese;
+        \item the course will tell me the techniques that create the android
+            Lieutenant Commander Data in \emph{Star Trek};
+        \item the course will be 15 weeks long;
+        \item the course will be story-like.
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (4). As for the others: (1) no, the instructor's Taiwanese is unfortunately
+    not good enough for teaching (yet); (2) no, although what we teach may serve
+    as foundations of those (future) techniques; (3) no, unless you choose to
+    join the next course. So: let us begin the story.
+\end{proof}
+
+\section{What is Machine Learning}\label{sec:what-is-ml}
+
+\source{slides p.6--11}
+
+\subsection{From Learning to Machine Learning}
+
+The safest way into a definition is by analogy with the thing we already do
+ourselves.
+
+\begin{definition}[Learning]
+    \vocab{Learning} is acquiring \emph{skill} with experience accumulated from
+    \emph{observations}.
+\end{definition}
+
+\begin{center}
+    \begin{tikzpicture}[node distance=1.3cm]
+        \node[mlbox] (a) {observations};
+        \node[mlop, right=of a] (b) {learning};
+        \node[mlbox, right=of b] (c) {skill};
+        \draw[mlarrow] (a) -- (b);
+        \draw[mlarrow] (b) -- (c);
+    \end{tikzpicture}
+\end{center}
+
+A machine has no eyes and no childhood, so the only observations it can
+accumulate are the ones we hand it in recorded form. Replacing
+\emph{observations} by \emph{data} and \emph{learning} by \emph{computation}
+gives the machine version.
+
+\begin{definition}[Machine learning, first attempt]
+    \vocab{Machine learning} is acquiring skill with experience
+    accumulated/computed from \emph{data}.
+\end{definition}
+
+\begin{center}
+    \begin{tikzpicture}[node distance=1.3cm]
+        \node[mlbox] (a) {data};
+        \node[mlop, right=of a] (b) {ML};
+        \node[mlbox, right=of b] (c) {skill};
+        \draw[mlarrow] (a) -- (b);
+        \draw[mlarrow] (b) -- (c);
+    \end{tikzpicture}
+\end{center}
+
+The word \emph{data} is concrete enough to be useful. The word \emph{skill} is
+not: it is exactly the kind of word that cannot be handed to a computer, so the
+definition is not finished yet.
+
+\begin{question}
+    What is skill?
+\end{question}
+
+\subsection{A More Concrete Definition}
+
+\begin{intuition}
+    skill \(\iff\) improve some \emph{performance measure}
+    (e.g.\ prediction accuracy).
+\end{intuition}
+
+This is the move that makes the whole subject possible: a vague goal (``be
+good at recognizing trees'') is replaced by a number that can be computed and
+watched (``fraction of tree images classified correctly''). Every later chapter
+is, in one way or another, an argument about which number to watch and what
+watching it really guarantees.
+
+\begin{definition}[Machine learning]\label{def:ml-performance}
+    \vocab{Machine learning} is improving some \emph{performance measure} with
+    experience computed from \emph{data}.
+\end{definition}
+
+\begin{center}
+    \begin{tikzpicture}[node distance=1.3cm]
+        \node[mlbox] (a) {data};
+        \node[mlop, right=of a] (b) {ML};
+        \node[mlbox, right=of b] (c) {improved\\performance\\measure};
+        \draw[mlarrow] (a) -- (b);
+        \draw[mlarrow] (b) -- (c);
+    \end{tikzpicture}
+\end{center}
+
+\begin{eg}[An application in computational finance]
+    Take the data to be historical stock data, and the performance measure to be
+    investment gain. Then machine learning here means: use the stock data to
+    compute a trading rule whose gain is higher than what we had before.
+    \begin{center}
+        \begin{tikzpicture}[node distance=1.3cm]
+            \node[mlbox] (a) {stock data};
+            \node[mlop, right=of a] (b) {ML};
+            \node[mlbox, right=of b] (c) {more\\investment gain};
+            \draw[mlarrow] (a) -- (b);
+            \draw[mlarrow] (b) -- (c);
+        \end{tikzpicture}
+    \end{center}
+\end{eg}
+
+\subsection{Why Use Machine Learning?}
+
+We now know what machine learning \emph{is}. A separate matter is why one would
+ever want it, given that a computer can already be programmed directly.
+
+\begin{question}
+    Why use machine learning?
+\end{question}
+
+\begin{eg}[Tree recognition]
+    Suppose we want a system that looks at a photograph and answers whether
+    there is a tree in it.
+    \begin{itemize}
+        \item To \emph{`define' trees and hand-program} the answer is difficult:
+            try writing down, in code, a condition that accepts every pine,
+            palm and bonsai and rejects every bush and lamppost.
+        \item To \emph{learn from data (observations) and recognize} is easy
+            enough that a 3-year-old can do it, having never received a
+            definition of ``tree'' in their life --- only examples.
+    \end{itemize}
+    So an `ML-based tree recognition system' can be easier to \emph{build} than
+    a hand-programmed one, even though it is harder to \emph{explain}.
+\end{eg}
+
+\begin{moral}
+    ML is an alternative route to build complicated systems.
+\end{moral}
+
+The useful way to read that moral is as a list of situations where the direct
+route is blocked:
+
+\begin{itemize}
+    \item when humans cannot program the system manually --- navigating on Mars;
+    \item when humans cannot `define the solution' easily ---
+        speech/visual recognition;
+    \item when rapid decisions are needed that humans cannot make ---
+        high-frequency trading;
+    \item when the system must be user-oriented at a massive scale ---
+        consumer-targeted marketing.
+\end{itemize}
+
+\begin{remark}
+    Give a computer a fish, you feed it for a day; teach it how to fish, you
+    feed it for a lifetime. :-)
+\end{remark}
+
+\subsection{Key Essence of Machine Learning}
+
+Machine learning is not always the right tool, and the definition above already
+tells us when it is not. Reading \autoref{def:ml-performance} backwards, three
+things must hold before the phrase even makes sense.
+
+\begin{enumerate}
+    \item There exists some \vocab{underlying pattern} to be learned --- so that
+        a `performance measure' \emph{can} be improved. Without a pattern there
+        is nothing to be better at.
+    \item But there is no programmable (easy) \emph{definition} of that pattern
+        --- so that `ML' is \emph{needed}. If you can just write the rule down,
+        write it down.
+    \item Somehow there is \vocab{data} about the pattern --- so that ML has some
+        `inputs' to learn from. A pattern nobody has recorded cannot be computed
+        from.
+\end{enumerate}
+
+\begin{moral}
+    Key essence: it helps decide whether to use ML at all.
+\end{moral}
+
+\begin{exercise}[Fun Time]
+    Which of the following is best suited for machine learning?
+    \begin{enumerate}[(1)]
+        \item predicting whether the next cry of a baby girl happens at an
+            even-numbered minute or not;
+        \item determining whether a given graph contains a cycle;
+        \item deciding whether to approve a credit card to some customer;
+        \item guessing whether the earth will be destroyed by the misuse of
+            nuclear power in the next ten years.
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (3), and the three essences say exactly why each of the others fails.
+    \begin{enumerate}[(1)]
+        \item Fails essence~1: there is no pattern.
+        \item Fails essence~2: the definition is programmable (run a cycle
+            detection algorithm).
+        \item Passes all three --- pattern: customer behaviour; definition: not
+            easily programmable; data: the history of bank operations.
+        \item Fails essence~3: there is arguably no (or not enough) data yet.
+    \end{enumerate}
+\end{proof}
+
+\section{Applications of Machine Learning}\label{sec:applications}
+
+\source{slides p.12--16}
+
+Every application below is the same picture,
+\begin{center}
+    \begin{tikzpicture}[node distance=1.3cm]
+        \node[mlbox] (a) {data};
+        \node[mlop, right=of a] (b) {ML};
+        \node[mlbox, right=of b] (c) {skill};
+        \draw[mlarrow] (a) -- (b);
+        \draw[mlarrow] (b) -- (c);
+    \end{tikzpicture}
+\end{center}
+with the two ends filled in differently. So the exercise in reading an
+application is always: \emph{what is the data, and what is the skill?}
+
+\subsection{Daily Needs: Food, Clothing, Housing, Transportation}
+
+\begin{enumerate}
+    \item \textbf{Food} (Sadilek et al., 2013).
+        \emph{Data}: Twitter data (words \(+\) location).
+        \emph{Skill}: tell the food-poisoning likeliness of a restaurant
+        properly.
+    \item \textbf{Clothing} (Abu-Mostafa, 2012).
+        \emph{Data}: sales figures \(+\) client surveys.
+        \emph{Skill}: give good fashion recommendations to clients.
+    \item \textbf{Housing} (Tsanas and Xifara, 2012).
+        \emph{Data}: characteristics of buildings and their energy load.
+        \emph{Skill}: predict the energy load of other buildings closely.
+    \item \textbf{Transportation} (Stallkamp et al., 2012).
+        \emph{Data}: some traffic sign images and their meanings.
+        \emph{Skill}: recognize traffic signs accurately.
+\end{enumerate}
+
+\begin{moral}
+    ML is everywhere!
+\end{moral}
+
+\subsection{Education}
+
+\emph{Data}: students' records on quizzes in a mathematics tutoring system.
+\emph{Skill}: predict whether a student can give a correct answer to
+\emph{another} quiz question.
+
+What makes this example instructive is that the pattern one guesses is not a
+formula in the recorded variables at all; it is a formula in quantities nobody
+ever measured:
+\[
+    \text{answer correctly} \approx
+    \llbracket\, \text{recent strength of student}
+    > \text{difficulty of question} \,\rrbracket.
+\]
+
+\begin{notation}
+    \(\llbracket \cdot \rrbracket\) is the \emph{Iverson bracket}: it equals
+    \(1\) when the statement inside is true and \(0\) when it is false.
+\end{notation}
+
+Neither ``strength'' nor ``difficulty'' appears in the data --- only who
+answered what, and whether it was right. Feeding roughly \(9\) million records
+from \(3000\) students to a learning algorithm lets it
+\emph{reverse-engineer} both numbers automatically, purely from the requirement
+that the formula above should reproduce the observed answers.
+
+\begin{moral}
+    This was the key part of the world-champion system from National Taiwan
+    University in KDDCup 2010.
+\end{moral}
+
+\subsection{Entertainment: Recommender Systems}
+
+\emph{Data}: how many users have rated some movies.
+\emph{Skill}: predict how a user would rate an unrated movie.
+
+\begin{eg}[A hot problem]
+    \begin{itemize}
+        \item A competition held by Netflix in 2006: \(100{,}480{,}507\) ratings
+            that \(480{,}189\) users gave to \(17{,}770\) movies, with a
+            \(10\%\) improvement worth a one-million-dollar prize.
+        \item A similar competition (movies \(\to\) songs) held by Yahoo!\ in
+            KDDCup 2011: \(252{,}800{,}275\) ratings that \(1{,}000{,}990\)
+            users gave to \(624{,}961\) songs.
+    \end{itemize}
+\end{eg}
+
+\begin{question}
+    How can machines learn our preferences?
+\end{question}
+
+The same trick as in the education example applies, and it is worth seeing that
+it is literally the same trick. Postulate that a viewer and a movie are each
+described by the \emph{same} list of hidden \vocab{factors} --- how much comedy,
+how much action, how much of a blockbuster --- read on the viewer's side as
+\emph{how much this viewer wants it} and on the movie's side as \emph{how much
+this movie has it}.
+
+\begin{center}
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tikzpicture}[font=\small,
+            slot/.style={draw=black!65, minimum width=0.8cm,
+                    minimum height=0.62cm, inner sep=0pt},
+            flab/.style={font=\scriptsize, inner sep=1pt},
+            tick/.style={-{Stealth[length=1.4mm]}, thin, draw=black!55}]
+
+            % ── the two factor vectors, as rows of slots in matching order
+            \foreach \y/\name in {1.5/viewer, -1.5/movie}{
+                \node[font=\small, anchor=east] at (-0.15,\y) {\name};
+                \foreach \i in {0,1,2}{\node[slot] at ({0.4+0.8*\i},\y) {};}
+                \node[slot, minimum width=2.2cm] at (3.5,\y) {\(\cdots\)};
+                \node[slot] at (5.0,\y) {};
+            }
+            % how much the viewer wants each factor (dot size = magnitude)
+            \fill[ForestGreen] (0.4, 1.5) circle (0.09);
+            \fill[NavyBlue]    (1.2, 1.5) circle (0.17);
+            \fill[Magenta]     (2.0, 1.5) circle (0.09);
+            \fill[Violet]      (5.0, 1.5) circle (0.07);
+            % how much the movie has of each factor
+            \fill[ForestGreen] (0.4,-1.5) circle (0.18);
+            \fill[NavyBlue]    (1.2,-1.5) circle (0.08);
+            \fill[Magenta]     (2.0,-1.5) circle (0.09);
+            \fill[Violet]      (5.0,-1.5) circle (0.18);
+
+            % ── what each slot stands for
+            \foreach \i/\up/\dn in {%
+                0/likes comedy?/comedy content,
+                1/likes action?/action content,
+                2/prefers blockbusters?/blockbuster?}{
+                \node[flab, rotate=58, anchor=south west]
+                    at ({0.55+0.8*\i},{1.98+0.2*\i}) {\up};
+                \draw[tick] ({0.5+0.8*\i},{1.95+0.2*\i})
+                    -- ({0.4+0.8*\i},1.84);
+                \node[flab, rotate=58, anchor=north east]
+                    at ({0.55+0.8*\i},{-1.98-0.2*\i}) {\dn};
+                \draw[tick] ({0.5+0.8*\i},{-1.95-0.2*\i})
+                    -- ({0.4+0.8*\i},-1.84);
+            }
+            \node[flab, rotate=58, anchor=south west]
+                at (5.15,1.98) {likes Tom Cruise?};
+            \draw[tick] (5.1,1.95) -- (5.0,1.84);
+            \node[flab, rotate=58, anchor=north east]
+                at (5.15,-1.98) {Tom Cruise in it?};
+            \draw[tick] (5.1,-1.95) -- (5.0,-1.84);
+
+            % ── slot k of one row is paired with slot k of the other
+            \foreach \x in {1.2, 2.0, 5.0}{
+                \draw[black!25, densely dotted] (\x,1.19) -- (\x,-1.19);}
+            \draw[{Stealth[length=2mm]}-{Stealth[length=2mm]}, thick, black!70]
+                (0.4,1.19) -- (0.4,-1.19);
+            \node[font=\scriptsize, align=center, fill=white, inner sep=2pt]
+                at (1.7,0) {match movie and\\viewer factors};
+
+            % ── then sum the matched contributions
+            \draw[mlarrow] (3.35,0) -- (4.95,0);
+            \node[font=\scriptsize, align=center, anchor=south]
+                at (4.15,0.16) {add contributions\\from each factor};
+            \node[align=center, font=\small\bfseries, color=RawSienna,
+                anchor=west] at (5.15,0) {predicted\\rating};
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{center}
+
+Both rows carry the same factors in the same order, so a viewer and a movie
+live in one common space; the size of a dot is the size of a number. The
+vertical arrow pairs slot \(k\) with slot \(k\), the horizontal one sums the
+pairs, and together they are a single formula: writing \(v_k\) for how much the
+viewer wants factor \(k\) and \(m_k\) for how much the movie has of it,
+\[
+    \text{predicted rating} \approx \sum_{k=1}^{K} v_k m_k ,
+\]
+the inner product of the two factor vectors. The product is the point --- a
+factor contributes only where the two sides \emph{agree}, so our
+action-loving viewer would rate this comedy rather low.
+
+The dashes say the list is long, and the last slot says how arbitrary it may
+be. Nobody drew that list up: as with the students' strength and difficulty,
+the factors are never observed, and the learning is what invents them.
+\begin{align*}
+    \text{pattern:} \quad & \text{rating} \longleftarrow
+        \text{viewer/movie factors};\\
+    \text{learning:} \quad & \text{known ratings} \longrightarrow
+        \text{learned factors} \longrightarrow
+        \text{unknown rating prediction}.
+\end{align*}
+
+\begin{moral}
+    Again the key part of the world-champion system from National Taiwan
+    University, this time in KDDCup 2011.
+\end{moral}
+
+\begin{exercise}[Fun Time]
+    Which of the following fields \emph{cannot} use machine learning?
+    \begin{enumerate}[(1)]
+        \item Finance;
+        \item Medicine;
+        \item Law;
+        \item none of the above.
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (4). Finance can predict stock prices from data, medicine can predict
+    medicine effects from data, and law can summarize legal documents from data.
+    Welcome to study this hot topic.
+\end{proof}
+
+\section{Components of Machine Learning}\label{sec:components}
+
+\source{slides p.17--22}
+
+So far ``machine learning'' has been a box in a picture. This section opens the
+box and names its parts. The running metaphor is \emph{credit approval}: a bank
+receives an application and must decide whether issuing a card to this person is
+good for the bank.
+
+\begin{center}
+    \begin{tabular}{@{}lr@{}}
+        \toprule
+        \multicolumn{2}{@{}l}{\textbf{Applicant Information}}\\
+        \midrule
+        age               & 23 years\\
+        gender            & female\\
+        annual salary     & NTD 1,000,000\\
+        year in residence & 1 year\\
+        year in job       & 0.5 year\\
+        current debt      & 200,000\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+The unknown pattern to be learned is: \emph{is approving this credit card good
+for the bank?}
+
+\subsection{Formalizing the Learning Problem}
+
+\begin{notation}
+    \hfill
+    \begin{itemize}
+        \item \textbf{Input}: \(x \in \mathcal{X}\) (a customer application).
+        \item \textbf{Output}: \(y \in \mathcal{Y}\) (good/bad after approving
+            the credit card).
+        \item The unknown pattern to be learned \(\iff\) the
+            \vocab{target function}
+            \[
+                f\colon \mathcal{X} \to \mathcal{Y}
+            \]
+            (the ideal credit approval formula).
+        \item The data \(\iff\) the \vocab{training examples}
+            \[
+                \mathcal{D} = \left\{ (x_1, y_1), (x_2, y_2), \dots ,
+                (x_N, y_N) \right\}
+            \]
+            (historical records in the bank).
+        \item The skill, hopefully with good performance, \(\iff\) the
+            \vocab{hypothesis}
+            \[
+                g\colon \mathcal{X} \to \mathcal{Y}
+            \]
+            (the `learned' formula to be used).
+    \end{itemize}
+\end{notation}
+
+\begin{center}
+    \begin{tikzpicture}[node distance=1.3cm]
+        \node[mlbox, minimum width=3.4cm] (a) {\(\left\{ (x_n, y_n) \right\}\)
+            from \(f\)};
+        \node[mlop, right=of a] (b) {ML};
+        \node[mlbox, right=of b] (c) {\(g\)};
+        \draw[mlarrow] (a) -- (b);
+        \draw[mlarrow] (b) -- (c);
+    \end{tikzpicture}
+\end{center}
+
+\begin{remark}
+    The asymmetry between \(f\) and \(g\) is the whole difficulty of the
+    subject, so it is worth stating plainly.
+    \begin{itemize}
+        \item \(f\) is \emph{unknown} --- indeed, by essence~2 of the previous
+            section, it has no programmable definition. We never see \(f\); we
+            only ever see \(N\) of its values.
+        \item \(g\) is what we produce, and we hope \(g \approx f\). But \(g\)
+            may differ from \(f\), and perfection is `impossible' precisely
+            because \(f\) is unknown --- there is no way to check the answer.
+    \end{itemize}
+    Everything in \emph{Why can machines learn?} is an attempt to say something
+    rigorous about \(g \approx f\) despite never seeing \(f\).
+\end{remark}
+
+Drawing the arrows in the order in which things actually happen gives the
+learning flow.
+
+\begin{center}
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tikzpicture}
+            \node[mlbox, minimum width=4.2cm] (f) at (0,2.25)
+                {unknown target function\\
+                 \(f\colon \mathcal{X} \to \mathcal{Y}\)\\[2pt]
+                 {\scriptsize (ideal credit approval formula)}};
+            \node[mlbox, minimum width=5.2cm] (D) at (0,0)
+                {training examples\\
+                 \(\mathcal{D}\colon (x_1, y_1), \dots , (x_N, y_N)\)\\[2pt]
+                 {\scriptsize (historical records in bank)}};
+            \node[mlop, minimum width=2.4cm] (A) at (5.4,0)
+                {learning\\algorithm\\\(\mathcal{A}\)};
+            \node[mlbox, minimum width=4.4cm] (g) at (10.2,0)
+                {final hypothesis\\
+                 \(g \approx f\)\\[2pt]
+                 {\scriptsize (`learned' formula to be used)}};
+            \draw[mlarrow] (f) -- (D);
+            \draw[mlarrow] (D) -- (A);
+            \draw[mlarrow] (A) -- (g);
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{center}
+
+\subsection{The Learning Model}
+
+The diagram still hides one thing.
+
+\begin{question}
+    What does \(g\) look like?
+\end{question}
+
+An algorithm cannot search over \emph{all} functions \(\mathcal{X} \to \mathcal{Y}\), so we
+must first decide which formulas are even candidates.
+
+\begin{definition}[Hypothesis set]
+    The \vocab{hypothesis set} \(\mathcal{H} = \left\{ h_k \right\}\) is the set
+    of candidate formulas that the algorithm is allowed to return, so that
+    \(g \in \mathcal{H}\).
+\end{definition}
+
+\begin{eg}
+    For credit approval, one might approve if
+    \begin{itemize}
+        \item \(h_1\): annual salary \(>\) NTD 800,000;
+        \item \(h_2\): debt \(>\) NTD 100,000 \quad (really?);
+        \item \(h_3\): year in job \(\le 2\) \quad (really?).
+    \end{itemize}
+    Note that \(\mathcal{H}\) happily contains bad hypotheses next to good ones.
+    That is not a defect: it is up to \(\mathcal{A}\) to pick the `best' one out
+    of \(\mathcal{H}\) and call it \(g\).
+\end{eg}
+
+\begin{definition}[Learning model]
+    A \vocab{learning model} is the pair consisting of the hypothesis set
+    \(\mathcal{H}\) and the learning algorithm \(\mathcal{A}\).
+\end{definition}
+
+\begin{center}
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tikzpicture}
+            \node[mlbox, minimum width=4.2cm] (f) at (0,2.25)
+                {unknown target function\\
+                 \(f\colon \mathcal{X} \to \mathcal{Y}\)\\[2pt]
+                 {\scriptsize (ideal credit approval formula)}};
+            \node[mlbox, minimum width=5.2cm] (D) at (0,0)
+                {training examples\\
+                 \(\mathcal{D}\colon (x_1, y_1), \dots , (x_N, y_N)\)\\[2pt]
+                 {\scriptsize (historical records in bank)}};
+            \node[mlop, minimum width=2.4cm] (A) at (5.4,0)
+                {learning\\algorithm\\\(\mathcal{A}\)};
+            \node[mlbox, minimum width=4.4cm] (g) at (10.2,0)
+                {final hypothesis\\
+                 \(g \approx f\)\\[2pt]
+                 {\scriptsize (`learned' formula to be used)}};
+            \node[mlbox, minimum width=3.4cm] (H) at (5.4,-2.25)
+                {hypothesis set\\
+                 \(\mathcal{H}\)\\[2pt]
+                 {\scriptsize (set of candidate formulas)}};
+            \draw[mlarrow] (f) -- (D);
+            \draw[mlarrow] (D) -- (A);
+            \draw[mlarrow] (A) -- (g);
+            \draw[mlarrow] (H) -- (A);
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{center}
+
+This is the picture the rest of the course elaborates. The dashed halves of the
+story are already visible in it: \(f\) and \(\mathcal{D}\) are given by the
+world and we cannot choose them, while \(\mathcal{H}\) and \(\mathcal{A}\) are
+ours to design.
+
+\begin{moral}
+    Machine learning: use data to compute a hypothesis \(g\) that approximates
+    the target \(f\).
+\end{moral}
+
+\begin{exercise}[Fun Time]
+    How should the four sets below be used to form a learning problem for song
+    recommendation?
+    \begin{align*}
+        S_1 &= [0, 100];\\
+        S_2 &= \text{all possible (userid, songid) pairs};\\
+        S_3 &= \text{all formulas that `multiply' user factors and song
+            factors,}\\
+            &\qquad \text{indexed by all possible combinations of such
+            factors};\\
+        S_4 &= \text{1,000,000 pairs of ((userid, songid), rating)}.
+    \end{align*}
+    \begin{enumerate}[(1)]
+        \item \(S_1 = \mathcal{X},\ S_2 = \mathcal{Y},\ S_3 = \mathcal{H},\
+            S_4 = \mathcal{D}\);
+        \item \(S_1 = \mathcal{Y},\ S_2 = \mathcal{X},\ S_3 = \mathcal{H},\
+            S_4 = \mathcal{D}\);
+        \item \(S_1 = \mathcal{D},\ S_2 = \mathcal{H},\ S_3 = \mathcal{Y},\
+            S_4 = \mathcal{X}\);
+        \item \(S_1 = \mathcal{X},\ S_2 = \mathcal{D},\ S_3 = \mathcal{Y},\
+            S_4 = \mathcal{H}\).
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (2). Reading the whole problem in one line,
+    \[
+        S_4 \xrightarrow{\ \mathcal{A} \text{ on } S_3\ }
+        \left( g\colon S_2 \to S_1 \right),
+    \]
+    i.e.\ the input space is the set of (user, song) pairs, the output space is
+    the rating scale \([0,100]\), the hypothesis set is the family of
+    factor-multiplying formulas, and the data is the list of observed ratings.
+\end{proof}
+
+\section{Machine Learning and Other Fields}\label{sec:other-fields}
+
+\source{slides p.23--27}
+
+Machine learning did not grow up alone, and much of the confusion around the
+name comes from its neighbours. Comparing the one-line definitions is enough to
+see both the overlap and the difference in \emph{focus} --- which is usually
+where the real difference lies.
+
+\subsection{Machine Learning and Data Mining}
+
+\begin{center}
+    \begin{tabular}{@{}p{0.45\textwidth}p{0.45\textwidth}@{}}
+        \toprule
+        \textbf{Machine Learning} & \textbf{Data Mining}\\
+        \midrule
+        use data to compute a hypothesis \(g\) that approximates a target \(f\)
+        & use (huge) data to find a property that is \emph{interesting}\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\begin{itemize}
+    \item If the `interesting property' \emph{is} the `hypothesis that
+        approximates the target', then ML \(=\) DM. This is usually what KDDCup
+        does.
+    \item If the `interesting property' is merely \emph{related} to such a
+        hypothesis, then DM can help ML and vice versa --- often, but not
+        always.
+    \item Traditional DM also puts weight on efficient computation in large
+        databases, which ML traditionally does not.
+\end{itemize}
+
+\begin{moral}
+    It is difficult to distinguish ML and DM in reality.
+\end{moral}
+
+\subsection{Machine Learning and Artificial Intelligence}
+
+\begin{center}
+    \begin{tabular}{@{}p{0.45\textwidth}p{0.45\textwidth}@{}}
+        \toprule
+        \textbf{Machine Learning} & \textbf{Artificial Intelligence}\\
+        \midrule
+        use data to compute a hypothesis \(g\) that approximates a target \(f\)
+        & compute something that shows \emph{intelligent behaviour}\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\begin{itemize}
+    \item \(g \approx f\) is something that shows intelligent behaviour, so ML
+        can realize AI --- among other routes.
+    \item For example, in chess playing: traditional AI builds a game tree,
+        whereas ML for AI learns from board data.
+\end{itemize}
+
+\begin{moral}
+    ML is one possible route to realize AI.
+\end{moral}
+
+\subsection{Machine Learning and Statistics}
+
+\begin{center}
+    \begin{tabular}{@{}p{0.45\textwidth}p{0.45\textwidth}@{}}
+        \toprule
+        \textbf{Machine Learning} & \textbf{Statistics}\\
+        \midrule
+        use data to compute a hypothesis \(g\) that approximates a target \(f\)
+        & use data to make \emph{inference} about an unknown process\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\begin{itemize}
+    \item \(g\) is an inference outcome and \(f\) is something unknown, so
+        statistics can be used to achieve ML.
+    \item Traditional statistics also focuses on provable results under
+        mathematical assumptions, and cares less about computation.
+\end{itemize}
+
+\begin{moral}
+    Statistics: many useful tools for ML.
+\end{moral}
+
+\begin{exercise}[Fun Time]
+    Which of the following claims is \emph{not} totally true?
+    \begin{enumerate}[(1)]
+        \item machine learning is a route to realize artificial intelligence;
+        \item machine learning, data mining and statistics all need data;
+        \item data mining is just another name for machine learning;
+        \item statistics can be used for data mining.
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (3). While data mining and machine learning do share a huge overlap, they
+    are arguably not equivalent, because of the difference of focus.
+\end{proof}
+
+\hrulebar
+
+\subsection*{Summary}
+
+\begin{description}
+    \item[Course Introduction] foundation oriented and story-like.
+    \item[What is Machine Learning] use data to approximate a target.
+    \item[Applications of Machine Learning] almost everywhere.
+    \item[Components of Machine Learning] \(\mathcal{A}\) takes \(\mathcal{D}\)
+        and \(\mathcal{H}\) to get \(g\).
+    \item[Machine Learning and Other Fields] related to DM, AI and statistics.
+\end{description}
+
+We have a frame, \((\mathcal{X}, \mathcal{Y}, f, \mathcal{D}, \mathcal{H},
+\mathcal{A}, g)\), but not a single concrete learning model to put in it: we
+never said what any \(h \in \mathcal{H}\) actually computes, nor how
+\(\mathcal{A}\) searches. The next chapter fills in the simplest useful choice
+of \(\mathcal{H}\) and \(\mathcal{A}\), for the simplest useful output space
+\(\mathcal{Y} = \left\{ -1, +1 \right\}\) --- that is, learning to answer
+yes/no.

@@ -1,0 +1,204 @@
+\chapter{Phony Targets and Project Conventions}\label{ch:mk-phony}
+
+Not every target is a file. \cmd{make clean}, \cmd{make test} and \cmd{make
+	install} name \emph{actions}, and make's file-and-timestamp model needs to be
+told so.
+
+\section{\texorpdfstring{\texttt{.PHONY} and Why It Matters}{.PHONY and Why It Matters}}\label{sec:mk-phonyt}
+
+\begin{makecode}
+clean:
+    rm -f app *.o
+\end{makecode}
+
+This works until the day someone creates a file called \file{clean}:
+
+\begin{shell}
+$ touch clean
+$ make clean
+make: 'clean' is up to date.
+\end{shell}
+
+Make did exactly what it promised. The target \texttt{clean} exists, it has no
+prerequisites, so nothing is out of date and the recipe does not run. The fix
+is to declare that this target is not a file:
+
+\begin{makecode}
+.PHONY: all clean install test
+
+clean:
+    rm -f app *.o
+\end{makecode}
+
+\begin{definition}[Phony target]
+	A target listed as a prerequisite of the special target \texttt{.PHONY}. Make
+	then never checks the filesystem for it: the recipe runs unconditionally, and
+	no timestamp comparison is made.
+\end{definition}
+
+\begin{note}
+	The stray file is the story everyone tells, and it is rare. The reason to use
+	\texttt{.PHONY} every time is the second, mundane one: it is faster --- make
+	skips the implicit-rule search entirely for phony targets --- and it documents
+	intent. A reader can tell at a glance which of your targets produce files.
+\end{note}
+
+\begin{moral}
+	Every target that does not name a file it creates goes in \texttt{.PHONY}.
+	Declare it once, near the bottom, listing all of them.
+\end{moral}
+
+\section{The Standard Target Names}\label{sec:mk-standard}
+
+These names are close to universal. Using them means anyone can build your
+project without reading the Makefile.
+
+\begin{keys}[0.20]
+	\texttt{all}       & The default build. Should be the first rule (\autoref{sec:mk-goal}) \\
+	\texttt{clean}     & Remove everything the build produced                     \\
+	\texttt{distclean} & \dots{} and the configuration too, back to a fresh checkout \\
+	\texttt{install}   & Copy the results into \texttt{\$(PREFIX)}                \\
+	\texttt{uninstall} & Remove them again                                        \\
+	\texttt{test}, \texttt{check} & Run the test suite                            \\
+	\texttt{dist}      & Build a release tarball                                  \\
+	\texttt{help}      & Print the available targets                              \\
+\end{keys}
+
+\begin{makecode}
+PREFIX ?= /usr/local
+BINDIR := $(PREFIX)/bin
+
+install: app
+    install -d $(DESTDIR)$(BINDIR)
+    install -m 755 app $(DESTDIR)$(BINDIR)/app
+
+uninstall:
+    rm -f $(DESTDIR)$(BINDIR)/app
+
+test: app
+    ./run-tests.sh
+
+clean:
+    rm -f app $(OBJ) $(DEP)
+
+.PHONY: all install uninstall test clean
+\end{makecode}
+
+\begin{note}
+	\texttt{DESTDIR} is prepended to every installed path and is normally empty.
+	Distribution packagers set it to a staging directory, so that
+	\cmd{make install DESTDIR=/tmp/pkg} lays out a complete tree under
+	\file{/tmp/pkg} without touching the real \file{/usr/local}. It costs nothing
+	to support and packagers will thank you.
+\end{note}
+
+\begin{eg}[A self-documenting \texttt{help}]
+	A pleasant trick: annotate targets with a marked comment and let
+	\cmd{awk} (\autoref{sec:sh-awk}) extract them.
+\begin{makecode}
+help:  ## show this message
+    @awk -F':.*##' '/^[a-z-]+:.*##/ {printf "  %-12s %s\n", $$1, $$2}' \
+        $(MAKEFILE_LIST)
+
+build: ## compile everything
+test:  ## run the test suite
+\end{makecode}
+	Note \texttt{\$\$1}: make expands \texttt{\$} first, so the \cmd{awk} program
+	needs its dollars doubled to survive --- exactly the hazard named in
+	\autoref{sec:mk-notation}.
+\end{eg}
+
+\section{Order-Only Prerequisites and Directories}\label{sec:mk-orderonly}
+
+\autoref{sec:mk-vpath} left a problem: \file{build/} must exist before anything
+is written into it, but it must not trigger rebuilds.
+
+The naive fix does not work:
+
+\begin{makecode}
+$(BUILD)/%.o: %.c $(BUILD)
+    $(CC) -c -o $@ $<
+\end{makecode}
+
+A directory's timestamp changes every time a file is written into it. So the
+directory becomes newer than the objects, and every object rebuilds on every
+run.
+
+\begin{definition}[Order-only prerequisite]
+	A prerequisite written after a \texttt{|} in the prerequisite list. It must be
+	built before the target, but its timestamp is ignored when deciding whether the
+	target is out of date.
+\end{definition}
+
+\begin{makecode}
+$(BUILD)/%.o: %.c | $(BUILD)
+    $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+
+$(BUILD):
+    mkdir -p $@
+\end{makecode}
+
+\begin{note}
+	Read the \texttt{|} as ``and, before any of that, make sure this exists''.
+	Creating output directories is the overwhelmingly common use; the other is a
+	code generator that must run first but whose own timestamp should not force
+	everything downstream to rebuild.
+\end{note}
+
+\section{Recursive Make, and Its Problems}\label{sec:mk-recursive}
+
+A large project is often split into a Makefile per directory, each invoking make
+in its subdirectories:
+
+\begin{makecode}
+SUBDIRS := src lib tests
+
+all:
+    for d in $(SUBDIRS); do $(MAKE) -C $$d || exit 1; done
+\end{makecode}
+
+\begin{note}
+	\texttt{\$(MAKE)} rather than \cmd{make}: it carries the parent's flags through
+	(including \cmd{-j} and \cmd{-n}) and lets make recognise the sub-build as its
+	own. \cmd{-C dir} changes directory first. Writing \cmd{make} literally here
+	breaks parallel builds and \cmd{make -n} alike.
+\end{note}
+
+This arrangement is common, and it is a known mistake. Peter Miller's 1997
+paper \emph{Recursive Make Considered Harmful} \cite{miller1998recursive} sets
+out why, and the argument has not weakened:
+
+\begin{enumerate}[(i)]
+	\item \textbf{No sub-make sees the whole graph.} Each knows only its own
+	      directory, so a dependency crossing a directory boundary cannot be expressed
+	      --- only guessed at by ordering the subdirectories by hand.
+	\item \textbf{The order is a lie.} \texttt{src} before \texttt{tests} is a
+	      hand-maintained approximation of a graph make could have computed exactly.
+	\item \textbf{Parallelism is crippled.} \cmd{make -j8} cannot overlap two
+	      subdirectories that a shell \cmd{for} loop runs in sequence, so the build is
+	      as slow as its longest chain.
+	\item \textbf{Builds can be wrong, not merely slow.} A missing cross-directory
+	      edge means make declares success with a stale object linked in --- the worst
+	      failure a build system has.
+\end{enumerate}
+
+\begin{moral}
+	Prefer one Makefile that \cmd{include}s fragments from each directory over one
+	Makefile per directory that calls make. Each fragment contributes its rules to
+	a single graph, make sees all of it, and \cmd{-j} works properly.
+\end{moral}
+
+\begin{makecode}
+# top-level Makefile: one graph, several files
+include src/module.mk
+include lib/module.mk
+include tests/module.mk
+
+all: $(ALL_TARGETS)
+\end{makecode}
+
+\begin{remark}
+	This is also roughly what CMake and Ninja do: the description is written per
+	directory, and the graph that gets executed is a single flat one. The idea did
+	win --- it just stopped being spelled \cmd{make -C}.
+\end{remark}

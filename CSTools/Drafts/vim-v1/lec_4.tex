@@ -1,0 +1,249 @@
+\chapter{Editing in Practice}\label{ch:editing}
+
+\section{Entering Insert Mode}\label{sec:insert-entry}
+
+There are eight ways in, and choosing the right one saves a motion every time.
+
+\begin{keys}[0.16]
+	\key{i} / \key{a}  & Insert before / after the cursor                      \\
+	\key{I} / \key{A}  & Insert at the first non-blank / at end of line        \\
+	\key{o} / \key{O}  & Open a new line below / above, and insert             \\
+	\key{c} \texttt{\{motion\}} & Change: delete the region, then insert       \\
+	\key{s} / \key{S}  & Substitute a character / the whole line               \\
+	\key{g} \key{i}    & Insert exactly where you last left Insert mode        \\
+	\key{g} \key{I}    & Insert in column 1                                    \\
+\end{keys}
+
+\begin{eg}
+	To append a semicolon, \key{A} \key{;} \key{<Esc>} --- not \key{\$} \key{a}
+	\key{;} \key{<Esc>}. To add a line under the current one, \key{o}, not
+	\key{\$} \key{a} \key{<CR>}. These savings look trivial written down and are
+	not, because you make the edit several hundred times a day.
+\end{eg}
+
+\subsection{Useful keys inside Insert mode}
+
+\begin{keys}[0.16]
+	\key{<C-w>}   & Delete the word before the cursor                   \\
+	\key{<C-u>}   & Delete to the start of the line                     \\
+	\key{<C-h>}   & Backspace                                           \\
+	\key{<C-r>} \texttt{\{reg\}} & Insert the contents of a register (\autoref{sec:registers}) \\
+	\key{<C-o>}   & Run \emph{one} Normal-mode command, then come back  \\
+	\key{<C-n>} / \key{<C-p>} & Complete the current word from the buffer \\
+	\key{<C-t>} / \key{<C-d>} & Indent / dedent the current line        \\
+\end{keys}
+
+\begin{note}
+	\key{<C-o>} is the escape hatch that prevents mode-thrashing: \key{<C-o>}
+	\key{z} \key{z} recentres the screen mid-sentence without leaving Insert mode,
+	and \key{<C-o>} \key{D} deletes the rest of the line.
+\end{note}
+
+\section{Undo}
+
+\begin{keys}[0.20]
+	\key{u} / \key{<C-r>}     & Undo / redo                                     \\
+	\key{U}                   & Undo all recent changes on one line             \\
+	\cmd{:earlier 10m}        & Revert the file to its state ten minutes ago    \\
+	\cmd{:later 30s}          & And forward again                               \\
+	\key{g} \key{-} / \key{g} \key{+} & Move through the undo tree in time order \\
+\end{keys}
+
+\begin{remark}[The undo tree]
+	Vim's undo history is a \emph{tree}, not a stack. If you undo three changes
+	and then type something new, the old branch is not destroyed --- \key{g} \key{-}
+	walks back into it chronologically. Setting \cmd{'undofile'} persists this tree
+	to disk so that it survives closing the file, which is one of the options most
+	worth switching on.
+\end{remark}
+
+\hrulebar
+
+\section{Registers}\label{sec:registers}
+
+Vim does not have \emph{a} clipboard; it has several dozen.
+
+\begin{definition}[Register]
+	A named slot holding text. Prefix any yank, delete or paste with
+	\key{"}\texttt{x} to direct it at register \texttt{x}.
+\end{definition}
+
+\begin{keys}[0.16]
+	\key{"} \key{"} & The unnamed register: the target of every unprefixed yank and delete \\
+	\key{"} \key{0} & The yank register: only \key{y} writes here, so it survives deletions \\
+	\key{"} \key{1}--\key{"} \key{9} & A ring of the last nine multi-line deletions        \\
+	\key{"} \key{a}--\key{"} \key{z} & Named registers you control                         \\
+	\key{"} \key{A}--\key{"} \key{Z} & The same, but \emph{appending} instead of replacing  \\
+	\key{"} \key{+} & The system clipboard                                                 \\
+	\key{"} \key{*} & The X11 primary selection (middle-click paste)                       \\
+	\key{"} \key{\_} & The black hole: writes here are discarded                           \\
+	\key{"} \key{\%} & The current file name (read-only)                                   \\
+	\key{"} \key{.} & The last inserted text (read-only)                                   \\
+	\key{"} \key{:} & The last Ex command (read-only)                                      \\
+	\key{"} \key{/} & The last search pattern                                              \\
+\end{keys}
+
+\begin{eg}[The classic frustration]
+	You yank a word with \key{y} \key{i} \key{w}, move to another word, delete it
+	with \key{d} \key{i} \key{w}, and paste --- and get back the word you just
+	deleted. The delete overwrote the unnamed register. Three fixes:
+	\begin{enumerate}[(i)]
+		\item paste from the yank register instead: \key{"} \key{0} \key{p};
+		\item delete into the black hole: \key{"} \key{\_} \key{d} \key{i} \key{w} then \key{p};
+		\item select the target in Visual mode and press \key{p}, which replaces the
+		      selection with the register in one step.
+	\end{enumerate}
+\end{eg}
+
+\begin{keys}[0.16]
+	\key{p} / \key{P} & Paste after / before the cursor                                  \\
+	\key{g} \key{p}   & Paste and leave the cursor after the pasted text                 \\
+	\key{y} \key{y} \key{p} & Duplicate the current line                                 \\
+	\cmd{:registers}  & Show every register's contents                                   \\
+\end{keys}
+
+\begin{note}[Linewise vs.\ charwise]
+	A register remembers \emph{how} it was filled. Text yanked with \key{y} \key{y}
+	is linewise and \key{p} puts it on a new line below; text yanked with \key{y}
+	\key{i} \key{w} is charwise and \key{p} inserts it after the cursor. This is
+	why \key{y} \key{y} \key{p} duplicates a line cleanly.
+\end{note}
+
+\begin{remark}[System clipboard]
+	\key{"} \key{+} \key{y} copies to the system clipboard and \key{"} \key{+}
+	\key{p} pastes from it. Setting \cmd{vim.opt.clipboard = "unnamedplus"} makes
+	every plain yank and paste use it, which is convenient but means deletes also
+	clobber your clipboard --- many people deliberately leave it off. Neovim needs
+	a provider for this (\texttt{xclip}, \texttt{wl-clipboard}, or
+	\texttt{pbcopy}); check with \cmd{:checkhealth provider}.
+\end{remark}
+
+\section{Macros}\label{sec:macros}
+
+A macro is a register holding keystrokes rather than text --- which is why they
+share the same namespace.
+
+\begin{keys}[0.20]
+	\key{q} \texttt{\{reg\}}  & Start recording into register \texttt{reg}       \\
+	\key{q}                   & Stop recording                                   \\
+	\key{@} \texttt{\{reg\}}  & Play it back                                     \\
+	\key{@} \key{@}           & Replay the last macro                            \\
+	\key{5} \key{@} \key{q}   & Play macro \texttt{q} five times                 \\
+	\cmd{:\%normal @q}        & Run macro \texttt{q} on every line in the file   \\
+\end{keys}
+
+\begin{eg}
+	Turn a list of bare words into a \LaTeX{} itemised list. With the cursor on the
+	first line:
+	\begin{vimcode}
+qq            # start recording into register q
+I\item <Esc>  # insert the item macro at the start of the line
+j             # move to the next line
+q             # stop recording
+9@q           # apply to the next nine lines
+	\end{vimcode}
+\end{eg}
+
+\begin{note}[Writing macros that survive]
+	Finish every macro by moving to the start of the next unit of work (usually
+	\key{j} \key{\textasciicircum{}}), so that repetition composes. Prefer \key{0}, \key{\textasciicircum{}},
+	\key{f}\texttt{x} and text objects over counting characters --- a macro built
+	from structural motions keeps working on lines of different lengths. And
+	because a macro is just a register, \key{"} \key{q} \key{p} pastes it into the
+	buffer for editing, and \key{"} \key{q} \key{y} \key{y} loads the edited line
+	back.
+\end{note}
+
+\begin{moral}
+	Reach for \key{.} first, a macro when \key{.} is not enough, and \cmd{:g}
+	(\autoref{sec:global}) when the change is described by a pattern rather than a
+	position.
+\end{moral}
+
+\section{Visual Mode}
+
+\begin{keys}[0.20]
+	\key{v} / \key{V} / \key{<C-v>} & Start charwise / linewise / blockwise selection \\
+	\key{g} \key{v}   & Reselect the previous selection                              \\
+	\key{o}           & Jump to the other end of the selection                       \\
+	\key{i} \key{w}, \key{a} \key{p}, \dots & Text objects extend the selection      \\
+	\key{u} / \key{U} & Lowercase / uppercase the selection                          \\
+	\key{J}           & Join the selected lines                                      \\
+	\key{:}           & Start an Ex command with the range \cmd{'<,'>} pre-filled     \\
+\end{keys}
+
+Blockwise Visual mode is the one feature with no Normal-mode equivalent:
+
+\begin{keys}[0.20]
+	\key{<C-v>} \dots \key{I} \texttt{text} \key{<Esc>} & Insert \texttt{text} at the start of every selected line \\
+	\key{<C-v>} \dots \key{A} \texttt{text} \key{<Esc>} & Append it at the end of every line                      \\
+	\key{<C-v>} \dots \key{\$} \key{A}                  & Append at each line's own end, ragged right             \\
+	\key{<C-v>} \dots \key{d}                           & Delete a rectangle                                      \\
+	\key{<C-v>} \dots \key{r} \key{-}                   & Fill the rectangle with hyphens                        \\
+\end{keys}
+
+\begin{tryit}
+	Comment out five lines of Lua: put the cursor on the first, press \key{<C-v>}
+	\key{4} \key{j} to select a zero-width column, then \key{I} \texttt{-{}-}
+	\key{<Esc>}. The insertion is replicated down the block when you leave Insert
+	mode.
+\end{tryit}
+
+\section{Substitution}\label{sec:substitute}
+
+\begin{keys}[0.34]
+	\cmd{:s/old/new/}            & Replace the first match on this line     \\
+	\cmd{:s/old/new/g}           & Every match on this line                 \\
+	\cmd{:\%s/old/new/g}         & Every match in the file                  \\
+	\cmd{:\%s/old/new/gc}        & \dots\ confirming each one                \\
+	\cmd{:\%s/old/new/gi}        & \dots\ case-insensitively                 \\
+	\cmd{:'<,'>s/old/new/g}      & Within the last Visual selection         \\
+	\cmd{:10,20s/old/new/g}      & Within lines 10--20                      \\
+	\cmd{:.,+5s/old/new/g}       & From here to five lines on               \\
+	\cmd{:\%s//new/g}            & Reuse the last search pattern as \texttt{old} \\
+\end{keys}
+
+In the replacement, \cmd{\&} is the whole match, \cmd{\textbackslash 1}
+--\cmd{\textbackslash 9} are capture groups, \cmd{\textasciitilde} is the previous
+replacement, and \cmd{\textbackslash u} / \cmd{\textbackslash U} uppercase what
+follows.
+
+\begin{eg}
+	\cmd{:\%s/\textbackslash v(\textbackslash w+)\textbackslash .(\textbackslash w+)/\textbackslash 2.\textbackslash 1/g}
+	swaps the two halves of every dotted pair in the file. Under ``very magic''
+	(\cmd{\textbackslash v}) the parentheses group without escaping.
+\end{eg}
+
+\begin{note}
+	Leaving the pattern empty reuses the last search, so the safe workflow is:
+	search with \key{/} until the highlighting shows exactly the matches you
+	intend, then run \cmd{:\%s//replacement/g}. You never have to type the pattern
+	twice, and you never substitute blind.
+\end{note}
+
+\section{The Global Command}\label{sec:global}
+
+\cmd{:g} is Vim's answer to \texttt{grep} piped into an editor: \emph{run an Ex
+	command on every line matching a pattern.}
+
+\begin{keys}[0.34]
+	\cmd{:g/pat/d}              & Delete every line matching \texttt{pat}        \\
+	\cmd{:v/pat/d}              & Delete every line \emph{not} matching it       \\
+	\cmd{:g/pat/normal A;}      & Append a semicolon to matching lines           \\
+	\cmd{:g/pat/t\$}            & Copy matching lines to the end of the file     \\
+	\cmd{:g/pat/m0}             & Move them to the top --- reverses their order   \\
+	\cmd{:g/\textasciicircum{}\$/d}             & Delete all blank lines                         \\
+	\cmd{:g/pat/normal @q}      & Run macro \texttt{q} on every matching line    \\
+\end{keys}
+
+\begin{eg}
+	\cmd{:g/TODO/normal gcc} comments out every line containing \texttt{TODO}
+	(assuming the \key{g} \key{c} \key{c} comment mapping from \texttt{mini.comment}).
+	\cmd{:g/\textbackslash vfn \textbackslash w+/normal O\textbackslash /\textbackslash /\textbackslash /} inserts a doc-comment line above every function.
+\end{eg}
+
+\begin{moral}
+	\cmd{:g} plus \cmd{normal} plus a macro is the most powerful line in Vim. When
+	a refactor is describable as ``for every line that looks like $X$, do $Y$'',
+	it is one command, not a script.
+\end{moral}

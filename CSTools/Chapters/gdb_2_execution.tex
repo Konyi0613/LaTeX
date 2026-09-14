@@ -1,0 +1,182 @@
+\chapter{Controlling Execution}\label{ch:gdb-exec}
+
+A debugger is a program that runs your program slowly enough for you to look at
+it. This chapter is the controls: start, stop, and advance by one step of
+whatever size you need.
+
+\section{Starting and Stopping}\label{sec:gdb-run}
+
+\begin{keys}[0.28]
+	\cmd{run}                 & Start the program from the beginning                 \\
+	\cmd{run arg1 arg2}       & \dots{} with arguments                               \\
+	\cmd{run < in.txt > out.txt} & \dots{} with redirection, as in \autoref{sec:sh-redirect} \\
+	\cmd{start}               & \cmd{run}, with a temporary breakpoint on \cmd{main} \\
+	\cmd{continue}            & Resume until the next stop                           \\
+	\cmd{continue 5}          & Resume, ignoring this breakpoint the next 4 times     \\
+	\cmd{kill}                & Stop the program, keep the session                   \\
+	\cmd{quit}                & Leave GDB                                            \\
+	\cmd{set args -v in.txt}  & Set the arguments for future runs                    \\
+	\cmd{show args}           & What they currently are                              \\
+\end{keys}
+
+\begin{note}
+	\cmd{start} is almost always the right way in: it gets you to the first line of
+	\cmd{main} with the program loaded and the dynamic libraries mapped, which is
+	the point at which most things become inspectable. Plain \cmd{run} with no
+	breakpoints set simply runs to completion.
+\end{note}
+
+\begin{note}[The program keeps its state]
+	\cmd{run} a second time restarts from scratch; breakpoints and watchpoints
+	survive, convenience variables survive, and the value history survives. So the
+	loop is: set breakpoints, \cmd{run}, look, adjust, \cmd{run} again --- without
+	ever leaving GDB.
+\end{note}
+
+\section{Stepping}\label{sec:gdb-step}
+
+\begin{keys}[0.28]
+	\cmd{next} (\cmd{n})      & Run the next source line. \textbf{Step over} calls   \\
+	\cmd{step} (\cmd{s})      & Run the next source line. \textbf{Step into} calls   \\
+	\cmd{finish}              & Run until the current function returns; print its value \\
+	\cmd{until}               & Like \cmd{next}, but do not go backwards --- runs a loop to completion \\
+	\cmd{until 60}            & Run until line 60 is reached, or the frame returns   \\
+	\cmd{advance parse}       & Run until \cmd{parse} is reached, or the frame returns \\
+	\cmd{next 10}             & Ten lines at once                                    \\
+\end{keys}
+
+\begin{intuition}
+	\cmd{next} and \cmd{step} differ only at a function call. \cmd{next} treats the
+	call as one line and runs the whole thing; \cmd{step} stops at its first line.
+	Use \cmd{next} by default and \cmd{step} only when you have decided that the
+	bug is inside \emph{this} call --- otherwise you will spend the afternoon
+	inside \cmd{printf}.
+\end{intuition}
+
+\begin{eg}
+\begin{gdbcode}
+(gdb) start
+Temporary breakpoint 1, main () at main.c:12
+12          int n = count_words(argv[1]);
+(gdb) next                     # run count_words, stop after it
+13          printf("%d\n", n);
+(gdb) print n
+$1 = 0                         # wrong: the file has 40 words
+(gdb) run                      # start again, this time go inside
+(gdb) step
+count_words (path=0x7fffffffe5c1 "input.txt") at parser.c:8
+8           FILE *f = fopen(path, "r");
+\end{gdbcode}
+	The first \cmd{next} establishes \emph{that} the answer is wrong; the
+	\cmd{step} begins finding out why. Doing it in that order saves you from
+	stepping through functions that were never the problem.
+\end{eg}
+
+\begin{note}[\cmd{step} into a library]
+	\cmd{step} will not enter a function with no debug information --- it steps
+	over it instead, which is what you want. If you have installed libc's debug
+	symbols and now find yourself inside \cmd{malloc}, \cmd{finish} gets you out,
+	and \cmd{skip file malloc.c} stops it happening again.
+\end{note}
+
+\begin{eg}[\cmd{until}, and why loops are annoying]
+	Stepping with \cmd{next} inside a loop walks the body once per iteration, so a
+	thousand-iteration loop takes a thousand presses. \cmd{until} at the closing
+	line of the body runs the loop out:
+\begin{gdbcode}
+(gdb) next
+14              for (int i = 0; i < n; i++) {
+(gdb) next
+15                  total += weight[i];
+(gdb) until                    # run the loop to completion
+17          printf("%d\n", total);
+\end{gdbcode}
+	The other answer is a conditional breakpoint on the iteration you care about
+	--- \autoref{sec:gdb-cond}.
+\end{eg}
+
+\begin{moral}
+	\key{<CR>} repeats the last command, so stepping is: type \cmd{n} once, then
+	hold Enter. This is the single most-used key sequence in GDB.
+\end{moral}
+
+\section{Source Lines versus Instructions}\label{sec:gdb-instr}
+
+Everything above steps by \emph{source line}. Underneath, a line is several
+machine instructions, and sometimes that is the level you need.
+
+\begin{keys}[0.28]
+	\cmd{stepi} (\cmd{si})  & One machine instruction, entering calls        \\
+	\cmd{nexti} (\cmd{ni})  & One instruction, stepping over calls           \\
+	\cmd{disassemble}       & The current function's instructions            \\
+	\cmd{disassemble /s}    & \dots{} interleaved with the source            \\
+	\cmd{x/5i \$pc}         & The next five instructions from the program counter \\
+	\cmd{info registers}    & Every register                                 \\
+	\cmd{display/i \$pc}    & Show the next instruction after every stop     \\
+\end{keys}
+
+\begin{eg}
+\begin{gdbcode}
+(gdb) disassemble /s main
+Dump of assembler code for function main:
+main.c:
+5       int main(void) {
+   0x1149 <+0>:     push   %rbp
+   0x114a <+1>:     mov    %rsp,%rbp
+6           int *p = NULL;
+   0x114d <+4>:     movq   $0x0,-0x8(%rbp)
+7           return *p;
+   0x1155 <+12>:    mov    -0x8(%rbp),%rax
+   0x1159 <+16>:    mov    (%rax),%eax        # <-- the fault is here
+\end{gdbcode}
+\end{eg}
+
+\begin{note}
+	You need this level in exactly three situations: the code was compiled without
+	\cmd{-g}; the bug is in inline assembly or a compiler intrinsic; or you suspect
+	the compiler, which is almost never the case. Otherwise stay at the source
+	level --- assembly is a way of being precise about the wrong thing.
+\end{note}
+
+\section{Changing the Flow}\label{sec:gdb-force}
+
+GDB can do more than watch. These commands alter a running program, which is
+occasionally exactly what an experiment needs.
+
+\begin{keys}[0.28]
+	\cmd{return}          & Abandon the current function immediately            \\
+	\cmd{return 0}        & \dots{} making it return that value                 \\
+	\cmd{jump 42}         & Continue from line 42 instead of here               \\
+	\cmd{call parse(s)}   & Call a function in the program, right now           \\
+	\cmd{print parse(s)}  & The same, and show the result                       \\
+\end{keys}
+
+\begin{eg}
+	Testing a fix without recompiling. A function is returning a null pointer and
+	you suspect the caller mishandles it:
+\begin{gdbcode}
+(gdb) break lookup
+(gdb) run
+Breakpoint 1, lookup (key=0x4006f4 "port") at config.c:31
+(gdb) return 0                 # force the NULL return, right now
+(gdb) continue
+Program received signal SIGSEGV, Segmentation fault.
+0x00005555555552a1 in main () at main.c:22
+22          printf("%s\n", value);
+\end{gdbcode}
+	Confirmed in twenty seconds: the caller does not check. You have reproduced a
+	rare failure on demand, which is usually the hard part.
+\end{eg}
+
+\begin{note}
+	\cmd{call} and \cmd{print} of a function actually run it in the program's own
+	process, side effects and all. That is powerful --- \cmd{print dump\_state()}
+	invokes your own debug printer --- and dangerous: if the function crashes, it
+	crashes the program you were debugging. GDB will tell you and offer to unwind.
+\end{note}
+
+\begin{moral}
+	\cmd{jump} skips the stack adjustment a real control transfer would do, so
+	jumping out of one function into another is undefined nonsense. Jump within a
+	function, or not at all.
+\end{moral}

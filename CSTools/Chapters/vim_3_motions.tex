@@ -1,0 +1,178 @@
+\chapter{Motions}\label{ch:vim-motions}
+
+A \vocab{motion} is any command that moves the cursor. Motions matter far beyond
+navigation, because \autoref{ch:vim-grammar} will feed every one of them to an
+operator: learning a new motion automatically teaches you a new way to delete,
+change, copy and indent. Read this chapter as vocabulary building, not as a
+tour of the arrow keys.
+
+\section{Characters and Lines}\label{sec:vim-charline}
+
+\begin{keys}[0.16]
+	\key{h} \key{j} \key{k} \key{l} & Left, down, up, right                                      \\
+	\key{0}                         & First character of the line (column zero)                  \\
+	\key{\textasciicircum{}}                        & First \emph{non-blank} character --- usually what you want \\
+	\key{\$}                        & End of the line                                            \\
+	\key{g} \key{\_}                & Last non-blank character                                   \\
+	\key{+} / \key{-}               & First non-blank of the next/previous line                  \\
+\end{keys}
+
+\begin{intuition}
+	\key{h} \key{j} \key{k} \key{l} sit under the right hand in the home row, which
+	is the entire argument for them: your hand never leaves its resting position.
+	The usual advice to disable the arrow keys is sound, but temporary --- once the
+	habit forms you will find you were never reaching for them anyway.
+\end{intuition}
+
+\begin{remark}[Soft-wrapped lines]
+	With \cmd{'wrap'} on, \key{j} moves a whole logical line, which may be several
+	screen rows. Prefix with \key{g} --- \key{g} \key{j}, \key{g} \key{k},
+	\key{g} \key{0}, \key{g} \key{\$} --- to move by \emph{display} line instead.
+	Indispensable when editing prose or \LaTeX.
+\end{remark}
+
+\section{Words and WORDs}\label{sec:vim-words}
+
+\begin{keys}[0.16]
+	\key{w} / \key{b}   & Forward / backward to the start of a word \\
+	\key{e} / \key{ge}  & Forward / backward to the end of a word   \\
+	\key{W} \key{B} \key{E} & The same, by \vocab{WORD}             \\
+\end{keys}
+
+\begin{definition}[word vs.\ WORD]
+	A lowercase \vocab{word} is a run of letters, digits and underscores, or a run
+	of punctuation. An uppercase \vocab{WORD} is any run of non-blank characters,
+	delimited only by whitespace. In \texttt{foo\_bar.baz()} there are five words
+	but one WORD.
+\end{definition}
+
+\begin{eg}
+	On the line \texttt{self.config[key] = value}, pressing \key{w} repeatedly
+	stops at \texttt{self}, \texttt{.}, \texttt{config}, \texttt{[}, \texttt{key},
+	\texttt{]}, \texttt{=}, \texttt{value} --- eight stops. \key{W} makes three:
+	\texttt{self.config[key]}, \texttt{=}, \texttt{value}. Use \key{W} when
+	punctuation is noise, \key{w} when it is structure.
+\end{eg}
+
+\section{Finding a Character on the Line}\label{sec:vim-findchar}
+
+The most under-used motions in Vim, and the ones that most reward practice.
+
+\begin{keys}[0.16]
+	\key{f} \key{x} & Jump \emph{onto} the next \texttt{x} on this line     \\
+	\key{F} \key{x} & Jump onto the previous \texttt{x}                    \\
+	\key{t} \key{x} & Jump \emph{till} just before the next \texttt{x}     \\
+	\key{T} \key{x} & Jump till just after the previous \texttt{x}         \\
+	\key{;}         & Repeat the last \key{f}/\key{t} search forward       \\
+	\key{,}         & Repeat it backward                                   \\
+\end{keys}
+
+\begin{intuition}
+	Think \vocab{f}ind and \vocab{t}ill. The distinction exists entirely so that
+	operators land in the right place: \key{d} \key{f} \key{,} deletes up to and
+	including the comma, while \key{d} \key{t} \key{,} leaves the comma behind.
+\end{intuition}
+
+\begin{eg}
+	Cursor at the start of \texttt{foo(alpha, beta)}. To change the first argument,
+	\key{c} \key{t} \key{,} --- ``change till comma''. To delete both arguments and
+	the parentheses' contents, \key{d} \key{i} \key{(} (\autoref{sec:vim-textobj}).
+\end{eg}
+
+\section{Around the File, and Scrolling}\label{sec:vim-file}
+
+\begin{keys}[0.20]
+	\key{g} \key{g}       & First line of the file                              \\
+	\key{G}               & Last line of the file                               \\
+	\key{42} \key{G}      & Line 42 (equivalently \cmd{:42<CR>})                \\
+	\key{\{} / \key{\}}   & Previous / next blank-line-delimited paragraph      \\
+	\key{(} / \key{)}     & Previous / next sentence                            \\
+	\key{\%}              & Jump to the matching bracket, or with a count, to that percentage of the file \\
+	\key{H} \key{M} \key{L} & \vocab{H}ighest, \vocab{M}iddle, \vocab{L}owest line on screen             \\
+\end{keys}
+
+Scrolling is distinct from motion --- these move the window, dragging the cursor
+along only when it would otherwise leave the screen:
+
+\begin{keys}[0.20]
+	\key{<C-d>} / \key{<C-u>} & Half a screen down / up      \\
+	\key{<C-f>} / \key{<C-b>} & A full screen forward / back \\
+	\key{<C-e>} / \key{<C-y>} & One line down / up           \\
+	\key{z} \key{z}           & Redraw with the cursor line centred \\
+	\key{z} \key{t} / \key{z} \key{b} & \dots at the top / bottom   \\
+\end{keys}
+
+\begin{note}
+	\key{z} \key{z} deserves to be a reflex. After any long jump, centring the
+	view costs two keystrokes and saves you from reading code at the very bottom
+	edge of the terminal.
+\end{note}
+
+\hrulebar
+
+\section{Search as a Motion}\label{sec:vim-search}
+
+\begin{keys}[0.20]
+	\key{/} \texttt{pat} \key{<CR>} & Search forward for \texttt{pat}                \\
+	\key{?} \texttt{pat} \key{<CR>} & Search backward                                \\
+	\key{n} / \key{N}               & Next / previous match, in the same direction   \\
+	\key{*} / \key{\#}              & Search for the word under the cursor, forward / backward \\
+	\cmd{:nohlsearch}               & Clear the highlighting until the next search   \\
+\end{keys}
+
+Search is itself a motion, so it composes: \key{d} \key{/} \texttt{end}
+\key{<CR>} deletes from the cursor up to the next occurrence of \texttt{end}.
+Offsets refine where it lands --- \key{/} \texttt{pat} \key{/} \key{e}
+\key{<CR>} puts the cursor on the last character of the match rather than
+the first.
+
+\begin{remark}[Regular expressions]
+	Vim's regex dialect is its own. By default \texttt{+}, \texttt{?}, \texttt{|},
+	\texttt{(} and \texttt{)} are \emph{literal} and must be backslash-escaped,
+	which is a constant irritation if you come from PCRE. Prefix the pattern with
+	\cmd{\textbackslash v} (``very magic'') to get the familiar behaviour:
+	\key{/} \cmd{\textbackslash v(foo|bar)+} \key{<CR>}. See \cmd{:help /magic}.
+\end{remark}
+
+\begin{eg}
+	Useful atoms: \cmd{\textbackslash <} and \cmd{\textbackslash >} anchor word
+	boundaries, so \key{/} \cmd{\textbackslash <if\textbackslash >} will not match
+	\texttt{diff}. \key{*} is exactly this --- it searches for
+	\cmd{\textbackslash <word\textbackslash >} under the cursor. Use \key{g}
+	\key{*} for the unanchored version.
+\end{eg}
+
+\section{Jumps, Marks and the Change List}\label{sec:vim-jumps}
+
+Vim records every ``long'' move --- searches, \key{G}, \key{\%}, \key{\{} --- in
+a per-window \vocab{jump list}, so you can retrace your steps.
+
+\begin{keys}[0.20]
+	\key{<C-o>}   & Go back to the previous position in the jump list    \\
+	\key{<C-i>}   & Go forward again                                    \\
+	\key{`} \key{`} & Back to the position before the latest jump        \\
+	\key{`} \key{.} & To the position of the last change                 \\
+	\cmd{:jumps}  & Show the jump list                                  \\
+	\key{g} \key{;} / \key{g} \key{,} & Walk backward/forward through the \vocab{change list} \\
+\end{keys}
+
+\begin{definition}[Mark]
+	A named bookmark. \key{m} \key{a} sets mark \texttt{a} at the cursor; \key{`}
+	\key{a} returns to the exact position, and \key{'} \key{a} to the first
+	non-blank of that line. Lowercase marks are local to the buffer, uppercase
+	marks are global --- \key{m} \key{T} in a file and \key{`} \key{T} anywhere
+	later will open it again.
+\end{definition}
+
+\begin{tryit}
+	Open a long file. Jump to the end with \key{G}, search for something with
+	\key{/}, then press \key{<C-o>} three times to walk back to where you started
+	and \key{<C-i>} to return. This pair replaces most uses of a mouse and a
+	scrollbar.
+\end{tryit}
+
+\begin{moral}
+	Prefer the motion that expresses your \emph{intent}. ``Down eleven lines'' is
+	a description of the screen; ``to the next \texttt{return}'' is a description
+	of the code, and it keeps working after the code moves.
+\end{moral}

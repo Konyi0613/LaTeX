@@ -1,0 +1,292 @@
+\chapter{Processes and the Environment}\label{ch:sh-proc}
+
+Everything you have run so far became a \vocab{process}: a program in mid-flight,
+with its own memory, its own file descriptors, and its own copy of the
+environment. This chapter is about seeing them, controlling them, and
+understanding the environment they inherit --- which is where a surprising share
+of ``it works on my machine'' lives.
+
+\section{Processes}\label{sec:sh-processes}
+
+\begin{definition}[Process]
+	A running instance of a program, identified by a \vocab{process ID} (PID).
+	Every process but the first has a parent, and the parent--child relationship
+	forms a tree: your terminal started your shell, and your shell starts
+	everything you type.
+\end{definition}
+
+\begin{keys}[0.24]
+	\cmd{ps}              & Your processes in this terminal                         \\
+	\cmd{ps aux}          & Every process on the system, in BSD syntax              \\
+	\cmd{ps -ef}          & The same, in System V syntax                            \\
+	\cmd{ps -p \$\$}      & Just this shell                                         \\
+	\cmd{pstree -p}       & The process tree, with PIDs                             \\
+	\cmd{pgrep nvim}      & PIDs of processes whose name matches                    \\
+	\cmd{top} / \cmd{htop} & Live, sorted by resource use                           \\
+	\cmd{lsof -p 1234}    & Which files a process has open                          \\
+	\cmd{lsof -i :8080}   & Which process is holding a network port                 \\
+\end{keys}
+
+\begin{keys}[0.16]
+	\texttt{\$\$}   & The PID of the current shell                                  \\
+	\texttt{\$!}    & The PID of the most recent background command                 \\
+	\texttt{\$?}    & The exit status of the last command                           \\
+	\texttt{\$0}    & The name of the running shell or script                       \\
+\end{keys}
+
+\begin{eg}
+	The two most common uses, by a wide margin:
+\begin{shell}
+$ ps aux | grep '[n]vim'          # what is running, and as whom
+$ lsof -i :3000                   # what is squatting on the port I want
+\end{shell}
+	The bracket trick in the first is a small classic: \texttt{[n]vim} matches the
+	text \texttt{nvim}, but the \cmd{grep} process's own command line contains
+	\texttt{[n]vim} rather than \texttt{nvim}, so it does not match itself.
+\end{eg}
+
+\section{Job Control}\label{sec:sh-jobs}
+
+A \vocab{job} is a shell-level handle on a pipeline you started. Job control
+lets you run several at once from one terminal without opening more of them.
+
+\begin{keys}[0.22]
+	\cmd{cmd \&}      & Start it in the background immediately                    \\
+	\key{<C-z>}       & Suspend the foreground job                                \\
+	\cmd{bg}          & Resume the suspended job, in the background               \\
+	\cmd{fg}          & Bring it back to the foreground                           \\
+	\cmd{fg \%2}      & Bring back job number 2                                   \\
+	\cmd{jobs}        & List this shell's jobs                                    \\
+	\cmd{jobs -l}     & \dots{} with PIDs                                         \\
+	\key{<C-c>}       & Interrupt the foreground job                              \\
+	\cmd{wait}        & Block until all background jobs finish                    \\
+	\cmd{disown \%1}  & Detach a job, so it survives the shell exiting            \\
+	\cmd{nohup cmd \&} & Start it already immune to hangup                        \\
+\end{keys}
+
+\begin{eg}
+	You are editing, and need a shell for one command:
+\begin{shell}
+$ nvim report.tex
+# press C-z
+[1]+  Stopped                 nvim report.tex
+$ make
+$ fg
+# back in Neovim, exactly where you left it
+\end{shell}
+	Faster than quitting and reopening, and your undo history survives. Neovim's
+	own \cmd{:terminal} (\autoref{sec:nvim-terminal}) covers the same need from the
+	other direction.
+\end{eg}
+
+\begin{note}
+	Jobs belong to the shell that started them, and normally die when it exits.
+	\cmd{nohup}, \cmd{disown} and \cmd{tmux} (\autoref{sec:sh-tmux}) are three
+	answers to that; over SSH, \cmd{tmux} is the one that also survives losing your
+	connection.
+\end{note}
+
+\section{Signals}\label{sec:sh-signals}
+
+\begin{definition}[Signal]
+	A short asynchronous message sent to a process. Most signals have a default
+	behaviour --- usually ``terminate'' --- and most can be caught by the process
+	and handled instead.
+\end{definition}
+
+\begin{keys}[0.24]
+	\texttt{SIGINT} (2)   & Interrupt. What \key{<C-c>} sends. Catchable            \\
+	\texttt{SIGTERM} (15) & Polite termination. \cmd{kill}'s default. Catchable     \\
+	\texttt{SIGKILL} (9)  & Immediate death. \textbf{Cannot} be caught or ignored   \\
+	\texttt{SIGSTOP} (19) & Suspend. What \key{<C-z>} sends. Cannot be caught       \\
+	\texttt{SIGCONT} (18) & Resume a stopped process                               \\
+	\texttt{SIGHUP} (1)   & The terminal went away. Often means ``reload config''  \\
+	\texttt{SIGSEGV} (11) & Invalid memory access --- see \autoref{sec:gdb-segv}   \\
+\end{keys}
+
+\begin{keys}[0.24]
+	\cmd{kill 1234}          & Send \texttt{SIGTERM} to PID 1234                    \\
+	\cmd{kill -9 1234}       & Send \texttt{SIGKILL}                                \\
+	\cmd{kill -HUP 1234}     & By name; \cmd{kill -l} lists them all                \\
+	\cmd{killall nvim}       & By process name                                      \\
+	\cmd{pkill -f 'python.*server'} & By matching the full command line            \\
+\end{keys}
+
+\begin{moral}
+	Try \cmd{kill} before \cmd{kill -9}. \texttt{SIGTERM} lets a program flush its
+	buffers, remove its lock files and save your work; \texttt{SIGKILL} does not
+	give it the chance, and the corrupted state it leaves behind is your problem.
+	Reach for \cmd{-9} only when the polite version has already failed.
+\end{moral}
+
+\section{Environment Variables}\label{sec:sh-env}
+
+\begin{definition}[Environment]
+	A set of name--value pairs that every process inherits from its parent, in a
+	\emph{copy}. A child can change its own copy, but nothing a child does can
+	affect its parent's --- which is why \cmd{cd} and \cmd{export} must be
+	builtins.
+\end{definition}
+
+\begin{keys}[0.26]
+	\cmd{name=value}      & A shell variable: visible here, not to children        \\
+	\cmd{export name}     & Promote it to an environment variable                  \\
+	\cmd{export n=v}      & Both at once                                           \\
+	\cmd{unset name}      & Remove it                                              \\
+	\cmd{env}             & Print the whole environment                            \\
+	\cmd{echo "\$PATH"}   & Print one variable                                     \\
+	\cmd{n=v cmd}         & Set it for this one command only                       \\
+\end{keys}
+
+\begin{keys}[0.20]
+	\texttt{PATH}     & Where to look for commands                                 \\
+	\texttt{HOME}     & Your home directory; what \texttt{\textasciitilde} expands to \\
+	\texttt{PWD}      & The current directory                                      \\
+	\texttt{USER}     & Your login name                                            \\
+	\texttt{SHELL}    & Your login shell, from \file{/etc/passwd}                  \\
+	\texttt{EDITOR}   & What Git, \cmd{crontab} and others open for you            \\
+	\texttt{PAGER}    & What \cmd{man} and \cmd{git log} pipe through              \\
+	\texttt{LANG}     & Language and character encoding                            \\
+	\texttt{TERM}     & The terminal type, which decides what colours work         \\
+\end{keys}
+
+\texttt{PATH} deserves its own paragraph, because it is where ``command not
+found'' comes from. It is a colon-separated list of directories, searched left
+to right, and the first match wins:
+
+\begin{shell}
+$ echo $PATH
+/home/konyi/.local/bin:/usr/local/bin:/usr/bin:/bin
+$ which -a python3          # every match, in search order
+/home/konyi/miniconda3/bin/python3
+/usr/bin/python3
+$ export PATH="$HOME/bin:$PATH"     # prepend: yours wins
+\end{shell}
+
+\begin{note}
+	Prepend to put your own tools first; append to use them only as a fallback.
+	Note that \file{.} is deliberately \emph{not} on \texttt{PATH}: if it were,
+	\cmd{cd}-ing into a directory containing a malicious file called \file{ls}
+	would be enough to run it.
+\end{note}
+
+\begin{eg}
+	Setting a variable for one command is the cleanest way to change behaviour
+	temporarily, and leaves no trace afterwards:
+\begin{shell}
+$ EDITOR=nvim git commit
+$ LANG=C sort names.txt        # byte order, not locale-dependent order
+$ DEBUG=1 ./run.sh
+\end{shell}
+\end{eg}
+
+\section{Startup Files}\label{sec:sh-startup}
+
+Which file runs when is the most-searched question about shell configuration,
+and the answer follows the distinction in \autoref{sec:sh-what}.
+
+\begin{keys}[0.30]
+	\file{\textasciitilde/.zshrc}, \file{\textasciitilde/.bashrc} & Every \emph{interactive} shell. Aliases, prompt, key bindings \\
+	\file{\textasciitilde/.zprofile}, \file{\textasciitilde/.bash\_profile} & \emph{Login} shells only. Environment variables, \texttt{PATH} \\
+	\file{\textasciitilde/.profile}   & The POSIX fallback, read by many login shells and display managers \\
+	\file{\textasciitilde/.zshenv}    & Zsh: read by \emph{every} shell, including scripts \\
+	\file{/etc/profile}, \file{/etc/zsh/*} & System-wide versions, read first     \\
+\end{keys}
+
+\begin{moral}
+	Environment variables belong in the \emph{login} file; aliases, functions and
+	prompt settings belong in the \emph{interactive} file. Put \texttt{PATH} in
+	\file{.bashrc} and it is re-prepended every time you open a nested shell, which
+	is how people end up with the same directory in \texttt{PATH} nine times.
+\end{moral}
+
+\begin{keys}[0.30]
+	\cmd{source \textasciitilde/.zshrc} & Re-read it in the current shell         \\
+	\cmd{.\ \textasciitilde/.zshrc}     & The same thing; \cmd{.} is POSIX        \\
+	\cmd{exec zsh}                      & Replace this shell with a fresh one     \\
+\end{keys}
+
+\begin{note}
+	\cmd{source} runs the file \emph{in the current shell}, so its variables and
+	functions stick. Running \cmd{./script.sh} starts a child, and everything it
+	sets vanishes when it exits. This is why activation scripts --- virtualenvs,
+	\texttt{conda} --- always tell you to \cmd{source} them.
+\end{note}
+
+\section{Aliases and Functions}\label{sec:sh-alias}
+
+\begin{keys}[0.28]
+	\cmd{alias ll='ls -lh'}   & Define an alias                                    \\
+	\cmd{alias}               & List them all                                      \\
+	\cmd{unalias ll}          & Remove one                                         \\
+	\cmd{\textbackslash ls}   & Run the real command, bypassing any alias          \\
+	\cmd{command ls}          & The same, and script-safe                          \\
+\end{keys}
+
+Aliases do simple textual substitution and cannot take arguments in the middle.
+When you need that, write a function:
+
+\begin{bashcode}
+# make a directory and enter it
+mkcd() {
+  mkdir -p "$1" && cd "$1"
+}
+
+# find a file by name under the current directory
+ff() {
+  find . -iname "*$1*" -not -path '*/.git/*'
+}
+
+# extract any archive, without remembering the flags
+extract() {
+  case "$1" in
+    *.tar.gz|*.tgz) tar xzf "$1" ;;
+    *.tar.bz2)      tar xjf "$1" ;;
+    *.zip)          unzip "$1"   ;;
+    *) echo "don't know how to extract $1" >&2; return 1 ;;
+  esac
+}
+\end{bashcode}
+
+\begin{note}
+	Aliases are not expanded inside scripts, so a script that relies on your
+	\cmd{ll} will fail for everyone else, including future you. Functions defined
+	in \file{.bashrc} have the same problem. Anything a script needs should be
+	written out in full or defined in the script itself.
+\end{note}
+
+\section{Measuring}\label{sec:sh-resources}
+
+\begin{keys}[0.28]
+	\cmd{time cmd}          & How long did it take --- real, user, and system time \\
+	\cmd{/usr/bin/time -v}  & Much more detail, including peak memory              \\
+	\cmd{top}, \cmd{htop}   & Live CPU and memory, by process                      \\
+	\cmd{free -h}           & Memory in use and available                          \\
+	\cmd{df -h}             & Disk space per filesystem                            \\
+	\cmd{du -sh * | sort -h} & What is using the space here                        \\
+	\cmd{uptime}            & How long since boot, and the load average            \\
+	\cmd{nice -n 10 cmd}    & Run at lower priority                                \\
+	\cmd{ulimit -a}         & Resource limits for this shell                       \\
+\end{keys}
+
+\begin{eg}
+	\cmd{time} distinguishes three quantities, and the distinction is the whole
+	point:
+\begin{shell}
+$ time make -j4
+real    0m12.431s      # wall-clock time you waited
+user    0m41.208s      # CPU time in your program, summed over all cores
+sys     0m3.117s       # CPU time inside the kernel
+\end{shell}
+	\texttt{user} exceeding \texttt{real} means the work really was parallel. If
+	\texttt{real} greatly exceeds \texttt{user + sys}, the program spent its time
+	waiting --- on disk, on the network, or on a lock --- and buying a faster CPU
+	will not help.
+\end{eg}
+
+\begin{tryit}
+	Run \cmd{du -sh * | sort -h} in your home directory. It combines
+	\autoref{sec:sh-inspect}, \autoref{sec:sh-sort} and \autoref{sec:sh-pipes}
+	into one line, and it is usually the fastest answer to ``where did my disk
+	space go''.
+\end{tryit}

@@ -1,0 +1,240 @@
+\chapter{Anatomy of a Makefile}\label{ch:mk-anatomy}
+
+A Makefile is a list of rules. Everything else --- variables, functions,
+pattern matching, conditionals --- exists to stop you from writing the same rule
+forty times.
+
+\section{The Rule}\label{sec:mk-rule}
+
+\begin{center}
+	\ttfamily\large
+	\{target\}: [\{prerequisites\}]\\[2pt]
+	\textrightarrow\{recipe\}
+\end{center}
+
+\begin{definition}[Target, prerequisite, recipe]
+	The \vocab{target} is the file to be produced. The \vocab{prerequisites} are
+	the files it is produced from. The \vocab{recipe} is the shell commands that
+	produce it, each on its own line, each indented with a tab.
+\end{definition}
+
+\begin{makecode}
+app: main.o parser.o util.o
+    gcc -o app main.o parser.o util.o
+
+main.o: main.c parser.h
+    gcc -Wall -c main.c
+
+parser.o: parser.c parser.h
+    gcc -Wall -c parser.c
+
+util.o: util.c
+    gcc -Wall -c util.c
+\end{makecode}
+
+That is the graph of \autoref{sec:mk-graph} written out. Running \cmd{make app}
+makes make read every rule, build the sub-graph rooted at \texttt{app}, and run
+only the recipes whose targets are out of date.
+
+\begin{shell}
+$ make app
+gcc -Wall -c main.c
+gcc -Wall -c parser.c
+gcc -Wall -c util.c
+gcc -o app main.o parser.o util.o
+$ make app                      # nothing changed
+make: 'app' is up to date.
+$ touch parser.c
+$ make app                      # only what the graph reaches
+gcc -Wall -c parser.c
+gcc -o app main.o parser.o util.o
+\end{shell}
+
+\begin{note}
+	Rules may appear in any order --- make reads the whole file before building
+	anything, so a rule can name a prerequisite defined fifty lines later. The
+	single exception is the \emph{first} rule in the file, which is special
+	(\autoref{sec:mk-goal}).
+\end{note}
+
+\begin{note}[A target need not be a file]
+	Nothing checks that \texttt{app} is really produced. A rule whose target is
+	never created just runs its recipe every time, which is how \texttt{clean} and
+	\texttt{test} work --- with a caveat that \autoref{sec:mk-phonyt} spends its
+	whole length on.
+\end{note}
+
+\section{The Tab Character}\label{sec:mk-tab}
+
+Every line of a recipe must begin with a literal tab. Not four spaces, not
+eight: a tab.
+
+\begin{center}
+	\ttfamily
+	\begin{tabular}{@{}l@{}}
+		app: main.o                                                        \\
+		{\color{WildStrawberry}\ensuremath{\hookrightarrow}}\quad gcc -o app main.o \\
+	\end{tabular}
+\end{center}
+
+\begin{note}
+	The arrow marks the one \texttt{U+0009} byte that must begin that line. This
+	is make's most notorious wart --- its author called it a mistake within a few
+	years, and by then it was too widely used to change.
+\end{note}
+
+Spaces instead of a tab produce make's least helpful error message:
+
+\begin{shell}
+$ make
+Makefile:2: *** missing separator.  Stop.
+\end{shell}
+
+\begin{keys}[0.30]
+	\cmd{cat -A Makefile}       & Show tabs as \texttt{\textasciicircum{}I} and line ends as \texttt{\$} \\
+	\cmd{grep -P '\textbackslash t' Makefile} & Which lines actually contain a tab      \\
+	\cmd{sed -n 'l' Makefile}   & The same, in POSIX                                    \\
+	\key{<C-v>} \key{<Tab>}     & In Vim's Insert mode: insert a literal tab even where \cmd{'expandtab'} is on \\
+\end{keys}
+
+\begin{note}[Editors that expand tabs]
+	Any editor configured to turn tabs into spaces will silently corrupt a
+	Makefile. In Neovim, add a filetype rule (\autoref{sec:nvim-keymaps}):
+\begin{luacode}
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "make",
+  callback = function() vim.opt_local.expandtab = false end,
+})
+\end{luacode}
+	LazyVim already does this, and \cmd{:set list} makes the tabs visible so you
+	can check.
+\end{note}
+
+\begin{remark}
+	GNU make since 3.82 can use another character instead. Setting the special
+	variable \cmd{.RECIPEPREFIX} to \texttt{>} lets recipes be indented with
+	\texttt{>} rather than a tab. It works, and almost nobody uses it: a Makefile
+	that does is one more thing the next reader has to notice. Use the tab.
+\end{remark}
+
+\section{The Default Goal}\label{sec:mk-goal}
+
+Running \cmd{make} with no arguments builds the \vocab{default goal}: the target
+of the first rule in the file.
+
+\begin{makecode}
+all: app docs          # first rule -- so `make' means `make all'
+app: main.o
+    gcc -o app main.o
+docs: manual.pdf
+\end{makecode}
+
+\begin{moral}
+	Make the first rule \texttt{all}, always, and make it depend on everything a
+	plain \cmd{make} should produce. Otherwise the default goal is whatever rule
+	happens to be at the top, and adding a rule in the wrong place quietly changes
+	what \cmd{make} does.
+\end{moral}
+
+\begin{note}
+	\cmd{.DEFAULT\_GOAL := app} states it explicitly and is immune to reordering.
+	It is worth using in a Makefile that other people will edit.
+\end{note}
+
+\section{How Recipes Are Run}\label{sec:mk-recipe}
+
+\begin{moral}
+	Each line of a recipe runs in its \emph{own} shell. Directory changes and
+	variables do not carry to the next line.
+\end{moral}
+
+\begin{makecode}
+broken:
+    cd build          # this shell ends here...
+    ls                # ...so this one is back where it started
+
+works:
+    cd build && ls    # one shell, one line
+
+also-works:
+    cd build; \
+    ls                # a backslash joins them into one line
+\end{makecode}
+
+\begin{keys}[0.20]
+	\texttt{@}   & Do not echo this line before running it            \\
+	\texttt{-}   & Ignore a non-zero exit status; carry on            \\
+	\texttt{+}   & Run even under \cmd{make -n} (\autoref{sec:mk-flags}) \\
+\end{keys}
+
+\begin{makecode}
+greet:
+    @echo "building..."    # prints the message, not the echo command
+clean:
+    -rm -f *.o             # do not fail if there is nothing to remove
+\end{makecode}
+
+\begin{note}
+	Make aborts as soon as a recipe line exits non-zero, which is the behaviour you
+	want --- a build that carries on after a compile error produces a binary built
+	from stale objects. The \texttt{-} prefix switches it off for one line, and
+	\cmd{rm} in a \texttt{clean} rule is the main legitimate use. \cmd{rm -f}
+	is usually better, since it succeeds on its own.
+\end{note}
+
+\begin{remark}
+	The shell is \file{/bin/sh}, not your login shell, so the Bash features of
+	\autoref{ch:sh-script} --- \texttt{[[ ]]}, arrays, process substitution --- are
+	unavailable unless you ask for them with \cmd{SHELL := /bin/bash}. A recipe
+	that works when you paste it into your terminal and fails under make is almost
+	always this.
+\end{remark}
+
+\section{A First Makefile}\label{sec:mk-first}
+
+Everything so far, in one file, for a three-source C program:
+
+\begin{makecode}
+# ---- what to build -------------------------------------------------------
+all: app
+
+app: main.o parser.o util.o
+    gcc -o app main.o parser.o util.o
+
+main.o: main.c parser.h
+    gcc -Wall -Wextra -g -c main.c
+
+parser.o: parser.c parser.h
+    gcc -Wall -Wextra -g -c parser.c
+
+util.o: util.c util.h
+    gcc -Wall -Wextra -g -c util.c
+
+# ---- housekeeping --------------------------------------------------------
+clean:
+    rm -f app *.o
+
+.PHONY: all clean
+\end{makecode}
+
+This is correct, and it is also the last time in Part~\ref{part:make} you will
+see a Makefile this repetitive. Three things about it are unsatisfying:
+
+\begin{enumerate}[(i)]
+	\item The compiler and its flags are written out four times, so changing
+	      \cmd{-O2} means four edits and one you will miss.
+	\item The three \texttt{.o} rules are the same rule with different names.
+	\item The header dependencies are maintained by hand, so the first time you add
+	      an \cmd{\#include} and forget to record it, make will confidently not
+	      rebuild.
+\end{enumerate}
+
+\autoref{ch:mk-vars} fixes the first, \autoref{ch:mk-patterns} the second and
+third. The result is about fifteen lines and works for any number of sources.
+
+\begin{tryit}
+	Create the three source files (any contents will do), type this Makefile ---
+	with real tabs --- and run \cmd{make}, then \cmd{make} again, then
+	\cmd{touch parser.h} and \cmd{make}. Watch which recipes run each time, and
+	check them against the graph on \autopageref{sec:mk-graph}.
+\end{tryit}

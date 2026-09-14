@@ -1,0 +1,260 @@
+\chapter{Preparing to Debug}\label{ch:gdb-prepare}
+
+Almost everyone debugs by inserting print statements. It is universal, it
+works, and it is also why a great many people spend an afternoon on a bug that
+a debugger would have located in ninety seconds. The cost is invisible
+precisely because you never see the faster path.
+
+This chapter is about getting into position: what to compile, how to start, and
+how to ask GDB for help once you are there.
+
+\section{Notation for Part IV}\label{sec:gdb-notation}
+
+Two kinds of transcript appear in Part~\ref{part:gdb}. Shell transcripts keep
+the convention of \autoref{sec:sh-notation}; GDB sessions use GDB's own prompt:
+
+\begin{gdbcode}
+(gdb) break main          # a line beginning "(gdb)" is what YOU type
+Breakpoint 1 at 0x1149: file main.c, line 5.
+(gdb) run                 # everything else is GDB's output
+Starting program: /home/konyi/demo/app
+\end{gdbcode}
+
+C source appears with line numbers, so that breakpoints can refer to them:
+
+\begin{ccode}
+int main(void) {
+    int *p = NULL;
+    return *p;            /* this is line 3 */
+}
+\end{ccode}
+
+\begin{keys}[0.26]
+	\cmd{(gdb)}          & GDB's prompt. Never type it                              \\
+	\cmd{\$1}, \cmd{\$2} & GDB's value history --- results it numbered for you       \\
+	\cmd{\$rip}, \cmd{\$sp} & A machine register                                     \\
+	\cmd{\$myvar}        & A convenience variable you created                        \\
+	\texttt{\{n\}}, \texttt{[n]} & Placeholders, as in \autoref{sec:sh-notation}      \\
+\end{keys}
+
+\begin{note}
+	The dollar sign means something different again here. In
+	Part~\ref{part:shell} it introduced a shell variable, in
+	Part~\ref{part:make} a make variable, and in GDB it marks a register, a
+	convenience variable, or an entry in the value history. Each part's tools are
+	unrelated; the character is just popular.
+\end{note}
+
+\section{Compiling with \texorpdfstring{\cmd{-g}}{-g}}\label{sec:gdb-g}
+
+\begin{shell}
+$ gcc -g -O0 -Wall -o app main.c parser.c
+\end{shell}
+
+\begin{keys}[0.20]
+	\cmd{-g}    & Emit debug information: line numbers, variable names, types  \\
+	\cmd{-g3}   & \dots{} and macro definitions, so \cmd{print} understands them \\
+	\cmd{-O0}   & Do not optimise                                              \\
+	\cmd{-Og}   & Optimise, but only in ways that keep debugging sensible      \\
+\end{keys}
+
+\begin{definition}[Debug information]
+	A section of the binary (DWARF, on Linux) mapping machine addresses back to
+	source: which line produced which instruction, where each variable lives, and
+	what every type looks like. Without it GDB can still run the program and read
+	memory, but it cannot name anything.
+\end{definition}
+
+Without \cmd{-g}, a backtrace is addresses:
+
+\begin{gdbcode}
+#0  0x0000555555555149 in ?? ()
+#1  0x00007ffff7db0d90 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+\end{gdbcode}
+
+With it, the same backtrace is a story:
+
+\begin{gdbcode}
+#0  parse_line (s=0x0) at parser.c:42
+#1  0x000055555555520a in main (argc=2, argv=0x7fffffffe3c8) at main.c:17
+\end{gdbcode}
+
+\begin{moral}
+	\cmd{-g} costs nothing at run time. It makes the binary larger, and that is
+	all --- it does not slow the program down and it does not change what the code
+	does. Compile \emph{everything} with \cmd{-g}, including release builds, and
+	strip the symbols later if you must ship something small.
+\end{moral}
+
+\begin{note}[Why \cmd{-O0} matters]
+	Optimisation is what makes a debugger confusing. At \cmd{-O2} the compiler
+	reorders statements, keeps variables in registers, merges identical code paths
+	and inlines small functions out of existence. GDB then reports things that are
+	true but useless:
+	\begin{keys}[0.34]
+		\texttt{<optimized out>}          & The variable exists in the source but nowhere at run time \\
+		Stepping jumps backwards          & Instructions from several lines were interleaved           \\
+		A breakpoint never fires          & That code was inlined, or folded into another branch       \\
+		\texttt{\dots (inlined)} frames   & The call is real in the source and absent in the binary    \\
+	\end{keys}
+	\cmd{-Og} is the compromise: it applies the optimisations that do not destroy
+	debug information. Use \cmd{-O0} while hunting a bug, and \cmd{-Og} for a build
+	you want to be both fast and debuggable.
+\end{note}
+
+\begin{remark}
+	Sometimes the bug only appears at \cmd{-O2}, and then you have no choice.
+	\autoref{sec:gdb-optimised} covers reading optimised frames. But check first
+	that the bug is really the optimiser's doing --- more often the optimiser has
+	merely exposed undefined behaviour that was always there, and
+	\autoref{sec:gdb-companions} finds it faster than GDB will.
+\end{remark}
+
+\section{Debug Symbols and Stripped Binaries}\label{sec:gdb-symbols}
+
+\begin{keys}[0.30]
+	\cmd{file app}             & Says \texttt{with debug\_info} or \texttt{stripped} \\
+	\cmd{nm app | head}        & List the symbols                                    \\
+	\cmd{objdump -h app | grep debug} & Which DWARF sections are present             \\
+	\cmd{strip app}            & Remove the symbol table --- irreversibly            \\
+	\cmd{objcopy -{}-only-keep-debug app app.debug} & Split the debug info into its own file \\
+\end{keys}
+
+\begin{shell}
+$ file app
+app: ELF 64-bit LSB pie executable, ..., with debug_info, not stripped
+$ strip app && file app
+app: ELF 64-bit LSB pie executable, ..., stripped
+\end{shell}
+
+\begin{note}
+	Distribution binaries are stripped, which is why a backtrace through a system
+	library shows \texttt{??}. The fix is to install the matching debug package
+	--- \cmd{libc6-dbg} on Debian and Ubuntu, or the \texttt{debuginfod} service
+	GDB will offer to use automatically. Do it once; a backtrace that names libc's
+	frames is worth much more than one that does not.
+\end{note}
+
+\section{Core Dumps}\label{sec:gdb-core}
+
+\begin{definition}[Core dump]
+	A snapshot of a process's memory written when it crashes. Loading it into GDB
+	gives you the state at the moment of death --- the stack, the variables, the
+	faulting instruction --- without having to reproduce the crash.
+\end{definition}
+
+\begin{shell}
+$ ulimit -c              # 0 means cores are disabled -- the usual default
+0
+$ ulimit -c unlimited    # for this shell only
+$ ./app
+Segmentation fault (core dumped)
+$ gdb ./app core
+\end{shell}
+
+\begin{note}
+	\cmd{ulimit -c unlimited} affects only the current shell and its children
+	(\autoref{sec:sh-resources}). Where the file lands is set by
+	\file{/proc/sys/kernel/core\_pattern}, and on a modern desktop it is usually
+	handed to \texttt{systemd-coredump} rather than written to the current
+	directory --- in which case \cmd{coredumpctl list} finds it and
+	\cmd{coredumpctl debug} opens it in GDB directly.
+\end{note}
+
+\begin{moral}
+	Core dumps are the answer to ``it crashed once, on the server, at three in the
+	morning''. Enabling them costs nothing and turns an unreproducible report into
+	an ordinary debugging session.
+\end{moral}
+
+\section{Ways to Start GDB}\label{sec:gdb-start}
+
+\begin{keys}[0.34]
+	\cmd{gdb ./app}               & Load the program; it is not running yet         \\
+	\cmd{gdb -{}-args ./app -v in.txt} & \dots{} with the arguments it should get   \\
+	\cmd{gdb ./app core}          & Post-mortem, from a core dump                   \\
+	\cmd{gdb -p 1234}             & Attach to a process that is already running     \\
+	\cmd{gdb -q}                  & Quiet: skip the licence banner                  \\
+	\cmd{gdb -x script.gdb ./app} & Run a file of GDB commands first                \\
+	\cmd{gdb -ex run -ex bt ./app} & Run commands given on the command line         \\
+	\cmd{gdb -tui ./app}          & Start with the source window open (\autoref{sec:gdb-tui}) \\
+\end{keys}
+
+\begin{eg}[The one-line crash triage]
+\begin{shell}
+$ gdb -q -batch -ex run -ex bt --args ./app broken-input.txt
+Program received signal SIGSEGV, Segmentation fault.
+0x0000555555555185 in parse_line (s=0x0) at parser.c:42
+42          while (*s != '\n') {
+#0  parse_line (s=0x0) at parser.c:42
+#1  0x00005555555551f9 in main (argc=2, argv=0x7fffffffe3b8) at main.c:17
+\end{shell}
+	\cmd{-batch} runs the commands and exits, so this fits in a shell script or a
+	CI job. In four seconds you know the function, the line, and that the argument
+	was \texttt{NULL}.
+\end{eg}
+
+\begin{note}[Attaching]
+	\cmd{gdb -p} is how you investigate a process that is hung rather than crashed:
+	attach, \cmd{bt}, see what it is waiting on, then \cmd{detach}. On most Linux
+	systems \texttt{ptrace} is restricted to child processes, so attaching to an
+	unrelated process needs \cmd{sudo}, or
+	\cmd{sudo sysctl kernel.yama.ptrace\_scope=0} to lift the restriction for the
+	session.
+\end{note}
+
+\section{The Prompt, Abbreviations and Help}\label{sec:gdb-ui}
+
+GDB accepts any unambiguous prefix of a command, and the common ones have
+one-letter forms that everybody uses.
+
+\begin{keys}[0.20]
+	\cmd{b}   & \cmd{break}      \\
+	\cmd{r}   & \cmd{run}        \\
+	\cmd{c}   & \cmd{continue}   \\
+	\cmd{n}   & \cmd{next}       \\
+	\cmd{s}   & \cmd{step}       \\
+	\cmd{fin} & \cmd{finish}     \\
+	\cmd{p}   & \cmd{print}      \\
+	\cmd{bt}  & \cmd{backtrace}  \\
+	\cmd{i}   & \cmd{info}       \\
+	\cmd{l}   & \cmd{list}       \\
+	\cmd{q}   & \cmd{quit}       \\
+\end{keys}
+
+\begin{keys}[0.26]
+	\key{<CR>} on an empty line & Repeat the previous command. Holding it down is how you step \\
+	\key{<Tab>}                 & Complete a command, a function name or a variable            \\
+	\key{<C-c>}                 & Interrupt the running program and return to the prompt       \\
+	\key{<C-d>}                 & Quit                                                         \\
+	\key{<C-r>}                 & Search the command history --- the Readline bindings of \autoref{sec:sh-readline} all work \\
+	\cmd{shell ls}              & Run a shell command without leaving GDB                      \\
+	\cmd{!ls}                   & The same, abbreviated                                        \\
+\end{keys}
+
+Help is structured by topic, and is better than its reputation:
+
+\begin{keys}[0.30]
+	\cmd{help}                & The list of command classes                        \\
+	\cmd{help breakpoints}    & Every command in one class                         \\
+	\cmd{help break}          & One command, in detail                             \\
+	\cmd{apropos watch}       & Search all help text                               \\
+	\cmd{info}                & What GDB knows: \cmd{info locals}, \cmd{info breakpoints}, \dots \\
+	\cmd{show}                & GDB's own settings: \cmd{show args}, \cmd{show language} \\
+	\cmd{set}                 & Change them: \cmd{set pagination off}              \\
+\end{keys}
+
+\begin{note}
+	\cmd{info} and \cmd{show} are easy to confuse and the distinction is worth
+	learning: \cmd{info} asks about \emph{the program} --- its breakpoints, its
+	stack, its variables. \cmd{show} asks about \emph{GDB} --- its own
+	configuration. \cmd{info args} lists the current function's arguments;
+	\cmd{show args} lists the arguments your program was started with.
+\end{note}
+
+\begin{tryit}
+	Compile anything with \cmd{gcc -g -O0}, run \cmd{gdb -q ./app}, and type
+	\cmd{start}. You are stopped on the first line of \cmd{main} with the whole of
+	the rest of Part~\ref{part:gdb} available. Then \cmd{help running} and read the
+	list --- it is one screen, and it is most of \autoref{ch:gdb-exec}.
+\end{tryit}

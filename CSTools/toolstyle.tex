@@ -1,0 +1,256 @@
+% ─────────────────────────────────────────────────────────────────────────
+%  vimstyle.tex — extra preamble for the Vim/Neovim note
+%  (keycaps, key tables, source-code listings)
+% ─────────────────────────────────────────────────────────────────────────
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{listings}
+\usepackage{upquote}
+
+% ── Inline notation ──────────────────────────────────────────────────────
+% \key{dw}   a keystroke, drawn as a small keycap
+% \cmd{:w}   an Ex command / option name
+% \file{~/.config/nvim/init.lua}
+\newcommand{\key}[1]{%
+	{\setlength{\fboxsep}{2pt}%
+		\fcolorbox{Gray!45}{Gray!8}{\small\ttfamily #1}}}
+\newcommand{\cmd}[1]{\texttt{\color{MidnightBlue!85!black}#1}}
+\newcommand{\file}[1]{\texttt{\color{RawSienna!85!black}#1}}
+
+% ── Key tables ───────────────────────────────────────────────────────────
+% \begin{keys} \key{dw} & delete a word \\ ... \end{keys}
+\newenvironment{keys}[1][0.26]{%
+	\par\vspace{0.35em}\noindent
+	\renewcommand{\arraystretch}{1.25}%
+	\tabularx{\linewidth}{@{}>{\raggedright\arraybackslash}p{#1\linewidth}>{\raggedright\arraybackslash}X@{}}%
+}{%
+	\endtabularx\par\vspace{0.35em}%
+}
+
+% Same, but for the long reference tables in the appendix (page breakable)
+\newenvironment{keyslong}[1][0.26]{%
+	\renewcommand{\arraystretch}{1.25}%
+	\begin{longtable}{@{}>{\raggedright\arraybackslash}p{#1\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.96\linewidth-#1\linewidth\relax}@{}}%
+		}{%
+	\end{longtable}%
+}
+
+% ── Listings ─────────────────────────────────────────────────────────────
+\lstdefinestyle{nvimlua}{
+	language=[5.2]Lua,
+	basicstyle=\footnotesize\ttfamily,
+	keywordstyle=\color{MidnightBlue}\bfseries,
+	commentstyle=\color{Gray!75!black}\itshape,
+	stringstyle=\color{RawSienna},
+	identifierstyle=\color{black},
+	showstringspaces=false,
+	columns=fullflexible,
+	keepspaces=true,
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=2,
+	morekeywords={vim,require,pairs,ipairs,setmetatable,opts,true,false,nil},
+	frame=none,
+	xleftmargin=0pt,
+	xrightmargin=0pt,
+	aboveskip=0pt,
+	belowskip=0pt,
+}
+
+\lstdefinestyle{vimsession}{
+	basicstyle=\footnotesize\ttfamily,
+	columns=fullflexible,
+	keepspaces=true,
+	breaklines=true,
+	tabsize=4,
+	commentstyle=\color{Gray!75!black}\itshape,
+	morecomment=[l]{\#},
+	frame=none,
+	xleftmargin=0pt,
+	xrightmargin=0pt,
+	aboveskip=0pt,
+	belowskip=0pt,
+}
+
+% Code blocks are drawn by tcolorbox rather than by listings' own `frame'.
+% listings computes its frame from \linewidth, which is wrong inside the
+% theorem boxes of header.tex: the top rule comes out shifted and overhanging.
+% tcolorbox gets the geometry right in every context, so the styles above set
+% frame=none and the box below supplies the rule and the padding.
+%
+% These take no optional argument on purpose: with one, LaTeX looks ahead past
+% the newline for a `[', and a listing whose first line is a bare `{' (a Lua
+% table, say) is then swallowed as a group instead of being typeset.
+\tcbuselibrary{listings}
+\tcbset{
+	code box/.style={
+		enhanced, sharp corners,
+		colframe=Gray!45, colback=Gray!5, boxrule=0.5pt,
+		left=7pt, right=7pt, top=5pt, bottom=5pt,
+		before skip=1em, after skip=1em,
+		splitsafe,                % see header.tex: breakable + colback is unsafe
+	                              % under XeTeX, so these stay whole instead
+	}
+}
+
+\newtcblisting{luacode}{code box,
+	listing only, listing options={style=nvimlua}}
+\newtcblisting{vimcode}{code box,
+	listing only, listing options={style=vimsession}}
+\newtcblisting{shell}{code box,
+	listing only, listing options={style=shellsession}}
+\newtcblisting{bashcode}{code box,
+	listing only, listing options={style=bashscript}}
+
+% ── Makefile listings ────────────────────────────────────────────────────
+% `makecode' — a Makefile excerpt.  Recipe indentation is written as spaces
+% here, because tcolorbox's verbatim reader does not pass tabs through to
+% listings; sec:mk-notation says so in the text, and sec:mk-tab explains why a
+% real Makefile needs the tab.
+\lstdefinestyle{makefile}{
+	language=[gnu]make,
+	basicstyle=\footnotesize\ttfamily,
+	keywordstyle=\color{MidnightBlue}\bfseries,
+	commentstyle=\color{Gray!75!black}\itshape,
+	stringstyle=\color{RawSienna},
+	showstringspaces=false,
+	columns=fullflexible,
+	keepspaces=true,
+	breaklines=true,
+	tabsize=4,
+	frame=none,
+	xleftmargin=0pt,
+	xrightmargin=0pt,
+	aboveskip=0pt,
+	belowskip=0pt,
+}
+
+
+\newtcblisting{makecode}{code box,
+	listing only, listing options={style=makefile}}
+
+% ── C and GDB listings ───────────────────────────────────────────────────
+% `ccode'    — a C source excerpt.
+% `gdbcode'  — a GDB session: "(gdb)" prompt lines are input, the rest output.
+\lstdefinestyle{csource}{
+	language=C,
+	basicstyle=\footnotesize\ttfamily,
+	keywordstyle=\color{MidnightBlue}\bfseries,
+	commentstyle=\color{Gray!75!black}\itshape,
+	stringstyle=\color{RawSienna},
+	showstringspaces=false,
+	columns=fullflexible,
+	keepspaces=true,
+	breaklines=true,
+	tabsize=4,
+	numbers=left,
+	numberstyle=\scriptsize\color{Gray!90!black},
+	numbersep=9pt,
+	frame=none,
+	xleftmargin=16pt,   % room for the line numbers inside the box
+	xrightmargin=0pt,
+	aboveskip=0pt,
+	belowskip=0pt,
+}
+
+\lstdefinestyle{gdbsession}{
+	basicstyle=\footnotesize\ttfamily,
+	columns=fullflexible,
+	keepspaces=true,
+	breaklines=true,
+	tabsize=4,
+	commentstyle=\color{Gray!75!black}\itshape,
+	morecomment=[l]{\#},
+	frame=none,
+	xleftmargin=0pt,
+	xrightmargin=0pt,
+	aboveskip=0pt,
+	belowskip=0pt,
+}
+
+\newtcblisting{ccode}{code box,
+	listing only, listing options={style=csource}}
+\newtcblisting{gdbcode}{code box,
+	listing only, listing options={style=gdbsession}}
+
+% `conf' — a configuration file: .gitconfig, .gitignore, YAML, INI.
+\lstdefinestyle{conffile}{
+	basicstyle=\footnotesize\ttfamily,
+	% Latin Modern Mono ligates << and >> into guillemets, which mangles Git
+	% conflict markers.  Emitting each character separately suppresses it.
+	literate={<}{{\char60}}1 {>}{{\char62}}1,
+	columns=fullflexible,
+	keepspaces=true,
+	breaklines=true,
+	tabsize=4,
+	commentstyle=\color{Gray!75!black}\itshape,
+	morecomment=[l]{\#},
+	stringstyle=\color{RawSienna},
+	frame=none,
+	xleftmargin=0pt,
+	xrightmargin=0pt,
+	aboveskip=0pt,
+	belowskip=0pt,
+}
+
+\newtcblisting{conf}{code box,
+	listing only, listing options={style=conffile}}
+
+
+% ── A "try it" box, for hands-on drills ──────────────────────────────────
+\newenvironment{tryit}{%
+	\begin{tcolorbox}[
+			enhanced, sharp corners, arc=4pt, outer arc=4pt,
+			colframe=SeaGreen!70!black, colback=SeaGreen!3, boxrule=0.6pt,
+			before skip=10pt, after skip=14pt, splitsafe,
+			left=10pt, right=10pt, top=5pt, bottom=6pt,
+			title={\sffamily\bfseries\small Try it},
+			coltitle=white, colbacktitle=SeaGreen!65!black,
+			fonttitle=\sffamily\bfseries\small]%
+		}{%
+	\end{tcolorbox}%
+}
+
+% ── Cross-reference names ────────────────────────────────────────────────
+% The template maps \chapterautorefname to "Section", which is fine for a
+% single-subject note but ambiguous here: this book has both Chapter 3 and
+% Section 3.1.  Name them separately.
+\def\chapterautorefname{Chapter}
+\def\sectionautorefname{Section}
+\def\subsectionautorefname{Section}
+\def\partautorefname{Part}
+
+% ── Shell listings ───────────────────────────────────────────────────────
+% `shell'     — a terminal transcript: prompt lines plus program output.
+% `bashcode'  — a script file, with shell keywords highlighted.
+\lstdefinestyle{shellsession}{
+	basicstyle=\footnotesize\ttfamily,
+	columns=fullflexible,
+	keepspaces=true,
+	breaklines=true,
+	breakatwhitespace=false,
+	tabsize=4,
+	commentstyle=\color{Gray!75!black}\itshape,
+	morecomment=[l]{\#},
+	frame=none,
+	xleftmargin=0pt,
+	xrightmargin=0pt,
+	aboveskip=0pt,
+	belowskip=0pt,
+}
+
+\lstdefinestyle{bashscript}{
+	style=shellsession,
+	language=sh,
+	keywordstyle=\color{MidnightBlue}\bfseries,
+	morekeywords={local,return,function,source,export,declare,readonly,shift,
+		trap,set,unset,printf,echo,read,exit,eval,shopt,select},
+	stringstyle=\color{RawSienna},
+	showstringspaces=false,
+	alsoletter={-},
+}
+
+
+
+% Three-digit page numbers need a wider column in the table of contents.
+\DeclareTOCStyleEntries[pagenumberwidth=2.2em]{tocline}{part,chapter,section}

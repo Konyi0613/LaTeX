@@ -1,0 +1,238 @@
+\chapter{Debugging Real Failures}\label{ch:gdb-failures}
+
+The previous chapters were the instrument panel. This one is the flying: the
+handful of failures you will actually meet, and the shortest route through each.
+
+\section{Segmentation Faults}\label{sec:gdb-segv}
+
+\begin{definition}[Segmentation fault]
+	The kernel's response to a memory access the process is not allowed to make:
+	dereferencing a null or wild pointer, running off the end of the stack, or
+	writing to read-only memory. The signal is \texttt{SIGSEGV}
+	(\autoref{sec:sh-signals}).
+\end{definition}
+
+The procedure is mechanical:
+
+\begin{gdbcode}
+(gdb) run
+Program received signal SIGSEGV, Segmentation fault.
+0x00005555555551a9 in parse_line (s=0x0) at parser.c:42
+42          while (*s != '\n') {
+(gdb) bt                        # 1. how did I get here?
+#0  parse_line (s=0x0) at parser.c:42
+#1  0x0000555555555241 in read_config (path=0x7fff...) at config.c:18
+#2  0x00005555555552c8 in main (argc=2, argv=0x7fff...) at main.c:11
+(gdb) info args                 # 2. what was I given?
+s = 0x0
+(gdb) frame 1                   # 3. who gave it to me?
+#1  read_config (path=0x7fffffffe5c1 "app.conf") at config.c:18
+18          parse_line(next_line(f));
+(gdb) print f
+$1 = (FILE *) 0x0               # 4. and why? fopen failed, unchecked
+\end{gdbcode}
+
+\begin{moral}
+	\cmd{bt}, \cmd{info args}, \cmd{up} until something looks wrong. Four commands
+	solve the large majority of segfaults, and none of them requires understanding
+	the program first.
+\end{moral}
+
+\begin{keys}[0.30]
+	\texttt{0x0}                 & A null pointer: something returned \texttt{NULL} unchecked \\
+	A small value like \texttt{0x10} & A null pointer plus a struct offset --- \texttt{p->field} where \texttt{p} is null \\
+	\texttt{0xffffffffffffffff}  & An uninitialised or already-freed pointer          \\
+	An address just past a valid one & A buffer overrun                               \\
+	The address is fine, the write fails & Writing to a string literal or other read-only memory \\
+\end{keys}
+
+\begin{note}
+	When the pointer expression is complicated, GDB will tell you the faulting
+	address directly:
+\begin{gdbcode}
+(gdb) print $_siginfo._sifields._sigfault.si_addr
+$1 = (void *) 0x0
+\end{gdbcode}
+\end{note}
+
+\section{Stack Overflow and Runaway Recursion}\label{sec:gdb-stackoverflow}
+
+A crash whose backtrace is thousands of identical frames, or entirely
+\texttt{??}, is usually the stack rather than the heap.
+
+\begin{gdbcode}
+(gdb) bt
+#0  descend (n=0x5555555592a0) at tree.c:14
+#1  0x0000555555555199 in descend (n=0x5555555592a0) at tree.c:17
+#2  0x0000555555555199 in descend (n=0x5555555592a0) at tree.c:17
+...
+#65531 0x0000555555555199 in descend (n=0x5555555592a0) at tree.c:17
+(gdb) bt -5                    # the OUTERMOST frames: where it started
+(gdb) frame 65000
+(gdb) print n == $_saved        # same node every time -- a cycle in the tree
+\end{gdbcode}
+
+\begin{keys}[0.30]
+	\cmd{bt 10}, \cmd{bt -10}   & The two ends of the stack; the middle is repetition \\
+	\cmd{set backtrace limit 20} & Stop GDB printing 60,000 frames                    \\
+	\cmd{info frame}            & Where the stack pointer has reached                 \\
+	\cmd{ulimit -s}             & The stack limit, usually 8\,MB                      \\
+\end{keys}
+
+\begin{note}
+	Infinite recursion and a merely deep recursion look identical in a backtrace.
+	The distinguishing question is whether the argument changes between frames: if
+	frame \texttt{\#1} and frame \texttt{\#500} have the same pointer, the data
+	structure has a cycle. A very large stack array --- \cmd{char buf[8*1024*1024]}
+	--- produces the same crash with a backtrace only one frame deep.
+\end{note}
+
+\section{Uninitialised Memory and Heap Corruption}\label{sec:gdb-memory}
+
+These are the failures GDB is \emph{worst} at, and it is important to know why.
+
+\begin{intuition}
+	A use-after-free or a buffer overrun does its damage at one moment and causes a
+	crash at another, often far away and in unrelated code. GDB shows you the
+	crash. It has no way to show you the write that caused it, because by then
+	nothing is left to see.
+\end{intuition}
+
+What GDB can still do:
+
+\begin{keys}[0.30]
+	\cmd{watch -l *ptr}      & Catch the write, if you can guess the address in advance \\
+	\cmd{x/32xb p-16}        & Look at the bytes around a suspect block                 \\
+	\cmd{print *p}           & Implausible field values suggest the block was reused    \\
+	\cmd{p \$\_memeq(a, b, n)} & Compare two regions                                    \\
+\end{keys}
+
+\begin{gdbcode}
+(gdb) print *node
+$1 = {name = 0x6161616161616161 <error: Cannot access memory>, port = 1633771873}
+\end{gdbcode}
+
+\begin{note}
+	\texttt{0x6161616161616161} is \texttt{"aaaaaaaa"} read as a pointer --- a
+	string has been written over a struct. Recognising ASCII in a pointer is a
+	useful reflex: \texttt{0x41414141} is \texttt{"AAAA"},
+	\texttt{0xdeadbeef} and \texttt{0xcdcdcdcd} are debug fill patterns, and
+	\texttt{0x0} is the honest one.
+\end{note}
+
+\begin{moral}
+	Do not hunt memory corruption in GDB. Rebuild with AddressSanitizer, which
+	catches the bad access at the moment it happens and prints both the access and
+	the allocation it belongs to. Then, if you still need to, come back to GDB
+	knowing exactly where to put the breakpoint.
+\end{moral}
+
+\begin{shell}
+$ gcc -g -O0 -fsanitize=address,undefined -o app main.c
+$ ./app
+==12345==ERROR: AddressSanitizer: heap-use-after-free on address 0x60300000eff4
+READ of size 4 at 0x60300000eff4 thread T0
+    #0 0x55d in use_node table.c:88
+freed by thread T0 here:
+    #1 0x4f2 in release table.c:61
+previously allocated by thread T0 here:
+    #2 0x48a in make_node table.c:22
+\end{shell}
+
+\begin{note}
+	Three stack traces --- the bad access, the \cmd{free}, and the
+	\cmd{malloc} --- which is the entire life story of the bug. This is available
+	on this machine (\autoref{sec:gdb-companions}) and costs one compiler flag.
+\end{note}
+
+\section{Multi-Threaded Programs}\label{sec:gdb-threads}
+
+\begin{keys}[0.32]
+	\cmd{info threads}              & List them; \texttt{*} marks the current one    \\
+	\cmd{thread 3}                  & Switch to thread 3                             \\
+	\cmd{thread apply all bt}       & A backtrace of every thread                    \\
+	\cmd{thread apply all bt full}  & \dots{} with locals. The deadlock command      \\
+	\cmd{break f thread 3}          & A breakpoint only thread 3 honours             \\
+	\cmd{set scheduler-locking on}  & Step one thread; freeze the others             \\
+	\cmd{set non-stop on}           & Stop one thread while the rest keep running    \\
+\end{keys}
+
+\begin{eg}[Diagnosing a deadlock]
+	Attach to the hung process (\autoref{sec:gdb-start}) and ask every thread what
+	it is doing:
+\begin{gdbcode}
+(gdb) thread apply all bt
+
+Thread 2 (Thread 0x7ffff7a3d700):
+#0  futex_wait (...) at lowlevellock.c:52
+#1  __lll_lock_wait (...) 
+#2  work (arg=0x0) at worker.c:44        # waiting for mutex B
+    
+Thread 1 (Thread 0x7ffff7fc0740):
+#0  futex_wait (...) at lowlevellock.c:52
+#2  main () at main.c:31                 # waiting for mutex A
+\end{gdbcode}
+	Two threads, each blocked in \cmd{futex\_wait}, each holding what the other
+	wants: a lock-ordering deadlock. One command diagnosed it.
+\end{eg}
+
+\begin{note}
+	\cmd{set scheduler-locking on} makes stepping comprehensible --- otherwise
+	other threads run while you step and the state changes under you. It also makes
+	deadlock easy to cause yourself, so turn it off again before \cmd{continue}.
+\end{note}
+
+\begin{moral}
+	\cmd{thread apply all bt} is to concurrency what \cmd{bt} is to a crash. For a
+	hang, it is very often the whole diagnosis.
+\end{moral}
+
+\section{Handling Signals}\label{sec:gdb-signals}
+
+GDB intercepts every signal before the program sees it, and you can change what
+it does with each.
+
+\begin{keys}[0.32]
+	\cmd{info signals}                & The whole table                              \\
+	\cmd{handle SIGPIPE nostop noprint} & Ignore it entirely                          \\
+	\cmd{handle SIGUSR1 stop print}   & Stop on it                                    \\
+	\cmd{handle SIGSEGV nostop pass}  & Let the program's own handler have it         \\
+	\cmd{signal SIGINT}               & Deliver a signal by hand                      \\
+	\cmd{continue}                    & Resume, delivering the pending signal         \\
+\end{keys}
+
+\begin{note}
+	The common need is \cmd{handle SIGPIPE nostop noprint pass}: a networking
+	program may take \texttt{SIGPIPE} routinely, and GDB stopping every time makes
+	the session unusable. The opposite case is a program with its own
+	\texttt{SIGSEGV} handler --- GDB stops first, which is what you want, and
+	\cmd{pass} lets the handler run if you want to debug the handler instead.
+\end{note}
+
+\section{Companion Tools}\label{sec:gdb-companions}
+
+GDB is an inspector, not a detector. These find bugs it can only witness.
+
+\begin{keys}[0.30]
+	\vocab{AddressSanitizer} & \cmd{-fsanitize=address}. Use-after-free, buffer overruns, leaks, with the allocating stack trace. A few times slower \\
+	\vocab{UBSan}            & \cmd{-fsanitize=undefined}. Signed overflow, bad shifts, misaligned access, null dereference \\
+	\vocab{ThreadSanitizer}  & \cmd{-fsanitize=thread}. Data races, which are otherwise nearly impossible to find \\
+	\vocab{Valgrind}         & \cmd{valgrind ./app}. The same class of errors with no recompilation, considerably slower \\
+	\vocab{rr}               & \cmd{rr record} then \cmd{rr replay}. Records an execution so you can step \emph{backwards} in GDB \\
+	\vocab{strace}, \vocab{ltrace} & Every system or library call the program makes \\
+\end{keys}
+
+\begin{note}
+	On this machine the sanitisers are available through GCC 13, and \cmd{strace}
+	is present; \cmd{valgrind} and \cmd{rr} are not installed
+	(\cmd{apt install valgrind}). The sanitisers are the better default anyway ---
+	they are faster and more precise --- with Valgrind's advantage being that it
+	needs no rebuild, which matters when you only have the binary.
+\end{note}
+
+\begin{moral}
+	Match the tool to the failure. A crash with a sensible backtrace: GDB. Memory
+	corruption, a leak, or a crash whose backtrace is nonsense: a sanitiser first,
+	then GDB. A hang: \cmd{gdb -p} and \cmd{thread apply all bt}. A wrong answer
+	with no crash at all: a breakpoint and \cmd{display}.
+\end{moral}

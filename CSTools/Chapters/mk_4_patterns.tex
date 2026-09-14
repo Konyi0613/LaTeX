@@ -1,0 +1,262 @@
+\chapter{Pattern and Implicit Rules}\label{ch:mk-patterns}
+
+\autoref{sec:mk-first} ended with three complaints. This chapter answers two of
+them: how to write one rule that covers every source file, and how to stop
+maintaining header dependencies by hand.
+
+\section{The Built-in Rule Database}\label{sec:mk-implicit}
+
+Make ships knowing how to build some things already.
+
+\begin{shell}
+$ ls
+main.c
+$ make main.o                    # no Makefile at all
+cc    -c -o main.o main.c
+\end{shell}
+
+\begin{definition}[Implicit rule]
+	A rule make already knows, matching targets by their suffix. Roughly a hundred
+	are built in, covering C, C++, Fortran, Pascal, \TeX{}, Yacc, Lex, and archive
+	members.
+\end{definition}
+
+\begin{keys}[0.30]
+	\cmd{make -p}            & Print the entire database, rules and variables   \\
+	\cmd{make -p -f /dev/null} & Print only the built-ins, with no Makefile     \\
+	\cmd{make -r}            & Disable them all                                 \\
+\end{keys}
+
+The C rule is worth reading, because every Makefile in this chapter is a
+variation on it:
+
+\begin{makecode}
+%.o: %.c
+    $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+\end{makecode}
+
+\begin{note}
+	That is why \autoref{sec:mk-conv} insisted on the conventional variable names.
+	Setting \texttt{CC} and \texttt{CFLAGS} alone changes how every \texttt{.o} is
+	built, and you never write the rule. It is also why \cmd{-lm} belongs in
+	\texttt{LDLIBS}: the built-in link rule puts \texttt{LDLIBS} last.
+\end{note}
+
+\begin{remark}
+	\cmd{make -r} (or \cmd{MAKEFLAGS += -r} inside the file) turns the database
+	off. Large projects do this: searching a hundred irrelevant rules for every
+	target costs measurable time, and an accidental match --- make cheerfully
+	building \file{foo} from a \file{foo.c} you forgot about --- is worse than no
+	match at all.
+\end{remark}
+
+\section{Pattern Rules}\label{sec:mk-pattern}
+
+\begin{definition}[Pattern rule]
+	A rule whose target contains a \texttt{\%}. The \texttt{\%} matches any
+	non-empty string --- the \vocab{stem} --- and the same stem is substituted into
+	the prerequisites.
+\end{definition}
+
+\begin{makecode}
+%.o: %.c
+    $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+\end{makecode}
+
+Asked for \file{parser.o}, make matches the stem \texttt{parser}, looks for
+\file{parser.c}, and runs the recipe with \texttt{\$@} as \file{parser.o},
+\texttt{\$<} as \file{parser.c} and \texttt{\$*} as \texttt{parser}.
+
+\begin{eg}
+	One pattern rule replaces all three of the \texttt{.o} rules in
+	\autoref{sec:mk-first}, and the whole Makefile becomes:
+\begin{makecode}
+CC       := gcc
+CPPFLAGS := -Iinclude
+CFLAGS   := -Wall -Wextra -std=c17 -g
+SRC      := $(wildcard *.c)
+OBJ      := $(SRC:.c=.o)
+
+all: app
+
+app: $(OBJ)
+    $(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
+%.o: %.c
+    $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+
+clean:
+    rm -f app $(OBJ)
+
+.PHONY: all clean
+\end{makecode}
+	Fifteen lines, and it handles any number of source files.
+\end{eg}
+
+Patterns are not restricted to compilation:
+
+\begin{makecode}
+%.pdf: %.tex
+    latexmk -xelatex -interaction=nonstopmode $<
+
+%.png: %.svg
+    inkscape --export-type=png --export-filename=$@ $<
+
+%.csv: %.json
+    jq -r '.[] | [.name, .value] | @csv' $< > $@
+\end{makecode}
+
+\begin{note}
+	A pattern rule is used only when make needs the target and the prerequisite
+	exists (or can itself be built). Several matching patterns are resolved by
+	choosing the one with the shortest stem. If nothing matches, make reports
+	\texttt{No rule to make target} --- which nearly always means a typo in a
+	filename rather than a missing rule.
+\end{note}
+
+\begin{moral}
+	Write pattern rules in terms of the automatic variables of
+	\autoref{sec:mk-auto}, never in terms of concrete filenames. \texttt{\$@} and
+	\texttt{\$<} are the only way a single rule can serve every file.
+\end{moral}
+
+\section{Static Pattern Rules}\label{sec:mk-static}
+
+A plain pattern rule applies to \emph{anything} matching it. A static pattern
+rule applies only to a list you name.
+
+\begin{center}
+	\ttfamily\large
+	\{targets\}: \{target-pattern\}: \{prereq-patterns\}
+\end{center}
+
+\begin{makecode}
+OBJ := main.o parser.o util.o
+
+$(OBJ): %.o: %.c
+    $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+\end{makecode}
+
+\begin{note}
+	The difference matters when two kinds of file share a suffix. With a plain
+	\texttt{\%.o: \%.c}, make will try to build \emph{any} \texttt{.o} it hears
+	about that way, including ones that should come from assembly or from a
+	generator. Restricting the rule to a known list turns a silent wrong build into
+	an honest \texttt{No rule to make target}.
+\end{note}
+
+\begin{eg}
+	Static patterns are also how you build one list two ways:
+\begin{makecode}
+RELEASE_OBJ := $(SRC:%.c=build/release/%.o)
+DEBUG_OBJ   := $(SRC:%.c=build/debug/%.o)
+
+$(RELEASE_OBJ): build/release/%.o: %.c
+    $(CC) -O2 -DNDEBUG -c -o $@ $<
+
+$(DEBUG_OBJ): build/debug/%.o: %.c
+    $(CC) -O0 -g -c -o $@ $<
+\end{makecode}
+	Two sets of objects from one set of sources, with no risk of the flags getting
+	mixed --- which, as \autoref{sec:mk-override} warned, is exactly what
+	target-specific variables cannot guarantee.
+\end{eg}
+
+\section{\texorpdfstring{\texttt{VPATH} and Out-of-Tree Builds}{VPATH and Out-of-Tree Builds}}\label{sec:mk-vpath}
+
+Real projects do not keep sources, objects and the binary in one directory.
+
+\begin{keys}[0.28]
+	\texttt{VPATH = src:include} & A colon-separated list of directories to search for \emph{any} prerequisite \\
+	\texttt{vpath \%.c src}      & The same, but only for files matching a pattern    \\
+	\texttt{vpath \%.h include}  & \dots{} and headers somewhere else                 \\
+\end{keys}
+
+\begin{makecode}
+vpath %.c src
+vpath %.h include
+
+BUILD := build
+SRC   := $(wildcard src/*.c)
+OBJ   := $(patsubst src/%.c,$(BUILD)/%.o,$(SRC))
+
+$(BUILD)/%.o: %.c
+    $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+\end{makecode}
+
+\begin{note}
+	\cmd{vpath} with a pattern is almost always preferable to \texttt{VPATH}.
+	\texttt{VPATH} searches those directories for everything, so a stale
+	\file{build/parser.o} sitting in a searched directory can satisfy a
+	prerequisite you meant to rebuild. Being specific about which patterns come
+	from where avoids a whole class of confusing builds.
+\end{note}
+
+\begin{note}[The directory must exist]
+	\cmd{gcc -o build/main.o} fails if \file{build/} does not exist, and make will
+	not create it for you. The clean fix is an order-only prerequisite, which
+	\autoref{sec:mk-orderonly} covers.
+\end{note}
+
+\section{Automatic Dependency Generation}\label{sec:mk-depgen}
+
+This section fixes the last complaint from \autoref{sec:mk-first}, and it is the
+most valuable thing in the chapter.
+
+The problem: \file{main.c} does \cmd{\#include "parser.h"}, so editing that
+header must rebuild \file{main.o}. Make cannot know this --- it does not read
+your source. Written by hand, the dependency is correct on the day you write it
+and wrong within a month.
+
+The solution: the compiler already parses the includes, so ask it.
+
+\begin{keys}[0.20]
+	\cmd{-MMD} & Write a dependency file alongside each object, listing the headers it included. \cmd{-MD} also lists system headers \\
+	\cmd{-MP}  & Add a dummy target for each header, so that \emph{deleting} a header does not break the build \\
+\end{keys}
+
+\begin{makecode}
+CPPFLAGS += -MMD -MP
+OBJ      := $(SRC:.c=.o)
+DEP      := $(OBJ:.o=.d)
+
+app: $(OBJ)
+    $(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
+clean:
+    rm -f app $(OBJ) $(DEP)
+
+-include $(DEP)          # the leading dash: do not complain on the first build
+\end{makecode}
+
+Compiling \file{main.c} now also writes \file{main.d}:
+
+\begin{makecode}
+main.o: main.c parser.h util.h
+parser.h:
+util.h:
+\end{makecode}
+
+which is a Makefile fragment, and \cmd{-include} pulls it back in next time.
+The dependency graph now maintains itself.
+
+\begin{note}
+	The leading dash in \cmd{-include} means ``do not fail if these do not exist''.
+	On a clean tree there are no \texttt{.d} files yet, and without the dash the
+	very first build stops with an error. The empty \texttt{parser.h:} rules come
+	from \cmd{-MP} and exist so that a header you delete is treated as a target
+	with no recipe rather than a missing prerequisite.
+\end{note}
+
+\begin{moral}
+	Three lines --- \cmd{-MMD -MP}, a \texttt{DEP} list, and \cmd{-include} --- and
+	you never write a header dependency again. Any C or C++ Makefile without them
+	is one refactor away from a build that is quietly wrong.
+\end{moral}
+
+\begin{tryit}
+	Add the three lines to the Makefile from \autoref{sec:mk-pattern}, build, then
+	\cmd{cat main.d}. Now add an \cmd{\#include} to \file{main.c}, rebuild, and
+	look again --- the new header is there, and touching it rebuilds
+	\file{main.o}. Nothing in the Makefile mentions it.
+\end{tryit}

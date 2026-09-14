@@ -1,0 +1,196 @@
+\chapter{The Modal Mindset}\label{ch:vim-modal}
+
+\section{Why Modes}\label{sec:vim-why-modal}
+
+Every other editor you have used is \vocab{modeless}: the keyboard always
+inserts text, and commands are reached by holding modifiers
+(\key{<C-c>}, \key{<C-v>}, \key{<C-S-k>}) or by leaving the keyboard for the
+mouse. This is a reasonable design, but it wastes the most valuable real estate
+on the machine --- the twenty-six letter keys --- on a single operation.
+
+\begin{intuition}
+	\vocab{Modal editing} observes that you spend far more time \emph{reading and
+		restructuring} code than typing it fresh. So Vim gives the letter keys a
+	second life: in \vocab{Normal mode} they are commands, and you enter
+	\vocab{Insert mode} only for the short bursts when you are genuinely producing
+	new characters.
+\end{intuition}
+
+The consequence is that commands become \emph{composable} in a way that
+modifier-key shortcuts never can be. \key{<C-S-k>} deletes a line and that is
+all it will ever do; \key{d} is an operator that combines with any motion, so
+\key{d} \key{w}, \key{d} \key{\$}, \key{d} \key{i} \key{(} and \key{d} \key{/}
+\key{f} \key{o} \key{o} \key{<CR>} all follow from one key. We will make this
+precise in \autoref{ch:vim-grammar} --- it is the single idea worth taking away from
+this note.
+
+\begin{moral}
+	Normal mode is home. You should be in Insert mode only while text is actually
+	appearing on screen, and you should leave it the moment you stop.
+\end{moral}
+
+\section{The Modes}\label{sec:vim-the-modes}
+
+\begin{definition}[Normal mode]
+	The default mode, entered with \key{<Esc>}. Keys are \vocab{commands}: they
+	move the cursor, delete, copy, paste and repeat. If you are ever unsure what
+	mode you are in, press \key{<Esc>} twice.
+\end{definition}
+
+\begin{definition}[Insert mode]
+	Typed characters are inserted into the buffer, as in any ordinary editor.
+	Entered with \key{i}, \key{a}, \key{o} and friends (\autoref{sec:vim-insert}),
+	left with \key{<Esc>} or \key{<C-[>}.
+\end{definition}
+
+\begin{definition}[Visual mode]
+	Select a region first, then act on it --- the reverse of Normal mode's
+	verb-then-object order. Three flavours:
+	\begin{keys}[0.16]
+		\key{v}      & \vocab{charwise}: select character by character                 \\
+		\key{V}      & \vocab{linewise}: select whole lines                            \\
+		\key{<C-v>}  & \vocab{blockwise}: select a rectangle, for column edits         \\
+	\end{keys}
+\end{definition}
+
+\begin{definition}[Command-line mode]
+	Entered with \key{:} (Ex commands such as \cmd{:write}), \key{/} or \key{?}
+	(search), or \key{!} (filter through a shell command). One line is typed at the
+	bottom of the screen and executed with \key{<CR>}; \key{<Esc>} aborts.
+\end{definition}
+
+\begin{definition}[Replace mode]
+	Entered with \key{R}. Typed characters overwrite existing ones instead of
+	pushing them right. Rarely needed; \key{r} (replace exactly one character) is
+	the version you will actually use.
+\end{definition}
+
+\begin{definition}[Terminal mode]
+	A Neovim addition: inside a \cmd{:terminal} buffer, keystrokes go to the shell.
+	Return to Normal mode with \key{<C-\textbackslash>} \key{<C-n>}. See
+	\autoref{sec:nvim-terminal}.
+\end{definition}
+
+\begin{remark}
+	Vim also has \vocab{Operator-pending mode} --- the sliver of time after you
+	press \key{d} but before you have said \emph{what} to delete. You will never
+	enter it deliberately, but it is why \key{d} \key{d} works: the second \key{d}
+	is parsed as ``the whole line'' only because Vim was waiting for a motion.
+\end{remark}
+
+\hrulebar
+
+\section{Survival Kit: Open, Edit, Save, Quit}\label{sec:vim-survival}
+
+Enough to open a file, change it, and get out alive.
+
+\begin{keys}[0.22]
+	\cmd{nvim file.tex}  & Open a file from the shell                                   \\
+	\key{i}              & Enter Insert mode; type something                            \\
+	\key{<Esc>}          & Back to Normal mode                                          \\
+	\cmd{:w<CR>}         & \vocab{Write} (save) the file                                \\
+	\cmd{:q<CR>}         & \vocab{Quit}                                                 \\
+	\cmd{:wq<CR>}        & Write and quit (\key{Z} \key{Z} is the Normal-mode shorthand) \\
+	\cmd{:q!<CR>}        & Quit, discarding all changes                                 \\
+	\cmd{:w newname<CR>} & Write to a different file                                     \\
+	\key{u}              & Undo                                                         \\
+	\key{<C-r>}          & Redo                                                         \\
+\end{keys}
+
+\begin{note}[The \texttt{!} suffix]
+	Appending \key{!} to an Ex command means \emph{force}, or ``yes, I am sure''.
+	\cmd{:q} refuses to quit a modified buffer; \cmd{:q!} throws the changes away.
+	\cmd{:qa!} does it for every open buffer at once.
+\end{note}
+
+\begin{note}[If you are stuck]
+	Three situations trap beginners, and all three have the same escape:
+	\begin{enumerate}[(i)]
+		\item You pressed \key{<C-s>} out of habit and the terminal froze --- press
+		      \key{<C-q>} to resume.
+		\item You are in the middle of a half-typed command --- \key{<Esc>}.
+		\item You entered Ex mode (\key{Q} in Vim) and see a \texttt{:} prompt that will
+		      not go away --- type \cmd{:visual<CR>}. Neovim removed this trap entirely.
+	\end{enumerate}
+\end{note}
+
+\begin{tryit}
+	Open a scratch file with \cmd{nvim /tmp/scratch.txt}, type a few lines, save
+	with \cmd{:w}, quit with \cmd{:q}, reopen it, and delete everything you wrote
+	with \key{u}. Do this until saving and quitting requires no thought at all ---
+	the rest of the note assumes it.
+\end{tryit}
+
+\section{Reading the Manual}\label{sec:vim-help}
+
+Vim's documentation is unusually good, and it is available offline, inside the
+editor, with no network round trip. Learning to navigate it is worth more than
+any cheat sheet.
+
+\begin{keys}[0.30]
+	\cmd{:help}                & The table of contents                                        \\
+	\cmd{:help dd}             & Help for the Normal-mode command \key{d} \key{d}             \\
+	\cmd{:help i\_CTRL-r}      & Help for \key{<C-r>} \emph{in Insert mode}                   \\
+	\cmd{:help v\_o}           & Help for \key{o} \emph{in Visual mode}                       \\
+	\cmd{:help 'number'}       & Help for an \emph{option} --- note the single quotes          \\
+	\cmd{:help :write}         & Help for an Ex command --- note the leading colon             \\
+	\cmd{:helpgrep <pattern>}  & Full-text search across all help files                       \\
+	\key{<C-]>}                & Follow the tag under the cursor                              \\
+	\key{<C-o>}                & Jump back where you came from                                \\
+\end{keys}
+
+So the mode you are asking about is encoded in the prefix: \cmd{i\_} for Insert,
+\cmd{v\_} for Visual, \cmd{c\_} for the command line, \cmd{o\_} for
+operator-pending, and no prefix for Normal. Tab completion works on the help
+argument, which is the fastest way to discover the prefixes.
+
+\begin{eg}
+	You have forgotten what \key{g} \key{U} does. Type \cmd{:help gU} and read.
+	You want to know why your search is case-insensitive: \cmd{:help 'ignorecase'}.
+	You saw \key{<C-a>} in someone's config and want to know if it is safe to
+	remap: \cmd{:help CTRL-A}.
+\end{eg}
+
+\begin{note}[\texttt{vimtutor}]
+	Vim ships with a thirty-minute interactive tutorial. Run \cmd{vimtutor} in a
+	shell (or \cmd{:Tutor} inside Neovim). It is the single highest-return half
+	hour available to a beginner, and this chapter is not a substitute for it.
+\end{note}
+
+\section{Options}\label{sec:vim-options}
+
+Behaviour is controlled by \vocab{options}, set with \cmd{:set}. Three forms
+matter:
+
+\begin{keys}[0.30]
+	\cmd{:set number}        & Turn a boolean option on                    \\
+	\cmd{:set nonumber}      & Turn it off (prefix \cmd{no})               \\
+	\cmd{:set number!}       & Toggle it (suffix \cmd{!})                  \\
+	\cmd{:set number?}       & Ask its current value (suffix \cmd{?})      \\
+	\cmd{:set tabstop=4}     & Set a numeric or string option              \\
+	\cmd{:setlocal ...}      & Apply to the current buffer/window only     \\
+\end{keys}
+
+A handful you will want on day one:
+
+\begin{keys}[0.30]
+	\cmd{'number'}, \cmd{'relativenumber'} & Absolute and relative line numbers; together they give the \vocab{hybrid} display that makes counts like \key{7} \key{j} easy to read off \\
+	\cmd{'ignorecase'}, \cmd{'smartcase'}  & Case-insensitive search, unless the pattern contains a capital                                                                          \\
+	\cmd{'expandtab'}, \cmd{'shiftwidth'}  & Insert spaces instead of tabs; how far \key{>} \key{>} indents                                                                          \\
+	\cmd{'wrap'}, \cmd{'linebreak'}        & Soft-wrap long lines, and wrap at word boundaries                                                                                      \\
+	\cmd{'scrolloff'}                      & Keep $n$ lines of context above and below the cursor                                                                                   \\
+	\cmd{'clipboard'}                      & Set to \cmd{unnamedplus} to share yanks with the system clipboard (\autoref{sec:vim-registers})                                            \\
+\end{keys}
+
+Typed at the \key{:} prompt, an option lasts for the session only. To make it
+permanent it goes in your configuration file --- \file{\textasciitilde/.vimrc}
+for Vim, \file{\textasciitilde/.config/nvim/init.lua} for Neovim, where the Lua
+spelling is \cmd{vim.opt.number = true} (\autoref{sec:nvim-lua}).
+
+\begin{remark}
+	Neovim already switches on many options that Vim leaves off for compatibility
+	with 1976: \cmd{'nocompatible'}, \cmd{'incsearch'}, \cmd{'hlsearch'},
+	\cmd{'autoindent'}, syntax highlighting and filetype plugins are all default.
+	A Neovim configuration is therefore much shorter than the equivalent
+	\file{.vimrc}; see \cmd{:help nvim-defaults} for the full list.
+\end{remark}

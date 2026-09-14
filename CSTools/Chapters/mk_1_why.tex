@@ -1,0 +1,198 @@
+\chapter{Why a Build System}\label{ch:mk-why}
+
+\texttt{make} was written in 1976, is older than most of the languages it
+builds, and has outlived a long procession of intended replacements. That
+survival is not inertia. It solves a problem that never went away, and it
+solves it with one idea small enough to fit in a paragraph.
+
+\section{Notation for Part III}\label{sec:mk-notation}
+
+Makefile excerpts appear in framed blocks, as shell transcripts did in
+Part~\ref{part:shell}:
+
+\begin{makecode}
+program: main.o util.o        # target: prerequisites
+    gcc -o program main.o util.o  # recipe
+\end{makecode}
+
+\begin{note}[Indentation in these listings]
+	Recipe lines are printed indented, as above. In a real Makefile that
+	indentation must be a single literal tab character --- not the spaces the page
+	appears to show. \autoref{sec:mk-tab} is about nothing else, and it is the
+	first thing to check when a Makefile will not run.
+\end{note}
+
+Terminal transcripts keep the convention of \autoref{sec:sh-notation}: a line
+beginning \texttt{\$}~is what you type, and everything else is output.
+
+\begin{shell}
+$ make
+gcc -c main.c
+gcc -o program main.o util.o
+\end{shell}
+
+\begin{keys}[0.24]
+	\texttt{\$(VAR)}        & A make variable being expanded. Parentheses are conventional; \texttt{\$\{VAR\}} is identical \\
+	\texttt{\$\$}           & A literal dollar sign, passed through to the shell             \\
+	\texttt{\{target\}}, \texttt{[prereq]} & Placeholders, as in \autoref{sec:sh-notation}  \\
+\end{keys}
+
+\begin{note}
+	The \texttt{\$} character means two different things two lines apart. In
+	\texttt{\$(CC)} it is \emph{make} expanding a variable; in a recipe,
+	\texttt{\$\$HOME} is what you write to get the \emph{shell} a single
+	\texttt{\$HOME}. Make expands first and the shell second, and forgetting the
+	order is the most common Makefile bug after the tab.
+\end{note}
+
+\section{Compiling by Hand, and Where It Breaks}\label{sec:mk-byhand}
+
+A one-file program needs no build system:
+
+\begin{shell}
+$ gcc -Wall -o hello hello.c
+\end{shell}
+
+Three files is still manageable, if tedious:
+
+\begin{shell}
+$ gcc -Wall -c main.c
+$ gcc -Wall -c parser.c
+$ gcc -Wall -c util.c
+$ gcc -o app main.o parser.o util.o
+\end{shell}
+
+You could put those four lines in a shell script (\autoref{ch:sh-script}) and
+call the problem solved. For a while it is. Then the project reaches forty
+source files, a full rebuild takes ninety seconds, and you are changing one
+line at a time --- at which point the script is recompiling thirty-nine files
+that did not change, and you start editing the script to comment things out.
+That is the moment the problem stops being ``run these commands'' and becomes
+something else.
+
+\begin{intuition}
+	A build script answers \emph{what commands do I run?} A build system answers
+	\emph{which of them do I still need to run?} The second question is the one
+	that scales, and it cannot be answered without knowing what depends on what.
+\end{intuition}
+
+\section{Dependency Graphs and Incremental Builds}\label{sec:mk-graph}
+
+\begin{definition}[Dependency graph]
+	A directed graph whose nodes are files and whose edges say ``this file is built
+	from that one''. Building a target means visiting its prerequisites first, and
+	an edge is \vocab{stale} when the prerequisite is newer than the thing derived
+	from it.
+\end{definition}
+
+For the three-file program above:
+
+\begin{center}
+	\begin{tikzpicture}[
+			x=1mm, y=1mm, font=\footnotesize\ttfamily,
+			file/.style={draw=Gray!60, rounded corners=2pt, inner sep=3pt,
+					fill=Gray!5, anchor=center},
+			dep/.style={-{Stealth[length=4pt]}, Gray!70!black},
+			hdr/.style={dep, dashed}
+		]
+		\node[file] (app) at (  0,   0) {app};
+		\node[file] (mo)  at (-32, -16) {main.o};
+		\node[file] (po)  at (  0, -16) {parser.o};
+		\node[file] (uo)  at ( 32, -16) {util.o};
+		\node[file] (mc)  at (-32, -32) {main.c};
+		\node[file] (pc)  at (  0, -32) {parser.c};
+		\node[file] (uc)  at ( 32, -32) {util.c};
+		\node[file] (h)   at (  0, -50) {parser.h};
+		\draw[dep] (mo) -- (app);
+		\draw[dep] (po) -- (app);
+		\draw[dep] (uo) -- (app);
+		\draw[dep] (mc) -- (mo);
+		\draw[dep] (pc) -- (po);
+		\draw[dep] (uc) -- (uo);
+		% the shared header reaches two objects; route the edges through the
+		% gaps between columns so neither passes behind parser.c
+		\draw[hdr] (h) to[out=150, in=-35] (mo);
+		\draw[hdr] (h) to[out=30,  in=-45] (po);
+	\end{tikzpicture}
+\end{center}
+
+Solid edges are the obvious ones; the dashed pair is the shared header, which
+both \file{main.c} and \file{parser.c} include.
+
+Now the question ``what must I rebuild after editing \file{parser.c}?'' has a
+mechanical answer: follow the arrows out of that node. \file{parser.o}, then
+\file{app}. Two commands, not four. Editing \file{parser.h} instead reaches
+\file{main.o} as well, because both source files include it --- and \emph{that}
+edge is the one a hand-written script always forgets.
+
+\begin{definition}[Incremental build]
+	Rebuilding only the parts of the graph that are out of date. The saving is not
+	a constant factor: as a project grows, the full build grows with it while a
+	typical incremental build stays roughly the same size.
+\end{definition}
+
+\begin{moral}
+	Everything else in Part~\ref{part:make} is syntax. The content is this graph.
+	When a Makefile misbehaves --- rebuilding too much, or worse, too little ---
+	the question to ask is never ``what is wrong with my rules'' but ``what does my
+	graph actually say''.
+\end{moral}
+
+\section{Make's Model}\label{sec:mk-model}
+
+\texttt{make} implements exactly the above, with one simplifying decision that
+explains most of its behaviour and all of its failure modes.
+
+\begin{definition}[Make's rule]
+	Given a \vocab{target}, a list of \vocab{prerequisites}, and a \vocab{recipe}
+	of shell commands: build each prerequisite first, then run the recipe if and
+	only if the target does not exist, or any prerequisite has a
+	\emph{modification time} newer than the target's.
+\end{definition}
+
+\begin{intuition}
+	Make does not know what your compiler does, what a \texttt{.c} file is, or what
+	changed inside it. It compares timestamps on files. That is the whole of its
+	understanding, and it is why make works equally well for C, \LaTeX{}, image
+	conversion and data pipelines --- and why it is fooled by anything that does
+	not show up as a timestamp.
+\end{intuition}
+
+\begin{note}[What timestamps cannot see]
+	Three consequences follow immediately, and all three will bite you eventually:
+	\begin{enumerate}[(i)]
+		\item Touching a file without changing it (\cmd{touch main.c}) forces a rebuild
+		      that achieves nothing.
+		\item Changing a \emph{compiler flag} rebuilds nothing at all, because no file
+		      changed --- your object files are now inconsistent and make is content.
+		\item A clock skew, or a file copied with its old timestamp, can make a
+		      prerequisite look older than its target, and the rebuild silently does not
+		      happen.
+	\end{enumerate}
+	\autoref{sec:mk-depgen} fixes the first of these properly. For the second the
+	answer is usually \cmd{make clean}.
+\end{note}
+
+\section{Where Make Sits}\label{sec:mk-alt}
+
+\begin{keys}[0.24]
+	\texttt{make}        & Rules and timestamps, by hand. Universal, tiny, and unopinionated \\
+	\texttt{CMake}       & Generates Makefiles (or Ninja files) from a higher-level description; handles cross-platform and dependency discovery \\
+	\texttt{Ninja}       & A make-like executor designed to be generated rather than written; much faster on large graphs \\
+	\texttt{latexmk}     & A purpose-built builder for \LaTeX{} that knows about reruns, \texttt{biber} and \texttt{makeindex} (\autoref{sec:setup-vimtex}) \\
+	\texttt{cargo}, \texttt{go build} & Language-specific; the dependency graph is derived from the source, not declared \\
+\end{keys}
+
+\begin{remark}
+	CMake and Ninja have not replaced make so much as moved it. CMake's output is
+	usually a Makefile, and reading it is the fastest way to appreciate why nobody
+	writes those by hand. The reason to learn make anyway is that it is present on
+	every Unix machine, needs no project, and is the right size for the jobs that
+	are too small to justify a real build system --- which is most of them.
+\end{remark}
+
+\begin{moral}
+	Learn \texttt{make} for your own projects and for reading other people's. Reach
+	for CMake when you need to build on Windows too, or when finding libraries
+	becomes a project of its own.
+\end{moral}
