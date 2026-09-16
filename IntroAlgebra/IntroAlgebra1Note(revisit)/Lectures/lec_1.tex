@@ -1,0 +1,2249 @@
+\chapter{Groups I}
+\lecture{1}{Rotman §2.2--§2.4}{Permutations, Groups, Lagrange's Theorem}
+
+\section{Permutations}
+
+In high school mathematics the words \emph{permutation} and \emph{arrangement} are used
+interchangeably. We draw a distinction between them.
+
+\begin{definition}[Permutation, arrangement]
+	A \vocab{permutation} of a set \(X\) is a bijection \(\alpha\colon X \to X\). If \(X\)
+	is finite with \(\abs{X} = n\), then an \vocab{arrangement} of \(X\) is a list
+	\(x_1, x_2, \dots, x_n\) of all the elements of \(X\) with no repetitions.
+\end{definition}
+
+Given an arrangement \(x_1, \dots, x_n\), define \(f\colon \{1, \dots, n\} \to X\) by
+\(f(i) = x_i\); thus the list displays the values of \(f\). That there are no repetitions
+says \(f\) is injective, and that every \(x \in X\) occurs on the list says \(f\) is
+surjective. So an arrangement of \(X\) is the same thing as a bijection
+\(f\colon \{1, \dots, n\} \to X\).
+
+\begin{eg}[Arrangements of a three-element set]
+	There are six arrangements of \(X = \{a,b,c\}\):
+	\[
+		abc; \quad acb; \quad bac; \quad bca; \quad cab; \quad cba.
+	\]
+	In general there are exactly \(n!\) arrangements of an \(n\)-element set.
+\end{eg}
+
+If \(X = \{1, 2, \dots, n\}\), a permutation \(\alpha\colon X \to X\) gives the list
+\(\alpha(1) = i_1, \dots, \alpha(n) = i_n\), which we record in \vocab{two-rowed notation}:
+\[
+	\alpha =
+	\begin{pmatrix}
+		1         & 2         & \cdots & j            & \cdots & n         \\
+		\alpha(1) & \alpha(2) & \cdots & \alpha(j)    & \cdots & \alpha(n)
+	\end{pmatrix}.
+\]
+
+\begin{intuition}
+	Informally, arrangements (lists) and permutations (bijections) are two ways of
+	describing the same thing. The advantage of viewing a permutation as a \emph{bijection}
+	is that bijections can be \emph{composed}, and the composite of two permutations is
+	again a permutation. Lists can only be counted.
+\end{intuition}
+
+\begin{definition}[Symmetric group]
+	The family of all permutations of a set \(X\), denoted by \(S_X\), is called the
+	\vocab{symmetric group} on \(X\). When \(X = \{1, 2, \dots, n\}\) we write \(S_n\) and
+	call it the \vocab{symmetric group on \(n\) letters}.
+\end{definition}
+
+\begin{eg}[Composition in \(S_3\) is not commutative]
+	If
+	\[
+		\alpha = \begin{pmatrix} 1 & 2 & 3 \\ 2 & 3 & 1 \end{pmatrix}
+		\quad\text{and}\quad
+		\beta  = \begin{pmatrix} 1 & 2 & 3 \\ 2 & 1 & 3 \end{pmatrix},
+	\]
+	then
+	\[
+		\alpha \circ \beta = \begin{pmatrix} 1 & 2 & 3 \\ 3 & 2 & 1 \end{pmatrix}
+		\quad\text{and}\quad
+		\beta \circ \alpha = \begin{pmatrix} 1 & 2 & 3 \\ 1 & 3 & 2 \end{pmatrix},
+	\]
+	so \(\alpha \circ \beta \neq \beta \circ \alpha\): for instance
+	\(\alpha\circ\beta\colon 1 \mapsto \alpha(\beta(1)) = \alpha(2) = 3\), whereas
+	\(\beta\circ\alpha\colon 1 \mapsto 2 \mapsto 1\).
+
+	Some permutations do commute, however; the reader may check that
+	\(\begin{psmallmatrix} 1&2&3&4 \\ 2&1&3&4\end{psmallmatrix}\) and
+	\(\begin{psmallmatrix} 1&2&3&4 \\ 1&2&4&3\end{psmallmatrix}\) commute.
+\end{eg}
+
+\begin{note}[Order of multiplication]
+	Some authors put ``functions on the right'', writing \((i)\alpha\) instead of
+	\(\alpha(i)\). Their \(\alpha \circ \beta\) is our \(\beta \circ \alpha\): the
+	notational switch causes a switch in the order of multiplication.
+\end{note}
+
+\begin{proposition}[Cancellation in \(S_X\)]\label{prop:cancel-SX}
+	If \(\gamma, \alpha, \beta \in S_X\) and \(\gamma\alpha = \gamma\beta\), then
+	\(\alpha = \beta\). Similarly \(\alpha\gamma = \beta\gamma\) implies \(\alpha = \beta\).
+\end{proposition}
+
+\begin{proof}
+	Compose with \(\gamma^{-1}\) and use associativity of composition:
+	\[
+		\alpha
+		= 1_X \circ \alpha
+		= (\gamma^{-1}\circ\gamma) \circ \alpha
+		= \gamma^{-1} \circ (\gamma \circ \alpha)
+		= \gamma^{-1} \circ (\gamma \circ \beta)
+		= (\gamma^{-1}\circ\gamma) \circ \beta
+		= 1_X \circ \beta = \beta.
+	\]
+	A similar argument works on the other side.
+\end{proof}
+
+Aside from being cumbersome, the two-rowed notation hides the answers to elementary
+questions: is the square of a permutation the identity? what is the smallest \(m > 0\)
+with \(\alpha^m = 1\)? can one factor a permutation into simpler pieces? The special
+permutations below remedy this defect.
+
+\begin{notation}
+	From now on we write \(\beta\alpha\) instead of \(\beta \circ \alpha\), and \((1)\)
+	instead of \(1_X\).
+\end{notation}
+
+\subsection{Cycles}
+
+\begin{definition}[Fixes, moves]
+	If \(\alpha \in S_n\) and \(i \in \{1, \dots, n\}\), then \(\alpha\) \vocab{fixes} \(i\)
+	if \(\alpha(i) = i\), and \(\alpha\) \vocab{moves} \(i\) if \(\alpha(i) \neq i\).
+\end{definition}
+
+\begin{definition}[Cycle]
+	Let \(i_1, i_2, \dots, i_r\) be distinct integers in \(\{1, \dots, n\}\). If
+	\(\alpha \in S_n\) fixes the other integers (if any) and
+	\[
+		\alpha(i_1) = i_2, \quad \alpha(i_2) = i_3, \quad \dots, \quad
+		\alpha(i_{r-1}) = i_r, \quad \alpha(i_r) = i_1,
+	\]
+	then \(\alpha\) is called an \vocab{\(r\)-cycle}, or a \vocab{cycle of length \(r\)},
+	and we write
+	\[
+		\alpha = (i_1\ i_2\ \dots\ i_r).
+	\]
+	A \(2\)-cycle is called a \vocab{transposition}. A \(1\)-cycle is the identity, so all
+	\(1\)-cycles are equal: \((i) = (1)\) for every \(i\).
+\end{definition}
+
+\begin{eg}[Cycle notation]
+	The two-rowed notation does not help us recognize that
+	\(\alpha = \begin{psmallmatrix} 1&2&3&4&5 \\ 4&3&1&5&2 \end{psmallmatrix}\) is a
+	\(5\)-cycle, but in fact \(\alpha(1) = 4\), \(\alpha(4) = 5\), \(\alpha(5) = 2\),
+	\(\alpha(2) = 3\), \(\alpha(3) = 1\); that is, \(\alpha = (1\ 4\ 5\ 2\ 3)\). Likewise
+	\begin{gather*}
+		\begin{pmatrix} 1&2&3&4 \\ 2&3&4&1 \end{pmatrix} = (1\ 2\ 3\ 4),
+		\qquad
+		\begin{pmatrix} 1&2&3&4&5 \\ 5&1&4&2&3 \end{pmatrix} = (1\ 5\ 3\ 4\ 2), \\
+		\begin{pmatrix} 1&2&3&4&5 \\ 2&3&1&4&5 \end{pmatrix} = (1\ 2\ 3).
+	\end{gather*}
+	On the other hand \(\beta = \begin{psmallmatrix} 1&2&3&4 \\ 2&1&4&3\end{psmallmatrix}\)
+	is \emph{not} a cycle; in fact \(\beta = (1\ 2)(3\ 4)\).
+\end{eg}
+
+The term \emph{cycle} comes from the Greek word for circle: one pictures the cycle
+\((i_1\ i_2\ \dots\ i_r)\) as a clockwise rotation of a circle
+(\autoref{fig:cycle-rotation}). Any \(i_j\) may be taken as the starting point, so an
+\(r\)-cycle has \(r\) different cycle notations:
+\[
+	(i_1\ i_2\ \dots\ i_r) = (i_2\ i_3\ \dots\ i_r\ i_1) = \cdots = (i_r\ i_1\ i_2\ \dots\ i_{r-1}).
+\]
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[>=stealth]
+		\def\rad{1.9}
+		\draw[gray!40, dashed] (0,0) circle (\rad);
+		\fill (90:\rad)  circle (1.8pt) node[above=3pt]      {\(i_1\)};
+		\fill (20:\rad)  circle (1.8pt) node[right=3pt]      {\(i_2\)};
+		\fill (-50:\rad) circle (1.8pt) node[below right=1pt] {\(i_3\)};
+		\fill (160:\rad) circle (1.8pt) node[left=3pt]       {\(i_r\)};
+		\foreach \a in {272, 245, 218, 191} {
+			\fill[black!75] (\a:\rad) circle (1.3pt);
+		}
+		\draw[->, thick, MidnightBlue] (82:\rad) arc (82:28:\rad);
+		\draw[->, thick, MidnightBlue] (12:\rad) arc (12:-42:\rad);
+		\draw[->, thick, MidnightBlue] (152:\rad) arc (152:98:\rad);
+	\end{tikzpicture}
+	\caption{A cycle as a (clockwise) rotation.}
+	\label{fig:cycle-rotation}
+\end{figure}
+
+\begin{eg}[The factorization algorithm]\label{eg:factor-algorithm}
+	Take
+	\[
+		\alpha = \begin{pmatrix}
+			1&2&3&4&5&6&7&8&9 \\
+			6&4&7&2&5&1&8&9&3
+		\end{pmatrix}.
+	\]
+	Begin by writing ``\((1\)''. Now \(\alpha\colon 1 \mapsto 6\), so write ``\((1\ 6\)''.
+	Next \(\alpha\colon 6 \mapsto 1\), so the parentheses close: \(\alpha\) begins
+	``\((1\ 6)\)''. The smallest number not yet used is \(2\), and \(2 \mapsto 4\),
+	\(4 \mapsto 2\), giving ``\((1\ 6)(2\ 4)\)''. The smallest remaining number is \(3\),
+	and \(3 \mapsto 7 \mapsto 8 \mapsto 9 \mapsto 3\), giving the \(4\)-cycle
+	\((3\ 7\ 8\ 9)\). Finally \(\alpha(5) = 5\), and so
+	\[
+		\alpha = (1\ 6)(2\ 4)(3\ 7\ 8\ 9)(5).
+	\]
+	To verify a claim like this one evaluates both sides. For instance, writing
+	\(\beta = (1\ 6)\), \(\gamma = (2\ 4)\), \(\delta = (3\ 7\ 8\ 9)\),
+	\[
+		\beta\gamma\delta(1) = \beta(\gamma(\delta(1))) = \beta(\gamma(1)) = \beta(1) = 6 = \alpha(1),
+	\]
+	since \(\delta\) and \(\gamma\) fix \(1\). (\autoref{prop:disjoint-cycles} gives a more
+	satisfactory proof that the algorithm works.)
+\end{eg}
+
+\begin{eg}[Multiplying with the algorithm]
+	Factorizations into cycles are convenient for \emph{multiplying} permutations: one
+	simply displays the partial outputs. In \(S_5\) let
+	\[
+		\sigma = (1\ 2)(1\ 3\ 4\ 2\ 5)(2\ 5\ 1\ 3).
+	\]
+	Then \(\sigma\colon 1 \mapsto 3 \mapsto 4 \mapsto 4\), so \(\sigma\) begins
+	``\((1\ 4\)''. Next \(4 \mapsto 4 \mapsto 2 \mapsto 1\), so \(\sigma\) begins
+	``\((1\ 4)\)''. Then \(2 \mapsto 5 \mapsto 1 \mapsto 2\), so \(\sigma\) fixes \(2\);
+	and \(3 \mapsto 2 \mapsto 5 \mapsto 5\), \(5 \mapsto 1 \mapsto 3 \mapsto 3\).
+	Therefore \(\sigma = (1\ 4)(2)(3\ 5)\).
+\end{eg}
+
+\begin{definition}[Disjoint permutations]
+	Two permutations \(\alpha, \beta \in S_n\) are \vocab{disjoint} if every \(i\) moved by
+	one is fixed by the other: if \(\alpha(i) \neq i\) then \(\beta(i) = i\), and if
+	\(\beta(j) \neq j\) then \(\alpha(j) = j\). A family \(\beta_1, \dots, \beta_t\) is
+	disjoint if each pair of them is disjoint.
+\end{definition}
+
+\begin{observation}
+	If \(\alpha = (i_1\ \dots\ i_r)\) and \(\beta = (j_1\ \dots\ j_s)\), then any
+	\(k \in \{i_1, \dots, i_r\} \cap \{j_1, \dots, j_s\}\) is moved by both. Hence two
+	cycles are disjoint if and only if the underlying sets
+	\(\{i_1, \dots, i_r\}\) and \(\{j_1, \dots, j_s\}\) are disjoint sets. When
+	\(\alpha\) and \(\beta\) are disjoint there are exactly three possibilities for a
+	number \(i\): it is moved by \(\alpha\), it is moved by \(\beta\), or it is fixed by
+	both.
+\end{observation}
+
+\begin{lemma}[Disjoint permutations commute]\label{lem:disjoint-commute}
+	Disjoint permutations \(\alpha, \beta \in S_n\) commute.
+\end{lemma}
+
+\begin{proof}
+	It suffices to prove \(\alpha\beta(i) = \beta\alpha(i)\) for \(1 \leq i \leq n\).
+	If \(\beta\) moves \(i\), say \(\beta(i) = j \neq i\), then \(\beta\) also moves \(j\)
+	(otherwise \(\beta(j) = j\) and \(\beta(i) = j\) contradict injectivity of \(\beta\));
+	since \(\alpha\) and \(\beta\) are disjoint, \(\alpha(i) = i\) and \(\alpha(j) = j\),
+	so \(\beta\alpha(i) = \beta(i) = j = \alpha(j) = \alpha\beta(i)\). A similar argument
+	applies if \(\alpha\) moves \(i\). The last possibility is that neither moves \(i\),
+	and then \(\alpha\beta(i) = i = \beta\alpha(i)\).
+\end{proof}
+
+\begin{remark}
+	The converse fails: permutations that are \emph{not} disjoint may still commute. The
+	reader may check that \((1\ 2\ 3)(4\ 5)\) and \((1\ 3\ 2)(6\ 7)\) commute; even simpler,
+	\(\alpha\alpha^2 = \alpha^2\alpha\).
+\end{remark}
+
+\begin{lemma}\label{lem:orbit}
+	Let \(X = \{1, \dots, n\}\), let \(\alpha \in S_X = S_n\), and given \(i_1 \in X\)
+	define \(i_{j+1} = \alpha(i_j)\) for \(j \geq 1\). Write \(Y = \{i_j : j \geq 1\}\) and
+	let \(Y'\) be the complement of \(Y\) in \(X\).
+	\begin{enumerate}[(i)]
+		\item If \(\alpha\) moves \(i_1\), then there is \(r > 1\) with
+		      \(i_1, \dots, i_r\) all distinct and \(i_{r+1} = \alpha(i_r) = i_1\).
+		\item \(\alpha(Y) = Y\) and \(\alpha(Y') = Y'\).
+	\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+	(i) Since \(X\) is finite, there is a smallest \(r > 1\) with \(i_1, \dots, i_r\) all
+	distinct but \(i_{r+1} = \alpha(i_r) \in \{i_1, \dots, i_r\}\); say
+	\(\alpha(i_r) = i_j\) with \(1 \leq j \leq r\). If \(j > 1\), then
+	\(\alpha(i_r) = i_j = \alpha(i_{j-1})\), and injectivity of \(\alpha\) gives
+	\(i_r = i_{j-1}\), contradicting distinctness. Therefore \(\alpha(i_r) = i_1\).
+
+	(ii) Clearly \(\alpha(Y) \subseteq Y\), since \(i_j \in Y\) implies
+	\(\alpha(i_j) = i_{j+1} \in Y\). If \(k \in Y'\) and \(\alpha(k) \in Y\), then
+	\(\alpha(k) = i_j = \alpha(i_{j-1})\) for some \(j\) (by part (i) this holds even for
+	\(i_j = i_1\)); injectivity gives \(k = i_{j-1} \in Y\), contradicting
+	\(Y \cap Y' = \varnothing\). Hence \(\alpha(Y') \subseteq Y'\).
+
+	These inclusions are equalities: \(\alpha(X) = \alpha(Y) \cup \alpha(Y')\) is a disjoint
+	union because \(\alpha\) is injective, and \(\abs{\alpha(Y)} \leq \abs{Y}\),
+	\(\abs{\alpha(Y')} \leq \abs{Y'}\). If either inequality were strict, then
+	\(\abs{\alpha(X)} < \abs{X}\), contradicting surjectivity of \(\alpha\).
+\end{proof}
+
+\begin{proposition}[Factorization into disjoint cycles]\label{prop:disjoint-cycles}
+	Every permutation \(\alpha \in S_n\) is either a cycle or a product of disjoint cycles.
+\end{proposition}
+
+\begin{proof}
+	Induct on the number \(k \geq 0\) of points moved by \(\alpha\). The base step
+	\(k = 0\) is true, for then \(\alpha\) is the identity, which is a \(1\)-cycle.
+
+	If \(k > 0\), let \(i_1\) be a point moved by \(\alpha\). As in \autoref{lem:orbit},
+	define \(Y = \{i_1, \dots, i_r\}\) with the \(i_j\) distinct, \(\alpha(i_j) = i_{j+1}\)
+	for \(j < r\), and \(\alpha(i_r) = i_1\). Let \(\sigma = (i_1\ i_2\ \dots\ i_r)\), so
+	that \(\sigma\) fixes each point of \(Y'\). If \(r = n\), then \(\alpha = \sigma\).
+	If \(r < n\), then \(\alpha(Y') = Y'\) by the lemma. Put \(\alpha' = \alpha\sigma^{-1}\);
+	we claim \(\alpha'\) and \(\sigma\) are disjoint. If \(\sigma\) moves \(i\), then
+	\(i = i_j \in Y\), and
+	\(\alpha'(i_j) = \alpha\sigma^{-1}(i_j) = \alpha(i_{j-1}) = i_j\), so \(\alpha'\) fixes
+	\(i_j\). Conversely, if \(\alpha'\) moves \(k\), then \(k \notin Y\), so \(k \in Y'\);
+	but \(\sigma\) fixes every element of \(Y'\). Hence \(\alpha = \alpha'\sigma\) is a
+	factorization into disjoint permutations. The number of points moved by \(\alpha'\) is
+	\(k - r < k\), so the inductive hypothesis gives \(\alpha' = \beta_1 \cdots \beta_t\)
+	with \(\beta_1, \dots, \beta_t\) disjoint cycles. Therefore
+	\(\alpha = \beta_1 \cdots \beta_t \sigma\) is a product of disjoint cycles.
+\end{proof}
+
+\begin{definition}[Complete factorization]
+	A \vocab{complete factorization} of a permutation \(\alpha\) is a factorization of
+	\(\alpha\) into disjoint cycles that contains one \(1\)-cycle \((i)\) for every \(i\)
+	fixed by \(\alpha\).
+\end{definition}
+
+The algorithm of \autoref{eg:factor-algorithm} always yields a complete factorization. In
+a complete factorization \(\alpha = \beta_1\cdots\beta_t\), every symbol \(i\) between
+\(1\) and \(n\) occurs in exactly one \(\beta_\lambda\).
+
+\begin{eg}
+	If \(\alpha = \begin{psmallmatrix} 1&2&3&4&5 \\ 1&3&4&2&5 \end{psmallmatrix}\), the
+	algorithm gives the complete factorization \(\alpha = (1)(2\ 3\ 4)(5)\). By contrast the
+	factorizations
+	\[
+		\alpha = (2\ 3\ 4) = (1)(2\ 3\ 4) = (2\ 3\ 4)(5)
+	\]
+	are \emph{not} complete.
+\end{eg}
+
+Write \(\beta = (i_0\ i_1\ \dots\ i_{r-1})\). Then \(i_1 = \beta(i_0)\),
+\(i_2 = \beta(i_1) = \beta^2(i_0)\), and in general
+\begin{equation}\label{eq:cycle-power}
+	i_k = \beta^k(i_0) \qquad (k \leq r-1).
+\end{equation}
+Since \(\beta(i_{r-1}) = i_0\), equation~\eqref{eq:cycle-power} holds for all \(k\) if the
+subscripts \(j\) in \(i_j\) are read \(\bmod\ r\).
+
+\begin{lemma}[Powers of a cycle]\label{lem:cycle-order}
+	Let \(\beta = (i_0\ i_1\ \dots\ i_{r-1})\) be an \(r\)-cycle. Then \(\beta^r = (1)\),
+	and \(r\) is the smallest positive integer \(k\) with \(\beta^k = (1)\).
+\end{lemma}
+
+\begin{proof}
+	Reading subscripts \(\bmod\ r\), equation~\eqref{eq:cycle-power} gives
+	\(\beta^k(i_j) = i_{j+k}\) for all \(j\) and all \(k \geq 1\). Taking \(k = r\) yields
+	\(\beta^r(i_j) = i_j\) for every \(j\); since \(\beta\) fixes every other symbol, so
+	does \(\beta^r\), and hence \(\beta^r = (1)\). If \(0 < k < r\), then
+	\(\beta^k(i_0) = i_k \neq i_0\), because \(i_0, \dots, i_{r-1}\) are distinct;
+	therefore \(\beta^k \neq (1)\).
+\end{proof}
+
+\begin{lemma}\label{lem:cycle-powers}
+	\begin{enumerate}[(i)]
+		\item Let \(\alpha = \beta\delta\) be a factorization into disjoint permutations. If
+		      \(\beta\) moves \(i\), then \(\alpha^k(i) = \beta^k(i)\) for all \(k \geq 1\).
+		\item If \(\beta\) and \(\gamma\) are cycles both of which move \(i = i_0\), and if
+		      \(\beta^k(i) = \gamma^k(i)\) for all \(k \geq 1\), then \(\beta = \gamma\).
+	\end{enumerate}
+\end{lemma}
+
+\begin{remark}
+	The hypothesis in (ii) does \emph{not} assume that \(\beta\) and \(\gamma\) have the
+	same length; that is part of the conclusion.
+\end{remark}
+
+\begin{proof}
+	(i) Since \(\beta\) moves \(i\), disjointness implies \(\delta\) fixes \(i\), and hence
+	so does every power of \(\delta\). Now \(\beta\) and \(\delta\) commute by
+	\autoref{lem:disjoint-commute}, so
+	\((\beta\delta)^k(i) = \beta^k(\delta^k(i)) = \beta^k(i)\).
+
+	(ii) By \eqref{eq:cycle-power}, if \(\beta = (i_0\ i_1\ \dots\ i_{r-1})\), then
+	\(i_k = \beta^k(i_0)\), and if \(\gamma = (i_0\ j_1\ \dots\ j_{s-1})\), then
+	\(j_k = \gamma^k(i_0)\). We may assume \(r \leq s\), so that
+	\(i_1 = j_1, \dots, i_{r-1} = j_{r-1}\). Since
+	\(j_r = \gamma^r(i_0) = \beta^r(i_0) = i_0\), it follows that \(s = r\) and
+	\(j_k = i_k\) for all \(k\). Therefore \(\beta = \gamma\).
+\end{proof}
+
+\begin{theorem}[Uniqueness of the complete factorization]\label{thm:unique-factorization}
+	Let \(\alpha \in S_n\) and let \(\alpha = \beta_1 \cdots \beta_t\) be a complete
+	factorization into disjoint cycles. This factorization is unique except for the order in
+	which the cycles occur.
+\end{theorem}
+
+\begin{intuition}
+	This is the analog, for permutations, of the fundamental theorem of arithmetic: cycles
+	play the role of primes.
+\end{intuition}
+
+\begin{proof}
+	Let \(\alpha = \gamma_1 \cdots \gamma_s\) be a second complete factorization into
+	disjoint cycles. Every complete factorization has exactly one \(1\)-cycle for each \(i\)
+	fixed by \(\alpha\), so it suffices to prove, by induction on \(\ell\), the larger of
+	\(t\) and \(s\), that the cycles of length \(> 1\) are uniquely determined by \(\alpha\).
+
+	The base step \(\ell = 1\) is the hypothesis \(\beta_1 = \alpha = \gamma_1\).
+
+	For the inductive step, if \(\beta_t\) moves \(i = i_0\), then
+	\(\beta_t^{\,k}(i_0) = \alpha^k(i_0)\) for all \(k \geq 1\), by
+	\autoref{lem:cycle-powers}(i). Some \(\gamma_j\) must also move \(i_0\); since disjoint
+	cycles commute, we may re-index so that \(\gamma_s\) moves \(i_0\), and then
+	\(\gamma_s^{\,k}(i_0) = \alpha^k(i_0)\) for all \(k\). Now
+	\autoref{lem:cycle-powers}(ii) gives \(\beta_t = \gamma_s\), so that cancellation
+	(\autoref{prop:cancel-SX}) yields
+	\[
+		\beta_1 \cdots \beta_{t-1} = \gamma_1 \cdots \gamma_{s-1}.
+	\]
+	By the inductive
+	hypothesis \(s = t\) and the \(\gamma\)'s may be re-indexed so that
+	\(\gamma_\lambda = \beta_\lambda\) for all \(\lambda\).
+\end{proof}
+
+\begin{proposition}[Inverses]\label{prop:inverse-cycle}
+	\begin{enumerate}[(i)]
+		\item \((i_1\ i_2\ \dots\ i_r)^{-1} = (i_r\ i_{r-1}\ \dots\ i_1)\).
+		\item If \(\gamma \in S_n\) and \(\gamma = \beta_1 \cdots \beta_k\), then
+		      \(\gamma^{-1} = \beta_k^{-1} \cdots \beta_1^{-1}\) (note that the order of the
+		      factors is reversed).
+	\end{enumerate}
+\end{proposition}
+
+\begin{intuition}
+	In the picture of a cycle as a clockwise rotation of a circle
+	(\autoref{fig:cycle-rotation}), the inverse is just the counterclockwise rotation.
+\end{intuition}
+
+\begin{proof}
+	(i) The composite \((i_1\ i_2\ \dots\ i_r)(i_r\ i_{r-1}\ \dots\ i_1)\) fixes every
+	integer between \(1\) and \(n\) other than \(i_1, \dots, i_r\); it sends
+	\(i_1 \mapsto i_r \mapsto i_1\), and for \(j \geq 2\) it sends
+	\(i_j \mapsto i_{j-1} \mapsto i_j\). Thus every integer is fixed, so the composite is
+	\((1)\). A similar argument treats the other order.
+
+	(ii) Induct on \(k \geq 2\). For \(k = 2\),
+	\[
+		(\beta_1\beta_2)(\beta_2^{-1}\beta_1^{-1})
+		= \beta_1(\beta_2\beta_2^{-1})\beta_1^{-1}
+		= \beta_1\beta_1^{-1} = (1),
+	\]
+	and similarly \((\beta_2^{-1}\beta_1^{-1})(\beta_1\beta_2) = (1)\). For the inductive
+	step, let \(\delta = \beta_1\cdots\beta_k\); then
+	\(\beta_1 \cdots \beta_k\beta_{k+1} = \delta\beta_{k+1}\), and so
+	\[
+		(\beta_1 \cdots \beta_{k+1})^{-1}
+		= (\delta\beta_{k+1})^{-1}
+		= \beta_{k+1}^{-1}\delta^{-1}
+		= \beta_{k+1}^{-1}(\beta_1\cdots\beta_k)^{-1}
+		= \beta_{k+1}^{-1}\beta_k^{-1}\cdots\beta_1^{-1}. \qedhere
+	\]
+\end{proof}
+
+Thus \((1\ 2\ 3\ 4)^{-1} = (4\ 3\ 2\ 1) = (1\ 4\ 3\ 2)\), and
+\((1\ 2)^{-1} = (2\ 1) = (1\ 2)\): every transposition is its own inverse.
+
+\begin{eg}
+	\autoref{prop:inverse-cycle} applies in particular when the factors are disjoint
+	cycles, in which case reversing the order is unnecessary because disjoint cycles commute.
+	Thus if \(\alpha = \begin{psmallmatrix} 1&2&3&4&5&6&7&8&9 \\ 6&4&7&2&5&1&8&9&3
+	\end{psmallmatrix} = (1\ 6)(2\ 4)(3\ 7\ 8\ 9)(5)\), then
+	\[
+		\alpha^{-1} = (5)(9\ 8\ 7\ 3)(4\ 2)(6\ 1) = (1\ 6)(2\ 4)(3\ 9\ 8\ 7).
+	\]
+\end{eg}
+
+\subsection{Cycle Structure and Conjugation}
+
+\begin{definition}[Cycle structure]
+	Two permutations \(\alpha, \beta \in S_n\) have the same \vocab{cycle structure} if
+	their complete factorizations have the same number of \(r\)-cycles for every
+	\(r \geq 1\).
+\end{definition}
+
+There are \(\tfrac{1}{r}\bigl[n(n-1)\cdots(n-r+1)\bigr]\) \(r\)-cycles in \(S_n\)
+(Rotman, Exercise 2.21). This formula counts permutations of a given cycle
+structure, provided one is careful when several cycles have the same length. For example,
+the number of permutations in \(S_4\) of cycle structure \((a\ b)(c\ d)\) is
+\[
+	\tfrac{1}{2}\Bigl[\tfrac{1}{2}(4\times 3)\Bigr]\cdot\Bigl[\tfrac{1}{2}(2 \times 1)\Bigr] = 3,
+\]
+the extra factor \(\tfrac{1}{2}\) occurring so that we do not count
+\((a\ b)(c\ d) = (c\ d)(a\ b)\) twice. Similarly, the number of permutations in \(S_n\) of
+the form \((a\ b)(c\ d)(e\ f)\) is
+\[
+	\frac{1}{3!\,2^3}\bigl[n(n-1)(n-2)(n-3)(n-4)(n-5)\bigr].
+\]
+
+\begin{table}[H]
+	\centering
+	\begin{minipage}{0.42\linewidth}
+		\centering
+		\begin{tabular}{lr}
+			\toprule
+			Cycle structure & Number \\
+			\midrule
+			\((1)\)          & 1  \\
+			\((1\ 2)\)       & 6  \\
+			\((1\ 2\ 3)\)    & 8  \\
+			\((1\ 2\ 3\ 4)\) & 6  \\
+			\((1\ 2)(3\ 4)\) & 3  \\
+			\midrule
+			                 & 24 \\
+			\bottomrule
+		\end{tabular}
+		\subcaption{Permutations in \(S_4\).}
+	\end{minipage}
+	\hfill
+	\begin{minipage}{0.52\linewidth}
+		\centering
+		\begin{tabular}{lr}
+			\toprule
+			Cycle structure     & Number \\
+			\midrule
+			\((1)\)               & 1   \\
+			\((1\ 2)\)            & 10  \\
+			\((1\ 2\ 3)\)         & 20  \\
+			\((1\ 2\ 3\ 4)\)      & 30  \\
+			\((1\ 2\ 3\ 4\ 5)\)   & 24  \\
+			\((1\ 2)(3\ 4\ 5)\)   & 20  \\
+			\((1\ 2)(3\ 4)\)      & 15  \\
+			\midrule
+			                      & 120 \\
+			\bottomrule
+		\end{tabular}
+		\subcaption{Permutations in \(S_5\).}
+	\end{minipage}
+	\caption{Counting permutations by cycle structure.}
+	\label{tab:cycle-counts}
+\end{table}
+
+\begin{lemma}\label{lem:conj-action}
+	Let \(\alpha, \gamma \in S_n\). For all \(i\), if \(\gamma\colon i \mapsto j\), then
+	\(\alpha\gamma\alpha^{-1}\colon \alpha(i) \mapsto \alpha(j)\).
+\end{lemma}
+
+\begin{proof}
+	\(\alpha\gamma\alpha^{-1}(\alpha(i)) = \alpha\gamma(i) = \alpha(j)\).
+\end{proof}
+
+\begin{proposition}\label{prop:conj-same-structure}
+	If \(\gamma, \alpha \in S_n\), then \(\alpha\gamma\alpha^{-1}\) has the same cycle
+	structure as \(\gamma\). In more detail, if the complete factorization of \(\gamma\) is
+	\[
+		\gamma = \beta_1\beta_2 \cdots (i\ j\ \dots) \cdots \beta_t,
+	\]
+	then \(\alpha\gamma\alpha^{-1}\) is the permutation obtained from \(\gamma\) by applying
+	\(\alpha\) to every symbol occurring in the cycles of \(\gamma\).
+\end{proposition}
+
+\begin{remark}
+	For example, if \(\gamma = (1\ 3)(2\ 4\ 7)(5)(6)\) and
+	\(\alpha = (2\ 5\ 6)(1\ 4\ 3)\), then
+	\[
+		\alpha\gamma\alpha^{-1}
+		= (\alpha 1\ \ \alpha 3)(\alpha 2\ \ \alpha 4\ \ \alpha 7)(\alpha 5)(\alpha 6)
+		= (4\ 1)(5\ 3\ 7)(6)(2).
+	\]
+\end{remark}
+
+\begin{proof}
+	Let \(\sigma\) denote the permutation obtained from \(\gamma\) by applying \(\alpha\) to
+	all the symbols. If \(\gamma\) fixes \(i\), then \autoref{lem:conj-action} shows that
+	\(\alpha\gamma\alpha^{-1}\) fixes \(\alpha(i)\), as does \(\sigma\). Assume that
+	\(\gamma\) moves \(i\), say \(\gamma(i) = j\), so that one of the cycles of \(\gamma\)
+	is \((i\ j\ \dots)\); by definition, one of the cycles of \(\sigma\) is
+	\((\alpha(i)\ \alpha(j)\ \dots)\), that is,
+	\(\sigma\colon \alpha(i) \mapsto \alpha(j)\). But \autoref{lem:conj-action} says
+	\(\alpha\gamma\alpha^{-1}\colon \alpha(i) \mapsto \alpha(j)\), so \(\sigma\) and
+	\(\alpha\gamma\alpha^{-1}\) agree on every number of the form \(\alpha(i)\). Since
+	\(\alpha\) is surjective, every \(k \in X\) has this form, and so
+	\(\sigma = \alpha\gamma\alpha^{-1}\).
+\end{proof}
+
+\begin{proposition}\label{prop:conjugacy-criterion}
+	If \(\gamma, \gamma' \in S_n\), then \(\gamma\) and \(\gamma'\) have the same cycle
+	structure if and only if there exists \(\alpha \in S_n\) with
+	\(\gamma' = \alpha\gamma\alpha^{-1}\).
+\end{proposition}
+
+\begin{proof}
+	Sufficiency is \autoref{prop:conj-same-structure}.
+
+	Conversely, assume \(\gamma\) and \(\gamma'\) have the same cycle structure; that is,
+	\(\gamma = \beta_1\cdots\beta_t\) and \(\gamma' = \sigma_1\cdots\sigma_t\) are complete
+	factorizations with \(\beta_\lambda\) and \(\sigma_\lambda\) of the same length for all
+	\(\lambda \leq t\). Write
+	\(\beta_\lambda = (i_1^\lambda, \dots, i_{r(\lambda)}^\lambda)\) and
+	\(\sigma_\lambda = (j_1^\lambda, \dots, j_{r(\lambda)}^\lambda)\), and define
+	\[
+		\alpha(i_1^\lambda) = j_1^\lambda, \quad
+		\alpha(i_2^\lambda) = j_2^\lambda, \quad \dots, \quad
+		\alpha(i_{r(\lambda)}^\lambda) = j_{r(\lambda)}^\lambda
+	\]
+	for all \(\lambda\). Since \(\beta_1\cdots\beta_t\) is a \emph{complete} factorization,
+	every \(i \in X = \{1, \dots, n\}\) occurs in exactly one \(\beta_\lambda\); hence
+	\(\alpha(i)\) is defined for every \(i \in X\) and \(\alpha\colon X \to X\) is a
+	single-valued function. Since every \(j \in X\) occurs in some \(\sigma_\lambda\),
+	\(\alpha\) is surjective, hence a bijection, and so \(\alpha \in S_n\). By
+	\autoref{prop:conj-same-structure}, the \(\lambda\)th cycle of
+	\(\alpha\gamma\alpha^{-1}\) is
+	\(\bigl(\alpha(i_1^\lambda)\ \dots\ \alpha(i_{r(\lambda)}^\lambda)\bigr) = \sigma_\lambda\).
+	Therefore \(\alpha\gamma\alpha^{-1} = \gamma'\).
+\end{proof}
+
+\begin{eg}
+	If \(\gamma = (1\ 2\ 3)(4\ 5)(6)\) and \(\gamma' = (2\ 5\ 6)(3\ 1)(4)\), then
+	\(\gamma' = \alpha\gamma\alpha^{-1}\) where
+	\[
+		\alpha = \begin{pmatrix} 1&2&3&4&5&6 \\ 2&5&6&3&1&4 \end{pmatrix}
+		= (1\ 2\ 5)(3\ 6\ 4).
+	\]
+	Note that there are other choices for \(\alpha\) as well.
+\end{eg}
+
+\subsection{Parity}
+
+\begin{proposition}\label{prop:product-of-transpositions}
+	If \(n \geq 2\), then every \(\alpha \in S_n\) is a product of transpositions.
+\end{proposition}
+
+\begin{proof}
+	Of course \((1) = (1\ 2)(1\ 2)\) is such a product, as is every transposition:
+	\((i\ j) = (i\ j)(1\ 2)(1\ 2)\). By \autoref{prop:disjoint-cycles} it suffices to
+	factor an \(r\)-cycle \(\beta\). If \(r = 1\), then \(\beta = (1\ 2)(1\ 2)\). If
+	\(r \geq 2\), then
+	\[
+		\beta = (1\ 2\ \dots\ r) = (1\ r)(1\ r-1)\cdots(1\ 3)(1\ 2).
+	\]
+	One checks this by evaluating each side: the left side sends \(1 \mapsto 2\), and each of
+	\((1\ r), (1\ r-1), \dots, (1\ 3)\) fixes \(2\), so the right side also sends
+	\(1 \mapsto 2\); and so on.
+\end{proof}
+
+\begin{remark}[Transposition factorizations are far from unique]
+	Such a factorization is not as nice as the factorization into disjoint cycles. The
+	transpositions occurring need not commute:
+	\((1\ 2\ 3) = (1\ 3)(1\ 2) \neq (1\ 2)(1\ 3)\); and neither the factors nor their
+	number is determined. For example, in \(S_4\),
+	\begin{align*}
+		(1\ 2\ 3) & = (1\ 3)(1\ 2)                              \\
+		          & = (2\ 3)(1\ 3)                              \\
+		          & = (1\ 3)(4\ 2)(1\ 2)(1\ 4)                  \\
+		          & = (1\ 3)(4\ 2)(1\ 2)(1\ 4)(2\ 3)(2\ 3).
+	\end{align*}
+	The only invariant that survives is the \emph{parity} of the number of factors, and
+	proving this is the goal of the rest of the section.
+\end{remark}
+
+\begin{eg}[The \(15\)-puzzle]\label{eg:15-puzzle}
+	The \vocab{\(15\)-puzzle} consists of a starting position, which is a \(4 \times 4\)
+	array of the numbers \(1\) through \(15\) together with a symbol \(\#\) (a blank), and
+	\vocab{simple moves}. Consider the starting position
+	\[
+		\begin{array}{|c|c|c|c|}
+			\hline
+			3  & 15 & 4  & 12 \\ \hline
+			10 & 11 & 1  & 8  \\ \hline
+			2  & 5  & 13 & 9  \\ \hline
+			6  & 7  & 14 & \# \\ \hline
+		\end{array}
+	\]
+	A simple move interchanges the blank with an adjacent symbol; here there are two
+	beginning moves, interchanging \(\#\) with \(14\) or with \(9\). One \emph{wins} if,
+	after a sequence of simple moves, the starting position is transformed into the standard
+	array \(1, 2, \dots, 15, \#\).
+
+	To analyze the game, note that the given array is really a permutation
+	\(\alpha \in S_{16}\) of \(\{1, 2, \dots, 15, \#\}\): if the \emph{squares} are labelled
+	\(1\) through \(15, \#\), then \(\alpha(i)\) is the symbol occupying the \(i\)th square.
+	The position above is
+	\[
+		\alpha =
+		\setlength{\arraycolsep}{2.5pt}
+		\left(\begin{array}{*{16}{c}}
+				1 & 2  & 3 & 4  & 5  & 6  & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 & \# \\
+				3 & 15 & 4 & 12 & 10 & 11 & 1 & 8 & 2 & 5  & 13 & 9  & 6  & 7  & 14 & \#
+			\end{array}\right).
+	\]
+	Each simple move is a transposition \(\tau\) that moves \(\#\), and performing it from
+	the position \(\beta\) yields the position \(\tau\beta\). Hence to win one needs special
+	transpositions \(\tau_1, \dots, \tau_m\) with
+	\[
+		\tau_m \cdots \tau_2\tau_1\alpha = (1).
+	\]
+	Some starting positions can be won and others cannot, as we shall see in
+	\autoref{eg:15-puzzle-solved}.
+\end{eg}
+
+\begin{lemma}\label{lem:split-merge}
+	If \(k, \ell \geq 0\) and the letters \(a, b, c_i, d_j\) are all distinct, then
+	\[
+		(a\ b)(a\ c_1 \dots c_k\ b\ d_1 \dots d_\ell) = (a\ c_1 \dots c_k)(b\ d_1 \dots d_\ell)
+	\]
+	and
+	\[
+		(a\ b)(a\ c_1 \dots c_k)(b\ d_1 \dots d_\ell) = (a\ c_1 \dots c_k\ b\ d_1 \dots d_\ell).
+	\]
+\end{lemma}
+
+\begin{proof}
+	The left side of the first equation sends
+	\[
+		a \mapsto c_1 \mapsto c_1; \quad
+		c_i \mapsto c_{i+1} \mapsto c_{i+1} \ (i < k); \quad
+		c_k \mapsto b \mapsto a;
+	\]
+	\[
+		b \mapsto d_1 \mapsto d_1; \quad
+		d_j \mapsto d_{j+1} \mapsto d_{j+1} \ (j < \ell); \quad
+		d_\ell \mapsto a \mapsto b.
+	\]
+	Evaluating the right side gives the same values on \(a\), \(b\), and all \(c_i, d_j\),
+	and each side fixes every other number, so the two sides are equal.
+
+	For the second equation, reverse the first and multiply both sides on the left by
+	\((a\ b)\), using \((a\ b)(a\ b) = (1)\).
+\end{proof}
+
+An illustration: \((1\ 2)(1\ 3\ 4\ 2\ 5\ 6\ 7) = (1\ 3\ 4)(2\ 5\ 6\ 7)\).
+
+\begin{definition}[Signum]
+	If \(\alpha \in S_n\) and \(\alpha = \beta_1 \cdots \beta_t\) is a \emph{complete}
+	factorization into disjoint cycles, then the \vocab{signum} of \(\alpha\) is
+	\[
+		\sgn(\alpha) = (-1)^{n-t}.
+	\]
+\end{definition}
+
+\autoref{thm:unique-factorization} shows that \(\sgn\) is a well-defined function, for
+\(t\) is determined by \(\alpha\). If \(\varepsilon\) is a \(1\)-cycle, then \(t = n\) and
+\(\sgn(\varepsilon) = 1\). If \(\tau\) is a transposition, then it moves two numbers and
+fixes the other \(n - 2\), so \(t = 1 + (n-2) = n-1\) and
+\(\sgn(\tau) = (-1)^{n-(n-1)} = -1\).
+
+\begin{lemma}\label{lem:sgn-transposition}
+	If \(\alpha, \tau \in S_n\) with \(\tau\) a transposition, then
+	\(\sgn(\tau\alpha) = -\sgn(\alpha)\).
+\end{lemma}
+
+\begin{proof}
+	Let \(\alpha = \beta_1 \cdots \beta_t\) be a complete factorization and let
+	\(\tau = (a\ b)\).
+
+	If \(a\) and \(b\) occur in the same \(\beta\), say \(\beta_1\), then
+	\(\beta_1 = (a\ c_1 \dots c_k\ b\ d_1 \dots d_\ell)\) with \(k, \ell \geq 0\), and
+	\autoref{lem:split-merge} gives
+	\(\tau\beta_1 = (a\ c_1 \dots c_k)(b\ d_1 \dots d_\ell)\). This exhibits a complete
+	factorization of \(\tau\alpha = (\tau\beta_1)\beta_2\cdots\beta_t\) with \(t+1\) cycles,
+	for \(\beta_1\) has split in two. Therefore
+	\(\sgn(\tau\alpha) = (-1)^{n-(t+1)} = -\sgn(\alpha)\).
+
+	Otherwise \(a\) and \(b\) occur in different cycles, say
+	\(\beta_1 = (a\ c_1 \dots c_k)\) and \(\beta_2 = (b\ d_1 \dots d_\ell)\). Then
+	\(\tau\alpha = (\tau\beta_1\beta_2)\beta_3\cdots\beta_t\) and
+	\autoref{lem:split-merge} gives
+	\(\tau\beta_1\beta_2 = (a\ c_1 \dots c_k\ b\ d_1 \dots d_\ell)\). So \(\tau\alpha\) has a
+	complete factorization with \(t-1\) cycles, and
+	\(\sgn(\tau\alpha) = (-1)^{n-(t-1)} = -\sgn(\alpha)\).
+\end{proof}
+
+\begin{theorem}[\(\sgn\) is multiplicative]\label{thm:sgn-multiplicative}
+	For all \(\alpha, \beta \in S_n\),
+	\[
+		\sgn(\alpha\beta) = \sgn(\alpha)\sgn(\beta).
+	\]
+\end{theorem}
+
+\begin{proof}
+	By \autoref{prop:product-of-transpositions} we may write
+	\(\alpha = \tau_1 \cdots \tau_m\) as a product of transpositions; induct on \(m\). The
+	base step \(m = 1\) is \autoref{lem:sgn-transposition}. If \(m > 1\), the inductive
+	hypothesis applies to \(\tau_2\cdots\tau_m\), and
+	\begin{align*}
+		\sgn(\alpha\beta) & = \sgn(\tau_1\cdots\tau_m\beta)                    \\
+		                  & = -\sgn(\tau_2\cdots\tau_m\beta)                   && \text{(\autoref{lem:sgn-transposition})} \\
+		                  & = -\sgn(\tau_2\cdots\tau_m)\sgn(\beta)             && \text{(induction)}                         \\
+		                  & = \sgn(\tau_1\cdots\tau_m)\sgn(\beta)              && \text{(\autoref{lem:sgn-transposition})} \\
+		                  & = \sgn(\alpha)\sgn(\beta). &&\qedhere
+	\end{align*}
+\end{proof}
+
+It follows by induction on \(k \geq 2\) that
+\(\sgn(\alpha_1\alpha_2\cdots\alpha_k) = \sgn(\alpha_1)\sgn(\alpha_2)\cdots\sgn(\alpha_k)\).
+
+\begin{definition}[Even, odd, parity]
+	A permutation \(\alpha \in S_n\) is \vocab{even} if \(\sgn(\alpha) = 1\), and
+	\vocab{odd} if \(\sgn(\alpha) = -1\). We say \(\alpha\) and \(\beta\) have the same
+	\vocab{parity} if both are even or both are odd.
+\end{definition}
+
+\begin{theorem}\label{thm:parity}
+	\begin{enumerate}[(i)]
+		\item Let \(\alpha \in S_n\). If \(\alpha\) is even, then \(\alpha\) is a product of
+		      an even number of transpositions; if \(\alpha\) is odd, then \(\alpha\) is a
+		      product of an odd number of transpositions.
+		\item If \(\alpha = \tau_1\cdots\tau_q = \tau'_1\cdots\tau'_p\) are two
+		      factorizations into transpositions, then \(q\) and \(p\) have the same parity.
+	\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+	(i) If \(\alpha = \tau_1\cdots\tau_q\), then \autoref{thm:sgn-multiplicative} gives
+	\(\sgn(\alpha) = \sgn(\tau_1)\cdots\sgn(\tau_q) = (-1)^q\), since every transposition is
+	odd. Hence \(\sgn(\alpha) = 1\) forces \(q\) even, and \(\sgn(\alpha) = -1\) forces
+	\(q\) odd.
+
+	(ii) If there were two factorizations, one into an odd and one into an even number of
+	transpositions, then \(\sgn(\alpha)\) would have two different values.
+\end{proof}
+
+\begin{corollary}\label{cor:parity-product}
+	Let \(\alpha, \beta \in S_n\). If \(\alpha\) and \(\beta\) have the same parity, then
+	\(\alpha\beta\) is even; if they have distinct parity, then \(\alpha\beta\) is odd.
+\end{corollary}
+
+\begin{proof}
+	If \(\sgn(\alpha) = (-1)^q\) and \(\sgn(\beta) = (-1)^p\), then
+	\autoref{thm:sgn-multiplicative} gives \(\sgn(\alpha\beta) = (-1)^{q+p}\).
+\end{proof}
+
+\begin{eg}[The \(15\)-puzzle, resolved]\label{eg:15-puzzle-solved}
+	One can show that if \(\alpha \in S_{16}\) is the starting position of the \(15\)-puzzle,
+	then the game can be won if and only if \(\alpha\) is an \emph{even} permutation fixing
+	\(\#\). One direction is clear. The blank \(\#\) starts in position \(16\); each simple
+	move takes \(\#\) up, down, left, or right, so the total number of moves is
+	\(m = u + d + l + r\). If \(\#\) is to return home, then \(u = d\) and \(l = r\), so
+	\(m = 2u + 2r\) is even. That is, if \(\tau_m\cdots\tau_1\alpha = (1)\), then \(m\) is
+	even; hence \(\alpha = \tau_1\cdots\tau_m\) (because \(\tau^{-1} = \tau\) for every
+	transposition), and so \(\alpha\) is even.
+
+	For the starting position of \autoref{eg:15-puzzle}, the cycle notation is
+	\[
+		\alpha = (1\ 3\ 4\ 12\ 9\ 2\ 15\ 14\ 7)(5\ 10)(6\ 11\ 13)(8)(\#),
+	\]
+	so \(t = 5\) and \(\sgn(\alpha) = (-1)^{16-5} = -1\). Therefore \(\alpha\) is odd, and
+	the game starting with \(\alpha\) \emph{cannot} be won.
+\end{eg}
+
+\section{Groups}
+
+Generalizations of the quadratic formula for cubics and quartics were discovered in the
+early 1500s. Over the next three centuries many tried to find analogous formulas for
+higher degree, but in 1824 N.~H.~Abel (1802--1829) proved that no such formula exists for
+the general polynomial of degree \(5\). In 1831 E.~Galois (1811--1832) solved the problem
+completely, determining precisely which polynomials admit such a formula; his fundamental
+idea was the invention of the notion of \emph{group}. Since Galois's time groups have
+arisen throughout mathematics, for they are also the way to describe \emph{symmetry}.
+
+\begin{intuition}
+	The essence of a ``product'' is that two things are combined to form a third thing of
+	the same kind: multiplication, addition and subtraction combine two numbers to give a
+	number; composition combines two permutations to give a permutation.
+\end{intuition}
+
+\begin{definition}[Binary operation]
+	A \vocab{(binary) operation} on a set \(G\) is a function
+	\(* \colon G \times G \to G\).
+\end{definition}
+
+In more detail, an operation assigns an element \(*(x,y) \in G\) to each \emph{ordered}
+pair \((x,y)\) of elements of \(G\); it is more natural to write \(x * y\). Thus
+composition of functions is the operation \((f,g) \mapsto g \circ f\), while
+multiplication, addition and subtraction are \((x,y) \mapsto xy\),
+\((x,y) \mapsto x+y\) and \((x,y) \mapsto x-y\). Composition and subtraction show why we
+want \emph{ordered} pairs, for \(x * y\) and \(y * x\) may differ.
+
+\begin{note}[Law of substitution]
+	An operation is, as any function, single-valued. Stated explicitly, this is called the
+	\vocab{law of substitution}: if \(x = x'\) and \(y = y'\), then \(x*y = x'*y'\).
+\end{note}
+
+\begin{definition}[Group]\label{def:group}
+	A \vocab{group} is a set \(G\) equipped with an operation \(*\) and a special element
+	\(e \in G\), called the \vocab{identity}, such that
+	\begin{enumerate}[(i)]
+		\item the \vocab{associative law} holds: \(a*(b*c) = (a*b)*c\) for all
+		      \(a,b,c \in G\);
+		\item \(e * a = a\) for all \(a \in G\);
+		\item for every \(a \in G\) there is \(a' \in G\) with \(a' * a = e\).
+	\end{enumerate}
+\end{definition}
+
+\begin{remark}
+	Only a \emph{left} identity and \emph{left} inverses are assumed. The two-sided
+	statements \(a * e = a\) and \(a * a' = e\) are theorems, proved in
+	\autoref{prop:group-basics}.
+\end{remark}
+
+The set \(S_X\) of all permutations of a set \(X\), with composition as operation and
+\(1_X\) as identity, is a group: the symmetric group on \(X\).
+
+\begin{intuition}[Why abstraction pays]
+	We are now at the precise point where algebra becomes \emph{abstract} algebra. In
+	contrast to the concrete group \(S_n\), we will prove general results about groups
+	without specifying either their elements or their operation. Theorems then apply to
+	\emph{many} different groups at once, and it is often simpler to work abstractly even
+	when dealing with one particular concrete group (see \autoref{eg:finite-order}).
+\end{intuition}
+
+\begin{definition}[Abelian group]
+	A group \(G\) is \vocab{abelian} if it satisfies the \vocab{commutative law}:
+	\(x*y = y*x\) for all \(x, y \in G\).
+\end{definition}
+
+The name honours Abel, who proved in 1827 a theorem equivalent to the existence of a
+formula for the roots of a polynomial whose Galois group is commutative. The groups
+\(S_n\) for \(n \geq 3\) are \emph{not} abelian, because
+\((1\ 2)(1\ 3) = (1\ 3\ 2)\) while \((1\ 3)(1\ 2) = (1\ 2\ 3)\).
+
+\subsection{First Consequences of the Axioms}
+
+Associativity says \(a*(b*c) = (a*b)*c\), so it is unambiguous to write \(a*b*c\). Not
+all operations are associative: if \(c \neq 0\), then
+\(a - (b-c) \neq (a-b) - c\). The next lemma shows that some associativity carries over to
+products of four factors.
+
+\begin{lemma}\label{lem:assoc4}
+	If \(*\) is an associative operation on a set \(G\), then
+	\[
+		(a*b)*(c*d) = \bigl[a*(b*c)\bigr]*d
+	\]
+	for all \(a,b,c,d \in G\).
+\end{lemma}
+
+\begin{proof}
+	Write \(g = a*b\). Then
+	\((a*b)*(c*d) = g*(c*d) = (g*c)*d = \bigl[(a*b)*c\bigr]*d = \bigl[a*(b*c)\bigr]*d\).
+\end{proof}
+
+\begin{lemma}\label{lem:idempotent}
+	If \(G\) is a group and \(a \in G\) satisfies \(a*a = a\), then \(a = e\).
+\end{lemma}
+
+\begin{proof}
+	There is \(a' \in G\) with \(a'*a = e\). Multiplying both sides of \(a*a = a\) on the
+	left by \(a'\) gives \(a'*(a*a) = a'*a = e\); but
+	\(a'*(a*a) = (a'*a)*a = e*a = a\). Hence \(a = e\).
+\end{proof}
+
+\begin{proposition}\label{prop:group-basics}
+	Let \(G\) be a group with operation \(*\) and identity \(e\).
+	\begin{enumerate}[(i)]
+		\item \(a*a' = e\) for all \(a \in G\).
+		\item \(a*e = a\) for all \(a \in G\).
+		\item If \(e' \in G\) satisfies \(e'*a = a\) for all \(a \in G\), then \(e' = e\);
+		      that is, the identity is unique.
+		\item Let \(a \in G\). If \(b \in G\) satisfies \(b*a = e\), then \(b = a'\); that
+		      is, inverses are unique.
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+	(i) By \autoref{lem:assoc4},
+	\[
+		(a*a')*(a*a') = \bigl[a*(a'*a)\bigr]*a' = (a*e)*a' = a*(e*a') = a*a',
+	\]
+	and \autoref{lem:idempotent} gives \(a*a' = e\).
+
+	(ii) Using part (i),
+	\(a*e = a*(a'*a) = (a*a')*a = e*a = a\).
+
+	(iii) If \(e'*a = a\) for all \(a \in G\), then in particular \(e'*e' = e'\), so
+	\(e' = e\) by \autoref{lem:idempotent}.
+
+	(iv) By part (i), \(a*a' = e\). Hence
+	\(b = b*e = b*(a*a') = (b*a)*a' = e*a' = a'\).
+\end{proof}
+
+\begin{definition}[Inverse]
+	If \(G\) is a group and \(a \in G\), then the unique element \(a' \in G\) with
+	\(a'*a = e\) is called the \vocab{inverse} of \(a\), denoted by \(a^{-1}\).
+\end{definition}
+
+\begin{lemma}\label{lem:group-cancellation}
+	Let \(G\) be a group.
+	\begin{enumerate}[(i)]
+		\item The \vocab{cancellation laws} hold: if \(a,b,x \in G\) and either
+		      \(x*a = x*b\) or \(a*x = b*x\), then \(a = b\).
+		\item \((a^{-1})^{-1} = a\) for all \(a \in G\).
+		\item If \(a, b \in G\), then \((a*b)^{-1} = b^{-1}*a^{-1}\). More generally, for
+		      all \(n \geq 2\),
+		      \[
+			      (a_1 * a_2 * \cdots * a_n)^{-1} = a_n^{-1} * \cdots * a_2^{-1} * a_1^{-1}.
+		      \]
+	\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+	(i)
+	\[
+		a = e*a = (x^{-1}*x)*a = x^{-1}*(x*a) = x^{-1}*(x*b) = (x^{-1}*x)*b = e*b = b.
+	\]
+	A similar proof, using \(x*x^{-1} = e\), works when \(x\) is on the right.
+
+	(ii) By \autoref{prop:group-basics}(i), \(a*a^{-1} = e\). Uniqueness of
+	inverses, \autoref{prop:group-basics}(iv), says that \((a^{-1})^{-1}\) is the
+	unique \(x \in G\) with \(x*a^{-1} = e\); therefore \((a^{-1})^{-1} = a\).
+
+	(iii) By \autoref{lem:assoc4},
+	\[
+		(a*b)*(b^{-1}*a^{-1}) = \bigl[a*(b*b^{-1})\bigr]*a^{-1} = (a*e)*a^{-1} = a*a^{-1} = e,
+	\]
+	so \((a*b)^{-1} = b^{-1}*a^{-1}\) by \autoref{prop:group-basics}(iv). The
+	general statement follows by induction on \(n\).
+\end{proof}
+
+\begin{notation}
+	From now on we usually write \(ab\) for \(a*b\) and \(1\) for the identity. When a
+	group is abelian we often use \emph{additive} notation instead: an \vocab{additive
+		group} is a set \(G\) with an operation \(+\) and an element \(0 \in G\) such that
+	\(a + (b+c) = (a+b)+c\), \(0 + a = a\), and for every \(a\) there is \(-a \in G\) with
+	\((-a) + a = 0\). The inverse of \(a\) is written \(-a\) rather than \(a^{-1}\).
+\end{notation}
+
+\subsection{Examples of Groups}
+
+\begin{eg}[A first list of groups]\label{eg:group-list}
+	\begin{enumerate}[(i)]
+		\item \(S_X\), the set of all permutations of a set \(X\), is a group under
+		      composition; in particular \(S_n\) is a group.
+		\item \(\mathbb{Z}\) is an additive abelian group with \(a*b = a+b\), identity
+		      \(e = 0\), and inverse \(-n\) of \(n\). Similarly \(\mathbb{Q}\),
+		      \(\mathbb{R}\) and \(\mathbb{C}\) are additive abelian groups.
+		\item \(\mathbb{Q}^\times\), the set of all nonzero rationals, is an abelian group
+		      under ordinary multiplication, with identity \(1\) and inverse \(1/r\) of
+		      \(r\). Similarly \(\mathbb{R}^\times\) is a multiplicative abelian group.
+		      Note that \(\mathbb{Z}^\times\) is \emph{not} a group, for no element other
+		      than \(\pm 1\) has a multiplicative inverse in \(\mathbb{Z}^\times\).
+		\item The nonzero complex numbers \(\mathbb{C}^\times\) form an abelian group under
+		      multiplication. For inverses, if \(z = a + ib\) with \(a, b \in \mathbb{R}\),
+		      let \(\overline{z} = a - ib\) be its complex conjugate; then
+		      \(z\overline{z} = a^2 + b^2\), so \(z \neq 0\) if and only if
+		      \(z\overline{z} \neq 0\), and for \(z \neq 0\),
+		      \[
+			      z^{-1} = \overline{z}/z\overline{z} = (a/z\overline{z}) - (b/z\overline{z})i.
+		      \]
+		\item The \vocab{circle group} is
+		      \(S^1 = \{z \in \mathbb{C} : \abs{z} = 1\}\) under multiplication of complex
+		      numbers; the identity is \(1\), and the inverse of a number of modulus \(1\)
+		      is its complex conjugate. Although \(S^1\) is abelian we still write it
+		      multiplicatively.
+		\item For a positive integer \(n\), let
+		      \(\Gamma_n = \{\zeta^k : 0 \leq k < n\}\) be the set of all \(n\)th roots of
+		      unity, where \(\zeta = e^{2\pi i/n} = \cos(2\pi/n) + i\sin(2\pi/n)\). De
+		      Moivre's theorem shows \(\Gamma_n\) is an abelian group under multiplication,
+		      the inverse of a root of unity being its complex conjugate.
+		\item The plane \(\mathbb{R} \times \mathbb{R}\) is an additive abelian group under
+		      vector addition: \((x,y) + (x',y') = (x+x', y+y')\). The identity is the
+		      origin \(O = (0,0)\) and the inverse of \(\vb{v} = (x,y)\) is
+		      \(-\vb{v} = (-x,-y)\).
+		\item The \vocab{parity group} \(\mathbb{P}\) has two elements, the words ``even''
+		      and ``odd'', with
+		      \[
+			      \text{even} + \text{even} = \text{even} = \text{odd} + \text{odd},
+			      \qquad
+			      \text{even} + \text{odd} = \text{odd} = \text{odd} + \text{even}.
+		      \]
+		\item The \vocab{Boolean group} \(\mathcal{B}(X)\) of a set \(X\) (named after the
+		      logician G.~Boole, 1815--1864) is the family of all subsets of \(X\) with
+		      addition given by symmetric difference
+		      \(A + B = (A - B) \cup (B - A)\). Symmetric difference is commutative, the
+		      identity is \(\varnothing\), and every element is its own inverse, since
+		      \(A + A = \varnothing\). Thus \(\mathcal{B}(X)\) is abelian.
+	\end{enumerate}
+\end{eg}
+
+\begin{eg}[Matrix groups and affine maps]\label{eg:matrix-groups}
+	\begin{enumerate}[(i)]
+		\item A \((2\times 2\) real\()\) matrix is
+		      \(A = \begin{psmallmatrix} a & c \\ b & d \end{psmallmatrix}\) with
+		      \(a,b,c,d \in \mathbb{R}\), and the product is
+		      \[
+			      AB =
+			      \begin{pmatrix} a & c \\ b & d \end{pmatrix}
+			      \begin{pmatrix} w & y \\ x & z \end{pmatrix}
+			      =
+			      \begin{pmatrix} aw + cx & ay + cz \\ bw + dx & by + dz \end{pmatrix};
+		      \]
+		      each entry of \(AB\) is a dot product of a row of \(A\) with a column of
+		      \(B\). The \vocab{determinant} of \(A\) is \(\det(A) = ad - bc\), and \(A\) is
+		      \vocab{nonsingular} if \(\det(A) \neq 0\). Since
+		      \(\det(AB) = \det(A)\det(B)\), a product of nonsingular matrices is
+		      nonsingular. The set \(GL(2,\mathbb{R})\) of all nonsingular matrices, under
+		      matrix multiplication, is a \emph{nonabelian} group, the \(2\times 2\) real
+		      \vocab{general linear group}: the identity is
+		      \(I = \begin{psmallmatrix} 1&0 \\ 0&1\end{psmallmatrix}\) and
+		      \[
+			      A^{-1} = \begin{pmatrix} d/\Delta & -c/\Delta \\ -b/\Delta & a/\Delta \end{pmatrix},
+			      \qquad \Delta = ad - bc = \det(A).
+		      \]
+		\item Allowing entries in \(\mathbb{Q}\) or \(\mathbb{C}\) gives
+		      \(GL(2,\mathbb{Q})\) and \(GL(2,\mathbb{C})\); one may even allow entries in
+		      \(\mathbb{Z}\), in which case \(GL(2,\mathbb{Z})\) is defined to be the set of
+		      such matrices with determinant \(\pm 1\) (so that \(A^{-1}\) also has integer
+		      entries). More generally, all nonsingular \(n \times n\) matrices form a group
+		      \(GL(n, k)\).
+		\item All \vocab{special orthogonal} matrices, that is, all matrices
+		      \(A = \begin{psmallmatrix} \cos\alpha & -\sin\alpha \\
+				      \sin\alpha & \cos\alpha \end{psmallmatrix}\), form the \(2 \times 2\)
+		      \vocab{special orthogonal group} \(SO(2,\mathbb{R})\). Indeed
+		      \[
+			      \begin{pmatrix} \cos\alpha & -\sin\alpha \\ \sin\alpha & \cos\alpha \end{pmatrix}
+			      \begin{pmatrix} \cos\beta  & -\sin\beta  \\ \sin\beta  & \cos\beta  \end{pmatrix}
+			      =
+			      \begin{pmatrix} \cos(\alpha+\beta) & -\sin(\alpha+\beta) \\
+				      \sin(\alpha+\beta) & \cos(\alpha+\beta) \end{pmatrix}
+		      \]
+		      by the addition theorems for sine and cosine; this calculation also shows that
+		      \(SO(2,\mathbb{R})\) is abelian. The identity matrix is special orthogonal, and
+		      so is the inverse of a special orthogonal matrix. We shall see that
+		      \(SO(2,\mathbb{R})\) is a disguised version of the circle group \(S^1\), and
+		      that it consists of all rotations of the plane about the origin.
+		\item The \vocab{affine group} \(\mathrm{Aff}(1,\mathbb{R})\) consists of all
+		      \vocab{affine maps} \(f_{a,b}\colon \mathbb{R}\to\mathbb{R}\),
+		      \(f_{a,b}(x) = ax + b\), with \(a, b\) fixed reals and \(a \neq 0\). It is a
+		      group under composition: if \(f_{c,d}(x) = cx+d\), then
+		      \[
+			      f_{a,b}f_{c,d}(x) = a(cx+d) + b = acx + (ad+b) = f_{ac,\,ad+b}(x),
+		      \]
+		      and \(ac \neq 0\); the identity is \(1_{\mathbb{R}} = f_{1,0}\), and the
+		      inverse of \(f_{a,b}\) is \(f_{a^{-1},\,-a^{-1}b}\). The composition is
+		      reminiscent of matrix multiplication:
+		      \[
+			      \begin{pmatrix} a & b \\ 0 & 1 \end{pmatrix}
+			      \begin{pmatrix} c & d \\ 0 & 1 \end{pmatrix}
+			      =
+			      \begin{pmatrix} ac & ad+b \\ 0 & 1 \end{pmatrix}.
+		      \]
+	\end{enumerate}
+\end{eg}
+
+\subsection{Generalized Associativity and Powers}
+
+\begin{definition}[\(n\)-expression, ultimate product]
+	An \vocab{\(n\)-expression} is an \(n\)-tuple \((a_1, \dots, a_n)\) in the product of
+	\(n\) copies of \(G\). It yields elements of \(G\) as follows: choose two adjacent
+	entries of the tuple, multiply them, and
+	obtain an \((n-1)\)-expression; repeat until a \(2\)-expression \((W,X)\) is reached,
+	and then form \(WX \in G\). Such an element \(WX\) is called an \vocab{ultimate
+		product} derived from the expression. The expression \vocab{needs no parentheses} if
+	all ultimate products derived from it are equal.
+\end{definition}
+
+For example, from \((a,b,c,d)\) one can reach \([(ab)c]d\), \((ab)(cd)\), \(a[(bc)d]\),
+and so on. To say that an operation is associative is exactly to say that the two ultimate
+products from every \(3\)-expression agree; it is not obvious that all ultimate products
+from a longer expression agree.
+
+\begin{theorem}[Generalized associativity]\label{thm:gen-assoc}
+	If \(n \geq 3\), then every \(n\)-expression \((a_1, \dots, a_n)\) in a group \(G\)
+	needs no parentheses.
+\end{theorem}
+
+\begin{remark}
+	Neither the identity element nor inverses are used in the proof; the hypothesis can be
+	weakened to \(G\) being a \vocab{semigroup}, that is, a nonempty set with an associative
+	binary operation.
+\end{remark}
+
+\begin{proof}
+	Induct on \(n\) (second form). The base step \(n = 3\) is associativity. For the
+	inductive step, consider two \(2\)-expressions obtained from \((a_1, \dots, a_n)\):
+	\[
+		(W, X) = (a_1\cdots a_i,\ a_{i+1}\cdots a_n)
+		\quad\text{and}\quad
+		(Y, Z) = (a_1\cdots a_j,\ a_{j+1}\cdots a_n).
+	\]
+	We must prove \(WX = YZ\). By induction each of \(W, X, Y, Z\) is the one and only
+	ultimate product of an \(m\)-expression with \(m < n\). Without loss of generality
+	\(i \leq j\). If \(i = j\), then \(W = Y\) and \(X = Z\), so \(WX = YZ\).
+
+	Assume \(i < j\). Let \(A\) be the ultimate product of \((a_1, \dots, a_i)\), let \(B\)
+	be that of \((a_{i+1}, \dots, a_j)\), and let \(C\) be that of
+	\((a_{j+1}, \dots, a_n)\); these are unambiguous by the inductive hypothesis. Then
+	\(W = A\), \(Z = C\), \(X = BC\) and \(Y = AB\), so \(WX = A(BC)\) and
+	\(YZ = (AB)C\). The base step \(n = 3\) gives \(WX = YZ\).
+\end{proof}
+
+\begin{definition}[Powers]
+	If \(G\) is a group and \(a \in G\), define \(a^n\) for \(n \geq 1\) inductively by
+	\(a^1 = a\) and \(a^{n+1} = a a^n\); define \(a^0 = 1\) and, for \(n > 0\),
+	\(a^{-n} = (a^{-1})^n\).
+\end{definition}
+
+One shows \((a^{-1})^n = (a^n)^{-1}\); this is a special case of
+\autoref{lem:group-cancellation}(iii). There is a hidden complication: we defined
+\(a^3 = a a^2 = a(aa)\), but \((aa)a = a^2 a\) is another reasonable contender.
+Associativity makes them equal, and generalized associativity shows that all powers are
+unambiguously defined.
+
+\begin{corollary}\label{cor:powers}
+	If \(G\) is a group, \(a \in G\), and \(m, n \geq 1\), then
+	\[
+		a^{m+n} = a^m a^n \quad\text{and}\quad (a^m)^n = a^{mn}.
+	\]
+\end{corollary}
+
+\begin{proof}
+	Both \(a^{m+n}\) and \(a^m a^n\) are ultimate products of the expression having \(m+n\)
+	factors each equal to \(a\); both \((a^m)^n\) and \(a^{mn}\) arise from the expression
+	having \(mn\) factors each equal to \(a\). Apply \autoref{thm:gen-assoc}.
+\end{proof}
+
+In particular any two powers of the same element commute:
+\(a^m a^n = a^{m+n} = a^{n+m} = a^n a^m\).
+
+\begin{proposition}[Laws of exponents]\label{prop:exponents}
+	Let \(G\) be a group, \(a, b \in G\), and let \(m, n\) be (not necessarily positive)
+	integers.
+	\begin{enumerate}[(i)]
+		\item If \(a\) and \(b\) commute, then \((ab)^n = a^n b^n\).
+		\item \((a^n)^m = a^{mn}\).
+		\item \(a^m a^n = a^{m+n}\).
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+	Exercises for the reader.
+\end{proof}
+
+\begin{notation}
+	If the operation is \(+\), it is more natural to write \(na\) for
+	\(a + a + \cdots + a\). In additive notation \autoref{prop:exponents} reads
+	\[
+		n(a+b) = na + nb, \qquad m(na) = (mn)a, \qquad ma + na = (m+n)a.
+	\]
+\end{notation}
+
+\subsection{The Order of an Element}
+
+\begin{eg}[Shuffling a deck]\label{eg:finite-order}
+	Suppose a deck of cards is shuffled, changing the order from
+	\(1, 2, 3, 4, \dots, 52\) to \(2, 1, 4, 3, \dots, 52, 51\). Shuffling again the same way
+	restores the original order. In fact for \emph{any} permutation \(\alpha\) of the
+	\(52\) cards, repeating \(\alpha\) sufficiently often restores the deck. One proof uses
+	our knowledge of permutations: write \(\alpha = \beta_1\cdots\beta_t\) with \(\beta_i\)
+	a disjoint \(r_i\)-cycle. Then \(\beta_i^{r_i} = (1)\) by
+	\autoref{lem:cycle-order}, so \(\beta_i^k = (1)\) for \(k = r_1\cdots r_t\); since
+	disjoint cycles commute, \autoref{prop:exponents}(i) gives
+	\[
+		\alpha^k = (\beta_1\cdots\beta_t)^k = \beta_1^k \cdots \beta_t^k = (1).
+	\]
+
+	Here is a more general result with a \emph{simpler} proof (abstract algebra can be
+	easier than algebra): if \(G\) is a finite group and \(a \in G\), then \(a^k = 1\) for
+	some \(k \geq 1\). Indeed, consider \(1, a, a^2, \dots\). Since \(G\) is finite there
+	must be a repetition, say \(a^m = a^n\) with \(m > n\); then
+	\(1 = a^m a^{-n} = a^{m-n}\).
+\end{eg}
+
+\begin{definition}[Order of an element]
+	Let \(G\) be a group and \(a \in G\). If \(a^k = 1\) for some \(k \geq 1\), then the
+	smallest such exponent \(k \geq 1\) is called the \vocab{order} of \(a\); if no such
+	power exists, \(a\) is said to have \vocab{infinite order}.
+\end{definition}
+
+Every element of a finite group has finite order, by \autoref{eg:finite-order}. In any
+group the identity is the only element of order \(1\); an element has order \(2\) if and
+only if it is not the identity and equals its own inverse. The matrix
+\(A = \begin{psmallmatrix} 1&1 \\ 0&1\end{psmallmatrix} \in GL(2,\mathbb{R})\) has infinite
+order, since \(A^k = \begin{psmallmatrix} 1&k \\ 0&1\end{psmallmatrix} \neq I\) for all
+\(k \geq 1\).
+
+\begin{lemma}\label{lem:order-divides}
+	Let \(G\) be a group and let \(a \in G\) have finite order \(k\). If \(a^n = 1\), then
+	\(k \mid n\). In fact \(\{n \in \mathbb{Z} : a^n = 1\}\) is the set of all multiples of
+	\(k\).
+\end{lemma}
+
+\begin{proof}
+	Let \(I = \{n \in \mathbb{Z} : a^n = 1\}\). Then \(0 \in I\) because \(a^0 = 1\); if
+	\(n, m \in I\), then \(a^{n-m} = a^n a^{-m} = 1\), so \(n - m \in I\); and if
+	\(n \in I\), \(q \in \mathbb{Z}\), then \(a^{qn} = (a^n)^q = 1\), so \(qn \in I\).
+	Therefore \(I\) consists of all the multiples of its smallest positive element, which by
+	definition is the order \(k\) of \(a\). Hence \(a^n = 1\) implies \(k \mid n\).
+\end{proof}
+
+\begin{proposition}[Order of a permutation]\label{prop:order-permutation}
+	Let \(\alpha \in S_n\).
+	\begin{enumerate}[(i)]
+		\item If \(\alpha\) is an \(r\)-cycle, then \(\alpha\) has order \(r\).
+		\item If \(\alpha = \beta_1\cdots\beta_t\) is a product of disjoint \(r_i\)-cycles
+		      \(\beta_i\), then \(\alpha\) has order
+		      \(m = \operatorname{lcm}(r_1, \dots, r_t)\).
+		\item If \(p\) is a prime, then \(\alpha\) has order \(p\) if and only if it is a
+		      \(p\)-cycle or a product of disjoint \(p\)-cycles.
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+	(i) This is \autoref{lem:cycle-order}.
+
+	(ii) Each \(\beta_i\) has order \(r_i\) by (i). Suppose \(\alpha^M = (1)\). Since the
+	\(\beta_i\) commute, \((1) = \alpha^M = \beta_1^M \cdots \beta_t^M\). The \(\beta_i\)
+	are disjoint, hence so are their powers, and a product of disjoint permutations can be
+	the identity only if every factor is; thus \(\beta_i^M = (1)\) for each \(i\), and then
+	\autoref{lem:order-divides} gives
+	\(r_i \mid M\) for all \(i\), so \(M\) is a common multiple of \(r_1, \dots, r_t\).
+	Conversely, if \(m = \operatorname{lcm}(r_1, \dots, r_t)\), then \(\alpha^m = (1)\).
+	Hence \(\alpha\) has order \(m\).
+
+	(iii) Write \(\alpha\) as a product of disjoint cycles and use (ii).
+\end{proof}
+
+For example, a permutation in \(S_n\) has order \(2\) if and only if it is either a
+transposition or a product of disjoint transpositions. We can now augment
+\autoref{tab:cycle-counts}.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{lrrl}
+		\toprule
+		Cycle structure     & Number & Order & Parity \\
+		\midrule
+		\((1)\)             & 1      & 1     & Even   \\
+		\((1\ 2)\)          & 10     & 2     & Odd    \\
+		\((1\ 2\ 3)\)       & 20     & 3     & Even   \\
+		\((1\ 2\ 3\ 4)\)    & 30     & 4     & Odd    \\
+		\((1\ 2\ 3\ 4\ 5)\) & 24     & 5     & Even   \\
+		\((1\ 2)(3\ 4\ 5)\) & 20     & 6     & Odd    \\
+		\((1\ 2)(3\ 4)\)    & 15     & 2     & Even   \\
+		\midrule
+		                    & 120    &       &        \\
+		\bottomrule
+	\end{tabular}
+	\caption{Permutations in \(S_5\).}
+	\label{tab:S5}
+\end{table}
+
+\subsection{Symmetry}
+
+What do we mean when we say that an isosceles triangle \(\triangle\) is symmetric? Put
+\(\triangle = \triangle ABC\) with base \(AB\) on the \(x\)-axis and the \(y\)-axis the
+perpendicular bisector of \(AB\). Close your eyes; let \(\triangle\) be reflected in the
+\(y\)-axis (interchanging \(A\) and \(B\)); open your eyes. You cannot tell that
+\(\triangle\) has been reflected: \(\triangle\) is symmetric about the \(y\)-axis. Had
+\(\triangle\) been reflected in the \(x\)-axis it would be obvious. Reflection is a
+special kind of \emph{isometry}.
+
+\begin{definition}[Isometry]
+	An \vocab{isometry} of the plane is a function
+	\(\varphi\colon \mathbb{R}^2 \to \mathbb{R}^2\) that is \emph{distance preserving}: for
+	all \(P = (a,b)\) and \(Q = (c,d)\),
+	\[
+		\norm{\varphi(P) - \varphi(Q)} = \norm{P - Q},
+		\qquad \text{where } \norm{P-Q} = \sqrt{(a-c)^2 + (b-d)^2}.
+	\]
+\end{definition}
+
+Write \(P \cdot Q = ac + bd\) for the dot product. Then
+\[
+	(P-Q)\cdot(P-Q)
+	= P\cdot P - 2(P\cdot Q) + Q\cdot Q
+	= (a-c)^2 + (b-d)^2
+	= \norm{P-Q}^2,
+\]
+from which it follows that every isometry preserves dot products:
+\(\varphi(P)\cdot\varphi(Q) = P\cdot Q\). Conversely, a map preserving dot products is an
+isometry. Since \(P \cdot Q = \norm{P}\norm{Q}\cos\theta\), every isometry also preserves
+\emph{angles}; in particular \(P\) and \(Q\) are orthogonal if and only if
+\(P\cdot Q = 0\), so isometries preserve perpendicularity.
+
+\begin{notation}
+	Denote the set of all isometries of the plane by \(\operatorname{Isom}(\mathbb{R}^2)\).
+	Its subset of isometries \(\varphi\) with \(\varphi(O) = O\) is called the
+	\vocab{orthogonal group} of the plane, denoted \(O_2(\mathbb{R})\). If \(P \neq Q\) are
+	points, let \(L[P,Q]\) denote the line they determine and \(PQ\) the line segment with
+	endpoints \(P\) and \(Q\).
+\end{notation}
+
+\begin{eg}[Rotations, reflections, translations]\label{eg:isometries}
+	\begin{enumerate}[(i)]
+		\item Given an angle \(\theta\), the \vocab{rotation} \(R_\theta\) about the origin
+		      \(O\) is defined by \(R_\theta(O) = O\), and for \(P \neq O\), by rotating the
+		      segment \(PO\) through \(\theta\) (counterclockwise if \(\theta > 0\)). One can
+		      rotate about any point of the plane.
+		\item The \vocab{reflection} \(\rho_\ell\) in a line \(\ell\), called its
+		      \vocab{axis}, fixes each point of \(\ell\); if \(P \notin \ell\), then
+		      \(\rho_\ell(P) = P'\) where \(\ell\) is the perpendicular bisector of
+		      \(PP'\). Pretending \(\ell\) is a mirror, \(P'\) is the mirror image of \(P\).
+		      Now \(\rho_\ell \in \operatorname{Isom}(\mathbb{R}^2)\), and if \(\ell\) passes
+		      through the origin, then \(\rho_\ell \in O_2(\mathbb{R})\).
+		\item Given a point \(V\), \vocab{translation} by \(V\) is
+		      \(\tau_V\colon \mathbb{R}^2 \to \mathbb{R}^2\), \(\tau_V(U) = U + V\). A
+		      translation fixes the origin if and only if \(V = O\), so the identity is the
+		      only translation that is also a rotation.
+	\end{enumerate}
+\end{eg}
+
+\begin{lemma}\label{lem:isometry-collinear}
+	If \(\varphi\) is an isometry of the plane, then distinct points \(P, Q, R\) are
+	collinear if and only if \(\varphi(P), \varphi(Q), \varphi(R)\) are collinear.
+\end{lemma}
+
+\begin{proof}
+	Suppose \(P, Q, R\) are collinear, with \(R\) between \(P\) and \(Q\), so that
+	\(\norm{P-Q} = \norm{P-R} + \norm{R-Q}\). If \(\varphi(P), \varphi(Q), \varphi(R)\) were
+	not collinear, they would be the vertices of a triangle, and the triangle inequality
+	would give
+	\[
+		\norm{\varphi(P)-\varphi(Q)} < \norm{\varphi(P)-\varphi(R)} + \norm{\varphi(R)-\varphi(Q)},
+	\]
+	contradicting that \(\varphi\) preserves distance. Conversely, if \(P, Q, R\) are not
+	collinear they are the vertices of a triangle; if their images were collinear, the strict
+	inequality above becomes an equality, again a contradiction.
+\end{proof}
+
+Every isometry \(\varphi\) is injective: if \(P \neq Q\), then
+\(\norm{\varphi(P)-\varphi(Q)} = \norm{P-Q} \neq 0\). Surjectivity is less obvious.
+
+\begin{proposition}\label{prop:isometry-linear}
+	Every isometry \(\varphi\) of the plane fixing the origin is a linear transformation.
+\end{proposition}
+
+\begin{proof}
+	Let \(C_d = \{Q \in \mathbb{R}^2 : \norm{Q - O} = d\}\) be the circle of radius
+	\(d > 0\) centred at \(O\). If \(P \in C_d\), then
+	\(d = \norm{\varphi(P) - \varphi(O)} = \norm{\varphi(P) - O}\), so
+	\(\varphi(C_d) \subseteq C_d\).
+
+	Let \(P \neq O\) and \(r \in \mathbb{R}\). If \(\norm{P - O} = p\), then
+	\(\norm{rP - O} = \abs{r}p\), so \(rP \in L[O,P] \cap C_{\abs{r}p}\). Since \(\varphi\)
+	preserves collinearity (\autoref{lem:isometry-collinear}),
+	\(\varphi(L[O,P]\cap C_{\abs{r}p}) \subseteq L[O,\varphi(P)]\cap C_{\abs{r}p}\), and a
+	line meets a circle in at most two points; hence
+	\(\varphi(rP) = \pm r\varphi(P)\). To eliminate the minus sign, suppose \(r > 0\). The
+	origin lies between \(-rP\) and \(P\), so the distance from \(-rP\) to \(P\) is
+	\(rp + p\), whereas the distance from \(rP\) to \(P\) is \(\abs{rp - p}\). Since
+	\(rp + p \neq \abs{rp-p}\) and \(\varphi\) preserves distance,
+	\(\varphi(rP) \neq -r\varphi(P)\). A similar argument works for \(r < 0\). Therefore
+	\(\varphi(rP) = r\varphi(P)\).
+
+	It remains to prove \(\varphi(P+Q) = \varphi(P) + \varphi(Q)\). If \(O, P, Q\) are
+	collinear, choose \(U\) on \(L[O,P]\) at distance \(1\) from the origin, so
+	\(P = pU\), \(Q = qU\) and \(P + Q = (p+q)U\). Since \(\varphi\) preserves scalar
+	multiplication,
+	\[
+		\varphi(P) + \varphi(Q) = p\varphi(U) + q\varphi(U) = (p+q)\varphi(U) = \varphi(P+Q).
+	\]
+	If \(O, P, Q\) are not collinear, then \(P + Q\) is the point \(S\) such that
+	\(O, P, Q, S\) are the vertices of a parallelogram (parallelogram law). Since \(\varphi\)
+	preserves distance, \(O = \varphi(O), \varphi(P), \varphi(Q), \varphi(S)\) are also the
+	vertices of a parallelogram, so \(\varphi(S) = \varphi(P) + \varphi(Q)\); that is,
+	\(\varphi(P+Q) = \varphi(P) + \varphi(Q)\).
+\end{proof}
+
+\begin{corollary}\label{cor:isometry-bijection}
+	Every isometry \(\varphi\colon\mathbb{R}^2\to\mathbb{R}^2\) is a bijection, and every
+	isometry fixing \(O\) is a nonsingular linear transformation.
+\end{corollary}
+
+\begin{proof}
+	First assume \(\varphi(O) = O\), so \(\varphi\) is linear by
+	\autoref{prop:isometry-linear}. Since \(\varphi\) is injective,
+	\(P = \varphi(e_1)\), \(Q = \varphi(e_2)\) is a basis of \(\mathbb{R}^2\), where
+	\(e_1 = (1,0)\), \(e_2 = (0,1)\). Hence
+	\(\psi\colon aP + bQ \mapsto ae_1 + be_2\) is a well-defined function inverse to
+	\(\varphi\); so \(\varphi\) is a bijection and is nonsingular.
+
+	Now let \(\varphi\) be any isometry, say \(\varphi(O) = U\). Then
+	\(\tau_{-U}\circ\varphi\) fixes \(O\), so \(\tau_{-U}\circ\varphi = \theta\) is a
+	nonsingular linear transformation, and \(\varphi = \tau_U \circ \theta\) is a
+	composite of bijections.
+\end{proof}
+
+\begin{proposition}\label{prop:isom-group}
+	Both \(\operatorname{Isom}(\mathbb{R}^2)\) and \(O_2(\mathbb{R})\) are groups under
+	composition.
+\end{proposition}
+
+\begin{proof}
+	Clearly \(1_{\mathbb{R}^2}\) is an isometry. If \(\varphi'\) and \(\varphi\) are
+	isometries, then
+	\[
+		\norm{(\varphi'\varphi)(P) - (\varphi'\varphi)(Q)}
+		= \norm{\varphi(P) - \varphi(Q)}
+		= \norm{P - Q},
+	\]
+	so composition is an operation on \(\operatorname{Isom}(\mathbb{R}^2)\). Each
+	\(\varphi\) is a bijection by \autoref{cor:isometry-bijection}, and
+	\(\varphi^{-1}\) is also an isometry:
+	\(\norm{P-Q} = \norm{\varphi(\varphi^{-1}(P)) - \varphi(\varphi^{-1}(Q))} = \norm{\varphi^{-1}(P) - \varphi^{-1}(Q)}\).
+	Composition of functions is always associative. The same proof applies to
+	\(O_2(\mathbb{R})\).
+\end{proof}
+
+\begin{corollary}\label{cor:isometry-determined}
+	If \(O, P, Q\) are noncollinear points and \(\varphi, \psi\) are isometries of the plane
+	with \(\varphi(P) = \psi(P)\) and \(\varphi(Q) = \psi(Q)\), then \(\varphi = \psi\).
+\end{corollary}
+
+\begin{proof}
+	Since \(O, P, Q\) are noncollinear, the list \(P, Q\) is linearly independent in
+	\(\mathbb{R}^2\); as \(\dim(\mathbb{R}^2) = 2\), it is a basis, and two linear
+	transformations agreeing on a basis are equal.
+\end{proof}
+
+\begin{eg}[Triangles]\label{eg:triangles}
+	If \(\triangle\) is a triangle with vertices \(P, Q, U\) and \(\varphi\) is an isometry,
+	then \(\varphi(\triangle)\) is the triangle with vertices
+	\(\varphi(P), \varphi(Q), \varphi(U)\). If moreover \(\varphi(\triangle) = \triangle\),
+	then \(\varphi\) permutes the vertices. Assume the centre of \(\triangle\) is \(O\).
+	\begin{itemize}
+		\item If \(\triangle\) is \emph{isosceles} with equal sides \(PQ\) and \(PU\), and
+		      \(\rho_\ell\) is the reflection with axis \(\ell = L[O,P]\), then
+		      \(\rho_\ell(\triangle) = \triangle\); we may describe \(\rho_\ell\) by the
+		      transposition \((Q\ U)\). On the other hand
+		      \(\rho_{\ell'}(\triangle) \neq \triangle\) for \(\ell' = L[O,Q]\).
+		\item If \(\triangle\) is \emph{equilateral}, then also
+		      \(\rho_{L[O,Q]}\) and \(\rho_{L[O,U]}\) carry \(\triangle\) to itself
+		      (described by \((P\ U)\) and \((P\ Q)\)), and so do the rotations about \(O\)
+		      by \(120^\circ\) and \(240^\circ\) (described by \((P\ Q\ U)\) and
+		      \((P\ U\ Q)\)).
+		\item If \(\triangle\) is \emph{scalene}, then \(\varphi(\triangle) = \triangle\)
+		      implies \(\varphi = 1\).
+	\end{itemize}
+	So an equilateral triangle is ``more symmetric'' than an isosceles triangle, which in
+	turn is ``more symmetric'' than a scalene one.
+\end{eg}
+
+\begin{definition}[Symmetry group]
+	The \vocab{symmetry group} \(\Sigma(\Omega)\) of a figure \(\Omega\) in the plane is the
+	set of all isometries \(\varphi\) of the plane with \(\varphi(\Omega) = \Omega\). The
+	elements of \(\Sigma(\Omega)\) are called \vocab{symmetries} of \(\Omega\).
+\end{definition}
+
+It is straightforward to see that \(\Sigma(\Omega)\) is always a group.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[scale=1.15, >=stealth]
+		% equilateral triangle with its three axes
+		\begin{scope}
+			\coordinate (P) at (90:1.15);
+			\coordinate (Q) at (210:1.15);
+			\coordinate (U) at (330:1.15);
+			\draw[gray!45, dashed] (P) -- ($(Q)!0.5!(U)$);
+			\draw[gray!45, dashed] (Q) -- ($(P)!0.5!(U)$);
+			\draw[gray!45, dashed] (U) -- ($(P)!0.5!(Q)$);
+			\draw[thick, MidnightBlue] (P) -- (Q) -- (U) -- cycle;
+			\fill (P) circle (1.4pt) node[above=2pt] {\(P\)};
+			\fill (Q) circle (1.4pt) node[left=2pt]  {\(Q\)};
+			\fill (U) circle (1.4pt) node[right=2pt] {\(U\)};
+			\fill (0,0) circle (1pt) node[below right=0pt] {\scriptsize\(O\)};
+			\node at (0,-2.0) {\(\Sigma(\pi_3) = D_6\), \(\abs{\Sigma(\pi_3)} = 6\)};
+		\end{scope}
+		% square with its four axes
+		\begin{scope}[xshift=4.3cm]
+			\coordinate (v0) at (135:1.25);
+			\coordinate (v1) at (45:1.25);
+			\coordinate (v2) at (-45:1.25);
+			\coordinate (v3) at (-135:1.25);
+			\draw[gray!45, dashed] (-1.55,0) -- (1.55,0);
+			\draw[gray!45, dashed] (0,-1.55) -- (0,1.55);
+			\draw[gray!45, dashed] (135:1.55) -- (-45:1.55);
+			\draw[gray!45, dashed] (45:1.55) -- (-135:1.55);
+			\draw[thick, BrickRed] (v0) -- (v1) -- (v2) -- (v3) -- cycle;
+			\fill (v0) circle (1.4pt) node[above left=0pt]  {\(v_0\)};
+			\fill (v1) circle (1.4pt) node[above right=0pt] {\(v_1\)};
+			\fill (v2) circle (1.4pt) node[below right=0pt] {\(v_2\)};
+			\fill (v3) circle (1.4pt) node[below left=0pt]  {\(v_3\)};
+			\fill (0,0) circle (1pt) node[below right=0pt] {\scriptsize\(O\)};
+			\node at (0,-2.0) {\(\Sigma(\pi_4) = D_8\), \(\abs{\Sigma(\pi_4)} = 8\)};
+		\end{scope}
+	\end{tikzpicture}
+	\caption{Reflection axes of a regular \(3\)-gon and a regular \(4\)-gon.}
+	\label{fig:regular-polygons}
+\end{figure}
+
+\begin{eg}[Symmetry groups of regular polygons]\label{eg:dihedral-examples}
+	\begin{enumerate}[(i)]
+		\item A regular \(3\)-gon \(\pi_3\) is an equilateral triangle, and
+		      \(\abs{\Sigma(\pi_3)} = 6\), as we saw in \autoref{eg:triangles}.
+		\item Let \(\pi_4\) be a square with vertices \(\{v_0, v_1, v_2, v_3\}\), drawn with
+		      centre at the origin and sides parallel to the axes. Every
+		      \(\varphi \in \Sigma(\pi_4)\) permutes the vertices, and \(\varphi\) is
+		      determined by \(\{\varphi(v_i)\}\), so there are at most \(24 = 4!\)
+		      symmetries. Not every permutation arises, however: if \(v_i\) and \(v_j\) are
+		      adjacent, then \(\norm{v_i - v_j} = 1\), whereas
+		      \(\norm{v_0 - v_2} = \sqrt{2} = \norm{v_1 - v_3}\); since isometries preserve
+		      distance, \(\varphi\) must preserve adjacency. There are exactly eight
+		      symmetries (\autoref{thm:dihedral}): the identity, the three rotations
+		      about \(O\) by \(90^\circ, 180^\circ, 270^\circ\), and four reflections with
+		      axes \(L[v_0,v_2]\), \(L[v_1,v_3]\), the \(x\)-axis and the \(y\)-axis. This
+		      group is the \vocab{dihedral group with \(8\) elements}, denoted \(D_8\).
+		\item The symmetry group of a regular pentagon \(\pi_5\) with vertices
+		      \(v_0, \dots, v_4\) and centre \(O\) has \(10\) elements: the rotations about
+		      the origin by \((72j)^\circ\) for \(0 \leq j \leq 4\), together with the
+		      reflections with axes \(L[O,v_k]\) for \(0 \leq k \leq 4\). It is denoted
+		      \(D_{10}\).
+	\end{enumerate}
+\end{eg}
+
+\begin{definition}[Dihedral group]
+	A group \(D_{2n}\) with exactly \(2n\) elements is called a \vocab{dihedral group} if it
+	contains an element \(a\) of order \(n\) and an element \(b\) of order \(2\) such that
+	\[
+		bab = a^{-1}.
+	\]
+\end{definition}
+
+\begin{note}
+	The definition is purely algebraic: it does not depend on geometry. If \(n = 2\), then
+	\(D_4\) is abelian; if \(n \geq 3\), then \(D_{2n}\) is not abelian. One can show that
+	there is essentially only one dihedral group with \(2n\) elements (any two such are
+	isomorphic). The name comes from F.~Klein's \emph{dihedron}, two congruent regular
+	polygons of zero thickness pasted together.
+\end{note}
+
+\begin{theorem}\label{thm:dihedral}
+	The symmetry group \(\Sigma(\pi_n)\) of a regular \(n\)-gon \(\pi_n\) is a dihedral
+	group with \(2n\) elements.
+\end{theorem}
+
+\begin{proof}
+	Let \(\pi_n\) have vertices \(v_0, \dots, v_{n-1}\) and centre \(O\). Define \(a\) to be
+	the rotation about \(O\) by \((360/n)^\circ\),
+	\[
+		a(v_i) = \begin{cases}
+			v_{i+1} & \text{if } 0 \leq i < n-1, \\
+			v_0     & \text{if } i = n-1,
+		\end{cases}
+		\qquad\text{and}\qquad
+		b(v_i) = \begin{cases}
+			v_0     & \text{if } i = 0,          \\
+			v_{n-i} & \text{if } 1 \leq i \leq n-1,
+		\end{cases}
+	\]
+	where \(b\) is the reflection with axis \(L[O, v_0]\). Clearly \(a\) has order \(n\) and
+	\(b\) has order \(2\). There are \(n\) distinct symmetries \(1, a, a^2, \dots, a^{n-1}\),
+	and \(b, ab, a^2b, \dots, a^{n-1}b\) are also all distinct by cancellation. If
+	\(a^s = a^r b\) with \(0 \leq r \leq n-1\) and \(s = 0, 1\), then \(a^s(v_i) = a^rb(v_i)\)
+	for all \(i\); now \(a^s(v_0) = v_s\) while \(a^rb(v_0) = v_{r-1}\), forcing
+	\(s = r-1\); but with \(i = 1\) we get \(a^{r-1}(v_1) = v_{r+1}\) while
+	\(a^rb(v_1) = v_{r-1}\), a contradiction. So \(a^s \neq a^r b\) for all \(r, s\), and we
+	have exhibited \(2n\) distinct symmetries.
+
+	There are no others. We may assume the centre \(O\) of \(\pi_n\) is the origin, so every
+	symmetry \(\varphi\) fixes \(O\) and hence is a linear transformation
+	(\autoref{prop:isometry-linear}). The vertices adjacent to \(v_0\), namely
+	\(v_1\) and \(v_{n-1}\), are the closest vertices to \(v_0\); that is,
+	\(\norm{v_i - v_0} > \norm{v_1 - v_0}\) for \(2 \leq i \leq n-2\). So if
+	\(\varphi(v_0) = v_j\), then \(\varphi(v_1) = v_{j+1}\) or \(\varphi(v_1) = v_{j-1}\). In
+	the first case \(a^j\) agrees with \(\varphi\) on \(v_0\) and \(v_1\), so
+	\autoref{cor:isometry-determined} gives \(\varphi = a^j\); in the second case
+	\(\varphi = a^j b\) for the same reason. Therefore \(\abs{\Sigma(\pi_n)} = 2n\).
+
+	Finally, \(bab = a^{-1}\): by \autoref{cor:isometry-determined} it suffices to
+	evaluate both sides on \(v_0\) and \(v_1\), and
+	\(bab(v_0) = v_{n-1} = a^{-1}(v_0)\) while \(bab(v_1) = v_0 = a^{-1}(v_1)\).
+\end{proof}
+
+\begin{note}[Symmetry in calculus]
+	Symmetry arises in calculus when describing curves \(f(x,y) = 0\):
+	\begin{enumerate}[(i)]
+		\item symmetry about the \(x\)-axis: the equation is unaltered when \(y\) is replaced
+		      by \(-y\) --- in our language, \(\rho_x\);
+		\item symmetry about the \(y\)-axis: \(x\) replaced by \(-x\) --- \(\rho_y\);
+		\item symmetry with respect to the origin: both replaced --- \(R_{180}\);
+		\item symmetry about the line \(y = x\): \(x\) and \(y\) interchanged ---
+		      \(\rho_L\) with \(L\) the \(45^\circ\) line.
+	\end{enumerate}
+	Thus \(f(x,y) = f(x,-y)\) says the graph \(\Gamma\) of \(f(x,y) = 0\) is symmetric about
+	the \(x\)-axis, for \((a,b) \in \Gamma\) implies \((a,-b) \in \Gamma\).
+\end{note}
+
+\section{Subgroups and Lagrange's Theorem}
+
+A subgroup of a group \(G\) is a subset which is a group under the same operation as in
+\(G\). The following definition makes this precise.
+
+\begin{definition}[Closed subset]
+	Let \(*\) be an operation on a set \(G\) and let \(S \subseteq G\). We say \(S\) is
+	\vocab{closed} under \(*\) if \(x*y \in S\) for all \(x, y \in S\).
+\end{definition}
+
+The operation on \(G\) is a function \(*\colon G\times G \to G\); if \(S \subseteq G\),
+then \(S \times S \subseteq G\times G\), and \(S\) being closed means
+\(*(S\times S) \subseteq S\). For example, \(\mathbb{Z}\) is a subset of the additive group
+\(\mathbb{Q}\) closed under \(+\). However \(\mathbb{Q}^\times\) is closed under
+multiplication but not under \(+\): both \(2\) and \(-2\) lie in \(\mathbb{Q}^\times\), yet
+\(-2 + 2 = 0 \notin \mathbb{Q}^\times\).
+
+\begin{definition}[Subgroup]\label{def:subgroup}
+	A subset \(H\) of a group \(G\) is a \vocab{subgroup} if
+	\begin{enumerate}[(i)]
+		\item \(1 \in H\);
+		\item if \(x, y \in H\), then \(xy \in H\) (that is, \(H\) is closed under \(*\));
+		\item if \(x \in H\), then \(x^{-1} \in H\).
+	\end{enumerate}
+\end{definition}
+
+\begin{notation}
+	We write \(H \leq G\) to denote that \(H\) is a subgroup of \(G\). Both \(\{1\}\) and
+	\(G\) are always subgroups of \(G\). A subgroup \(H\) is \vocab{proper} if \(H \neq G\),
+	written \(H < G\), and \vocab{nontrivial} if \(H \neq \{1\}\).
+\end{notation}
+
+\begin{proposition}\label{prop:subgroup-is-group}
+	Every subgroup \(H \leq G\) of a group \(G\) is itself a group.
+\end{proposition}
+
+\begin{proof}
+	Axiom (ii) shows \(H\) is closed under the operation of \(G\), so \(H\) has an operation
+	(the restriction of \(*\) to \(H\times H\)). This operation is associative, since
+	\((xy)z = x(yz)\) holds for all \(x,y,z \in G\), in particular for all
+	\(x,y,z \in H\). Axiom (i) gives the identity and axiom (iii) gives inverses.
+\end{proof}
+
+\begin{intuition}
+	It is \emph{quicker} to check that a subset is a subgroup than to verify the group axioms
+	from scratch, because associativity is inherited and need not be verified again.
+\end{intuition}
+
+\begin{eg}[Subgroups]\label{eg:subgroups}
+	\begin{enumerate}[(i)]
+		\item \(O_2(\mathbb{R})\), the isometries fixing the origin, is a subgroup of
+		      \(\operatorname{Isom}(\mathbb{R}^2)\). If \(\Omega \subseteq \mathbb{R}^2\),
+		      then \(\Sigma(\Omega)\) is also a subgroup of
+		      \(\operatorname{Isom}(\mathbb{R}^2)\); and if the centre of gravity of
+		      \(\Omega\) is at the origin, then \(\Sigma(\Omega) \leq O_2(\mathbb{R})\).
+		\item The four permutations
+		      \[
+			      \mathbf{V} = \bigl\{(1),\ (1\ 2)(3\ 4),\ (1\ 3)(2\ 4),\ (1\ 4)(2\ 3)\bigr\}
+		      \]
+		      form a group, because \(\mathbf{V}\) is a subgroup of \(S_4\): \((1) \in
+			      \mathbf{V}\); \(\alpha^2 = (1)\) for each \(\alpha \in \mathbf{V}\), so
+		      \(\alpha^{-1} = \alpha \in \mathbf{V}\); and the product of any two distinct
+		      elements of \(\mathbf{V} - \{(1)\}\) is the third one. One calls
+		      \(\mathbf{V}\) the \vocab{four-group}, or \vocab{Klein group}
+		      (\(\mathbf{V}\) abbreviates \emph{Vierergruppe}).
+
+		      Note how much work this saves: verifying \(a(bc) = (ab)c\) directly would
+		      involve \(4^3 = 64\) equations.
+		\item If \(\mathbb{R}^2\) is the plane as an additive abelian group, then any line
+		      \(L\) through the origin is a subgroup: choose a point \((a,b)\) on \(L\) and
+		      note that \(L\) consists of all scalar multiples \((ra, rb)\).
+	\end{enumerate}
+\end{eg}
+
+One can shorten the list of items needed to verify that a subset is a subgroup.
+
+\begin{proposition}\label{prop:subgroup-criterion}
+	A subset \(H\) of a group \(G\) is a subgroup if and only if \(H\) is nonempty and,
+	whenever \(x, y \in H\), then \(xy^{-1} \in H\).
+\end{proposition}
+
+\begin{proof}
+	If \(H\) is a subgroup, then \(H \neq \varnothing\) since \(1 \in H\); and if
+	\(x, y \in H\), then \(y^{-1} \in H\) by (iii), so \(xy^{-1} \in H\) by (ii).
+
+	Conversely, assume \(H\) satisfies the new condition. Since \(H\) is nonempty it
+	contains some \(h\); taking \(x = h = y\) gives \(1 = hh^{-1} \in H\), so (i) holds. If
+	\(y \in H\), set \(x = 1\) (legitimate now that \(1 \in H\)) to get
+	\(y^{-1} = 1y^{-1} \in H\), so (iii) holds. Finally
+	\((y^{-1})^{-1} = y\) by \autoref{lem:group-cancellation}, so if \(x, y \in H\), then
+	\(y^{-1} \in H\) and \(xy = x(y^{-1})^{-1} \in H\), giving (ii).
+\end{proof}
+
+\begin{remark}
+	Since every subgroup contains \(1\), one may replace ``\(H\) is nonempty'' by
+	``\(1 \in H\)''. If the operation in \(G\) is addition, the condition reads: \(H\) is a
+	nonempty subset with \(x, y \in H \implies x - y \in H\).
+\end{remark}
+
+\begin{note}[Historical]
+	For Galois a group was just a subset \(H\) of \(S_n\) closed under composition.
+	A.~Cayley, in 1854, was the first to define an abstract group, mentioning associativity,
+	inverses and identity explicitly.
+\end{note}
+
+\begin{proposition}\label{prop:finite-subgroup-criterion}
+	A nonempty subset \(H\) of a \emph{finite} group \(G\) is a subgroup if and only if
+	\(H\) is closed under the operation of \(G\). In particular, a nonempty subset of
+	\(S_n\) is a subgroup if and only if it is closed under composition.
+\end{proposition}
+
+\begin{proof}
+	Every subgroup is nonempty and closed, by axioms (i) and (ii).
+
+	Conversely, assume \(H\) is a nonempty closed subset, so axiom (ii) holds. Then \(H\)
+	contains all powers of its elements: there is some \(a \in H\), and \(a^n \in H\) for all
+	\(n \geq 1\). As in \autoref{eg:finite-order}, every element of \(G\) has finite
+	order, so there is \(m\) with \(a^m = 1\); hence \(1 \in H\) and axiom (i) holds.
+	Finally, if \(h \in H\) and \(h^m = 1\), then \(h^{-1} = h^{m-1} \in H\) (since
+	\(hh^{m-1} = 1 = h^{m-1}h\)), so axiom (iii) holds.
+\end{proof}
+
+\begin{remark}
+	This proposition can be false for infinite \(G\): the subset \(\mathbb{N}\) of the
+	additive group \(\mathbb{Z}\) is closed under \(+\) but is not a subgroup.
+\end{remark}
+
+\begin{eg}[The alternating group]\label{eg:alternating}
+	The subset of \(S_n\) consisting of all the \emph{even} permutations is a subgroup,
+	because it is closed under multiplication: even \(\circ\) even \(=\) even
+	(\autoref{cor:parity-product}). This subgroup is called the \vocab{alternating
+		group} on \(n\) letters and is denoted by \(A_n\).
+\end{eg}
+
+\begin{note}
+	The name comes from polynomials: if
+	\(f(x) = (x-u_1)\cdots(x-u_n)\), then \(D = \prod_{i<j}(u_i - u_j)\) changes sign when
+	one permutes the roots, since \(\prod_{i<j}[\alpha(u_i) - \alpha(u_j)] = \pm D\). The
+	sign \emph{alternates} as various \(\alpha\) are applied; it does not change for
+	\(\alpha\) in the alternating group.
+\end{note}
+
+\subsection{Cyclic Groups}
+
+\begin{definition}[Cyclic subgroup, cyclic group]
+	If \(G\) is a group and \(a \in G\), write
+	\[
+		\langle a \rangle = \{a^n : n \in \mathbb{Z}\} = \{\text{all powers of } a\};
+	\]
+	\(\langle a \rangle\) is called the \vocab{cyclic subgroup} of \(G\) generated by
+	\(a\). A group \(G\) is \vocab{cyclic} if \(G = \langle a\rangle\) for some
+	\(a \in G\), and then \(a\) is called a \vocab{generator} of \(G\).
+\end{definition}
+
+It is easy to see \(\langle a\rangle\) is a subgroup: \(1 = a^0 \in \langle a\rangle\);
+\(a^n a^m = a^{n+m} \in \langle a\rangle\); \(a^{-1} \in \langle a\rangle\). By
+\autoref{eg:group-list}(vi), for every \(n \geq 1\) the multiplicative group
+\(\Gamma_n\) of all \(n\)th roots of unity is cyclic, with the primitive \(n\)th root of
+unity \(\zeta = e^{2\pi i/n}\) as a generator. A cyclic group can have several different
+generators; for instance \(\langle a\rangle = \langle a^{-1}\rangle\).
+
+\begin{proposition}\label{prop:cyclic-generators}
+	If \(G = \langle a\rangle\) is a cyclic group of order \(n\), then \(a^k\) is a
+	generator of \(G\) if and only if \(\gcd(k,n) = 1\).
+\end{proposition}
+
+\begin{proof}
+	If \(a^k\) is a generator, then \(a \in \langle a^k\rangle\), so \(a = a^{ks}\) for some
+	\(s\). Hence \(a^{ks-1} = 1\), and \autoref{lem:order-divides} gives
+	\(n \mid (ks-1)\); that is, \(ks - 1 = tn\) for some integer \(t\), so
+	\(sk - tn = 1\) and \(\gcd(k,n) = 1\).
+
+	Conversely, if \(1 = sk + tn\), then \(a = a^{sk+tn} = a^{sk}\) (because \(a^{tn} = 1\)),
+	so \(a \in \langle a^k\rangle\). Hence
+	\(G = \langle a\rangle \leq \langle a^k\rangle\), and so \(G = \langle a^k\rangle\).
+\end{proof}
+
+\begin{corollary}\label{cor:number-of-generators}
+	The number of generators of a cyclic group of order \(n\) is \(\phi(n)\), where
+	\(\phi\) is the Euler \(\phi\)-function.
+\end{corollary}
+
+\begin{proof}
+	Immediate from \autoref{prop:cyclic-generators}.
+\end{proof}
+
+\begin{proposition}\label{prop:subgroup-of-cyclic}
+	Every subgroup \(S\) of a cyclic group \(G = \langle a\rangle\) is itself cyclic. In
+	fact \(a^m\) is a generator of \(S\), where \(m\) is the smallest positive integer with
+	\(a^m \in S\).
+\end{proposition}
+
+\begin{proof}
+	We may assume \(S \neq \{1\}\), the statement being obvious otherwise. Let
+	\(I = \{m \in \mathbb{Z} : a^m \in S\}\). Then \(0 \in I\), since \(a^0 = 1 \in S\); if
+	\(m, n \in I\), then \(a^m a^{-n} = a^{m-n} \in S\), so \(m - n \in I\); and if
+	\(m \in I\), \(i \in \mathbb{Z}\), then \((a^m)^i = a^{im} \in S\), so \(im \in I\).
+	Since \(S \neq \{1\}\) there is \(a^q \in S\) with \(a^q \neq 1\), so \(q \in I\) and
+	\(I \neq \{0\}\). Hence, if \(k\) is the smallest positive integer in \(I\), then
+	\(k \mid m\) for every \(m \in I\).
+
+	We claim \(\langle a^k\rangle = S\). Clearly \(\langle a^k\rangle \leq S\). Conversely,
+	take \(s \in S\); then \(s = a^m\) for some \(m \in I\), and \(m = k\ell\) for some
+	\(\ell\), so \(s = a^{k\ell} \in \langle a^k \rangle\).
+\end{proof}
+
+\begin{proposition}\label{prop:order-equals-size}
+	Let \(G\) be a finite group and let \(a \in G\). Then the order of \(a\) is the number
+	of elements in \(\langle a\rangle\).
+\end{proposition}
+
+\begin{proof}
+	Since \(G\) is finite, there is \(k \geq 1\) such that \(1, a, a^2, \dots, a^{k-1}\) are
+	\(k\) distinct elements while \(1, a, \dots, a^k\) has a repetition; hence \(a^k = a^i\)
+	for some \(0 \leq i < k\). If \(i \geq 1\), then \(a^{k-i} = 1\), contradicting the
+	original list having no repetitions. Therefore \(a^k = a^0 = 1\), and \(k\) is the order
+	of \(a\), being the smallest such positive integer.
+
+	Put \(H = \{1, a, a^2, \dots, a^{k-1}\}\), so \(\abs{H} = k\); it suffices to show
+	\(H = \langle a\rangle\). Clearly \(H \subseteq \langle a\rangle\). Conversely, given
+	\(a^i \in \langle a\rangle\), the division algorithm gives \(i = qk + r\) with
+	\(0 \leq r < k\), and then
+	\(a^i = a^{qk+r} = (a^k)^q a^r = a^r \in H\).
+\end{proof}
+
+\begin{definition}[Order of a group]
+	If \(G\) is a finite group, then the number of elements in \(G\), denoted \(\abs{G}\),
+	is called the \vocab{order} of \(G\).
+\end{definition}
+
+\begin{abuse}
+	The word ``order'' is used in two senses: the order of an element \(a \in G\), and the
+	order \(\abs{G}\) of a group. \autoref{prop:order-equals-size} reconciles them:
+	the order of \(a\) equals \(\abs{\langle a\rangle}\).
+\end{abuse}
+
+\begin{proposition}\label{prop:cyclic-criterion}
+	A group \(G\) of order \(n\) is cyclic if and only if, for each divisor \(d\) of \(n\),
+	there is at most one cyclic subgroup of order \(d\).
+\end{proposition}
+
+\begin{proof}
+	Suppose \(G = \langle a\rangle\) is cyclic of order \(n\). We claim
+	\(\langle a^{n/d}\rangle\) has order \(d\). Clearly \((a^{n/d})^d = a^n = 1\), and
+	\(d\) is smallest with this property: if \((a^{n/d})^r = 1\), then
+	\(n \mid (n/d)r\) by \autoref{lem:order-divides}, so \((n/d)r = ns\) for some
+	integer \(s\), giving \(r = ds \geq d\).
+
+	For uniqueness, let \(C \leq G\) have order \(d\). By
+	\autoref{prop:subgroup-of-cyclic}, \(C\) is cyclic, say
+	\(C = \langle x\rangle\) with \(x = a^m\) of order \(d\). Then
+	\(1 = x^d = a^{md}\), so \(n \mid md\) by \autoref{lem:order-divides}, say
+	\(md = nk\). Therefore \(x = a^m = (a^{n/d})^k\), so
+	\(C = \langle x\rangle \subseteq \langle a^{n/d}\rangle\); since both subgroups have
+	order \(d\), \(C = \langle a^{n/d}\rangle\).
+
+	Conversely, define a relation on \(G\) by \(a \equiv b\) if
+	\(\langle a\rangle = \langle b\rangle\). This is an equivalence relation, and the class
+	\([a]\) consists of all the generators of \(C = \langle a\rangle\); denote it by
+	\(\operatorname{gen}(C)\). Then
+	\[
+		G = \bigcup_{C \text{ cyclic}} \operatorname{gen}(C),
+		\qquad\text{so}\qquad
+		n = \abs{G} = \sum_{C} \abs{\operatorname{gen}(C)},
+	\]
+	the sum being over all cyclic subgroups of \(G\). But
+	\(\abs{\operatorname{gen}(C)} = \phi(\abs{C})\) by
+	\autoref{cor:number-of-generators}. By hypothesis \(G\) has at most one cyclic
+	subgroup of any given order, so
+	\[
+		n = \sum_C \abs{\operatorname{gen}(C)} \leq \sum_{d \mid n} \phi(d) = n.
+	\]
+	Therefore, for each divisor \(d\) of \(n\), there must be a cyclic subgroup \(C\) of
+	order \(d\) contributing \(\phi(d)\) to the sum. In particular there is a cyclic
+	subgroup of order \(n\), and so \(G\) is cyclic.
+\end{proof}
+
+\subsection{Subgroups Generated by a Subset}
+
+\begin{proposition}\label{prop:intersection-subgroup}
+	The intersection \(\bigcap_{i \in I} H_i\) of any family of subgroups of a group \(G\) is
+	again a subgroup of \(G\). In particular, if \(H, K \leq G\), then \(H \cap K \leq G\).
+\end{proposition}
+
+\begin{proof}
+	Let \(D = \bigcap_{i\in I} H_i\). Then \(D \neq \varnothing\) because \(1 \in H_i\) for
+	all \(i\). If \(x \in D\), then \(x \in H_i\) for all \(i\); each \(H_i\) is a subgroup,
+	so \(x^{-1} \in H_i\) for all \(i\) and \(x^{-1} \in D\). Finally, if \(x, y \in D\),
+	then \(x, y\) lie in every \(H_i\), hence so does \(xy\), and \(xy \in D\).
+\end{proof}
+
+\begin{corollary}\label{cor:generated-subgroup}
+	If \(X\) is a subset of a group \(G\), then there is a subgroup \(\langle X\rangle\) of
+	\(G\) containing \(X\) that is smallest in the sense that
+	\(\langle X\rangle \leq H\) for every subgroup \(H \leq G\) with \(X \subseteq H\).
+\end{corollary}
+
+\begin{proof}
+	There do exist subgroups of \(G\) containing \(X\); for example \(G\) itself. Define
+	\(\langle X\rangle = \bigcap_{X \subseteq H} H\), the intersection of all subgroups
+	\(H\) of \(G\) containing \(X\). By \autoref{prop:intersection-subgroup} this is
+	a subgroup, and it contains \(X\) because each \(H\) does. If \(H\) is any subgroup
+	containing \(X\), then \(H\) is one of the subgroups being intersected, so
+	\(\langle X\rangle \leq H\).
+\end{proof}
+
+\begin{note}
+	There is no restriction on \(X\); in particular \(X = \varnothing\) is allowed. Since
+	\(\varnothing \subseteq H\) for every subgroup \(H\), the subgroup
+	\(\langle\varnothing\rangle\) is the intersection of \emph{all} subgroups of \(G\), one
+	of which is \(\{1\}\); hence \(\langle\varnothing\rangle = \{1\}\).
+\end{note}
+
+\begin{definition}[Subgroup generated by a subset]
+	If \(X\) is a subset of a group \(G\), then \(\langle X\rangle\) is called the
+	\vocab{subgroup generated by \(X\)}.
+\end{definition}
+
+\begin{eg}
+	\begin{enumerate}[(i)]
+		\item If \(G = \langle a\rangle\) is cyclic with generator \(a\), then \(G\) is
+		      generated by \(X = \{a\}\).
+		\item The symmetry group \(\Sigma(\pi_n)\) of a regular \(n\)-gon is generated by
+		      \(a, b\), where \(a\) is the rotation about the origin by \((360/n)^\circ\)
+		      and \(b\) is a reflection (\autoref{thm:dihedral}). These generators
+		      satisfy \(a^n = 1\), \(b^2 = 1\) and \(bab = a^{-1}\), so
+		      \(\Sigma(\pi_n)\) is a dihedral group \(D_{2n}\).
+	\end{enumerate}
+\end{eg}
+
+\begin{definition}[Word]
+	Let \(X\) be a nonempty subset of a group \(G\). A \vocab{word} on \(X\) is either the
+	identity element or an element of \(G\) of the form
+	\[
+		w = x_1^{e_1}x_2^{e_2}\cdots x_n^{e_n},
+	\]
+	where \(n \geq 1\), \(x_i \in X\) for all \(i\), and \(e_i = \pm 1\) for all \(i\).
+\end{definition}
+
+\begin{proposition}\label{prop:words}
+	If \(X\) is a nonempty subset of a group \(G\), then \(\langle X\rangle\) is the set of
+	all words on \(X\).
+\end{proposition}
+
+\begin{proof}
+	Let \(W\) be the set of all words on \(X\); we first show \(W \leq G\). By definition
+	\(1 \in W\). If \(w = x_1^{e_1}\cdots x_n^{e_n}\) and
+	\(w' = y_1^{f_1}\cdots y_m^{f_m}\) lie in \(W\), then
+	\(ww' = x_1^{e_1}\cdots x_n^{e_n}y_1^{f_1}\cdots y_m^{f_m}\) is again a word on \(X\),
+	so \(ww' \in W\); and
+	\(w^{-1} = x_n^{-e_n}x_{n-1}^{-e_{n-1}}\cdots x_1^{-e_1} \in W\). Thus \(W\) is a
+	subgroup containing every element of \(X\), and so \(\langle X\rangle \leq W\).
+
+	For the reverse inequality, let \(S\) be any subgroup containing \(X\). Since \(S\) is a
+	subgroup it contains \(x^e\) whenever \(x \in X\) and \(e = \pm 1\), and it contains all
+	products of such elements; hence \(W \leq S\). Therefore
+	\(W \leq \bigcap S = \langle X\rangle\).
+\end{proof}
+
+\begin{proposition}[\(\gcd\) and \(\operatorname{lcm}\), group-theoretically]\label{prop:gcd-lcm}
+	Let \(a\) and \(b\) be integers and let \(A = \langle a\rangle\) and
+	\(B = \langle b\rangle\) be the cyclic subgroups of \(\mathbb{Z}\) they generate.
+	\begin{enumerate}[(i)]
+		\item If \(A + B = \{\alpha + \beta : \alpha \in A,\ \beta \in B\}\), then
+		      \(A + B = \langle d\rangle\), where \(d = \gcd(a,b)\).
+		\item \(A \cap B = \langle m\rangle\), where \(m = \operatorname{lcm}(a,b)\).
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+	(i) It is straightforward to check that \(A + B\) is a subgroup of \(\mathbb{Z}\); in
+	fact \(A + B\) is precisely the set of all linear combinations of \(a\) and \(b\). By
+	\autoref{prop:subgroup-of-cyclic} the subgroup \(A + B\) is cyclic:
+	\(A + B = \langle d\rangle\), where \(d\) can be chosen to be the smallest nonnegative
+	number in \(A + B\). Thus \(d\) is a common divisor of \(a\) and \(b\), and it is the
+	smallest such; that is, \(d = \gcd(a,b)\).
+
+	(ii) If \(c \in A \cap B\), then \(a \mid c\) and \(b \mid c\), so every element of
+	\(A \cap B\) is a common multiple of \(a\) and \(b\); conversely every common multiple
+	lies in the intersection. By \autoref{prop:subgroup-of-cyclic},
+	\(A \cap B = \langle m\rangle\), where \(m\) may be taken to be the smallest
+	nonnegative number in \(A \cap B\); that is, \(m = \operatorname{lcm}(a,b)\).
+\end{proof}
+
+\subsection{Cosets and Lagrange's Theorem}
+
+Perhaps the most fundamental fact about subgroups \(H\) of a finite group \(G\) is that
+their orders are constrained. Certainly \(\abs{H} \leq \abs{G}\), but it turns out that
+\(\abs{H}\) must \emph{divide} \(\abs{G}\). To prove this we introduce cosets.
+
+\begin{definition}[Coset]
+	If \(H \leq G\) and \(a \in G\), then the \vocab{coset} \(aH\) is the subset
+	\[
+		aH = \{ah : h \in H\}.
+	\]
+\end{definition}
+
+Of course \(a = a1 \in aH\). Cosets are usually \emph{not} subgroups: if \(a \notin H\),
+then \(1 \notin aH\), for \(1 = ah\) would give the contradiction \(a = h^{-1} \in H\). In
+\(*\) notation we write \(a * H = \{a*h : h \in H\}\); in additive notation,
+\(a + H = \{a + h : h \in H\}\).
+
+\begin{note}
+	The cosets just defined are often called \emph{left} cosets; there are also \emph{right}
+	cosets \(Ha = \{ha : h \in H\}\). We shall work almost exclusively with left cosets.
+\end{note}
+
+\begin{eg}[Cosets]\label{eg:cosets}
+	\begin{enumerate}[(i)]
+		\item Consider \(\mathbb{R}^2\) as an additive abelian group and let \(\ell\) be a
+		      line through the origin \(O\); as in \autoref{eg:subgroups}(iii), \(\ell\)
+		      is a subgroup. If \(\beta \in \mathbb{R}^2\), then the coset \(\beta + \ell\)
+		      is the line \(\ell'\) through \(\beta\) \emph{parallel} to \(\ell\), for if
+		      \(r\alpha \in \ell\), then the parallelogram law gives
+		      \(\beta + r\alpha \in \ell'\) (see \autoref{fig:coset}).
+		\item If \(G = S_3\) and \(H = \langle (1\ 2)\rangle\), there are exactly three
+		      cosets of \(H\), each of size \(2\):
+		      \begin{align*}
+			      H            & = \{(1),\ (1\ 2)\}         = (1\ 2)H,   \\
+			      (1\ 3)H      & = \{(1\ 3),\ (1\ 2\ 3)\}   = (1\ 2\ 3)H, \\
+			      (2\ 3)H      & = \{(2\ 3),\ (1\ 3\ 2)\}   = (1\ 3\ 2)H.
+		      \end{align*}
+	\end{enumerate}
+\end{eg}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[>=stealth, scale=1.15]
+		\coordinate (O) at (0,0);
+		\coordinate (a) at (1.6,0.8);
+		\coordinate (b) at (-1.0,1.0);
+		\coordinate (s) at ($(a)+(b)$);
+		\draw[thick, MidnightBlue] (-2.6,-1.3) -- (2.6,1.3) node[right=2pt] {\(\ell\)};
+		\draw[thick, BrickRed] (-2.6,0.2) -- (2.6,2.8) node[right=2pt] {\(\beta + \ell\)};
+		\draw[gray!55, dashed] (b) -- (s) -- (a);
+		\draw[->, gray!85] (O) -- (a);
+		\draw[->, gray!85] (O) -- (b);
+		\draw[->, thick, BrickRed!85] (O) -- (s);
+		\fill (O) circle (1.4pt) node[below=3pt] {\(O\)};
+		\fill (a) circle (1.4pt) node[below right=1pt] {\(r\alpha\)};
+		\fill (b) circle (1.4pt) node[left=3pt] {\(\beta\)};
+		\fill (s) circle (1.4pt) node[above=3pt] {\(\beta + r\alpha\)};
+	\end{tikzpicture}
+	\caption{The coset \(\beta + \ell\) is the line through \(\beta\) parallel to \(\ell\).}
+	\label{fig:coset}
+\end{figure}
+
+\begin{observation}
+	In these examples different cosets of a given subgroup do not overlap. That is no
+	accident: cosets are equivalence classes.
+\end{observation}
+
+\begin{proposition}\label{prop:coset-equivalence}
+	If \(H \leq G\), then the relation on \(G\) defined by
+	\[
+		a \equiv b \quad\text{if}\quad a^{-1}b \in H
+	\]
+	is an equivalence relation, and the equivalence class of \(a \in G\) is the coset
+	\(aH\).
+\end{proposition}
+
+\begin{proof}
+	\emph{Reflexive:} \(a^{-1}a = 1 \in H\). \emph{Symmetric:} if \(a^{-1}b \in H\), then
+	\((a^{-1}b)^{-1} = b^{-1}a \in H\), since subgroups are closed under inverses.
+	\emph{Transitive:} if \(a^{-1}b, b^{-1}c \in H\), then
+	\((a^{-1}b)(b^{-1}c) = a^{-1}c \in H\), since subgroups are closed under
+	multiplication.
+
+	For the classes: if \(x \equiv a\), then \(x^{-1}a \in H\), and
+	\autoref{lem:coset-basics} gives \(x \in xH = aH\); thus \([a] \subseteq aH\).
+	Conversely, if \(x = ah \in aH\), then
+	\(x^{-1}a = (ah)^{-1}a = h^{-1}a^{-1}a = h^{-1} \in H\), so \(x \equiv a\) and
+	\(x \in [a]\). Hence \([a] = aH\).
+\end{proof}
+
+\begin{lemma}\label{lem:coset-basics}
+	Let \(H \leq G\) and let \(a, b \in G\).
+	\begin{enumerate}[(i)]
+		\item \(aH = bH\) if and only if \(b^{-1}a \in H\). In particular, \(aH = H\) if and
+		      only if \(a \in H\).
+		\item If \(aH \cap bH \neq \varnothing\), then \(aH = bH\).
+		\item \(\abs{aH} = \abs{H}\) for all \(a \in G\).
+	\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+	(i) and (ii) are the general facts about equivalence classes applied to
+	\autoref{prop:coset-equivalence}: distinct classes are disjoint, and two
+	elements are equivalent if and only if their classes coincide. The second statement of
+	(i) follows because \(H = 1H\).
+
+	(iii) The function \(f\colon H \to aH\) given by \(f(h) = ah\) is a bijection, with
+	inverse \(ah \mapsto a^{-1}(ah) = h\). Therefore \(H\) and \(aH\) have the same number
+	of elements.
+\end{proof}
+
+\begin{theorem}[Lagrange's theorem]\label{thm:lagrange}
+	If \(H\) is a subgroup of a finite group \(G\), then \(\abs{H}\) is a divisor of
+	\(\abs{G}\).
+\end{theorem}
+
+\begin{proof}
+	Let \(\{a_1H, a_2H, \dots, a_tH\}\) be the family of all the distinct cosets of \(H\) in
+	\(G\). Then
+	\[
+		G = a_1H \cup a_2H \cup \cdots \cup a_tH,
+	\]
+	because each \(g \in G\) lies in the coset \(gH\), and \(gH = a_iH\) for some \(i\).
+	Moreover distinct cosets \(a_iH\) and \(a_jH\) are disjoint, by
+	\autoref{lem:coset-basics}(ii). It follows that
+	\[
+		\abs{G} = \abs{a_1H} + \abs{a_2H} + \cdots + \abs{a_tH}.
+	\]
+	But \(\abs{a_iH} = \abs{H}\) for all \(i\), by \autoref{lem:coset-basics}(iii), and so
+	\(\abs{G} = t\abs{H}\).
+\end{proof}
+
+\begin{definition}[Index]
+	The \vocab{index} of a subgroup \(H\) in \(G\), denoted \([G:H]\), is the number of
+	cosets of \(H\) in \(G\).
+\end{definition}
+
+When \(G\) is finite, the index \([G:H]\) is the number \(t\) in the formula
+\(\abs{G} = t\abs{H}\) above, so that
+\[
+	\abs{G} = [G:H]\,\abs{H}.
+\]
+In particular the index \([G:H]\) is also a divisor of \(\abs{G}\).
+
+\begin{corollary}\label{cor:index-formula}
+	If \(H\) is a subgroup of a finite group \(G\), then \([G:H] = \abs{G}/\abs{H}\).
+\end{corollary}
+
+\begin{proof}
+	Immediate from Lagrange's theorem.
+\end{proof}
+
+\begin{eg}
+	By \autoref{thm:dihedral}, the symmetry group \(\Sigma(\pi_n)\) of a regular
+	\(n\)-gon is a dihedral group of order \(2n\). It contains the cyclic subgroup
+	\(\langle a\rangle\) of order \(n\) generated by a rotation \(a\), and
+	\([\Sigma(\pi_n) : \langle a\rangle] = 2\). Thus there are two cosets:
+	\(\langle a\rangle\) and \(b\langle a\rangle\), where \(b\) is any symmetry outside
+	\(\langle a\rangle\).
+\end{eg}
+
+\begin{corollary}\label{cor:order-divides-group}
+	If \(G\) is a finite group and \(a \in G\), then the order of \(a\) is a divisor of
+	\(\abs{G}\).
+\end{corollary}
+
+\begin{proof}
+	By \autoref{prop:order-equals-size}, the order of \(a\) equals the order of the
+	subgroup \(H = \langle a\rangle\); now apply Lagrange's theorem.
+\end{proof}
+
+This explains why the orders of the elements of \(S_5\) displayed in \autoref{tab:S5} are
+divisors of \(120\).
+
+\begin{corollary}\label{cor:am-equals-1}
+	If a finite group \(G\) has order \(m\), then \(a^m = 1\) for all \(a \in G\).
+\end{corollary}
+
+\begin{proof}
+	By \autoref{cor:order-divides-group}, \(a\) has order \(d\) with \(d \mid m\), say
+	\(m = dk\). Thus \(a^m = a^{dk} = (a^d)^k = 1\).
+\end{proof}
+
+\begin{corollary}\label{cor:prime-order-cyclic}
+	If \(p\) is a prime, then every group \(G\) of order \(p\) is cyclic.
+\end{corollary}
+
+\begin{proof}
+	Choose \(a \in G\) with \(a \neq 1\) and let \(H = \langle a\rangle\). By Lagrange's
+	theorem \(\abs{H}\) divides \(\abs{G} = p\); since \(p\) is prime and \(\abs{H} > 1\),
+	it follows that \(\abs{H} = p = \abs{G}\), and so \(H = G\).
+\end{proof}
+
+\begin{question}[Is the converse of Lagrange's theorem true?]
+	Lagrange's theorem says the order of a subgroup of a finite group \(G\) divides
+	\(\abs{G}\). If \(d\) divides \(\abs{G}\), must there exist a subgroup of \(G\) of order
+	\(d\)?
+\end{question}
+
+\begin{remark}
+	The answer is \emph{no}: the alternating group \(A_4\) has order \(12\) but has no
+	subgroup of order \(6\).
+\end{remark}
