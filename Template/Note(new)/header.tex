@@ -170,26 +170,17 @@
 \appto\tcb@use@after@lastbox{\@endparenv\@doendpe}
 \makeatother
 
-% `splitsafe' — use instead of `breakable' on any tcolorbox with a background.
-%
-% tcolorbox splits a breakable box across a page with \vsplit.  XeTeX carries
-% the current colour in a stack driven by \special{color push/pop}, and that
-% stack does not survive \vsplit: the continuation segment starts with whatever
-% colour was set last, which is the `colback' just painted for that segment.
-% Its body text is then drawn in the background colour, i.e. invisibly — the
-% text is still in the PDF and pdftotext finds it, but nothing is readable.
-% LuaTeX's native \pdfcolorstack is split-safe, so the same source is fine
-% there.  Keep such boxes whole under XeTeX instead; they then move to the next
-% page as a unit, exactly as the unbreakable `theorem box' already does.
-\ifXeTeX
-	\tcbset{splitsafe/.style={unbreakable}}
-\else
-	\tcbset{splitsafe/.style={breakable}}
-\fi
+% `splitsafe' — kept as a name so existing boxes keep working; it is now just
+% `breakable'.  It used to expand to `unbreakable' under XeTeX, because older
+% tcolorbox releases lost the colour across \vsplit and drew the continuation
+% segment's body text in the background colour.  Current tcolorbox (TeX Live
+% 2024) handles this correctly under XeLaTeX — verified with colback + xeCJK
+% text spanning a page break — so all these boxes now split normally.
+\tcbset{splitsafe/.style={breakable}}
 
 \tcbset{
 	theorem box/.style={
-		enhanced, arc=9pt, outer arc=10pt,
+		enhanced, breakable, arc=9pt, outer arc=10pt,
 		colframe=blue, colback=TealBlue!5, boxrule=1pt,
 		before skip=12pt, after skip=14pt,
 		left=10pt, right=10pt
