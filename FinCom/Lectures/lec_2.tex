@@ -137,12 +137,6 @@ Two observations about the formula.
 	      Higher yield, lower price: the sign is not an accident but a restatement of the discounting formula.
 \end{itemize}
 
-\begin{remark}
-	光看 \eqref{eq:bond-vol} 幾乎讀不出任何直覺——它只是把微分做完而已。
-	接下來的\vocab{麥考利存續期間}（Macaulay duration, MD）之所以重要，正是因為它把同一個量改寫成一個\emph{看得懂}的形式：現金流到期時間的加權平均。
-	同一件事，兩種面貌。
-\end{remark}
-
 %─────§ Macaulay duration─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Macaulay Duration}
 
@@ -165,6 +159,21 @@ Put
 the fraction of today's price that is accounted for by the $i$th cash flow.
 Since $P=\sum_{i} C_{i}(1+y)^{-i}$ we have $\sum_{i} w_{i}=1$, and \eqref{eq:md-def} reads $\mathrm{MD}=\sum_{i} w_{i}\,i$.
 So MD is the \emph{centre of mass} of the cash flows when each is given the weight of its present value.
+
+\begin{remark}
+	\vocab{麥考利存續期間}（Macaulay duration, MD）在問一句話：\emph{這檔債券的錢，平均要等幾期才拿得到？}
+
+	$i$ 是第 $i$ 筆現金流距今幾期（不是到期日，到期日是 $n$）。
+	直接把 $1,\dots,n$ 平均，等於不管每期收到的錢多寡，通通當同一回事；但債券到期那期通常連本金帶票息一起付，金額遠大於中途單純的票息，不該跟其他期一樣輕。所以要用每筆現金流的現值佔總價格的比重 $w_{i}$ 來加權——金額愈大、時間愈近，權重愈大，MD 就愈被拉向那一期。
+	這就是 \eqref{eq:md-def} 是\vocab{加權平均}（weighted average）、$w_{i}$ 叫\vocab{現值權重}（PV weight）的原因。
+
+	下面例子裡 $w_{5}=0.744$，於是 MD$=4.34$：比單純平均的 $3$ 大得多（因為多數價值壓在最後一期），又比到期日 $5$ 略小（因為中途先收到票息）。
+	把每期現值想成掛在時間軸上的砝碼，MD 就是這根槓桿的平衡點，即\vocab{重心}（centre of mass），見 \autoref{fig:md-balance}。
+
+	這個數字有用，是因為錢等得愈久、折現折得愈兇，價格對殖利率也就愈敏感——所以「平均要等幾期」同時也是「殖利率一動，價格會動多少」的度量，這正是下一小節 \eqref{eq:md-vol} 要證明的事。
+
+	單位是「期」，換算成年要除以每年付息次數 $k$（\autoref{sec:conversion-annual}）。
+\end{remark}
 
 \begin{figure}[H]
 	\centering
@@ -232,6 +241,7 @@ So MD is the \emph{centre of mass} of the cash flows when each is given the weig
 \end{proof}
 
 \subsection{MD as a Measure of Price Volatility}
+\label{sec:md-volatility}
 
 \source{Slides p.~98}
 
@@ -265,9 +275,6 @@ Here is the fact that makes MD worth defining: it is the bridge between the ``av
 
 	The reason is visible in the proof: differentiating $(1+y)^{-i}$ brings down exactly the factor $i$, which is the time index.
 	Long cash flows are discounted more steeply, so a security's sensitivity to $y$ is governed by how far out its money sits.
-
-	同一個數字有兩種讀法：一是「現金流平均要等多久」，二是「殖利率動一單位，價格動幾個百分比」。
-	兩者只差 $1+y$ 這個因子，原因在微分 $(1+y)^{-i}$ 時恰好掉下一個 $i$——而 $i$ 就是時間。
 \end{intuition}
 
 \subsection{MD of a Level-Coupon Bond}
@@ -288,7 +295,16 @@ Here is the fact that makes MD worth defining: it is the bridge between the ``av
 \end{proposition}
 
 \eqref{eq:md-bond} is just \eqref{eq:md-def} with the cash flows of a level-coupon bond written out: a coupon $C$ in each of periods $1,\dots,n$, plus the par value $F$ at period $n$.
-\eqref{eq:md-bond-closed} follows by summing the arithmetic-geometric series and dividing through by $F$; note that, as with \eqref{eq:bond-vol}, the par value cancels and only the \emph{rate} $c=C/F$ survives.
+
+For \eqref{eq:md-bond-closed}, write $C=Fc$ and let $A(n)\triangleq\sum_{i=1}^{n}(1+y)^{-i}=\bigl[1-(1+y)^{-n}\bigr]/y$ be the ordinary annuity factor, so \eqref{eq:bond-price-2} reads $P=F\bigl[\,c\,A(n)+(1+y)^{-n}\,\bigr]$.
+The bracket in \eqref{eq:md-bond} factors the same way:
+\[
+	\sum_{i=1}^{n}\frac{iC}{(1+y)^{i}} + \frac{nF}{(1+y)^{n}}
+	\;=\; F\left[\,c\sum_{i=1}^{n}\frac{i}{(1+y)^{i}} + \frac{n}{(1+y)^{n}}\,\right] .
+\]
+So the numerator and the denominator $P$ of \eqref{eq:md-bond} carry the \emph{same} factor $F$, and it cancels --- this is why $F$ disappears.
+$C$ disappears too, but only because it was never independent: it enters solely through $C=Fc$, and once $F$ is gone all that is left of it is the rate $c$.
+Summing the remaining arithmetic--geometric series and simplifying gives \eqref{eq:md-bond-closed}, which --- exactly as with \eqref{eq:bond-vol} --- depends only on $c$, $y$ and $n$, never on the bond's size.
 
 Two consequences are worth stating separately.
 
@@ -299,17 +315,6 @@ Two consequences are worth stating separately.
 	      With $c=0$ there is a single cash flow, $w_{n}=1$, and the average of one number is that number.
 	      Its duration \emph{is} its term to maturity.
 \end{itemize}
-
-\begin{remark}
-	驗算 \eqref{eq:md-bond-closed} 的三個特例，可以順便把公式的意思讀出來：
-	\begin{itemize}[nosep]
-		\item $c=0$（零息債）：分子 $=ny^{2}$，分母 $=y^{2}$，故 $\mathrm{MD}=n$。
-		\item $c=y$（平價債）：整理後得 $\mathrm{MD}=\dfrac{1+y}{y}\bigl[1-(1+y)^{-n}\bigr]$，是教科書上平價債的標準結果。
-		\item $n\to\infty$（\vocab{永續債}（perpetual bond），$c>0$）：$(1+y)^{n}$ 的指數成長輾壓掉線性的 $ny(y-c)$，故 $\mathrm{MD}\to\dfrac{1+y}{y}$——這是所有票息債存續期間的上限。
-	\end{itemize}
-	最後一條特別值得記住：\emph{票息債的存續期間有天花板}。
-	$y=5\%$ 時不論到期日多長，$\mathrm{MD}$ 都不超過 $21$ 期。
-\end{remark}
 
 %─────§ Remarks on MD─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{What MD Does and Does Not Mean}
@@ -334,15 +339,22 @@ Then the actual price volatility, as originally defined in \eqref{eq:price-vol},
 Formula and reality point in opposite directions.
 
 \begin{remark}
-	哪些證券會這樣？兩個標準例子：
-	\begin{itemize}[nosep]
-		\item \vocab{可贖回債券}（callable bond）：殖利率下跌時發行人可以低利重新發債，於是行使贖回權把舊債買回，債券實際上提早到期。
-		\item \vocab{不動產抵押貸款證券}（MBS）：利率下跌時屋主爭相\vocab{提前還款}（prepayment）轉貸，現金流整批提前湧入。
-	\end{itemize}
-	兩者都在殖利率下跌時\emph{縮短}了實際存續期間，價格因此漲不上去——這種現象叫做\vocab{負凸性}（negative convexity），下一節會再回來談。
+	白話翻譯一下上面這段在講什麼。
 
-	重點是：$C$、$F$、$n$ 與 $y$ 無關這個前提，一旦碰上帶有\vocab{嵌入式選擇權}（embedded option）的商品就直接失效，\eqref{eq:md-bond} 算出來的數字便不再是價格敏感度。
-	這正是後面要引入\vocab{有效存續期間}（effective duration）的原因——不靠公式，直接用數值微分去問價格模型。
+	MD 的公式（\eqref{eq:md-vol}、\eqref{eq:md-bond}）都偷偷假設了一件事：$C$、$F$、$n$ 這些現金流的\emph{內容}不會因為 $y$ 變動而跟著變——也就是「不管殖利率變成怎樣，這張債券該付多少錢、哪一期付，永遠不變」。
+	一般公司債、公債確實如此，但\vocab{可贖回債券}（callable bond）跟房貸抵押證券不是：殖利率一降，發行人可能提前贖回、屋主可能\vocab{提前還款}（prepayment）再融資，現金流本身就跟著 $y$ 一起變了。
+
+	現在把「公式算出來的」跟「實際上發生的」分開看：
+
+	\begin{itemize}[nosep]
+		\item \textbf{公式算出來的}：套用 \eqref{eq:md-bond-closed}，殖利率 $y$ 下降 $\to$ 折現折得比較輕 $\to$ 較晚那幾期的權重 $w_i$ 變大 $\to$ MD（加權平均的期數）變長。這一步純粹是代公式，跟債券實際上會不會被贖回無關。
+		\item \textbf{實際上發生的}：如果這張債券在殖利率下降時被提前贖回或提前還款，它的壽命反而\emph{縮短}了。壽命一短，價格對利率的敏感度（\eqref{eq:price-vol} 那個真正的定義）通常也跟著下降。
+	\end{itemize}
+
+	\textbf{為什麼壽命短，敏感度就低？}
+	最乾淨的例子是零息債：$P=F(1+y)^{-n}$，算一下 \eqref{eq:price-vol} 就得到價格波動性 $=n/(1+y)$——敏感度就是到期期數 $n$ 除以 $1+y$，$n$ 愈小，敏感度愈低，一目了然。
+	直覺上也對：$n$ 愈小，這筆錢愈快回到你手上，$y$ 的變動只需要「折現少數幾期」，累積效果自然小；$n$ 愈大，同一個 $y$ 的變動要連乘（或連加，在指數上）更多次，效果就被放大。
+	一般附息債也是同樣道理：\autoref{sec:md-volatility} 已經證明 MD 就是 $(1+y)\times$ 價格波動性，而 MD 本身是現金流到期期數的加權平均，到期日一旦提前，這個加權平均自然跟著縮小，價格波動性也跟著等比例縮小。
 \end{remark}
 
 \subsection{How Not To Think about MD}
@@ -365,6 +377,15 @@ But it should be seen mainly as measuring \emph{price volatility}, for the simpl
 Neither of these makes sense under the maturity interpretation: no security is outstanding for longer than its maturity, and none is outstanding for a negative length of time.
 Many, if not most, duration-related terms can only be comprehended as measuring volatility.
 
+\begin{remark}
+	簡單說：MD 本質上是「利率敏感度」（sensitivity），「加權平均到期時間」只是現金流固定不變時剛好等於敏感度的副產品；現金流一旦隨 $y$ 變化，MD 就可能跑出時間該有的範圍。
+
+	\begin{itemize}[nosep]
+		\item \textbf{槓桿反向浮動利率債券（leveraged inverse floater）}：票息 $=20\%-2\times$ 參考利率。等同於「多一張固定利率債（fixed-rate bond）、用借來的錢放空一張浮動利率債（floater）」——浮動債每期重設票息，久期（duration）近乎 $0$，固定債久期則正常。用槓桿多買固定債、空浮動債對沖，等於把固定債的利率敏感度用槓桿倍數放大，MD 自然能超過同期限的一般定息債。
+		\item \textbf{IO strip（interest-only strip，純利息證券）}：只分到房貸池的利息，不分本金。$y$（連帶房貸利率）一下降，屋主\vocab{提前還款}（prepayment，也叫 refinance 轉貸）的比例上升；本金一旦提前還完，後面本該收的利息就直接消失，不只是折現折得少。這個「現金流消失」的損失蓋過折現效果，導致價格跟 $y$ 反向變動，$\partial P/\partial y>0$，MD 變負。
+	\end{itemize}
+\end{remark}
+
 \begin{moral}
 	Read ``duration'' as ``price sensitivity measured in units of time'', never as ``time''.
 
@@ -373,6 +394,7 @@ Many, if not most, duration-related terms can only be comprehended as measuring 
 
 %─────§ Conversion───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Conversion to Annual Units}
+\label{sec:conversion-annual}
 
 \source{Slides p.~102}
 
@@ -386,6 +408,7 @@ For the MD to be year-based, modify \eqref{eq:md-bond} to
 		\;+\; \frac{n}{k}\,\frac{F}{\bigl(1+\frac{y}{k}\bigr)^{n}}\right] . \label{eq:md-years}
 \end{equation}
 Nothing has changed except that each time index $i$ has been re-expressed as $i/k$ years.
+($n$ itself is still a count of \emph{periods}, not years; only the time label in the numerator has been converted to $i/k$ and $n/k$ years, while the discounting exponent stays in periods.)
 Formula \eqref{eq:md-vol} likewise becomes
 \begin{equation}
 	\mathrm{MD} \;=\; -\Bigl(1+\frac{y}{k}\Bigr)\frac{\partial P}{\partial y}\,\frac{1}{P}. \label{eq:md-vol-years}
@@ -396,13 +419,27 @@ By definition, then,
 \]
 
 \begin{remark}
+    注意 MD(in periods) 是指每期利率 \(\frac{y}{k}\) 算出來的 md，然後 MD(in year)只是把時間的單位從期換到年，利率還是一樣。 
 	三個式子講的是同一件事，只是單位不同，但實務上最常出錯的就是單位。
 
-	\eqref{eq:md-years} 是把\emph{時間}換單位：每個 $i$ 期換成 $i/k$ 年，整體除以 $k$。
+	\eqref{eq:md-years} 這一步很直覺：$i/k$、$n/k$ 只是把「第 $i$ 期」重新標成「第 $i/k$ 年」，$k$ 是常數可以直接從加總裡拿出來，所以整個式子自然就是 $\mathrm{MD}(\text{periods})/k$，沒有懸念。
 
-	\eqref{eq:md-vol-years} 則是把\emph{殖利率}換單位：$\partial P / \partial y$ 中的 $y$ 現在是年殖利率，$y$ 動 1 個單位相當於期殖利率動 $1/k$ 個單位，所以導數本身已經自帶了 $1/k$；前面的因子只需從 $(1+y_{\text{period}})$ 改成 $(1+y/k)$ 即可。
+	\eqref{eq:md-vol-years} 看起來像是另外冒出來的一個公式，但它\emph{不是}重新定義出來湊答案的，而是可以從 \eqref{eq:md-vol} 用連鎖律（chain rule）硬算出來，結果剛好也等於 $\mathrm{MD}(\text{periods})/k$。推導如下。
 
-	一句話：半年付息債的 $\mathrm{MD}=14$ 期就是 $7$ 年。報數字時一定要講清楚是哪一個。
+	把每期的殖利率記成 $y_{p}=y/k$（也就是 \eqref{eq:md-vol} 裡原本那個 $y$，這裡改名是為了不跟年殖利率 $y$ 搞混）。因為 $P$ 其實是 $y_{p}$ 的函數，$y$ 只是透過 $y_{p}=y/k$ 間接影響 $P$，連鎖律給出
+	\[
+		\frac{\partial P}{\partial y} \;=\; \frac{\partial P}{\partial y_{p}}\cdot\frac{\partial y_{p}}{\partial y} \;=\; \frac{1}{k}\,\frac{\partial P}{\partial y_{p}} .
+	\]
+	直覺上：$y$ 動 $1$ 個單位，真正拿去折現的 $y_{p}=y/k$ 只被拖著動 $1/k$ 個單位，所以價格對「年殖利率 $y$」的敏感度，天生就比對「期殖利率 $y_p$」的敏感度小了 $k$ 倍——這就是那個 $1/k$ 的來源，跟前面的係數完全無關。
+
+	把這個關係代進 \eqref{eq:md-vol-years}：
+	\[
+		-\Bigl(1+\frac{y}{k}\Bigr)\frac{\partial P}{\partial y}\frac{1}{P}
+		\;=\; -(1+y_{p})\cdot\frac{1}{k}\frac{\partial P}{\partial y_{p}}\cdot\frac{1}{P}
+		\;=\; \frac{1}{k}\underbrace{\left[-(1+y_{p})\frac{\partial P}{\partial y_{p}}\frac{1}{P}\right]}_{=\ \mathrm{MD}(\text{periods})\text{，即 \eqref{eq:md-vol}}}
+		\;=\; \frac{\mathrm{MD}(\text{periods})}{k} .
+	\]
+	注意係數 $\bigl(1+y/k\bigr)$ 只是原本的 $(1+y_{p})$ 換了個寫法而已，並沒有跟著 $k$ 做任何調整；真正帶出 $1/k$ 的，是求導變數從 $y_p$ 換成 $y$ 時連鎖律多乘出來的那個因子。兩者是獨立的兩件事，只是恰好都跟 $k$ 有關，才會讓最後結果乾淨地等於 $\mathrm{MD}(\text{periods})/k$——跟直接把加總式除以 $k$（\eqref{eq:md-years} 的做法）殊途同歸，這正是三個式子彼此一致、講的是同一件事的原因。
 \end{remark}
 
 %─────§ Modified duration────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -427,6 +464,11 @@ By the Taylor expansion,
 \end{equation}
 
 \begin{note}
+	Taylor-expanding $P$ to first order, $P(y+\Delta y)\approx P(y)+\frac{\partial P}{\partial y}\Delta y$; dividing by $P(y)$ and substituting \eqref{eq:mod-dur} gives exactly \eqref{eq:mod-dur-approx} --- the same computation that produced \eqref{eq:price-vol-approx}.
+	 ``price volatility'' and ``modified duration'' are two names for that one term.
+\end{note}
+
+\begin{note}
 	Modified duration equals MD under continuous compounding.
 	With continuous compounding $P=\sum_{i}C_{i}e^{-y t_{i}}$, so $\partial P/\partial y = -\sum_{i} t_{i}C_{i}e^{-yt_{i}}$ and the ratio $-\bigl(\partial P/\partial y\bigr)/P$ is the PV-weighted average of the $t_{i}$ with no correction factor at all.
 	The $1+y$ in \eqref{eq:mod-dur} is an artifact of discrete compounding; it is the discrete analogue of the fact that $\frac{d}{dy}e^{-yt}=-t\,e^{-yt}$ exactly, whereas $\frac{d}{dy}(1+y)^{-i}=-i(1+y)^{-i-1}$ picks up one extra factor of $(1+y)^{-1}$.
@@ -446,8 +488,6 @@ By the Taylor expansion,
 
 \begin{remark}
 	注意單位：殖利率從 $10\%$ 升到 $10.1\%$，變化量是 $0.1$ 個百分點，也就是 $\Delta y = 0.001$，即十個\vocab{基點}（basis point, bp），不是 $0.1$。
-	\vocab{修正存續期間}（modified duration）的單位是「每單位殖利率的百分比價格變化」，所以乘進去的必須是小數形式的殖利率變化。
-	這是初學者最常見的錯誤之一；\autoref{sec:practices-d} 的 $D_{\%}$ 約定就是為了避開這種小數點而生的。
 \end{remark}
 
 \subsection{Modified Duration of a Portfolio}
@@ -472,12 +512,6 @@ By the Taylor expansion,
 		= \sum_{i}\omega_{i}D_{i} . \qedhere
 	\]
 \end{proof}
-
-\begin{note}
-	Additivity is the practical reason duration is quoted at all: a desk can summarise a book of thousands of bonds by one number, and rebalance it by trading that number.
-	The hidden cost is the assumption that \emph{one} $y$ moves for all assets --- a parallel shift of the whole yield curve.
-	Real curves steepen and twist, and a portfolio with zero net duration can still lose money when they do.
-\end{note}
 
 %─────§ Effective duration───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Effective Duration}
