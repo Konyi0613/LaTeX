@@ -1332,6 +1332,37 @@ perpendicular bisector of \(AB\). Close your eyes; let \(\triangle\) be reflecte
 \(\triangle\) been reflected in the \(x\)-axis it would be obvious. Reflection is a
 special kind of \emph{isometry}.
 
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[scale=1.15, >=stealth]
+		\coordinate (A) at (-1.3,0);
+		\coordinate (B) at (1.3,0);
+		\coordinate (C) at (0,1.8);
+		\coordinate (C') at (0,-1.8);
+		% reflection of the triangle in the x-axis
+		\draw[dashed, thick, BrickRed, fill=BrickRed!6] (A) -- (B) -- (C') -- cycle;
+		% the triangle
+		\draw[thick, MidnightBlue, fill=MidnightBlue!8] (A) -- (B) -- (C) -- cycle;
+		% equal legs
+		\draw[MidnightBlue] ($(A)!0.5!(C)!0.1cm!90:(C)$) -- ($(A)!0.5!(C)!0.1cm!-90:(C)$);
+		\draw[MidnightBlue] ($(B)!0.5!(C)!0.1cm!90:(C)$) -- ($(B)!0.5!(C)!0.1cm!-90:(C)$);
+		\draw[->, gray!80] (2.9,1.0) to[bend left=40]
+			node[right=1pt] {\small reflect in \(x\)-axis} (2.9,-1.0);
+		\fill (A) circle (1.4pt) node[above left=0pt] {\(A\)};
+		\fill (B) circle (1.4pt) node[above right=0pt] {\(B\)};
+		\fill (C) circle (1.4pt) node[above right=0pt] {\(C\)};
+		\fill[BrickRed] (C') circle (1.4pt) node[below right=0pt] {\(C'\)};
+		\node[below left=0pt] at (0,0) {\scriptsize\(O\)};
+
+        % axes
+		\draw[->, gray!70] (-2.2,0) -- (2.2,0) node[right] {\(x\)};
+		\draw[->, gray!70] (0,-2.4) -- (0,2.5) node[above] {\(y\)};
+	\end{tikzpicture}
+	\caption{The isosceles triangle \(\triangle ABC\) is symmetric about the \(y\)-axis;
+		its reflection in the \(x\)-axis (dashed) is visibly different.}
+	\label{fig:isosceles-reflection}
+\end{figure}
+
 \begin{definition}[Isometry]
 	An \vocab{isometry} of the plane is a function
 	\(\varphi\colon \mathbb{R}^2 \to \mathbb{R}^2\) that is \emph{distance preserving}: for
@@ -1342,18 +1373,116 @@ special kind of \emph{isometry}.
 	\]
 \end{definition}
 
-Write \(P \cdot Q = ac + bd\) for the dot product. Then
+Write \(P \cdot Q = ac + bd\) for the dot product of \(P = (a,b)\) and \(Q = (c,d)\). It
+is symmetric and bilinear, and \(P\cdot P = a^2 + b^2 = \norm{P}^2\), where
+\(O = (0,0)\) is the origin and \(\norm{P} = \norm{P - O}\). Expanding,
+\begin{equation}\label{eq:norm-dot}
+	\norm{P-Q}^2
+	= (P-Q)\cdot(P-Q)
+	= P\cdot P - 2(P\cdot Q) + Q\cdot Q.
+\end{equation}
+
+\begin{lemma}[Isometries fixing \(O\) preserve dot products]\label{lem:isometry-dot}
+	Let \(\varphi\colon \mathbb{R}^2 \to \mathbb{R}^2\) be a function.
+	\begin{enumerate}[(i)]
+		\item If \(\varphi\) is an isometry with \(\varphi(O) = O\), then
+		      \(\varphi(P)\cdot\varphi(Q) = P\cdot Q\) for all \(P, Q\).
+		\item Conversely, if \(\varphi(P)\cdot\varphi(Q) = P\cdot Q\) for all \(P, Q\), then
+		      \(\varphi\) is an isometry and \(\varphi(O) = O\).
+	\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+	(i) Putting \(Q = O\) in the definition of an isometry gives
+	\(\norm{\varphi(P)} = \norm{\varphi(P) - \varphi(O)} = \norm{P - O} = \norm{P}\), so
+	\(\varphi(P)\cdot\varphi(P) = P\cdot P\) for every \(P\). Now expand both sides of
+	\(\norm{\varphi(P)-\varphi(Q)}^2 = \norm{P-Q}^2\) using \eqref{eq:norm-dot}:
+	\[
+		\varphi(P)\cdot\varphi(P) - 2\bigl(\varphi(P)\cdot\varphi(Q)\bigr)
+		+ \varphi(Q)\cdot\varphi(Q)
+		= P\cdot P - 2(P\cdot Q) + Q\cdot Q.
+	\]
+	The first terms on the two sides are equal, and so are the last terms; cancelling them
+	and dividing by \(-2\) gives \(\varphi(P)\cdot\varphi(Q) = P\cdot Q\).
+
+	(ii) By \eqref{eq:norm-dot} and the hypothesis,
+	\begin{align*}
+		\norm{\varphi(P)-\varphi(Q)}^2
+		 & = \varphi(P)\cdot\varphi(P) - 2\bigl(\varphi(P)\cdot\varphi(Q)\bigr)
+		+ \varphi(Q)\cdot\varphi(Q)                                            \\
+		 & = P\cdot P - 2(P\cdot Q) + Q\cdot Q = \norm{P-Q}^2,
+	\end{align*}
+	and taking nonnegative square roots shows that \(\varphi\) is an isometry. Moreover
+	\(\norm{\varphi(O)}^2 = \varphi(O)\cdot\varphi(O) = O\cdot O = 0\), so
+	\(\varphi(O) = O\).
+\end{proof}
+
+\begin{remark}
+	The hypothesis \(\varphi(O) = O\) in (i) cannot be dropped. The map
+	\(\varphi(U) = U + V\) with \(V = (1,0)\) is an isometry, since
+	\(\norm{(P+V) - (Q+V)} = \norm{P-Q}\), but
+	\(\varphi(O)\cdot\varphi(O) = V\cdot V = 1 \neq 0 = O\cdot O\).
+\end{remark}
+
+Dot products measure angles. Let \(P, Q \neq O\), and write
+\(P = \norm{P}(\cos\alpha, \sin\alpha)\) and \(Q = \norm{Q}(\cos\beta, \sin\beta)\) in
+polar coordinates. Then
 \[
-	(P-Q)\cdot(P-Q)
-	= P\cdot P - 2(P\cdot Q) + Q\cdot Q
-	= (a-c)^2 + (b-d)^2
-	= \norm{P-Q}^2,
+	P\cdot Q
+	= \norm{P}\norm{Q}(\cos\alpha\cos\beta + \sin\alpha\sin\beta)
+	= \norm{P}\norm{Q}\cos(\alpha - \beta).
 \]
-from which it follows that every isometry preserves dot products:
-\(\varphi(P)\cdot\varphi(Q) = P\cdot Q\). Conversely, a map preserving dot products is an
-isometry. Since \(P \cdot Q = \norm{P}\norm{Q}\cos\theta\), every isometry also preserves
-\emph{angles}; in particular \(P\) and \(Q\) are orthogonal if and only if
-\(P\cdot Q = 0\), so isometries preserve perpendicularity.
+The angle \(\theta \in [0,\pi]\) between \(P\) and \(Q\) (that is, \(\angle POQ\)) differs
+from \(\pm(\alpha - \beta)\) by a multiple of \(2\pi\); since \(\cos\) is even and
+\(2\pi\)-periodic, \(\cos\theta = \cos(\alpha-\beta)\). Hence
+\begin{equation}\label{eq:dot-angle}
+	P\cdot Q = \norm{P}\norm{Q}\cos\theta,
+	\qquad\text{that is,}\qquad
+	\cos\theta = \frac{P\cdot Q}{\norm{P}\norm{Q}}.
+\end{equation}
+Since \(\cos\) is injective on \([0,\pi]\), this determines \(\theta\). In particular,
+\(P\) and \(Q\) are orthogonal (\(\theta = \pi/2\)) if and only if \(P\cdot Q = 0\).
+
+\begin{corollary}[Isometries preserve angles]\label{cor:isometry-angle}
+	\begin{enumerate}[(i)]
+		\item If \(\varphi\) is an isometry with \(\varphi(O) = O\) and \(P, Q \neq O\), then
+		      the angle between \(\varphi(P)\) and \(\varphi(Q)\) equals the angle between
+		      \(P\) and \(Q\).
+		\item More generally, if \(\varphi\) is any isometry and \(P, Q, R\) are points with
+		      \(Q, R \neq P\), then
+		      \(\angle QPR = \angle\,\varphi(Q)\varphi(P)\varphi(R)\).
+	\end{enumerate}
+	In particular, every isometry preserves perpendicularity.
+\end{corollary}
+
+\begin{proof}
+	(i) By \autoref{lem:isometry-dot}, \(\varphi(P)\cdot\varphi(Q) = P\cdot Q\), and, as in
+	its proof, \(\norm{\varphi(P)} = \norm{P} \neq 0\) and
+	\(\norm{\varphi(Q)} = \norm{Q} \neq 0\). If \(\theta\) and \(\theta'\) are the angles
+	between \(P, Q\) and between \(\varphi(P), \varphi(Q)\), then \eqref{eq:dot-angle} gives
+	\[
+		\cos\theta'
+		= \frac{\varphi(P)\cdot\varphi(Q)}{\norm{\varphi(P)}\norm{\varphi(Q)}}
+		= \frac{P\cdot Q}{\norm{P}\norm{Q}}
+		= \cos\theta,
+	\]
+	and \(\theta' = \theta\) because both lie in \([0,\pi]\).
+
+	(ii) The angle \(\angle QPR\) is the angle between the vectors \(Q - P\) and \(R - P\).
+	Since \((Q-P) - (R-P) = Q - R\), applying \eqref{eq:norm-dot} to \(Q-P\) and \(R-P\)
+	gives
+	\[
+		(Q-P)\cdot(R-P)
+		= \tfrac12\bigl(\norm{Q-P}^2 + \norm{R-P}^2 - \norm{Q-R}^2\bigr).
+	\]
+	The right side involves only distances, as do \(\norm{Q-P}\) and \(\norm{R-P}\), so
+	none of them change when \(P, Q, R\) are replaced by \(\varphi(P), \varphi(Q),
+	\varphi(R)\). By \eqref{eq:dot-angle}, the two angles have the same cosine, hence are
+	equal.
+
+	Finally, perpendicularity means meeting at an angle of \(\pi/2\), which is preserved by
+	(ii).
+\end{proof}
 
 \begin{notation}
 	Denote the set of all isometries of the plane by \(\operatorname{Isom}(\mathbb{R}^2)\).
@@ -1395,9 +1524,9 @@ isometry. Since \(P \cdot Q = \norm{P}\norm{Q}\cos\theta\), every isometry also 
 	\[
 		\norm{\varphi(P)-\varphi(Q)} < \norm{\varphi(P)-\varphi(R)} + \norm{\varphi(R)-\varphi(Q)},
 	\]
-	contradicting that \(\varphi\) preserves distance. Conversely, if \(P, Q, R\) are not
-	collinear they are the vertices of a triangle; if their images were collinear, the strict
-	inequality above becomes an equality, again a contradiction.
+	contradicting that \(\varphi\) preserves distance.
+
+    We can prove the other direction with similar method.
 \end{proof}
 
 Every isometry \(\varphi\) is injective: if \(P \neq Q\), then
@@ -1480,15 +1609,44 @@ Every isometry \(\varphi\) is injective: if \(P \neq Q\), then
 \end{proof}
 
 \begin{corollary}\label{cor:isometry-determined}
-	If \(O, P, Q\) are noncollinear points and \(\varphi, \psi\) are isometries of the plane
-	with \(\varphi(P) = \psi(P)\) and \(\varphi(Q) = \psi(Q)\), then \(\varphi = \psi\).
+	\begin{enumerate}[(i)]
+		\item If \(O, P, Q\) are noncollinear points and \(\varphi, \psi\) are isometries of
+		      the plane with \(\varphi(O) = \psi(O) = O\), \(\varphi(P) = \psi(P)\) and
+		      \(\varphi(Q) = \psi(Q)\), then \(\varphi = \psi\).
+		\item More generally, if \(A, B, C\) are noncollinear points and \(\varphi, \psi\)
+		      are isometries of the plane agreeing on \(A\), \(B\) and \(C\), then
+		      \(\varphi = \psi\).
+	\end{enumerate}
 \end{corollary}
 
 \begin{proof}
-	Since \(O, P, Q\) are noncollinear, the list \(P, Q\) is linearly independent in
-	\(\mathbb{R}^2\); as \(\dim(\mathbb{R}^2) = 2\), it is a basis, and two linear
+	(i) Since \(\varphi\) and \(\psi\) fix \(O\), both are linear transformations by
+	\autoref{prop:isometry-linear}. Since \(O, P, Q\) are noncollinear, the list \(P, Q\)
+	is linearly independent in \(\mathbb{R}^2\): a nontrivial relation \(aP + bQ = O\)
+	would put \(P\) and \(Q\) on a common line through \(O\). As
+	\(\dim(\mathbb{R}^2) = 2\), the list \(P, Q\) is a basis, and two linear
 	transformations agreeing on a basis are equal.
+
+	(ii) Let \(U = \varphi(A) = \psi(A)\), and set
+	\(\varphi' = \tau_{-U}\circ\varphi\circ\tau_A\) and
+	\(\psi' = \tau_{-U}\circ\psi\circ\tau_A\). These are composites of isometries, hence
+	isometries, and \(\varphi'(O) = \varphi(A) - U = O\); likewise \(\psi'(O) = O\).
+	Moreover
+	\[
+		\varphi'(B - A) = \varphi(B) - U = \psi(B) - U = \psi'(B - A),
+	\]
+	and similarly \(\varphi'(C - A) = \psi'(C - A)\). The points \(O, B - A, C - A\) are the
+	translates of \(A, B, C\) by \(-A\), so they are noncollinear. By (i),
+	\(\varphi' = \psi'\), and therefore
+	\(\varphi = \tau_U\circ\varphi'\circ\tau_{-A} = \tau_U\circ\psi'\circ\tau_{-A} = \psi\).
 \end{proof}
+
+\begin{remark}
+	In (i) the hypothesis \(\varphi(O) = \psi(O) = O\) cannot be dropped, and in (ii) two
+	points are not enough. If \(O, P, Q\) are noncollinear, the identity and the reflection
+	\(\rho_{L[P,Q]}\) both fix \(P\) and \(Q\), yet they are different: the reflection moves
+	\(O \notin L[P,Q]\).
+\end{remark}
 
 \begin{eg}[Triangles]\label{eg:triangles}
 	If \(\triangle\) is a triangle with vertices \(P, Q, U\) and \(\varphi\) is an isometry,

@@ -1,0 +1,334 @@
+\lecture{2}{18 September 2026}{Residue Classes and Units Modulo \(n\)}
+
+\section{Residue classes}
+
+Fix an integer \(n \geq 2\). Under addition, the set
+\[
+	n\mathbb Z = \{nk : k \in \mathbb Z\}
+\]
+is a subgroup of \(\mathbb Z\). Its cosets are the basic objects of this lecture.
+
+\begin{definition}[Residue class]
+	For \(a \in \mathbb Z\), the \vocab{residue class of \(a\) modulo \(n\)} is the coset
+	\[
+		[a]_n = a+n\mathbb Z = \{a+kn : k \in \mathbb Z\}.
+	\]
+	The set of all residue classes modulo \(n\) is denoted by
+	\[
+		\mathbb Z_n = \{[a]_n : a \in \mathbb Z\}.
+	\]
+\end{definition}
+
+\begin{proposition}[Equality of residue classes]\label{prop:residue-class-equality}
+	For \(a,b \in \mathbb Z\), the following conditions are equivalent:
+	\[
+		[a]_n=[b]_n, \qquad a-b\in n\mathbb Z, \qquad n\mid(a-b).
+	\]
+\end{proposition}
+
+\begin{proof}
+	By the criterion for equality of cosets,
+	\(a+n\mathbb Z=b+n\mathbb Z\) if and only if
+	\(a-b\in n\mathbb Z\). The latter means precisely that \(a-b=kn\) for some
+	\(k\in\mathbb Z\), which is equivalent to \(n\mid(a-b)\).
+\end{proof}
+
+Thus \([a]_n=[b]_n\) exactly when \(a\equiv b\pmod n\). In particular, changing an
+integer by a multiple of \(n\) does not change its residue class.
+
+\begin{proposition}[Division algorithm]\label{prop:division-algorithm}
+	Given \(a\in\mathbb Z\), there exist unique integers \(q,r\) such that
+	\[
+		a=qn+r \qquad\text{and}\qquad 0\leq r\leq n-1.
+	\]
+\end{proposition}
+
+\begin{proof}
+	For existence, consider
+	\[
+		S=\{a-kn:k\in\mathbb Z\}\cap\mathbb N_0.
+	\]
+	The set \(S\) is nonempty: for example, if \(m\geq \abs{a}\), then
+	\(a-(-m)n=a+mn\geq0\). By the well-ordering principle, \(S\) has a least element
+	\(r\). Thus \(r=a-qn\) for some \(q\in\mathbb Z\), so \(a=qn+r\).
+	If \(r\geq n\), then
+	\[
+		r-n=a-(q+1)n\geq0,
+	\]
+	so \(r-n\in S\), contradicting the minimality of \(r\). Hence
+	\(0\leq r<n\), equivalently \(0\leq r\leq n-1\).
+
+	For uniqueness, suppose
+	\(a=qn+r=q'n+r'\), where \(0\leq r,r'<n\). Then
+	\[
+		r-r'=(q'-q)n.
+	\]
+	But \(\abs{r-r'}<n\), and the only multiple of \(n\) with absolute value strictly
+	less than \(n\) is \(0\). Therefore \(r=r'\), and then \(q=q'\).
+\end{proof}
+
+\begin{corollary}[Standard representative]\label{cor:standard-representative}
+	Every residue class in \(\mathbb Z_n\) contains exactly one integer \(r\) satisfying
+	\(0\leq r\leq n-1\).
+\end{corollary}
+
+\begin{proof}
+	If \(a=qn+r\) is the division-algorithm decomposition of \(a\), then
+	\(a-r=qn\), so \([a]_n=[r]_n\) by
+	\autoref{prop:residue-class-equality}. If both \(r,r'\in\{0,\ldots,n-1\}\)
+	represent the same class, then \(n\mid(r-r')\) and \(\abs{r-r'}<n\); hence
+	\(r=r'\).
+\end{proof}
+
+\begin{corollary}\label{cor:Zn-list}
+	The integers \(0,1,\ldots,n-1\) form a complete set of coset representatives for
+	\(n\mathbb Z\) in \(\mathbb Z\). Consequently,
+	\[
+		\mathbb Z_n=\{[0]_n,[1]_n,\ldots,[n-1]_n\}
+	\]
+	and these \(n\) residue classes are pairwise distinct.
+\end{corollary}
+
+\begin{proof}
+	Existence and distinctness are exactly the two assertions of
+	\autoref{cor:standard-representative}.
+\end{proof}
+
+\section{The additive group \(\mathbb Z_n\)}
+
+We would like to add residue classes by adding representatives. Since a class has many
+representatives, we must first check that the answer does not depend on the choices.
+
+\begin{lemma}[Addition is well-defined]\label{lem:addition-well-defined}
+	The assignment
+	\[
+		([a]_n,[b]_n)\longmapsto[a+b]_n
+	\]
+	is well-defined.
+\end{lemma}
+
+\begin{proof}
+	Suppose \([a_1]_n=[a_2]_n\) and \([b_1]_n=[b_2]_n\). Then
+	\(n\mid(a_1-a_2)\) and \(n\mid(b_1-b_2)\). Therefore
+	\[
+		n\mid (a_1-a_2)+(b_1-b_2)=(a_1+b_1)-(a_2+b_2),
+	\]
+	which gives \([a_1+b_1]_n=[a_2+b_2]_n\). Thus different choices of
+	representatives produce the same residue class.
+\end{proof}
+
+Define addition on \(\mathbb Z_n\) by
+\[
+	[a]_n+[b]_n=[a+b]_n.
+\]
+
+\begin{theorem}\label{thm:Zn-additive-group}
+	The set \(\mathbb Z_n\) is an abelian group of order \(n\) under addition.
+\end{theorem}
+
+\begin{proof}
+	The operation is well-defined by \autoref{lem:addition-well-defined}, and its value is
+	again an element of \(\mathbb Z_n\). For \([a]_n,[b]_n,[c]_n\in\mathbb Z_n\),
+	associativity follows from associativity in \(\mathbb Z\):
+	\[
+		([a]_n+[b]_n)+[c]_n=[(a+b)+c]_n=[a+(b+c)]_n
+		=[a]_n+([b]_n+[c]_n).
+	\]
+	The identity is \([0]_n\), because
+	\([0]_n+[a]_n=[a]_n=[a]_n+[0]_n\). The inverse of \([a]_n\) is \([-a]_n\), since
+	\([a]_n+[-a]_n=[0]_n\). Finally,
+	\[
+		[a]_n+[b]_n=[a+b]_n=[b+a]_n=[b]_n+[a]_n,
+	\]
+	so the group is abelian. By \autoref{cor:Zn-list}, it has exactly \(n\) elements.
+\end{proof}
+
+\begin{eg}[Subgroups of \(\mathbb Z_{12}\)]\label{eg:subgroups-Z12}
+	For \([a]_{12}\in\mathbb Z_{12}\), write
+	\[
+		H_a=\langle[a]_{12}\rangle
+		=\{[ka]_{12}:k\in\mathbb Z\}.
+	\]
+	The distinct possibilities are
+	\begin{align*}
+		H_0&=\{[0]_{12}\},\\
+		H_6&=\{[0]_{12},[6]_{12}\},\\
+		H_4=H_8&=\{[0]_{12},[4]_{12},[8]_{12}\},\\
+		H_3=H_9&=\{[0]_{12},[3]_{12},[6]_{12},[9]_{12}\},\\
+		H_2=H_{10}&=\{[0]_{12},[2]_{12},[4]_{12},[6]_{12},[8]_{12},[10]_{12}\},\\
+		H_1=H_5=H_7=H_{11}&=\mathbb Z_{12}.
+	\end{align*}
+	For example, repeatedly adding \([5]_{12}\) gives
+	\([0]_{12},[5]_{12},[10]_{12},[3]_{12},\ldots\), and eventually every residue
+	class occurs. Notice that \(1,5,7,11\) are precisely the standard representatives
+	that are relatively prime to \(12\).
+\end{eg}
+
+The subgroup sizes in this example are governed by a general formula, proved in
+\autoref{prop:order-in-Zn} after we establish B\'ezout's identity.
+
+\section{Multiplication and the group of units}
+
+\begin{lemma}[Multiplication is well-defined]\label{lem:multiplication-well-defined}
+	The assignment
+	\[
+		([a]_n,[b]_n)\longmapsto[ab]_n
+	\]
+	is well-defined.
+\end{lemma}
+
+\begin{proof}
+	Suppose \([a_1]_n=[a_2]_n\) and \([b_1]_n=[b_2]_n\). Write
+	\(a_1-a_2=kn\) and \(b_1-b_2=\ell n\). Then
+	\[
+		a_1b_1-a_2b_2
+		=a_1(b_1-b_2)+b_2(a_1-a_2)
+		=n(a_1\ell+b_2k).
+	\]
+	Thus \(n\mid(a_1b_1-a_2b_2)\), so \([a_1b_1]_n=[a_2b_2]_n\).
+\end{proof}
+
+We may therefore define multiplication on \(\mathbb Z_n\) by
+\[
+	[a]_n[b]_n=[ab]_n.
+\]
+Not every nonzero residue class has a multiplicative inverse. The invertible classes are
+characterized by the greatest common divisor.
+
+\begin{lemma}[The gcd is constant on residue classes]\label{lem:gcd-class-invariant}
+	If \([a]_n=[b]_n\), then \(\gcd(a,n)=\gcd(b,n)\).
+\end{lemma}
+
+\begin{proof}
+	We have \(a=b+kn\) for some \(k\in\mathbb Z\). An integer divides both \(a\) and
+	\(n\) if and only if it divides both \(a-kn=b\) and \(n\). Hence the pairs
+	\((a,n)\) and \((b,n)\) have exactly the same common divisors, and therefore the
+	same greatest common divisor.
+\end{proof}
+
+\begin{definition}[Units modulo \(n\)]
+	The set of \vocab{units modulo \(n\)} is
+	\[
+		\mathbb Z_n^*=\{[a]_n\in\mathbb Z_n:\gcd(a,n)=1\}.
+	\]
+	This definition does not depend on the representative \(a\), by
+	\autoref{lem:gcd-class-invariant}.
+\end{definition}
+
+The following result supplies the inverse needed to make \(\mathbb Z_n^*\) a group.
+
+\begin{proposition}[B\'ezout's identity]\label{prop:bezout}
+	Let \(a,b\in\mathbb Z\), not both zero, and let \(d\) be the least positive integer in
+	\[
+		S=\{ax+by:x,y\in\mathbb Z\}.
+	\]
+	Then \(d=\gcd(a,b)\). In particular, there exist \(x,y\in\mathbb Z\) such that
+	\[
+		\gcd(a,b)=ax+by.
+	\]
+\end{proposition}
+
+\begin{proof}
+	First, \(S\) contains a positive integer: one of \(a,b\) is nonzero, and either that
+	integer or its negative is positive. Hence the least positive element \(d\) exists by
+	the well-ordering principle. Write \(d=ax_0+by_0\).
+
+	We claim that \(d\mid a\). By the division algorithm, write \(a=qd+r\) with
+	\(0\leq r<d\). Then
+	\[
+		r=a-qd=a-q(ax_0+by_0)=a(1-qx_0)+b(-qy_0),
+	\]
+	so \(r\in S\). If \(r>0\), this contradicts the minimality of \(d\); hence \(r=0\)
+	and \(d\mid a\). The same argument gives \(d\mid b\), so \(d\) is a common divisor
+	of \(a\) and \(b\).
+
+	Conversely, if \(c\) is any common divisor of \(a\) and \(b\), then
+	\(c\mid ax_0+by_0=d\). Thus every common divisor of \(a,b\) divides \(d\). Since
+	\(d>0\) is itself a common divisor, it is the greatest positive common divisor:
+	\(d=\gcd(a,b)\).
+\end{proof}
+
+\begin{corollary}[B\'ezout criterion]\label{cor:bezout-criterion}
+	For integers \(a,b\), one has \(\gcd(a,b)=1\) if and only if there exist
+	\(x,y\in\mathbb Z\) such that \(ax+by=1\).
+\end{corollary}
+
+\begin{proof}
+	If \(\gcd(a,b)=1\), the required integers exist by \autoref{prop:bezout}. Conversely,
+	if \(ax+by=1\), every common divisor of \(a\) and \(b\) divides \(1\); hence their
+	greatest common divisor is \(1\).
+\end{proof}
+
+\begin{proposition}[Order of a residue class]\label{prop:order-in-Zn}
+	In the additive group \(\mathbb Z_n\),
+	\[
+		\abs{\langle[a]_n\rangle}=\frac{n}{\gcd(a,n)}.
+	\]
+	Consequently, \([a]_n\) generates \(\mathbb Z_n\) if and only if
+	\(\gcd(a,n)=1\).
+\end{proposition}
+
+\begin{proof}
+	Let \(d=\gcd(a,n)\), and write \(a=da'\) and \(n=dn'\). Then
+	\(\gcd(a',n')=1\). For a positive integer \(k\),
+	\[
+		k[a]_n=[0]_n
+		\iff n\mid ka
+		\iff dn'\mid kda'
+		\iff n'\mid ka'.
+	\]
+	Choose \(x,y\in\mathbb Z\) with \(a'x+n'y=1\). If \(n'\mid ka'\), then
+	\[
+		k=k(a'x+n'y)=(ka')x+n'(ky),
+	\]
+	so \(n'\mid k\). Conversely, \(n'\mid k\) plainly implies \(n'\mid ka'\).
+	Therefore the least positive \(k\) for which \(k[a]_n=[0]_n\) is
+	\(n'=n/d\). This is the order of \([a]_n\), and hence the size of the cyclic
+	subgroup it generates. The final assertion follows because this size is \(n\) exactly
+	when \(d=1\).
+\end{proof}
+
+\begin{corollary}[Criterion for invertibility]\label{cor:unit-criterion}
+	A residue class \([a]_n\in\mathbb Z_n\) has a multiplicative inverse if and only if
+	\(\gcd(a,n)=1\).
+\end{corollary}
+
+\begin{proof}
+	If \(\gcd(a,n)=1\), choose \(x,y\in\mathbb Z\) with \(ax+ny=1\). Reducing this
+	equality modulo \(n\) gives
+	\([a]_n[x]_n=[ax]_n=[1]_n\), so \([x]_n\) is an inverse of \([a]_n\).
+
+	Conversely, suppose \([a]_n[x]_n=[1]_n\) for some \(x\in\mathbb Z\). Then
+	\(ax\equiv1\pmod n\), so \(ax-1=kn\) for some \(k\in\mathbb Z\). Therefore
+	\(ax+n(-k)=1\), and \autoref{cor:bezout-criterion} gives \(\gcd(a,n)=1\).
+\end{proof}
+
+\begin{theorem}\label{thm:units-group}
+	The set \(\mathbb Z_n^*\) is an abelian group under multiplication.
+\end{theorem}
+
+\begin{proof}
+	Multiplication is well-defined by \autoref{lem:multiplication-well-defined}. If
+	\([a]_n,[b]_n\in\mathbb Z_n^*\), then \(\gcd(a,n)=\gcd(b,n)=1\). Choose B\'ezout
+	relations \(ax+ny=1\) and \(bu+nv=1\). Multiplying them gives
+	\[
+		1=(ax+ny)(bu+nv)=ab(xu)+n(axv+buy+nyv),
+	\]
+	so \(\gcd(ab,n)=1\) by \autoref{cor:bezout-criterion}. Hence \([ab]_n\) is again in
+	\(\mathbb Z_n^*\), proving closure.
+
+	Associativity and commutativity are inherited from integer multiplication, and
+	\([1]_n\) is the identity. Every element of \(\mathbb Z_n^*\) has an inverse by
+	\autoref{cor:unit-criterion}; moreover that inverse also belongs to \(\mathbb Z_n^*\),
+	since it is itself invertible. Thus \(\mathbb Z_n^*\) is an abelian group.
+\end{proof}
+
+\begin{eg}[The units modulo \(12\)]
+	We have
+	\[
+		\mathbb Z_{12}^*=\{[1]_{12},[5]_{12},[7]_{12},[11]_{12}\}.
+	\]
+	Each nonidentity element is its own inverse:
+	\(5^2\equiv7^2\equiv11^2\equiv1\pmod{12}\). Thus
+	\(\mathbb Z_{12}^*\) is a group of order \(4\), but it is not cyclic.
+\end{eg}
