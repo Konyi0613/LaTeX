@@ -551,25 +551,26 @@ The prices $P_{-},P_{0},P_{+}$ are obtained by re-running the pricing model thre
 				every axis x label/.style={at={(ticklabel cs:1.0)}, anchor=west},
 				clip=false,
 			]
-			% dotted guides, exactly as on the slide
+			% Dotted guides.
 			\foreach \xx/\yy in {3.070/0.3572, 4.478/0.7101, 5.872/0.8252} {
-					\addplot[Gray!65, densely dotted] coordinates {(\xx,0) (\xx,\yy)};
-					\addplot[Gray!65, densely dotted] coordinates {(-0.35,\yy) (\xx,\yy)};
-				}
-			% price curve, traced from the slide
-			\addplot[MidnightBlue!80!black, very thick] coordinates {
-					(0.021,0.1660) (0.199,0.1647) (0.378,0.1675) (0.556,0.1759) (0.735,0.1901) (0.913,0.2104)
-					(1.092,0.2367) (1.271,0.2671) (1.449,0.2992) (1.628,0.3290) (1.806,0.3527) (1.985,0.3689)
-					(2.163,0.3766) (2.342,0.3782) (2.521,0.3762) (2.699,0.3715) (2.878,0.3650) (3.056,0.3578)
-					(3.070,0.3572) (3.235,0.3542) (3.413,0.3542) (3.592,0.3629) (3.771,0.4015) (3.949,0.5133)
-					(4.128,0.6176) (4.306,0.6737) (4.478,0.7101) (4.485,0.7115) (4.663,0.7432) (4.842,0.7680)
-					(5.021,0.7879) (5.199,0.8035) (5.378,0.8155) (5.556,0.8215) (5.735,0.8237) (5.872,0.8252)
-					(5.913,0.8260) (6.092,0.8224) (6.271,0.8130) (6.449,0.7987) (6.628,0.7802) (6.806,0.7581)
-					(6.985,0.7334) (7.163,0.7068) (7.342,0.6786) (7.521,0.6512) (7.699,0.6240) (7.878,0.5984)
-					(8.056,0.5748) (8.235,0.5537) (8.413,0.5352) (8.592,0.5195) (8.771,0.5070) (8.949,0.4972)
-					(9.128,0.4905) (9.306,0.4865) (9.485,0.4853) (9.663,0.4865) (9.842,0.4902) (10.000,0.4946)
-				};
-			% the chord whose slope the effective duration measures
+				\addplot[Gray!65, densely dotted] coordinates {(\xx,0) (\xx,\yy)};
+				\addplot[Gray!65, densely dotted] coordinates {(-0.35,\yy) (\xx,\yy)};
+			}
+			% A tensioned spline smooths the traced samples while retaining their shape.
+			\addplot[MidnightBlue!80!black, very thick, smooth, tension=0.42]
+			coordinates {
+				(0.021,0.1660) (0.199,0.1647) (0.378,0.1675) (0.556,0.1759) (0.735,0.1901) (0.913,0.2104)
+				(1.092,0.2367) (1.271,0.2671) (1.449,0.2992) (1.628,0.3290) (1.806,0.3527) (1.985,0.3689)
+				(2.163,0.3766) (2.342,0.3782) (2.521,0.3762) (2.699,0.3715) (2.878,0.3650) (3.056,0.3578)
+				(3.070,0.3572) (3.235,0.3542) (3.413,0.3542) (3.592,0.3629) (3.771,0.4015) (3.949,0.5133)
+				(4.128,0.6176) (4.306,0.6737) (4.478,0.7101) (4.485,0.7115) (4.663,0.7432) (4.842,0.7680)
+				(5.021,0.7879) (5.199,0.8035) (5.378,0.8155) (5.556,0.8215) (5.735,0.8237) (5.872,0.8252)
+				(5.913,0.8260) (6.092,0.8224) (6.271,0.8130) (6.449,0.7987) (6.628,0.7802) (6.806,0.7581)
+				(6.985,0.7334) (7.163,0.7068) (7.342,0.6786) (7.521,0.6512) (7.699,0.6240) (7.878,0.5984)
+				(8.056,0.5748) (8.235,0.5537) (8.413,0.5352) (8.592,0.5195) (8.771,0.5070) (8.949,0.4972)
+				(9.128,0.4905) (9.306,0.4865) (9.485,0.4853) (9.663,0.4865) (9.842,0.4902) (10.000,0.4946)
+			};
+			% The chord whose slope the effective duration measures.
 			\addplot[RawSienna, thick] coordinates {(3.070,0.3572) (5.872,0.8252)};
 			\addplot[only marks, mark=*, mark size=1.5pt, RawSienna]
 			coordinates {(3.070,0.3572) (5.872,0.8252)};
@@ -581,25 +582,20 @@ The prices $P_{-},P_{0},P_{+}$ are obtained by re-running the pricing model thre
 	\end{tikzpicture}
 	\caption{Effective duration reads the slope of the chord through
 		$(y_{-},P_{-})$ and $(y_{+},P_{+})$, not of the tangent at $y$. The curve is
-		traced from the plot shown in class. It is deliberately badly behaved --- a
-		plateau on the left, a steep rise through the bracket, a peak just past
-		$y_{+}$ --- and it is \emph{increasing} in the yield over $[y_{-},y_{+}]$, so
+		traced from the plot shown in class. It is deliberately badly behaved---a
+		plateau on the left, a steep rise through the bracket, and a peak just past
+		$y_{+}$---and it is \emph{increasing} in the yield over $[y_{-},y_{+}]$, so
 		this security's duration there is negative. No closed-form duration formula
 		can handle such a price curve.}
 	\label{fig:eff-duration}
 \end{figure}
 
 \begin{remark}
-	這張圖是全章脈絡最容易斷掉的地方，值得說清楚它在講什麼。
+	\textbf{為什麼要定義 effective duration？} \eqref{eq:md-bond} 的算法是先把價格寫成 $y$ 的封閉公式，再對 $y$ 解析微分。一旦現金流本身會隨 $y$ 改變——可贖回債被贖回、房貸提前還款——這樣的封閉公式根本寫不出來，\eqref{eq:md-bond} 也就沒有意義（正是 \autoref{sec:md-caveats} 點出的情形）。effective duration 的辦法是繞開微分：把定價模型當黑箱，讓 $y$ 分別偏移 $\pm\Delta y$、現金流也跟著一起變動，重新定價三次得到 $P_{-},P_{0},P_{+}$，再用連接 $(y_{-},P_{-})$ 與 $(y_{+},P_{+})$ 的\emph{割線}斜率去近似 $(y,P_{0})$ 處\emph{切線}斜率 $-\partial P/\partial y$。也就是說，\eqref{eq:eff-dur} 不管定價公式長什麼樣、甚至有沒有公式，都能算——這正是「一個泛用的數值公式」的意思。
+	（順帶一提：一般中央差分寫成 $(P_{+}-P_{-})/(y_{+}-y_{-})$ 去近似 $\partial P/\partial y$；\eqref{eq:eff-dur} 的分子把順序反過來寫成 $P_{-}-P_{+}$，分母卻維持 $y_{+}-y_{-}$ 不變，這不是筆誤，而是把 duration 定義裡本來就有的那個負號直接吃進分子，等價於在標準中央差分前面乘上 $-1$。）
 
-	圖中的價格曲線\emph{隨殖利率上升}（$P_{-}<P_{0}<P_{+}$），而且還不是單調的——左邊有個平台、右邊過了 $y_{+}$ 就掉下來。
-	這種形狀在 MBS、\vocab{純息分割債券}（interest-only strip, IO）、可贖回債券上都真實存在，公式 \eqref{eq:md-bond} 對它完全無能為力。
-
-	\eqref{eq:eff-dur} 的作法是：不去碰導數，改成把定價模型跑三次，用\emph{割線}斜率近似\emph{切線}斜率。
-	代入這張圖的數字，$P_{-}-P_{+}<0$，所以 effective duration 是負的——正好印證 \autoref{sec:md-caveats} 裡「duration 可以是負的」那句話。
-
-	另外注意 \eqref{eq:eff-dur} 用的是\vocab{中央差分}（central difference），把 $y_{+}$ 與 $y_{-}$ 對稱地放在 $y$ 兩側。
-	這麼做的誤差是 $O((\Delta y)^{2})$，而單邊差分只有 $O(\Delta y)$——下一頁的替代公式就是拿精度換計算量。
+	\textbf{這張圖在講什麼？} 橫軸是殖利率 $y$、縱軸是價格 $P$；虛線標出 $(y_{-},P_{-})$、$(y,P_{0})$、$(y_{+},P_{+})$ 三個點。曲線刻意畫得不規則——左邊一段平台、中間陡然爬升、過了 $y_{+}$ 後反而往下掉——用來代表 MBS、\vocab{純息分割債券}（interest-only strip, IO）這類現金流會隨 $y$ 改變的證券，這種形狀一般封閉公式完全處理不了。橙色直線是連接 $(y_{-},P_{-})$ 與 $(y_{+},P_{+})$ 的割線，它的斜率（取負號、除以 $P_{0}$）正是 \eqref{eq:eff-dur} 在算的量。
+	在圖上區間 $[y_{-},y_{+}]$ 裡曲線是\emph{遞增}的，即 $P_{-}<P_{+}$，於是 $P_{-}-P_{+}<0$，代入 \eqref{eq:eff-dur} 得到 effective duration $<0$——這就是 \autoref{sec:md-caveats}「duration 可以是負的」那個 IO strip 例子的具體樣子。
 \end{remark}
 
 \source{Slides p.~108}
@@ -623,6 +619,12 @@ which is more economical --- two model runs instead of three, and $P_{0}$ is usu
 	Halving $\Delta y$ buys a factor of four in one case and only a factor of two in the other.
 \end{note}
 
+\begin{remark}
+	$P_{0}$ 是現在的價格，通常本來就知道；中央差分 \eqref{eq:eff-dur} 分子不含 $P_{0}$，真正要多算的是 $P_{-}$ 與 $P_{+}$ 兩次；單邊差分 \eqref{eq:eff-dur-onesided} 直接拿現成的 $P_{0}$ 當基準，只需多算一次 $P_{+}$，所以少一次定價。
+
+	不準在哪裡：把 $y$ 對稱地往兩邊推，二階（曲率）誤差在 $P_{-}$ 與 $P_{+}$ 裡符號相反、相減即抵消，只剩三階項，誤差 $O((\Delta y)^{2})$；只往一個方向推就沒有這種抵消，誤差停在 $O(\Delta y)$。把 $\Delta y$ 減半，中央差分誤差縮到 $1/4$、單邊只縮到 $1/2$——這正是「省一次定價」換來的代價。
+\end{remark}
+
 %─────§ The practices (duration)─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{The Practices: Duration in Percentage Terms}
 \label{sec:practices-d}
@@ -635,6 +637,10 @@ The percentage price change expressed in percentage terms is then approximated b
 	-D_{\%}\times\Delta r \label{eq:dpct}
 \end{equation}
 when the yield increases instantaneously by $\Delta r\%$.
+
+\begin{remark}
+	先說清楚一個容易誤會的地方：$D_{\%}$ 不是把 $D$ 換算成百分比形式後得到的另一個數字。它只是 \eqref{eq:dpct} 這條式子裡的\emph{係數}；式子裡真正換了單位的是 $\Delta r$（百分點）跟價格變化（百分比），不是係數本身。下面會證明 $D_{\%}$ 其實跟原來的 duration 數值完全相同——證完之後的說明會解釋為什麼這件事一點都不奇怪。
+\end{remark}
 
 \begin{eg}
 	Suppose $D_{\%}=10$ and $\Delta r=2$.
@@ -656,9 +662,7 @@ when the yield increases instantaneously by $\Delta r\%$.
 \end{proof}
 
 \begin{remark}
-	換句話說，$D_{\%}$ 不是新的量，只是\emph{換一套讀數的習慣}：
-	把殖利率變化以「百分點」計、價格變化以「百分比」計之後，同一個 duration 數字可以直接相乘，不必先換算成小數。
-	前一頁 $-11.54\times 0.001$ 那種容易錯的運算，改寫成 $-11.54\times 0.1 = -1.154$（百分比）就直觀多了。
+	\textbf{$D_{\%}$ 是哪一種 duration？} 不是新的第五種量。前面算出來的那個數字 $D$——這裡是 modified duration \eqref{eq:mod-dur}，若現金流會隨 $y$ 變就是 effective duration \eqref{eq:eff-dur}——$D_{\%}$ 就是同一個 $D$，數值完全不變，只是換一套單位讀它：把 $\Delta y$（小數）換成以\emph{百分點}記的 $\Delta r=100\,\Delta y$，把 $\Delta P/P$（小數）換成以\emph{百分比}記的 $100\,\Delta P/P$。
 \end{remark}
 
 %─────§ Hedging─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -667,6 +671,12 @@ when the yield increases instantaneously by $\Delta r\%$.
 \source{Slides p.~110}
 
 \vocab{Hedging} offsets the price fluctuations of the position to be hedged by the hedging instrument in the opposite direction, leaving the total wealth unchanged.
+
+\begin{remark}
+	\vocab{部位}（position）指你手上持有的一筆資產或負債；\emph{要避險的部位}（the position to be hedged）就是你原本就有、想保護價值的那筆持倉，例如一個債券投資組合。\emph{避險工具}（hedging instrument）是額外配上去的另一筆部位，專門用來抵銷前者的風險，通常是另一種對 $y$ 敏感度相反的證券。
+
+	「往相反方向抵銷」的意思是：$y$ 一變動，原部位賺（賠）多少，避險工具那邊就賠（賺）差不多多少；兩筆加在一起，總財富幾乎不受 $y$ 變動影響——這就是 leaving the total wealth unchanged。「差不多多少」要怎麼配、配多少，就是本節接下來要算的東西。
+\end{remark}
 
 Percentages are the wrong unit for that job: two positions of different size with equal and opposite \emph{modified} durations do not cancel.
 What must cancel is the change in \emph{dollars}.
@@ -686,14 +696,20 @@ One can hedge a bond portfolio with a dollar duration $D$ by bonds with a dollar
 \begin{intuition}
 	Modified duration is a \emph{rate}; dollar duration is a \emph{quantity}.
 	Hedging is an accounting identity about quantities, so the hedge ratio must be computed in dollar durations.
-
-	修正存續期間是比率，\vocab{金額存續期間}（dollar duration）是金額。\vocab{避險}（hedging）是關於金額的會計恆等式，所以\vocab{避險比例}（hedge ratio）必須用金額存續期間來算。
 \end{intuition}
 
 \begin{note}
 	The hedge is only first-order and only instantaneous.
 	It fails for large moves --- that is the second-order term, i.e.\ convexity --- and it fails when the two legs' yields do not move together, which no single-$y$ framework can express.
 \end{note}
+
+\begin{remark}
+	「first-order」「second-order」呼應本章最開頭的泰勒展開 $\Delta P=(\partial P/\partial y)\Delta y+\frac12(\partial^{2}P/\partial y^{2})(\Delta y)^{2}+\cdots$：一階項只跟 $\Delta y$ 成正比，也就是 duration 那一項；二階項跟 $(\Delta y)^{2}$ 成正比，也就是 convexity 那一項。
+
+	怎麼看出避險只做到一階：\eqref{eq:dollar-dur-approx} 這條式子本身就只有一階項，完全沒寫 $(\Delta y)^{2}$ 那一塊。配 $D$ 與 $-D$ 兩筆 dollar duration，只保證兩邊代入 \eqref{eq:dollar-dur-approx} 算出來的一階項互相抵銷；至於兩邊真正的二階項（convexity），公式裡從沒要求它們相等，通常也真的不相等，所以加總後還留著一段沒被抵銷的 $(\Delta y)^{2}$ 尾巴。$\Delta y$ 很小時這尾巴可以忽略，避險看起來完美；$\Delta y$ 一大，這段二階尾巴就顯現出來，避險失靈——這就是「fails for large moves」。
+
+	至於「兩腳殖利率沒有一起動」：\vocab{腳}（leg）就是避險這筆交易的其中一邊——被避險的部位是一腳，拿來避險的工具是另一腳，兩腳各自有自己的價格、自己的殖利率。這是另一個完全不同的限制，跟 order 高低無關：整套 $D$、$-D$ 的算法都假設這兩腳共用同一個 $y$（利率平行移動），$y$ 一變兩腳一起變、變一樣多。如果兩腳的殖利率各自變動、不同步（例如一邊是公司債、一邊是公債，信用利差自己在變），就沒有單一個 $y$ 可以同時代入兩腳的一階分析了。
+\end{remark}
 
 %─────§ Convexity───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Convexity}
@@ -714,16 +730,28 @@ Duration is the first derivative. The second derivative gets its own name.
 \end{exercise}
 
 \begin{proof}
-	Differentiate $P=\sum_{i=1}^{n}C_{i}(1+y)^{-i}$ twice:
+	Write the coupons and the par value as separate terms,
 	\[
-		\frac{\partial^{2}P}{\partial y^{2}} = \sum_{i=1}^{n} i(i+1)\,C_{i}\,(1+y)^{-i-2} \;>\; 0 ,
+		P \;=\; \sum_{i=1}^{n}C_{i}(1+y)^{-i} \;+\; F(1+y)^{-n},
 	\]
-	since every $C_{i}\ge 0$ and at least one is strictly positive.
+	where $C_{i}=C$ is the coupon paid at period $i$ and $F$ is the par value returned at maturity.
+	Differentiating term by term,
+	\[
+		\frac{\partial P}{\partial y}
+		= -\sum_{i=1}^{n} i\,C_{i}\,(1+y)^{-i-1} \;-\; nF(1+y)^{-n-1},
+	\]
+	and once more,
+	\[
+		\frac{\partial^{2}P}{\partial y^{2}}
+		= \sum_{i=1}^{n} i(i+1)\,C_{i}\,(1+y)^{-i-2} \;+\; n(n+1)\,F(1+y)^{-n-2} \;>\; 0 ,
+	\]
+	since $C_{i}\ge 0$, $F\ge 0$, not all of them are zero, and $1+y>0$.
 	Dividing by $P>0$ leaves the sign unchanged.
 	The argument uses nothing about level coupons: \emph{any} security with non-negative, yield-independent cash flows has positive convexity.
 \end{proof}
 
 For a bond with positive convexity, the price rises more for a rate decline than it falls for a rate increase of equal magnitude.
+（也就是說，凸性為正的債券，殖利率下降時價格漲的幅度，會大於殖利率上升同樣幅度時價格跌的幅度。）
 That asymmetry is the content of \autoref{fig:convexity-taylor}: the true price curve bends away from its own tangent, and it bends \emph{upwards}, so the tangent understates the price on both sides.
 
 \source{Slides p.~112}
@@ -801,9 +829,24 @@ Convexity measured in periods and convexity measured in years are related by
 \end{equation}
 
 \begin{note}
-	The $k^{2}$ is not a new convention but a consequence of the $k$ in $\mathrm{MD}(\text{years})=\mathrm{MD}(\text{periods})/k$.
-	Convexity is a \emph{second} derivative with respect to the yield, so re-expressing the yield in annual units divides it twice.
-	Any quantity that is an $r$th derivative with respect to $y$ picks up a factor $k^{-r}$.
+	This is the chain rule, applied twice. Let $u=y/k$ be the periodic yield, so the price is $P(u)$, and let $\widetilde P(y)\triangleq P(y/k)$ be the same price viewed as a function of the annual yield $y$. Since $u=y/k$ is linear in $y$, $du/dy=1/k$ is constant, and
+	\[
+		\frac{\partial \widetilde P}{\partial y} \;=\; \frac{\partial P}{\partial u}\cdot\frac{du}{dy} \;=\; \frac1k\,\frac{\partial P}{\partial u} ,
+	\]
+	which is $\mathrm{MD}(\text{years})=\mathrm{MD}(\text{periods})/k$ up to the $(1+u)$-vs.-$1$ normalising factor in \eqref{eq:md-vol}--\eqref{eq:md-vol-years}. Differentiating once more, and noting that $\partial P/\partial u$ is again a function of $u=y/k$, the chain rule applies a \emph{second} time:
+	\[
+		\frac{\partial^{2}\widetilde P}{\partial y^{2}}
+		\;=\; \frac{\partial}{\partial y}\!\left(\frac1k\,\frac{\partial P}{\partial u}\right)
+		\;=\; \frac1k\cdot\frac{\partial^{2}P}{\partial u^{2}}\cdot\frac{du}{dy}
+		\;=\; \frac{1}{k^{2}}\,\frac{\partial^{2}P}{\partial u^{2}} .
+	\]
+	Dividing both sides by the same $P$ gives exactly \eqref{eq:convexity-years}: the $k^{2}$ is two factors of $k^{-1}$, one from each application of the chain rule, not an independent convention.
+
+	More generally, this is an induction on the order $r$ of the derivative. The base case $r=1$ is the MD computation above. For the inductive step, suppose $\partial^{r}\widetilde P/\partial y^{r}=k^{-r}\,\partial^{r}P/\partial u^{r}$. The right-hand side is a function of $u=y/k$ composed with $y\mapsto y/k$, so differentiating both sides once more in $y$ picks up one further factor $du/dy=1/k$:
+	\[
+		\frac{\partial^{r+1}\widetilde P}{\partial y^{r+1}} \;=\; k^{-r}\cdot\frac{\partial^{r+1}P}{\partial u^{r+1}}\cdot\frac{du}{dy} \;=\; k^{-(r+1)}\,\frac{\partial^{r+1}P}{\partial u^{r+1}} .
+	\]
+	Hence any quantity that is an $r$th derivative with respect to the yield converts between periods and years by a factor of $k^{-r}$: $k^{-1}$ for duration ($r=1$), $k^{-2}$ for convexity ($r=2$).
 \end{note}
 
 \begin{remark}
@@ -878,9 +921,7 @@ when the yield increases instantaneously by $\Delta r\%$.
 \end{proof}
 
 \begin{remark}
-	為什麼 duration 換算係數是 $1$，凸性卻是 $1/100$？
-	因為 duration 項對 $\Delta y$ 是一次的，兩側各乘 $100$ 恰好相消；凸性項對 $\Delta y$ 是\emph{二次}的，左邊只乘了 $100$、右邊卻乘了 $100^{2}$，於是多出一個 $100$ 要除掉。
-	一般而言，$r$ 階項的百分比版本等於原值除以 $100^{\,r-1}$。
+	\textbf{$D_{\%}=D$ 這件事哪裡容易搞錯？} 直覺上很容易以為「掛了 $\%$」代表這個數字本身被換成了百分比形式，所以 $D_\%$ 應該跟 $D$ 長得不一樣（比方乘或除以 $100$）。但 $D_\%$、$C_\%$ 從來不是把 $D$、$\mathrm{conv}$ 本身換算單位，它們只是 \eqref{eq:dpct}、\eqref{eq:cpct} 這兩條式子裡的\emph{係數}；式子裡真正換單位的是變量：輸入端 $\Delta y\to\Delta r=100\Delta y$，輸出端 $\Delta P/P\to 100\,\Delta P/P$。係數本身要變成多少，要看它前面到底黏著幾個 $\Delta y$。
 \end{remark}
 
 %─────§ Effective convexity──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -900,6 +941,62 @@ Just as effective duration replaced the closed-form first derivative by a differ
 
 Since $0.5\times(y_{+}-y_{-})=\Delta y$, the denominator is just $P_{0}(\Delta y)^{2}$, and \eqref{eq:eff-conv} is the standard central second difference $\bigl[P_{+}+P_{-}-2P_{0}\bigr]/(\Delta y)^{2}$ normalised by $P_{0}$.
 Effective convexity is most relevant when a bond's cash flow is interest rate sensitive --- the callable bonds and mortgage securities for which \eqref{eq:convexity} cannot even be written down, and for which the convexity often turns out \emph{negative}.
+
+\begin{remark}
+	\textbf{這條式子在算什麼？} 沿用本章最開頭的泰勒展開 $\Delta P=P'\Delta y+\frac12P''(\Delta y)^{2}+\frac16P'''(\Delta y)^{3}+\cdots$（這裡 $'$ 表示對 $y$ 微分），在 $y$ 兩側各展開一次：
+	\[
+		P_{+}=P_{0}+P'\Delta y+\tfrac12P''(\Delta y)^{2}+\tfrac16P'''(\Delta y)^{3}+\cdots,
+		\qquad
+		P_{-}=P_{0}-P'\Delta y+\tfrac12P''(\Delta y)^{2}-\tfrac16P'''(\Delta y)^{3}+\cdots.
+	\]
+	effective duration 是把這兩式\emph{相減}，讓一階項 $P'\Delta y$ 留下來、其他項互相抵銷或變高階小量。effective convexity 反過來，把兩式\emph{相加}：一階、三階這些奇數階的項符號相反、正好消掉，只留下偶數階：
+	\[
+		P_{+}+P_{-} = 2P_{0}+P''(\Delta y)^{2}+O\bigl((\Delta y)^{4}\bigr)
+		\;\Longrightarrow\;
+		\frac{P_{+}+P_{-}-2P_{0}}{(\Delta y)^{2}} = P''+O\bigl((\Delta y)^{2}\bigr).
+	\]
+	再除以 $P_{0}$，換成跟 \eqref{eq:convexity} 一樣「除以 $P$」的正規化，就得到 \eqref{eq:eff-conv}。所以這條公式跟 effective duration 是同一招的延伸：effective duration 用兩點的\emph{差}逼近一階導數，effective convexity 用三點的\emph{加權和}逼近二階導數。
+
+	\textbf{幾何意義。} $y$ 是 $y_{-}$、$y_{+}$ 的中點，所以連接 $(y_{-},P_{-})$ 與 $(y_{+},P_{+})$ 的割線，在 $y$ 這一點的高度正好是兩端點的平均 $(P_{-}+P_{+})/2$。因此
+	\[
+		P_{+}+P_{-}-2P_{0} \;=\; 2\left[\frac{P_{-}+P_{+}}{2}-P_{0}\right]
+	\]
+	就是「割線在 $y$ 處的高度」與「曲線實際在 $y$ 處的高度 $P_{0}$」之間差距的兩倍，見 \autoref{fig:eff-convexity}。曲線向上凸（跟 \autoref{fig:convexity-taylor} 一樣）時，曲線落在割線下方，這個差距是正的，effective convexity 隨之為正；曲線若在這段反而向下凹，差距變負，算出來的 effective convexity 就是負的——這正是 MBS、可贖回債券的凸性常常是負的原因。
+\end{remark}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+				width=0.65\textwidth, height=6cm,
+				xmin=0.3, xmax=3.7, ymin=4.0, ymax=9.0,
+				axis x line=bottom, axis y line=left,
+				axis line style={thin, -{Stealth[length=5pt]}},
+				xtick={1,2,3}, xticklabels={$y_{-}$, $y$, $y_{+}$},
+				ytick={4.6,5.6,7.4}, yticklabels={$P_{+}$, $P_{0}$, $P_{-}$},
+				tick style={draw=none},
+				tick label style={font=\small},
+				xlabel={Yield}, ylabel={Price},
+				label style={font=\footnotesize, text=Gray!60!black},
+				every axis y label/.style={at={(ticklabel cs:1.0)}, rotate=0, anchor=south},
+				every axis x label/.style={at={(ticklabel cs:1.0)}, anchor=west},
+				clip=false,
+			]
+			\foreach \xx/\yy in {1/7.4, 2/5.6, 3/4.6} {
+					\addplot[Gray!65, densely dotted] coordinates {(\xx,4.0) (\xx,\yy)};
+					\addplot[Gray!65, densely dotted] coordinates {(0.3,\yy) (\xx,\yy)};
+				}
+			\addplot[MidnightBlue!80!black, very thick, domain=0.6:3.4, samples=60] {10-3*x+0.4*x^2};
+			\addplot[RawSienna, thick] coordinates {(1,7.4) (3,4.6)};
+			\addplot[only marks, mark=*, mark size=1.5pt, black] coordinates {(1,7.4) (2,5.6) (3,4.6)};
+			\addplot[only marks, mark=*, mark size=1.3pt, RawSienna] coordinates {(2,6.0)};
+			\draw[RawSienna, thick, {Stealth[length=4pt]}-{Stealth[length=4pt]}] (axis cs:2,5.6) -- (axis cs:2,6.0);
+			\node[RawSienna!80!black, font=\footnotesize, anchor=west] at (axis cs:2.08,5.8) {$\dfrac{P_{-}+P_{+}}{2}-P_{0}$};
+		\end{axis}
+	\end{tikzpicture}
+	\caption{The chord through $(y_{-},P_{-})$ and $(y_{+},P_{+})$ sits above the curve at the midpoint $y$ whenever the curve is convex there. Effective convexity is, up to the factor $2/\bigl[(\Delta y)^{2}P_{0}\bigr]$, exactly that vertical gap $(P_{-}+P_{+})/2-P_{0}$.}
+	\label{fig:eff-convexity}
+\end{figure}
 
 How to choose the right $\Delta y$ is a delicate matter.
 
@@ -1022,7 +1119,7 @@ This numerical issue is common in financial engineering but does not have genera
 
 If you have one, you have the other.
 Given a price, the yield is the root of \eqref{eq:bond-price-2}; given a yield, the price is its value.
-So they are just two names given to the same thing: the \vocab{cost of fund}.
+So they are just two names given to the same thing: the \vocab{cost of fund (資金成本)}.
 
 The difference is one of habit rather than of substance:
 
