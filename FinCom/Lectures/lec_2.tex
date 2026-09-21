@@ -1169,8 +1169,13 @@ The plan is:
 	\item use the curve to measure credit risk (\vocab{spreads}) and relate it back to the yield curve we started from.
 \end{enumerate}
 
+\begin{remark}
+	\vocab{信用風險}（credit risk）：發行人到期還不出錢（違約）的風險。公司債可能違約，殖利率因此比公債高，這多出來的部分就是\vocab{利差}（spread），細節見 \autoref{sec:spreads}。
+\end{remark}
+
 %─────§ What the term structure is──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{What the Term Structure Is}
+\label{sec:what-term-structure}
 
 \source{Slides p.~121}
 
@@ -1185,14 +1190,12 @@ Concretely, the set of yields to maturity for bonds form the term structure --- 
 The term structure is fundamental to the valuation of fixed-income securities.
 
 \begin{remark}
-	那兩個條件是整個概念的成立前提，值得說明白。
+	\vocab{期限結構}（term structure）就是「殖利率隨到期日怎麼變化」畫出來的一條曲線——橫軸是到期日，縱軸是殖利率。
 
-	我們想分離出來的是\emph{純粹因為到期日不同}而產生的利率差異。
-	若拿一檔 AAA 公司債和一檔垃圾債來比，兩者殖利率的差距主要來自\vocab{信用風險}而非期限，畫出來的曲線就不是期限結構，而是信用等級的混合物。
-	所以要求「品質相同」（實務上通常取同一發行體，例如美國公債）與「只有到期日不同」。
+	具體做法是拿一群債券各自的到期殖利率當縱軸上的點，但只有兩個條件都成立時，畫出來的才算是期限結構：品質相同、只差到期日。
+	這樣才能保證點跟點之間的殖利率差異\emph{純粹來自到期日不同}；若拿信用品質不同的債券比，測到的其實是信用風險（\autoref{sec:spreads}），畫出來的就不是期限結構。
 
-	真實世界裡這兩個條件從來不會完全成立——流動性、稅負、可否質押、新券舊券（on-the-run / off-the-run）都會造成差異。
-	這正是後面 \autoref{sec:ts-problems} 所列問題的來源。
+	最後一句「fundamental to valuation」是說：債券價格是把每期現金流分別折現再加總，不同到期日理當用不同的折現率，而期限結構正是提供這些折現率的來源——這也是本章稍後要用一整組 spot rate $S(1),S(2),\dots$ 取代單一 $y$ 的原因。
 \end{remark}
 
 \source{Slides p.~122}
@@ -1207,9 +1210,18 @@ Three names get used loosely and are worth separating once and for all:
 \end{itemize}
 
 \begin{note}
-	The three curves are different objects computed from the same market.
-	A coupon bond's yield blends the rates of every date on which it pays, so the yield curve is a smeared version of the term structure; the par yield curve fixes the smearing in a standard way by insisting the bond trade at par, which pins its coupon to its own yield.
-	Most published ``yield curves'', including the U.S.\ Treasury series in \autoref{fig:ust2015}, are par yield curves.
+	這三條曲線是用同一個市場的資料，算出來的三種不同東西。
+
+	一檔 coupon bond 的 yield 為什麼會「混雜」不同到期日的利率：它的 YTM 是用同一個折現率 $y$ 去折現\emph{所有}期數的現金流、再反解出來的單一數字；coupon 越高，越早期的現金流在價格裡佔比越重，YTM 就越偏向那些早期的折現率。換句話說，同樣 $n$ 年到期、但 coupon 不同的兩檔債券，YTM 一般並不相同——同一個到期日底下，YTM 其實不只一個值，會隨挑到哪個 coupon 而變。這就是「yield curve 是 term structure 被混雜後的版本」的意思。
+
+	par yield curve 就是從這些不同的 coupon 裡挑出一個標準答案：要求債券恰好 trade at par，即 $P=F$。由價格公式 \eqref{eq:bond-price-2}，
+	\[
+		P=\frac{C}{y}\Bigl[1-(1+y)^{-n}\Bigr]+F(1+y)^{-n} ,
+	\]
+	令 $P=F$，兩邊減去 $F(1+y)^{-n}$、再除以共同的 $\bigl[1-(1+y)^{-n}\bigr]$，直接解出 $F=C/y$，也就是 coupon rate $C/F$ 剛好等於 yield $y$。
+	所以「trade at par」不是巧合，而是代數上唯一決定了 coupon 該取多少：對每個到期日，par yield curve 只採用「coupon 恰好等於自己 yield」的那一檔債券，不再讓 coupon 隨便挑——這就是把「混雜」固定下來的意思。實務上很少有債券剛好以 par 交易，所以會取 trading near par 的債券近似，此時 $C/F\approx y$ 只是近似相等，不是恰好相等。
+
+	市面上大多數所謂的「yield curve」，包括 \autoref{fig:ust2015} 裡的美國公債利率曲線，其實都是 par yield curve。
 \end{note}
 
 \subsection{The Yield Curve of U.S.\ Treasuries}
@@ -1263,7 +1275,6 @@ Three names get used loosely and are worth separating once and for all:
 
 	要留意的是\emph{橫軸上的點有多稀疏}。
 	市場只在十一個到期日上報價，其中八個擠在前十年；$10$ 年到 $20$ 年之間整整十年沒有任何資料點。
-	圖上那條線是\emph{畫出來的}，不是觀察到的——這個看似無害的細節，就是 \autoref{fig:which-one} 的全部內容。
 \end{remark}
 
 \subsection{Four Typical Shapes}
@@ -1314,6 +1325,8 @@ Three names get used loosely and are worth separating once and for all:
 		\item \vocab{平坦}（flat）：常是正常與倒掛之間的過渡狀態。
 		\item \vocab{駝峰}（humped）：中期利率最高，兩端較低。
 	\end{itemize}
+	倒掛那一條的推理值得補一句。長天期利率大致是「今天的短率」與「市場預期未來各期短率」的平均：把錢鎖十年，跟每期滾動短天期投資十年，預期報酬應該相當，否則資金會往報酬高的那邊跑到兩者拉平為止（這正是之後預期理論的核心）。既然長率是預期短率的平均，長率\emph{低於}今天的短率就只有一種解釋——市場預期未來的短率會比現在低，也就是預期央行日後會降息。而央行通常是在景氣轉弱時才降息，倒掛因此被當成衰退的預警訊號。
+
 	要強調的是：這些都是\emph{經驗上的關聯}，不是本課程要證明的定理。
 	曲線形狀為何如此，是 \autoref{sec:ts-problems} 之後幾節（預期理論等）才會處理的問題；此處只需認得這四個名字。
 \end{remark}
@@ -1362,11 +1375,23 @@ In the bond price formula \eqref{eq:pv},
 	\sum_{i=1}^{n}\frac{C}{(1+y)^{i}} + \frac{F}{(1+y)^{n}} ,
 \]
 every cash flow is discounted at the same yield $y$.
-Now consider two riskless bonds with \emph{different} yields to maturity, the difference arising purely because their cash flows differ:
+Now consider two \vocab{riskless bonds}\footnote{\vocab{Riskless} (or \vocab{default-free}) means the promised cash flows are certain to arrive in full and on time --- the issuer cannot default. Government bonds such as U.S. Treasuries are the standard proxy.} with \emph{different} yields to maturity, the difference arising purely because their cash flows differ:
 \begin{align}
 	\mathrm{PV}_{1} & = \sum_{i=1}^{n_{1}}\frac{C}{(1+y_{1})^{i}} + \frac{F}{(1+y_{1})^{n_{1}}} , \label{eq:pv1} \\
 	\mathrm{PV}_{2} & = \sum_{i=1}^{n_{2}}\frac{C}{(1+y_{2})^{i}} + \frac{F}{(1+y_{2})^{n_{2}}} . \label{eq:pv2}
 \end{align}
+
+\begin{note}
+	\vocab{無風險債券}（riskless bond，亦稱 default-free bond）指的是\emph{承諾的現金流必定如期足額收到}，發行人不會違約；實務上以公債（如美國國庫券）為代表。
+
+	這個假設在這裡不是裝飾，而是整個論證的關鍵：
+	\begin{itemize}[itemsep=0.3em]
+		\item 兩檔債券都無風險，才能說它們在第 $i$ 期付的那一塊錢是\emph{同一件商品}——同一天、同樣金額、同樣確定。既然是同一件商品，就不該有兩個價格。
+		\item 若兩者信用不同，$y_{1} \neq y_{2}$ 反而理所當然：差額就是\vocab{信用價差}（credit spread），是對違約風險的補償，談不上矛盾。把風險排除後，殖利率的差異就只剩下現金流的時間分佈可以解釋，這正是下一頁要指出的問題所在。
+	\end{itemize}
+
+	要注意「無風險」只針對\emph{違約}而言，不表示沒有\vocab{利率風險}：市場利率變動時，債券價格照樣會漲跌（見 \autoref{tab:coupon9}），只是持有到期必定拿得到 $C$ 與 $F$。
+\end{note}
 
 \source{Slides p.~127}
 
@@ -1383,7 +1408,7 @@ But shouldn't they be discounted at the same rate?
 	這違反\vocab{一價法則}（law of one price）：同一件商品不能有兩個價格。
 	而且這不只是美感問題——真有兩個價格就有\vocab{套利}（arbitrage）空間：從便宜的那邊買進未來的一塊錢、往貴的那邊賣出，鎖住無風險利潤。
 
-	\textbf{病灶在哪裡？}
+	\textbf{問題出在哪裡？}
 	$y$ 是「把一整串現金流壓成一個數字」的\emph{內部報酬率}，它同時被當成第 1 期到第 $n$ 期的折現率使用。
 	但這串現金流的時間分佈（票息高低、到期長短）會影響這個平均值，於是不同的債券得到不同的 $y$。
 	換句話說，$y$ 是\emph{債券的}屬性，而折現率應該是\emph{日期的}屬性。
@@ -1467,9 +1492,36 @@ It is worth giving those common factors a name, because they, rather than the ra
 
 \begin{itemize}[nosep]
 	\item $d(i)$ is the PV of one dollar $i$ periods from now.
-	\item The above formula will be justified later in the course, rather than assumed.
+	\item The above formula will be justified later in the course, rather than assumed; the argument is \autoref{thm:pv-justified}.
 	\item The discount factors are often interpolated to form a continuous function called the \vocab{discount function}.
 \end{itemize}
+
+\begin{note}
+	最後一點的意思是：$d(1),d(2),\ldots,d(n)$ 只在\emph{整數期}上有定義，但現實中要折現的日期不見得落在這些格點上（下一期票息可能是 $2.5$ 期後才付）。
+	把這串離散的點連成一條曲線 $d(t)$（$t$ 為任意實數），就得到\vocab{折現函數}（discount function）。
+
+	舉個例子。設市場給出
+	\[
+		S(1)=3\%,\quad S(2)=3.5\%,\quad S(3)=4\% ,
+	\]
+	亦即
+	\[
+		d(1)=1.03^{-1}=0.97087,\quad
+		d(2)=1.035^{-2}=0.93351,\quad
+		d(3)=1.04^{-3}=0.88900 .
+	\]
+	現在要問：$2.5$ 期後的 $1{,}000$ 元今天值多少？表上沒有 $d(2.5)$，只能內插。最簡單的線性內插是
+	\[
+		d(2.5) \;\approx\; \frac{d(2)+d(3)}{2} \;=\; 0.91125 ,
+	\]
+	於是 PV $\approx 1{,}000 \times 0.91125 = 911.25$ 元。
+
+	順帶一提，內插的\emph{對象}會影響答案：若改成先內插利率 $S(2.5) \approx 3.75\%$ 再換算，得
+	\[
+		d(2.5) = 1.0375^{-2.5} = 0.91207 ,
+	\]
+	PV 變成 $912.07$ 元，兩者差了約 $0.82$ 元。差距雖小，但在名目金額動輒上億的部位上並非可以忽略；實務上因此不用直線，而是對 $d$（或 $\ln d$）配適三次樣條等較平滑的曲線。
+\end{note}
 
 \begin{remark}
 	為什麼\vocab{折現因子}（discount factor）要多取一個名字？因為 \eqref{eq:price-df} 對 $d(i)$ 是\emph{線性}的，對 $S(i)$ 卻不是。
@@ -1478,8 +1530,12 @@ It is worth giving those common factors a name, because they, rather than the ra
 	凡是關於「一籃子現金流值多少」的敘述，用 $d$ 寫出來都是加權求和，線性代數就能處理；換成 $S$ 就會冒出 $[1+S(i)]^{-i}$ 這種非線性的東西。
 	後面的 bootstrapping、避險、以及由債券價格反推曲線的迴歸，全都是在 $d$ 的座標下進行的。
 
-	另外，$d$ 這個向量本身帶有\vocab{無套利}（no-arbitrage）的結構：合理的期限結構必須滿足 $1 > d(1) > d(2) > \cdots > 0$（利率為正時，愈晚的錢愈不值錢）。
-	這種條件用 $d$ 寫既簡單又直接。
+	另外，用 $d$ 寫，\vocab{無套利}（no-arbitrage）的條件也特別乾淨。
+	所謂套利，是指一個不必掏錢、卻穩賺不賠的部位（正式定義見 \autoref{sec:arbitrage}）；此處可交易的就是那 $n$ 張零息債券，一組買賣就是一組 $d(i)$ 的加權和。
+	於是無套利等價於一句話：$d(i) > 0$——不會有人把未來的一塊錢白送給你。
+
+	至於常見的 $1 > d(1) > d(2) > \cdots$（愈晚的錢愈不值錢），那是\emph{額外}假設「現金可以零成本保存」之後才有的結論，不是無套利本身的內容。
+	保管現金其實要成本，這也正是負利率（2015 年起的德國、瑞士公債）能夠存在而不被套利掉的原因。
 \end{remark}
 
 %─────§ Bootstrapping──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -1490,6 +1546,15 @@ It is worth giving those common factors a name, because they, rather than the ra
 
 The market does not quote $S(1),S(2),\dots$ directly; beyond the very short end it quotes coupon bonds.
 Spot rates must therefore be \emph{extracted}, and the extraction is recursive.
+
+\begin{remark}
+	「beyond the very short end」指的是殖利率曲線最左端以外的部分。
+	最短的那一段（美國約一年以內的 Treasury bills）本身就是零息債券，價格與 $d(1)$ 是同一件事，所以 $S(1)$ 可以直接讀出來；
+	但兩年、五年、十年、三十年這些期限，市場上掛牌的都是每期付息的\vocab{附息債券}（coupon bond），沒有純粹「$n$ 期後付一元」的憑證在交易。
+
+	這就是必須\emph{反推}的原因：一張 $n$ 期附息債券的價格是 $d(1),\dots,d(n)$ 的加權和，單一個價格裡混著 $n$ 個未知數。
+	但若 $S(1),\dots,S(n-1)$ 已經由更短的債券定出來，那麼這個加權和裡只剩 $d(n)$ 未知，於是一式一未知、可以解出來。
+\end{remark}
 
 \begin{itemize}[itemsep=0.35em]
 	\item Start with the short rate $S(1)$.
@@ -1515,12 +1580,6 @@ Then $S(n)$ can be computed from \eqref{eq:spot-price}, repeated here:
 \]
 The running time can be made to be $O(n)$.
 The procedure is called \vocab{bootstrapping}.
-
-\begin{remark}
-	\vocab{拔靴法}（bootstrapping）的名字來自 ``to pull oneself up by one's bootstraps''（拉著自己的鞋帶把自己提起來）：
-	每一步都\emph{只能}靠前面已經解出來的結果，沒有外部資訊可用。
-	$S(1)$ 撐起 $S(2)$，$S(1),S(2)$ 撐起 $S(3)$，如此一路往上。
-\end{remark}
 
 \subsection{Why \texorpdfstring{$O(n)$}{O(n)}}
 
@@ -1637,6 +1696,21 @@ Each step is $O(1)$ work, so the whole curve costs $O(n)$.
 	選哪條曲線，往往只是選哪一種數學上的平滑性。
 \end{remark}
 
+\begin{note}
+	第（三）條的三種價差各有來歷。
+
+	\textbf{流動性。}價格與殖利率反向，「殖利率低」即「大家願意出更高的價錢」。
+	隨時能脫手、買賣價差極窄，本身就是有價值的方便，投資人願意為它多付錢；流動性差的券則必須便宜一點賣，多給的那一截就是\vocab{流動性溢酬}（liquidity premium）。
+	交易集中在最新標售的那一檔，它一旦被下一次標售取代就沒人碰了。
+
+	\textbf{稅負。}殖利率是稅前的，投資人在意的是稅後。
+	同一到期日、票息不同的兩檔債券，現金流的稅務性質不同——高票息每年課一次利息所得，折價券的報酬大半以到期價差實現、稅率與時點都不一樣——於是稅前價格被推到不同水準。
+
+	\textbf{附買回。}\vocab{附買回}（repo）是「賣出並約定買回」，實質上是拿債券當擔保品借現金，價差即利息。
+	若某檔券特別多人想借（例如放空者必須交割它），它的 repo 利率會低於一般擔保品，持有人得以用低於市場的成本取得資金。
+	持有它既然多賺這一點，大家就願意接受它債券本身的殖利率低一些；不被接受當擔保品的券則反過來要賣便宜。
+\end{note}
+
 \subsection{Which One?}
 
 \source{Slides p.~134}
@@ -1701,6 +1775,7 @@ Here are the same eleven observations of \autoref{fig:ust2015}, joined three dif
 
 %─────§ Spreads───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Yield Spread and Static Spread}
+\label{sec:spreads}
 
 Everything so far assumed riskless cash flows.
 A corporate bond promises the same shape of cash flow but may not deliver, and the market charges for that.
@@ -1715,7 +1790,7 @@ Consider a risky bond with the cash flow $C_{1},C_{2},\ldots,C_{n}$ and selling 
 \begin{itemize}[nosep]
 	\item Calculate the IRR of the risky bond.
 	\item Calculate the IRR of a riskless bond with comparable maturity.
-	\item The \vocab{yield spread} is their difference.
+	\item The \vocab{yield spread (殖利率價差/利差)} is their difference.
 \end{itemize}
 
 \subsection{Static Spread}
@@ -1738,13 +1813,17 @@ But as risk must be compensated, in reality $P < P^{*}$.
 Unlike the yield spread, the static spread explicitly incorporates information from the term structure.
 
 \begin{remark}
+	\label{rmk:static-vs-yield}
 	兩者差在哪裡，用一句話講：
 	\vocab{殖利率價差}（yield spread）\textbf{拿風險債券的 IRR 去減\emph{另一檔債券}的 IRR；}\vocab{靜態價差}（static spread）\textbf{則是把\emph{整條}無風險曲線平移到剛好能解釋這個價格。}
 
 	殖利率價差的毛病承襲自 \autoref{sec:ytm-problem}：兩個 IRR 各自是各自現金流的加權平均，票息與期限只要不同，比較就不乾淨。
 	靜態價差把每一期的現金流都對到它自己的 $S(t)$，再問「所有期別同時加上多少，價格才對得上」，因此拿掉了現金流形狀造成的干擾。
 
-	兩式的關係也值得看：\eqref{eq:static-spread} 右邊對 $s$ 嚴格遞減，$s=0$ 時值為 $P^{*} > P$，故解存在且唯一。
+	先確認 \eqref{eq:static-spread} 這個 $s$ 真的存在、而且只有一個。
+	把右邊看成 $s$ 的函數 $\varphi(s)$：票息 $C_{t}$ 皆為正，每一項 $C_{t}[1+s+S(t)]^{-t}$ 都隨 $s$ 遞減，故 $\varphi$ 連續且嚴格遞減。
+	又 $\varphi(0)=P^{*}>P$（不加價差會定出太高的價格），而 $s\to\infty$ 時 $\varphi(s)\to 0<P$。
+	由中間值定理，恰有一個 $s>0$ 滿足 $\varphi(s)=P$：價格與靜態價差是一一對應的，報其中一個等於報另一個。
 	期限結構平坦時（$S(t)\equiv S$），\eqref{eq:static-spread} 退化成 $P=\sum C_t/(1+S+s)^t$，此時靜態價差恰好等於殖利率價差——兩者的差異完全來自曲線的斜率。
 
 	「靜態」二字則是留給後面的伏筆：它假設現金流固定不變。
@@ -1762,7 +1841,7 @@ Unlike the yield spread, the static spread explicitly incorporates information f
 		\item Solving \eqref{eq:static-spread} gives a \emph{static spread} of $s=364.7$ basis points.
 	\end{itemize}
 
-	The two differ by about a basis point here because the curve is only mildly sloped over three periods; on a steep curve, or a long bond, the gap is far larger.
+	The two differ by about a basis point here because the curve is only mildly sloped over three periods --- by \autoref{rmk:static-vs-yield} a flat curve would make them agree exactly; on a steep curve, or a long bond, the gap is far larger.
 \end{eg}
 
 %─────§ Spot curve vs yield curve───────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -1782,9 +1861,13 @@ How do the two relate? Write $y_{i}$ for the yield to maturity of the $i$-period
 	\item If the yield curve is flat, the spot rate curve coincides with the yield curve.
 \end{itemize}
 
-All five follow from one small lemma, which is worth isolating because it is the precise sense in which ``a yield is an average of spot rates''.
+Throughout, $y_{k}$ is the \vocab{par yield}: the coupon rate at which the $k$-period bond trades at par.
+In particular $y_{1}=S(1)$, the one-period bond being zero-coupon.
+
+The last three bullets follow from one small lemma, which is worth isolating because it is the precise sense in which ``a yield is an average of spot rates''; the first two need one more step.
 
 \begin{lemma}
+	\label{lem:yield-avg}
 	Let a security with non-negative cash flows $C_{1},\ldots,C_{k}$, not all zero, be priced by \eqref{eq:price-df}, and let $y_{k}$ be its yield to maturity.
 	Then
 	\[
@@ -1802,7 +1885,8 @@ All five follow from one small lemma, which is worth isolating because it is the
 	The other inequality is symmetric.
 \end{proof}
 
-The third, fourth and fifth bullets are immediate:
+The lemma sandwiches $y_{k}$ between the smallest and the largest spot rate the bond touches.
+Whenever the hypothesis names the \emph{spot} curve, that sandwich already identifies which end $S(k)$ sits at, and the third, fourth and fifth bullets drop out:
 
 \begin{itemize}[itemsep=0.3em]
 	\item If the spot rate curve is normal then $\max_{i\le k}S(i)=S(k)$, so $y_{k}\le S(k)$.
@@ -1810,14 +1894,97 @@ The third, fourth and fifth bullets are immediate:
 	\item If the curve is flat, $\min=\max$ and $y_{k}$ is squeezed to the common value; spot and yield curves coincide.
 \end{itemize}
 
-\begin{remark}
-	用一句話記住這個引理：\emph{殖利率必落在該債券所觸及的各期即期利率的最大值與最小值之間}。
+The first two bullets assume instead that the \emph{yield} curve is monotone, and the lemma says nothing about where $S(k)$ then lies: a normal yield curve does not force a normal spot curve.\footnote{%
+	$S(1),\ldots,S(4) = 0.5\%, 1\%, 16\%, 15.5\%$ gives par yields $0.5000\%, 0.9975\%, 13.7364\%, 13.7853\%$, which increase although $S(4)<S(3)$.}
+So they have to be proved on their own, by induction along the curve.
 
-	把 \autoref{sec:bootstrap} 的例子代進來驗證：$S(1)=3.50\%$、$S(2)=4.01\%$、$S(3)=4.32\%$ 是遞增的，所以三期債的 $y_3$ 必須 $\le S(3)=4.32\%$；實際上 $y_3=4.30\%$ ✓。
-	而且票息愈高，早期現金流的權重愈大，$y_k$ 被往下拉得愈多，與 $S(k)$ 的差距就愈大——零息債（權重全在最後一期）則兩者相等。
+\begin{proposition}
+	\label{prop:par-vs-spot}
+	若 $y_{1}<y_{2}<\cdots$（yield curve 為 normal），則每個 $k$ 皆有 $S(k)\ge y_{k}$；
+	若 $y_{1}>y_{2}>\cdots$（inverted），則每個 $k$ 皆有 $S(k)\le y_{k}$。
+\end{proposition}
 
-	至於前兩條（以\emph{殖利率}曲線的形狀為條件），投影片與引理同屬一個機制，但方向相反、需要額外的歸納論證；下一頁正是要說明這個反向才是脆弱的一環。
-\end{remark}
+\begin{proof}
+	以下只證 normal 的情形；inverted 只需把每一個不等號反向。以下 rate 皆設為正。
+
+	\textbf{記號。}
+	除了 \eqref{eq:bootstrap-step} 的 annuity factor $A(k)=\sum_{i\le k}d(i)$——以 spot rate 逐期折現的那一個——再記
+	\[
+		a_{k}(y) \;\triangleq\; \sum_{i=1}^{k}(1+y)^{-i} \;=\; \frac{1-(1+y)^{-k}}{y}
+	\]
+	為同一筆 annuity 改用單一 flat rate $y$ 折現的因子，亦即 \autoref{rmk:premium-discount} 的 annuity present value factor。
+	折現率愈高、現值愈低，故 $a_{k}$ 對 $y$ 嚴格遞減；這是後面唯一用到的性質。
+
+	\textbf{策略。}
+	直接比較 $S(k)$ 與 $y_{k}$ 無從下手，因為 $y_{k}$ 是前 $k$ 期整段曲線的綜合結果，不是第 $k$ 期一個人的事。
+	辦法是把待證的「$S(k)\ge y_{k}$」改寫成一個\emph{只涉及前 $k-1$ 期}的等價條件（第二步），如此它便能由前一個到期日的結論推出，於是可以沿到期日歸納（第三步）。
+	第零步與第一步只是把要用的兩條等式擺好。
+
+	\textbf{第零步：$y_{k}$ 是怎麼來的。}
+	曲線 $d(1),\ldots,d(n)$ 已由 bootstrapping 定出，於是任何現金流的價格都算得出來。
+	考慮 $k$ 期、par value 為 $1$、每期付 coupon $c$ 的 bond，它的價格是 $c$ 的一次函數
+	\[
+		P(c) \;=\; c\,A(k) + d(k) .
+	\]
+	$A(k)>0$ 故 $P$ 嚴格遞增，又 $P(0)=d(k)<1$ 而 $c\to\infty$ 時 $P\to\infty$，因此方程 $P(c)=1$ 有唯一解
+	\[
+		y_{k} \;=\; \frac{1-d(k)}{A(k)} \;>\; 0 .
+	\]
+	這個唯一的 coupon rate 就是 par yield $y_{k}$：它完全由曲線決定，沒有挑選的餘地，而那張 bond 是據此算出來的合成物，不必真的在市場上交易。
+	反過來說，「它的價格是 $1$」並非觀察或假設，而是我們解 $c$ 時所要求的條件。
+
+	（把 coupon 固定成使 bond 以 par 成交的那一個，是為了讓 $y_{k}$ 有定義。
+	同一到期日、coupon 不同的 bond，YTM 本來就不同——即 \autoref{sec:ts-problems} 的 multiple cash flow problem——若不指定 coupon，「$y_{1}<y_{2}<\cdots$」根本不是一個意義明確的條件。）
+
+	\textbf{第一步：同一張 bond 的兩條定價式。}
+	把 $y_{k}$ 代回，第一條等式就只是 $P(y_{k})=1$ 的展開：
+	\begin{equation}
+		1 \;=\; y_{k}A(k) + d(k) \;=\; y_{k}A(k-1) + (1+y_{k})\,d(k) . \label{eq:par-curve}
+	\end{equation}
+	第二個等號把第 $k$ 期的最後一張 coupon 從 $A(k)$ 拆出來、與同時到達的 principal 併在一起，好讓「前 $k-1$ 期」與「第 $k$ 期」各據一項。
+
+	第二條等式來自 YTM 的定義：YTM 是能還原同一個價格的那個單一 flat rate。
+	這張 bond 以 par 成交，而依 \autoref{rmk:premium-discount}，par 等價於 coupon rate 等於 YTM，故它的 YTM 恰為 $y_{k}$，於是
+	\begin{equation}
+		1 \;=\; y_{k}\,a_{k-1}(y_{k}) + (1+y_{k})(1+y_{k})^{-k} . \label{eq:par-flat}
+	\end{equation}
+
+	兩式並未把 spot rate 與 YTM 混用：\eqref{eq:par-curve} 全程以曲線折現，$y_{k}$ 在其中只是 coupon 的\emph{金額}；\eqref{eq:par-flat} 全程以 flat rate 折現，$y_{k}$ 在其中才兼任 \emph{discount rate}。
+	兩式共用的僅是左邊那個價格 $1$——也正因如此才能相減。
+
+	\textbf{第二步：相減，換成只涉及前 $k-1$ 期的條件。}
+	兩式左邊同為 $1$，相減得
+	\begin{equation}
+		0 \;=\; y_{k}\bigl[\,A(k-1)-a_{k-1}(y_{k})\,\bigr] \;+\; (1+y_{k})\bigl[\,d(k)-(1+y_{k})^{-k}\,\bigr] . \label{eq:par-gap}
+	\end{equation}
+	（手法與 \autoref{rmk:premium-discount} 導出 premium 金額時相同：兩條同值的定價式相減，差異自然浮現。）
+	兩個中括號因此不同號。
+	而待證的 $S(k)\ge y_{k}$ 即 $d(k)\le(1+y_{k})^{-k}$，說的正是第二個中括號 $\le 0$，故
+	\begin{equation}
+		S(k)\ge y_{k}
+		\qquad\Longleftrightarrow\qquad
+		A(k-1) \;\ge\; a_{k-1}(y_{k}) . \label{eq:par-equiv}
+	\end{equation}
+	右邊只牽涉前 $k-1$ 期，這正是要的形式。
+	它的意思也很直白：總價已被釘在 $1$，曲線若對前 $k-1$ 期的 coupon 折現得不比 flat rate $y_{k}$ 吝嗇，那麼前面讓掉的就必須在第 $k$ 期補回來，$S(k)$ 只能高於 $y_{k}$。
+
+	\textbf{第三步：歸納。}
+	$k=1$ 時一期 bond 沒有中間 coupon，$y_{1}=S(1)$，結論以等號成立。
+
+	設 $S(k-1)\ge y_{k-1}$，即 $d(k-1)\le[1+y_{k-1}]^{-(k-1)}$。
+	第零步用在到期日 $k-1$ 上給出 $1=y_{k-1}A(k-1)+d(k-1)$，解出 annuity factor 後
+	\[
+		A(k-1) \;=\; \frac{1-d(k-1)}{y_{k-1}}
+		\;\ge\; \frac{1-[1+y_{k-1}]^{-(k-1)}}{y_{k-1}}
+		\;=\; a_{k-1}(y_{k-1})
+		\;\ge\; a_{k-1}(y_{k}) ,
+	\]
+	其中第一個不等號用歸納假設，第二個用 $y_{k-1}<y_{k}$ 與 $a_{k-1}$ 遞減。
+	這恰是 \eqref{eq:par-equiv} 的右邊，故 $S(k)\ge y_{k}$。
+\end{proof}
+
+整段論證只在一個地方用到 normal 的假設：第三步把 $A(k-1)$ 的下界從 $y_{k-1}$ 換成 $y_{k}$。
+這也說明為什麼假設非得是關於整條曲線不可——單獨一個 $k$ 的資訊推不出任何結論。
 
 \subsection{Shapes}
 
@@ -1866,6 +2033,21 @@ The first number is known today.
 The second is not: $S(i,j)$ is a rate that will only be quoted at time $i$.
 The question the market implicitly answers is what value of $S(i,j)$ would make the two strategies tie.
 
+\begin{remark}
+	rollover strategy 是這樣一件事：兩種策略都是今天投入一元、都要在時點 $j$ 把錢拿回來，差別只在\emph{中途要不要換手}。
+
+	maturity strategy 一次買一張 $j$ 期的 zero-coupon bond，錢鎖到 $j$ 期，結果 $[1+S(j)]^{j}$ 今天就已確定。
+	rollover strategy 則先買一張較短的 $i$ 期 bond（$i<j$），到第 $i$ 期拿回本利和 $[1+S(i)]^{i}$，再把這筆錢\emph{全數}投入一張剩餘 $j-i$ 期的 bond，持到 $j$ 期。
+	所謂 rollover（展期）就是指到期後把錢原封不動轉進下一張。
+
+	記號 $S(i,j)$ 要留意：兩個參數是\emph{起點與終點}，不是起點與期限。
+	它指「站在第 $i$ 期時，期限 $j-i$ 期的 spot rate」，因此今天的 $S(j)$ 在這個記號下就是 $S(0,j)$。
+
+	關鍵的不對稱在於：$S(i)$ 與 $S(j)$ 都是今天報價表上的數字，$S(i,j)$ 卻要等到第 $i$ 期才會被報出來。
+	所以 maturity strategy 的終值今天是已知數，rollover strategy 的終值今天還是未知數——兩者唯一的差別就在這裡。
+	於是可以反問：$S(i,j)$ 要是多少，兩條路才會打成平手？那個數就是下面的 forward rate。
+\end{remark}
+
 \source{Slides p.~140}
 
 \begin{definition}[Forward rate]
@@ -1884,14 +2066,6 @@ The question the market implicitly answers is what value of $S(i,j)$ would make 
 	\bigl[1+f(i,j)\bigr]^{j-i} = \frac{\bigl(1+S(j)\bigr)^{j}}{\bigl(1+S(i)\bigr)^{i}} .
 \]
 As expected, $f(0,j)=S(j)$: with $i=0$ the rollover strategy \emph{is} the maturity strategy.
-
-\begin{intuition}
-	$\bigl[1+S(k)\bigr]^{k}$ is the price of moving a dollar from time $0$ to time $k$.
-	\eqref{eq:fwd-def} divides the cost of travelling to $j$ by the cost of travelling to $i$, leaving the cost of the leg from $i$ to $j$ --- then annualises it by taking the $(j-i)$th root.
-
-	$\bigl[1+S(k)\bigr]^{k}$ 是把一塊錢從 $0$ 搬到 $k$ 的「價格」。
-	\eqref{eq:fwd-def} 用走到 $j$ 的成本除以走到 $i$ 的成本，剩下的就是 $i$ 到 $j$ 那一段的成本，再開 $(j-i)$ 次方還原成每期利率。
-\end{intuition}
 
 \subsection{The Time Line}
 
@@ -1944,14 +2118,18 @@ As expected, $f(0,j)=S(j)$: with $i=0$ the rollover strategy \emph{is} the matur
 The $f(i,i+1)$ are the \vocab{instantaneous forward rates} or \vocab{one-period forward rates}.
 
 \begin{remark}
-	這個區別是本章最常被誤解的地方，務必分清楚。
+	$f(i,j)$ 與 $S(i,j)$ 是兩個不同的東西，這是本章最常被誤解的地方。
 
-	\vocab{遠期利率}（forward rate）$f(i,j)$ 是\emph{今天}就能從 \eqref{eq:fwd-def} 算出來的數字，只用到今天觀察得到的 $S(i)$ 與 $S(j)$；它是一個\vocab{恆等式}（identity）的產物，不是預測。
-	$S(i,j)$ 則是 $i$ 期之後才會知道的隨機變數。
+	\vocab{遠期利率}（forward rate）$f(i,j)$ 是\emph{今天}的數字：由 \eqref{eq:fwd-def} 從今天查得到的 $S(i)$ 與 $S(j)$ 算出來，今天就已完全確定。
+	$S(i,j)$ 是\emph{未來}的數字：第 $i$ 期市場真正報出來的那個 $(j-i)$ 期 spot rate，今天還只是隨機變數。
 
-	「market expects」那句話加了引號，正是這個意思：$f$ 是市場定價\emph{隱含}的數字，至於它是否等於市場對 $S(i,j)$ 的期望值，是一個需要額外假設的\emph{理論命題}（\autoref{sec:ts-theories} 的無偏預期理論就是這樣一個假設），而不是推導出來的結果。
+	兩者容易混為一談，是因為 forward rate 的定義寫成「當 $S(i,j)$ 等於 $f(i,j)$ 時兩策略打成平手」。
+	那是一個\emph{條件句}：$f(i,j)$ 回答的是「若要打平，$S(i,j)$ 該是多少」，並非斷言 $S(i,j)$ 真的會等於它。
+	到了第 $i$ 期，實現的 $S(i,j)$ 通常不等於 $f(i,j)$，而兩種策略孰優孰劣正是由這個落差決定。
 
-	\autoref{sec:lock-fwd} 會更進一步：$f(i,j)$ 不只是算出來的數字，而是今天就能用現有債券\emph{鎖定}的真實利率。
+	這也是為什麼前面「market expects」那句話加了引號：$f$ 是市場定價\emph{隱含}的數字，至於 $f(i,j)$ 是否等於市場對 $S(i,j)$ 的期望值，是一個需要額外假設的\emph{理論命題}（\autoref{sec:ts-theories} 的無偏預期理論就是這樣一個假設），而不是推導出來的結果。
+
+	\autoref{sec:lock-fwd} 會更進一步：$f(i,j)$ 不只是算出來的數字，而是今天就能用現有 bond \emph{鎖定}的真實利率——這與「預測未來」仍是兩回事。
 \end{remark}
 
 %─────§ Spot vs forward────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -1961,6 +2139,7 @@ The $f(i,i+1)$ are the \vocab{instantaneous forward rates} or \vocab{one-period 
 \source{Slides p.~143}
 
 \begin{proposition}
+	\label{prop:fwd-dominates}
 	When the spot rate curve is normal, the forward rate dominates the spot rates,
 	\[
 		f(i,j) \;>\; S(j) \;>\; \cdots \;>\; S(i) .
@@ -2032,20 +2211,46 @@ The $f(i,i+1)$ are the \vocab{instantaneous forward rates} or \vocab{one-period 
 		\end{groupplot}
 	\end{tikzpicture}
 	\caption{The three curves never cross: forward above spot above yield when
-		the curve is normal, and exactly the reverse when it is inverted.
-		Horizontal axis maturity, vertical axis rate.}
+		the \emph{spot rate} curve is normal, and exactly the reverse when it is
+		inverted. Horizontal axis maturity, vertical axis rate.}
 	\label{fig:curve-order}
 \end{figure}
 
 \begin{remark}
-	三條曲線的順序不必死記，用\textbf{邊際量與平均量}的關係一次想通。
+	先說三條曲線為何能畫在同一張圖上。
+	$f(i,j)$ 有兩個變數，圖上畫的是它的\emph{對角線切片} $k\mapsto f(k-1,k)$，即固定 $j-i=1$ 的 one-period forward rate。
+	這沒有損失資訊，因為 \eqref{eq:fwd-def} 串接起來會 telescoping：
+	\[
+		\bigl[1+f(i,j)\bigr]^{j-i}
+		\;=\; \frac{\bigl(1+S(j)\bigr)^{j}}{\bigl(1+S(i)\bigr)^{i}}
+		\;=\; \prod_{k=i}^{j-1}\bigl[1+f(k,k+1)\bigr] ,
+	\]
+	任何 $f(i,j)$ 都是那條曲線上各點的幾何平均。
+	另兩條同樣是切片：$S(k)$ 就是 $S(0,k)$（固定今天出發），$y_{k}$ 則是把 coupon 固定成 par 後唯一的那一條。
+	三者各被固定掉一個自由度，剩下的參數都讀成到期期限，因此共用橫軸。
 
-	把 $f$ 看成\emph{邊際}利率（第 $k$ 期那一小段的價格），$S$ 是它們的\emph{平均}（連續複利下 \eqref{eq:cc-avg} 就字面上是算術平均），$y$ 則是把票息也算進來的\emph{再一次平均}——因為票息落在較早、利率較低的日期，$y$ 被往下拉得比 $S$ 更多。
+	再說順序，關鍵是\textbf{每一條都是它上面那一條的平均}，而平均的窗口一路回溯到今天。
 
-	微積分裡的老規矩：\emph{平均上升時，邊際必在平均之上}。
-	所以曲線正常（平均遞增）時 $f > S$；曲線倒掛（平均遞減）時 $f < S$。
-	$y$ 與 $S$ 的先後則由 \autoref{sec:spot-vs-yield} 的引理保證。
-	兩者串起來就是圖上的順序。
+	其一，\eqref{eq:fwd-spot-prod} 在 $i=0$ 時說
+	\[
+		\bigl[1+S(k)\bigr]^{k} \;=\; \prod_{m=1}^{k}\bigl[1+f(m-1,m)\bigr] ,
+	\]
+	即 $1+S(k)$ 是前 $k$ 個 one-period forward 之 gross factor 的幾何平均（連續複利下 \eqref{eq:cc-avg} 即字面上的算術平均）。
+	滑動平均要上升，新進的那一項就必須高於平均本身，故 spot curve 為 normal 時 $f(k-1,k)>S(k)$——這正是 \autoref{prop:fwd-dominates}。
+
+	其二，$y_{k}$ 是單一折現率卻要處理 bond 的所有現金流，依 \autoref{lem:yield-avg} 它夾在 $\min_{i\le k}S(i)$ 與 $\max_{i\le k}S(i)$ 之間，實為 $S(1),\ldots,S(k)$ 以各期現金流現值為權重的加權平均；coupon 落在較早、較低的日期，故 normal 時 $y_{k}\le S(k)$，zero-coupon bond 取等號。
+
+	兩者疊起來即
+	\[
+		\underbrace{f(k-1,k)}_{\text{只第 }k\text{ 期}}
+		\;>\; \underbrace{S(k)}_{\text{平均 }1\sim k\text{ 期}}
+		\;\ge\; \underbrace{y_{k}}_{\text{再按 coupon 加權}} .
+	\]
+	窗口愈寬就算進愈多較早、較低的 rate，值被拉得愈低；inverted 時較早的 rate 較高，同一機制把每個平均往\emph{上}拉，順序於是整串反轉。
+	兩條不等式對每個 $k$ 逐點成立，故三條曲線從不交叉。
+
+	最後，前提必須掛在 \emph{spot} curve 的單調性上：上述兩條不等式是定理，而「yield curve 的\emph{形狀}跟著 spot curve 一樣單調」只是傾向（見 \autoref{sec:spot-vs-yield} 那則 note）。
+	若只知道 yield curve 為 normal，spot curve 仍可能非單調，圖上的順序便未必成立。
 \end{remark}
 
 %─────§ Equivalence────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -2068,6 +2273,31 @@ The FV of \$1 at time $n$ can be derived in two ways.
 		      \bigl[\,1+S(1)\,\bigr]\bigl[\,1+f(1,2)\,\bigr]\cdots\bigl[\,1+f(n-1,n)\,\bigr] .
 	      \]
 \end{itemize}
+
+\begin{remark}
+	為什麼兩種算法的 FV 一定相同？可以從代數與經濟兩面看。
+
+	\textbf{代數面：telescoping。}
+	先注意 $1+S(1)=1+f(0,1)$，再把 \eqref{eq:fwd-def} 取 $j=i+1$ 代進每一個因子：
+	\[
+		\prod_{k=1}^{n}\bigl[1+f(k-1,k)\bigr]
+		\;=\; \frac{\bigl(1+S(1)\bigr)^{1}}{\bigl(1+S(0)\bigr)^{0}}\cdot
+		\frac{\bigl(1+S(2)\bigr)^{2}}{\bigl(1+S(1)\bigr)^{1}}\cdots
+		\frac{\bigl(1+S(n)\bigr)^{n}}{\bigl(1+S(n-1)\bigr)^{n-1}}
+		\;=\; \bigl[1+S(n)\bigr]^{n} .
+	\]
+	相鄰分子分母兩兩相消，只剩頭尾。
+	換句話說，forward rate 本來就是\emph{定義成}讓 rollover 與 maturity 打平的那個數（見 \eqref{eq:fwd-def} 下方的 tie condition）；這裡只是把 $n$ 段「每段各自打平」串起來，整條路自然也打平。
+
+	\textbf{經濟面：無套利。}
+	第二種做法用的是今天就\emph{鎖定}的 $f(k-1,k)$，而不是屆時才報價的未來 spot rate $S(k-1,k)$。
+	\autoref{sec:lock-fwd} 會看到，每一段 forward loan 都能用今天交易的零息債券複製出來，所以這條 rollover 路徑的 FV 在今天就已完全確定，和第一種一樣是\emph{無風險}的。
+	兩個無風險策略、同樣今天投入 \$1、同樣在時點 $n$ 收錢，終值若不同，就買進終值高的、放空終值低的，今天淨投入為零、時點 $n$ 穩賺差額——這是\vocab{套利}（arbitrage）。
+	因此兩者必須相等。
+
+	要小心的是：若第二種做法改成「到期後按\emph{當時}的市場利率再投資」，FV 就變成隨機的 $\bigl[1+S(1)\bigr]\bigl[1+S(1,2)\bigr]\cdots\bigl[1+S(n-1,n)\bigr]$，一般\emph{不會}等於 $\bigl[1+S(n)\bigr]^{n}$。
+	相等是 forward rate 的性質，不是未來 spot rate 的性質。
+\end{remark}
 
 \source{Slides p.~146}
 
@@ -2100,14 +2330,6 @@ Other equivalencies can be derived similarly, such as
 	任一套都能算出其餘三套，沒有誰多帶了資訊。
 \end{moral}
 
-\begin{eg}[Not on the slides]
-	With the same curve as above, \eqref{eq:fwd-spot-prod} gives
-	\[
-		\bigl(1.035 \times 1.045225 \times 1.049440 \times 1.051617\bigr)^{1/4} - 1 = 4.5301\% = S(4) ,
-	\]
-	and \eqref{eq:fwd-df} gives $d(1)/d(2)-1 = 0.966184/0.924378 - 1 = 4.5225\% = f(1,2)$.
-\end{eg}
-
 %─────§ Locking in──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Locking in the Forward Rate}
 \label{sec:lock-fwd}
@@ -2132,6 +2354,30 @@ The following trade turns it into a rate one can actually contract at today, usi
 	\]
 	which is exactly what the $n$-period zero costs.
 \end{proof}
+
+\begin{remark}
+	這一頁要說的是：$f(n,m)$ 不只是從 spot curve 算出來的數字，今天就能用市場上現成的零息債券\emph{做出}一筆利率為 $f(n,m)$ 的借款。
+	這組交易（買 $n$ 期 zero、同時放空適當數量的 $m$ 期 zero）之後會被稱為 \vocab{locking trade}：lock 指「鎖定」，因為它讓人在今天就把未來 $n$ 到 $m$ 這段期間的利率鎖死在 $f(n,m)$，不必等到時點 $n$ 再看市場報價 $S(n,m)$。
+
+	\textbf{兩條腿各做什麼。}
+	買一張 $n$ 期零息債券，是今天把錢借出去、第 $n$ 期拿回 \$1；
+	賣出（放空）$m$ 期零息債券，則是今天借錢進來，第 $m$ 期每張還 \$1。
+	單看任何一條腿，今天都有現金進出。
+
+	\textbf{數量怎麼挑。}
+	賣出的張數 $(1+S(m))^{m}/(1+S(n))^{n}$ 是刻意選的：它讓放空拿到的錢剛好付得起那張 $n$ 期債券（上面的 proof）。
+	於是今天兩邊互相抵銷，一毛錢都不用出。
+
+	\textbf{剩下的現金流。}
+	把時點 $0$ 抵銷掉之後，只剩第 $n$ 期\emph{收到} \$1、第 $m$ 期\emph{付出} $(1+S(m))^{m}/(1+S(n))^{n}$。
+	這就是「第 $n$ 期借進 \$1、第 $m$ 期還本帶息」的借款，只是今天就已經簽好。
+	還款金額除以 \$1 就是 $m-n$ 期的 gross factor，由 \eqref{eq:fwd-def} 它正好等於 $\bigl(1+f(n,m)\bigr)^{m-n}$，所以這筆借款的利率就是 $f(n,m)$（下一頁 \autoref{fig:lock-fwd}）。
+
+	\textbf{這為什麼重要。}
+	未來的 spot rate $S(n,m)$ 今天還不知道，但 $f(n,m)$ 今天就能鎖定，而且所有條件都已定死，沒有任何不確定性。
+	這也是上一節「兩種算法 FV 相同」的無套利論證所依靠的事實：rollover 路徑每一段用的都是這樣鎖定的利率，所以它和直接買 $n$ 期債券一樣是無風險的。
+	反過來，如果市場上另有一筆 forward loan 的利率不等於 $f(n,m)$，就可以一邊用它、一邊用這組零息債券做反向操作，賺取無風險利潤。
+\end{remark}
 
 \source{Slides p.~148}
 
@@ -2159,14 +2405,6 @@ This implies the interest rate between times $n$ and $m$ equals $f(n,m)$, becaus
 	\frac{(1+S(m))^{m}}{(1+S(n))^{n}} = \bigl(1+f(n,m)\bigr)^{m-n} .
 \]
 
-\begin{eg}[Not on the slides]
-	Lock in $f(1,3)$ on the curve above.
-	Buy one $1$-period zero for $d(1)=0.966184$ and sell
-	$K=(1.043204)^{3}/1.035 = 1.096901$ three-period zeros, raising $K\times d(3) = 1.096901\times 0.880830 = 0.966184$ --- the same amount.
-	The resulting cash flow is $+1$ at time $1$ and $-1.096901$ at time $3$, and
-	$1.096901 = (1+4.7330\%)^{2}$, so the locked rate is $f(1,3)=4.7330\%$.
-\end{eg}
-
 \subsection{Forward Loans}
 
 \source{Slides p.~149}
@@ -2184,24 +2422,34 @@ Agreed upon today, it enables one to
 \end{question}
 
 \begin{proof}[Answer]
-	No. Since every forward loan can be manufactured from traded zeros, the forward rates implied by the curve are rates one can actually transact at --- so they must themselves be free of arbitrage.
+	不行。每一筆 forward loan 都能用市場上交易的 zero-coupon bond 複製出來，所以曲線隱含的 forward rate 是真的能成交的利率——它們本身也必須不能被套利。
 
-	Suppose $f(n,n+1)<0$ for some $n$, which by \eqref{eq:fwd-df} means $d(n)<d(n+1)$.
-	Then sell the $(n+1)$-period zero and buy the $n$-period zero: this raises $d(n+1)-d(n)>0$ today, pays \$1 at time $n$, and costs \$1 at time $n+1$.
-	Hold the dollar received at time $n$ as cash until time $n+1$ and the later obligation is met exactly.
-	The result is a strictly positive amount today against no future liability --- an arbitrage.
+	假設某個 $n$ 使得 $f(n,n+1)<0$，由 \eqref{eq:fwd-df} 這等價於 $d(n)<d(n+1)$，也就是較晚到期的 zero 反而比較貴。
+	這時賣出一張 $(n+1)$ 期 zero、買進一張 $n$ 期 zero：今天淨收入 $d(n+1)-d(n)>0$，時點 $n$ 收到 \$1，時點 $n+1$ 要付出 \$1。
+	把時點 $n$ 收到的那 \$1 以現金形式保管到時點 $n+1$，剛好用來支付後面的義務。
+	結果是今天白拿一筆正的錢，將來沒有任何負債——這就是 arbitrage。
 
-	So the curve must satisfy
+	因此曲線必須滿足
 	\[
 		1 > d(1) \ge d(2) \ge \cdots ,
-		\qquad\text{equivalently}\qquad
-		\bigl(1+S(n)\bigr)^{n} \text{ is non-decreasing in } n .
+		\qquad\text{等價地}\qquad
+		\bigl(1+S(n)\bigr)^{n} \text{ 對 } n \text{ 非遞減} .
 	\]
-	In particular an inverted curve cannot fall arbitrarily fast; \autoref{sec:cc-forward} will record the continuous-time version of the same bound.
+	（取 $n=0$、$d(0)=1$ 用同一個論證就得到 $d(1)<1$。）
+	特別地，inverted curve 不能下降得任意快；\autoref{sec:cc-forward} 會給出同一個界的連續時間版本。
 \end{proof}
 
 \begin{remark}
-	上面那段論證偷偷用了一個假設：\emph{現金可以無成本地保管}。
+	先說為什麼會冒出這個問題。
+	到目前為止，spot rate curve 一直被當成\emph{輸入}：給任何一組 $S(1),S(2),\ldots$，都能用 \eqref{eq:fwd-def} 算出一組 $f(i,j)$，代數上從來不會卡住。
+	如果 $f$ 只是算出來的數字，那 spot curve 畫成什麼形狀似乎都可以。
+
+	但上一節剛證明了 $f(n,m)$ 不只是數字：用 zero-coupon bond 就能在今天把它鎖定成一筆真的 forward loan。
+	一旦 forward rate 是能成交的價格，它就得接受市場的檢驗——例如「$n$ 到 $n+1$ 之間借錢還能拿到利息補貼」這種 forward rate 若出現，就會被套利。
+	所以問題其實是在問：forward loan 的可交易性\emph{反過來}對 spot curve 加了什麼限制？答案就是上面的單調性條件：$\bigl(1+S(n)\bigr)^{n}$ 不能隨 $n$ 變小。
+	這也呼應前面「曲線是 normal 還是 inverted」的討論：inverted 是允許的，但只能緩慢下降，不能降到讓某段 forward rate 變負。
+
+	再說上面那段論證偷偷用了一個假設：\emph{現金可以無成本地保管}。
 	正因為存著鈔票的報酬率是 $0$，任何低於 $0$ 的遠期利率才會被套利掉。
 
 	現實中這個假設並不完全成立——大額現金的保管、保險與運送都要錢，而且央行可以對準備金課負利率。
@@ -2210,6 +2458,7 @@ Agreed upon today, it enables one to
 \end{remark}
 
 \subsection{Synthetic Bonds}
+\label{sec:synthetic-bonds}
 
 \source{Slides p.~150}
 
@@ -2224,6 +2473,27 @@ Thus
 \]
 We have created a \vocab{synthetic} zero-coupon bond with forward loans and other zero-coupon bonds.
 This is useful if the $n$-period zero is unavailable or illiquid.
+
+\begin{remark}
+	\textbf{這些式子在說什麼。}
+	把每個金融商品看成「各時點收付多少錢」的一張清單，式子就是在加減這些清單：
+	$+$ 是持有（long），$-$ 是放空（short），係數是張數，$=$ 表示兩邊\emph{每個時點的現金流都一樣}。
+	令 $K=\bigl[1+f(n,m)\bigr]^{m-n}$，逐期列出來：
+	\[
+		\begin{array}{lcc}
+			                          & \text{時點 } n & \text{時點 } m \\ \hline
+			n\text{-period zero}      & +1             & 0              \\
+			K\times m\text{-period zero} & 0           & +K             \\
+			\text{forward loan}       & +1             & -K
+		\end{array}
+	\]
+	第一式：第一列減第二列，得到第三列——這就是上一節的做法（買 $n$ 期 zero、放空 $K$ 張 $m$ 期 zero，今天淨成本 $0$）。
+	第二式：把同一件事移項，第三列加第二列，得回第一列。
+
+	\textbf{搞這個幹嘛。}
+	第二式告訴你：就算市場上買不到（或很少成交）$n$ 期 zero，只要能交易 $m$ 期 zero 和 forward loan，就能自己\vocab{合成}（synthesize）一張現金流一模一樣的 $n$ 期 zero。
+	現金流一樣，價格就必須一樣，否則可以套利；驗算也對得上：forward loan 今天不用錢，組合成本 $K\,d(m)=d(n)$。
+\end{remark}
 
 \begin{note}
 	This is the first appearance of a move that will run through the rest of the course: an identity between cash flows is an identity between \emph{prices}, so any instrument that can be replicated must cost what its replicating portfolio costs.
@@ -2254,6 +2524,23 @@ Recall \eqref{eq:continuous}: one dollar grows to $e^{rn}$ rather than $(1+r)^{n
 	      \end{equation}
 \end{itemize}
 
+\begin{proof}[推導 \eqref{eq:cc-avg}]
+	與 \autoref{sec:fwd-equiv} 同一個論證：\$1 放到時點 $n$，有兩種方式。
+	直接買 $n$ 期 zero，連續複利下得到 $e^{nS(n)}$；
+	逐期 rollover、每期用今天鎖定的 one-period forward rate，得到
+	\[
+		e^{f(0,1)}\,e^{f(1,2)}\cdots e^{f(n-1,n)} \;=\; e^{f(0,1)+f(1,2)+\cdots+f(n-1,n)} .
+	\]
+	兩者都是今天就確定的無風險終值，無套利下必須相等：
+	\[
+		e^{nS(n)} \;=\; e^{f(0,1)+f(1,2)+\cdots+f(n-1,n)} .
+	\]
+	兩邊取 $\ln$ 得 $nS(n)=f(0,1)+\cdots+f(n-1,n)$，再除以 $n$ 即得。
+
+	也可以逐項看：one-period 的 tie condition $e^{(k-1)S(k-1)}e^{f(k-1,k)}=e^{kS(k)}$ 取 $\ln$ 得
+	$f(k-1,k)=kS(k)-(k-1)S(k-1)$，對 $k=1,\ldots,n$ 相加時中間項兩兩相消（telescoping），只剩 $nS(n)-0\cdot S(0)=nS(n)$。
+\end{proof}
+
 \begin{remark}
 	把 \eqref{eq:cc-avg} 與離散版的 \eqref{eq:fwd-spot-prod} 並排看，就知道連續複利的好處在哪裡。
 
@@ -2277,8 +2564,24 @@ Recall \eqref{eq:continuous}: one dollar grows to $e^{rn}$ rather than $(1+r)^{n
 	      \end{equation}
 \end{itemize}
 
-Compare \eqref{eq:cc-fwd} with \eqref{eq:fwd-def} and \eqref{eq:cc-fwd-df} with \eqref{eq:fwd-df}: in each case a ratio of gross growth factors has turned into a difference of rates.
-Both follow from the tie condition written continuously, $e^{iS(i)}e^{(j-i)f(i,j)} = e^{jS(j)}$, which on taking logarithms reads $iS(i)+(j-i)f(i,j)=jS(j)$.
+\begin{proof}[推導 \eqref{eq:cc-fwd}]
+	與離散版 \eqref{eq:fwd-def} 同一個 tie condition：\$1 放到時點 $j$，
+	maturity strategy 得 $e^{jS(j)}$；rollover strategy 先放 $i$ 期得 $e^{iS(i)}$，再以鎖定的 $f(i,j)$ 放 $j-i$ 期，得 $e^{iS(i)}e^{(j-i)f(i,j)}$。
+	兩者相等：
+	\[
+		e^{iS(i)+(j-i)f(i,j)} \;=\; e^{jS(j)} .
+	\]
+	取 $\ln$ 得 $iS(i)+(j-i)f(i,j)=jS(j)$，移項後除以 $j-i$ 即得。
+\end{proof}
+
+\begin{proof}[推導 \eqref{eq:cc-fwd-df}]
+	由 \eqref{eq:cc-df}，$d(k)=e^{-kS(k)}$，所以
+	\[
+		\frac{d(j+1)}{d(j)} \;=\; \frac{e^{-(j+1)S(j+1)}}{e^{-jS(j)}} \;=\; e^{-[(j+1)S(j+1)-jS(j)]} \;=\; e^{-f(j,j+1)} ,
+	\]
+	最後一步是 \eqref{eq:cc-fwd} 取 $i=j$、$j\to j+1$（分母 $j-i=1$）。
+	兩邊取 $\ln$ 再加負號即得。
+\end{proof}
 
 \source{Slides p.~153}
 
@@ -2308,10 +2611,21 @@ Two consequences are recorded on the slide:
 \begin{remark}
 	第二條正是前面「曲線不能任意畫」的連續版本。
 
-	$f(T)\ge 0$ 等價於 $\dfrac{d}{dT}\bigl[T\,S(T)\bigr]\ge 0$，也就是\emph{累積利率} $T\,S(T)$ 必須遞增——與離散版 $d(n)$ 遞減、$(1+S(n))^{n}$ 遞增是同一句話（因為 $d(T)=e^{-TS(T)}$）。
-
-	改寫成 $S'(T) \ge -S(T)/T$ 就看得出限制有多具體：倒掛的曲線每往下走一點，都受到\emph{目前水準除以年期}的約束。
-	$S=2\%$、$T=5$ 時，斜率不得低於 $-0.4\%$ 每年；$T$ 愈長，允許的下滑愈平緩。
+	離散版是 \autoref{sec:lock-fwd} 裡那題 question 的答案：forward rate 不能是負的，否則借長賣短、中間持有現金就能套利。
+	連續版把「一期 forward rate」換成「瞬間 forward rate $f(T)$」，其餘一字不改。兩邊逐行對照：
+	\[
+		\begin{array}{lcc}
+			                   & \text{離散} & \text{連續} \\ \hline
+			\text{條件}        & f(n,n+1)\ge 0 & f(T)\ge 0 \\
+			\text{用 } d \text{ 寫} & d(n)\ge d(n+1) & d(T)=e^{-TS(T)} \text{ 遞減} \\
+			\text{用 } S \text{ 寫} & (1+S(n))^{n} \text{ 遞增} & T\,S(T) \text{ 遞增}
+		\end{array}
+	\]
+	每一欄的三行互相等價：
+	離散欄由 \eqref{eq:fwd-df}，$1+f(n,n+1)=d(n)/d(n+1)$，而 $d(n)=(1+S(n))^{-n}$；
+	連續欄由 \eqref{eq:inst-fwd}，$f(T)=\dfrac{d}{dT}\bigl[T\,S(T)\bigr]$，而 $d(T)=e^{-TS(T)}$。
+	最後一行的對應也很直接：$(1+S(n))^{n}$ 是 \$1 放 $n$ 期的終值，$e^{TS(T)}$ 是連續版的終值，$T\,S(T)$ 就是它的指數。
+	所以兩邊說的是同一件事——\emph{\$1 放得愈久，終值不能變少}。
 \end{remark}
 
 \subsection{An Example}
@@ -2393,17 +2707,34 @@ Answering it requires an assumption, and the candidate assumptions are the term 
 
 \source{Slides p.~155}
 
-\begin{definition}[Unbiased expectations theory]
+\begin{theorem}[Unbiased expectations theory]
 	The forward rate equals the average future spot rate,
 	\begin{equation}
 		f(a,b) \;=\; E\bigl[\,S(a,b)\,\bigr] . \label{eq:uet}
 	\end{equation}
-\end{definition}
+\end{theorem}
 
 \begin{itemize}[nosep]
 	\item It does \emph{not} imply that the forward rate is an accurate predictor for the future spot rate.
 	\item It implies the maturity strategy and the rollover strategy produce the same result at the horizon ``on average''.
 \end{itemize}
+
+\begin{remark}
+	先釐清定理本身：$f(a,b)$ 是今天就算得出來的數字，$S(a,b)$ 則要到時點 $a$ 才會在市場上報出來，今天看它是隨機變數。
+	這個理論假設前者等於後者的期望值。它是一個關於市場的\emph{假設}，不是前面那種由無套利推出來的定理。
+
+	\textbf{第一點：「無偏」不等於「準」。}
+	$f(a,b)=E[S(a,b)]$ 只是說 forward rate 沒有\emph{系統性}地偏高或偏低：把很多次的預測誤差 $S(a,b)-f(a,b)$ 平均起來是 $0$。
+	但任何一次實際報出的 $S(a,b)$ 都可能離 $f(a,b)$ 很遠，例如今天算出 $f(1,2)=5\%$，一年後的實際利率是 $3\%$ 或 $7\%$ 都跟理論不衝突。
+
+	\textbf{第二點：兩種策略「平均」打平。}
+	回想 \autoref{sec:forward-rates} 的兩種策略。
+	maturity strategy 的終值今天已經確定；rollover strategy 的終值要用到未來的 $S(a,b)$，所以是隨機的。
+	forward rate 的定義是：若 rollover 後半段的利率\emph{剛好}等於 $f(a,b)$，兩者就打平。
+	這個理論再假設 $f(a,b)$ 是 $S(a,b)$ 的期望值，於是 rollover 的終值\emph{平均而言}等於 maturity 的終值；實際走出來的某一條路徑則可能高也可能低。
+	「on average」加了引號，是因為這句話只在粗略意義下成立：終值裡的 $S(a,b)$ 是出現在 $(1+S(a,b))^{b-a}$ 裡，而一般來說 $E\bigl[(1+S)^{k}\bigr]\ne(1+E[S])^{k}$。
+	下一小節的「bad」expectations theory 就是在這種細節上出問題。
+\end{remark}
 
 \source{Slides p.~156}
 
@@ -2433,6 +2764,26 @@ The theory ties the shape of today's curve to the market's expectations.
 	第一個小結論\emph{不需要}任何理論——它純粹是 \eqref{eq:fwd-def} 的代數重寫，也就是 \autoref{sec:fwd-vs-spot} 的特例。
 	理論的作用只在最後一步：把算出來的 $f(j,j+1)$ 換成\emph{期望值} $E[S(j,j+1)]$。
 
+	\textbf{那串不等式為什麼等於「預期利率上升」？}
+	關鍵是把每個符號讀成「哪個時點的一期利率」：
+	\begin{itemize}[nosep]
+		\item $S(1)=S(0,1)$ 是\emph{今天}的一期利率；
+		\item $S(j,j+1)$ 是\emph{時點 $j$} 的一期利率，今天未知，$E[S(j,j+1)]$ 就是市場對它的預期。
+	\end{itemize}
+	「預期未來利率上升」的意思就是：預期時點 $j$ 的一期利率高於今天的一期利率，即 $E[S(j,j+1)]>S(1)$。
+	那串不等式的頭尾正是這件事：
+	\[
+		\underbrace{E\bigl[S(j,j+1)\bigr]}_{\text{預期的未來一期利率}}
+		\;>\; S(j+1) \;>\; \cdots \;>\;
+		\underbrace{S(1)}_{\text{今天的一期利率}} ,
+	\]
+	中間的 $S(j+1)>\cdots>S(1)$ 就是「spot curve 是 normal」。
+	所以整句讀成：曲線 normal $\Longleftrightarrow$ 預期的未來一期利率高過今天的一期利率。
+
+	直覺上：由 \eqref{eq:fwd-spot-prod}，$S(j+1)$ 是 $S(1),f(1,2),\ldots,f(j,j+1)$ 的（幾何）平均；在此理論下這些 $f$ 就是各期的\emph{預期}一期利率。
+	所以長天期 spot rate 就是「今天的利率加上未來各期預期利率」的平均。
+	平均值隨期限上升（normal），唯一的原因就是後面加進來的預期利率比較高——市場預期利率會漲。
+
 	所以這條命題的內容其實是：\textbf{在}\vocab{無偏預期理論}（unbiased expectations theory）\textbf{之下}，「殖利率曲線正常」與「市場預期短率將上升」是同一件事。
 	這也是新聞上「倒掛的殖利率曲線預示降息」那句話的理論根據——但別忘了它\emph{建立在假設之上}，而下一小節正是要說明這一類假設有多脆弱。
 \end{remark}
@@ -2452,6 +2803,44 @@ After rearrangement,
 \begin{equation}
 	\frac{1}{E\bigl[\,1+S(1,2)\,\bigr]} \;=\; \frac{1+S(1)}{\bigl(1+S(2)\bigr)^{2}} . \label{eq:bad-two-rearranged}
 \end{equation}
+
+\begin{remark}
+	\textbf{這個理論在說什麼。}
+	先固定一個\vocab{持有期間}（holding period）$H$：今天投入 \$1，看時點 $H$ 手上有多少。
+	在這 $H$ 期內，用無違約風險的債券可以有很多玩法：買 $H$ 期 zero 持有到期、買短的一路 rollover、買更長的 zero 然後在時點 $H$ 提前賣掉……
+	這個理論主張：\emph{只要持有期間相同}，所有這些策略的\emph{預期} one-plus return 都相等，而且這對\emph{每一個} $H$ 都成立。
+	其中 \vocab{one-plus return} $=$ 期末價值 $/$ 期初投入，算的是\emph{整個持有期間}：例如兩期 zero 持有兩期是 $(1+S(2))^{2}$，不是 $1+S(2)$。
+
+	背後的想法是：若投資人只看期望報酬、不在乎風險，那麼哪個策略的期望報酬比較高，大家就會去搶，價格被推到直到打平為止。
+	注意「無風險」只是指不會違約；rollover 或提前賣出時，未來的利率與價格今天仍未知，所以報酬還是隨機的，才需要取期望值。
+
+	\textbf{所以什麼時候「要相等」？}
+	只比\emph{同一個持有期間}的策略：
+	\begin{itemize}[nosep]
+		\item $H=2$（這一頁）：兩期 zero 持有到期 vs.\ 一期 zero rollover 兩次；
+		\item $H=1$（p.~158--159）：一期 zero 持有到期（報酬確定是 $1+S(1)$）vs.\ 兩期 zero 持有一期後賣掉（賣價未知）。
+	\end{itemize}
+	p.~159 說「the theory says the returns are equal」，就是因為那兩個策略的持有期間都是 $1$，理論要求它們預期報酬相同。
+
+	\textbf{跟 unbiased expectations theory 的關係。}
+	不是先相信 unbiased expectations theory 再去推廣它。
+	單看 $H=2$ 那條式子，它其實就是 unbiased expectations theory 用在 $f(1,2)$ 上（$E[S(1,2)]=f(1,2)$）；單看 $H=1$ 那條式子，它就是下一小節的 local expectations theory。
+	兩條\emph{各自}都可以成立，這個「bad」theory 的問題是把「投資人不在乎風險」這個直覺\emph{同時}套到所有持有期間上。
+	接下來三頁要證明：兩條式子不可能同時成立，除非未來利率毫無不確定性。
+	所以結論不是「unbiased expectations theory 錯了」，而是「expectations theory 只能挑一個持有期間來要求，不能全都要」。
+
+	\textbf{證明的策略。}
+	先用 $H=2$ 得到一條等式（這一頁），再用 $H=1$ 得到另一條（下一頁），兩條合起來會跟 Jensen's inequality 衝突。
+
+	\textbf{兩期的持有期間。}
+	今天投入 \$1，看時點 $2$ 的結果：
+	\begin{itemize}[nosep]
+		\item 買兩期 zero 持有到期：終值 $(1+S(2))^{2}$，今天就確定；
+		\item 買一期 zero，時點 $1$ 再以當時的利率 $S(1,2)$ 滾一期：終值 $(1+S(1))(1+S(1,2))$，因為 $S(1,2)$ 今天未知，只能取期望值。
+	\end{itemize}
+	理論說兩者預期相等，就是 \eqref{eq:bad-two}。
+	到這裡還只是 unbiased expectations theory 的兩期版本（$E[1+S(1,2)]=1+E[S(1,2)]$），沒有任何問題。
+\end{remark}
 
 \source{Slides p.~158}
 
@@ -2481,6 +2870,7 @@ Combining this with \eqref{eq:bad-two-rearranged} yields
 
 \begin{proposition}
 	\eqref{eq:bad-clash} is impossible save for a certain economy --- that is, unless $S(1,2)$ is known today.
+	（除非是一個\emph{確定性}的經濟——也就是未來利率 $S(1,2)$ 今天就已知、沒有任何隨機性——否則 \eqref{eq:bad-clash} 不可能成立。這裡的 save for 是「除了」。）
 \end{proposition}
 
 \begin{proof}
@@ -2514,23 +2904,31 @@ Combining this with \eqref{eq:bad-two-rearranged} yields
 
 \source{Slides p.~161}
 
-\begin{definition}[Local expectations theory]
+\begin{theorem}[Local expectations theory]
 	The expected rate of return of any bond over \emph{a single period} equals the prevailing one-period spot rate:
 	\begin{equation}
 		\frac{E\bigl[\,(1+S(1,n))^{-(n-1)}\,\bigr]}{(1+S(n))^{-n}} \;=\; 1+S(1)
 		\qquad \text{for \emph{all} } n>1 . \label{eq:let}
 	\end{equation}
-\end{definition}
+\end{theorem}
 
-This theory is the basis of many interest rate models.
+\begin{remark}
+	\eqref{eq:let} 就是「今天買一張 $n$ 期 zero、持有\emph{一期}後賣掉」的預期 one-plus return（賣價 $/$ 買價）：
+	\begin{itemize}[nosep]
+		\item 分母 $(1+S(n))^{-n}$：這張 $n$ 期 zero 今天的價格（買價）；
+		\item 分子：到了時點 $1$，它變成剩 $n-1$ 期的 zero，當時的價格是 $(1+S(1,n))^{-(n-1)}$，其中 $S(1,n)$ 是時點 $1$ 才報出的利率，今天未知，所以取期望值（預期賣價）；
+		\item 右邊 $1+S(1)$：直接買一期 zero 持有到期的報酬，今天就確定。
+	\end{itemize}
+	兩邊比的是\emph{比值}，與買多少無關：左邊用面額 \$1 的 zero 算，右邊若也用面額 \$1 的一期 zero，買價 $(1+S(1))^{-1}$、到期拿 \$1，比值同樣是 $1+S(1)$，跟「投入 \$1 拿回 $1+S(1)$」一樣。
+	所以整條式子說：\emph{持有一期的話，買哪一張 zero 預期報酬都一樣，都等於一期利率}。
+	$n=2$ 就是 p.~159 那條式子；這裡只要求持有期間 $H=1$，不再同時要求 $H=2$，因此不會碰到上一小節的 Jensen 矛盾。
 
-\begin{note}
-	The repair is exactly the one the previous subsection pointed to.
-	\eqref{eq:let} imposes the equal-expected-return condition over \emph{one} period only, and says nothing about longer horizons; there is therefore no second equation to clash with the first, and no Jensen contradiction arises.
-
-	Read \eqref{eq:let} as: today's price of every bond is the expectation of its price next period, discounted at the known one-period rate.
-	That is precisely the recursive structure a tree or lattice model needs, which is why the theory reappears later in the course as the \emph{risk-neutral} pricing convention.
-\end{note}
+	等價的寫法是把分母移過去：
+	\[
+		\underbrace{(1+S(n))^{-n}}_{\text{今天價格}} \;=\; \frac{E\bigl[\,\text{時點 } 1 \text{ 的價格}\,\bigr]}{1+S(1)} ,
+	\]
+	即今天的價格 $=$ 下一期的預期價格用一期利率折現回來。(today's price of every bond is the expectation of its price next period, discounted at the known one-period rate. 	That is precisely the recursive structure a tree or lattice model needs, which is why the theory reappears later in the course as the \emph{risk-neutral} pricing convention.)
+\end{remark}
 
 %─────§ Duration in practice────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Duration, in Practice}
@@ -2590,6 +2988,37 @@ At least one $c_{i}$ should be $1$ as the reference point.
 	\label{fig:shift-vectors}
 \end{figure}
 
+\begin{remark}
+	\textbf{問題在哪。}
+	之前算 duration 時說「利率上升 $\Delta y$，價格掉多少」，暗中假設曲線上\emph{每一期}的 spot rate 都一起上升 $\Delta y$，也就是整條曲線平移（parallel shift）。
+	但實際上曲線常常不是這樣動的：可能短天期漲、長天期跌（曲線變平或倒掛），也可能中間動得多、兩端動得少。
+
+	\textbf{這一頁的做法。}
+	把「曲線怎麼動」拆成兩部分：
+	\[
+		S(i) \;\longrightarrow\; S(i) + y\,c_{i} ,
+	\]
+	\begin{itemize}[nosep]
+		\item $y$：一個數字，代表\emph{動多大}；
+		\item $[c_{1},\ldots,c_{n}]$：一個向量，代表\emph{動的形狀}——第 $i$ 期跟著 $y$ 動幾倍。
+	\end{itemize}
+	以 $y=0.1\%$ 為例：
+	\begin{itemize}[nosep]
+		\item $[1,1,\ldots,1]$：每一期都 $+0.1\%$，就是原本的平移；
+		\item $[1,\ldots,1,-1,\ldots,-1]$：前幾期 $+0.1\%$、後幾期 $-0.1\%$，短端漲長端跌，曲線被「扭」了（twist）；
+		\item $[1.8,1.6,1.4,1,0,-1,\ldots]$：第 $1$ 期 $+0.18\%$、第 $4$ 期 $+0.1\%$、第 $5$ 期不動、再往後轉為下跌，是比較平滑的扭轉。
+	\end{itemize}
+	上圖就是把這三個向量畫出來：橫軸是期別 $i$，縱軸是 $c_{i}$。
+
+	\textbf{為什麼要有一個 $c_{i}=1$。}
+	$y$ 和 $c_{i}$ 只以乘積出現，$[c_{i}]$ 全部乘 $2$、$y$ 除以 $2$ 是同一種變動，所以要固定尺度。
+	規定某一期的 $c_{i}=1$，$y$ 就有了明確意義：\emph{那一期}的 spot rate 動了多少。
+
+	下一頁再用這個 $y$ 定義 duration：$y$ 動一點點時，價格變動的百分比。
+	它是原本 duration 的推廣：若形狀選平移 $[1,\ldots,1]$、\emph{且}曲線本來就是平的（$S(i)$ 全等於某個 $r$），價格變成 $P(y)=\sum_{i} C_{i}/(1+r+y)^{i}$，這正是把殖利率從 $r$ 移到 $r+y$ 的價格函數，
+	於是 $-\dfrac{1}{P}\dfrac{\partial P}{\partial y}\Big|_{y=0}=\dfrac{1}{P}\sum_{i}\dfrac{i\,C_{i}}{(1+r)^{i+1}}$，恰好就是 \eqref{eq:mod-dur} 的 modified duration。
+\end{remark}
+
 \source{Slides p.~163}
 
 \begin{definition}[Duration under a general shift]
@@ -2628,6 +3057,8 @@ Modified duration equals the above when
 
 	實務上把不同的 $[c_{i}]$ 各算一個 duration，就得到\vocab{關鍵利率存續期間}（key rate duration）：取 $[c_{i}]$ 為只在某一期為 $1$、其餘為 $0$ 的向量，便可量出部位對曲線上\emph{各個點}的個別暴險，而不是只有一個總數。
 	一個 duration 為零的部位，仍可能對\vocab{扭轉}（twist）有巨大暴險。
+	twist 指曲線繞著某個期別「轉動」：一端上升、另一端下降，改變的是曲線的\emph{斜率}而不是整體高低（例如短端 $-0.1\%$、長端 $+0.1\%$，曲線變陡）。
+	例如持有長天期債券、同時放空短天期債券，把數量配到平移下的 duration 為零；平移時兩邊損益互相抵銷，但遇到上述變陡的 twist，長債因長端利率上升而跌價、放空的短債因短端利率下降而漲價，兩邊\emph{同時}虧錢。
 \end{remark}
 
 %─────§ Loose ends─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -2648,6 +3079,11 @@ Converting those to actual dates raises a list of unglamorous questions that non
 \begin{note}
 	These are the same concerns as the day count conventions of \autoref{sec:day-count}, now compounded by the settlement calendar.
 	None of them is deep, and all of them are mandatory: a discount factor $d(i)$ is only as well defined as the date $i$ names, and two desks using different holiday calendars will bootstrap two different curves from the same quotes.
+
+	（翻譯：這些問題和 \autoref{sec:day-count} 的 day count convention 是同一類，只是現在還多疊了一層\vocab{交割日曆}（settlement calendar）的問題。
+	它們都不深奧，卻\emph{每一個都非處理不可}：折現因子 $d(i)$ 的定義只能跟「第 $i$ 期」指的是哪一天一樣明確；
+	兩個交易櫃檯若用不同的假日日曆，拿同一組報價 bootstrap 出來的曲線就會不同。
+	其中 $T+2$ 指成交後第 $2$ 個營業日才交割（錢券互換），所以現金流的實際日期還要跳過週末與假日來算。）
 \end{note}
 
 %─────Fundamental Statistical Concepts───────────────────────────────────────────────────────────────────────────────────────────────────────────────
