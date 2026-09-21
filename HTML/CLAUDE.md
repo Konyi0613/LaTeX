@@ -89,6 +89,15 @@ Numbered envs (`theorem`, `question`, `exercise`, `eg`, `definition`, …) share
 one counter, so they read in document order. Do not use numbered envs in the
 Preface — the section counter is 0 there.
 
+## Tables
+
+`booktabs` rules and `|` separators do not meet: the rule separation leaves a
+gap where the vertical line should cross. Any table that has both must open with
+`\solidrules` (defined in `header.tex`) right before `\begin{tabular}`, so the
+verticals run unbroken through `\toprule`, `\midrule` and `\bottomrule`. It is
+a local length change — put it inside the surrounding `center`/`adjustbox`
+group, never in the preamble.
+
 ## Figures
 
 Redraw every slide figure in TikZ. Shared styles already in `header.tex`:

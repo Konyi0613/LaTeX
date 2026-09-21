@@ -45,7 +45,16 @@
 \usepackage[colorlinks=true,linkcolor=cyan,urlcolor=magenta,citecolor=violet]{hyperref}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{array}
 \usepackage{booktabs}
+% Local switch for a tabular whose `|' separators must run unbroken through the
+% booktabs rules: kill the rule separation that breaks them, and give back the
+% breathing room with extra row height.
+\newcommand{\solidrules}{%
+	\setlength{\aboverulesep}{0pt}%
+	\setlength{\belowrulesep}{0pt}%
+	\setlength{\extrarowheight}{0.75ex}%
+}
 \usepackage{emptypage}
 \usepackage{subcaption}
 \usepackage[usenames,dvipsnames,svgnames]{xcolor}
@@ -125,6 +134,91 @@
 			inner sep=0pt, minimum size=3.4pt},
 	plotbox/.style={draw=black!55, semithick},
 }
+
+% Panels of the `how many kinds of lines' figures.  A panel is a small framed
+% box holding one fixed layout of inputs, each drawn as a circle (+1) or a cross
+% (-1); the mandatory argument is one letter per input, `o' or `x', in index
+% order.  The layouts are the deck's own: \dichone one input, \dichtwo two,
+% \dichthree three in general position, \dichcol three collinear ones and
+% \dichfour four in convex position, so that the same coordinates recur in the
+% big picture and in every panel beside it.  The optional argument `veto'
+% strikes a panel through, marking a dichotomy that no line can produce.
+% \dmark gives the same two marks at text size, for the dichotomy tables.
+\tikzset{
+	dichveto/.style={line width=2.2pt, draw=orange, line cap=round},
+}
+\newcommand{\dmarkat}[3]{%
+	\ifthenelse{\equal{#3}{o}}%
+	{\node[dpos] at (#1,#2) {};}%
+	{\node[dneg] at (#1,#2) {\(\times\)};}}
+\newcommand{\dmark}[1]{\tikz[baseline=-0.55ex]{\dmarkat{0}{0}{#1}}}
+\newcommand{\dichonegrid}[1]{\dmarkat{1.00}{0.70}{#1}}
+\newcommand{\dichtwogrid}[2]{\dmarkat{1.28}{0.98}{#1}\dmarkat{0.72}{0.46}{#2}}
+\newcommand{\dichthreegrid}[3]{%
+	\dmarkat{1.10}{1.08}{#1}\dmarkat{0.58}{0.70}{#2}\dmarkat{1.34}{0.32}{#3}}
+\newcommand{\dichcolgrid}[3]{%
+	\dmarkat{1.32}{1.08}{#1}\dmarkat{0.86}{0.70}{#2}\dmarkat{0.40}{0.32}{#3}}
+\newcommand{\dichfourgrid}[4]{%
+	\dmarkat{1.02}{1.10}{#1}\dmarkat{0.50}{0.70}{#2}%
+	\dmarkat{1.28}{0.30}{#3}\dmarkat{1.62}{0.80}{#4}}
+\newcommand{\dichframe}[3][]{%
+	\begin{tikzpicture}[scale=0.62, baseline=(current bounding box.center)]
+		\draw[plotbox] (0,0) rectangle (2.0,1.4);
+		#2#3%
+		\ifthenelse{\equal{#1}{veto}}{%
+			\draw[dichveto] (0.12,0.12) -- (1.88,1.28);
+			\draw[dichveto] (0.12,1.28) -- (1.88,0.12);}{}%
+	\end{tikzpicture}}
+\newcommand{\dichone}[2][]{\dichframe[#1]{\dichonegrid}{#2}}
+\newcommand{\dichtwo}[2][]{\dichframe[#1]{\dichtwogrid}{#2}}
+\newcommand{\dichthree}[2][]{\dichframe[#1]{\dichthreegrid}{#2}}
+\newcommand{\dichcol}[2][]{\dichframe[#1]{\dichcolgrid}{#2}}
+\newcommand{\dichfour}[2][]{\dichframe[#1]{\dichfourgrid}{#2}}
+
+% The `bin' of marbles used all through the feasibility chapter.  `\binpath'
+% traces the outline measured off the handout --- a waist just under the rim,
+% a belly a third of the way up, a flat base.  It is a path macro rather than
+% a style so that the very same coordinates can be \draw n (for the wall) and
+% \clip ped (to keep stray marbles inside).  The bin is one unit tall and
+% about 0.86 units wide, so `scale=3' in the enclosing scope gives a 3cm bin;
+% marble nodes are placed in those scaled coordinates but keep an absolute
+% `minimum size', which is why the diameter is passed explicitly.
+\definecolor{marbleorange}{HTML}{F08000}
+\definecolor{marblegreen}{HTML}{1B9E1B}
+\newcommand{\binpath}{%
+	plot[smooth] coordinates {(-0.340,1.000) (-0.299,0.795) (-0.326,0.631)
+			(-0.395,0.467) (-0.432,0.303) (-0.416,0.139) (-0.363,0.000)}
+	-- plot[smooth] coordinates {(0.363,0.000) (0.416,0.139) (0.432,0.303)
+			(0.395,0.467) (0.326,0.631) (0.299,0.795) (0.340,1.000)}}
+\tikzset{
+	binwall/.style={line width=1pt, draw=black, line cap=round,
+			line join=round},
+	morange/.style={circle, fill=marbleorange, inner sep=0pt, minimum size=#1},
+	morange/.default=2.4pt,
+	mgreen/.style={circle, fill=marblegreen, inner sep=0pt, minimum size=#1},
+	mgreen/.default=2.4pt,
+	% the hand-drawn arrow that scoops a sample out of a bin
+	scoop/.style={-{Stealth[length=2.6mm]}, line width=1pt, draw=black},
+}
+
+% Cells of the 3x3 black/white pictures in the learning puzzle: `\puzzle{...}'
+% takes nine digits, row by row, 1 for a black cell and 0 for a white one.
+\newcommand{\puzzlecell}[3]{%
+	\ifnum#3=1 \fill[black] (#1,#2) rectangle ++(1,1);\fi
+	\draw[black, line width=0.4pt] (#1,#2) rectangle ++(1,1);}
+\newcommand{\puzzle}[1]{%
+	\begin{tikzpicture}[scale=0.32, baseline=(current bounding box.center)]
+		\puzzlegrid#1\relax
+	\end{tikzpicture}}
+% ... and `\puzzleat{x}{y}{bits}' drops one grid with its lower-left corner at
+% (x,y) inside a picture that is already open, one unit per cell, so that a
+% whole board of them can be laid out with exact gaps.
+\newcommand{\puzzleat}[3]{%
+	\begin{scope}[shift={(#1,#2)}]\puzzlegrid#3\relax\end{scope}}
+\newcommand{\puzzlegrid}[9]{%
+	\puzzlecell{0}{2}{#1}\puzzlecell{1}{2}{#2}\puzzlecell{2}{2}{#3}%
+	\puzzlecell{0}{1}{#4}\puzzlecell{1}{1}{#5}\puzzlecell{2}{1}{#6}%
+	\puzzlecell{0}{0}{#7}\puzzlecell{1}{0}{#8}\puzzlecell{2}{0}{#9}}
 
 % Algorithm Env
 \usepackage[linesnumbered,lined,vlined,ruled,commentsnumbered,resetcount,algochapter]{algorithm2e}
