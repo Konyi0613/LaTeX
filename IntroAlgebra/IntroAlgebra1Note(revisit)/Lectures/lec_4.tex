@@ -1,0 +1,580 @@
+\lecture{4}{Rotman §2.5}{Homomorphisms}
+
+\section{Homomorphisms}
+
+An important problem is deciding whether two given groups \(G\) and \(H\) are somehow the
+same. For example, \(S_3\) is the group of all permutations of \(X = \{1,2,3\}\), and the
+group \(S_Y\) of all permutations of \(Y = \{a,b,c\}\) is a different group, because
+permutations of \(\{1,2,3\}\) are not permutations of \(\{a,b,c\}\). But even though
+\(S_3\) and \(S_Y\) are different, they surely bear a strong resemblance to each other
+(\autoref{eg:S3-SY}). The notions of homomorphism and isomorphism allow one to compare
+different groups.
+
+\subsection{Homomorphisms and Isomorphisms}
+
+\begin{definition}[Homomorphism, isomorphism]\label{def:homomorphism}
+	If \((G, *)\) and \((H, \circ)\) are groups (we have displayed the operation in each),
+	then a function \(f\colon G \to H\) is a \vocab{homomorphism} if
+	\[
+		f(x * y) = f(x) \circ f(y)
+	\]
+	for all \(x, y \in G\). If \(f\) is also a bijection, then \(f\) is called an
+	\vocab{isomorphism}. We say that \(G\) and \(H\) are \vocab{isomorphic}, denoted by
+	\(G \cong H\), if there exists an isomorphism \(f\colon G \to H\).
+\end{definition}
+
+\begin{note}[Etymology]
+	\emph{Homomorphism} comes from the Greek \emph{homo} (``same'') and \emph{morph}
+	(``shape'' or ``form''): a homomorphism carries a group to another group (its image) of
+	similar form. \emph{Isomorphism} involves the Greek \emph{iso} (``equal''), and
+	isomorphic groups have identical form.
+\end{note}
+
+\begin{lemma}[Rotman, Exercise 2.57]\label{lem:iso-equivalence}
+	\begin{enumerate}[(i)]
+		\item The composite of homomorphisms is a homomorphism.
+		\item The inverse of an isomorphism is an isomorphism.
+		\item Isomorphism is an equivalence relation on any family of groups. In particular,
+		      if \(G \cong H\), then \(H \cong G\).
+	\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+	(i) If \(f\colon G \to H\) and \(g\colon H \to L\) are homomorphisms, then
+	\(gf(xy) = g(f(x)f(y)) = gf(x)\,gf(y)\).
+
+	(ii) Let \(f\colon G \to H\) be an isomorphism with inverse function
+	\(f^{-1}\colon H \to G\). Given \(u, v \in H\), write \(u = f(x)\) and \(v = f(y)\);
+	then \(f^{-1}(uv) = f^{-1}(f(x)f(y)) = f^{-1}(f(xy)) = xy = f^{-1}(u)f^{-1}(v)\).
+
+	(iii) \(1_G\colon G \to G\) is an isomorphism (reflexivity); (ii) gives symmetry; and
+	(i), together with the fact that a composite of bijections is a bijection, gives
+	transitivity.
+\end{proof}
+
+\begin{eg}[First examples]\label{eg:hom-first}
+	\begin{enumerate}[(i)]
+		\item The identity \(1_G\colon G \to G\) is an isomorphism, and the \vocab{trivial
+			      homomorphism} \(f\colon G \to H\), \(f(a) = 1\) for all \(a \in G\), is a
+		      homomorphism.
+		\item Let \(\mathbb R\) be the additive group of real numbers and
+		      \(\mathbb R^{>}\) the multiplicative group of positive reals. Then
+		      \(f\colon \mathbb R \to \mathbb R^{>}\), \(f(x) = e^x\), is a homomorphism,
+		      for
+		      \[
+			      f(x+y) = e^{x+y} = e^xe^y = f(x)f(y).
+		      \]
+		      It is an isomorphism, since its inverse function is
+		      \(g(x) = \log x\). Therefore \(\mathbb R \cong \mathbb R^{>}\). Note that
+		      \(g\) is also an isomorphism, as \autoref{lem:iso-equivalence}(ii) predicts:
+		      \(g(xy) = \log(xy) = \log x + \log y = g(x) + g(y)\).
+		\item The additive group \(\mathbb C\) is isomorphic to the plane
+		      \(\mathbb R^2\) (\autoref{eg:group-list}(vii)). Define
+		      \(f\colon \mathbb C \to \mathbb R^2\) by \(f(a + ib) = (a,b)\). Clearly \(f\)
+		      is a bijection, and it is a homomorphism:
+		      \begin{align*}
+			      f\bigl((a+ib) + (a'+ib')\bigr)
+			       & = f\bigl((a+a') + i(b+b')\bigr) = (a+a', b+b') \\
+			       & = (a,b) + (a',b') = f(a+ib) + f(a'+ib').
+		      \end{align*}
+	\end{enumerate}
+\end{eg}
+
+\begin{definition}[Multiplication table]
+	Let \(a_1, a_2, \dots, a_n\) be a list, with no repetitions, of all the elements of a
+	finite group \(G\) of order \(n\). A \vocab{multiplication table} for \(G\) is the
+	\(n \times n\) array whose \(ij\) entry is \(a_ia_j\):
+	\[
+		\begin{array}{c|ccccc}
+			G      & a_1      & \cdots & a_j      & \cdots & a_n      \\ \hline
+			a_1    & a_1a_1   & \cdots & a_1a_j   & \cdots & a_1a_n   \\
+			\vdots & \vdots   &        & \vdots   &        & \vdots   \\
+			a_i    & a_ia_1   & \cdots & a_ia_j   & \cdots & a_ia_n   \\
+			\vdots & \vdots   &        & \vdots   &        & \vdots   \\
+			a_n    & a_na_1   & \cdots & a_na_j   & \cdots & a_na_n
+		\end{array}
+	\]
+\end{definition}
+
+We agree that the identity is listed first, \(a_1 = 1\); then the first row and first
+column merely repeat the listing, and we usually omit them.
+
+Consider two almost trivial groups: the multiplicative group \(\Gamma_2 = \{1, -1\}\) and
+the parity group \(\mathbb P\) (\autoref{eg:group-list}(viii)). Their multiplication
+tables are
+\[
+	\Gamma_2\colon\
+	\begin{array}{|c|c|}
+		\hline
+		1  & -1 \\ \hline
+		-1 & 1  \\ \hline
+	\end{array}\,;
+	\qquad\qquad
+	\mathbb P\colon\
+	\begin{array}{|c|c|}
+		\hline
+		\text{even} & \text{odd}  \\ \hline
+		\text{odd}  & \text{even} \\ \hline
+	\end{array}\,.
+\]
+Clearly \(\Gamma_2\) and \(\mathbb P\) are distinct groups; equally clearly, there is no
+significant difference between them. Isomorphism formalizes this: the function
+\(f\colon \Gamma_2 \to \mathbb P\) with \(f(1) = \text{even}\) and
+\(f(-1) = \text{odd}\) is an isomorphism.
+
+There are many multiplication tables for a group of order \(n\), one for each of the
+\(n!\) lists of its elements. If \(a_1, \dots, a_n\) lists the elements of \(G\) and
+\(f\colon G \to H\) is a bijection, then \(f(a_1), \dots, f(a_n)\) lists the elements of
+\(H\) and determines a multiplication table for \(H\). That \(f\) is an isomorphism says
+precisely that the two tables match: if \(a_ia_j\) is the \(ij\) entry of the table of
+\(G\), then \(f(a_i)f(a_j) = f(a_ia_j)\) is the \(ij\) entry of the table of \(H\). In
+this sense isomorphic groups have the same multiplication table; they are essentially the
+same, differing only in the notation for the elements and the operations.
+
+\begin{eg}[\(S_3\) and \(S_Y\)]\label{eg:S3-SY}
+	Here is an algorithm to check whether a bijection \(f\colon G \to H\) between finite
+	groups is an isomorphism: list the elements \(a_1, \dots, a_n\) of \(G\), form the
+	multiplication table of \(G\) from this list and that of \(H\) from
+	\(f(a_1), \dots, f(a_n)\), and compare the \(n^2\) entries.
+
+	Take \(G = S_3\) and \(H = S_Y\), \(Y = \{a,b,c\}\). List \(S_3\) as
+	\[
+		(1),\ (1\ 2),\ (1\ 3),\ (2\ 3),\ (1\ 2\ 3),\ (1\ 3\ 2),
+	\]
+	and let \(\varphi\colon S_3 \to S_Y\) be the obvious function replacing numbers by
+	letters:
+	\[
+		(1),\ (a\ b),\ (a\ c),\ (b\ c),\ (a\ b\ c),\ (a\ c\ b).
+	\]
+	Superimposing the two tables, they match. For instance, the \(4,5\) entry for \(S_3\) is
+	\((2\ 3)(1\ 2\ 3) = (1\ 3)\), while the \(4,5\) entry for \(S_Y\) is
+	\((b\ c)(a\ b\ c) = (a\ c)\). This is the special case \(X = \{1,2,3\}\) of
+	\autoref{lem:SX-iso}.
+\end{eg}
+
+We now turn from isomorphisms to general homomorphisms.
+
+\begin{lemma}\label{lem:hom-basics}
+	Let \(f\colon G \to H\) be a homomorphism.
+	\begin{enumerate}[(i)]
+		\item \(f(1) = 1\);
+		\item \(f(x^{-1}) = f(x)^{-1}\);
+		\item \(f(x^n) = f(x)^n\) for all \(n \in \mathbb Z\).
+	\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+	(i) Applying \(f\) to \(1 \cdot 1 = 1\) gives \(f(1)f(1) = f(1)\), and multiplying both
+	sides by \(f(1)^{-1}\) gives \(f(1) = 1\).
+
+	(ii) Applying \(f\) to \(x^{-1}x = 1\) gives \(f(x^{-1})f(x) = 1\), and uniqueness of
+	inverses (\autoref{prop:group-basics}(iv)) gives \(f(x^{-1}) = f(x)^{-1}\).
+
+	(iii) An easy induction gives \(f(x^n) = f(x)^n\) for all \(n \geq 0\). For negative
+	exponents, \((y^{-1})^n = y^{-n}\) in any group, so
+	\[
+		f(x^{-n}) = f\bigl((x^{-1})^n\bigr) = f(x^{-1})^n = \bigl(f(x)^{-1}\bigr)^n
+		= f(x)^{-n}. \qedhere
+	\]
+\end{proof}
+
+\begin{eg}[Cyclic groups of the same order]\label{eg:cyclic-iso}
+	Any two finite cyclic groups \(G\) and \(H\) of the same order \(m\) are isomorphic.
+	Together with \autoref{cor:prime-order-cyclic}, it follows that any two groups of prime
+	order \(p\) are isomorphic.
+
+	Suppose \(G = \langle x\rangle\) and \(H = \langle y\rangle\), and define
+	\(f\colon G \to H\) by \(f(x^i) = y^i\) for \(0 \leq i < m\). Since
+	\(G = \{1, x, \dots, x^{m-1}\}\) and \(H = \{1, y, \dots, y^{m-1}\}\)
+	(\autoref{prop:order-equals-size}), \(f\) is a bijection. To see that \(f\) is a
+	homomorphism, we must show \(f(x^ix^j) = f(x^i)f(x^j)\) for \(0 \leq i, j < m\). If
+	\(i + j < m\), then
+	\[
+		f(x^ix^j) = f(x^{i+j}) = y^{i+j} = y^iy^j = f(x^i)f(x^j).
+	\]
+	If \(i + j \geq m\), then \(i + j = m + r\) with \(0 \leq r < m\), so
+	\(x^{i+j} = x^mx^r = x^r\) (because \(x^m = 1\)); similarly \(y^{i+j} = y^r\). Hence
+	\[
+		f(x^ix^j) = f(x^{i+j}) = f(x^r) = y^r = y^{i+j} = y^iy^j = f(x^i)f(x^j).
+	\]
+	Therefore \(f\) is an isomorphism and \(G \cong H\). (\autoref{eg:cyclic-first-iso} gives
+	a nicer proof.)
+\end{eg}
+
+\begin{definition}[Invariant]
+	A property of a group \(G\) that is shared by every group isomorphic to \(G\) is called an
+	\vocab{invariant} of \(G\).
+\end{definition}
+
+For example, the order \(\abs{G}\) is an invariant, for isomorphic groups have the same
+order. Being abelian is an invariant: if \(ab = ba\), then
+\[
+	f(a)f(b) = f(ab) = f(ba) = f(b)f(a),
+\]
+so \(f(a)\) and \(f(b)\) commute. Thus \(\mathbb R\) and \(GL(2,\mathbb R)\) are not
+isomorphic, for \(\mathbb R\) is abelian and \(GL(2,\mathbb R)\) is not. Here are some
+further invariants.
+
+\begin{lemma}[Rotman, Exercise 2.59]\label{lem:order-invariant}
+	Let \(f\colon G \to H\) be an isomorphism.
+	\begin{enumerate}[(i)]
+		\item For every \(a \in G\), the elements \(a\) and \(f(a)\) have the same order
+		      (both infinite, or both finite and equal). Consequently, if \(G\) has an
+		      element of some order \(n\) and \(H\) does not, then \(G \not\cong H\).
+		\item For every \(k\), \(G\) and \(H\) have the same number of elements of
+		      order \(k\).
+	\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+	(i) By \autoref{lem:hom-basics}, \(f(a)^n = f(a^n)\), and since \(f\) is injective
+	with \(f(1) = 1\), we have \(f(a^n) = 1\) if and only if \(a^n = 1\). Thus
+	\(\{n : a^n = 1\} = \{n : f(a)^n = 1\}\), and the orders agree.
+
+	(ii) By (i), \(f\) restricts to a bijection from the elements of order \(k\) in \(G\) to
+	those in \(H\).
+\end{proof}
+
+Whether or not a group is cyclic is also an invariant. In general, however, it is a
+challenge to decide whether two given groups are isomorphic.
+
+\begin{eg}[\(\mathbf V \not\cong \Gamma_4\)]\label{eg:V-not-Gamma4}
+	Here are two nonisomorphic groups of the same order. Let
+	\(\mathbf V = \{(1), (1\ 2)(3\ 4), (1\ 3)(2\ 4), (1\ 4)(2\ 3)\}\) be the four-group
+	(\autoref{eg:subgroups}), and let \(\Gamma_4 = \langle i\rangle = \{1, i, -1, -i\}\) be
+	the multiplicative cyclic group of fourth roots of unity. If there were an isomorphism
+	\(f\colon \mathbf V \to \Gamma_4\), then surjectivity would provide \(x \in \mathbf V\)
+	with \(i = f(x)\). But \(x^2 = (1)\) for all \(x \in \mathbf V\), so
+	\(i^2 = f(x)^2 = f(x^2) = f((1)) = 1\), contradicting \(i^2 = -1\). Therefore
+	\(\mathbf V \not\cong \Gamma_4\).
+
+	There are other proofs: \(\Gamma_4\) is cyclic and \(\mathbf V\) is not; \(\Gamma_4\)
+	has an element of order \(4\) and \(\mathbf V\) does not; \(\Gamma_4\) has a unique
+	element of order \(2\), while \(\mathbf V\) has three.
+\end{eg}
+
+\subsection{Kernels, Images, and Normal Subgroups}
+
+\begin{definition}[Kernel, image]
+	If \(f\colon G \to H\) is a homomorphism, define its \vocab{kernel} and \vocab{image} by
+	\[
+		\ker f = \{x \in G : f(x) = 1\}
+		\qquad\text{and}\qquad
+		\im f = \{h \in H : h = f(x) \text{ for some } x \in G\}.
+	\]
+\end{definition}
+
+\begin{note}
+	\emph{Kernel} comes from the German word for ``grain'' or ``seed'' (\emph{corn} comes
+	from the same word): it indicates an important ingredient of a homomorphism.
+\end{note}
+
+\begin{eg}[Kernels and images]\label{eg:kernels}
+	\begin{enumerate}[(i)]
+		\item Let \(\Gamma_n = \langle\zeta\rangle\), where \(\zeta = e^{2\pi i/n}\) is a
+		      primitive \(n\)th root of unity. Then \(f\colon \mathbb Z \to \Gamma_n\),
+		      \(f(m) = \zeta^m\), is a surjective homomorphism, and \(\ker f\) consists of
+		      all the multiples of \(n\), because \(\zeta\) has order \(n\)
+		      (\autoref{lem:order-divides}).
+		\item \(\sgn\colon S_n \to \Gamma_2 = \{\pm 1\}\) is a homomorphism by
+		      \autoref{thm:sgn-multiplicative}. For \(n \geq 2\) it is surjective, since
+		      \(\sgn(\tau) = -1\) for a transposition \(\tau\); its kernel is the alternating
+		      group \(A_n\) of all even permutations.
+		\item Since \(\det(AB) = \det(A)\det(B)\), the determinant
+		      \(\det\colon GL(2,\mathbb R) \to \mathbb R^\times\) is a homomorphism. It is
+		      surjective, since
+		      each \(r \in \mathbb R^\times\) is the determinant of
+		      \(\begin{psmallmatrix} r & 0 \\ 0 & 1 \end{psmallmatrix}\). Its kernel is the
+		      \vocab{special linear group}
+		      \[
+			      SL(2,\mathbb R) = \{A \in GL(2,\mathbb R) : \det(A) = 1\}.
+		      \]
+		      (This extends to \(\det\colon GL(n,\mathbb R) \to \mathbb R^\times\).)
+		\item We generalize the construction of \(\ker f\). Recall the \vocab{inverse image}
+		      of a subset \(B \subseteq Y\) under a function \(f\colon X \to Y\):
+		      \[
+			      f^{-1}(B) = \{x \in X : f(x) \in B\}.
+		      \]
+		      If \(f\colon G \to H\) is a homomorphism and \(B \leq H\), then
+		      \(f^{-1}(B)\) is a subgroup of \(G\) containing \(\ker f\). Indeed,
+		      \(1 \in f^{-1}(B)\), for \(f(1) = 1 \in B\). If \(x, y \in f^{-1}(B)\), then
+		      \(f(xy) = f(x)f(y) \in B\), so \(xy \in f^{-1}(B)\). If \(x \in f^{-1}(B)\),
+		      then \(f(x^{-1}) = f(x)^{-1} \in B\), so \(x^{-1} \in f^{-1}(B)\). Finally
+		      \(\ker f = f^{-1}(\{1\}) \subseteq f^{-1}(B)\).
+	\end{enumerate}
+\end{eg}
+
+\begin{proposition}\label{prop:kernel-image}
+	Let \(f\colon G \to H\) be a homomorphism.
+	\begin{enumerate}[(i)]
+		\item \(\ker f\) is a subgroup of \(G\), and \(\im f\) is a subgroup of \(H\).
+		\item If \(x \in \ker f\) and \(a \in G\), then \(axa^{-1} \in \ker f\).
+		\item \(f\) is an injection if and only if \(\ker f = \{1\}\).
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+	(i) \(\ker f = f^{-1}(\{1\})\) is a subgroup by \autoref{eg:kernels}(iv). As for the
+	image: \(1 = f(1) \in \im f\); if \(h = f(x) \in \im f\), then
+	\(h^{-1} = f(x)^{-1} = f(x^{-1}) \in \im f\); and if also \(k = f(y) \in \im f\), then
+	\(hk = f(x)f(y) = f(xy) \in \im f\).
+
+	(ii) If \(f(x) = 1\), then
+	\(f(axa^{-1}) = f(a)f(x)f(a)^{-1} = f(a)f(a)^{-1} = 1\).
+
+	(iii) If \(f\) is an injection, then \(x \neq 1\) implies \(f(x) \neq f(1) = 1\), so
+	\(x \notin \ker f\). Conversely, assume \(\ker f = \{1\}\) and \(f(x) = f(y)\). Then
+	\(1 = f(x)f(y)^{-1} = f(xy^{-1})\), so \(xy^{-1} \in \ker f = \{1\}\); hence
+	\(x = y\).
+\end{proof}
+
+\begin{definition}[Normal subgroup]\label{def:normal}
+	A subgroup \(K\) of a group \(G\) is a \vocab{normal subgroup} if \(k \in K\) and
+	\(g \in G\) imply \(gkg^{-1} \in K\). We then write \(K \trianglelefteq G\).
+\end{definition}
+
+\autoref{prop:kernel-image} thus says that \emph{the kernel of a homomorphism is always a
+	normal subgroup}. We record some first examples.
+\begin{itemize}
+	\item If \(G\) is abelian, then every subgroup \(K\) is normal: for \(k \in K\) and
+	      \(g \in G\), \(gkg^{-1} = kgg^{-1} = k \in K\).
+	\item The cyclic subgroup \(H = \langle(1\ 2)\rangle = \{(1), (1\ 2)\}\) of \(S_3\) is
+	      \emph{not} normal: if \(\alpha = (1\ 2\ 3)\), then \(\alpha^{-1} = (3\ 2\ 1)\) and
+	      \[
+		      \alpha(1\ 2)\alpha^{-1} = (1\ 2\ 3)(1\ 2)(3\ 2\ 1) = (2\ 3) \notin H.
+	      \]
+	\item The cyclic subgroup \(K = \langle(1\ 2\ 3)\rangle = \{(1), (1\ 2\ 3), (1\ 3\ 2)\}\)
+	      of \(S_3\) is normal: by \autoref{prop:conj-same-structure}, a conjugate of a
+	      \(3\)-cycle is a \(3\)-cycle, and \(K\) contains both \(3\)-cycles of \(S_3\).
+	\item By \autoref{eg:kernels}(ii) and (iii), \(A_n \trianglelefteq S_n\) and
+	      \(SL(2,\mathbb R) \trianglelefteq GL(2,\mathbb R)\) (both facts are also easy to
+	      prove directly).
+\end{itemize}
+
+\subsection{Conjugation and the Center}
+
+\begin{definition}[Conjugate]
+	If \(G\) is a group and \(a \in G\), then a \vocab{conjugate} of \(a\) is any element of
+	the form \(gag^{-1}\) with \(g \in G\).
+\end{definition}
+
+Clearly, a subgroup \(K \leq G\) is normal if and only if \(K\) contains all the conjugates
+of its elements. By \autoref{prop:conjugacy-criterion}, \(\alpha, \beta \in S_n\) are
+conjugate in \(S_n\) if and only if they have the same cycle structure.
+
+\begin{remark}
+	If \(H \leq S_n\), then \(\alpha, \beta \in H\) being conjugate in \(S_n\) does
+	\emph{not} imply that they are conjugate in \(H\). For example, \((1\ 2)(3\ 4)\) and
+	\((1\ 3)(2\ 4)\) are conjugate in \(S_4\), but not in \(\mathbf V\): since
+	\(\mathbf V\) is abelian, the only conjugate of an element of \(\mathbf V\) in
+	\(\mathbf V\) is the element itself.
+\end{remark}
+
+\begin{remark}[Similarity]
+	In linear algebra, a linear transformation \(T\colon V \to V\) of an \(n\)-dimensional
+	real vector space determines an \(n \times n\) matrix \(A\) once a basis of \(V\) is
+	chosen; another basis gives another matrix \(B\), and \(A\) and \(B\) are
+	\emph{similar}: \(B = PAP^{-1}\) for some nonsingular \(P\). Thus conjugacy in
+	\(GL(n,\mathbb R)\) is similarity.
+\end{remark}
+
+\begin{definition}[Conjugation]
+	If \(G\) is a group and \(g \in G\), define \vocab{conjugation}
+	\(\gamma_g\colon G \to G\) by
+	\[
+		\gamma_g(a) = gag^{-1} \qquad\text{for all } a \in G.
+	\]
+\end{definition}
+
+\begin{proposition}\label{prop:conjugation-iso}
+	\begin{enumerate}[(i)]
+		\item If \(G\) is a group and \(g \in G\), then conjugation
+		      \(\gamma_g\colon G \to G\) is an isomorphism.
+		\item Conjugate elements have the same order.
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+	(i) If \(g, h \in G\), then
+	\[
+		(\gamma_g \circ \gamma_h)(a) = \gamma_g(hah^{-1}) = g(hah^{-1})g^{-1}
+		= (gh)a(gh)^{-1} = \gamma_{gh}(a);
+	\]
+	that is, \(\gamma_g \circ \gamma_h = \gamma_{gh}\). It follows that each \(\gamma_g\) is
+	a bijection, for \(\gamma_g \circ \gamma_{g^{-1}} = \gamma_1 = 1_G
+	= \gamma_{g^{-1}} \circ \gamma_g\). And \(\gamma_g\) is a homomorphism:
+	\[
+		\gamma_g(ab) = g(ab)g^{-1} = (gag^{-1})(gbg^{-1}) = \gamma_g(a)\gamma_g(b).
+	\]
+
+	(ii) If \(a\) and \(b\) are conjugate, then \(b = gag^{-1} = \gamma_g(a)\) for some
+	\(g \in G\). Since \(\gamma_g\) is an isomorphism, \(a\) and \(b\) have the same order by
+	\autoref{lem:order-invariant}(i).
+\end{proof}
+
+\begin{eg}[The center]\label{eg:center}
+	The \vocab{center} of a group \(G\) is
+	\[
+		Z(G) = \{z \in G : zg = gz \text{ for all } g \in G\};
+	\]
+	it consists of all elements commuting with everything in \(G\). (The equation
+	\(zg = gz\) can be rewritten as \(z = gzg^{-1}\), so no other element of \(G\) is
+	conjugate to \(z\).)
+
+	\(Z(G)\) is a subgroup: \(1 \in Z(G)\). If \(y, z \in Z(G)\), then for all \(g\),
+	\((yz)g = y(zg) = y(gz) = (yg)z = g(yz)\), so \(yz \in Z(G)\). If \(z \in Z(G)\), then
+	in particular \(zg^{-1} = g^{-1}z\) for all \(g\), and taking inverses
+	(\autoref{lem:group-cancellation}(iii)) gives \(gz^{-1} = z^{-1}g\), so
+	\(z^{-1} \in Z(G)\).
+
+	\(Z(G)\) is a normal subgroup: if \(z \in Z(G)\) and \(g \in G\), then
+	\(gzg^{-1} = zgg^{-1} = z \in Z(G)\). The same computation shows that \emph{every}
+	subgroup of \(Z(G)\) is normal in \(G\).
+
+	A group \(G\) is abelian if and only if \(Z(G) = G\). At the other extreme are groups with
+	\(Z(G) = \{1\}\); these are called \vocab{centerless}. For example, \(S_n\) is centerless
+	for every \(n \geq 3\) (Rotman, Exercise 2.31): if \(\alpha \neq (1)\), then \(\alpha\)
+	moves some \(i\), say \(\alpha(i) = j \neq i\); choose \(k \notin \{i, j\}\) and let
+	\(\beta = (j\ k)\). By \autoref{lem:conj-action}, \(\beta\alpha\beta^{-1}\) sends
+	\(\beta(i) = i\) to \(\beta(j) = k \neq j\), so \(\beta\alpha\beta^{-1} \neq \alpha\),
+	and \(\alpha \notin Z(S_n)\).
+\end{eg}
+
+\begin{eg}[\(\mathbf V \trianglelefteq S_4\)]\label{eg:V-normal-S4}
+	The four-group \(\mathbf V = \{(1), (1\ 2)(3\ 4), (1\ 3)(2\ 4), (1\ 4)(2\ 3)\}\) is a
+	normal subgroup of \(S_4\). By \autoref{prop:conj-same-structure}, every conjugate of a
+	product of two disjoint transpositions is another such; but there are only \(3\)
+	permutations in \(S_4\) with this cycle structure (\autoref{tab:cycle-counts}), and all
+	of them lie in \(\mathbf V\).
+\end{eg}
+
+\begin{proposition}\label{prop:index-two}
+	Let \(H\) be a subgroup of index \(2\) in a group \(G\).
+	\begin{enumerate}[(i)]
+		\item \(g^2 \in H\) for every \(g \in G\).
+		\item \(H\) is a normal subgroup of \(G\).
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+	Since \(H\) has index \(2\), there are exactly two cosets, \(H\) and \(aH\) with
+	\(a \notin H\), and \(G\) is the disjoint union \(G = H \cup aH\).
+
+	(i) If \(g \in H\), then \(g^2 \in H\). Otherwise \(g \in aH\), say \(g = ah\) with
+	\(h \in H\). If \(g^2 \notin H\), then \(g^2 = ah'\) with \(h' \in H\), and
+	\[
+		g = g^{-1}g^2 = (ah)^{-1}ah' = h^{-1}a^{-1}ah' = h^{-1}h' \in H,
+	\]
+	a contradiction.
+
+	(ii) Let \(h \in H\) and \(g \in G\); we show \(ghg^{-1} \in H\). If \(g \in H\), this
+	holds because \(H\) is a subgroup. Otherwise \(g \in aH\), say \(g = ax\) with
+	\(x \in H\). Then \(ghg^{-1} = a(xhx^{-1})a^{-1} = ah'a^{-1}\), where
+	\(h' = xhx^{-1} \in H\). If \(ghg^{-1} \notin H\), then \(ah'a^{-1} \in aH\), say
+	\(ah'a^{-1} = ay\) with \(y \in H\). Canceling \(a\) gives \(h'a^{-1} = y\), and then
+	\(a = y^{-1}h' \in H\), a contradiction. Hence \(H \trianglelefteq G\).
+\end{proof}
+
+\subsection{The Quaternions}
+
+\begin{definition}[Quaternions]\label{def:quaternions}
+	The \vocab{group of quaternions} is the set \(\mathbf Q\) of the following eight matrices
+	in \(GL(2,\mathbb C)\):
+	\[
+		\mathbf Q = \{I, A, A^2, A^3, B, BA, BA^2, BA^3\},
+		\qquad\text{where}\quad
+		A = \begin{pmatrix} 0 & 1 \\ -1 & 0 \end{pmatrix},
+		\quad
+		B = \begin{pmatrix} 0 & i \\ i & 0 \end{pmatrix}.
+	\]
+\end{definition}
+
+\begin{proposition}[Rotman, Exercise 2.76]\label{prop:quaternions}
+	\(\mathbf Q\) is a nonabelian group of order \(8\). Its only element of order \(2\) is
+	\(-I\), every \(M \in \mathbf Q\) with \(M \neq \pm I\) satisfies \(M^2 = -I\), and
+	\(Z(\mathbf Q) = \{I, -I\}\).
+\end{proposition}
+
+\begin{proof}
+	Put \(C = BA\). Direct computation gives
+	\[
+		A^2 = B^2 = -I, \qquad
+		C = BA = \begin{pmatrix} -i & 0 \\ 0 & i \end{pmatrix}, \qquad
+		AB = \begin{pmatrix} i & 0 \\ 0 & -i \end{pmatrix} = -C, \qquad C^2 = -I.
+	\]
+	Hence \(A^3 = -A\), \(BA^2 = -B\), \(BA^3 = -C\), and
+	\(\mathbf Q = \{\pm I, \pm A, \pm B, \pm C\}\), eight distinct matrices. From the
+	relations above,
+	\begin{align*}
+		AB & = -C,             & BC & = B^2A = -A,        & CA & = BA^2 = -B,     \\
+		BA & = C,              & CB & = BAB = -B^2A = A,  & AC & = ABA = -CA = B,
+	\end{align*}
+	Thus the product of any two elements of \(\mathbf Q\) lies in
+	\(\mathbf Q\), and \(\mathbf Q\) is a subgroup of \(GL(2,\mathbb C)\) by
+	\autoref{prop:finite-subgroup-criterion}. It is not abelian, since \(AB = -BA \neq BA\).
+
+	Since \((-M)^2 = M^2\), every element other than \(\pm I\) squares to \(-I\) and hence has
+	order \(4\), while \(-I\) has order \(2\). Finally \(\pm I\) are central (they are scalar
+	matrices), whereas \(\pm A\) does not commute with \(B\), and \(\pm B\) and \(\pm C\) do
+	not commute with \(A\); so \(Z(\mathbf Q) = \{\pm I\}\).
+\end{proof}
+
+\begin{note}[Hamilton's quaternions]
+	Addition, subtraction, multiplication, and division can be extended from \(\mathbb R\) to
+	the plane so that all the usual laws hold: this is \(\mathbb C\). W.~R.~Hamilton found
+	a way of extending these operations to four-dimensional space so that all the usual
+	laws still hold except commutativity of multiplication; he called the new ``numbers''
+	\emph{quaternions} (Latin for ``four''). The multiplication is determined by the basis
+	vectors \(1, \mathbf i, \mathbf j, \mathbf k\) with
+	\[
+		\mathbf i^2 = \mathbf j^2 = \mathbf k^2 = -1, \quad
+		\mathbf{ij} = \mathbf k = -\mathbf{ji}, \quad
+		\mathbf{jk} = \mathbf i = -\mathbf{kj}, \quad
+		\mathbf{ki} = \mathbf j = -\mathbf{ik}.
+	\]
+	The nonzero quaternions form a multiplicative group, and \(\mathbf Q\) is isomorphic to
+	its subgroup \(\{\pm 1, \pm\mathbf i, \pm\mathbf j, \pm\mathbf k\}\).
+\end{note}
+
+In \(\mathbf Q\), the element \(A\) has order \(4\), so \(\langle A\rangle\) has index
+\(2\); its other coset is
+\[
+	B\langle A\rangle = \{B, BA, BA^2, BA^3\}.
+\]
+
+\begin{eg}[Every subgroup of \(\mathbf Q\) is normal]\label{eg:Q-subgroups-normal}
+	By Lagrange's theorem the possible orders of subgroups of \(\mathbf Q\) are \(1, 2, 4,
+	8\). The subgroups \(\{I\}\) and \(\mathbf Q\) are clearly normal. A subgroup of order
+	\(4\) has index \(2\), hence is normal by \autoref{prop:index-two}. Finally, \(-I\) is
+	the only element of order \(2\), so \(\langle -I\rangle\) is the only subgroup of order
+	\(2\); it is normal because it equals the center \(Z(\mathbf Q)\)
+	(\autoref{eg:center}).
+\end{eg}
+
+Thus \(\mathbf Q\) is a nonabelian group which is like an abelian group in the sense that
+every subgroup is normal. This is essentially the only such example: every finite group
+all of whose subgroups are normal has the form \(\mathbf Q \times A\), where
+\(A = B \times C\), every nonidentity element of \(B\) has order \(2\), and every element
+of \(C\) has odd order (direct products are introduced in the next section).
+
+Lagrange's theorem says that the order of a subgroup of a finite group \(G\) divides
+\(\abs{G}\). As remarked after \autoref{cor:prime-order-cyclic}, the converse is false; we
+can now prove it.
+
+\begin{proposition}\label{prop:A4-no-6}
+	The alternating group \(A_4\) is a group of order \(12\) having no subgroup of order
+	\(6\).
+\end{proposition}
+
+\begin{proof}
+	By \autoref{tab:cycle-counts}, the even permutations in \(S_4\) are the identity, the
+	\(8\) three-cycles, and the \(3\) products of two disjoint transpositions; so
+	\(\abs{A_4} = 12\). If \(A_4\) had a subgroup \(H\) of order \(6\), then \(H\) would have
+	index \(2\), and so \(\alpha^2 \in H\) for every \(\alpha \in A_4\), by
+	\autoref{prop:index-two}(i). If \(\alpha\) is a \(3\)-cycle, then \(\alpha\) has order
+	\(3\), so \(\alpha = \alpha^4 = (\alpha^2)^2 \in H\). Thus \(H\) contains all \(8\)
+	three-cycles, which is impossible since \(\abs{H} = 6\).
+\end{proof}
+
+\autoref{prop:abelian-subgroups} will show, however, that an \emph{abelian} group of order
+\(n\) has a subgroup of order \(d\) for every divisor \(d\) of \(n\).

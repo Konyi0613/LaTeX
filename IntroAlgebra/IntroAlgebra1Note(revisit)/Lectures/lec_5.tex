@@ -1,0 +1,834 @@
+\lecture{5}{Rotman §2.6}{Quotient Groups}
+
+\section{Quotient Groups}
+
+The group \(\mathbb Z_m\) of residue classes was built from \(\mathbb Z\) and its subgroup
+\(m\mathbb Z\). This construction is the prototype of a general way of building new groups
+from given ones, called \emph{quotient groups}. Along the way, group theory gives new proofs
+of the theorems of Fermat, Euler, and Wilson.
+
+\subsection{The Integers mod \(m\), Revisited}
+
+Fix \(m \geq 2\). We constructed the residue classes \([a]_m = a + m\mathbb Z\) and the set
+\(\mathbb Z_m\) in Lecture~2. Rotman's Propositions 2.98--2.103 are results we have
+already proved:
+\begin{itemize}
+	\item \([a]_m = [b]_m\) if and only if \(a \equiv b \pmod m\)
+	      (\autoref{prop:residue-class-equality}); in particular \([a]_m = [0]_m\) if and only
+	      if \(m \mid a\);
+	\item \(\mathbb Z_m = \{[0]_m, [1]_m, \dots, [m-1]_m\}\) has exactly \(m\) elements
+	      (\autoref{cor:Zn-list});
+	\item \([a]_m + [b]_m = [a+b]_m\) is well defined (\autoref{lem:addition-well-defined}),
+	      and \(\mathbb Z_m\) is an abelian group of order \(m\) under it
+	      (\autoref{thm:Zn-additive-group});
+	\item \([a]_m[b]_m = [ab]_m\) is well defined (\autoref{lem:multiplication-well-defined});
+	      it is associative and commutative with identity \([1]_m\), because these laws are
+	      inherited from \(\mathbb Z\) exactly as for addition.
+\end{itemize}
+The group axioms in \(\mathbb Z_m\) are ``inherited'' from those of \(\mathbb Z\). When the
+modulus is clear from context, we sometimes drop the subscript and write \([a]\) for
+\([a]_m\).
+
+\begin{proposition}\label{prop:Zm-cyclic}
+	\(\mathbb Z_m\) is a cyclic group of order \(m\) with generator \([1]_m\). Consequently,
+	every cyclic group of order \(m\) is isomorphic to \(\mathbb Z_m\).
+\end{proposition}
+
+\begin{proof}
+	If \(0 \leq r < m\), then \([r]_m = [1]_m + \cdots + [1]_m\) (\(r\) summands), so
+	\(\mathbb Z_m = \langle[1]_m\rangle\). The second statement follows from
+	\autoref{eg:cyclic-iso}.
+\end{proof}
+
+\begin{remark}
+	Here is an alternative construction. Let \(G_m = \{0, 1, \dots, m-1\}\), with
+	\[
+		a \oplus b = \begin{cases}
+			a + b     & \text{if } a + b \leq m-1, \\
+			a + b - m & \text{if } a + b > m-1.
+		\end{cases}
+	\]
+	Although this definition looks simpler, proving associativity is now very tedious, and
+	proofs with it usually require case analyses (compare \autoref{eg:cyclic-iso}).
+\end{remark}
+
+\(\mathbb Z_m\) is \emph{not} a group under multiplication, since some elements, e.g.\
+\([0]_m\), have no inverse. We shall repeatedly need two consequences of B\'ezout's identity.
+
+\begin{lemma}\label{lem:coprime-divisibility}
+	Let \(a, b, m, n\) be integers.
+	\begin{enumerate}[(i)]
+		\item \emph{(Euclid's lemma)} If \(\gcd(m, a) = 1\) and \(m \mid ab\), then
+		      \(m \mid b\). In particular, if \(p\) is prime and \(p \mid ab\), then
+		      \(p \mid a\) or \(p \mid b\).
+		\item If \(\gcd(m, n) = 1\), \(m \mid a\), and \(n \mid a\), then \(mn \mid a\).
+	\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+	(i) By \autoref{cor:bezout-criterion} there are \(x, y\) with \(mx + ay = 1\). Then
+	\(b = mbx + (ab)y\), and \(m\) divides both terms. If \(p\) is prime and \(p \nmid a\),
+	then \(\gcd(p, a) = 1\), since the only positive divisors of \(p\) are \(1\) and \(p\).
+
+	(ii) Write \(a = mq\). Then \(n \mid mq\) with \(\gcd(n, m) = 1\), so \(n \mid q\) by
+	(i), and \(mn \mid mq = a\).
+\end{proof}
+
+\begin{proposition}\label{prop:Zp-units}
+	\begin{enumerate}[(i)]
+		\item If \(\gcd(a, m) = 1\), then \([a]_m[x]_m = [b]_m\) can be solved for
+		      \([x]_m \in \mathbb Z_m\).
+		\item If \(p\) is prime, then \(\mathbb Z_p^\times\), the set of nonzero elements of
+		      \(\mathbb Z_p\), is a multiplicative abelian group of order \(p - 1\).
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+	(i) Choose \(s, t\) with \(sa + tm = 1\). Then \([s]_m[a]_m = [1]_m\), so
+	\([x]_m = [sb]_m\) is a solution: \([a]_m[sb]_m = [s]_m[a]_m[b]_m = [b]_m\).
+
+	(ii) If \(0 < a < p\), then \(\gcd(a, p) = 1\). Hence \(\mathbb Z_p^\times\) coincides
+	with the group \(\mathbb Z_p^*\) of units of \autoref{thm:units-group}, and it has
+	\(p - 1\) elements, being \(\mathbb Z_p\) with \([0]_p\) removed.
+\end{proof}
+
+We will prove later (Rotman, Theorem 3.122) that \(\mathbb Z_p^\times\) is a \emph{cyclic}
+group of order \(p - 1\). Here is a new proof of Fermat's theorem, entirely different from
+the one in \autoref{eg:mckay}.
+
+\begin{corollary}[Fermat]\label{cor:fermat}
+	If \(p\) is a prime and \(a \in \mathbb Z\), then \(a^p \equiv a \pmod p\).
+\end{corollary}
+
+\begin{proof}
+	It suffices to show that \([a^p]_p = [a]_p\). If \([a]_p = [0]_p\), then
+	\([a^p]_p = [a]_p^p = [0]_p = [a]_p\). If \([a]_p \neq [0]_p\), then
+	\([a]_p \in \mathbb Z_p^\times\), a group of order \(p - 1\), so
+	\([a]_p^{p-1} = [1]_p\) by \autoref{cor:am-equals-1}. Multiplying by \([a]_p\) gives
+	\([a^p]_p = [a]_p^p = [a]_p\).
+\end{proof}
+
+If \(m\) is not prime, then \(\mathbb Z_m^\times = \mathbb Z_m - \{[0]_m\}\) is \emph{not} a
+group: if \(m = ab\) with \(1 < a, b < m\), then \([a]_m, [b]_m \neq [0]_m\), but
+\([a]_m[b]_m = [m]_m = [0]_m\). The right analogue of \(\mathbb Z_p^\times\) is the group
+\(\mathbb Z_m^*\) of units from Lecture~2, which Rotman denotes by \(U(\mathbb Z_m)\).
+
+\begin{definition}[Euler \(\phi\)-function]
+	For \(m \geq 1\), \(\phi(m)\) is the number of integers \(k\) with \(1 \leq k \leq m\) and
+	\(\gcd(k, m) = 1\).
+\end{definition}
+
+\begin{lemma}\label{lem:units-order}
+	\(\mathbb Z_m^*\) is exactly the set of classes in \(\mathbb Z_m\) having a
+	multiplicative inverse, and it is a multiplicative abelian group of order \(\phi(m)\).
+\end{lemma}
+
+\begin{proof}
+	The first statement is \autoref{cor:unit-criterion}, and \(\mathbb Z_m^*\) is an abelian
+	group by \autoref{thm:units-group}. By \autoref{cor:Zn-list}, \(\mathbb Z_m^*\) consists
+	of the \([r]_m\) with \(0 \leq r \leq m-1\) and \(\gcd(r, m) = 1\), and these are
+	distinct. Since \(\gcd(0, m) = m = \gcd(m, m) \neq 1\), replacing the range
+	\(0 \leq r \leq m-1\) by \(1 \leq r \leq m\) does not change the count, which is
+	therefore \(\phi(m)\).
+\end{proof}
+
+If \(p\) is prime, then \(\phi(p) = p - 1\) and \(\mathbb Z_p^* = \mathbb Z_p^\times\).
+
+\begin{theorem}[Euler]\label{thm:euler}
+	If \(\gcd(r, m) = 1\), then \(r^{\phi(m)} \equiv 1 \pmod m\).
+\end{theorem}
+
+\begin{proof}
+	If \(G\) is a finite group of order \(n\), then \(x^n = 1\) for all \(x \in G\)
+	(\autoref{cor:am-equals-1}). Here \([r]_m \in \mathbb Z_m^*\), a group of order
+	\(\phi(m)\) by \autoref{lem:units-order}, so \([r]_m^{\phi(m)} = [1]_m\). In congruence
+	notation, \(r^{\phi(m)} \equiv 1 \pmod m\).
+\end{proof}
+
+\begin{eg}[\(\mathbb Z_8^*\) and \(\mathbb Z_{10}^*\)]\label{eg:units-8-10}
+	We have
+	\[
+		\mathbb Z_8^* = \{[1], [3], [5], [7]\} \cong \mathbf V,
+	\]
+	for \([3]^2 = [9] = [1]\), \([5]^2 = [25] = [1]\), and \([7]^2 = [49] = [1]\), so every
+	nonidentity element has order \(2\) (see \autoref{prop:order-4}). Moreover,
+	\[
+		\mathbb Z_{10}^* = \{[1], [3], [7], [9]\} \cong \mathbb Z_4,
+	\]
+	for \([3]^4 = [81] = [1]\) while \([3]^2 = [9] = [-1] \neq [1]\); so \([3]\) has order
+	\(4\), and \(\mathbb Z_{10}^*\) is cyclic.
+\end{eg}
+
+\begin{theorem}[Wilson]\label{thm:wilson}
+	An integer \(p \geq 2\) is a prime if and only if
+	\[
+		(p-1)! \equiv -1 \pmod p.
+	\]
+\end{theorem}
+
+\begin{proof}
+	Assume \(p\) is prime. If \(a_1, \dots, a_n\) is a list of all the elements of a finite
+	abelian group \(G\), then the product \(a_1a_2\cdots a_n\) equals the product of all
+	elements \(a\) with \(a^2 = 1\), for every other element cancels against its inverse
+	(\(a \neq a^{-1}\) pairs off with \(a^{-1}\)). In \(\mathbb Z_p^\times\), if
+	\([a]^2 = [1]\), then \(p \mid a^2 - 1 = (a-1)(a+1)\), so \(p \mid a - 1\) or
+	\(p \mid a + 1\) by \autoref{lem:coprime-divisibility}(i); that is, \([a] = [\pm 1]\).
+	Hence the product of all elements of \(\mathbb Z_p^\times\), namely
+	\([1][2]\cdots[p-1] = [(p-1)!]\), is \([1][-1] = [-1]\) if \(p\) is odd, and
+	\([1] = [-1]\) if \(p = 2\). Therefore \((p-1)! \equiv -1 \pmod p\).
+
+	Conversely, suppose \((m-1)! \equiv -1 \pmod m\), say \((m-1)! + 1 = km\). Then every
+	common divisor of \(m\) and \((m-1)!\) divides \(1\), so \(\gcd(m, (m-1)!) = 1\). If
+	\(m\) were composite, there would be \(a \mid m\) with \(1 < a \leq m-1\); then
+	\(a \mid (m-1)!\), and \(a > 1\) would be a common divisor of \(m\) and \((m-1)!\), a
+	contradiction. Therefore \(m\) is prime.
+\end{proof}
+
+\begin{remark}
+	Wilson's theorem generalizes the way Euler's theorem generalizes Fermat's: replace
+	\(\mathbb Z_p^\times\) by \(\mathbb Z_n^*\). For example, one can show for all
+	\(m \geq 3\) that \(\mathbb Z_{2^m}^*\) has exactly \(3\) elements of order \(2\), namely
+	\([-1]\), \([1 + 2^{m-1}]\), and \([-(1 + 2^{m-1})]\). It follows that the product of
+	all odd numbers \(r\) with \(1 \leq r < 2^m\) is congruent to \(1\) modulo \(2^m\), because
+	\[
+		(-1)(1 + 2^{m-1})(-1 - 2^{m-1}) = (1 + 2^{m-1})^2 = 1 + 2^m + 2^{2m-2}
+		\equiv 1 \pmod{2^m}.
+	\]
+\end{remark}
+
+\subsection{Quotient Groups}
+
+The map \(\pi\colon \mathbb Z \to \mathbb Z_m\), \(\pi(a) = [a]_m\), is a surjective
+homomorphism, so \(\mathbb Z_m = \im\pi\): every element of \(\mathbb Z_m\) has the form
+\(\pi(a)\), and \(\pi(a) + \pi(b) = \pi(a+b)\). This description of \(\mathbb Z_m\) in
+terms of \(\mathbb Z\) generalizes to arbitrary groups. Suppose \(f\colon G \to H\) is a
+surjective homomorphism. Every element of \(H\) has the form \(f(a)\), and the operation
+in \(H\) is given by \(f(a)f(b) = f(ab)\). Now \(K = \ker f\) is a normal subgroup of \(G\),
+and we are going to reconstruct \(H = \im f\) (and a surjective homomorphism
+\(\pi\colon G \to H\)) from \(G\) and \(K\) alone.
+
+\begin{definition}[Product of subsets]
+	Let \(\mathcal P(G)\) be the family of all nonempty subsets of a group \(G\). For
+	\(X, Y \in \mathcal P(G)\), define
+	\[
+		XY = \{xy : x \in X \text{ and } y \in Y\}.
+	\]
+\end{definition}
+
+This multiplication is associative: \(X(YZ)\) is the set of all \(x(yz)\) and \((XY)Z\) is
+the set of all \((xy)z\) with \(x \in X\), \(y \in Y\), \(z \in Z\), and these are the same
+elements. Some instances:
+\begin{itemize}
+	\item The product of a one-point subset \(\{a\}\) and a subgroup \(H\) is the coset
+	      \(aH\).
+	\item If \(H \leq G\), then \(HH = H\): \(HH \subseteq H\) because \(H\) is closed under
+	      multiplication, and \(h = h1 \in HH\) for every \(h \in H\).
+\end{itemize}
+Two subsets may commute even though their elements do not: \(HH = HH\) for a nonabelian
+subgroup \(H\). More interestingly, let \(G = S_3\) and \(K = \langle(1\ 2\ 3)\rangle\).
+Then \((1\ 2)\) does not commute with \((1\ 2\ 3) \in K\), but \((1\ 2)K = K(1\ 2)\). In
+fact, normal subgroups are characterized by this property.
+
+\begin{lemma}\label{lem:normal-cosets}
+	A subgroup \(K\) of a group \(G\) is normal if and only if \(bK = Kb\) for every
+	\(b \in G\).
+\end{lemma}
+
+\begin{proof}
+	Assume \(K \trianglelefteq G\), and let \(bk \in bK\). Then \(bkb^{-1} = k' \in K\), so
+	\(bk = (bkb^{-1})b = k'b \in Kb\); hence \(bK \subseteq Kb\). For the reverse inclusion,
+	let \(kb \in Kb\). Since \(K\) is normal, \(b^{-1}kb = b^{-1}k(b^{-1})^{-1} = k'' \in K\),
+	so \(kb = b(b^{-1}kb) = bk'' \in bK\). Therefore \(bK = Kb\).
+
+	Conversely (Rotman, Exercise 2.69), assume \(bK = Kb\) for all \(b\). If \(k \in K\) and
+	\(b \in G\), then \(bk \in bK = Kb\), say \(bk = k'b\); hence
+	\(bkb^{-1} = k' \in K\).
+\end{proof}
+
+Here is a fundamental construction of a new group from a given group.
+
+\begin{theorem}\label{thm:quotient-group}
+	Let \(G/K\) denote the family of all cosets of a subgroup \(K\) of \(G\). If \(K\) is a
+	normal subgroup, then
+	\[
+		aK\,bK = abK
+	\]
+	for all \(a, b \in G\), and \(G/K\) is a group under this operation.
+\end{theorem}
+
+\begin{proof}
+	The product \((aK)(bK)\) is a product of four elements of \(\mathcal P(G)\), so
+	associativity in \(\mathcal P(G)\) gives
+	\[
+		(aK)(bK) = a(Kb)K = a(bK)K = ab(KK) = abK,
+	\]
+	using \(Kb = bK\) (\autoref{lem:normal-cosets}) and \(KK = K\). Thus the product of two
+	cosets of \(K\) is again a coset of \(K\), and an operation on \(G/K\) has been defined.
+	It is associative, because multiplication in \(\mathcal P(G)\) is. The identity is
+	\(K = 1K\), for \((1K)(bK) = bK\), and the inverse of \(aK\) is \(a^{-1}K\), for
+	\((a^{-1}K)(aK) = a^{-1}aK = K\). Therefore \(G/K\) is a group.
+\end{proof}
+
+\begin{definition}[Quotient group]
+	The group \(G/K\) of \autoref{thm:quotient-group} is called the \vocab{quotient group}
+	\(G\) mod \(K\). When \(G\) is finite, its order is
+	\[
+		\abs{G/K} = [G : K] = \abs{G}/\abs{K}
+	\]
+	(presumably the reason for the name).
+\end{definition}
+
+\begin{eg}[\(\mathbb Z/\langle m\rangle = \mathbb Z_m\)]\label{eg:Z-mod-m}
+	Let \(\langle m\rangle = m\mathbb Z\) be the subgroup of all multiples of \(m\).
+	Since \(\mathbb Z\) is abelian, \(\langle m\rangle\) is normal. The sets
+	\(\mathbb Z/\langle m\rangle\) and \(\mathbb Z_m\) coincide, because they have the same
+	elements: the coset \(a + \langle m\rangle = \{a + km : k \in \mathbb Z\}\) is the class
+	\([a]_m\). The operations also coincide: addition in \(\mathbb Z/\langle m\rangle\) is
+	\((a + \langle m\rangle) + (b + \langle m\rangle) = (a+b) + \langle m\rangle\), which is
+	just \([a]_m + [b]_m = [a+b]_m\). Therefore \(\mathbb Z_m = \mathbb Z/\langle m\rangle\).
+\end{eg}
+
+Recall \autoref{lem:coset-basics}(i): if \(K \leq G\), then \(aK = bK\) if and only if
+\(b^{-1}a \in K\); in particular \(aK = K\) if and only if \(a \in K\). We can now prove
+the converse of \autoref{prop:kernel-image}(ii).
+
+\begin{corollary}\label{cor:normal-is-kernel}
+	Every normal subgroup \(K \trianglelefteq G\) is the kernel of some homomorphism.
+\end{corollary}
+
+\begin{proof}
+	Define the \vocab{natural map} \(\pi\colon G \to G/K\) by \(\pi(a) = aK\). The formula
+	\(aK\,bK = abK\) says \(\pi(a)\pi(b) = \pi(ab)\), so \(\pi\) is a (surjective)
+	homomorphism. Since \(K\) is the identity of \(G/K\),
+	\[
+		\ker\pi = \{a \in G : aK = K\} = K. \qedhere
+	\]
+\end{proof}
+
+The next theorem shows that every homomorphism gives rise to an isomorphism, and that
+quotient groups are merely constructions of homomorphic images. E.~Noether (1882--1935)
+emphasized the fundamental importance of this fact.
+
+\begin{theorem}[First isomorphism theorem]\label{thm:first-iso}
+	If \(f\colon G \to H\) is a homomorphism, then
+	\[
+		\ker f \trianglelefteq G \qquad\text{and}\qquad G/\ker f \cong \im f.
+	\]
+	In more detail, if \(\ker f = K\), then \(\varphi\colon G/K \to \im f \leq H\),
+	\(\varphi(aK) = f(a)\), is an isomorphism.
+\end{theorem}
+
+\begin{proof}
+	\(K = \ker f\) is normal by \autoref{prop:kernel-image}(ii).
+	\begin{itemize}
+		\item \emph{Well defined:} if \(aK = bK\), then \(a = bk\) for some \(k \in K\), and
+		      \(f(a) = f(b)f(k) = f(b)\), because \(f(k) = 1\).
+		\item \emph{Homomorphism:}
+		      \(\varphi(aK\,bK) = \varphi(abK) = f(ab) = f(a)f(b) = \varphi(aK)\varphi(bK)\).
+		\item \emph{Surjective onto \(\im f\):} clearly \(\im\varphi \subseteq \im f\); and if
+		      \(y = f(a) \in \im f\), then \(y = \varphi(aK)\).
+		\item \emph{Injective:} if \(\varphi(aK) = \varphi(bK)\), then \(f(a) = f(b)\), so
+		      \(1 = f(b)^{-1}f(a) = f(b^{-1}a)\) and \(b^{-1}a \in K\); thus \(aK = bK\) by
+		      \autoref{lem:coset-basics}(i). \qedhere
+	\end{itemize}
+\end{proof}
+
+\begin{remark}
+	The following commutative diagram describes the proof, where \(\pi\colon G \to G/K\) is
+	the natural map; the theorem says \(f = \varphi\pi\) with \(\varphi\) an isomorphism
+	onto \(\im f\).
+	\[
+		\begin{tikzcd}
+			G \arrow[rr, "f"] \arrow[dr, "\pi"'] & & H \\
+			& G/K \arrow[ur, "\varphi"'] &
+		\end{tikzcd}
+	\]
+\end{remark}
+
+For example, the identity \(1_G\colon G \to G\) is a surjective homomorphism with kernel
+\(\{1\}\), so \(G/\{1\} \cong G\). Given any homomorphism \(f\colon G \to H\), one should
+immediately ask for its kernel and image; the first isomorphism theorem then provides an
+isomorphism \(G/\ker f \cong \im f\). Since there is no significant difference between
+isomorphic groups, it also says that there is no significant difference between quotient
+groups and homomorphic images.
+
+\begin{eg}[Cyclic groups, again]\label{eg:cyclic-first-iso}
+	We revisit \autoref{eg:cyclic-iso}. If \(G = \langle a\rangle\) is cyclic of order
+	\(m\), define \(f\colon \mathbb Z \to G\) by \(f(n) = a^n\). Then \(f\) is a
+	homomorphism (laws of exponents, \autoref{prop:exponents}), it is surjective because
+	\(a\) generates \(G\), and \(\ker f = \{n \in \mathbb Z : a^n = 1\} = \langle m\rangle\)
+	by \autoref{lem:order-divides}. The first isomorphism theorem gives
+	\(\mathbb Z/\langle m\rangle \cong G\). So every cyclic group of order \(m\) is
+	isomorphic to \(\mathbb Z/\langle m\rangle = \mathbb Z_m\), and hence any two cyclic
+	groups of order \(m\) are isomorphic.
+\end{eg}
+
+\begin{eg}[\(\mathbb R/\mathbb Z \cong S^1\)]\label{eg:R-mod-Z}
+	What is the quotient group \(\mathbb R/\mathbb Z\)? Define
+	\(f\colon \mathbb R \to S^1\), where \(S^1\) is the circle group, by
+	\(f(x) = e^{2\pi ix}\). Then \(f\) is a homomorphism, \(f(x+y) = f(x)f(y)\), by the
+	addition formulas for sine and cosine, and \(f\) is surjective. Its kernel consists of
+	all \(x \in \mathbb R\) with \(e^{2\pi ix} = \cos 2\pi x + i\sin 2\pi x = 1\); but
+	\(\cos 2\pi x = 1\) forces \(x \in \mathbb Z\), and every integer lies in the kernel, so
+	\(\ker f = \mathbb Z\). The first isomorphism theorem gives
+	\[
+		\mathbb R/\mathbb Z \cong S^1.
+	\]
+\end{eg}
+
+\subsection{Products of Subgroups and the Isomorphism Theorems}
+
+A natural question is whether \(HK\) is a subgroup when \(H\) and \(K\) are subgroups. In
+general it is not: in \(G = S_3\), with \(H = \langle(1\ 2)\rangle\) and
+\(K = \langle(1\ 3)\rangle\),
+\[
+	HK = \{(1), (1\ 2), (1\ 3), (1\ 2)(1\ 3)\} = \{(1), (1\ 2), (1\ 3), (1\ 3\ 2)\}
+\]
+has \(4\) elements, so it is not a subgroup lest we contradict Lagrange's theorem.
+
+\begin{proposition}\label{prop:HK-subgroup}
+	\begin{enumerate}[(i)]
+		\item If \(H\) and \(K\) are subgroups of a group \(G\), and one of them is normal,
+		      then \(HK\) is a subgroup of \(G\); moreover \(HK = KH\) in this case.
+		\item If both \(H\) and \(K\) are normal subgroups, then \(HK\) is a normal subgroup.
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+	(i) Assume first that \(K \trianglelefteq G\). We claim \(HK = KH\). If \(hk \in HK\), then
+	\(k' = hkh^{-1} \in K\), and \(hk = (hkh^{-1})h = k'h \in KH\); so \(HK \subseteq KH\).
+	Similarly \(kh = h(h^{-1}kh) = hk'' \in HK\) with \(k'' = h^{-1}kh \in K\); so
+	\(KH \subseteq HK\).
+
+	Now \(HK\) is a subgroup: \(1 = 1 \cdot 1 \in HK\); if \(hk \in HK\), then
+	\((hk)^{-1} = k^{-1}h^{-1} \in KH = HK\); and if \(hk, h_1k_1 \in HK\), then
+	\(h_1^{-1}kh_1 = k' \in K\), so
+	\[
+		hk\,h_1k_1 = hh_1(h_1^{-1}kh_1)k_1 = (hh_1)(k'k_1) \in HK.
+	\]
+	If instead \(H \trianglelefteq G\), the same argument with the roles of \(H\) and \(K\)
+	exchanged shows that \(KH = HK\) and that \(KH\) is a subgroup.
+
+	(ii) If \(g \in G\), then \(ghkg^{-1} = (ghg^{-1})(gkg^{-1}) \in HK\).
+\end{proof}
+
+Here is a useful counting result.
+
+\begin{proposition}[Product formula]\label{prop:product-formula}
+	If \(H\) and \(K\) are subgroups of a finite group \(G\), then
+	\[
+		\abs{HK}\,\abs{H \cap K} = \abs{H}\,\abs{K},
+	\]
+	where \(HK = \{hk : h \in H,\ k \in K\}\) (not necessarily a subgroup).
+\end{proposition}
+
+\begin{proof}
+	Define \(f\colon H \times K \to HK\) by \(f(h,k) = hk\); clearly \(f\) is surjective. Since
+	\(H \times K\) is the disjoint union of the fibres
+	\(f^{-1}(x) = \{(h,k) \in H \times K : hk = x\}\) for \(x \in HK\), it suffices to show
+	\(\abs{f^{-1}(x)} = \abs{H \cap K}\) for every \(x \in HK\).
+
+	We claim that if \(x = hk\), then
+	\[
+		f^{-1}(x) = \{(hd, d^{-1}k) : d \in H \cap K\}.
+	\]
+	Each \((hd, d^{-1}k)\) lies in \(f^{-1}(x)\), for \(hdd^{-1}k = hk = x\). Conversely, if
+	\((h', k') \in f^{-1}(x)\), then \(h'k' = hk\), so \(h^{-1}h' = kk'^{-1}\) lies in
+	\(H \cap K\); call it \(d\). Then \(h' = hd\) and \(k' = d^{-1}k\). Finally,
+	\(d \mapsto (hd, d^{-1}k)\) is a bijection from \(H \cap K\) onto \(f^{-1}(x)\) (it is
+	injective by cancellation), so \(\abs{f^{-1}(x)} = \abs{H \cap K}\).
+\end{proof}
+
+The next two results are variants of the first isomorphism theorem.
+
+\begin{theorem}[Second isomorphism theorem]\label{thm:second-iso}
+	If \(H\) and \(K\) are subgroups of a group \(G\) with \(H \trianglelefteq G\), then \(HK\)
+	is a subgroup, \(H \cap K \trianglelefteq K\), and
+	\[
+		K/(H \cap K) \cong HK/H.
+	\]
+\end{theorem}
+
+\begin{proof}
+	\(HK\) is a subgroup by \autoref{prop:HK-subgroup}. Moreover \(H \trianglelefteq HK\): in
+	general, if \(H \leq S \leq G\) and \(H\) is normal in \(G\), then \(H\) is normal in \(S\)
+	(if \(ghg^{-1} \in H\) for all \(g \in G\), then in particular for all \(g \in S\)). So
+	\(HK/H\) makes sense.
+
+	Each coset \(xH \in HK/H\) has the form \(kH\) with \(k \in K\): write \(x = hk\); then
+	\(hk = k(k^{-1}hk) = kh'\) with \(h' \in H\), so \(xH = kh'H = kH\). Hence the function
+	\(f\colon K \to HK/H\), \(f(k) = kH\), is surjective. It is a homomorphism, being the
+	restriction to \(K\) of the natural map \(HK \to HK/H\), and
+	\[
+		\ker f = \{k \in K : kH = H\} = K \cap H.
+	\]
+	Therefore \(H \cap K \trianglelefteq K\), and the first isomorphism theorem gives
+	\(K/(H \cap K) \cong HK/H\).
+\end{proof}
+
+The second isomorphism theorem gives the product formula when one of the subgroups is
+normal: \(\abs{K}/\abs{H \cap K} = \abs{HK}/\abs{H}\), that is,
+\(\abs{HK}\,\abs{H \cap K} = \abs{H}\,\abs{K}\).
+
+\begin{theorem}[Third isomorphism theorem]\label{thm:third-iso}
+	If \(H\) and \(K\) are normal subgroups of a group \(G\) with \(K \leq H\), then
+	\(H/K \trianglelefteq G/K\) and
+	\[
+		(G/K)/(H/K) \cong G/H.
+	\]
+\end{theorem}
+
+\begin{proof}
+	Define \(f\colon G/K \to G/H\) by \(f(aK) = aH\). It is well defined: if \(a'K = aK\),
+	then \(a^{-1}a' \in K \leq H\), so \(a'H = aH\). It is a homomorphism,
+	\(f(aK\,bK) = f(abK) = abH = aH\,bH\), and it is surjective. Moreover
+	\[
+		\ker f = \{aK : aH = H\} = \{aK : a \in H\} = H/K,
+	\]
+	so \(H/K\) is a normal subgroup of \(G/K\). Since \(f\) is surjective, the first
+	isomorphism theorem gives \((G/K)/(H/K) \cong G/H\).
+\end{proof}
+
+The third isomorphism theorem is easy to remember: the \(K\)'s in the fraction
+\((G/K)/(H/K)\) can be canceled. One better appreciates the first isomorphism theorem
+after proving the third: \((G/K)/(H/K)\) consists of cosets (of \(H/K\)) whose
+representatives are themselves cosets (of \(K\)), and a direct proof could be nasty.
+
+The next result, which describes the subgroups of a quotient group \(G/K\), can be regarded
+as a fourth isomorphism theorem. Recall that a function \(f\colon X \to Y\) sets up a
+correspondence between subsets of \(X\) and subsets of \(Y\) via direct and inverse images;
+we shall use the elementary facts
+\[
+	S \subseteq T \implies f(S) \subseteq f(T), \qquad
+	S \subseteq f^{-1}(f(S)), \qquad
+	f(f^{-1}(U)) = U \text{ if } f \text{ is surjective}.
+\]
+If \(K \trianglelefteq G\), let \(\operatorname{Sub}(G;K)\) be the family of all subgroups
+\(S\) of \(G\) containing \(K\), and \(\operatorname{Sub}(G/K)\) the family of all subgroups
+of \(G/K\).
+
+\begin{proposition}[Correspondence theorem]\label{prop:correspondence}
+	Let \(G\) be a group and \(K \trianglelefteq G\). Then \(S \mapsto S/K\) is a bijection
+	\(\operatorname{Sub}(G;K) \to \operatorname{Sub}(G/K)\). Writing \(S^* = S/K\):
+	\begin{enumerate}[(i)]
+		\item \(T \leq S\) in \(\operatorname{Sub}(G;K)\) if and only if \(T^* \leq S^*\), in
+		      which case \([S : T] = [S^* : T^*]\);
+		\item \(T \trianglelefteq S\) in \(\operatorname{Sub}(G;K)\) if and only if
+		      \(T^* \trianglelefteq S^*\), in which case \(S/T \cong S^*/T^*\).
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+	Let \(\pi\colon G \to G/K\) be the natural map, and note that
+	\(S/K = \{sK : s \in S\} = \pi(S)\). This is a subgroup of \(G/K\): the image of a
+	subgroup under a homomorphism is a subgroup (apply \autoref{prop:kernel-image}(i) to
+	\(\pi\) restricted to \(S\)). Let \(\Phi(S) = S/K\).
+
+	\emph{Key fact: if \(K \leq S \leq G\), then \(\pi^{-1}(\pi(S)) = S\).} Certainly
+	\(S \subseteq \pi^{-1}(\pi(S))\). Conversely, if \(a \in \pi^{-1}(\pi(S))\), then
+	\(\pi(a) = \pi(s)\) for some \(s \in S\); so \(s^{-1}a \in \ker\pi = K\), that is,
+	\(a = sk\) with \(k \in K \leq S\), and \(a \in S\).
+
+	\emph{\(\Phi\) is injective:} if \(\pi(S) = \pi(S')\) with \(S, S' \in
+	\operatorname{Sub}(G;K)\), then \(S = \pi^{-1}\pi(S) = \pi^{-1}\pi(S') = S'\).
+
+	\emph{\(\Phi\) is surjective:} if \(U \leq G/K\), then \(\pi^{-1}(U)\) is a subgroup of
+	\(G\) containing \(\pi^{-1}(\{1\}) = K\) (\autoref{eg:kernels}(iv)), and
+	\(\pi(\pi^{-1}(U)) = U\) because \(\pi\) is surjective.
+
+	(i) If \(T \leq S\), then \(T^* = \pi(T) \subseteq \pi(S) = S^*\). Conversely, if
+	\(T^* \leq S^*\), then \(T = \pi^{-1}(T^*) \subseteq \pi^{-1}(S^*) = S\) by the key fact.
+	For the indices, we show that \(sT \mapsto \pi(s)T^*\) (\(s \in S\)) is a bijection from
+	the cosets of \(T\) in \(S\) to the cosets of \(T^*\) in \(S^*\). For \(s, s' \in S\),
+	\[
+		sT = s'T \iff s'^{-1}s \in T = \pi^{-1}(T^*) \iff \pi(s')^{-1}\pi(s) \in T^*
+		\iff \pi(s)T^* = \pi(s')T^*,
+	\]
+	which shows that the map is well defined and injective; it is surjective because every
+	element of \(S^*\) is \(\pi(s)\) for some \(s \in S\). Hence \([S : T] = [S^* : T^*]\).
+	(When \(G\) is finite this is simply
+	\([S^*:T^*] = \frac{\abs{S}/\abs{K}}{\abs{T}/\abs{K}} = \abs{S}/\abs{T} = [S:T]\).)
+
+	(ii) If \(T \trianglelefteq S\), then \(K \leq T\) are normal subgroups of the group
+	\(S\), and the third isomorphism theorem (applied to \(S\)) gives
+	\(T/K \trianglelefteq S/K\) and \((S/K)/(T/K) \cong S/T\), that is,
+	\(S^*/T^* \cong S/T\). Conversely, assume \(T^* \trianglelefteq S^*\), and let
+	\(t \in T\), \(s \in S\). Then
+	\[
+		\pi(sts^{-1}) = \pi(s)\pi(t)\pi(s)^{-1} \in \pi(s)T^*\pi(s)^{-1} = T^*,
+	\]
+	so \(sts^{-1} \in \pi^{-1}(T^*) = T\). Hence \(T \trianglelefteq S\).
+\end{proof}
+
+When dealing with quotient groups, one usually says, without explicitly mentioning the
+correspondence theorem, that every subgroup of \(G/K\) has the form \(S/K\) for a unique
+subgroup \(S\) with \(K \leq S \leq G\).
+
+\begin{eg}[The second center]
+	If \(G\) is a finite \(p\)-group and \(G \neq \{1\}\), then \(Z(G) \neq \{1\}\) by
+	\autoref{thm:p-group-center}. Hence, if \(G\) is not abelian, then \(G/Z(G)\) is a
+	nontrivial \(p\)-group and \(Z(G/Z(G)) \neq \{1\}\). An important role in the study of
+	finite \(p\)-groups is played by \(Z_2(G)\), defined as the inverse image of
+	\(Z(G/Z(G))\) under the natural map \(G \to G/Z(G)\). Since the center
+	\(Z(G/Z(G))\) is normal in \(G/Z(G)\), the correspondence theorem gives
+	\(Z_2(G) \trianglelefteq G\).
+\end{eg}
+
+\begin{proposition}\label{prop:abelian-subgroups}
+	If \(G\) is a finite abelian group, then \(G\) has a subgroup of order \(d\) for every
+	divisor \(d\) of \(\abs{G}\). In particular, if \(p\) is a prime divisor of \(\abs{G}\),
+	then \(G\) contains an element of order \(p\). (Compare \autoref{prop:A4-no-6}.)
+\end{proposition}
+
+\begin{proof}
+	First we prove, by induction on \(n = \abs{G}\), that for every prime \(p \mid n\) there
+	is an element of order \(p\) in \(G\). The base step \(n = 1\) is vacuous. For the
+	inductive step, \(n > 1\), so we may choose \(a \in G\) of order \(k > 1\).
+
+	If \(p \mid k\), say \(k = p\ell\), then \(a^\ell\) has order \(p\): indeed
+	\((a^\ell)^p = a^k = 1\), while \((a^\ell)^j = a^{\ell j} \neq 1\) for \(0 < j < p\),
+	since \(0 < \ell j < k\).
+
+	If \(p \nmid k\), let \(H = \langle a\rangle\). Since \(G\) is abelian,
+	\(H \trianglelefteq G\), and \(\abs{G/H} = n/k\) is divisible by \(p\) (Euclid's lemma).
+	By induction, \(G/H\) has an element \(bH\) of order \(p\). If \(b\) has order \(m\),
+	then \((bH)^m = b^mH = H\), so \(p \mid m\) by \autoref{lem:order-divides}. We are back
+	in the first case: \(b^{m/p}\) has order \(p\).
+
+	Now we prove the general statement by induction on \(d \geq 1\), for all finite abelian
+	groups at once. The base step \(d = 1\) is obvious. If \(d > 1\), let \(p\) be a prime
+	divisor of \(d\). By the first part, \(G\) has a subgroup \(H\) of order \(p\); it is
+	normal because \(G\) is abelian, and \(\abs{G/H} = \abs{G}/p\) is divisible by \(d/p\).
+	By induction, \(G/H\) has a subgroup \(S^*\) of order \(d/p\). By the correspondence
+	theorem, \(S^* = S/H\) for a subgroup \(S\) with \(H \leq S \leq G\), and
+	\(\abs{S} = \abs{S^*}\,\abs{H} = (d/p) \cdot p = d\).
+\end{proof}
+
+Cauchy's theorem (\autoref{thm:cauchy}) says that the second statement holds for every
+finite group, abelian or not.
+
+\subsection{Direct Products}
+
+Here is another construction of a new group from two given groups.
+
+\begin{definition}[Direct product]\label{def:direct-product}
+	If \(H\) and \(K\) are groups, their \vocab{direct product} \(H \times K\) is the set of
+	all ordered pairs \((h, k)\) with \(h \in H\) and \(k \in K\), with the operation
+	\[
+		(h, k)(h', k') = (hh', kk').
+	\]
+\end{definition}
+
+It is routine to check that \(H \times K\) is a group: associativity holds coordinatewise,
+the identity is \((1, 1)\), and \((h, k)^{-1} = (h^{-1}, k^{-1})\). Note that \(H \times K\)
+is abelian if and only if both \(H\) and \(K\) are abelian.
+
+\begin{eg}[\(\mathbf V \cong \mathbb Z_2 \times \mathbb Z_2\)]\label{eg:V-Z2Z2}
+	The function \(f\colon \mathbf V \to \mathbb Z_2 \times \mathbb Z_2\) defined by
+	\begin{align*}
+		f\colon (1)          & \mapsto ([0], [0]), & (1\ 2)(3\ 4) & \mapsto ([1], [0]), \\
+		(1\ 3)(2\ 4)         & \mapsto ([0], [1]), & (1\ 4)(2\ 3) & \mapsto ([1], [1])
+	\end{align*}
+	is an isomorphism: in both groups, every nonidentity element has order \(2\) and the
+	product of any two distinct nonidentity elements is the third one.
+\end{eg}
+
+We now apply the first isomorphism theorem to direct products.
+
+\begin{proposition}\label{prop:product-quotient}
+	Let \(G\) and \(G'\) be groups, and let \(K \trianglelefteq G\) and
+	\(K' \trianglelefteq G'\). Then \(K \times K'\) is a normal subgroup of \(G \times G'\),
+	and
+	\[
+		(G \times G')/(K \times K') \cong (G/K) \times (G'/K').
+	\]
+\end{proposition}
+
+\begin{proof}
+	Let \(\pi\colon G \to G/K\) and \(\pi'\colon G' \to G'/K'\) be the natural maps, and
+	define \(f\colon G \times G' \to (G/K) \times (G'/K')\) by
+	\[
+		f(g, g') = (\pi(g), \pi'(g')) = (gK, g'K').
+	\]
+	Since \(\pi\) and \(\pi'\) are surjective homomorphisms and the operations are
+	coordinatewise, \(f\) is a surjective homomorphism. Its kernel is
+	\(\{(g, g') : gK = K,\ g'K' = K'\} = K \times K'\). The first isomorphism theorem now
+	gives both assertions.
+\end{proof}
+
+Here is a characterization of direct products.
+
+\begin{proposition}\label{prop:internal-direct}
+	If a group \(G\) contains normal subgroups \(H\) and \(K\) with \(H \cap K = \{1\}\) and
+	\(HK = G\), then \(G \cong H \times K\).
+\end{proposition}
+
+\begin{proof}
+	First, each \(g \in G\) has a \emph{unique} factorization \(g = hk\) with \(h \in H\) and
+	\(k \in K\): if \(hk = h'k'\), then \(h'^{-1}h = k'k^{-1} \in H \cap K = \{1\}\), so
+	\(h' = h\) and \(k' = k\). We may therefore define \(\varphi\colon G \to H \times K\) by
+	\(\varphi(g) = (h, k)\), where \(g = hk\).
+
+	Next, elements of \(H\) commute with elements of \(K\). Let \(h \in H\) and \(k \in K\).
+	Since \(K\) is normal, \((hkh^{-1})k^{-1} \in K\); since \(H\) is normal,
+	\(h(kh^{-1}k^{-1}) \in H\). But \(H \cap K = \{1\}\), so \(hkh^{-1}k^{-1} = 1\), and
+	\(hk = kh\).
+
+	Now \(\varphi\) is a homomorphism: if \(g = hk\) and \(g' = h'k'\), then
+	\(gg' = hkh'k' = (hh')(kk')\), so
+	\[
+		\varphi(gg') = (hh', kk') = (h, k)(h', k') = \varphi(g)\varphi(g').
+	\]
+	It is surjective, since \(\varphi(hk) = (h, k)\), and injective, since
+	\(\varphi(g) = (1, 1)\) forces \(g = 1\). Therefore \(\varphi\) is an isomorphism.
+\end{proof}
+
+All the hypotheses are needed. For example, let \(G = S_3\), \(H = \langle(1\ 2\ 3)\rangle\),
+and \(K = \langle(1\ 2)\rangle\). Then \(S_3 = HK\) (by the product formula,
+\(\abs{HK} = 3 \cdot 2 / 1 = 6\)), \(H \cap K = \{1\}\), and \(H \trianglelefteq S_3\), but
+\(K\) is not normal. And \(S_3 \not\cong H \times K\), for \(S_3\) is not abelian, while a
+direct product of abelian groups is abelian.
+
+\begin{theorem}\label{thm:Zmn}
+	If \(m\) and \(n\) are relatively prime, then
+	\[
+		\mathbb Z_{mn} \cong \mathbb Z_m \times \mathbb Z_n.
+	\]
+\end{theorem}
+
+\begin{proof}
+	Define \(f\colon \mathbb Z \to \mathbb Z_m \times \mathbb Z_n\) by
+	\(f(a) = ([a]_m, [a]_n)\); it is a homomorphism because each coordinate is. We claim
+	\(\ker f = \langle mn\rangle\). Clearly \(\langle mn\rangle \leq \ker f\). Conversely, if
+	\(a \in \ker f\), then \([a]_m = [0]_m\) and \([a]_n = [0]_n\), so \(m \mid a\) and
+	\(n \mid a\); since \(\gcd(m, n) = 1\), \autoref{lem:coprime-divisibility}(ii) gives
+	\(mn \mid a\), so \(a \in \langle mn\rangle\).
+
+	By the first isomorphism theorem and \autoref{eg:Z-mod-m},
+	\(\mathbb Z_{mn} = \mathbb Z/\langle mn\rangle \cong \im f\). Thus \(\im f\) is a
+	subgroup of \(\mathbb Z_m \times \mathbb Z_n\) with \(mn\) elements; since
+	\(\mathbb Z_m \times \mathbb Z_n\) also has \(mn\) elements, \(\im f\) is all of it,
+	and \(\mathbb Z_{mn} \cong \mathbb Z_m \times \mathbb Z_n\).
+\end{proof}
+
+\begin{remark}
+	Surjectivity of \(f\) says: for any \(a, b \in \mathbb Z\) there is \(x \in \mathbb Z\)
+	with \(x \equiv a \pmod m\) and \(x \equiv b \pmod n\). This is the \vocab{Chinese
+		remainder theorem}; Rotman uses it to prove surjectivity, while the counting argument
+	above proves it.
+\end{remark}
+
+For example, \(\mathbb Z_6 \cong \mathbb Z_2 \times \mathbb Z_3\). There is no such
+isomorphism if \(m\) and \(n\) are not relatively prime: \autoref{eg:V-Z2Z2} shows
+\(\mathbf V \cong \mathbb Z_2 \times \mathbb Z_2\), which is not isomorphic to
+\(\mathbb Z_4\), because \(\mathbf V\) has no element of order \(4\).
+
+Since \(\langle a\rangle \cong \mathbb Z_n\) exactly when \(a\) has order \(n\)
+(\autoref{prop:order-equals-size} and \autoref{prop:Zm-cyclic}), \autoref{thm:Zmn} can be read as saying that if \(a\) and \(b\)
+are commuting elements of relatively prime orders \(m\) and \(n\), then \(ab\) has order
+\(mn\). Here is a direct proof (this is the statement we already used as
+\autoref{lem:coprime-orders}).
+
+\begin{proposition}\label{prop:coprime-orders}
+	Let \(G\) be a group, and let \(a, b \in G\) be commuting elements of orders \(m\) and
+	\(n\). If \(\gcd(m, n) = 1\), then \(ab\) has order \(mn\).
+\end{proposition}
+
+\begin{proof}
+	Since \(a\) and \(b\) commute, \((ab)^r = a^rb^r\) for all \(r\), so
+	\((ab)^{mn} = a^{mn}b^{mn} = 1\). It suffices to prove that \((ab)^k = 1\) implies
+	\(mn \mid k\). If \(1 = (ab)^k = a^kb^k\), then \(a^k = b^{-k}\). Since \(a\) has order
+	\(m\), \(1 = a^{mk} = b^{-mk}\); since \(b\) has order \(n\), \autoref{lem:order-divides}
+	gives \(n \mid mk\), and so \(n \mid k\) by Euclid's lemma. Similarly \(m \mid k\).
+	Finally \(mn \mid k\) by \autoref{lem:coprime-divisibility}(ii).
+\end{proof}
+
+Here is a number-theoretic application of direct products.
+
+\begin{corollary}\label{cor:phi-multiplicative}
+	If \(\gcd(m, n) = 1\), then \(\phi(mn) = \phi(m)\phi(n)\).
+\end{corollary}
+
+\begin{proof}
+	The isomorphism of \autoref{thm:Zmn} is
+	\(f\colon \mathbb Z_{mn} \to \mathbb Z_m \times \mathbb Z_n\),
+	\(f([a]_{mn}) = ([a]_m, [a]_n)\) (this is the \(\varphi\) of the first isomorphism
+	theorem). It also preserves multiplication:
+	\[
+		f([a]_{mn}[b]_{mn}) = f([ab]_{mn}) = ([a]_m[b]_m, [a]_n[b]_n) = f([a]_{mn})f([b]_{mn}),
+	\]
+	where pairs are multiplied coordinatewise, and \(f([1]_{mn}) = ([1]_m, [1]_n)\).
+
+	We claim \(f(\mathbb Z_{mn}^*) = \mathbb Z_m^* \times \mathbb Z_n^*\). If
+	\([a]_{mn}[b]_{mn} = [1]_{mn}\), then applying \(f\) gives \([a]_m[b]_m = [1]_m\) and
+	\([a]_n[b]_n = [1]_n\), so \(f([a]_{mn}) \in \mathbb Z_m^* \times \mathbb Z_n^*\).
+	Conversely, suppose \(f([c]_{mn}) = ([c]_m, [c]_n)\) with \([c]_m[d]_m = [1]_m\) and
+	\([c]_n[e]_n = [1]_n\). Since \(f\) is surjective, there is \(b\) with
+	\(([b]_m, [b]_n) = ([d]_m, [e]_n)\); then
+	\(f([c]_{mn}[b]_{mn}) = ([1]_m, [1]_n) = f([1]_{mn})\), and injectivity gives
+	\([c]_{mn}[b]_{mn} = [1]_{mn}\), so \([c]_{mn} \in \mathbb Z_{mn}^*\).
+
+	By \autoref{lem:units-order},
+	\(\phi(mn) = \abs{\mathbb Z_{mn}^*} = \abs{\mathbb Z_m^* \times \mathbb Z_n^*}
+	= \phi(m)\phi(n)\).
+\end{proof}
+
+\begin{definition}[Direct product of \(n\) groups]
+	If \(H_1, \dots, H_n\) are groups, their \vocab{direct product}
+	\(H_1 \times \cdots \times H_n\) is the set of all \(n\)-tuples \((h_1, \dots, h_n)\)
+	with \(h_i \in H_i\), with coordinatewise multiplication
+	\[
+		(h_1, \dots, h_n)(h_1', \dots, h_n') = (h_1h_1', \dots, h_nh_n').
+	\]
+\end{definition}
+
+The \emph{basis theorem} (Rotman, Theorem 6.11) says that every finite abelian group is a
+direct product of cyclic groups. We end with a variant of \autoref{prop:cyclic-criterion}.
+
+\begin{proposition}\label{prop:unique-p-subgroup-cyclic}
+	If \(G\) is a finite abelian group having a unique subgroup of order \(p\) for every prime
+	divisor \(p\) of \(\abs{G}\), then \(G\) is cyclic.
+\end{proposition}
+
+\begin{proof}
+	Choose \(a \in G\) of largest order, say \(n\). We first show:
+	\emph{\(\langle a\rangle\) contains every element \(x \in G\) with \(x^p = 1\) for some
+		prime \(p\).} If \(x \neq 1\), then \(x\) has order \(p\), so \(p \mid \abs{G}\) and
+	\(C = \langle x\rangle\) is the unique subgroup of order \(p\). If \(\gcd(p, n) = 1\),
+	then \(xa\) has order \(pn > n\) by \autoref{prop:coprime-orders}, contradicting the
+	choice of \(a\). So \(p \mid n\), say \(n = pq\); then \(a^q\) has order \(p\), so
+	\(\langle a^q\rangle = C\) by uniqueness, and \(x \in C \leq \langle a\rangle\).
+
+	If \(\langle a\rangle = G\), we are done; so assume there is \(b \in G\) with
+	\(b \notin \langle a\rangle\). Since \(b^{\abs{G}} = 1 \in \langle a\rangle\), there is a
+	smallest positive integer \(k\) with \(b^k \in \langle a\rangle\), say
+	\[
+		b^k = a^r.
+	\]
+	Now \(k\) is the order of \(b\langle a\rangle\) in \(G/\langle a\rangle\), so
+	\(k \mid \abs{G}\); and \(k \neq 1\). Write \(k = p\ell\) with \(p\) prime; then
+	\(p \mid \abs{G}\). By \autoref{prop:abelian-subgroups}, \(G\) has an element of order
+	\(p\), and the argument of the first paragraph shows that \(p \mid n\). There are two
+	possibilities.
+	\begin{itemize}
+		\item If \(p \mid r\), say \(r = pu\), then \(b^{p\ell} = b^k = a^{pu}\), so
+		      \((b^\ell a^{-u})^p = 1\) (as \(G\) is abelian). By the first paragraph,
+		      \(b^\ell a^{-u} \in \langle a\rangle\), so \(b^\ell \in \langle a\rangle\) with
+		      \(0 < \ell < k\), contradicting the minimality of \(k\).
+		\item If \(p \nmid r\), then \(\gcd(p, r) = 1\), so \(1 = sp + tr\) for some
+		      integers \(s, t\), and
+		      \[
+			      a = a^{sp + tr} = a^{sp}(a^r)^t = a^{sp}b^{p\ell t} = (a^sb^{\ell t})^p.
+		      \]
+		      So \(a = x^p\) with \(x = a^sb^{\ell t}\). Let \(x\) have order \(N\). Then
+		      \(a^N = (x^N)^p = 1\), so \(n \mid N\). If \(N = n\), then, since \(p \mid n\),
+		      the element \(x^p\) would have order \(n/p\) (as \((x^p)^{n/p} = 1\) and
+		      \((x^p)^j = x^{pj} \neq 1\) for \(0 < j < n/p\)), contradicting
+		      \(x^p = a\) of order \(n\). Hence \(N > n\), contradicting the choice of \(a\).
+	\end{itemize}
+	Both cases are impossible, so \(G = \langle a\rangle\).
+\end{proof}
+
+The proposition is false for nonabelian groups: the quaternions \(\mathbf Q\) form a
+noncyclic group of order \(8\) having a unique subgroup of order \(2\)
+(\autoref{eg:Q-subgroups-normal}).
