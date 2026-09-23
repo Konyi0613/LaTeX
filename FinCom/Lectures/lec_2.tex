@@ -3121,8 +3121,15 @@ Three of them will do most of the work:
 \begin{itemize}[nosep]
 	\item \textbf{Conditional expectation}, which is how a model says ``given what we know today''.
 	\item \textbf{The normal distribution}, which is what we will assume \emph{log} returns follow.
-	\item \textbf{The lognormal distribution}, which is what prices then follow --- and the reason \eqref{eq:lognormal-partial} below turns into the Black--Scholes formula later on.
+	\item \textbf{The lognormal distribution}, which is what prices then follow --- and the reason \eqref{eq:lognormal-call} below turns into the Black--Scholes formula later on.
 \end{itemize}
+
+The chapter is built in layers, and each section uses only what came before it.
+\autoref{sec:moments}--\autoref{sec:var-sum} develop means, variances and covariances from the linearity of expectation, including the Cauchy--Schwarz inequality, Chebyshev's inequality and the law of large numbers.
+\autoref{sec:conditional-expectation} defines conditional expectation and proves the tower law.
+\autoref{sec:normal}--\autoref{sec:mvn} introduce densities, the normal distribution and its moment generating function, and the multivariate normal distribution.
+\autoref{sec:gen-normal} and \autoref{sec:gen-bivariate} turn this theory into algorithms for simulation, and prove the central limit theorem along the way.
+Finally, \autoref{sec:lognormal} combines everything into the lognormal model for prices, ending with the expected payoff of a call.
 
 \begin{note}
 	The epigraphs are a warning worth keeping.
@@ -3132,9 +3139,21 @@ Three of them will do most of the work:
 \end{note}
 
 %─────§ Moments────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-\section{Moments}
+\section{Moments}\label{sec:moments}
 
 \source{Slides p.~167}
+
+The expectation $E[X]$ tells us where a random variable is centred, but nothing about how widely it is spread or how it moves together with other random variables.
+Moments fill in that picture.
+Throughout, we take for granted the two basic properties of expectation:
+it is \emph{linear}, $E[aX+bY]=a\,E[X]+b\,E[Y]$, and \emph{monotone}, $X\le Y$ implies $E[X]\le E[Y]$.
+Apart from one limiting argument in \autoref{lem:zero-mean}, everything in this section is derived from these two facts.
+
+\subsection{Variance and Covariance}
+
+For $n\ge1$, the \vocab{$n$th moment} of $X$ is $E[X^{n}]$, and its \vocab{$n$th central moment} is $E\bigl[(X-\mu)^{n}\bigr]$, where $\mu=E[X]$.
+The mean is the first moment.
+The second central moment measures spread and gets its own name.
 
 \begin{definition}
 	The \vocab{variance} of a random variable $X$ is defined as
@@ -3149,32 +3168,179 @@ Three of them will do most of the work:
 	Random variables $X$ and $Y$ are \vocab{uncorrelated} if $\Cov[\,X,Y\,]=0$.
 \end{definition}
 
-Expanding the products gives the computational forms used in practice,
+The covariance is positive when $X$ and $Y$ tend to be above their means at the same time, and negative when one tends to be above its mean while the other is below.
+Taking $Y=X$ in \eqref{eq:covariance} recovers $\Cov[\,X,X\,]=\Var[\,X\,]$: variance is covariance with oneself.
+So most facts about variance are special cases of facts about covariance.
+
+\begin{proposition}\label{prop:cov-properties}
+	For random variables $X,Y,Z$ with finite variances and constants $a,b,c$:
+	\begin{enumerate}[nosep]
+		\item (Computational form) $\Cov[X,Y]=E[XY]-E[X]\,E[Y]$; in particular $\Var[X]=E[X^{2}]-\bigl(E[X]\bigr)^{2}$.
+		\item (Symmetry) $\Cov[X,Y]=\Cov[Y,X]$.
+		\item (Bilinearity) $\Cov[aX+bY,\,Z]=a\,\Cov[X,Z]+b\,\Cov[Y,Z]$, and likewise in the second argument.
+		\item (Constants do not matter) $\Cov[X+c,\,Y]=\Cov[X,Y]$ and $\Cov[c,\,Y]=0$.
+		\item (Scaling of variance) $\Var[a+bX]=b^{2}\,\Var[X]$.
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+	\textbf{1.} Expand the product and use linearity, remembering that $\mu_{X}$ and $\mu_{Y}$ are constants:
+	\[
+		E\bigl[(X-\mu_{X})(Y-\mu_{Y})\bigr]
+		= E[XY]-\mu_{Y}E[X]-\mu_{X}E[Y]+\mu_{X}\mu_{Y}
+		= E[XY]-\mu_{X}\mu_{Y} .
+	\]
+
+	\textbf{2.} The definition is symmetric in $X$ and $Y$.
+
+	\textbf{3.} The mean of $aX+bY$ is $a\mu_{X}+b\mu_{Y}$, so $(aX+bY)-E[aX+bY]=a(X-\mu_{X})+b(Y-\mu_{Y})$.
+	Multiply by $Z-\mu_{Z}$ and take expectations.
+	The second argument follows by symmetry.
+
+	\textbf{4.} $X+c$ has mean $\mu_{X}+c$, so $(X+c)-E[X+c]=X-\mu_{X}$ and nothing changes.
+	A constant equals its own mean, so $c-E[c]=0$.
+
+	\textbf{5.} By items 3 and 4, $\Var[a+bX]=\Cov[a+bX,\,a+bX]=\Cov[bX,\,bX]=b^{2}\,\Cov[X,X]$.
+\end{proof}
+
+Items 2 and 3 say that covariance behaves like a dot product of vectors, with the variance playing the role of squared length.
+This analogy is worth keeping in mind: the Cauchy--Schwarz inequality in \autoref{sec:correlation} and the formula for the variance of a sum in \autoref{sec:var-sum} are both the random-variable versions of familiar facts about dot products.
+Item~5 says that shifting a random variable does not change its spread, while scaling it by $b$ scales the standard deviation by $|b|$.
+
+\subsection{What Variance Controls}
+
+Variance is defined as an average squared distance from the mean.
+The next results make precise the idea that a small variance forces $X$ to stay close to its mean.
+
+\begin{lemma}[Markov's inequality]\label{lem:markov}
+	If $X\ge0$ and $a>0$, then
+	\[
+		P(X\ge a) \;\le\; \frac{E[X]}{a} .
+	\]
+\end{lemma}
+
+\begin{proof}
+	Let $\mathbf{1}_{\{X\ge a\}}$ be the random variable that equals $1$ when $X\ge a$ and $0$ otherwise.
+	Then $a\,\mathbf{1}_{\{X\ge a\}}\le X$: when $X\ge a$ the left side is $a\le X$, and otherwise it is $0\le X$.
+	Taking expectations and using monotonicity gives $a\,P(X\ge a)\le E[X]$.
+\end{proof}
+
+\begin{lemma}\label{lem:zero-mean}
+	If $X\ge0$ and $E[X]=0$, then $X=0$ with probability one.
+\end{lemma}
+
+\begin{proof}
+	By \autoref{lem:markov}, $P(X\ge1/n)\le n\,E[X]=0$ for every $n\ge1$.
+	The event $\{X>0\}$ is the union of the increasing events $\{X\ge1/n\}$, so $P(X>0)=\lim_{n\to\infty}P(X\ge1/n)=0$.
+\end{proof}
+
+\begin{proposition}\label{prop:var-properties}
+	\begin{enumerate}[nosep]
+		\item $\Var[X]\ge0$, and $\Var[X]=0$ if and only if $X$ is a constant with probability one.
+		\item (Chebyshev's inequality) If $\sigma=\sqrt{\Var[X]}>0$ and $k>0$, then
+		      \[
+			      P\bigl(\,|X-\mu|\ge k\sigma\,\bigr) \;\le\; \frac{1}{k^{2}} .
+		      \]
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+	\textbf{1.} $\Var[X]$ is the expectation of the non-negative random variable $(X-\mu)^{2}$, so it is non-negative.
+	If it is zero, \autoref{lem:zero-mean} gives $(X-\mu)^{2}=0$, that is, $X=\mu$, with probability one.
+	Conversely, a constant has zero variance by item~5 of \autoref{prop:cov-properties} with $b=0$.
+
+	\textbf{2.} Apply \autoref{lem:markov} to $(X-\mu)^{2}\ge0$ with $a=k^{2}\sigma^{2}$:
+	$P\bigl((X-\mu)^{2}\ge k^{2}\sigma^{2}\bigr)\le\sigma^{2}/(k^{2}\sigma^{2})$.
+\end{proof}
+
+Chebyshev's inequality holds for \emph{every} distribution with finite variance, which is why it is weak: it only says that at most $1/4$ of the probability lies more than two standard deviations from the mean.
+For a normal distribution the true figure is about $4.6\%$.
+The gap between the two is the room that heavy tails can occupy.
+
+The third and fourth central moments, scaled by $\sigma$, describe the shape of the distribution beyond its spread:
 \[
-	\Var[\,X\,] = E[\,X^{2}\,]-\bigl(E[\,X\,]\bigr)^{2} ,
+	\text{skewness} \;=\; \frac{E\bigl[(X-\mu)^{3}\bigr]}{\sigma^{3}} ,
 	\qquad
-	\Cov[\,X,Y\,] = E[\,XY\,]-E[\,X\,]E[\,Y\,] ,
+	\text{kurtosis} \;=\; \frac{E\bigl[(X-\mu)^{4}\bigr]}{\sigma^{4}} .
 \]
-and taking $Y=X$ in \eqref{eq:covariance} recovers $\Cov[\,X,X\,]=\Var[\,X\,]$: variance is covariance with oneself.
+Skewness measures asymmetry, and kurtosis measures how much of the variance comes from rare, large deviations.
+Both are unchanged by the scaling $X\mapsto a+bX$ with $b>0$, for the same reason as item~5 of \autoref{prop:cov-properties}.
+\autoref{sec:mgf} shows that the normal distribution has kurtosis $3$.
 
-\begin{remark}
-	\vocab{不相關}（uncorrelated）\textbf{ $\neq$ }\vocab{獨立}（independent）\textbf{，這是本章最容易出錯的地方。}
+\subsection{Independence and Uncorrelatedness}
+\label{subsec:independence}
 
-	獨立是說「$X$ 的任何資訊都不告訴你 $Y$ 的任何事」；不相關只是說\emph{線性}關係為零。
-	獨立必然不相關，反之不然。
+Uncorrelatedness is often confused with a much stronger notion.
 
-	標準反例：取 $X\sim N(0,1)$，$Y=X^{2}$。
-	此時 $\Cov[X,Y]=E[X^{3}]-E[X]E[X^{2}]=0-0=0$，兩者不相關；但 $Y$ 完全由 $X$ 決定，談不上獨立。
+\begin{definition}
+	Random variables $X$ and $Y$ are \vocab{independent} if, for all sets $A$ and $B$,
+	\[
+		P(X\in A,\ Y\in B) = P(X\in A)\,P(Y\in B) .
+	\]
+\end{definition}
 
-	為什麼在金融裡特別要緊？
-	因為風險管理常以「相關係數低」來論證分散效果，而危機時真正咬人的往往是\emph{非線性}的相依——平時各走各的，一起崩盤時卻同時跌。
-	相關係數對這種結構是盲的。
-\end{remark}
+In plain words: knowing the value of $X$ tells you nothing at all about $Y$.
+The following form of the definition is the one used in calculations.
+
+\begin{proposition}\label{prop:indep-factor}
+	$X$ and $Y$ are independent if and only if
+	\[
+		E\bigl[f(X)\,g(Y)\bigr] = E\bigl[f(X)\bigr]\,E\bigl[g(Y)\bigr]
+	\]
+	for all functions $f$ and $g$ for which the expectations exist.
+\end{proposition}
+
+\begin{proof}
+	Suppose $X$ and $Y$ are independent and discrete.
+	Independence with $A=\{x\}$ and $B=\{y\}$ gives $P(X=x,\,Y=y)=P(X=x)\,P(Y=y)$, so
+	\[
+		E\bigl[f(X)\,g(Y)\bigr]
+		= \sum_{x,y} f(x)\,g(y)\,P(X=x)\,P(Y=y)
+		= \Bigl(\sum_{x} f(x)\,P(X=x)\Bigr)\Bigl(\sum_{y} g(y)\,P(Y=y)\Bigr) ,
+	\]
+	which is $E[f(X)]\,E[g(Y)]$.
+	With densities, independence means the joint density factors as $f_{X}(x)f_{Y}(y)$, and the same computation works with integrals in place of sums.
+
+	Conversely, take $f=\mathbf{1}_{A}$ and $g=\mathbf{1}_{B}$, the functions that equal $1$ on $A$ (resp.\ $B$) and $0$ elsewhere.
+	Then $E[\mathbf{1}_{A}(X)\,\mathbf{1}_{B}(Y)]=P(X\in A,\,Y\in B)$ and $E[\mathbf{1}_{A}(X)]=P(X\in A)$, so the identity is exactly the definition of independence.
+\end{proof}
+
+\begin{corollary}
+	Independent random variables with finite means are uncorrelated.
+\end{corollary}
+
+\begin{proof}
+	First, $E[XY]$ is finite: applying \autoref{prop:indep-factor} to the non-negative functions $|x|$ and $|y|$ gives $E\bigl[|XY|\bigr]=E\bigl[|X|\bigr]\,E\bigl[|Y|\bigr]<\infty$.\footnote{For non-negative $f$ and $g$ the identity in \autoref{prop:indep-factor} holds even when the expectations are infinite; the proof is the same.}
+	Now take $f(x)=x$ and $g(y)=y$: $E[XY]=E[X]\,E[Y]$, so $\Cov[X,Y]=E[XY]-E[X]\,E[Y]=0$ by the computation in item~1 of \autoref{prop:cov-properties}, which uses only that $E[X]$, $E[Y]$ and $E[XY]$ are finite.
+\end{proof}
+
+No second moments are needed here: for dependent random variables, finite variances are what guarantee that $\Cov[X,Y]$ is finite (by the Cauchy--Schwarz inequality of \autoref{sec:correlation}), but independence already makes $E[XY]$ finite.
+
+The proof shows exactly how much weaker uncorrelatedness is.
+$\Cov[X,Y]=0$ is the single identity $E[XY]=E[X]E[Y]$, which is \autoref{prop:indep-factor} for \emph{one} choice of $f$ and $g$.
+Independence demands it for all $f$ and $g$, including nonlinear ones such as $x^{2}$ or $e^{x}$.
+So the converse of the corollary fails.
+
+\begin{eg}\label{eg:uncorrelated-dependent}
+	Let $X\sim N(0,1)$ and $Y=X^{2}$.
+	With $f(x)=x$ and $g(y)=y$, we get $E[XY]=E[X^{3}]=0=E[X]\,E[X^{2}]$, so $X$ and $Y$ are uncorrelated.
+	(The odd moments of $X$ vanish because its density is symmetric about $0$.)
+	But with $f(x)=x^{2}$ and $g(y)=y$, we get $E[X^{2}Y]=E[X^{4}]=3$ while $E[X^{2}]\,E[Y]=1$, so $X$ and $Y$ are not independent.
+	(The value $E[X^{4}]=3$ is computed in \autoref{sec:mgf}.)
+	Of course they are not: $Y$ is computed directly from $X$.
+\end{eg}
+
+\autoref{sec:correlation} explains what uncorrelatedness \emph{does} say: that the best straight line through the data is flat.
 
 %─────§ Correlation────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Correlation}
+\label{sec:correlation}
 
 \source{Slides p.~168}
+
+Covariance mixes two things: how strongly two variables move together, and how large they are.
+Measuring a price in cents instead of dollars multiplies every covariance with it by $100$, although nothing about the co-movement has changed.
+Correlation removes the size.
 
 \begin{definition}
 	The \vocab{standard deviation} of $X$ is the square root of the variance,
@@ -3188,31 +3354,146 @@ and taking $Y=X$ in \eqref{eq:covariance} recovers $\Cov[\,X,X\,]=\Var[\,X\,]$: 
 	provided both have nonzero standard deviations.\footnote{Wilmott (2009): ``the correlations between financial quantities are notoriously unstable.'' It may even break down ``at high-frequency time intervals'' (Budish, Cramton, \& Shim, 2015).}
 \end{definition}
 
-\begin{note}
-	Dividing by $\sigma_{X}\sigma_{Y}$ makes $\rho$ dimensionless and confines it to $[-1,1]$, by the Cauchy--Schwarz inequality
-	$\bigl|\Cov[X,Y]\bigr|\le\sigma_{X}\sigma_{Y}$, with equality exactly when $Y$ is an affine function of $X$.
-	Covariance says how two variables co-move \emph{and} how big they are; correlation strips out the size.
-\end{note}
+\subsection{Invariance under Rescaling}
+
+\begin{proposition}\label{prop:corr-invariance}
+	For constants $a,c$ and nonzero $b,d$,
+	\[
+		\rho_{a+bX,\;c+dY} \;=\; \operatorname{sign}(bd)\;\rho_{X,Y} .
+	\]
+	In particular, correlation is unchanged by changing the units or the origin of either variable.
+\end{proposition}
+
+\begin{proof}
+	By \autoref{prop:cov-properties}, $\Cov[a+bX,\,c+dY]=bd\,\Cov[X,Y]$, while $\sigma_{a+bX}=|b|\,\sigma_{X}$ and $\sigma_{c+dY}=|d|\,\sigma_{Y}$.
+	Dividing, the ratio is $bd/(|b||d|)=\operatorname{sign}(bd)$ times $\rho_{X,Y}$.
+\end{proof}
+
+\subsection{The Range of Correlation}
+
+The fact that $\rho$ lies between $-1$ and $1$ comes from the following inequality, the random-variable version of $|\bm{u}\cdot\bm{v}|\le\|\bm{u}\|\,\|\bm{v}\|$.
+
+\begin{lemma}[Cauchy--Schwarz inequality]\label{lem:cauchy-schwarz}
+	For random variables $U$ and $V$ with $E[U^{2}]$ and $E[V^{2}]$ finite,
+	\[
+		\bigl(E[UV]\bigr)^{2} \;\le\; E[U^{2}]\;E[V^{2}] .
+	\]
+	If $E[U^{2}]>0$, equality holds if and only if $V=t_{0}U$ with probability one for some constant $t_{0}$.
+\end{lemma}
+
+\begin{proof}
+	First, $E[UV]$ is finite, because $|UV|\le\tfrac12(U^{2}+V^{2})$.
+	If $E[U^{2}]=0$, then $U=0$ with probability one by \autoref{lem:zero-mean}, and both sides are zero.
+	Otherwise, for every real number $t$, the random variable $(V-tU)^{2}$ is non-negative, so
+	\[
+		0 \;\le\; q(t) \;\triangleq\; E\bigl[(V-tU)^{2}\bigr]
+		= E[V^{2}] - 2t\,E[UV] + t^{2}E[U^{2}] .
+	\]
+	This is a quadratic in $t$ that opens upward and never goes below zero, so it has at most one real root and its discriminant is not positive:
+	$4\bigl(E[UV]\bigr)^{2}-4E[U^{2}]\,E[V^{2}]\le0$.
+
+	If equality holds, the discriminant is zero and $q$ has a double root $t_{0}=E[UV]/E[U^{2}]$.
+	Then $E\bigl[(V-t_{0}U)^{2}\bigr]=0$, so $V=t_{0}U$ with probability one by \autoref{lem:zero-mean}.
+	Conversely, if $V=t_{0}U$, both sides equal $t_{0}^{2}\bigl(E[U^{2}]\bigr)^{2}$.
+\end{proof}
+
+\begin{theorem}\label{thm:corr-range}
+	$-1\le\rho_{X,Y}\le1$.
+	Moreover $|\rho_{X,Y}|=1$ if and only if $Y=a+bX$ with probability one for some constants $a$ and $b\ne0$, that is, $Y$ is an \vocab{affine} function of $X$;\footnote{An \emph{affine} function（仿射函數）is one of the form $f(x)=a+bx$: a linear function plus a constant. Its graph is any straight line, not necessarily one through the origin. Strictly speaking, a \emph{linear} function also requires $a=0$, but $\rho=\pm1$ does not; for example, $Y=3+2X$ has $\rho=1$.}
+	in that case $\rho_{X,Y}$ has the sign of $b$.
+\end{theorem}
+
+\begin{proof}
+	Apply \autoref{lem:cauchy-schwarz} to $U=X-\mu_{X}$ and $V=Y-\mu_{Y}$.
+	Then $E[UV]=\Cov[X,Y]$, $E[U^{2}]=\sigma_{X}^{2}>0$ and $E[V^{2}]=\sigma_{Y}^{2}$, so $\Cov[X,Y]^{2}\le\sigma_{X}^{2}\sigma_{Y}^{2}$.
+	Dividing by $\sigma_{X}^{2}\sigma_{Y}^{2}$ gives $\rho_{X,Y}^{2}\le1$.
+
+	Equality holds if and only if $Y-\mu_{Y}=t_{0}(X-\mu_{X})$, that is, $Y=a+bX$ with $b=t_{0}$ and $a=\mu_{Y}-t_{0}\mu_{X}$.
+	Here $b\ne0$, since otherwise $Y$ would be constant and $\sigma_{Y}=0$.
+	Finally, \autoref{prop:corr-invariance} with $X$ in place of $Y$ gives $\rho_{X,\,a+bX}=\operatorname{sign}(b)\,\rho_{X,X}=\operatorname{sign}(b)$.
+\end{proof}
+
+So $\rho=\pm1$ describes a perfect straight-line relationship, and every other value lies strictly in between.
+The next subsection says what the values in between mean.
+
+\subsection{Correlation and the Best Straight Line}
+\label{subsec:best-linear}
+
+Suppose we want to predict $Y$ by a straight-line function $a+bX$ of $X$, and we measure the quality of the prediction by the mean squared error $E\bigl[(Y-a-bX)^{2}\bigr]$.
+
+\begin{proposition}\label{prop:best-linear}
+	Assume $\sigma_{X}>0$.
+	The mean squared error $E\bigl[(Y-a-bX)^{2}\bigr]$ is minimised by
+	\[
+		b^{*} = \frac{\Cov[X,Y]}{\Var[X]} = \rho_{X,Y}\,\frac{\sigma_{Y}}{\sigma_{X}} ,
+		\qquad
+		a^{*} = \mu_{Y}-b^{*}\mu_{X} ,
+	\]
+	and the minimum value is
+	\begin{equation}
+		E\bigl[(Y-a^{*}-b^{*}X)^{2}\bigr] \;=\; \sigma_{Y}^{2}\,\bigl(1-\rho_{X,Y}^{2}\bigr) . \label{eq:best-linear-error}
+	\end{equation}
+\end{proposition}
+
+\begin{proof}
+	For fixed $b$, write $W=Y-bX$.
+	Then $E\bigl[(W-a)^{2}\bigr]=\Var[W]+\bigl(E[W]-a\bigr)^{2}$, by item~1 of \autoref{prop:cov-properties} applied to $W-a$, together with $\Var[W-a]=\Var[W]$ from item~5.
+	This is smallest when $a=E[W]=\mu_{Y}-b\mu_{X}$, and the minimum is $\Var[W]$.
+	By bilinearity,
+	\[
+		\Var[\,Y-bX\,] = \Var[Y] - 2b\,\Cov[X,Y] + b^{2}\,\Var[X] ,
+	\]
+	a quadratic in $b$ that opens upward, with its minimum at $b^{*}=\Cov[X,Y]/\Var[X]$.
+	Substituting $b^{*}$ gives
+	\[
+		\Var[Y]-\frac{\Cov[X,Y]^{2}}{\Var[X]}
+		= \sigma_{Y}^{2}\left(1-\frac{\Cov[X,Y]^{2}}{\sigma_{X}^{2}\sigma_{Y}^{2}}\right)
+		= \sigma_{Y}^{2}\bigl(1-\rho_{X,Y}^{2}\bigr) .
+		\qedhere
+	\]
+\end{proof}
+
+Equation \eqref{eq:best-linear-error} gives the cleanest reading of $\rho$.
+Before seeing $X$, the best constant prediction of $Y$ is $\mu_{Y}$, with mean squared error $\sigma_{Y}^{2}$.
+The best straight line in $X$ reduces this error by the factor $1-\rho^{2}$.
+So $\rho^{2}$ is the \emph{fraction of the variance of $Y$ explained by a straight line in $X$}.
+When $|\rho|=1$ the line explains everything, in agreement with \autoref{thm:corr-range}.
+When $\rho=0$ the best slope is $b^{*}=0$: the line is flat and explains nothing.
+
+This is the precise sense in which uncorrelated means ``no \emph{linear} relationship''.
+It does not rule out other relationships.
+In \autoref{eg:uncorrelated-dependent} the points $(X,Y)$ lie on the parabola $y=x^{2}$, which is symmetric about $x=0$, so the best straight line through it is flat, even though $Y$ is completely determined by $X$.
+\autoref{sec:conditional-expectation} shows that dropping the restriction to straight lines leads to the conditional expectation, which predicts $Y=X^{2}$ perfectly.
 
 \begin{remark}
-	那個腳註不是客套話，值得展開。
+	開頭那個腳註不是客套話，值得展開。
 
 	\textbf{（一）相關係數不穩定。}
-	$\rho$ 是用歷史樣本估出來的，而它本身會隨時間漂移——尤其在市場承壓時往往整體跳向 $1$。
-	用平時估出來的 $\rho$ 去計算危機時的投資組合風險，會系統性地低估損失；2008 年的結構型商品定價正是栽在這裡。
+	$\rho$ 是用歷史樣本估出來的，而它本身會隨時間漂移——尤其在市場承壓時，資產之間的相關係數往往一起往 $1$ 靠攏。
+	用平時估出來的 $\rho$ 去算危機時的投資組合風險，會系統性地低估損失；2008 年的結構型商品定價就是栽在這裡。
 
 	\textbf{（二）高頻下會崩解。}
-	把觀測間隔縮短到毫秒等級，兩個本來高度相關的資產（例如 S\&P 500 期貨與其 ETF）算出來的相關係數會急遽下降——這就是所謂的 \vocab{Epps 效應}（Epps effect）。
-	原因是兩邊的成交並非同時發生，取樣間隔一短，非同步性造成的雜訊就蓋過真正的共同波動。
+	把觀測間隔縮短到毫秒等級，兩個本來高度相關的資產（例如 S\&P 500 期貨與其 ETF）算出來的相關係數會急遽下降，這就是所謂的 \vocab{Epps 效應}（Epps effect）。
+	原因是兩邊的成交並非同時發生，取樣間隔一短，非同步造成的雜訊就蓋過真正的共同波動。
 	Budish、Cramton 與 Shim（2015）指出，這個在極短時間尺度上反覆出現的價差，正是高頻交易「軍備競賽」的獵物。
 
-	\textbf{結論：}$\rho$ 是一個\emph{取樣間隔與樣本期間的函數}，報告時必須說清楚是用什麼頻率、什麼期間算的。
+	\textbf{（三）相關係數只看得到直線關係。}
+	做風險管理時，常用「兩個資產相關係數很低」來說明 diversification（分散投資）有效。
+	但由 \eqref{eq:best-linear-error}，$\rho$ 量的只是直線能解釋多少；
+	真正出事的時候，資產之間的關係往往是非線性的——平常看起來各走各的，一遇到危機卻一起大跌。
+	這種關係，就像 \autoref{eg:uncorrelated-dependent} 的拋物線一樣，相關係數看不出來。
+
+	\textbf{結論：}$\rho$ 是一個\emph{取樣間隔與樣本期間的函數}，報告時必須說清楚是用什麼頻率、什麼期間算的；而且即使 $\rho$ 很小，也不代表兩個資產沒有關係。
 \end{remark}
 
 %─────§ Variance of sum────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Variance of a Sum}
+\label{sec:var-sum}
 
 \source{Slides p.~169}
+
+A portfolio is a weighted sum of asset returns, so the variance of a weighted sum is the first formula of risk management.
+Because covariance is bilinear (\autoref{prop:cov-properties}), it is also a direct computation.
 
 \begin{proposition}
 	The variance of a weighted sum of random variables equals
@@ -3228,26 +3509,91 @@ and taking $Y=X$ in \eqref{eq:covariance} recovers $\Cov[\,X,X\,]=\Var[\,X\,]$: 
 \end{proposition}
 
 \begin{proof}
-	Write $Z=\sum_{i}a_{i}(X_{i}-\mu_{i})$, so that $E[Z]=0$ and $\Var[\sum_i a_i X_i]=E[Z^{2}]$. Then
+	Since variance is covariance with oneself, apply bilinearity in each argument:
 	\[
-		E[Z^{2}] = E\left[\sum_{i}\sum_{j} a_{i}a_{j}(X_{i}-\mu_{i})(X_{j}-\mu_{j})\right]
-		= \sum_{i}\sum_{j} a_{i}a_{j}\,\Cov[\,X_{i},X_{j}\,]
+		\Var\Bigl[\sum_{i}a_{i}X_{i}\Bigr]
+		= \Cov\Bigl[\sum_{i}a_{i}X_{i},\,\sum_{j}a_{j}X_{j}\Bigr]
+		= \sum_{i}\sum_{j} a_{i}a_{j}\,\Cov[\,X_{i},X_{j}\,] .
 	\]
-	by linearity of expectation.
 	If the $X_{i}$ are uncorrelated, every off-diagonal term vanishes and only the $i=j$ terms, $a_{i}^{2}\Var[X_{i}]$, survive.
 \end{proof}
 
-\begin{intuition}
-	\eqref{eq:var-sum-uncorr} is the arithmetic of diversification.
-	Hold $n$ uncorrelated assets in equal weights $a_{i}=1/n$, each with variance $\sigma^{2}$; the portfolio variance is $n\cdot(1/n)^{2}\sigma^{2}=\sigma^{2}/n$, which vanishes as $n$ grows.
-	Correlation is what stops this: in \eqref{eq:var-sum} the $n^{2}-n$ off-diagonal terms outnumber the $n$ diagonal ones, so for large $n$ the portfolio variance is governed almost entirely by the \emph{average covariance}, not by the individual variances.
+The same argument with two different weight vectors gives the covariance of two weighted sums,
+\begin{equation}
+	\Cov\Bigl[\sum_{i}a_{i}X_{i},\,\sum_{j}b_{j}X_{j}\Bigr] = \sum_{i}\sum_{j}a_{i}b_{j}\,\Cov[\,X_{i},X_{j}\,] . \label{eq:cov-sum}
+\end{equation}
 
-	\vocab{分散投資}（diversification）之所以有效，是因為 \eqref{eq:var-sum-uncorr} 的 $\sigma^{2}/n$ 會隨 $n$ 趨近於零。
-	真正的限制在 \eqref{eq:var-sum}：非對角項有 $n^{2}-n$ 個，對角項只有 $n$ 個，$n$ 一大，組合的變異數幾乎完全由\emph{平均共變異數}決定——分散得掉個別風險，分散不掉共同風險。
-\end{intuition}
+\subsection{The Covariance Matrix}
+
+The double sums are easier to handle in matrix notation.
+Collect the random variables into a column vector $\bm{X}=(X_{1},\dots,X_{n})^{\mathsf{T}}$ and define its \vocab{covariance matrix}
+\[
+	C \;\triangleq\; \bigl[\,\Cov[\,X_{i},X_{j}\,]\,\bigr]_{1\le i,j\le n} ,
+\]
+whose diagonal holds the variances.
+With weights $\bm{a}=(a_{1},\dots,a_{n})^{\mathsf{T}}$, \eqref{eq:var-sum} and \eqref{eq:cov-sum} read
+\[
+	\Var[\,\bm{a}^{\mathsf{T}}\bm{X}\,]=\bm{a}^{\mathsf{T}}C\,\bm{a} ,
+	\qquad
+	\Cov[\,\bm{a}^{\mathsf{T}}\bm{X},\,\bm{b}^{\mathsf{T}}\bm{X}\,]=\bm{a}^{\mathsf{T}}C\,\bm{b} .
+\]
+
+\begin{proposition}\label{prop:cov-matrix}
+	\begin{enumerate}[nosep]
+		\item $C$ is symmetric and \vocab{positive semidefinite}: $\bm{a}^{\mathsf{T}}C\bm{a}\ge0$ for every $\bm{a}\in\mathbb{R}^{n}$.
+		\item $C$ is \vocab{positive definite} ($\bm{a}^{\mathsf{T}}C\bm{a}>0$ for every $\bm{a}\ne\bm{0}$) if and only if no nontrivial combination $\bm{a}^{\mathsf{T}}\bm{X}$ is constant with probability one.
+		\item If $A$ is an $m\times n$ matrix and $\bm{U}=A\bm{X}$, then the covariance matrix of $\bm{U}$ is $AC A^{\mathsf{T}}$.
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+	\textbf{1.} Symmetry is item~2 of \autoref{prop:cov-properties}, and $\bm{a}^{\mathsf{T}}C\bm{a}=\Var[\bm{a}^{\mathsf{T}}\bm{X}]\ge0$.
+
+	\textbf{2.} By \autoref{prop:var-properties}, $\bm{a}^{\mathsf{T}}C\bm{a}=\Var[\bm{a}^{\mathsf{T}}\bm{X}]=0$ exactly when $\bm{a}^{\mathsf{T}}\bm{X}$ is constant with probability one.
+
+	\textbf{3.} $U_{k}=\sum_{i}A_{ki}X_{i}$ is a weighted sum with weights given by the $k$th row of $A$.
+	By \eqref{eq:cov-sum}, $\Cov[U_{k},U_{l}]=\sum_{i,j}A_{ki}\,C_{ij}\,A_{lj}$, which is the $(k,l)$ entry of $ACA^{\mathsf{T}}$.
+\end{proof}
+
+Item~2 has a concrete meaning: $C$ fails to be positive definite exactly when one of the variables is redundant, in the sense that some combination of them carries no risk at all.
+Item~3 is what \autoref{sec:gen-bivariate} uses to manufacture correlated random variables from independent ones.
+
+\subsection{Averages and the Law of Large Numbers}
+
+The uncorrelated case \eqref{eq:var-sum-uncorr} has a consequence that the whole of Monte Carlo simulation rests on.
+
+\begin{theorem}[Weak law of large numbers]\label{thm:lln}
+	Let $X_{1},X_{2},\dots$ be uncorrelated with common mean $\mu$ and common variance $\sigma^{2}$, and let $\overline{X}_{n}=\frac1n\sum_{i=1}^{n}X_{i}$.
+	Then $E[\overline{X}_{n}]=\mu$, $\Var[\overline{X}_{n}]=\sigma^{2}/n$, and for every $\varepsilon>0$,
+	\[
+		P\bigl(\,|\overline{X}_{n}-\mu|\ge\varepsilon\,\bigr) \;\le\; \frac{\sigma^{2}}{n\varepsilon^{2}} \;\longrightarrow\; 0
+		\qquad (n\to\infty) .
+	\]
+\end{theorem}
+
+\begin{proof}
+	The mean follows from linearity.
+	By \eqref{eq:var-sum-uncorr} with $a_{i}=1/n$, $\Var[\overline{X}_{n}]=n\cdot\sigma^{2}/n^{2}=\sigma^{2}/n$.
+	Chebyshev's inequality (\autoref{prop:var-properties}) with $k\sigma/\sqrt n=\varepsilon$ gives the bound.
+\end{proof}
+
+So the average of many independent draws settles down to the mean, and the standard error shrinks like $\sigma/\sqrt{n}$: to gain one more decimal digit of accuracy, one needs $100$ times as many draws.
+This is exactly how Monte Carlo pricing estimates an expectation, and why it is slow.
+
+The same formula also shows the limits of diversification.
+If an equally weighted portfolio holds $n$ assets, each with variance $\sigma^{2}$ and every pair with correlation $\rho$, then \eqref{eq:var-sum} gives
+\[
+	\Var\Bigl[\frac1n\sum_{i=1}^{n}X_{i}\Bigr]
+	= \frac{1}{n^{2}}\Bigl(n\sigma^{2}+n(n-1)\rho\sigma^{2}\Bigr)
+	= \frac{\sigma^{2}}{n}+\Bigl(1-\frac1n\Bigr)\rho\sigma^{2}
+	\;\longrightarrow\; \rho\sigma^{2} .
+\]
+The uncorrelated part of the risk can be diversified away; the common part $\rho\sigma^{2}$ cannot.
+(The formula also shows that such a $\rho$ cannot be negative when $n$ is large, since the variance must stay non-negative: a common correlation $\rho$ among $n$ variables requires $\rho\ge-1/(n-1)$.)
 
 %─────§ Conditional expectation─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Conditional Expectation}
+\label{sec:conditional-expectation}
 
 \source{Slides p.~170}
 
@@ -3261,11 +3607,161 @@ and taking $Y=X$ in \eqref{eq:covariance} recovers $\Cov[\,X,X\,]=\Var[\,X\,]$: 
 	It is itself a \emph{random variable}.
 \end{definition}
 
+The definition above is informal: it does not say how to compute $E[X\mid I]$, nor in what sense it is ``the'' expected value.
+Before proving anything we make it precise, first in the simplest case and then in general.
+Throughout, $X$ is assumed to have a finite mean, $E\bigl[|X|\bigr]<\infty$.
+
+\subsection{The Elementary Case}
+
+By the \vocab{elementary case} we mean the following situation:
+the information set $I$ consists of the value of a single random variable $Y$, and $Y$ is \emph{discrete}, taking finitely or countably many values $y$, each with $P(Y=y)>0$.
+In this case $E[X\mid I]$, which we then write $E[X\mid Y]$, can be computed by an explicit formula.
+Once we learn that $Y=y$, the natural forecast of $X$ is its average under the conditional distribution,
+\[
+	g(y) \;\triangleq\; E[\,X\mid Y=y\,] \;=\; \sum_{x} x\,P(X=x\mid Y=y)
+	\;=\; \sum_{x} x\,\frac{P(X=x,\,Y=y)}{P(Y=y)} ,
+\]
+defined for every $y$ with $P(Y=y)>0$.
+This is an ordinary number for each fixed $y$.
+The conditional expectation is what we get by plugging in the random value of $Y$:
+\[
+	E[\,X\mid Y\,] \;\triangleq\; g(Y) .
+\]
+Before $Y$ is observed we do not know which $y$ will occur, so $g(Y)$ is random; this is the sense in which $E[X\mid I]$ is a random variable.
+When $X$ and $Y$ have a joint density $f(x,y)$, the analogous formula
+$g(y)=\int x\,f(x,y)\,dx\big/\!\int f(x,y)\,dx$ is the natural guess.
+This is \emph{not} the elementary case, since $P(Y=y)=0$ for every $y$ and the division by $P(Y=y)$ above no longer makes sense; justifying this formula is one of the reasons for the general definition below.
+
+\begin{eg}
+	Roll a fair die and let $X$ be the result.
+	Suppose we are only told whether $X$ is even, and let $Y=1$ if it is and $Y=0$ otherwise.
+	Then
+	\[
+		E[\,X\mid Y=1\,] = \frac{2+4+6}{3} = 4 ,
+		\qquad
+		E[\,X\mid Y=0\,] = \frac{1+3+5}{3} = 3 .
+	\]
+	So $E[X\mid Y]$ is the random variable that equals $4$ with probability $\tfrac12$ and $3$ with probability $\tfrac12$.
+	It is coarser than $X$: it only resolves as much as $Y$ does.
+\end{eg}
+
+\subsection{The General Definition}
+
+The formula for $g$ breaks down when $P(Y=y)=0$ for every $y$, and it says nothing when the information is something like ``all prices up to time $t$''.
+What survives in every case is the following property, which we first check in the elementary case.
+
+\begin{lemma}\label{lem:ce-defining}
+	In the elementary case, with $E[X\mid Y]=g(Y)$ as defined above, for every bounded function $h$,
+	\begin{equation}
+		E\bigl[\,E[\,X\mid Y\,]\,h(Y)\,\bigr] \;=\; E\bigl[\,X\,h(Y)\,\bigr] . \label{eq:ce-defining}
+	\end{equation}
+\end{lemma}
+
+\begin{proof}
+	Group the outcomes by the value of $Y$:
+	\[
+		E\bigl[\,g(Y)\,h(Y)\,\bigr]
+		= \sum_{y} g(y)\,h(y)\,P(Y=y)
+		= \sum_{y} h(y) \sum_{x} x\,P(X=x,\,Y=y)
+		= \sum_{x,y} x\,h(y)\,P(X=x,\,Y=y) ,
+	\]
+	and the last sum is $E[X\,h(Y)]$.
+\end{proof}
+
+Read \eqref{eq:ce-defining} as a statement about bets.
+Any bet whose payoff $W=h(Y)$ can be settled using only the information in $Y$ pays the same on average whether it is scaled by the true outcome $X$ or by the forecast $E[X\mid Y]$.
+In other words, as far as anyone who only knows $Y$ can tell, $E[X\mid Y]$ and $X$ are the same.
+This becomes the definition.
+
+Say that a random variable $W$ is \vocab{determined by} $I$ if its value is known once the information in $I$ is revealed.\footnote{In measure-theoretic probability, $I$ is a $\sigma$-field $\mathcal{G}$, and ``determined by $I$'' means ``$\mathcal{G}$-measurable''. When $I$ is the value of $Y$, the random variables determined by $I$ are exactly the functions $h(Y)$.}
+
+\begin{definition}\label{def:ce-general}
+	$E[X\mid I]$ is a random variable $M$ such that
+	\begin{enumerate}[nosep]
+		\item $M$ is determined by $I$, and
+		\item $E[\,M\,W\,]=E[\,X\,W\,]$ for every bounded $W$ determined by $I$.
+	\end{enumerate}
+\end{definition}
+
+Such an $M$ always exists; this is a theorem of measure theory (the Radon--Nikodym theorem), which we take for granted.
+It is also unique, which is what entitles us to say ``\emph{the} conditional expectation''.
+
+\begin{proposition}[Uniqueness]
+	If $M_{1}$ and $M_{2}$ both satisfy \autoref{def:ce-general}, then $M_{1}=M_{2}$ with probability one.
+\end{proposition}
+
+\begin{proof}
+	Let $D=M_{1}-M_{2}$.
+	It is determined by $I$, and subtracting the two versions of condition~2 gives $E[DW]=0$ for every bounded $W$ determined by $I$.
+	Take $W=\mathbf{1}_{\{D>0\}}$, which equals $1$ when $D>0$ and $0$ otherwise; it is determined by $I$ because $D$ is.
+	Then $E\bigl[D\,\mathbf{1}_{\{D>0\}}\bigr]=0$.
+	But $D\,\mathbf{1}_{\{D>0\}}\ge0$, so by \autoref{lem:zero-mean} it is zero with probability one, that is, $P(D>0)=0$.
+	The same argument with $W=\mathbf{1}_{\{D<0\}}$ gives $P(D<0)=0$.
+\end{proof}
+
+The payoff of the abstract definition is that every property below is proved the same way:
+write down a candidate, and check the two conditions of \autoref{def:ce-general}.
+Uniqueness then says the candidate \emph{is} the conditional expectation.
+
+\subsection{Basic Properties}
+
+\begin{proposition}\label{prop:ce-properties}
+	Let $X$ and $Z$ have finite means, and let $a,b$ be constants.
+	\begin{enumerate}[nosep]
+		\item (Linearity) $E[\,aX+bZ\mid I\,]=a\,E[\,X\mid I\,]+b\,E[\,Z\mid I\,]$.
+		\item (Known quantities come out) If $W$ is bounded and determined by $I$, then $E[\,WX\mid I\,]=W\,E[\,X\mid I\,]$.
+		      In particular $E[\,W\mid I\,]=W$.
+		\item (Irrelevant information is ignored) If $X$ is independent of $I$, then $E[\,X\mid I\,]=E[\,X\,]$.
+		\item (Monotonicity) If $X\ge0$, then $E[\,X\mid I\,]\ge0$.
+		      Consequently $X\le Z$ implies $E[X\mid I]\le E[Z\mid I]$.
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+	Write $M_{X}=E[X\mid I]$ and $M_{Z}=E[Z\mid I]$, and let $V$ denote an arbitrary bounded random variable determined by $I$.
+
+	\textbf{1.} The candidate $aM_{X}+bM_{Z}$ is determined by $I$, and
+	$E\bigl[(aM_{X}+bM_{Z})V\bigr]=a\,E[M_{X}V]+b\,E[M_{Z}V]=a\,E[XV]+b\,E[ZV]=E\bigl[(aX+bZ)V\bigr]$.
+
+	\textbf{2.} The candidate $WM_{X}$ is determined by $I$, since both factors are.
+	The product $WV$ is bounded and determined by $I$, so it is a legitimate test variable for $M_{X}$:
+	$E\bigl[(WM_{X})V\bigr]=E\bigl[M_{X}(WV)\bigr]=E\bigl[X(WV)\bigr]=E\bigl[(WX)V\bigr]$.
+	For the special case, take $X=1$, whose conditional expectation is clearly $1$.
+
+	\textbf{3.} The candidate is the constant $E[X]$, which is determined by any $I$.
+	Since $V$ is determined by $I$ and $X$ is independent of $I$, $X$ and $V$ are independent, so
+	$E[XV]=E[X]\,E[V]=E\bigl[E[X]\,V\bigr]$.
+
+	\textbf{4.} Take $V=\mathbf{1}_{\{M_{X}<0\}}$.
+	Then $M_{X}V\le0$, while $E[M_{X}V]=E[XV]\ge0$ because $X\ge0$.
+	So $E[M_{X}V]=0$ with $M_{X}V\le0$, forcing $M_{X}V=0$, that is, $P(M_{X}<0)=0$.
+	For the consequence, apply this to $Z-X\ge0$ and use linearity.
+\end{proof}
+
+Items 2 and 3 are the two extremes.
+If you already know $W$, conditioning on $I$ cannot tell you anything more about it, so it behaves like a constant.
+If $I$ carries no information about $X$, the best you can do is the unconditional mean.
+Everything else lies between the two.
+
+\subsection{The Tower Law}
+
 \begin{theorem}[Law of iterated conditional expectations, or the tower law]
 	\begin{equation}
 		E[\,X\,] \;=\; E\bigl[\,E[\,X\mid I\,]\,\bigr] . \label{eq:tower}
 	\end{equation}
 \end{theorem}
+
+\begin{proof}
+	The constant $W=1$ is bounded and determined by any $I$, so condition~2 of \autoref{def:ce-general} gives
+	$E\bigl[E[X\mid I]\cdot1\bigr]=E[X\cdot1]$.
+\end{proof}
+
+In the elementary case, \eqref{eq:tower} reads
+\[
+	E[\,X\,] = \sum_{y} E[\,X\mid Y=y\,]\;P(Y=y) ,
+\]
+which is the \vocab{law of total expectation}: the overall average is the weighted average of the group averages, weighted by the size of each group.
+In the die example, $\tfrac12\cdot4+\tfrac12\cdot3=3.5=E[X]$.
 
 \source{Slides p.~171}
 
@@ -3276,6 +3772,24 @@ and taking $Y=X$ in \eqref{eq:covariance} recovers $\Cov[\,X,X\,]=\Var[\,X\,]$: 
 	\end{equation}
 \end{theorem}
 
+\begin{proof}
+	Let $M_{2}=E[X\mid I_{2}]$.
+	We check that the candidate $M_{1}=E[X\mid I_{1}]$ satisfies the two conditions for being $E[M_{2}\mid I_{1}]$.
+	It is determined by $I_{1}$ by definition.
+	Now let $V$ be bounded and determined by $I_{1}$.
+	Because $I_{2}$ contains everything in $I_{1}$, $V$ is also determined by $I_{2}$, so it is a legitimate test variable for both $M_{1}$ and $M_{2}$:
+	\[
+		E[\,M_{1}V\,] = E[\,XV\,] = E[\,M_{2}V\,] .
+	\]
+	The outer equalities are condition~2 for $M_{1}$ and for $M_{2}$, respectively.
+	By uniqueness, $M_{1}=E[M_{2}\mid I_{1}]$.
+\end{proof}
+
+\eqref{eq:tower} is the special case where $I_{1}$ is the trivial information set (knowing nothing), since conditioning on nothing is the ordinary expectation.
+The other order of conditioning is even simpler:
+$E\bigl[E[X\mid I_{1}]\mid I_{2}\bigr]=E[X\mid I_{1}]$, by item~2 of \autoref{prop:ce-properties}, because $E[X\mid I_{1}]$ is determined by $I_{1}$ and hence by $I_{2}$.
+Either way, when two conditionings are stacked, \emph{the smaller information set wins}.
+
 Here $I_{1}$ contains price information up to time $t_{1}$, and $I_{2}$ contains price information up to a later time $t_{2}>t_{1}$.
 In general,
 \[
@@ -3283,26 +3797,133 @@ In general,
 \]
 means the players never forget past data, so the information sets are increasing over time.\footnote{Hirsa \& Neftci (2014). This idea is formalised by sigma fields and filtrations in probability theory.}
 
+\subsection{Conditional Expectation as the Best Forecast}
+
+\autoref{subsec:best-linear} showed that the best \emph{straight line} $a+bX$ for predicting $Y$ has slope $\Cov[X,Y]/\Var[X]$.
+Conditional expectation answers the same question without the restriction to straight lines.
+
+\begin{theorem}\label{thm:ce-best}
+	Suppose $E[X^{2}]<\infty$.
+	Among all random variables $Z$ determined by $I$ with $E[Z^{2}]<\infty$, the mean squared error $E\bigl[(X-Z)^{2}\bigr]$ is smallest for $Z=E[X\mid I]$.
+	More precisely,
+	\begin{equation}
+		E\bigl[(X-Z)^{2}\bigr] \;=\; E\bigl[(X-M)^{2}\bigr] + E\bigl[(M-Z)^{2}\bigr] ,
+		\qquad M=E[\,X\mid I\,] . \label{eq:ce-pythagoras}
+	\end{equation}
+\end{theorem}
+
+\begin{proof}
+	Expand $X-Z=(X-M)+(M-Z)$:
+	\[
+		E\bigl[(X-Z)^{2}\bigr] = E\bigl[(X-M)^{2}\bigr] + 2\,E\bigl[(X-M)(M-Z)\bigr] + E\bigl[(M-Z)^{2}\bigr] .
+	\]
+	The random variable $V=M-Z$ is determined by $I$, so condition~2 of \autoref{def:ce-general} gives $E[XV]=E[MV]$, that is, $E\bigl[(X-M)V\bigr]=0$, and the cross term vanishes.\footnote{Condition~2 was stated for bounded $V$. It extends to $V$ with $E[V^{2}]<\infty$ by truncating $V$ at $\pm n$ and letting $n\to\infty$; we skip the details.}
+	The last term is non-negative and equals zero when $Z=M$.
+\end{proof}
+
+Equation \eqref{eq:ce-pythagoras} is Pythagoras' theorem.
+The forecast error $X-M$ is orthogonal to everything determined by $I$, so $M$ is the ``foot of the perpendicular'' from $X$ onto the space of forecasts that use only $I$.
+The regression line of \autoref{subsec:best-linear} is the foot of the perpendicular onto the smaller space of straight lines $a+bX$, which is why it can do worse.
+For $X\sim N(0,1)$ and $Y=X^{2}$, the best line is flat and explains nothing, whereas $E[Y\mid X]=X^{2}$ predicts $Y$ perfectly.
+
+\subsection{Conditional Variance}
+
+Define the \vocab{conditional variance} by analogy with \eqref{eq:variance},
+\[
+	\Var[\,X\mid I\,] \;\triangleq\; E\bigl[\,(X-E[X\mid I])^{2}\mid I\,\bigr]
+	\;=\; E[\,X^{2}\mid I\,]-\bigl(E[\,X\mid I\,]\bigr)^{2} .
+\]
+The second form follows by expanding the square and using item~2 of \autoref{prop:ce-properties} to pull out $E[X\mid I]$, just as in the unconditional case.
+
+\begin{proposition}[Law of total variance]
+	If $E[X^{2}]<\infty$, then
+	\begin{equation}
+		\Var[\,X\,] \;=\; E\bigl[\,\Var[\,X\mid I\,]\,\bigr] + \Var\bigl[\,E[\,X\mid I\,]\,\bigr] . \label{eq:total-variance}
+	\end{equation}
+\end{proposition}
+
+\begin{proof}
+	Let $M=E[X\mid I]$; by the tower law $E[M]=E[X]$.
+	Taking expectations of the second form of $\Var[X\mid I]$ and using the tower law on $E[X^{2}\mid I]$,
+	\[
+		E\bigl[\Var[X\mid I]\bigr] = E[X^{2}]-E[M^{2}] ,
+		\qquad
+		\Var[M] = E[M^{2}]-\bigl(E[X]\bigr)^{2} .
+	\]
+	Adding the two gives $E[X^{2}]-(E[X])^{2}=\Var[X]$.
+\end{proof}
+
+The total uncertainty in $X$ splits into two parts:
+the uncertainty that remains \emph{after} learning $I$, on average,
+and the uncertainty in the forecast $E[X\mid I]$ itself, which comes from not yet knowing what $I$ will say.
+Since both parts are non-negative, $\Var\bigl[E[X\mid I]\bigr]\le\Var[X]$: forecasts are always less volatile than the thing they forecast.
+In the die example, $\Var[X]=\tfrac{35}{12}$, the forecast takes the values $3$ and $4$ with equal probability so $\Var\bigl[E[X\mid Y]\bigr]=\tfrac14$, and within each group the variance is $\tfrac83$; indeed $\tfrac83+\tfrac14=\tfrac{35}{12}$.
+
 \begin{remark}
-	這一節看起來抽象，但它是後面所有定價模型的語法，值得把三件事講清楚。
+	這一節補了很多數學，這裡把它們串起來，看它們在後面會怎麼用到。
 
-	\textbf{（一）為什麼 $E[X\mid I]$ 是隨機變數？}
-	因為 $I$ 本身是隨機的。
-	明天的股價期望值取決於今天觀察到什麼；今天的觀察結果尚未實現時，這個「期望值」就還是個變數。
-	一旦 $I$ 實現了，它才塌縮成一個數字。
+	\textbf{（一）$E[X\mid I]$ 為什麼是隨機變數。}
+	從骰子的例子就看得出來：在還不知道是奇數還是偶數之前，「條件期望值」可能是 $3$ 也可能是 $4$，所以它本身是個隨機變數。
+	一般的定義（\autoref{def:ce-general}）則是反過來刻畫它：只要是能用 $I$ 結算的賭注，用 $E[X\mid I]$ 算出來的平均報酬都跟用 $X$ 算的一樣。
+	後面所有性質都是從這個定義，加上唯一性推出來的。
 
-	\textbf{（二）\eqref{eq:tower-nested} 在講什麼？}
-	用白話說：\emph{今天對「明天的預測」所做的預測，就是今天的預測}。
-	你不可能今天就知道明天會把預測往上修——若知道，今天就該先修了。
-	這正是\vocab{鞅}（martingale）的核心性質，也是無套利定價的技術支柱。
+	\textbf{（二）\eqref{eq:tower-nested} 的意思。}
+	用白話講：今天對「明天的預測」做預測，得到的就是今天的預測。
+	如果你今天就能確定明天會把預測往上調，那今天就應該直接調上去。
+	之後會定義\vocab{鞅}（martingale）：一個過程 $M_{t}$ 若對所有 $t_{1}\le t_{2}$ 都滿足 $E[M_{t_{2}}\mid I_{t_{1}}]=M_{t_{1}}$，就叫做鞅。
+	由 \eqref{eq:tower-nested} 馬上可以得到：對任何 $X$，$M_{t}=E[X\mid I_{t}]$ 都是一個鞅。
+	無套利定價說的正是「折現後的價格是某個機率下的條件期望值」，所以折現後的價格是鞅。
 
-	\textbf{（三）$I_{1}\subseteq I_{2}\subseteq\cdots$ 為何要特別寫出來？}
-	它把「資訊只增不減」這個看似當然的假設明白化。
-	數學上這叫\vocab{過濾}（filtration），是隨機過程定義「時間」的方式——沒有它，「今天知道什麼」根本無從談起。
+	\textbf{（三）條件期望值是最好的預測。}
+	\autoref{thm:ce-best} 說 $E[X\mid I]$ 是只用 $I$ 能做到的最小均方誤差預測。
+	\autoref{subsec:best-linear} 的回歸直線只在直線裡面找最好的，條件期望值則是在所有函數裡面找。
+	這兩者的差距，正是前面說「相關係數看不到非線性關係」的原因。
+
+	\textbf{（四）為什麼要寫出 $I_{1}\subseteq I_{2}\subseteq\cdots$。}
+	它把「資訊只會增加、不會忘記」這個假設明確寫出來。
+	這也是 \eqref{eq:tower-nested} 能用的前提：證明裡用到「由 $I_{1}$ 決定的東西，也由 $I_{2}$ 決定」。
+	數學上這一串資訊集叫做\vocab{過濾}（filtration），是隨機過程裡描述「隨時間知道什麼」的方式。
 \end{remark}
 
 %─────§ Normal distribution─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{The Normal Distribution}
+\label{sec:normal}
+
+The random variables so far could be discrete or continuous; nothing depended on the difference.
+From here on we work mostly with continuous distributions, so we first collect the tools for handling densities.
+
+\subsection{Distribution Functions and Densities}
+
+The \vocab{distribution function} of a random variable $X$ is $F_{X}(x)\triangleq P(X\le x)$.
+It increases from $0$ to $1$ as $x$ runs from $-\infty$ to $\infty$.
+$X$ has a \vocab{density} $f_{X}$ if
+\[
+	P(a<X\le b) = \int_{a}^{b} f_{X}(x)\,dx
+	\qquad\text{for all } a<b ,
+\]
+in which case $f_{X}=F_{X}'$ wherever $f_{X}$ is continuous.
+Expectations are then computed by integrals instead of sums, $E[g(X)]=\int_{-\infty}^{\infty}g(x)\,f_{X}(x)\,dx$, and every result proved so far holds with the same proof.
+
+We will often need the density of a transformed variable $Y=g(X)$.
+The rule is to go through the distribution function.
+
+\begin{proposition}[Change of variables]\label{prop:change-of-variables}
+	Let $X$ have density $f_{X}$, and let $g$ be differentiable and strictly monotone with inverse $h=g^{-1}$.
+	Then $Y=g(X)$ has density
+	\[
+		f_{Y}(y) = f_{X}\bigl(h(y)\bigr)\,\bigl|h'(y)\bigr| .
+	\]
+\end{proposition}
+
+\begin{proof}
+	If $g$ is increasing, then $Y\le y$ exactly when $X\le h(y)$, so $F_{Y}(y)=F_{X}(h(y))$.
+	Differentiating by the chain rule gives $f_{Y}(y)=f_{X}(h(y))\,h'(y)$, and $h'>0$.
+	If $g$ is decreasing, then $Y\le y$ exactly when $X\ge h(y)$, so $F_{Y}(y)=1-F_{X}(h(y))$ and $f_{Y}(y)=-f_{X}(h(y))\,h'(y)$, with $h'<0$.
+\end{proof}
+
+The factor $|h'(y)|$ accounts for stretching: if $g$ spreads a small interval of $x$-values over a longer interval of $y$-values, the same probability is spread more thinly, and the density drops accordingly.
+
+\subsection{Definition and Standardisation}
 
 \source{Slides p.~172}
 
@@ -3318,6 +3939,60 @@ means the players never forget past data, so the information sets are increasing
 	\end{equation}
 \end{definition}
 
+We write $\phi(z)=e^{-z^{2}/2}/\sqrt{2\pi}$ for the standard normal density, so that $N'=\phi$.
+The definition calls $\mu$ and $\sigma^{2}$ the mean and the variance, and it calls \eqref{eq:normal-pdf} a density; all three claims need checking.
+The first step reduces everything to the standard case.
+
+\begin{proposition}[Standardisation]\label{prop:standardise}
+	$X\sim N(\mu,\sigma^{2})$ if and only if $Z=(X-\mu)/\sigma\sim N(0,1)$.
+	Consequently $X=\mu+\sigma Z$ and
+	\[
+		P(X\le x) = N\!\left(\frac{x-\mu}{\sigma}\right) .
+	\]
+\end{proposition}
+
+\begin{proof}
+	Apply \autoref{prop:change-of-variables} to $g(x)=(x-\mu)/\sigma$, whose inverse $h(z)=\mu+\sigma z$ has $h'=\sigma$:
+	the density of $Z$ is $\sigma\cdot e^{-(\sigma z)^{2}/(2\sigma^{2})}/(\sigma\sqrt{2\pi})=\phi(z)$.
+	The converse is the same computation with $g$ and $h$ exchanged.
+\end{proof}
+
+So a single function $N(\cdot)$ serves every normal distribution; this is why it appears in every option pricing formula.
+
+\begin{proposition}\label{prop:normal-basic}
+	\begin{enumerate}[nosep]
+		\item $\int_{-\infty}^{\infty}\phi(z)\,dz=1$, so \eqref{eq:normal-pdf} is a density.
+		\item If $Z\sim N(0,1)$, then $E[Z]=0$ and $\Var[Z]=1$. Hence $X\sim N(\mu,\sigma^{2})$ has mean $\mu$ and variance $\sigma^{2}$.
+		\item (Symmetry) $N(-z)=1-N(z)$ for every $z$.
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+	\textbf{1.} Let $I=\int_{-\infty}^{\infty}e^{-x^{2}/2}\,dx$.
+	Then $I^{2}$ is a double integral over the plane, which we evaluate in polar coordinates $x=r\cos\theta$, $y=r\sin\theta$, $dx\,dy=r\,dr\,d\theta$:
+	\[
+		I^{2}=\int_{-\infty}^{\infty}\!\int_{-\infty}^{\infty}e^{-(x^{2}+y^{2})/2}\,dx\,dy
+		=\int_{0}^{2\pi}\!\int_{0}^{\infty}e^{-r^{2}/2}\,r\,dr\,d\theta
+		=2\pi\Bigl[-e^{-r^{2}/2}\Bigr]_{0}^{\infty}=2\pi .
+	\]
+	So $I=\sqrt{2\pi}$ and $\int\phi=1$.
+
+	\textbf{2.} $z\,\phi(z)$ is an odd function, so $E[Z]=\int z\,\phi(z)\,dz=0$.
+	For the variance, note that $\phi'(z)=-z\,\phi(z)$ and integrate by parts:
+	\[
+		E[Z^{2}]=\int_{-\infty}^{\infty}z\cdot z\,\phi(z)\,dz
+		=\Bigl[-z\,\phi(z)\Bigr]_{-\infty}^{\infty}+\int_{-\infty}^{\infty}\phi(z)\,dz
+		=0+1 .
+	\]
+	For general $X=\mu+\sigma Z$, use linearity and item~5 of \autoref{prop:cov-properties}.
+
+	\textbf{3.} $\phi$ is even, so $P(Z\le-z)=P(Z\ge z)=1-N(z)$.
+\end{proof}
+
+Together, standardisation and symmetry answer every question about normal probabilities with a table of $N(z)$ for $z\ge0$.
+For instance, $P(|X-\mu|\le k\sigma)=N(k)-N(-k)=2N(k)-1$, which is about $68.3\%$, $95.4\%$ and $99.7\%$ for $k=1,2,3$.
+Compare this with Chebyshev's guarantee in \autoref{prop:var-properties}, which for $k=2$ promises only $75\%$.
+
 \begin{note}
 	The integral in \eqref{eq:normal-cdf} has no closed form in elementary functions, so $N(\cdot)$ is always evaluated numerically.
 	Every option pricing formula in this course will end up calling it, which makes a fast and accurate $N(\cdot)$ a genuine implementation concern rather than a detail.
@@ -3325,6 +4000,7 @@ means the players never forget past data, so the information sets are increasing
 
 %─────§ MGF───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Moment Generating Functions}
+\label{sec:mgf}
 
 \source{Slides p.~173}
 
@@ -3335,6 +4011,75 @@ means the players never forget past data, so the information sets are increasing
 	\]
 \end{definition}
 
+Since $e^{tX}>0$, the expectation always makes sense, but it may be $+\infty$.
+We always have $\theta_{X}(0)=1$.
+We say that the moment generating function \emph{exists} if $\theta_{X}(t)<\infty$ for every $t$ in some interval $(-h,h)$ with $h>0$.
+All the results below assume this.
+
+\subsection{Moments from Derivatives}
+
+\begin{proposition}\label{prop:mgf-moments}
+	If $\theta_{X}$ exists, then every moment $E[X^{n}]$ is finite,
+	\begin{equation}
+		\theta_{X}(t) \;=\; \sum_{n=0}^{\infty}\frac{E[\,X^{n}\,]}{n!}\,t^{n}
+		\qquad\text{for } |t|<h , \label{eq:mgf-series}
+	\end{equation}
+	and consequently $\theta_{X}^{(n)}(0)=E[X^{n}]$ for every $n\ge0$.
+\end{proposition}
+
+\begin{proof}
+	Expand the exponential: $e^{tX}=\sum_{n\ge0}t^{n}X^{n}/n!$.
+	Taking the expectation term by term gives \eqref{eq:mgf-series}.\footnote{Swapping $E$ and $\sum$ needs justification. For $|t|<h$, every partial sum is bounded in absolute value by $e^{|tX|}\le e^{tX}+e^{-tX}$, whose expectation $\theta_{X}(t)+\theta_{X}(-t)$ is finite. The dominated convergence theorem then allows the swap. The same bound shows $E\bigl[|X|^{n}\bigr]<\infty$, because $|tX|^{n}/n!\le e^{|tX|}$.}
+	The right-hand side of \eqref{eq:mgf-series} is a power series in $t$, and the coefficient of $t^{n}$ in the Taylor series of $\theta_{X}$ at $0$ is $\theta_{X}^{(n)}(0)/n!$.
+	Comparing coefficients gives $\theta_{X}^{(n)}(0)=E[X^{n}]$.
+\end{proof}
+
+This is where the name comes from: $\theta_{X}$ packs all the moments of $X$ into one function, and differentiating $n$ times at $0$ pulls out the $n$th moment.
+In particular,
+\[
+	E[\,X\,]=\theta_{X}'(0) ,
+	\qquad
+	\Var[\,X\,]=\theta_{X}''(0)-\bigl(\theta_{X}'(0)\bigr)^{2} .
+\]
+It is often easier to differentiate $\ln\theta_{X}$ instead.
+Using $\theta_{X}(0)=1$,
+\begin{equation}
+	\bigl(\ln\theta_{X}\bigr)'(0)=\theta_{X}'(0)=E[\,X\,] ,
+	\qquad
+	\bigl(\ln\theta_{X}\bigr)''(0)=\theta_{X}''(0)-\bigl(\theta_{X}'(0)\bigr)^{2}=\Var[\,X\,] . \label{eq:mgf-log}
+\end{equation}
+
+\subsection{Transformations and Sums}
+
+\begin{proposition}\label{prop:mgf-algebra}
+	\begin{enumerate}[nosep]
+		\item (Affine maps) For constants $a$ and $b$, $\theta_{a+bX}(t)=e^{at}\,\theta_{X}(bt)$.
+		\item (Independent sums) If $X$ and $Y$ are independent, then $\theta_{X+Y}(t)=\theta_{X}(t)\,\theta_{Y}(t)$.
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+	\textbf{1.} $E\bigl[e^{t(a+bX)}\bigr]=e^{at}\,E\bigl[e^{(bt)X}\bigr]$.
+
+	\textbf{2.} Apply \autoref{prop:indep-factor} with $f(x)=e^{tx}$ and $g(y)=e^{ty}$:
+	$E\bigl[e^{t(X+Y)}\bigr]=E\bigl[e^{tX}e^{tY}\bigr]=E\bigl[e^{tX}\bigr]\,E\bigl[e^{tY}\bigr]$.
+\end{proof}
+
+Item~2 is the main reason moment generating functions are useful.
+The distribution of $X+Y$ is given by a convolution integral, which is usually hard to compute.
+The moment generating function turns that convolution into a plain multiplication.
+
+To go back from $\theta_{X+Y}$ to the distribution of $X+Y$ we need one more fact, which we quote without proof.
+
+\begin{theorem}[Uniqueness]\label{thm:mgf-unique}
+	If $\theta_{X}(t)=\theta_{Y}(t)<\infty$ for all $t$ in some interval $(-h,h)$ with $h>0$, then $X$ and $Y$ have the same distribution.
+\end{theorem}
+
+So a moment generating function that exists identifies the distribution.
+To show that some random variable has a certain distribution, it is enough to compute its moment generating function and recognise it.
+
+\subsection{The Normal Distribution}
+
 \begin{theorem}
 	The moment generating function of $X\sim N(\mu,\sigma^{2})$ is
 	\begin{equation}
@@ -3342,32 +4087,105 @@ means the players never forget past data, so the information sets are increasing
 	\end{equation}
 \end{theorem}
 
-\begin{remark}
-	\textbf{為什麼叫}\vocab{動差生成函數}（moment generating function）\textbf{？}
-	把 $e^{tX}$ 展開成 $\sum_{n\ge 0} t^{n}X^{n}/n!$ 再取期望值，得
+\begin{proof}
+	First let $Z\sim N(0,1)$.
+	Complete the square in the exponent, $tz-\tfrac12z^{2}=\tfrac12t^{2}-\tfrac12(z-t)^{2}$:
 	\[
-		\theta_{X}(t) = \sum_{n\ge 0}\frac{E[\,X^{n}\,]}{n!}\,t^{n} ,
+		\theta_{Z}(t)
+		= \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} e^{tz-z^{2}/2}\,dz
+		= e^{t^{2}/2}\,\frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} e^{-(z-t)^{2}/2}\,dz
+		= e^{t^{2}/2} .
 	\]
-	所以 $\theta_{X}^{(n)}(0)=E[X^{n}]$——所有動差都藏在這一個函數裡，微分幾次就掉出第幾階動差。
+	The last integral equals $1$ because $e^{-(z-t)^{2}/2}/\sqrt{2\pi}$ is the $N(t,1)$ density.
+	For general $X\sim N(\mu,\sigma^{2})$, \autoref{prop:standardise} gives $X=\mu+\sigma Z$.
+	By item~1 of \autoref{prop:mgf-algebra},
+	\[
+		\theta_{X}(t)=e^{\mu t}\,\theta_{Z}(\sigma t)=e^{\mu t}\,e^{\sigma^{2}t^{2}/2} .
+		\qedhere
+	\]
+\end{proof}
 
-	\textbf{為什麼現在就要提？}
-	因為 \eqref{eq:normal-mgf} 在 $t=1$ 的值
+As a check, $\ln\theta_{X}(t)=\mu t+\tfrac12\sigma^{2}t^{2}$, so \eqref{eq:mgf-log} gives mean $\mu$ and variance $\sigma^{2}$, as it should.
+The normal distribution is exactly the distribution whose $\ln\theta$ is a polynomial of degree two; all its higher-order structure is fixed by the mean and the variance.
+
+\begin{corollary}\label{cor:normal-closure}
+	\begin{enumerate}[nosep]
+		\item If $X\sim N(\mu,\sigma^{2})$ and $b\ne0$, then $a+bX\sim N(a+b\mu,\,b^{2}\sigma^{2})$.
+		\item If $X_{1},\dots,X_{n}$ are independent with $X_{i}\sim N(\mu_{i},\sigma_{i}^{2})$, then
+		      $\sum_{i}X_{i}\sim N\bigl(\sum_{i}\mu_{i},\,\sum_{i}\sigma_{i}^{2}\bigr)$.
+	\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+	\textbf{1.} By \autoref{prop:mgf-algebra},
+	$\theta_{a+bX}(t)=e^{at}\exp\bigl(\mu bt+\tfrac12\sigma^{2}b^{2}t^{2}\bigr)=\exp\bigl((a+b\mu)t+\tfrac12 b^{2}\sigma^{2}t^{2}\bigr)$,
+	which is the moment generating function of $N(a+b\mu,\,b^{2}\sigma^{2})$.
+	Apply \autoref{thm:mgf-unique}.
+
+	\textbf{2.} By independence,
+	$\theta_{\sum X_{i}}(t)=\prod_{i}\exp\bigl(\mu_{i}t+\tfrac12\sigma_{i}^{2}t^{2}\bigr)=\exp\bigl((\sum_{i}\mu_{i})t+\tfrac12(\sum_{i}\sigma_{i}^{2})t^{2}\bigr)$.
+	Apply \autoref{thm:mgf-unique} again.
+\end{proof}
+
+\begin{corollary}\label{cor:normal-moments}
+	If $Z\sim N(0,1)$, then $E[Z^{n}]=0$ for odd $n$, and
 	\[
-		\theta_{X}(1) = E\bigl[\,e^{X}\,\bigr] = e^{\mu+\sigma^{2}/2}
+		E\bigl[\,Z^{2k}\,\bigr] = \frac{(2k)!}{2^{k}\,k!} = 1\cdot3\cdot5\cdots(2k-1) .
 	\]
-	正是下一節對數常態分佈的平均數 \eqref{eq:lognormal-moments}。
-	更一般地取 $t=n$ 就得到 $E[e^{nX}]=e^{n\mu+n^{2}\sigma^{2}/2}$，也就是 $E[Y^{n}]$——本章最後那一串對數常態公式，全部是 \eqref{eq:normal-mgf} 換個寫法而已。
+	In particular $E[Z^{2}]=1$, $E[Z^{4}]=3$ and $E[Z^{6}]=15$.
+\end{corollary}
+
+\begin{proof}
+	Expand $\theta_{Z}(t)=e^{t^{2}/2}$ as a power series:
+	\[
+		e^{t^{2}/2}=\sum_{k=0}^{\infty}\frac{(t^{2}/2)^{k}}{k!}=\sum_{k=0}^{\infty}\frac{t^{2k}}{2^{k}\,k!} .
+	\]
+	Only even powers appear, so by \eqref{eq:mgf-series} all odd moments vanish.
+	Matching the coefficient of $t^{2k}$ with $E[Z^{2k}]/(2k)!$ gives $E[Z^{2k}]=(2k)!/(2^{k}k!)$.
+	Finally, $(2k)!=\bigl(2\cdot4\cdots2k\bigr)\bigl(1\cdot3\cdots(2k-1)\bigr)=2^{k}k!\cdot\bigl(1\cdot3\cdots(2k-1)\bigr)$.
+\end{proof}
+
+The value $E[Z^{4}]=3$ is the benchmark behind the word ``kurtosis'': a distribution with $E[(X-\mu)^{4}]/\sigma^{4}>3$ has heavier tails than the normal, which is what \autoref{fig:sp500-density} showed for real returns.
+
+\begin{note}
+	The moment generating function does not always exist.
+	A lognormal $Y=e^{X}$ with $X$ normal has every moment finite, yet $E[e^{tY}]=\infty$ for every $t>0$, because $e^{te^{x}}$ grows far faster than the normal density $e^{-x^{2}/2}$ decays.
+	So \autoref{prop:mgf-moments} cannot be run in reverse: finite moments do not imply an existing moment generating function.
+	The usual remedy is the \vocab{characteristic function} $E[e^{itX}]$, with $i=\sqrt{-1}$, which always exists because $|e^{itX}|=1$, and which also determines the distribution.
+\end{note}
+
+\begin{remark}
+	這一節的重點可以濃縮成三句話，後面會一再用到。
+
+	\textbf{（一）動差生成函數把所有動差包在一起。}
+	把 $e^{tX}$ 展開再取期望值，第 $n$ 項的係數就是 $E[X^{n}]/n!$，所以在 $0$ 微分 $n$ 次就得到第 $n$ 階動差（\autoref{prop:mgf-moments}）。
+	實際在算的時候，對 $\ln\theta_{X}$ 微分通常比較方便：一次微分是平均數，二次微分是變異數。
+	常態分佈的 $\ln\theta_{X}$ 剛好是 $t$ 的二次式，所以它完全由平均數和變異數決定；
+	$E[Z^{4}]=3$ 這種高階動差，也是從同一個式子展開出來的。
+
+	\textbf{（二）獨立相加，在動差生成函數上就是相乘。}
+	這配合唯一性定理，就能直接證明「獨立常態相加還是常態」（\autoref{cor:normal-closure}）。
+	下一節的多元常態分佈，以及後面把每一期報酬加起來得到整段報酬的論證，都是建立在這件事上。
+
+	\textbf{（三）在 $t=n$ 取值就得到對數常態的動差。}
+	由 \eqref{eq:normal-mgf}，$E[e^{nX}]=e^{n\mu+n^{2}\sigma^{2}/2}$。
+	若 $Y=e^{X}$，這就是 $E[Y^{n}]$，所以 \autoref{sec:lognormal} 的平均數與變異數 \eqref{eq:lognormal-moments} 只是把 $n=1,2$ 代進去而已。
+	但要注意，$Y$ 自己的動差生成函數並不存在（上面的 note），所以處理對數常態時，永遠是透過 $\ln Y$ 這個常態變數來算，而不是直接算 $Y$ 的動差生成函數。
 \end{remark}
 
 %─────§ Multivariate normal─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{The Multivariate Normal Distribution}
+\label{sec:mvn}
 
 \source{Slides p.~174}
 
+A portfolio involves several assets at once, so a single normal variable is not enough: we need a joint distribution for several of them, with a prescribed covariance matrix.
+The independent case was settled in \autoref{sec:mgf}.
 If $X_{i}\sim N(\mu_{i},\sigma_{i}^{2})$ are independent, then
 \[
 	\sum_{i} X_{i} \;\sim\; N\left(\sum_{i}\mu_{i},\;\sum_{i}\sigma_{i}^{2}\right) .
 \]
+This was proved in \autoref{cor:normal-closure}.
 
 Dropping independence requires a definition rather than a theorem.
 Let $X_{i}\sim N(\mu_{i},\sigma_{i}^{2})$, which may not be independent, and suppose
@@ -3380,7 +4198,7 @@ for every linear combination $\sum_{i=1}^{n}t_{i}X_{i}$ with $\sum_{i=1}^{n}\sum
 
 \source{Slides p.~175}
 
-Then the $X_{i}$ are said to have a \vocab{multivariate normal distribution}.\footnote{Corrected by Mr.~Huang, Guo-Hua (\texttt{R98922107}) on March 10, 2010.}
+Then the $X_{i}$ are said to have a \vocab{multivariate normal distribution}, or to be \vocab{jointly normal}.\footnote{Corrected by Mr.~Huang, Guo-Hua (\texttt{R98922107}) on March 10, 2010.}
 With $M\equiv C^{-1}$ and the $(i,j)$th entry of the matrix $M$ being $M_{i,j}$, the probability density function for the $X_{i}$ is
 \begin{equation}
 	\frac{1}{\sqrt{(2\pi)^{n}\det(C)}}\,
@@ -3391,17 +4209,147 @@ with a positive definite covariance matrix
 	C \;\triangleq\; \bigl[\,\Cov[\,X_{i},X_{j}\,]\,\bigr]_{1\le i,j\le n} .
 \]
 
+The mean and the variance in \eqref{eq:mvn-def} are not an extra assumption: they are forced by linearity and by \eqref{eq:var-sum}.
+The real content of the definition is that every linear combination is \emph{normal}.
+The variance condition only excludes combinations that are constant, which are ``normal with variance $0$'' in a degenerate sense.
+The rest of this section explains where such random variables come from, where the density \eqref{eq:mvn-pdf} comes from, and what is special about them.
+
+\subsection{Construction from Independent Normals}
+
+\begin{proposition}\label{prop:mvn-construct}
+	Let $Z_{1},\dots,Z_{k}$ be independent standard normal variables, $\bm{Z}=(Z_{1},\dots,Z_{k})^{\mathsf{T}}$, and let $A$ be an $n\times k$ matrix and $\bm{\mu}\in\mathbb{R}^{n}$.
+	Then $\bm{X}=\bm{\mu}+A\bm{Z}$ is multivariate normal with mean $\bm{\mu}$ and covariance matrix $C=AA^{\mathsf{T}}$.
+\end{proposition}
+
+\begin{proof}
+	The covariance matrix of $\bm{Z}$ is the identity, so that of $\bm{X}$ is $AA^{\mathsf{T}}$ by item~3 of \autoref{prop:cov-matrix}.
+	For a weight vector $\bm{t}$, set $\bm{c}=A^{\mathsf{T}}\bm{t}$; then
+	\[
+		\bm{t}^{\mathsf{T}}\bm{X}=\bm{t}^{\mathsf{T}}\bm{\mu}+\sum_{j=1}^{k}c_{j}Z_{j} .
+	\]
+	Each $c_{j}Z_{j}$ with $c_{j}\ne0$ is $N(0,c_{j}^{2})$, and they are independent, so by \autoref{cor:normal-closure} the sum is normal with variance $\sum_{j}c_{j}^{2}=\bm{t}^{\mathsf{T}}AA^{\mathsf{T}}\bm{t}$, provided this is nonzero.
+	Its mean is $\bm{t}^{\mathsf{T}}\bm{\mu}$.
+	This is \eqref{eq:mvn-def}.
+\end{proof}
+
+Conversely, the distribution of a multivariate normal vector is determined by $\bm{\mu}$ and $C$ alone.
+Indeed, for every $\bm{t}$ the variable $\bm{t}^{\mathsf{T}}\bm{X}$ is normal, so by \eqref{eq:normal-mgf} at $t=1$,
+\[
+	E\bigl[e^{\bm{t}^{\mathsf{T}}\bm{X}}\bigr]=\exp\Bigl(\bm{t}^{\mathsf{T}}\bm{\mu}+\tfrac12\,\bm{t}^{\mathsf{T}}C\bm{t}\Bigr) ,
+\]
+and the multivariate version of \autoref{thm:mgf-unique}, which we quote, says that this function of $\bm{t}$ determines the joint distribution.
+Hence every multivariate normal vector with mean $\bm{\mu}$ and covariance matrix $C$ has the same distribution as $\bm{\mu}+A\bm{Z}$, for any matrix $A$ with $AA^{\mathsf{T}}=C$.
+Finding such an $A$ is the subject of \autoref{sec:gen-bivariate}.
+
+\subsection{The Density}
+
+When $C$ is positive definite, we can choose $A$ square and invertible with $AA^{\mathsf{T}}=C$ (\autoref{sec:gen-bivariate} shows how).
+The density \eqref{eq:mvn-pdf} is then the result of a change of variables.
+In $n$ dimensions, \autoref{prop:change-of-variables} becomes: if $\bm{X}=\bm{g}(\bm{Z})$ with $\bm{g}$ invertible and $\bm{h}=\bm{g}^{-1}$, then
+\[
+	f_{\bm{X}}(\bm{x})=f_{\bm{Z}}\bigl(\bm{h}(\bm{x})\bigr)\,\bigl|\det D\bm{h}(\bm{x})\bigr| ,
+\]
+where $D\bm{h}$ is the Jacobian matrix of partial derivatives.
+The absolute determinant measures how $\bm{h}$ scales volumes, just as $|h'|$ measured how $h$ scales lengths.
+
+\begin{proposition}
+	If $C$ is positive definite, the multivariate normal vector $\bm{X}$ has the density \eqref{eq:mvn-pdf}.
+\end{proposition}
+
+\begin{proof}
+	The $Z_{i}$ are independent, so the density of $\bm{Z}$ is the product
+	$\prod_{i}\phi(z_{i})=(2\pi)^{-n/2}\exp\bigl(-\tfrac12\bm{z}^{\mathsf{T}}\bm{z}\bigr)$.
+	Since $\bm{X}$ has the same distribution as $\bm{\mu}+A\bm{Z}$, we may take $\bm{X}=\bm{\mu}+A\bm{Z}$, so $\bm{h}(\bm{x})=A^{-1}(\bm{x}-\bm{\mu})$ and $D\bm{h}=A^{-1}$.
+	Then
+	\[
+		\bm{h}(\bm{x})^{\mathsf{T}}\bm{h}(\bm{x})
+		=(\bm{x}-\bm{\mu})^{\mathsf{T}}(A^{-1})^{\mathsf{T}}A^{-1}(\bm{x}-\bm{\mu})
+		=(\bm{x}-\bm{\mu})^{\mathsf{T}}C^{-1}(\bm{x}-\bm{\mu}) ,
+	\]
+	because $(A^{-1})^{\mathsf{T}}A^{-1}=(AA^{\mathsf{T}})^{-1}=C^{-1}$.
+	Also $|\det A^{-1}|=1/|\det A|=1/\sqrt{\det C}$, since $\det C=\det A\,\det A^{\mathsf{T}}=(\det A)^{2}$.
+	Substituting gives \eqref{eq:mvn-pdf}, whose double sum is $(\bm{x}-\bm{\mu})^{\mathsf{T}}M(\bm{x}-\bm{\mu})$.
+\end{proof}
+
+When $C$ is only positive semidefinite, some combination $\bm{t}^{\mathsf{T}}\bm{X}$ is constant (\autoref{prop:cov-matrix}), so $\bm{X}$ lives on a lower-dimensional subspace and has no density; the definition \eqref{eq:mvn-def} still applies.
+
+\subsection{Uncorrelated Jointly Normal Variables Are Independent}
+
+\autoref{subsec:independence} showed that uncorrelated random variables need not be independent.
+For jointly normal variables they must be.
+
+\begin{proposition}\label{prop:mvn-uncorrelated}
+	If $X_{1},\dots,X_{n}$ are jointly normal and pairwise uncorrelated, then they are independent.
+\end{proposition}
+
+\begin{proof}
+	Discard any $X_{i}$ with zero variance; a constant is independent of everything.
+	The remaining covariance matrix is diagonal with positive entries $\sigma_{i}^{2}$, hence positive definite, with $C^{-1}=\operatorname{diag}(1/\sigma_{i}^{2})$ and $\det C=\prod_{i}\sigma_{i}^{2}$.
+	The density \eqref{eq:mvn-pdf} becomes
+	\[
+		\prod_{i=1}^{n}\frac{1}{\sigma_{i}\sqrt{2\pi}}\,e^{-(x_{i}-\mu_{i})^{2}/(2\sigma_{i}^{2})} ,
+	\]
+	a product of one-variable densities, which is exactly independence.
+\end{proof}
+
+The hypothesis is \emph{joint} normality; normal marginals are not enough.
+
+\begin{eg}\label{eg:normal-not-joint}
+	Let $X\sim N(0,1)$, and let $S$ be independent of $X$ with $P(S=1)=P(S=-1)=\tfrac12$.
+	Put $Y=SX$.
+	By the symmetry of $\phi$, $Y\sim N(0,1)$.
+	Also $\Cov[X,Y]=E[SX^{2}]=E[S]\,E[X^{2}]=0$.
+	But $|Y|=|X|$, so $X$ and $Y$ are far from independent.
+	\autoref{prop:mvn-uncorrelated} is not contradicted, because $(X,Y)$ is not jointly normal:
+	$X+Y$ equals $0$ with probability $\tfrac12$, which no normal variable with positive variance does.
+\end{eg}
+
+\subsection{Conditional Expectation for Normal Variables}
+
+Proposition~\ref{prop:mvn-uncorrelated} has a striking consequence that ties together \autoref{subsec:best-linear} and \autoref{sec:conditional-expectation}.
+In general the best predictor $E[Y\mid X]$ can be any function of $X$, and the best straight line can do much worse.
+For jointly normal variables the two coincide.
+
+\begin{proposition}\label{prop:normal-conditional}
+	Let $(X,Y)$ be bivariate normal with $\sigma_{X}>0$, and let $b^{*}=\Cov[X,Y]/\Var[X]$.
+	Then
+	\[
+		E[\,Y\mid X\,]=\mu_{Y}+b^{*}(X-\mu_{X}) ,
+		\qquad
+		\Var[\,Y\mid X\,]=\sigma_{Y}^{2}\bigl(1-\rho_{X,Y}^{2}\bigr) .
+	\]
+	In fact, given $X$, the variable $Y$ is normal with this mean and this variance.
+\end{proposition}
+
+\begin{proof}
+	Let $W=Y-b^{*}X$.
+	Any combination $aX+cW=(a-cb^{*})X+cY$ is a combination of $X$ and $Y$, so $(X,W)$ is again bivariate normal.
+	By bilinearity, $\Cov[X,W]=\Cov[X,Y]-b^{*}\Var[X]=0$, so $X$ and $W$ are independent by \autoref{prop:mvn-uncorrelated}.
+	Now $Y=b^{*}X+W$.
+	Given $X$, the first term is known and the second has the same distribution as without conditioning, namely normal with mean $E[W]=\mu_{Y}-b^{*}\mu_{X}$ and variance $\Var[W]$.
+	In the language of \autoref{prop:ce-properties}, items~2 and~3 give $E[Y\mid X]=b^{*}X+E[W]$.
+	Finally $\Var[W]=\Var[Y-b^{*}X]=\sigma_{Y}^{2}(1-\rho_{X,Y}^{2})$ was computed in the proof of \autoref{prop:best-linear}.
+\end{proof}
+
+So for jointly normal variables, the regression line \emph{is} the conditional expectation, and the residual uncertainty $\sigma_{Y}^{2}(1-\rho^{2})$ does not even depend on the observed value of $X$.
+All of the dependence between $X$ and $Y$ is captured by the single number $\rho$.
+
 \begin{remark}
-	\eqref{eq:mvn-def} 的定義方式初看奇怪——為什麼不直接寫聯合密度函數，卻繞道去要求「每一個線性組合都是常態」？
+	這一節把前面幾節串在一起，重點有三個。
 
-	理由是這個定義\emph{更廣也更好用}。
-	密度函數 \eqref{eq:mvn-pdf} 需要 $C$ 可逆；若某些 $X_{i}$ 之間有完全線性相依（例如 $X_{3}=X_{1}+X_{2}$），$C$ 就退化、密度不存在，但 \eqref{eq:mvn-def} 依然成立。
-	投影片上那個 $\neq 0$ 的但書正是在排除退化的線性組合。
+	\textbf{（一）為什麼用「所有線性組合都是常態」來定義。}
+	這個定義比直接寫密度函數更廣：當 $C$ 不可逆時（例如 $X_{3}=X_{1}+X_{2}$），密度不存在，但定義一樣適用。
+	而且金融裡最常碰到的就是線性組合，因為投資組合就是資產的加權和；這個定義直接告訴你任何投資組合的分佈。
+	要注意每個邊際分佈都是常態，並不代表聯合起來是多元常態，\autoref{eg:normal-not-joint} 就是反例。
 
-	更實際的理由是：金融裡我們幾乎\emph{只}關心線性組合——投資組合就是資產的加權和。
-	\eqref{eq:mvn-def} 直接告訴你任何組合的分佈，不必先算聯合密度再積分。
+	\textbf{（二）多元常態都可以由獨立標準常態做出來。}
+	\autoref{prop:mvn-construct} 說 $\bm{\mu}+A\bm{Z}$ 是多元常態，共變異數矩陣是 $AA^{\mathsf{T}}$；反過來，任何多元常態都長這樣。
+	所以要模擬多元常態，只要產生獨立的標準常態（\autoref{sec:gen-normal}），再找一個 $A$ 使 $AA^{\mathsf{T}}=C$（\autoref{sec:gen-bivariate}）就好。
 
-	注意每個\vocab{邊際分佈}（marginal distribution）都是常態\emph{並不足以}保證聯合是多元常態；必須是\emph{所有}線性組合都常態才行。
+	\textbf{（三）在常態的世界裡，相關係數就是一切。}
+	\autoref{sec:correlation} 說過，相關係數只量得到直線關係，而且不相關不代表獨立。
+	但如果變數是聯合常態，不相關就等於獨立（\autoref{prop:mvn-uncorrelated}），而且最好的預測剛好就是回歸直線（\autoref{prop:normal-conditional}），所以 $\rho$ 已經描述了全部的相依關係。
+	這也是聯合常態假設危險的地方：真實市場在危機時一起崩跌的那種非線性相依，在這個模型裡根本不存在。
 \end{remark}
 
 %─────§ Generating normals──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -3411,7 +4359,68 @@ with a positive definite covariance matrix
 \source{Slides p.~176}
 
 Monte Carlo pricing needs normal variates by the million, and a computer supplies only uniform ones.
-The following is the \vocab{polar method}.
+This section explains how to turn the latter into the former.
+
+\subsection{Uniform Variables and the Inverse Transform}
+
+A random variable $\xi$ is \vocab{uniformly distributed} over $(0,1)$ if it has density $1$ on $(0,1)$ and $0$ elsewhere, that is, $P(\xi\le x)=x$ for $0<x\le1$.
+Its mean and variance are
+\[
+	E[\xi]=\int_{0}^{1}x\,dx=\frac12 ,
+	\qquad
+	\Var[\xi]=\int_{0}^{1}x^{2}\,dx-\Bigl(\frac12\Bigr)^{2}=\frac13-\frac14=\frac{1}{12} .
+\]
+The most direct way to turn a uniform variable into any other distribution is the following.
+
+\begin{proposition}[Inverse transform]\label{prop:inverse-transform}
+	Let $F$ be a continuous, strictly increasing distribution function, and let $\xi$ be uniform over $(0,1)$.
+	Then $F^{-1}(\xi)$ has distribution function $F$.
+\end{proposition}
+
+\begin{proof}
+	Since $F$ is increasing, $F^{-1}(\xi)\le x$ exactly when $\xi\le F(x)$, which has probability $F(x)$.
+\end{proof}
+
+So $N^{-1}(\xi)$ is a standard normal variable.
+The catch is that $N^{-1}$, like $N$ itself, has no closed form and must be approximated numerically.
+The inverse transform works well for distributions whose $F^{-1}$ is explicit.
+The one we need below is: if $\xi$ is uniform over $(0,1)$, then
+\begin{equation}
+	P\bigl(-2\ln\xi>s\bigr)=P\bigl(\xi<e^{-s/2}\bigr)=e^{-s/2} ,
+	\qquad s\ge0 , \label{eq:exp-from-uniform}
+\end{equation}
+so $-2\ln\xi$ has density $\tfrac12e^{-s/2}$ on $(0,\infty)$, the \vocab{exponential distribution} with mean $2$.
+
+\subsection{The Box--Muller Transform}
+
+The trick for avoiding $N^{-1}$ is to generate two normal variables at a time.
+A pair of independent standard normals has a rotationally symmetric joint density, so it is natural to describe it in polar coordinates.
+
+\begin{theorem}[Box--Muller]\label{thm:box-muller}
+	Let $S$ and $\Theta$ be independent, with $S$ exponential with mean $2$ and $\Theta$ uniform over $[0,2\pi)$.
+	Then $\sqrt{S}\cos\Theta$ and $\sqrt{S}\sin\Theta$ are independent standard normal variables.
+	In particular, if $\omega$ is uniform over $(0,1)$ and independent of $\Theta$, one may take $S=-2\ln\omega$.
+\end{theorem}
+
+\begin{proof}
+	Start from the other end.
+	Let $Z_{1},Z_{2}$ be independent standard normal, with joint density $\frac{1}{2\pi}e^{-(z_{1}^{2}+z_{2}^{2})/2}$, and write them in polar coordinates, $Z_{1}=R\cos\Theta'$ and $Z_{2}=R\sin\Theta'$.
+	For any region $B$ of the $(s,\theta)$ plane, with $s=r^{2}$ and $dz_{1}\,dz_{2}=r\,dr\,d\theta=\tfrac12\,ds\,d\theta$,
+	\[
+		P\bigl((R^{2},\Theta')\in B\bigr)
+		= \iint_{B}\frac{1}{2\pi}\,e^{-s/2}\cdot\frac12\,ds\,d\theta
+		= \iint_{B}\Bigl(\frac12e^{-s/2}\Bigr)\Bigl(\frac{1}{2\pi}\Bigr)\,ds\,d\theta .
+	\]
+	The joint density of $(R^{2},\Theta')$ factors into an exponential density with mean $2$ in $s$ times a uniform density on $[0,2\pi)$ in $\theta$.
+	So $R^{2}$ and $\Theta'$ are independent with exactly the distributions of $S$ and $\Theta$.
+	Since $(s,\theta)\mapsto(\sqrt{s}\cos\theta,\sqrt{s}\sin\theta)$ maps both pairs the same way, $(\sqrt{S}\cos\Theta,\sqrt{S}\sin\Theta)$ has the same joint distribution as $(Z_{1},Z_{2})$.
+	The last claim is \eqref{eq:exp-from-uniform}.
+\end{proof}
+
+\subsection{The Polar Method}
+
+The Box--Muller transform still needs $\cos$ and $\sin$.
+The \vocab{polar method} obtains the angle from a random point instead.
 
 \begin{itemize}[itemsep=0.35em]
 	\item Let $X$ be uniformly distributed over $(0,1]$ so that
@@ -3422,7 +4431,7 @@ The following is the \vocab{polar method}.
 	      \[
 		      \omega \;\triangleq\; (2x_{1}-1)^{2}+(2x_{2}-1)^{2} \;<\; 1 .
 	      \]
-	\item Then $c(2x_{1}-1)$ and $c(2x_{2}-1)$ are independent standard normal variables, where\footnote{As they are normally distributed, to prove independence it suffices to prove that they are uncorrelated, which is easy. Thanks to a lively class discussion on March 5, 2014.}
+	\item Then $c(2x_{1}-1)$ and $c(2x_{2}-1)$ are independent standard normal variables, where\footnote{As they are normally distributed, to prove independence it suffices to prove that they are uncorrelated, which is easy. Thanks to a lively class discussion on March 5, 2014. Strictly speaking, this shortcut needs them to be \emph{jointly} normal (\autoref{prop:mvn-uncorrelated}); normal marginals alone are not enough (\autoref{eg:normal-not-joint}). The proof below establishes independence directly.}
 	      \[
 		      c \;\triangleq\; \sqrt{-2(\ln\omega)/\omega} .
 	      \]
@@ -3460,27 +4469,54 @@ The following is the \vocab{polar method}.
 	\label{fig:polar}
 \end{figure}
 
-\begin{remark}
-	這個看似神祕的做法其實是 \vocab{Box--Muller 變換}（Box--Muller transform）的無三角函數版本，拆成三步就清楚了。
+The acceptance step is \vocab{rejection sampling}.
+Its correctness rests on two facts.
 
-	\textbf{（一）}\vocab{拒絕取樣}（rejection sampling）。
-	$(2x_{1}-1,2x_{2}-1)$ 均勻分佈在邊長 $2$ 的正方形上；只保留落入單位圓內的點，得到\emph{圓內的均勻分佈}。
-	接受率是 $\pi/4\approx 78.5\%$，代價不高。
+\begin{lemma}\label{lem:disk}
+	\begin{enumerate}[nosep]
+		\item An accepted pair $(V_{1},V_{2})=(2x_{1}-1,\,2x_{2}-1)$ is uniformly distributed on the unit disk, and the expected number of attempts per accepted pair is $4/\pi\approx1.27$.
+		\item If $(V_{1},V_{2})$ is uniform on the unit disk, then its squared radius $\omega=V_{1}^{2}+V_{2}^{2}$ is uniform over $(0,1)$, its angle $\Theta$ is uniform over $[0,2\pi)$, and $\omega$ and $\Theta$ are independent.
+	\end{enumerate}
+\end{lemma}
 
-	\textbf{（二）分離半徑與角度。}
-	圓內均勻分佈有一個漂亮性質：平方半徑 $\omega$ 服從 $(0,1)$ 上的均勻分佈，且與角度 $\theta$ \emph{獨立}，而 $\theta$ 均勻分佈於 $[0,2\pi)$。
-
-	\textbf{（三）套用 Box--Muller。}
-	該變換說：若 $\omega\sim U(0,1)$ 與 $\theta\sim U[0,2\pi)$ 獨立，則
-	$\sqrt{-2\ln\omega}\,\cos\theta$ 與 $\sqrt{-2\ln\omega}\,\sin\theta$ 是獨立的標準常態。
-	而由 $\cos\theta=(2x_{1}-1)/\sqrt{\omega}$、$\sin\theta=(2x_{2}-1)/\sqrt{\omega}$，
+\begin{proof}
+	\textbf{1.} A raw pair is uniform on the square $(-1,1]^{2}$ of area $4$, so it lands in a region $A$ with probability $\operatorname{area}(A)/4$.
+	For $A$ inside the disk,
 	\[
-		\sqrt{-2\ln\omega}\,\cos\theta
-		= \sqrt{\frac{-2\ln\omega}{\omega}}\,(2x_{1}-1) = c\,(2x_{1}-1) ,
+		P(\text{pair}\in A\mid\text{accepted})=\frac{\operatorname{area}(A)/4}{\pi/4}=\frac{\operatorname{area}(A)}{\pi} ,
 	\]
-	正是投影片上的式子。
+	which is the uniform distribution on the disk.
+	Each attempt succeeds independently with probability $p=\pi/4$, and the number of attempts until the first success has mean $1/p$.
 
-	\textbf{好處}：整個過程用不到 $\sin$ 與 $\cos$——三角函數在早期硬體上比開根號與取對數昂貴得多，而且一次產生\emph{兩個}常態變量。
+	\textbf{2.} The event $\{\omega\le s,\ \Theta\le\alpha\}$ is a sector of radius $\sqrt{s}$ and angle $\alpha$, with area $\tfrac12\alpha s$.
+	Therefore
+	\[
+		P(\omega\le s,\ \Theta\le\alpha)=\frac{\alpha s/2}{\pi}=s\cdot\frac{\alpha}{2\pi} ,
+		\qquad 0\le s\le1,\ 0\le\alpha<2\pi .
+	\]
+	This is the product of the uniform distribution function on $(0,1)$ and the uniform distribution function on $[0,2\pi)$, which gives both the marginals and independence.
+\end{proof}
+
+\begin{theorem}
+	The two numbers $c(2x_{1}-1)$ and $c(2x_{2}-1)$ produced by the polar method are independent standard normal variables.
+\end{theorem}
+
+\begin{proof}
+	By \autoref{lem:disk}, the accepted pair is $(V_{1},V_{2})=(\sqrt{\omega}\cos\Theta,\sqrt{\omega}\sin\Theta)$ with $\omega$ uniform over $(0,1)$ and independent of the uniform angle $\Theta$.
+	Hence
+	\[
+		c\,V_{1}=\sqrt{\frac{-2\ln\omega}{\omega}}\,\sqrt{\omega}\cos\Theta=\sqrt{-2\ln\omega}\,\cos\Theta ,
+		\qquad
+		c\,V_{2}=\sqrt{-2\ln\omega}\,\sin\Theta ,
+	\]
+	which are independent standard normals by \autoref{thm:box-muller}.
+\end{proof}
+
+\begin{remark}
+	這個方法看起來很神祕，其實就是把 Box--Muller 裡「產生一個均勻角度再取 $\cos$、$\sin$」這一步，換成「在圓裡隨機丟一個點」。
+	點的方向直接給出 $\cos\Theta=V_{1}/\sqrt{\omega}$ 和 $\sin\Theta=V_{2}/\sqrt{\omega}$，而點到圓心距離的平方 $\omega$ 剛好又是一個獨立的均勻變數，可以拿來當 Box--Muller 裡的 $\omega$，一個點用了兩次。
+	代價是大約 $21\%$ 的點會被丟掉，但整個過程不需要計算三角函數；在早期的硬體上，三角函數比開根號和取對數昂貴得多。
+	而且每次都產生\emph{兩個}獨立的常態變數。
 \end{remark}
 
 \subsection{A Dirty Trick and a Right Attitude}
@@ -3502,7 +4538,36 @@ The general formula is
 	\frac{\bigl(\sum_{i=1}^{n}\xi_{i}\bigr)-(n/2)}{\sqrt{n/12}} , \label{eq:dirty-trick-general}
 \end{equation}
 which is the central limit theorem applied to $n$ uniforms, standardised.
+By linearity and \eqref{eq:var-sum-uncorr}, the sum $\sum_{i=1}^{n}\xi_{i}$ has mean $n/2$ and variance $n/12$, so \eqref{eq:dirty-trick-general} always has mean $0$ and variance $1$; the theorem below says that its distribution approaches $N(0,1)$ as $n$ grows.
 Choosing $n=12$ makes the denominator $\sqrt{12/12}=1$ and the numerator's correction $6$, yielding a formula without the need of division and square-root operations.\footnote{Contributed by Mr.~Chen, Shih-Hang (\texttt{R02723031}) on March 5, 2014.}
+
+\begin{theorem}[Central limit theorem]\label{thm:clt}
+	Let $X_{1},X_{2},\dots$ be independent and identically distributed with mean $\mu$ and variance $\sigma^{2}>0$.
+	Then for every $z$,
+	\[
+		P\left(\frac{\sum_{i=1}^{n}X_{i}-n\mu}{\sigma\sqrt{n}}\le z\right)\;\longrightarrow\;N(z)
+		\qquad (n\to\infty) .
+	\]
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+	We assume in addition that the moment generating function of $X_{i}$ exists; this covers the uniform case.
+	Let $Y_{i}=(X_{i}-\mu)/\sigma$, which has mean $0$ and variance $1$, and let $T_{n}=\sum_{i=1}^{n}Y_{i}/\sqrt{n}$ be the standardised sum.
+	By \eqref{eq:mgf-series}, $\theta_{Y}(t)=1+\tfrac12t^{2}+\varepsilon(t)\,t^{2}$ with $\varepsilon(t)\to0$ as $t\to0$.
+	By \autoref{prop:mgf-algebra},
+	\[
+		\theta_{T_{n}}(t)=\Bigl(\theta_{Y}\bigl(t/\sqrt{n}\bigr)\Bigr)^{n}
+		=\left(1+\frac{t^{2}/2+\varepsilon(t/\sqrt n)\,t^{2}}{n}\right)^{n}
+		\;\longrightarrow\;e^{t^{2}/2} ,
+	\]
+	using $(1+a_{n}/n)^{n}\to e^{a}$ whenever $a_{n}\to a$.
+	The limit is the moment generating function of $N(0,1)$.
+	The \emph{continuity theorem}, a strengthening of \autoref{thm:mgf-unique} that we quote, says that convergence of moment generating functions near $0$ implies convergence of the distribution functions.
+\end{proof}
+
+The theorem says nothing about how fast the convergence is.
+In relative terms the approximation is worst far out in the tails, where the probabilities are tiny to begin with, so a small absolute error can still be a large relative one.
+\autoref{fig:dirty-trick} shows what this means for $n=12$.
 
 \begin{moral}
 	Always blame your random number generator last.\footnote{``The fault, dear Brutus, lies not in the stars but in ourselves that we are underlings.'' William Shakespeare (1564--1616), \emph{Julius Caesar}.}
@@ -3602,20 +4667,9 @@ Choosing $n=12$ makes the denominator $\sqrt{12/12}=1$ and the numerator's corre
 	\label{fig:dirty-trick}
 \end{figure}
 
-\begin{remark}
-	這個近似的毛病\emph{正好落在金融最在意的地方}。
-
-	\autoref{fig:dirty-trick} 用對數尺度畫，是因為線性尺度上兩條曲線看起來幾乎重合——中央部分確實吻合得很好。
-	問題在尾端：$\sum_{i=1}^{12}\xi_{i}-6$ 的\vocab{支撐集}（support）是 $[-6,6]$，超出範圍的機率\emph{恰好為零}，而真正的常態分佈在那裡仍有 $2\times 10^{-9}$ 的機率。
-
-	回想 \autoref{fig:sp500-density}：真實報酬的尾巴比常態\emph{更厚}。
-	若連常態的尾巴都模擬不出來，拿它去算\vocab{風險值}（value at risk, VaR）或\vocab{深度價外}（deep out-of-the-money）選擇權的價格，誤差方向是系統性的——一律低估極端事件。
-
-	所以 J\"ackel 那句「只能用來抓個大概」要認真看待：中央矩（平均、變異數）算得很準，尾端機率則完全不能信。
-\end{remark}
-
 %─────§ Bivariate normal────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Generation of Bivariate Normal Distributions}
+\label{sec:gen-bivariate}
 
 \source{Slides p.~179}
 
@@ -3651,7 +4705,7 @@ Let $X_{1}$ and $X_{2}$ be independent standard normal variables, and set
 	\]
 \end{proof}
 
-Note that the mapping from $(X_{1},X_{2})$ to $(U,V)$ is a one-to-one correspondence for $a\neq 0$.
+Note that the mapping from $(X_{1},X_{2})$ to $(U,V)$ is a one-to-one correspondence for $a\neq 0$ and $|\rho|<1$; when $\rho=\pm1$, $V=\pm U$ and the pair has no density.
 By \eqref{eq:correlation}, the correlation of $U$ and $V$ is $\rho a^{2}/(a\cdot a)=\rho$, as intended.
 
 \source{Slides p.~181}
@@ -3665,6 +4719,10 @@ The mapping in matrix form is
 	\end{bmatrix}
 	\begin{bmatrix} X_{1} \\ X_{2} \end{bmatrix} . \label{eq:bivariate-matrix}
 \end{equation}
+
+The proposition only checks variances and covariances, but more is true.
+This has the form $A\bm{X}$ with $\bm{X}=(X_{1},X_{2})^{\mathsf{T}}$, so by \autoref{prop:mvn-construct} the pair $(U,V)$ is bivariate normal.
+Since a multivariate normal distribution is determined by its mean and covariance matrix, $(U,V)$ has \emph{exactly} the bivariate normal distribution with variances $a^{2}$ and correlation $\rho$, not merely the right second moments.
 
 \begin{figure}[H]
 	\centering
@@ -3757,22 +4815,65 @@ The mapping in matrix form is
 	\label{fig:bivariate}
 \end{figure}
 
-\begin{remark}
-	\eqref{eq:bivariate-matrix} 不是特例，而是一般作法的二維版本。
+\subsection{The General Case: Cholesky Decomposition}
 
-	那個下三角矩陣正是相關係數矩陣
-	$\begin{bmatrix}1 & \rho\\ \rho & 1\end{bmatrix}$
-	的 \vocab{Cholesky 分解}（Cholesky decomposition）$LL^{\mathsf{T}}$：
+The matrix in \eqref{eq:bivariate-matrix} was not pulled out of thin air.
+With $a=1$ it is the lower-triangular matrix
+\[
+	L = \begin{bmatrix} 1 & 0 \\ \rho & \sqrt{1-\rho^{2}} \end{bmatrix}
+	\qquad\text{with}\qquad
+	LL^{\mathsf{T}} = \begin{bmatrix} 1 & \rho \\ \rho & 1 \end{bmatrix} ,
+\]
+the correlation matrix we wanted.
+By \autoref{prop:mvn-construct}, to generate an $n$-dimensional normal vector with mean $\bm{\mu}$ and covariance matrix $C$ we need, in general, a matrix $L$ with $LL^{\mathsf{T}}=C$; then $\bm{\mu}+L\bm{Z}$, with $\bm{Z}$ a vector of independent standard normals, does the job.
+Such an $L$ can always be found, and can be chosen lower triangular.
+
+\begin{theorem}[Cholesky decomposition]\label{thm:cholesky}
+	If $C$ is a symmetric positive definite $n\times n$ matrix, there is a lower-triangular matrix $L$ with positive diagonal entries such that $C=LL^{\mathsf{T}}$.
+\end{theorem}
+
+\begin{proof}
+	Induction on $n$.
+	For $n=1$, $C=[c]$ with $c>0$, and $L=[\sqrt{c}]$.
+	For $n>1$, write
 	\[
-		L = \begin{bmatrix} 1 & 0 \\ \rho & \sqrt{1-\rho^{2}} \end{bmatrix},
+		C=\begin{bmatrix} c_{11} & \bm{c}^{\mathsf{T}} \\ \bm{c} & C' \end{bmatrix} ,
 		\qquad
-		LL^{\mathsf{T}} = \begin{bmatrix} 1 & \rho \\ \rho & 1 \end{bmatrix} .
+		L=\begin{bmatrix} \ell_{11} & \bm{0}^{\mathsf{T}} \\ \bm{\ell} & L' \end{bmatrix} ,
 	\]
-	一般地，要產生共變異數矩陣為 $C$ 的 $n$ 維常態向量，就把 $C$ 做 Cholesky 分解 $C=LL^{\mathsf{T}}$，取獨立標準常態向量 $\bm{X}$，令 $\bm{U}=L\bm{X}$；則
-	$\Cov[\bm{U}]=L\,\Cov[\bm{X}]\,L^{\mathsf{T}}=LL^{\mathsf{T}}=C$。
+	where $c_{11}$ is a number, $\bm{c}$ is a column of length $n-1$ and $C'$ is $(n-1)\times(n-1)$.
+	Multiplying out, $LL^{\mathsf{T}}=C$ amounts to
+	\[
+		\ell_{11}^{2}=c_{11} ,
+		\qquad
+		\ell_{11}\bm{\ell}=\bm{c} ,
+		\qquad
+		L'L'^{\mathsf{T}}=C'-\bm{\ell}\bm{\ell}^{\mathsf{T}}=C'-\frac{\bm{c}\bm{c}^{\mathsf{T}}}{c_{11}} .
+	\]
+	Taking $\bm{a}=(1,0,\dots,0)^{\mathsf{T}}$ in the definition of positive definiteness gives $c_{11}>0$, so the first two equations are solved by $\ell_{11}=\sqrt{c_{11}}$ and $\bm{\ell}=\bm{c}/\sqrt{c_{11}}$.
+	For the third, it suffices by induction that $C''\triangleq C'-\bm{c}\bm{c}^{\mathsf{T}}/c_{11}$ be symmetric positive definite.
+	Symmetry is clear.
+	For $\bm{y}\ne\bm{0}$ of length $n-1$, put $\bm{a}=\bigl(-\bm{c}^{\mathsf{T}}\bm{y}/c_{11},\ \bm{y}\bigr)^{\mathsf{T}}\ne\bm{0}$; expanding,
+	\[
+		0<\bm{a}^{\mathsf{T}}C\bm{a}
+		=\frac{(\bm{c}^{\mathsf{T}}\bm{y})^{2}}{c_{11}}-2\,\frac{(\bm{c}^{\mathsf{T}}\bm{y})^{2}}{c_{11}}+\bm{y}^{\mathsf{T}}C'\bm{y}
+		=\bm{y}^{\mathsf{T}}C''\bm{y} .
+		\qedhere
+	\]
+\end{proof}
 
-	這也解釋了 \eqref{eq:mvn-pdf} 為什麼要求 $C$ \vocab{正定}（positive definite）——正定才有 Cholesky 分解，才產得出來。
-	實務上由市場資料估出的相關係數矩陣常因雜訊而不正定，必須先做修正，否則模擬根本無法開始。
+The proof is also the algorithm: fill in $L$ one column at a time, each step costing a square root and some divisions.
+It shows why positive definiteness is needed: the square roots taken along the way are square roots of variances of the form $\bm{a}^{\mathsf{T}}C\bm{a}$, and they break down as soon as some combination has zero or negative ``variance''.
+If $C$ is only positive semidefinite, a lower-triangular $L$ with $LL^{\mathsf{T}}=C$ still exists but some diagonal entries are $0$; one of the variables is then an exact combination of the others (\autoref{prop:cov-matrix}).
+
+\begin{remark}
+	這一節的做法，是 \autoref{prop:mvn-construct} 的具體實現：先產生獨立的標準常態，再乘上一個 $L$，使 $LL^{\mathsf{T}}$ 等於想要的共變異數矩陣。
+	\autoref{fig:bivariate} 可以直接看出這個線性變換在做什麼：$\rho$ 變大時，點雲被往對角線方向「剪」過去，但每個座標自己的分佈都沒有改變。
+
+	實務上最常出問題的是正定性。
+	由市場資料估出來的相關係數矩陣，理論上一定是半正定的（\autoref{prop:cov-matrix}），但如果每一對資產是用不同的樣本期間分別估計的，或者手動調整過某些相關係數，拼起來的矩陣就可能不再是半正定。
+	這時 Cholesky 分解會在某一步需要對負數開根號，模擬根本無法開始，必須先把矩陣修正成最接近的正定矩陣。
+	這也呼應 \autoref{sec:correlation} 的提醒：相關係數本身就不太穩定，一整個矩陣的相關係數更需要小心處理。
 \end{remark}
 
 %─────§ Lognormal──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -3785,7 +4886,33 @@ The mapping in matrix form is
 	A random variable $Y$ is said to have a \vocab{lognormal distribution} if $\ln Y$ has a normal distribution.
 \end{definition}
 
+This is the distribution we will use for prices: if the log return $\ln(S_{T}/S_{0})$ is normal, then $S_{T}/S_{0}$ is lognormal.
+Every question about a lognormal $Y$ is answered by translating it into a question about the normal variable $\ln Y$, using the tools of \autoref{sec:normal} and \autoref{sec:mgf}.
+
+\subsection{Density, Median and Moments}
+
 Let $X\sim N(\mu,\sigma^{2})$ and $Y\triangleq e^{X}$.
+
+\begin{proposition}\label{prop:lognormal-basic}
+	\begin{enumerate}[nosep]
+		\item $Y$ takes values in $(0,\infty)$ and has density
+		      \[
+			      f(y)=\frac{1}{y\,\sigma\sqrt{2\pi}}\,e^{-(\ln y-\mu)^{2}/(2\sigma^{2})} ,
+			      \qquad y>0 .
+		      \]
+		\item The median of $Y$ is $e^{\mu}$: $P(Y\le e^{\mu})=\tfrac12$.
+		\item $E[Y^{n}]=e^{n\mu+n^{2}\sigma^{2}/2}$ for every real $n$.
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+	\textbf{1.} Apply \autoref{prop:change-of-variables} with $g=\exp$, whose inverse $h=\ln$ has $h'(y)=1/y$.
+
+	\textbf{2.} $\exp$ is increasing, so $P(Y\le e^{\mu})=P(X\le\mu)=N(0)=\tfrac12$ by \autoref{prop:standardise} and the symmetry of $\phi$.
+
+	\textbf{3.} $E[Y^{n}]=E[e^{nX}]=\theta_{X}(n)$, which is \eqref{eq:normal-mgf} at $t=n$.
+\end{proof}
+
 The mean and variance of $Y$ are
 \begin{equation}
 	\begin{aligned}
@@ -3795,6 +4922,7 @@ The mean and variance of $Y$ are
 \end{equation}
 respectively.
 They follow from $E[\,Y^{n}\,]=e^{n\mu+n^{2}\sigma^{2}/2}$ --- which is just \eqref{eq:normal-mgf} evaluated at $t=n$.
+For the variance, $E[Y^{2}]-\mu_{Y}^{2}=e^{2\mu+2\sigma^{2}}-e^{2\mu+\sigma^{2}}$.
 
 \begin{figure}[H]
 	\centering
@@ -3836,50 +4964,134 @@ They follow from $E[\,Y^{n}\,]=e^{n\mu+n^{2}\sigma^{2}/2}$ --- which is just \eq
 	\label{fig:lognormal}
 \end{figure}
 
+\subsection{Jensen's Inequality}
+
+The mean $e^{\mu+\sigma^{2}/2}$ is strictly larger than the median $e^{\mu}$, and the gap grows with $\sigma$.
+This is an instance of a general inequality, already used in \autoref{sec:ts-theories} and needed again for options.
+
+A function $g$ is \vocab{convex} if through every point $(m,g(m))$ of its graph there is a straight line, a \vocab{supporting line}, that lies entirely below the graph.
+For differentiable $g$ the supporting line is the tangent line, and for twice differentiable $g$ convexity means $g''\ge0$.
+A convex function may have kinks, such as the call payoff $\max(x-a,0)$ at $x=a$; there any line through the kink with slope between the left and right slopes supports the graph.
+The function is \vocab{strictly convex} if each supporting line touches the graph only at its own point, which holds when $g''>0$.
+
+\begin{theorem}[Jensen's inequality]\label{thm:jensen}
+	If $g$ is convex and $X$ and $g(X)$ have finite means, then
+	\[
+		E\bigl[g(X)\bigr] \;\ge\; g\bigl(E[X]\bigr) .
+	\]
+	If $g$ is strictly convex, equality holds only when $X$ is constant with probability one.
+\end{theorem}
+
+\begin{proof}
+	Let $m=E[X]$ and let $\ell(x)=g(m)+k(x-m)$ be a supporting line of $g$ at $m$ (for differentiable $g$, $k=g'(m)$).
+	Convexity says $g(x)\ge\ell(x)$ for all $x$, so by monotonicity and linearity
+	\[
+		E\bigl[g(X)\bigr]\;\ge\;E\bigl[\ell(X)\bigr]=g(m)+k\bigl(E[X]-m\bigr)=g(m) .
+	\]
+	If equality holds, the non-negative random variable $g(X)-\ell(X)$ has mean $0$, so it is $0$ with probability one by \autoref{lem:zero-mean}.
+	For strictly convex $g$ that happens only at $X=m$.
+\end{proof}
+
+The picture is simple: averaging the points of a convex curve lands \emph{above} the curve.
+With $g(x)=e^{x}$ and $Y=e^{X}$,
+\[
+	E[Y]=E\bigl[e^{X}\bigr]\;>\;e^{E[X]}=e^{\mu} ,
+\]
+and \eqref{eq:lognormal-moments} says that the ratio is exactly $e^{\sigma^{2}/2}$.
+Rare large values of $Y$ pull the mean up, while small values of $Y$ are bounded below by $0$ and cannot pull it down as much.
+
+\subsection{Products of Lognormal Variables}
+
+The next result is why the lognormal distribution fits prices over many periods.
+
+\begin{proposition}\label{prop:lognormal-product}
+	If $Y_{1},\dots,Y_{n}$ are independent and lognormal with $\ln Y_{i}\sim N(\mu_{i},\sigma_{i}^{2})$, then $\prod_{i}Y_{i}$ is lognormal with $\ln\prod_{i}Y_{i}\sim N\bigl(\sum_{i}\mu_{i},\sum_{i}\sigma_{i}^{2}\bigr)$.
+	In particular, if the log returns $r_{t}=\ln(S_{t}/S_{t-1})$, $t=1,\dots,T$, are independent and normal, then $S_{T}=S_{0}\exp\bigl(\sum_{t}r_{t}\bigr)$ is lognormal.
+\end{proposition}
+
+\begin{proof}
+	$\ln\prod_{i}Y_{i}=\sum_{i}\ln Y_{i}$ is a sum of independent normal variables, which is normal by \autoref{cor:normal-closure}.
+	For the second claim, $S_{T}/S_{0}=\prod_{t}S_{t}/S_{t-1}$, and multiplying by the constant $S_{0}$ only shifts the mean of the logarithm by $\ln S_{0}$.
+\end{proof}
+
+Even without normality, \autoref{thm:clt} applied to the log returns suggests that $\ln(S_{T}/S_{0})$ is approximately normal when $T$ is large; this is the usual informal justification for the lognormal model.
+
 \begin{remark}
-	為什麼金融上用\vocab{對數常態分佈}（lognormal distribution）描述\emph{價格}，用常態描述\emph{對數報酬}？三個理由，都看得見。
+	為什麼金融上用\vocab{對數常態分佈}（lognormal distribution）描述\emph{價格}，用常態描述\emph{對數報酬}？前面證明過的三件事就是理由。
 
 	\textbf{（一）價格不能為負。}
-	常態分佈的支撐集是整條實線，但股價不會是負的。
-	$Y=e^{X}$ 自動把值域限制在 $(0,\infty)$。
+	常態分佈的值域是整條實線，但股價不會是負的。
+	$Y=e^{X}$ 自動把值域限制在 $(0,\infty)$（\autoref{prop:lognormal-basic}）。
 
-	\textbf{（二）報酬可加，價格可乘。}
-	回顧 \autoref{sec:log-returns} 的對數報酬 $r_{t}=\ln(S_{t}/S_{t-1})$：跨期報酬是逐期報酬之\emph{和}。
-	若每期 $r_{t}$ 為獨立常態，其和仍為常態，於是 $S_{T}=S_{0}\exp(\sum r_{t})$ 必然是對數常態。
-	這個封閉性正是整個模型的骨架。
+	\textbf{（二）報酬用加的，價格用乘的。}
+	\autoref{sec:log-returns} 的對數報酬 $r_{t}=\ln(S_{t}/S_{t-1})$ 有一個好處：跨期報酬就是逐期報酬的\emph{和}。
+	獨立常態相加還是常態，所以價格一定是對數常態（\autoref{prop:lognormal-product}）；
+	就算每期報酬不是常態，中央極限定理也讓對數常態成為合理的近似。
 
-	\textbf{（三）平均數與中位數不同。}
-	\eqref{eq:lognormal-moments} 裡的 $\mu_{Y}=e^{\mu+\sigma^{2}/2}$ 嚴格大於\vocab{中位數}（median）$e^{\mu}$，差額 $\sigma^{2}/2$ 純粹來自\emph{波動本身}。
-	這就是日後反覆出現的「$-\sigma^{2}/2$ 修正項」的來源：想讓價格的\emph{期望}成長率等於 $r$，指數裡就得寫 $r-\sigma^{2}/2$。
-	這又是 Jensen 不等式（見 \autoref{sec:ts-theories} 的「壞」預期理論）的另一個面貌。
+	\textbf{（三）平均數比中位數大。}
+	由 Jensen 不等式，$E[Y]=e^{\mu+\sigma^{2}/2}$ 嚴格大於中位數 $e^{\mu}$，多出來的 $\sigma^{2}/2$ 完全來自波動。
+	這就是之後會一再出現的「$-\sigma^{2}/2$ 修正項」的來源：想讓價格的\emph{期望}成長率等於 $r$，指數裡就要寫 $r-\sigma^{2}/2$。
 \end{remark}
+
+\subsection{Converting between the Two Parametrisations}
 
 \source{Slides p.~183}
 
-Conversely, suppose $Y$ is lognormally distributed with mean $\mu$ and variance $\sigma^{2}$.
-Then $\ln Y$ has a normal distribution with
+\begin{proposition}\label{prop:lognormal-inverse}
+	Suppose $Y$ is lognormally distributed with mean $\mu$ and variance $\sigma^{2}$.
+	Then $\ln Y$ has a normal distribution with
 \begin{equation}
-	\begin{aligned}
-		E[\,\ln Y\,]    & \;=\; \ln\left[\,\mu\big/\sqrt{1+(\sigma/\mu)^{2}}\,\right] , \\
-		\Var[\,\ln Y\,] & \;=\; \ln\bigl[\,1+(\sigma/\mu)^{2}\,\bigr] .
-	\end{aligned}\label{eq:lognormal-inverse}
-\end{equation}
+		\begin{aligned}
+			E[\,\ln Y\,]    & \;=\; \ln\left[\,\mu\big/\sqrt{1+(\sigma/\mu)^{2}}\,\right] , \\
+			\Var[\,\ln Y\,] & \;=\; \ln\bigl[\,1+(\sigma/\mu)^{2}\,\bigr] .
+		\end{aligned}\label{eq:lognormal-inverse}
+	\end{equation}
+\end{proposition}
 
-If $X$ and $Y$ are joint-lognormally distributed, then
-\begin{equation}
-	\begin{aligned}
-		E[\,XY\,]      & \;=\; E[\,X\,]E[\,Y\,]\,e^{\Cov[\,\ln X,\ln Y\,]} ,                     \\
-		\Cov[\,X,Y\,]  & \;=\; E[\,X\,]E[\,Y\,]\left(e^{\Cov[\,\ln X,\ln Y\,]}-1\right) .
-	\end{aligned}\label{eq:joint-lognormal}
-\end{equation}
+\begin{proof}
+	Write $m=E[\ln Y]$ and $s^{2}=\Var[\ln Y]$.
+	By \eqref{eq:lognormal-moments}, $\mu=e^{m+s^{2}/2}$ and $\sigma^{2}=\mu^{2}\bigl(e^{s^{2}}-1\bigr)$.
+	The second equation gives $e^{s^{2}}=1+(\sigma/\mu)^{2}$, which is the formula for $s^{2}$.
+	Then $m=\ln\mu-s^{2}/2=\ln\mu-\ln\sqrt{1+(\sigma/\mu)^{2}}$, which is the formula for $m$.
+\end{proof}
 
 \begin{note}
-	Beware the notation on this page: $\mu$ and $\sigma^{2}$ now denote the mean and variance of $Y$ \emph{itself}, not of $\ln Y$ as on the previous page.
+	Beware the notation in \autoref{prop:lognormal-inverse}: $\mu$ and $\sigma^{2}$ now denote the mean and variance of $Y$ \emph{itself}, not of $\ln Y$ as in \eqref{eq:lognormal-moments}.
 	\eqref{eq:lognormal-inverse} is the inverse of \eqref{eq:lognormal-moments}, and the two must not be mixed.
-	A quick check: substituting $\mu=e^{m+s^{2}/2}$ and $\sigma^{2}=e^{2m+s^{2}}(e^{s^{2}}-1)$ into \eqref{eq:lognormal-inverse} returns $E[\ln Y]=m$ and $\Var[\ln Y]=s^{2}$, as it should.
 \end{note}
 
+We say $X$ and $Y$ are \vocab{joint-lognormally distributed} if $(\ln X,\ln Y)$ is bivariate normal.
+
+\begin{proposition}
+	If $X$ and $Y$ are joint-lognormally distributed, then
+\begin{equation}
+		\begin{aligned}
+			E[\,XY\,]      & \;=\; E[\,X\,]E[\,Y\,]\,e^{\Cov[\,\ln X,\ln Y\,]} ,                     \\
+			\Cov[\,X,Y\,]  & \;=\; E[\,X\,]E[\,Y\,]\left(e^{\Cov[\,\ln X,\ln Y\,]}-1\right) .
+		\end{aligned}\label{eq:joint-lognormal}
+	\end{equation}
+\end{proposition}
+
+\begin{proof}
+	Write $\ln X\sim N(m_{X},s_{X}^{2})$, $\ln Y\sim N(m_{Y},s_{Y}^{2})$ and $c=\Cov[\ln X,\ln Y]$.
+	Since $(\ln X,\ln Y)$ is bivariate normal, $\ln X+\ln Y$ is normal with mean $m_{X}+m_{Y}$ and, by \eqref{eq:var-sum}, variance $s_{X}^{2}+s_{Y}^{2}+2c$.
+	So $XY=e^{\ln X+\ln Y}$ is lognormal, and by \autoref{prop:lognormal-basic}
+	\[
+		E[XY]=e^{m_{X}+m_{Y}+(s_{X}^{2}+s_{Y}^{2}+2c)/2}
+		=e^{m_{X}+s_{X}^{2}/2}\,e^{m_{Y}+s_{Y}^{2}/2}\,e^{c}
+		=E[X]\,E[Y]\,e^{c} .
+	\]
+	The covariance is $E[XY]-E[X]E[Y]$.
+\end{proof}
+
+In particular, $X$ and $Y$ are uncorrelated exactly when $\ln X$ and $\ln Y$ are, and the correlation of the prices always has the same sign as that of the log returns.
+
+\subsection{Partial Expectations}
+
 \source{Slides p.~184}
+
+Option payoffs are not smooth: a call pays only when the price ends above the strike.
+Its expected payoff therefore involves the expectation of $Y$ restricted to an event $\{Y>a\}$, and the probability of that event.
 
 \begin{theorem}
 	Let $Y$ be lognormally distributed such that $\ln Y\sim N(\mu,\sigma^{2})$, with density $f$. Then
@@ -3909,14 +5121,46 @@ If $X$ and $Y$ are joint-lognormally distributed, then
 	By the symmetry $1-N(z)=N(-z)$ this is $e^{\mu+\sigma^{2}/2}N\bigl((\mu+\sigma^{2}-\ln a)/\sigma\bigr)$, which is \eqref{eq:lognormal-partial}.
 \end{proof}
 
+The other ingredient is the probability of the event itself.
+
+\begin{proposition}\label{prop:lognormal-tail}
+	With $Y$ as above and $a>0$,
+	\[
+		\mathrm{Prob}[\,Y>a\,]=N\!\left(\frac{\mu-\ln a}{\sigma}\right) .
+	\]
+\end{proposition}
+
+\begin{proof}
+	$Y>a$ exactly when $\ln Y>\ln a$.
+	By \autoref{prop:standardise} this has probability $1-N\bigl((\ln a-\mu)/\sigma\bigr)$, which equals $N\bigl((\mu-\ln a)/\sigma\bigr)$ by symmetry (\autoref{prop:normal-basic}).
+\end{proof}
+
+\begin{corollary}\label{cor:lognormal-call}
+	With $Y$ as above and $a>0$, let
+	\[
+		d_{2}=\frac{\mu-\ln a}{\sigma} ,
+		\qquad
+		d_{1}=d_{2}+\sigma .
+	\]
+	Then
+	\begin{equation}
+		E\bigl[\max(Y-a,0)\bigr]=e^{\mu+\sigma^{2}/2}\,N(d_{1})-a\,N(d_{2}) . \label{eq:lognormal-call}
+	\end{equation}
+\end{corollary}
+
+\begin{proof}
+	$\max(Y-a,0)=(Y-a)\,\mathbf{1}_{\{Y>a\}}$, so its expectation is
+	$\int_{a}^{\infty}y\,f(y)\,dy-a\,\mathrm{Prob}[Y>a]$.
+	Apply \eqref{eq:lognormal-partial} to the first term and \autoref{prop:lognormal-tail} to the second.
+\end{proof}
+
 \begin{moral}
 	\eqref{eq:lognormal-partial} is the \vocab{partial expectation} of a lognormal variable --- the expected value of $Y$ restricted to the event $Y>a$.
 
 	It is not a technical curiosity: it is the entire content of the first term of the Black--Scholes formula.
-	A call option pays $Y-a$ exactly when $Y>a$, so its expected payoff splits into
-	$\int_{a}^{\infty}y\,f(y)\,dy - a\,\mathrm{Prob}[\,Y>a\,]$ ---
+	A call option pays $Y-a$ exactly when $Y>a$, so its expected payoff splits as in \autoref{cor:lognormal-call},
 	the first piece supplying $S_{0}N(d_{1})$ and the second $a\,N(d_{2})$.
 	Every remaining chapter of this course is, in one way or another, an elaboration of that split.
 
-	\eqref{eq:lognormal-partial} 就是 Black--Scholes 公式第一項的全部內容；買權在 $Y>a$ 時付 $Y-a$，期望報酬拆成這兩塊，前者給出 $S_{0}N(d_{1})$，後者給出 $a\,N(d_{2})$。
+	換句話說，\eqref{eq:lognormal-call} 就是 Black--Scholes 公式的骨架：買權在 $Y>a$ 時付 $Y-a$，期望報酬拆成兩塊，前者給出 $S_{0}N(d_{1})$，後者給出 $a\,N(d_{2})$。之後要做的，只是決定該用哪一個機率分佈來取期望值，以及怎麼折現。
 \end{moral}
