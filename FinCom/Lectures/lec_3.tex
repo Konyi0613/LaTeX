@@ -250,21 +250,21 @@ The writer's payoff is the holder's payoff reflected through the horizontal axis
 				every axis x label/.style={at={(ticklabel cs:1.0)}, anchor=west},
 				every axis y label/.style={at={(ticklabel cs:1.0)}, rotate=0,
 						anchor=south},
-				every axis plot/.append style={MidnightBlue!80!black,
+				every axis plot post/.append style={MidnightBlue!80!black,
 						very thick, mark=none},
 				clip=false,
 			]
 			\nextgroupplot[title={Long a call}, ymin=0, ymax=42, ytick={10,20,30,40}]
 			\addplot coordinates {(0,0) (50,0) (90,40)};
 
-			\nextgroupplot[title={Short a call}, ymin=-42, ymax=0,
+			\nextgroupplot[title={Short a call}, ymin=-42, ymax=0, xticklabel style={anchor=south, yshift=2pt}, title style={yshift=10pt},
 				ytick={-40,-30,-20,-10}]
 			\addplot coordinates {(0,0) (50,0) (90,-40)};
 
 			\nextgroupplot[title={Long a put}, ymin=0, ymax=52, ytick={10,20,30,40,50}]
 			\addplot coordinates {(0,50) (50,0) (90,0)};
 
-			\nextgroupplot[title={Short a put}, ymin=-52, ymax=0,
+			\nextgroupplot[title={Short a put}, ymin=-52, ymax=0, xticklabel style={anchor=south, yshift=2pt}, title style={yshift=10pt},
 				ytick={-50,-40,-30,-20,-10}]
 			\addplot coordinates {(0,-50) (50,0) (90,0)};
 		\end{groupplot}
@@ -455,7 +455,7 @@ The payoff of a short position is the payoff of a long position with the sign fl
 				every axis x label/.style={at={(ticklabel cs:1.0)}, anchor=west},
 				every axis y label/.style={at={(ticklabel cs:1.0)}, rotate=0,
 						anchor=south},
-				every axis plot/.append style={MidnightBlue!80!black,
+				every axis plot post/.append style={MidnightBlue!80!black,
 						very thick, mark=none},
 				clip=false,
 			]
@@ -463,7 +463,7 @@ The payoff of a short position is the payoff of a long position with the sign fl
 				ytick={20,40,60,80}]
 			\addplot coordinates {(0,0) (90,90)};
 
-			\nextgroupplot[title={Short a stock}, ymin=-92, ymax=0,
+			\nextgroupplot[title={Short a stock}, ymin=-92, ymax=0, xticklabel style={anchor=south, yshift=2pt}, title style={yshift=10pt},
 				ytick={-80,-60,-40,-20}]
 			\addplot coordinates {(0,0) (90,-90)};
 		\end{groupplot}
@@ -534,7 +534,8 @@ So the covered call \emph{caps} the outcome at $X$ and the protective put \emph{
 				tick label style={font=\scriptsize},
 				title style={font=\small, text=Gray!40!black},
 				xlabel={Stock price}, ylabel={Profit},
-				every axis x label/.style={at={(ticklabel cs:1.0)}, anchor=west},
+				every axis x label/.style={at={(ticklabel cs:1.0)}, anchor=north east,
+						yshift=-7pt},
 				every axis y label/.style={at={(ticklabel cs:1.0)}, rotate=0,
 						anchor=south},
 				clip=false,
@@ -741,8 +742,20 @@ It is therefore a bet on the stock \emph{not moving}, as opposed to the directio
 			]
 			\addplot[Gray!55!black, densely dashed, thick]
 			coordinates {(81,-1.172) (90,-1.172) (95,3.828) (100,-1.172) (111,-1.172)};
-			\addplot[MidnightBlue!80!black, very thick, domain=81:110,
-				samples=140] {bscall(x,90)+bscall(x,100)-2*bscall(x,95)-1.172};
+			% bscall(x,90)+bscall(x,100)-2*bscall(x,95)-1.172, precomputed in double
+			% precision: pgfmath loses too many digits in this second difference and
+			% the curve comes out visibly jagged.
+			\addplot[MidnightBlue!80!black, very thick, smooth] coordinates {
+				(81,-0.9290) (81.5,-0.8980) (82,-0.8647) (82.5,-0.8293) (83,-0.7918) (83.5,-0.7524)
+				(84,-0.7112) (84.5,-0.6685) (85,-0.6245) (85.5,-0.5795) (86,-0.5339) (86.5,-0.4880)
+				(87,-0.4421) (87.5,-0.3967) (88,-0.3520) (88.5,-0.3086) (89,-0.2668) (89.5,-0.2269)
+				(90,-0.1893) (90.5,-0.1544) (91,-0.1225) (91.5,-0.0938) (92,-0.0687) (92.5,-0.0473)
+				(93,-0.0297) (93.5,-0.0162) (94,-0.0067) (94.5,-0.0014) (95,-0.0002) (95.5,-0.0031)
+				(96,-0.0099) (96.5,-0.0206) (97,-0.0349) (97.5,-0.0528) (98,-0.0738) (98.5,-0.0979)
+				(99,-0.1247) (99.5,-0.1540) (100,-0.1855) (100.5,-0.2188) (101,-0.2536) (101.5,-0.2898)
+				(102,-0.3269) (102.5,-0.3648) (103,-0.4030) (103.5,-0.4415) (104,-0.4798) (104.5,-0.5179)
+				(105,-0.5555) (105.5,-0.5925) (106,-0.6285) (106.5,-0.6636) (107,-0.6976) (107.5,-0.7304)
+				(108,-0.7619) (108.5,-0.7921) (109,-0.8208) (109.5,-0.8482) (110,-0.8740)};
 		\end{axis}
 	\end{tikzpicture}
 	\caption{Profit of a butterfly spread with $X_{L}=90$, $X_{M}=95$,
