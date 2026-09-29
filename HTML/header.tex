@@ -58,6 +58,10 @@
 \usepackage{emptypage}
 \usepackage{subcaption}
 \usepackage[usenames,dvipsnames,svgnames]{xcolor}
+% Shaded rows and cells in the dichotomy tables (\rowcolor, \cellcolor).
+\usepackage{colortbl}
+% Row labels spanning several table rows (\multirow).
+\usepackage{multirow}
 \input{Math.tex}
 
 \usepackage{amsmath, amsfonts, mathtools, amsthm, amssymb, mathrsfs}
@@ -200,6 +204,51 @@
 	% the hand-drawn arrow that scoops a sample out of a bin
 	scoop/.style={-{Stealth[length=2.6mm]}, line width=1pt, draw=black},
 }
+
+% Shading for the dichotomy tables of the bounding-function chapter.  A row
+% whose first N-1 entries occur twice (once with each last entry) is a `pair',
+% a row whose prefix occurs once is a `single'; the two shades of each
+% alternate so that neighbouring pairs stay distinguishable.  `shatcell' marks
+% the columns that a rejected dichotomy would shatter.
+\colorlet{pairrow}{orange!30}
+\colorlet{pairrowalt}{orange!14}
+\colorlet{singlerow}{Purple!24}
+\colorlet{singlerowalt}{Purple!11}
+\colorlet{shatcell}{orange!35}
+
+% One BAD region in the `space of data sets' pictures: a scribbled rosette
+% centred at (x,y), in the given colour, turned by the optional angle so that
+% neighbouring blobs do not look stamped.  Usage: \badblob[30]{0.9}{2.1}{red}.
+\newcommand{\badblob}[4][0]{%
+	\begin{scope}[shift={(#2,#3)}, rotate=#1]
+		\draw[#4, line width=0.8pt, line join=round]
+			plot[smooth, domain=0:1080, samples=110, variable=\t]
+			({0.13*cos(\t) + 0.06*cos(3.7*\t)}, {0.13*sin(\t) - 0.06*sin(3.7*\t)});
+	\end{scope}}
+
+% The region of the B(N,k) and N^{k-1} tables (N >= 2, k >= 3) where the
+% polynomial N^{k-1} already dominates B(N,k), in the VC-dimension chapter.
+\colorlet{vcregion}{Purple!14}
+
+% A tuning knob for the `degrees of freedom' picture: a dark disc inside a
+% dial of 19 ticks labelled 0--18 counter-clockwise from the bottom, with a red
+% pointer at the given tick.  Usage: \dialknob{x}{y}{tick}, inside a picture.
+\tikzset{
+	dialdisc/.style={circle, fill=MidnightBlue!55!gray, draw=black, thick,
+			minimum size=10mm, inner sep=0pt},
+	dialptr/.style={red, line width=1.1pt, line cap=round},
+}
+\newcommand{\dialknob}[3]{%
+	\begin{scope}[shift={(#1,#2)}]
+		\draw[black, thin] (0,0) circle (0.62);
+		\foreach \i in {0,...,18}{%
+			\pgfmathsetmacro{\a}{-90 + (\i + 0.5) * 360 / 19}%
+			\draw[thin] (\a:0.62) -- (\a:0.72);
+			\node[font=\fontsize{4}{4}\selectfont] at (\a:0.84) {\i};}
+		\node[dialdisc] at (0,0) {};
+		\pgfmathsetmacro{\a}{-90 + (#3 + 0.5) * 360 / 19}%
+		\draw[dialptr] (0,0) -- (\a:0.55);
+	\end{scope}}
 
 % Cells of the 3x3 black/white pictures in the learning puzzle: `\puzzle{...}'
 % takes nine digits, row by row, 1 for a black cell and 0 for a white one.

@@ -14,16 +14,13 @@
     \(\Eout(g) \approx 0\) and learning is possible.
 \end{prev}
 
-The one hypothesis set we actually own is infinite. Perceptrons form a
-continuum, \(M = \infty\), and the bound collapses to the statement that a
-probability is at most \(\infty\). This chapter does not repair the proof; it
-repairs the \emph{counting} inside it. \(M\) entered through a union bound over
-\(M\) bad events, and a union bound is wasteful exactly when those events
-overlap --- which, for a hypothesis set full of near-identical hypotheses, they
-badly do. The honest count is not how many hypotheses \(\mathcal{H}\) contains
-but how many \emph{kinds} of behaviour it can display on \(N\) fixed inputs.
-That count is finite even when \(\mathcal{H}\) is not, and the chapter ends by
-isolating the property that keeps it small.
+But the perceptrons of \autoref{sec:perceptron-set} form an infinite set:
+\(M = \infty\) and the bound says nothing. This chapter looks for a finite
+quantity to put in place of \(M\). The plan is to find where \(M\) enters the
+proof --- a union bound over one BAD event per hypothesis --- observe that
+similar hypotheses have almost the same BAD event, and so count hypotheses only
+up to what \(N\) inputs can tell apart. That count is finite, and the last
+section asks when it grows only polynomially in \(N\).
 
 \section{Recap and Preview}\label{sec:recap-preview}
 
@@ -31,8 +28,8 @@ isolating the property that keeps it small.
 
 \subsection{The `Statistical' Learning Flow}
 
-The flow of \autoref{sec:real-learning} is worth putting down once more, now
-with its conclusion written underneath it rather than argued towards.
+We start from where \autoref{sec:real-learning} ended: the learning flow,
+now with its conclusion attached.
 
 \begin{center}
     \begin{adjustbox}{max width=\textwidth}
@@ -74,18 +71,19 @@ with its conclusion written underneath it rather than argued towards.
     \end{adjustbox}
 \end{center}
 
-The two \(\approx\) signs are of completely different kinds, and the label under
-each says which. The right-hand one is \emph{earned}: the algorithm works on
-\(\mathcal{D}\) until the in-sample error is small, and nothing stops it from
-trying. The left-hand one is \emph{granted}: no amount of work on
-\(\mathcal{D}\) can establish it, only a theorem about sampling can, and
-\autoref{thm:finite-hoeffding} is that theorem. Training buys one; testing ---
-that is, the world --- decides the other.
+The two \(\approx\) signs are achieved in different ways. The right-hand one,
+\(\Ein(g) \approx 0\), is about the training data: \(\Ein\) is computed on
+\(\mathcal{D}\), which we have, so the algorithm can measure it and push it down
+directly --- that is what PLA and pocket do. The left-hand one,
+\(\Eout(g) \approx \Ein(g)\), is about future test data: \(\Eout\) depends on the
+unknown \(P\), so it cannot be computed, and no work on \(\mathcal{D}\) can check
+it. We can only rely on \autoref{thm:finite-hoeffding}, which says it holds with
+high probability when \(N\) is large and \(M\) is finite. Learning therefore
+splits into two separate tasks.
 
 \subsection{Two Central Questions}
 
-Reading the chain from the outside in shows how much of it is already done, and
-by whom:
+Each link of the chain has been supplied by an earlier chapter:
 \[
     \underbrace{\text{for batch \& supervised binary classification,}}_{\text{Ch.\,3}}
     \quad
@@ -98,10 +96,9 @@ by whom:
     \quad\text{and}\quad
     \underbrace{\Ein(g) \approx 0}_{\text{Ch.\,2}} .
 \]
-Chapter~3 fixed the setting, Chapter~1 fixed what success means, Chapter~4
-supplied the generalisation half and Chapter~2 --- PLA --- supplied the fitting
-half. Nothing is left except to ask the two halves as questions in their own
-right.
+Chapter~3 fixed the setting and Chapter~1 the goal; Chapter~4 handled
+\(\Eout \approx \Ein\) and Chapter~2 (PLA) handled \(\Ein \approx 0\). So
+learning comes down to two questions:
 
 \begin{enumerate}
     \item Can we make sure that \(\Eout(g)\) is close enough to \(\Ein(g)\)?
@@ -128,7 +125,7 @@ right.
     small.
 \end{recall}
 
-\(M\) answers both at once, and in opposite directions.
+\(M\) pulls the two questions in opposite directions:
 
 \begin{center}
     \begin{tabular}{@{}p{0.45\linewidth}p{0.45\linewidth}@{}}
@@ -153,11 +150,8 @@ right.
     \end{tabular}
 \end{center}
 
-A small \(\mathcal{H}\) makes the bound tight but leaves the algorithm too few
-candidates to fit the data; a large \(\mathcal{H}\) is rich enough to fit but
-carries a bound too loose to be worth anything. The same number governs both
-columns, which is what makes the choice a genuine trade-off rather than a
-preference.
+A small \(\mathcal{H}\) gives a tight bound but may not contain a good fit; a
+large \(\mathcal{H}\) fits easily but its bound is loose.
 
 \begin{moral}
     Using the right \(M\) (or \(\mathcal{H}\)) is important.
@@ -169,13 +163,13 @@ preference.
 
 \subsection{Preview}
 
-What we know is one inequality,
+What we know is
 \[
     \mathbb{P}\left[ \abs{\Ein(g) - \Eout(g)} > \epsilon \right]
     \le 2 \cdot M \cdot \exp \left( -2 \epsilon^2 N \right) ,
 \]
-and the programme for the next three chapters is to keep its shape while
-replacing the one factor that blows up:
+and the plan for the next three chapters is to keep this form while replacing
+the factor that becomes infinite:
 
 \begin{itemize}
     \item establish a finite quantity \(m_{\mathcal{H}}\) that replaces \(M\),
@@ -189,14 +183,13 @@ replacing the one factor that blows up:
         `right' \(\mathcal{H}\), just as we would for \(M\).
 \end{itemize}
 
-The question mark over the inequality is not decoration: this chapter only
-builds the quantity \(m_{\mathcal{H}}\) and measures it, and the inequality
-itself stays unproved until two chapters from now.
+This chapter only constructs \(m_{\mathcal{H}}\) and computes it for a few
+hypothesis sets; the inequality itself, hence the `\(?\)', is proved two
+chapters from now.
 
 \begin{note}
-    The mysterious PLA is to be fully resolved after three more lectures ---
-    the bound that finally covers an infinite perceptron set is the one that
-    retroactively justifies everything \autoref{sec:pla} did.
+    The mysterious PLA is to be fully resolved after three more lectures, once
+    the bound covers the infinite perceptron set.
 \end{note}
 
 \begin{exercise}[Fun Time]
@@ -229,13 +222,11 @@ itself stays unproved until two chapters from now.
 
 \source{slides p.7--15}
 
-The previous section left \(M\) standing in the bound without asking where it
-came from. It came from one line of the proof, and that line is the only thing
-that has to change.
+To replace \(M\), we first look at where it came from.
 
 \subsection{Where Did \texorpdfstring{\(M\)}{M} Come From?}
 
-Recall the shape of the argument behind
+Recall the proof of
 \(\mathbb{P}\left[ \abs{\Ein(g) - \Eout(g)} > \epsilon \right]
 \le 2 M \exp(-2\epsilon^2 N)\). For each hypothesis there is a BAD event
 \[
@@ -257,8 +248,8 @@ non-overlapping:
     \mathbb{P}\left[ \mathcal{B}_2 \right] + \dots +
     \mathbb{P}\left[ \mathcal{B}_M \right] .
 \]
-Every one of the \(M\) summands is the same number, so the sum is \(M\) times
-it. That is the whole provenance of \(M\): it is a count of summands.
+Each summand is at most \(2\exp(-2\epsilon^2 N)\) by Hoeffding, so \(M\) is
+simply the number of terms in this sum.
 
 \begin{question}\label{q:union-fail}
     What did the union bound fail to consider when \(M = \infty\)?
@@ -266,9 +257,9 @@ it. That is the whole provenance of \(M\): it is a count of summands.
 
 \subsection{Where Did the Union Bound Fail?}
 
-A union bound is an equality only when the events are disjoint, and in a
-hypothesis set the BAD events are anything but. Take \(h_1 \approx h_2\), two
-lines a hair apart. Then
+The union bound is tight only when the events are disjoint. For similar
+hypotheses they are not: take \(h_1 \approx h_2\), two lines a hair apart.
+Then
 
 \begin{enumerate}
     \item \(\Eout(h_1) \approx \Eout(h_2)\), because the two hypotheses disagree
@@ -278,9 +269,8 @@ lines a hair apart. Then
         two disagree.
 \end{enumerate}
 
-Both quantities move together, so the gap \(\abs{\Ein - \Eout}\) moves together
-too, and \(\mathcal{B}_1\) and \(\mathcal{B}_2\) are all but the same event. The
-union bound counts their shared area twice.
+Hence \(\mathcal{B}_1\) and \(\mathcal{B}_2\) are almost the same event, and
+the union bound counts their overlap twice.
 
 \begin{center}
     \begin{tikzpicture}[scale=1.5]
@@ -296,9 +286,8 @@ union bound counts their shared area twice.
     \end{tikzpicture}
 \end{center}
 
-Three BAD events that nearly coincide are charged as three, and with a
-continuum of lines the overcharging is unbounded --- which is precisely how a
-finite quantity turned into \(\infty\).
+With infinitely many lines this over-counting is infinite, which is exactly
+why the bound became useless.
 
 \begin{question}\label{q:group-by-kind}
     To account for the overlap, can we group similar hypotheses by \emph{kind}?
@@ -306,14 +295,11 @@ finite quantity turned into \(\infty\).
 
 \subsection{How Many Lines Are There?}
 
-Take \(\mathcal{H} = \left\{ \text{all lines in } \mathbb{R}^2 \right\}\), where
-each line is read as a hypothesis by calling one side \(\circ\) and the other
-\(\times\). How many lines? Infinitely many. But the question worth asking is
-not how many lines exist; it is how many of them a handful of inputs can tell
-apart.
-
-Viewed from a single input vector \(\bm{x}_1\), a line is nothing but the answer
-it gives at that one point.
+To group lines by kind, take \(\mathcal{H} = \left\{ \text{all lines in }
+\mathbb{R}^2 \right\}\) (each line calls one side \(\circ\) and the other
+\(\times\)). There are infinitely many lines, but on a few fixed inputs they
+can only produce finitely many labellings. We count those, starting from one
+input.
 
 \begin{center}
     \begin{tikzpicture}[scale=0.95]
@@ -332,14 +318,12 @@ it gives at that one point.
     \dichone{o}\quad\dichone{x}
 \end{center}
 
-The arrow on each line is the side it calls positive. \(h_1\) puts
-\(\bm{x}_1\) on its positive side and \(h_2\) does not, so through the eye of
-one input there are exactly \emph{two} kinds of line:
-\(h_1\text{-like}(\bm{x}_1) = \circ\) or
-\(h_2\text{-like}(\bm{x}_1) = \times\). Every one of the infinitely many lines
-is one or the other.
+The arrow on each line points to its positive side. \(h_1\) puts
+\(\bm{x}_1\) on the positive side and \(h_2\) does not, so on one input there
+are two kinds of line: \(h_1\)-like (\(\bm{x}_1 = \circ\)) or \(h_2\)-like
+(\(\bm{x}_1 = \times\)).
 
-Add a second input and the eye gets sharper.
+With two inputs:
 
 \begin{center}
     \begin{tikzpicture}[scale=0.95]
@@ -367,9 +351,8 @@ Add a second input and the eye gets sharper.
 
 \(h_1\) leaves both points on its positive side and \(h_2\) leaves both on its
 negative side; the horizontal line between them, read upwards as \(h_3\) and
-downwards as \(h_4\), splits them the two possible ways. Four kinds, one for
-each of the \(2^2\) ways to label two points --- and here the count is exactly
-\(2^2\), which will not last.
+downwards as \(h_4\), splits them both ways. That gives four kinds, all
+\(2^2\) labellings.
 
 \begin{question}\label{q:three-inputs}
     One input: \(2\); two inputs: \(4\). Three inputs?
@@ -377,9 +360,8 @@ each of the \(2^2\) ways to label two points --- and here the count is exactly
 
 \subsection{Three Inputs, and Why the Answer Is Not One Number}
 
-For three inputs in general position --- a genuine triangle --- every one of the
-\(2^3\) labellings is achievable, because any single vertex can be cut off from
-the other two by a line, and so can any pair.
+For three inputs forming a triangle, all \(2^3\) labellings are achievable,
+since a line can cut off any one vertex (or, read the other way, any two).
 
 \begin{center}
     \begin{tabular}{@{}c@{\quad}c@{\quad}c@{}}
@@ -400,8 +382,7 @@ the other two by a line, and so can any pair.
     \end{tabular}
 \end{center}
 
-Move the three inputs onto a common line, though, and two of the eight
-evaporate.
+If the three inputs are collinear, two of the eight are lost.
 
 \begin{center}
     \begin{tabular}{@{}c@{\quad}c@{\quad}c@{}}
@@ -430,21 +411,16 @@ evaporate.
     inputs, or repeated ones --- costs.
 \end{observation}
 
-So the number of kinds depends on \emph{which} three inputs we look through, and
-the two answers are \(8\) and \(6\). We will take the larger one, for a reason
-that becomes clear in \autoref{sec:effective-hyp}: the bound has to hold for
-every data set, so the count that goes into it must be the worst case.
+So the count depends on where the inputs are: \(8\) or \(6\). Since the bound
+must hold for every data set, we will use the largest count, \(8\).
 
 \subsection{Four Inputs}
 
-With four inputs the maximum stops keeping up with \(2^N\) for the first time.
-In theory there are \(2^4 = 16\) labellings to account for, yet the picture
-below draws only eight of them. Nothing is being hidden: a line read from its
-other side calls every \(\circ\) a \(\times\) and every \(\times\) a \(\circ\),
-so the dichotomies come in complementary pairs and one panel does for both
-members of a pair. That is what the `\(2\times\)' beside the figure means, and
-it is why the eight panels drawn are exactly the eight with
-\(\bm{x}_1 = \circ\).
+With four inputs the count falls below \(2^N\) for the first time. There are
+\(2^4 = 16\) labellings in theory, but the figure draws only the eight with
+\(\bm{x}_1 = \circ\): reading a line from its other side swaps every \(\circ\)
+and \(\times\), so labellings come in complementary pairs and each panel stands
+for itself and its mirror image. That is the `\(2\times\)'.
 
 \begin{center}
     \begin{tabular}{@{}c@{\quad}c@{\quad}c@{}}
@@ -470,9 +446,9 @@ it is why the eight panels drawn are exactly the eight with
     \end{tabular}
 \end{center}
 
-Of the sixteen, exactly one pair is missing: the struck-out panel, which asks
-\(\bm{x}_1\) and \(\bm{x}_3\) to differ from \(\bm{x}_2\) and \(\bm{x}_4\),
-together with its mirror image. Fourteen survive.
+Only the struck-out panel (\(\bm{x}_1, \bm{x}_3\) against
+\(\bm{x}_2, \bm{x}_4\)) and its mirror image are impossible, leaving \(14\).
+This is not special to the picture:
 
 \begin{proposition}[At most \(14\) through four inputs]\label{prop:fourteen}
     For any four inputs \(\bm{x}_1, \dots , \bm{x}_4 \in \mathbb{R}^2\), lines
@@ -496,14 +472,6 @@ together with its mirror image. Fourteen survive.
     \(\bm{x}_2 \bm{x}_4\), and every other labelling is cut off by a line.
 \end{proof}
 
-\begin{remark}
-    The degenerate configurations do no better. If one input lies inside the
-    triangle of the other three, Radon's partition is `inner point against the
-    rest' and again removes exactly two labellings; if three of them are
-    collinear, more labellings are lost, not fewer. Four inputs never see more
-    than \(14\) kinds of line, which is the first crack in the ceiling
-    \(2^N\).
-\end{remark}
 
 \subsection{Effective Number of Lines}
 
@@ -514,11 +482,8 @@ together with its mirror image. Fourteen survive.
     \(\operatorname{effective}(N)\).
 \end{definition}
 
-Three facts come for free. It must be at most \(2^N\), since a kind of line is
-no more than an assignment of one of two labels to each of \(N\) inputs. It is a
-finite grouping of the infinitely many lines in \(\mathcal{H}\), which is
-exactly what \autoref{q:group-by-kind} asked for. And the counts collected so
-far are
+This is the grouping asked for in \autoref{q:group-by-kind}: it is finite, and
+at most \(2^N\) since each kind is a labelling of \(N\) inputs. So far:
 
 \begin{center}
     \solidrules
@@ -536,9 +501,8 @@ far are
     \end{tabular}
 \end{center}
 
-The wish is then easy to state: that the proof of
-\autoref{thm:finite-hoeffding} could be rerun with the number of kinds in place
-of the number of hypotheses, giving
+If the union bound could be taken over kinds instead of hypotheses, we would
+get
 \[
     \mathbb{P}\left[ \abs{\Ein(g) - \Eout(g)} > \epsilon \right]
     \le 2 \cdot \operatorname{effective}(N) \cdot \exp \left( -2 \epsilon^2 N \right) .
@@ -553,11 +517,10 @@ of the number of hypotheses, giving
 \end{moral}
 
 \begin{intuition}
-    Why both conditions? The first is the replacement itself. The second is what
-    makes the replacement worth having: \(\exp(-2\epsilon^2 N)\) decays
-    exponentially in \(N\), so a factor growing like \(2^N\) would cancel it
-    exactly and leave a bound that never becomes small. Anything that grows
-    polynomially loses the race and the product still vanishes.
+    Condition \textcircled{\scriptsize 2} is needed because
+    \(\exp(-2\epsilon^2 N)\) decays exponentially: a factor like \(2^N\) could
+    cancel it, while a polynomial factor cannot, and the bound still goes to
+    \(0\).
 \end{intuition}
 
 \begin{exercise}[Fun Time]
@@ -595,22 +558,13 @@ of the number of hypotheses, giving
     later chapter.
 \end{proof}
 
-\begin{remark}
-    The counts \(2, 4, 8, 14, 22\) are the start of
-    \(2 \left[ \binom{N-1}{0} + \binom{N-1}{1} + \binom{N-1}{2} \right]\), which
-    is Cover's formula for the number of dichotomies of \(N\) points in general
-    position realisable by a hyperplane in the plane. The differences
-    \(2, 4, 6, 8\) between consecutive terms are the giveaway: a quadratic, not
-    an exponential.
-\end{remark}
-
 \section{Effective Number of Hypotheses}\label{sec:effective-hyp}
 
 \source{slides p.16--22}
 
-Everything in the previous section was about lines. Nothing in it was, and the
-same counting works for any hypothesis set at all once the vocabulary is
-detached from geometry.
+Nothing in \autoref{sec:effective-lines} used the geometry of lines, so the
+same counting applies to any \(\mathcal{H}\). This section gives it general
+names and computes it for a few examples.
 
 \subsection{Dichotomies: Mini-hypotheses}
 
@@ -639,11 +593,9 @@ Let \(\mathcal{H}\) be any set of hypotheses \(h \colon \mathcal{X} \to
     of \autoref{sec:effective-lines} are exactly such strings, drawn.
 \end{notation}
 
-A dichotomy is a mini-hypothesis: all of \(h\) that \(N\) inputs can possibly
-detect. Two hypotheses collapse into one dichotomy precisely when the inputs
-cannot tell them apart --- which is the overlap of \autoref{q:union-fail}, now
-made into an object. That sentence is the whole reason for the definition, so
-it is worth making exact.
+A dichotomy is what is left of \(h\) when only \(N\) inputs are observed, and
+`grouping hypotheses by kind' now means grouping them by dichotomy. This is the
+right grouping for the union bound because of the following.
 
 \begin{lemma}[Same dichotomy, same \texorpdfstring{\(\Ein\)}{Ein}]\label{lem:same-ein}
     If \(h\) and \(h'\) implement the same dichotomy on the inputs of
@@ -657,17 +609,12 @@ it is worth making exact.
     sums have the same terms.
 \end{proof}
 
-Now retrace where \(M\) came from. It was a count of summands in the union
-bound of \autoref{sec:effective-lines}, one for each BAD event
-\(\mathcal{B}_h \colon \abs{\Ein(h) - \Eout(h)} > \epsilon\). The hypotheses
-sharing a dichotomy have the same \(\Ein\) by \autoref{lem:same-ein}, and ---
-agreeing wherever the data looks --- nearly the same \(\Eout\); their BAD events
-therefore nearly coincide, exactly the three-circle picture of
-\autoref{sec:effective-lines}. Such a family deserves one summand between all of
-its members, not one each. Charge per \emph{dichotomy} instead of per hypothesis
-and the number of summands falls from \(\abs{\mathcal{H}}\) to
-\(\abs{\mathcal{H}(\bm{x}_1, \bm{x}_2, \dots , \bm{x}_N)}\), which is at most
-\(2^N\) however infinite \(\mathcal{H}\) may be.
+Hypotheses with the same dichotomy thus have the same \(\Ein\) and, being
+similar, nearly the same \(\Eout\), so their BAD events nearly coincide --- the
+overlap of \autoref{q:union-fail}. Taking one term per dichotomy instead of one
+per hypothesis reduces the number of terms in the union bound from
+\(\abs{\mathcal{H}}\) to \(\abs{\mathcal{H}(\bm{x}_1, \dots , \bm{x}_N)}
+\le 2^N\).
 
 \begin{center}
     \solidrules
@@ -692,25 +639,19 @@ and the number of summands falls from \(\abs{\mathcal{H}}\) to
 \end{moral}
 
 \begin{note}
-    `Candidate' is the honest word, because the grouping argument above is a
-    motivation and not yet a proof. Two things are missing. The set
-    \(\mathcal{H}(\bm{x}_1, \bm{x}_2, \dots , \bm{x}_N)\) depends on the very
-    inputs we are averaging over, so it is not a fixed number a bound may quote;
-    the next subsection removes that dependence. And a dichotomy pins \(\Ein\)
-    exactly while leaving \(\Eout\) only \emph{approximately} equal across the
-    group, so the members of a group do not literally share one BAD event and
-    the union bound over groups is not yet licensed. That second gap is what the
-    `\(?\)' of \autoref{eq:wish} stands for, and closing it takes until two
-    chapters from now.
+    This is a motivation, not a proof, and two gaps remain. First,
+    \(\mathcal{H}(\bm{x}_1, \dots , \bm{x}_N)\) depends on the random inputs;
+    the next subsection removes this dependence. Second, a dichotomy fixes
+    \(\Ein\) exactly but \(\Eout\) only approximately, so hypotheses in a group
+    do not share exactly one BAD event. This second gap is the `\(?\)' in
+    \autoref{eq:wish}, closed two chapters from now.
 \end{note}
 
 \subsection{Growth Function}
 
-The candidate has one defect, and \autoref{sec:effective-lines} already showed
-it: \(\abs{\mathcal{H}(\bm{x}_1, \dots , \bm{x}_N)}\) depends on which inputs
-are chosen --- \(8\) for a triangle, \(6\) for three collinear points. A bound
-cannot depend on a data set it is supposed to hold for, so the dependence is
-removed in the only safe direction.
+The first gap is easy to close. \(\abs{\mathcal{H}(\bm{x}_1, \dots ,
+\bm{x}_N)}\) depends on the inputs (\(8\) or \(6\) for three points), so take the
+worst case:
 
 \begin{definition}[Growth function]\label{def:growth}
     The \vocab{growth function} of \(\mathcal{H}\) is
@@ -721,9 +662,8 @@ removed in the only safe direction.
     \]
 \end{definition}
 
-It is finite and upper bounded by \(2^N\), so unlike \(M\) it never escapes to
-infinity, however large \(\mathcal{H}\) is. For lines in the plane it is the
-effective number of \autoref{def:effective}:
+It is at most \(2^N\), finite however large \(\mathcal{H}\) is, and for lines
+in the plane it is exactly \(\operatorname{effective}(N)\):
 
 \begin{center}
     \solidrules
@@ -741,16 +681,12 @@ effective number of \autoref{def:effective}:
     \end{tabular}
 \end{center}
 
-The \(\max\) in the third row is the definition doing its job: the degenerate
-configurations are still there, they are simply not the ones that decide.
-
 \begin{question}\label{q:calculate-growth}
     How does one actually `calculate' the growth function?
 \end{question}
 
-The honest answer is that for perceptrons we cannot yet, so the next three
-subsections take hypothesis sets simple enough to count by hand. Each is chosen
-to land somewhere different on the scale from polynomial to exponential.
+For perceptrons we cannot yet, so we first compute it for three simpler
+hypothesis sets.
 
 \subsection{Growth Function for Positive Rays}
 
@@ -793,7 +729,7 @@ the `positive half' of the 1D perceptrons.
     repeated inputs only merge gaps.
 \end{proof}
 
-For \(N = 4\) the \(5\) dichotomies are all the ways to put the crosses first:
+For \(N = 4\), the \(5\) dichotomies:
 
 \begin{center}
     \begin{tabular}{@{}cccc@{}}
@@ -815,7 +751,7 @@ For \(N = 4\) the \(5\) dichotomies are all the ways to put the crosses first:
 
 \subsection{Growth Function for Positive Intervals}
 
-Keep \(\mathcal{X} = \mathbb{R}\) and let \(\mathcal{H}\) contain every \(h\)
+Still with \(\mathcal{X} = \mathbb{R}\), let \(\mathcal{H}\) contain every \(h\)
 with \(h(x) = +1\) if and only if \(x \in [\ell, r)\), and \(-1\) otherwise.
 
 \begin{center}
@@ -857,8 +793,7 @@ with \(h(x) = +1\) if and only if \(x \in [\ell, r)\), and \(-1\) otherwise.
     \(\binom{N+1}{2} + 1\).
 \end{proof}
 
-For \(N = 4\) that is \(10 + 1 = 11\): every contiguous run of \(\circ\), plus
-the empty one.
+For \(N = 4\), the \(10 + 1 = 11\) dichotomies:
 
 \begin{center}
     \begin{tabular}[t]{@{}cccc@{}}
@@ -894,7 +829,8 @@ the empty one.
 
 \subsection{Growth Function for Convex Sets}
 
-Now let \(\mathcal{X} = \mathbb{R}^2\) and let \(\mathcal{H}\) contain every
+The last example reaches the ceiling \(2^N\). Let \(\mathcal{X} =
+\mathbb{R}^2\) and let \(\mathcal{H}\) contain every
 \(h\) with \(h(\bm{x}) = +1\) if and only if \(\bm{x}\) lies in a convex region,
 and \(-1\) otherwise. Blue marks the region a hypothesis calls \(+1\); the red
 surround is everything it calls \(-1\).
@@ -918,9 +854,8 @@ surround is everything it calls \(-1\).
     What is \(m_{\mathcal{H}}(N)\) for convex sets?
 \end{question}
 
-The answer is the ceiling, and the way to see it is to choose the inputs as
-favourably as the \(\max\) in \autoref{def:growth} permits: put
-\(\bm{x}_1, \bm{x}_2, \dots , \bm{x}_N\) on a big circle.
+Since \(m_{\mathcal{H}}\) takes the best inputs, put
+\(\bm{x}_1, \dots , \bm{x}_N\) on a big circle:
 
 \begin{center}
     \begin{tikzpicture}[scale=1.5]
@@ -962,13 +897,9 @@ favourably as the \(\max\) in \autoref{def:growth} permits: put
     can be shattered.
 \end{moral}
 
-\begin{remark}
-    The `if and only if' is worth reading twice, because it is where the
-    \(\max\) pays off. \emph{Some} choice of \(N\) inputs being shattered is
-    enough; the other choices may be as degenerate as they like. Conversely, a
-    growth function short of \(2^N\) is a statement about \emph{every}
-    conceivable set of \(N\) inputs at once.
-\end{remark}
+Note the quantifiers: \(m_{\mathcal{H}}(N) = 2^N\) needs only \emph{some}
+\(N\) inputs to be shattered, whereas \(m_{\mathcal{H}}(N) < 2^N\) says that
+\emph{no} \(N\) inputs are.
 
 \begin{exercise}[Fun Time]
     Consider positive \emph{and} negative rays as \(\mathcal{H}\), which is
@@ -994,7 +925,7 @@ favourably as the \(\max\) in \autoref{def:growth} permits: put
 
 \subsection{The Four Growth Functions}
 
-Four hypothesis sets, four growth functions:
+Collecting the growth functions computed so far:
 
 \begin{itemize}
     \item positive rays: \(m_{\mathcal{H}}(N) = N + 1\);
@@ -1011,8 +942,9 @@ place of \(M\):
     \overset{?}{\le} 2 \cdot m_{\mathcal{H}}(N) \cdot
     \exp \left( -2 \epsilon^2 N \right) .
 \]
-The first two hypothesis sets would be safe and the third would not, and the
-line between them is the only thing that matters.
+Since \(\exp(-2\epsilon^2 N)\) decays exponentially, a polynomial
+\(m_{\mathcal{H}}(N)\) still lets the bound go to \(0\) (rays, intervals), while
+\(2^N\) does not (convex sets).
 
 \begin{moral}
     Polynomial: good; exponential: bad.
@@ -1024,22 +956,22 @@ line between them is the only thing that matters.
 
 \subsection{Break Point of \texorpdfstring{\(\mathcal{H}\)}{H}}
 
-What we know about 2D perceptrons so far is two statements of opposite
-quantifier. For three inputs there \emph{exists} a shattering; for four inputs,
-\emph{for all} configurations, there is none.
+We do not know \(m_{\mathcal{H}}(N)\) for 2D perceptrons, but we know that
+some three inputs can be shattered while \emph{no} four inputs can
+(\autoref{prop:fourteen}).
 
 \begin{center}
     \dichfour[veto]{oxox}
 \end{center}
 
-That second statement is the useful one, and it deserves a name.
+The second fact is the useful one, and we name it.
 
 \begin{definition}[Break point]\label{def:break}
     If no \(k\) inputs can be shattered by \(\mathcal{H}\), then \(k\) is a
     \vocab{break point} for \(\mathcal{H}\).
 \end{definition}
 
-Three consequences follow at once.
+Immediately:
 
 \begin{itemize}
     \item \(m_{\mathcal{H}}(k) < 2^k\), by \autoref{def:shatter}.
@@ -1063,7 +995,7 @@ Three consequences follow at once.
 
 \subsection{The Four Break Points}
 
-The same four hypothesis sets, now read for their break points:
+The four hypothesis sets with their break points:
 
 \begin{center}
     \solidrules
@@ -1082,17 +1014,9 @@ The same four hypothesis sets, now read for their break points:
     \end{adjustbox}
 \end{center}
 
-The arithmetic behind the third column is a single substitution each time.
-Positive rays give \(m_{\mathcal{H}}(1) = 2 = 2^1\) but
-\(m_{\mathcal{H}}(2) = 3 < 4\). Positive intervals give
-\(m_{\mathcal{H}}(2) = 4 = 2^2\) and \(m_{\mathcal{H}}(3) = 7 < 8\). Convex sets
-never fall short of \(2^N\), so they have no break point at all. Perceptrons in
-the plane shatter some three inputs and no four, by
-\autoref{prop:fourteen}.
-
-Read down the first two columns together and a pattern is hard to miss: break
-point \(2\) with a linear growth function, break point \(3\) with a quadratic
-one, no break point with an exponential one.
+(Rays: \(m_{\mathcal{H}}(2) = 3 < 4\); intervals:
+\(m_{\mathcal{H}}(3) = 7 < 8\).) Break point \(2\) comes with \(O(N)\), break
+point \(3\) with \(O(N^2)\), and no break point with \(2^N\). This suggests:
 
 \begin{conjecture}\label{conj:break}
     No break point: \(m_{\mathcal{H}}(N) = 2^N\) --- which is certain, being the
@@ -1100,11 +1024,9 @@ one, no break point with an exponential one.
     \(m_{\mathcal{H}}(N) = O \! \left( N^{k-1} \right)\).
 \end{conjecture}
 
-If the second half is true, then a single failure to shatter --- one
-configuration size at which \(\mathcal{H}\) runs out of expressive power ---
-forces polynomial growth for every \(N\), and with it a bound that decays.
-A very small local restriction would buy a very large global guarantee. Whether
-it is true is the whole of the next chapter.
+If true, a break point alone would guarantee polynomial growth, and hence,
+via \autoref{eq:wish}, feasible learning for 2D perceptrons. Proving it is the
+next chapter.
 
 \begin{exercise}[Fun Time]
     Consider positive and negative rays as \(\mathcal{H}\), the 1D perceptron
@@ -1137,21 +1059,17 @@ it is true is the whole of the next chapter.
     \item[Break Point] When \(m_{\mathcal{H}}(N)\) becomes `non-exponential'.
 \end{description}
 
-The chapter's title names the split it opened with: training is where \(\Ein\)
-is made small, testing is where \(\Eout\) is judged, and the bridge between them
-carries a factor that used to be \(M\). That factor is now
-\(m_{\mathcal{H}}(N)\), which counts kinds of behaviour rather than hypotheses
-and stays finite for the infinite hypothesis sets we care about.
+Training makes \(\Ein\) small; the bound connecting \(\Ein\) to \(\Eout\)
+carried a factor \(M\), and we have proposed replacing it by
+\(m_{\mathcal{H}}(N)\), which counts dichotomies instead of hypotheses and is
+finite even for infinite \(\mathcal{H}\).
 
-Two debts remain, and they are the next two chapters. The first is
-\autoref{conj:break}: a break point at \(k\) ought to force
-\(m_{\mathcal{H}}(N) = O(N^{k-1})\), and until that is proved, `finite' is not
-yet `polynomial'. The second is the question mark of \autoref{eq:wish}, still
-sitting over
+Two things remain for the next two chapters: proving \autoref{conj:break}, that
+a break point \(k\) gives \(m_{\mathcal{H}}(N) = O(N^{k-1})\); and removing the
+`\(?\)' of \autoref{eq:wish} from
 \[
     \mathbb{P}\left[ \abs{\Ein(g) - \Eout(g)} > \epsilon \right]
     \overset{?}{\le} 2 \cdot m_{\mathcal{H}}(N) \cdot
     \exp \left( -2 \epsilon^2 N \right) ,
 \]
-which no argument here has earned. Settle both and the perceptron --- infinite
-hypothesis set and all --- finally comes with a guarantee.
+Together they give a guarantee for the perceptron.

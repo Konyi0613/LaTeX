@@ -1,0 +1,1091 @@
+\chapter{Theory of Generalization}
+\lecture{6}{30 Sep.}{}
+
+\begin{prev}
+    \autoref{sec:break-point} ended with the growth function
+    \(m_{\mathcal{H}}(N)\), the number of dichotomies \(\mathcal{H}\) can
+    implement on the best \(N\) inputs, as the (wishful) effective price of
+    choice in training, and with \autoref{conj:break}: a break point \(k\)
+    should force \(m_{\mathcal{H}}(N) = O(N^{k-1})\). Two things were left
+    open --- proving that conjecture, and removing the `\(?\)' from
+    \[
+        \mathbb{P}\left[ \abs{\Ein(g) - \Eout(g)} > \epsilon \right]
+        \overset{?}{\le} 2 \cdot m_{\mathcal{H}}(N) \cdot
+        \exp \left( -2 \epsilon^2 N \right) .
+    \]
+\end{prev}
+
+This chapter does both. The first three sections prove the conjecture without
+ever looking at a particular \(\mathcal{H}\): a break point is a purely
+combinatorial restriction on which tables of \(\circ\) and \(\times\) may occur,
+and counting the largest such table gives a polynomial. The last section
+sketches why \(m_{\mathcal{H}}\), with a few changes of constant, really can
+stand in for \(M\).
+
+\section{Restriction of Break Point}\label{sec:restriction}
+
+\source{slides p.2--5}
+
+\subsection{The Four Break Points}
+
+The four hypothesis sets of the last chapter, each with the smallest input
+configuration it fails to shatter:
+
+\begin{center}
+    \solidrules
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tabular}{@{}l|c|c|l@{}}
+            \toprule
+            \(\mathcal{H}\) & \(m_{\mathcal{H}}(N)\) & inputs not shattered
+            & break point\\
+            \midrule
+            positive rays & \(N + 1\) & \dmark{o}\,\dmark{x}
+            & \(m_{\mathcal{H}}(2) = 3 < 2^2\): break point at \(2\)\\
+            positive intervals & \(\tfrac{1}{2} N^2 + \tfrac{1}{2} N + 1\)
+            & \dmark{o}\,\dmark{x}\,\dmark{o}
+            & \(m_{\mathcal{H}}(3) = 7 < 2^3\): break point at \(3\)\\
+            convex sets & \(2^N\)
+            & \tikz[baseline=(current bounding box.center), x=0.3cm, y=0.3cm]{%
+                \dmarkat{1}{2}{o}\dmarkat{2}{2}{x}\dmarkat{0}{1}{o}%
+                \dmarkat{1}{0}{x}\dmarkat{2}{0}{o}}
+            & \(m_{\mathcal{H}}(N) = 2^N\) always: no break point\\
+            2D perceptrons & \(< 2^N\) in some cases
+            & \tikz[baseline=(current bounding box.center), x=0.3cm, y=0.3cm]{%
+                \dmarkat{1}{2}{o}\dmarkat{0}{1}{x}\dmarkat{2}{1}{x}%
+                \dmarkat{1}{0}{o}}
+            & \(m_{\mathcal{H}}(4) = 14 < 2^4\): break point at \(4\)\\
+            \bottomrule
+        \end{tabular}
+    \end{adjustbox}
+\end{center}
+
+The third column is the dichotomy that fails: a ray cannot say \(\circ\) left
+of \(\times\), an interval cannot leave a hole in the middle, a line cannot do
+XOR. Convex sets never fail, whatever the input.
+
+\autoref{sec:break-point} already showed one consequence of a break point:
+break point \(k\) \(\implies\) break point \(k + 1, \dots\) That concerns only
+the values \(m_{\mathcal{H}}(N) < 2^N\) at \(N \ge k\).
+
+\begin{question}\label{q:what-else}
+    What else does a break point imply?
+\end{question}
+
+\subsection{What Must Be True When \texorpdfstring{\(k = 2\)}{k = 2}}
+
+Suppose the \emph{minimum} break point is \(k = 2\). Without knowing
+\(\mathcal{H}\), a few values of \(m_{\mathcal{H}}\) are forced:
+
+\begin{itemize}
+    \item \(N = 1\): every \(m_{\mathcal{H}}(N) = 2\) by definition, since the
+        minimum break point is above \(1\), so some single input is shattered;
+    \item \(N = 2\): every \(m_{\mathcal{H}}(N) < 4\) by definition, since \(2\)
+        is a break point (so the maximum possible is \(3\)).
+\end{itemize}
+
+\begin{question}\label{q:max-n3-k2}
+    What is the maximum possible \(m_{\mathcal{H}}(N)\) when \(N = 3\) and
+    \(k = 2\)?
+\end{question}
+
+The only rule is that no two of the three inputs may be shattered: in the table
+of dichotomies, no pair of columns may show all four patterns
+\(\circ\circ, \circ\times, \times\circ, \times\times\). So build the table row
+by row and reject any row that breaks the rule.
+
+\begin{itemize}
+    \item \(\circ\circ\circ\): \(1\) dichotomy; shatters any two points? No.
+    \item add \(\circ\circ\times\): \(2\) dichotomies; no.
+    \item add \(\circ\times\circ\): \(3\) dichotomies; no.
+    \item add \(\circ\times\times\): \(4\) dichotomies, but now columns
+        \(\bm{x}_2, \bm{x}_3\) read \(\circ\circ, \circ\times, \times\circ,
+        \times\times\) --- shattered. Rejected.
+    \item add \(\times\circ\circ\) instead: \(4\) dichotomies; no pair
+        shattered.
+    \item a fifth row: each of the three remaining candidates shatters some
+        pair (table below).
+\end{itemize}
+
+\begin{center}
+    \solidrules
+    \begin{tabular}{@{}ccc|l@{}}
+        \toprule
+        \(\bm{x}_1\) & \(\bm{x}_2\) & \(\bm{x}_3\) & \\
+        \midrule
+        \dmark{o} & \dmark{o} & \dmark{o} & kept\\
+        \dmark{o} & \dmark{o} & \dmark{x} & kept\\
+        \dmark{o} & \dmark{x} & \dmark{o} & kept\\
+        \dmark{x} & \dmark{o} & \dmark{o} & kept\\
+        \midrule
+        \dmark{o} & \cellcolor{shatcell}\dmark{x} & \cellcolor{shatcell}\dmark{x}
+        & 4th row tried: shatters \(\bm{x}_2, \bm{x}_3\)\\
+        \cellcolor{shatcell}\dmark{x} & \dmark{o} & \cellcolor{shatcell}\dmark{x}
+        & 5th row tried: shatters \(\bm{x}_1, \bm{x}_3\)\\
+        \cellcolor{shatcell}\dmark{x} & \cellcolor{shatcell}\dmark{x} & \dmark{o}
+        & 5th row tried: shatters \(\bm{x}_1, \bm{x}_2\)\\
+        \cellcolor{shatcell}\dmark{x} & \cellcolor{shatcell}\dmark{x} & \dmark{x}
+        & 5th row tried: shatters \(\bm{x}_1, \bm{x}_2\) (every pair, in fact)\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+The four kept rows use up the table: \(\circ\times\times\) was already refused,
+and \(\times\circ\times\), \(\times\times\circ\), \(\times\times\times\) each
+complete the four patterns on some pair, so no column pair has room left. The
+maximum possible so far is \(4\) dichotomies. The search here started from
+\(\circ\circ\circ\) and so is not a proof that no other table of five exists;
+that proof comes for free from \autoref{thm:bounding} below, which gives
+\(B(3, 2) \le 4\).
+
+\subsection{Restriction of Break Point}
+
+Putting the three cases together, when the minimum break point is \(k = 2\):
+
+\begin{itemize}
+    \item \(N = 1\): every \(m_{\mathcal{H}}(N) = 2\) by definition;
+    \item \(N = 2\): every \(m_{\mathcal{H}}(N) < 4\) by definition (so maximum
+        possible \(= 3\));
+    \item \(N = 3\): maximum possible \(= 4 \ll 2^3\).
+\end{itemize}
+
+At \(N = 3\) the break point already bites twice as hard as the definition
+asks: the definition only forbids shattering two points, yet it caps three
+points at half of \(2^3\).
+
+\begin{moral}
+    A break point \(k\) restricts the maximum possible \(m_{\mathcal{H}}(N)\) a
+    lot for \(N > k\).
+\end{moral}
+
+This is the answer to \autoref{q:what-else}, and it suggests how to prove
+\autoref{conj:break} without knowing anything else about \(\mathcal{H}\):
+\begin{equation}\label{eq:idea}
+    m_{\mathcal{H}}(N)
+    \;\le\; \text{maximum possible } m_{\mathcal{H}}(N) \text{ given } k
+    \;\le\; \mathrm{poly}(N) .
+\end{equation}
+The first inequality is trivial; the work is in the second.
+
+\begin{exercise}[Fun Time]
+    When the minimum break point is \(k = 1\), what is the maximum possible
+    \(m_{\mathcal{H}}(N)\) when \(N = 3\)?
+    \begin{enumerate*}[(1)]
+        \item \(1\); \item \(2\); \item \(4\); \item \(8\).
+    \end{enumerate*}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (1). Because \(k = 1\), the hypothesis set cannot even shatter one point.
+    Thus, every `column' of the table cannot contain both \(\circ\) and
+    \(\times\). Then, after including the first dichotomy, it is not possible
+    to include any other different dichotomy:
+
+    \begin{center}
+        \solidrules
+        \begin{tabular}{@{}ccc|l@{}}
+            \toprule
+            \(\bm{x}_1\) & \(\bm{x}_2\) & \(\bm{x}_3\) & \\
+            \midrule
+            \dmark{o} & \dmark{x} & \cellcolor{shatcell}\dmark{o} & kept\\
+            \dmark{o} & \dmark{x} & \cellcolor{shatcell}\dmark{x}
+            & rejected: column \(\bm{x}_3\) now shattered\\
+            \bottomrule
+        \end{tabular}
+    \end{center}
+
+    Any second row differs from the first somewhere, and that column then shows
+    both symbols. Thus, the maximum possible \(m_{\mathcal{H}}(N)\) is \(1\).
+\end{proof}
+
+\section{Bounding Function: Basic Cases}\label{sec:bound-basic}
+
+\source{slides p.6--11}
+
+The middle term of \autoref{eq:idea} deserves a name.
+
+\subsection{Bounding Function}
+
+\begin{definition}[Bounding function]\label{def:bounding}
+    The \vocab{bounding function} \(B(N, k)\) is the maximum possible
+    \(m_{\mathcal{H}}(N)\) when \(k\) is a break point.
+\end{definition}
+
+Two remarks make this concrete.
+
+\begin{itemize}
+    \item It is a \emph{combinatorial quantity}: the maximum number of
+        length-\(N\) vectors with entries in \(\left\{ \circ, \times
+        \right\}\) such that no length-\(k\) subvector is shattered --- that
+        is, no choice of \(k\) coordinates shows all \(2^k\) patterns.
+    \item It is \emph{irrelevant of the details of \(\mathcal{H}\)}. For
+        example, \(B(N, 3)\) bounds both positive intervals (\(k = 3\)) and
+        1D perceptrons (\(k = 3\)).
+\end{itemize}
+
+The first remark is why the second holds: the dichotomies of any
+\(\mathcal{H}\) with break point \(k\), on any \(N\) inputs, form such a set
+of vectors, so
+\[
+    m_{\mathcal{H}}(N) \le B(N, k)
+\]
+for every \(\mathcal{H}\) with break point \(k\). The price is looseness ---
+\(B\) takes the worst table, whether or not any \(\mathcal{H}\) realises it.
+
+\begin{question}\label{q:B-poly}
+    New goal: is \(B(N, k) \le \mathrm{poly}(N)\)?
+\end{question}
+
+\subsection{Table of Bounding Function}
+
+We fill in a table of \(B(N, k)\), rows \(N\), columns \(k\). What is known
+so far is:
+
+\begin{itemize}
+    \item \(B(2, 2) = 3\) (maximum \(< 4\));
+    \item \(B(3, 2) = 4\) (the `pictorial' proof above).
+\end{itemize}
+
+Three whole regions of the table then follow from short arguments.
+
+\begin{proposition}[Boundary cases]\label{prop:B-basic}
+    \leavevmode
+    \begin{enumerate}
+        \item \(B(N, 1) = 1\) for every \(N\).
+        \item \(B(N, k) = 2^N\) for \(N < k\) --- including all dichotomies does
+            not violate the `breaking condition'.
+        \item \(B(N, k) = 2^N - 1\) for \(N = k\) --- removing a single dichotomy
+            satisfies the `breaking condition'.
+    \end{enumerate}
+\end{proposition}
+
+\begin{proof}
+    (1) is the Fun Time above, for any \(N\): if no single coordinate may show
+    both symbols, all rows agree everywhere, so there is one row.
+
+    (2) With \(N < k\) there are no \(k\) coordinates to choose, so the
+    condition is empty and all \(2^N\) vectors are allowed.
+
+    (3) With \(N = k\) the only \(k\) coordinates are all of them. All \(2^N\)
+    vectors would shatter them, so at most \(2^N - 1\); and deleting any one
+    vector leaves the full coordinate set missing a pattern, so \(2^N - 1\) is
+    attained.
+\end{proof}
+
+Note that (3) contains the first known value, \(B(2, 2) = 2^2 - 1 = 3\). The
+four stages of the table, merged into one --- \textcolor{blue!75!black}{blue}:
+column \(k = 1\); black: \(N < k\); \textcolor{orange!85!black}{orange}:
+\(N = k\); purple: \(B(3, 2)\), the one entry from the pictorial search:
+
+\begin{center}
+    \solidrules
+    \begin{tabular}{@{}cc|ccccccc@{}}
+        \toprule
+        & & \multicolumn{7}{c}{\(k\)}\\
+        & \(B(N, k)\) & \(1\) & \(2\) & \(3\) & \(4\) & \(5\) & \(6\)
+        & \(\dots\)\\
+        \midrule
+        & \(1\) & \textcolor{blue!75!black}{\(1\)} & \(2\) & \(2\) & \(2\)
+        & \(2\) & \(2\) & \(\dots\)\\
+        & \(2\) & \textcolor{blue!75!black}{\(1\)}
+        & \textcolor{orange!85!black}{\(\bm{3}\)} & \(4\) & \(4\) & \(4\) & \(4\)
+        & \(\dots\)\\
+        & \(3\) & \textcolor{blue!75!black}{\(1\)} & \textcolor{Purple}{\(4\)}
+        & \textcolor{orange!85!black}{\(\bm{7}\)} & \(8\) & \(8\) & \(8\)
+        & \(\dots\)\\
+        \(N\) & \(4\) & \textcolor{blue!75!black}{\(1\)} & &
+        & \textcolor{orange!85!black}{\(\bm{15}\)} & \(16\) & \(16\)
+        & \(\dots\)\\
+        & \(5\) & \textcolor{blue!75!black}{\(1\)} & & &
+        & \textcolor{orange!85!black}{\(\bm{31}\)} & \(32\) & \(\dots\)\\
+        & \(6\) & \textcolor{blue!75!black}{\(1\)} & & & &
+        & \textcolor{orange!85!black}{\(\bm{63}\)} & \(\dots\)\\
+        & \(\vdots\) & \(\vdots\) & & & & & & \(\ddots\)\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+(The diagonal's first entry \(B(1, 1) = 2^1 - 1 = 1\) belongs to both the
+blue column and the orange diagonal.) Everything on and above the diagonal is
+now known, and so is the first column; only the region \(N > k \ge 2\) below
+the diagonal remains, which is where \(N\) grows with \(k\) fixed --- the only
+part that matters for \autoref{q:B-poly}.
+
+\begin{moral}
+    More than halfway done! :-)
+\end{moral}
+
+\begin{exercise}[Fun Time]
+    For the 2D perceptrons, which of the following claims is true?
+    \begin{enumerate}[(1)]
+        \item minimum break point \(k = 2\);
+        \item \(m_{\mathcal{H}}(4) = 15\);
+        \item \(m_{\mathcal{H}}(N) < B(N, k)\) when \(N = k =\) minimum break
+            point;
+        \item \(m_{\mathcal{H}}(N) > B(N, k)\) when \(N = k =\) minimum break
+            point.
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (3). As discussed previously, the minimum break point for 2D perceptrons
+    is \(4\), with \(m_{\mathcal{H}}(4) = 14\) (\autoref{prop:fourteen}).
+    Also, note that \(B(4, 4) = 15\). So the bounding function \(B(N, k)\) can
+    be `loose' in bounding \(m_{\mathcal{H}}(N)\): lines miss two of the
+    sixteen dichotomies of four points (a Radon pair and its mirror), where
+    the break-point rule alone forces only one to be missing. (4) is
+    impossible, since \(B\) is by definition an upper bound.
+\end{proof}
+
+\section{Bounding Function: Inductive Cases}\label{sec:bound-inductive}
+
+\source{slides p.12--20}
+
+\subsection{Estimating \texorpdfstring{\(B(4, 3)\)}{B(4, 3)}}
+
+The first unknown entry below the diagonal is \(B(4, 3)\), marked `\(?\)':
+
+\begin{center}
+    \solidrules
+    \setlength{\extrarowheight}{0.2ex}
+    \begin{tabular}{@{}cc|ccccccc@{}}
+        \toprule
+        & & \multicolumn{7}{c}{\(k\)}\\
+        & \(B(N, k)\) & \(1\) & \(2\) & \(3\) & \(4\) & \(5\) & \(6\)
+        & \(\dots\)\\
+        \midrule
+        & \(1\) & \(1\) & \(2\) & \(2\) & \(2\) & \(2\) & \(2\) & \(\dots\)\\
+        & \(2\) & \(1\) & \(3\) & \(4\) & \(4\) & \(4\) & \(4\) & \(\dots\)\\
+        & \(3\) & \(1\) & \(4\) & \(7\) & \(8\) & \(8\) & \(8\) & \(\dots\)\\
+        \(N\) & \(4\) & \(1\) & & \textcolor{orange!85!black}{\(\bm{?}\)}
+        & \(15\) & \(16\) & \(16\) & \(\dots\)\\
+        & \(5\) & \(1\) & & & & \(31\) & \(32\) & \(\dots\)\\
+        & \(6\) & \(1\) & & & & & \(63\) & \(\dots\)\\
+        & \(\vdots\) & \(\vdots\) & & & & & & \(\ddots\)\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+The motivation for how to get at it: a table on four inputs is a table on three
+inputs with one more column, so \(B(4, 3)\) shall be related to \(B(3, ?)\) ---
+`adding' one point to a \(B(3, ?)\) table. The next step is to reduce
+\(B(4, 3)\) to \(B(3, ?)\).
+
+\subsection{`Achieving' Dichotomies of \texorpdfstring{\(B(4, 3)\)}{B(4, 3)}}
+
+First the answer, found the brute-force way: after checking all \(2^{2^4}\)
+sets of dichotomies on four inputs --- every subset of the \(16\) possible rows
+--- the winner is a set of \(11\), and \(B(4, 3) = 11\):
+
+\begin{center}
+    \solidrules
+    \setlength{\extrarowheight}{0.2ex}
+    \begin{tabular}[t]{@{}c|cccc@{}}
+        \toprule
+        & \(\bm{x}_1\) & \(\bm{x}_2\) & \(\bm{x}_3\) & \(\bm{x}_4\)\\
+        \midrule
+        01 & \dmark{o} & \dmark{o} & \dmark{o} & \dmark{o}\\
+        02 & \dmark{x} & \dmark{o} & \dmark{o} & \dmark{o}\\
+        03 & \dmark{o} & \dmark{x} & \dmark{o} & \dmark{o}\\
+        04 & \dmark{o} & \dmark{o} & \dmark{x} & \dmark{o}\\
+        05 & \dmark{o} & \dmark{o} & \dmark{o} & \dmark{x}\\
+        06 & \dmark{x} & \dmark{x} & \dmark{o} & \dmark{x}\\
+        \bottomrule
+    \end{tabular}
+    \quad
+    \begin{tabular}[t]{@{}c|cccc@{}}
+        \toprule
+        & \(\bm{x}_1\) & \(\bm{x}_2\) & \(\bm{x}_3\) & \(\bm{x}_4\)\\
+        \midrule
+        07 & \dmark{x} & \dmark{o} & \dmark{x} & \dmark{o}\\
+        08 & \dmark{x} & \dmark{o} & \dmark{o} & \dmark{x}\\
+        09 & \dmark{o} & \dmark{x} & \dmark{x} & \dmark{o}\\
+        10 & \dmark{o} & \dmark{x} & \dmark{o} & \dmark{x}\\
+        11 & \dmark{o} & \dmark{o} & \dmark{x} & \dmark{x}\\
+        \bottomrule
+    \end{tabular}
+    \qquad
+    \begin{tabular}[t]{@{}cc|cccccc@{}}
+        \toprule
+        & & \multicolumn{6}{c}{\(k\)}\\
+        & \(B(N, k)\) & \(1\) & \(2\) & \(3\) & \(4\) & \(5\) & \(6\)\\
+        \midrule
+        & \(1\) & \(1\) & \(2\) & \(2\) & \(2\) & \(2\) & \(2\)\\
+        & \(2\) & \(1\) & \(3\) & \(4\) & \(4\) & \(4\) & \(4\)\\
+        \rowcolor{singlerowalt}
+        & \(3\) & \(1\) & \(4\) & \(7\) & \(8\) & \(8\) & \(8\)\\
+        \(N\) & \(4\) & \(1\) & & \cellcolor{singlerowalt}%
+        \textcolor{orange!85!black}{\(\bm{11}\)} & \(15\) & \(16\) & \(16\)\\
+        & \(5\) & \(1\) & & & & \(31\) & \(32\)\\
+        & \(6\) & \(1\) & & & & & \(63\)\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+(I reran the search: no set of \(12\) avoids shattering three coordinates, and
+the table above passes.) The shaded cells are the hint for what comes next: the new entry \(11\) is to
+be explained by the row \(N = 3\) above it.
+
+\begin{question}\label{q:reduce}
+    How to reduce \(B(4, 3)\) to \(B(3, ?)\) cases?
+\end{question}
+
+\subsection{Reorganized Dichotomies of \texorpdfstring{\(B(4, 3)\)}{B(4, 3)}}
+
+Sort the \(11\) rows by their first three entries, and look at what
+\(\bm{x}_4\) does. Some prefixes \((\bm{x}_1, \bm{x}_2, \bm{x}_3)\) occur twice,
+once with \(\bm{x}_4 = \circ\) and once with \(\bm{x}_4 = \times\); the others
+occur once.
+
+\begin{center}
+    \solidrules
+    \setlength{\extrarowheight}{0.2ex}
+    \begin{tabular}{@{}c|ccc|c@{}}
+        \toprule
+        & \(\bm{x}_1\) & \(\bm{x}_2\) & \(\bm{x}_3\) & \(\bm{x}_4\)\\
+        \midrule
+        \rowcolor{pairrow} 01 & \dmark{o} & \dmark{o} & \dmark{o} & \dmark{o}\\
+        \rowcolor{pairrow} 05 & \dmark{o} & \dmark{o} & \dmark{o} & \dmark{x}\\
+        \rowcolor{pairrowalt} 02 & \dmark{x} & \dmark{o} & \dmark{o} & \dmark{o}\\
+        \rowcolor{pairrowalt} 08 & \dmark{x} & \dmark{o} & \dmark{o} & \dmark{x}\\
+        \rowcolor{pairrow} 03 & \dmark{o} & \dmark{x} & \dmark{o} & \dmark{o}\\
+        \rowcolor{pairrow} 10 & \dmark{o} & \dmark{x} & \dmark{o} & \dmark{x}\\
+        \rowcolor{pairrowalt} 04 & \dmark{o} & \dmark{o} & \dmark{x} & \dmark{o}\\
+        \rowcolor{pairrowalt} 11 & \dmark{o} & \dmark{o} & \dmark{x} & \dmark{x}\\
+        \rowcolor{singlerow} 06 & \dmark{x} & \dmark{x} & \dmark{o} & \dmark{x}\\
+        \rowcolor{singlerowalt} 07 & \dmark{x} & \dmark{o} & \dmark{x} & \dmark{o}\\
+        \rowcolor{singlerow} 09 & \dmark{o} & \dmark{x} & \dmark{x} & \dmark{o}\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+Orange: pair; purple: single. Write \(\alpha\) for the number of pairs and
+\(\beta\) for the number of singles. Here \(\alpha = 4\) and \(\beta = 3\), and
+\[
+    B(4, 3) = 11 = 2\alpha + \beta .
+\]
+The point of the split is that the two kinds of prefix face different
+restrictions, and each restriction is a smaller bounding function.
+
+\subsection{Estimating Part of \texorpdfstring{\(B(4, 3)\)}{B(4, 3)}}
+
+Delete \(\bm{x}_4\) and merge each pair into one row. What remains is a table
+on \((\bm{x}_1, \bm{x}_2, \bm{x}_3)\) with \(\alpha + \beta\) distinct rows:
+
+\begin{center}
+    \solidrules
+    \begin{tabular}[t]{@{}c|ccc@{}}
+        \toprule
+        & \(\bm{x}_1\) & \(\bm{x}_2\) & \(\bm{x}_3\)\\
+        \midrule
+        \rowcolor{pairrow} & \dmark{o} & \dmark{o} & \dmark{o}\\
+        \rowcolor{pairrowalt} & \dmark{x} & \dmark{o} & \dmark{o}\\
+        \rowcolor{pairrow} & \dmark{o} & \dmark{x} & \dmark{o}\\
+        \rowcolor{pairrowalt} \multirow{-4}{*}{\(\alpha\)}
+        & \dmark{o} & \dmark{o} & \dmark{x}\\
+        \rowcolor{singlerow} & \dmark{x} & \dmark{x} & \dmark{o}\\
+        \rowcolor{singlerowalt} & \dmark{x} & \dmark{o} & \dmark{x}\\
+        \rowcolor{singlerow} \multirow{-3}{*}{\(\beta\)}
+        & \dmark{o} & \dmark{x} & \dmark{x}\\
+        \bottomrule
+    \end{tabular}
+    \qquad\qquad
+    \begin{tabular}[t]{@{}c|ccc@{}}
+        \toprule
+        & \(\bm{x}_1\) & \(\bm{x}_2\) & \(\bm{x}_3\)\\
+        \midrule
+        \rowcolor{pairrow} & \dmark{o} & \dmark{o} & \dmark{o}\\
+        \rowcolor{pairrowalt} & \dmark{x} & \dmark{o} & \dmark{o}\\
+        \rowcolor{pairrow} & \dmark{o} & \dmark{x} & \dmark{o}\\
+        \rowcolor{pairrowalt} \multirow{-4}{*}{\(\alpha\)}
+        & \dmark{o} & \dmark{o} & \dmark{x}\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\emph{Left: all \(\alpha + \beta\) prefixes. Right: the \(\alpha\) paired ones
+alone.}
+
+\paragraph{The whole prefix table (1/2).}
+
+\begin{itemize}
+    \item \(\alpha + \beta\): dichotomies on \((\bm{x}_1, \bm{x}_2, \bm{x}_3)\).
+    \item \(B(4, 3)\) `no shatter' any \(3\) inputs \(\implies\) \(\alpha +
+        \beta\) `no shatter' any \(3\).
+\end{itemize}
+
+The implication holds because deleting a column cannot create a pattern: if
+the prefix table showed all \(8\) patterns on \(\bm{x}_1, \bm{x}_2, \bm{x}_3\),
+so would the original \(11\) rows. Hence
+
+\begin{moral}
+    \(\alpha + \beta \le B(3, 3)\).
+\end{moral}
+
+\paragraph{The paired prefixes (2/2).}
+
+\begin{itemize}
+    \item \(\alpha\): dichotomies on \((\bm{x}_1, \bm{x}_2, \bm{x}_3)\) with
+        \(\bm{x}_4\) \emph{paired}.
+    \item \(B(4, 3)\) `no shatter' any \(3\) inputs \(\implies\) \(\alpha\)
+        `no shatter' any \(2\).
+\end{itemize}
+
+The claim is about the \(\alpha\) rows alone, not the whole table: rows 01,
+02, 03, 06 already shatter \(\bm{x}_1, \bm{x}_2\), and a break point at \(3\)
+says nothing about \(2\) in general. What makes the \(\alpha\) rows special is
+that each comes with \emph{both} values of \(\bm{x}_4\). So if they shattered
+two inputs, say \(\bm{x}_1, \bm{x}_2\), the original table would show each of
+those four patterns with \(\bm{x}_4 = \circ\) and with \(\bm{x}_4 = \times\)
+--- all eight patterns on \(\bm{x}_1, \bm{x}_2, \bm{x}_4\), three inputs
+shattered. The pairing supplies the third input for free. Hence
+
+\begin{moral}
+    \(\alpha \le B(3, 2)\).
+\end{moral}
+
+\subsection{Putting It All Together}
+
+The two estimates add up, since \(2\alpha + \beta = (\alpha + \beta) +
+\alpha\):
+\begin{align*}
+    B(4, 3) &= 2\alpha + \beta\\
+    \alpha + \beta &\le B(3, 3)\\
+    \alpha &\le B(3, 2)\\
+    \implies B(4, 3) &\le B(3, 3) + B(3, 2) .
+\end{align*}
+Nothing in the argument used \(4\) or \(3\) specifically. For any \(N\) and
+\(k\), take a largest table for \(B(N, k)\) and split it on the last input:
+\begin{align*}
+    B(N, k) &= 2\alpha + \beta\\
+    \alpha + \beta &\le B(N - 1, k)\\
+    \alpha &\le B(N - 1, k - 1)\\
+    \implies B(N, k) &\le B(N - 1, k) + B(N - 1, k - 1) .
+\end{align*}
+
+\begin{lemma}[Inductive formula]\label{lem:B-recursion}
+    For \(N \ge 2\) and \(k \ge 2\),
+    \[
+        B(N, k) \le B(N - 1, k) + B(N - 1, k - 1) .
+    \]
+\end{lemma}
+
+\begin{proof}
+    Let \(S\) be a set of \(B(N, k)\) vectors in \(\left\{ \circ, \times
+    \right\}^N\) that shatters no \(k\) coordinates. Group its vectors by their
+    first \(N - 1\) entries: \(\alpha\) prefixes appear with both values of the
+    last entry and \(\beta\) with one, so \(\abs{S} = 2\alpha + \beta\). The
+    \(\alpha + \beta\) distinct prefixes shatter no \(k\) of the first \(N - 1\)
+    coordinates, or \(S\) would shatter them too; so \(\alpha + \beta \le
+    B(N - 1, k)\). The \(\alpha\) paired prefixes shatter no \(k - 1\) of those
+    coordinates, or \(S\) would shatter those \(k - 1\) together with the last
+    one; so \(\alpha \le B(N - 1, k - 1)\). Add the two.
+\end{proof}
+
+Running the formula down the table from the known entries fills the region
+below the diagonal with upper bounds (orange):
+
+\begin{center}
+    \solidrules
+    \begin{tabular}{@{}cc|cccccc@{}}
+        \toprule
+        & & \multicolumn{6}{c}{\(k\)}\\
+        & \(B(N, k)\) & \(1\) & \(2\) & \(3\) & \(4\) & \(5\) & \(6\)\\
+        \midrule
+        & \(1\) & \(1\) & \(2\) & \(2\) & \(2\) & \(2\) & \(2\)\\
+        & \(2\) & \(1\) & \(3\) & \(4\) & \(4\) & \(4\) & \(4\)\\
+        & \(3\) & \(1\) & \cellcolor{singlerowalt}\(4\)
+        & \cellcolor{singlerowalt}\(7\) & \(8\) & \(8\) & \(8\)\\
+        \(N\) & \(4\) & \(1\) & \textcolor{orange!85!black}{\(\le 5\)}
+        & \cellcolor{singlerowalt}\(11\) & \(15\) & \(16\) & \(16\)\\
+        & \(5\) & \(1\) & \textcolor{orange!85!black}{\(\le 6\)}
+        & \textcolor{orange!85!black}{\(\le 16\)}
+        & \textcolor{orange!85!black}{\(\le 26\)} & \(31\) & \(32\)\\
+        & \(6\) & \(1\) & \textcolor{orange!85!black}{\(\le 7\)}
+        & \textcolor{orange!85!black}{\(\le 22\)}
+        & \textcolor{orange!85!black}{\(\le 42\)}
+        & \textcolor{orange!85!black}{\(\le 57\)} & \(63\)\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+The shaded cells show the pattern: each entry is at most the one directly
+above plus the one above-left, as in Pascal's triangle. For instance,
+\(B(4, 3) = 11 = 7 + 4\), so the formula is exact there, and
+\(B(5, 3) \le 11 + 5 = 16\).
+
+\begin{moral}
+    We now have an upper bound of the bounding function.
+\end{moral}
+
+\subsection{Bounding Function: The Theorem}
+
+The Pascal-like recursion suggests binomial coefficients, and indeed:
+
+\begin{theorem}[Bounding function]\label{thm:bounding}
+    For all \(N \ge 1\) and \(k \ge 1\),
+    \[
+        B(N, k) \le \underbrace{\sum_{i=0}^{k-1} \binom{N}{i}}_{\text{highest
+        term } N^{k-1}} .
+    \]
+\end{theorem}
+
+\begin{proof}
+    Simple induction on \(N\), using the boundary cases and the inductive
+    formula. Write \(\Phi(N, k)\) for the right-hand side.
+
+    \emph{Boundary.} If \(k = 1\), \(B(N, 1) = 1 = \binom{N}{0}\) by
+    \autoref{prop:B-basic}. If \(N = 1\) and \(k \ge 2\), \(B(1, k) = 2 =
+    \binom{1}{0} + \binom{1}{1}\) (the sum stops at \(\binom{1}{1}\), all later
+    terms being \(0\)).
+
+    \emph{Induction.} For \(N \ge 2\), \(k \ge 2\), \autoref{lem:B-recursion}
+    and the hypothesis for \(N - 1\) give
+    \[
+        B(N, k) \le \sum_{i=0}^{k-1} \binom{N-1}{i}
+        + \sum_{i=0}^{k-2} \binom{N-1}{i}
+        = \binom{N-1}{0} + \sum_{i=1}^{k-1}
+        \left[ \binom{N-1}{i} + \binom{N-1}{i-1} \right]
+        = \sum_{i=0}^{k-1} \binom{N}{i} ,
+    \]
+    the last step by Pascal's rule and \(\binom{N-1}{0} = \binom{N}{0}\).
+\end{proof}
+
+\begin{itemize}
+    \item The proof is a simple induction using the boundary and the inductive
+        formula.
+    \item For fixed \(k\), \(B(N, k)\) is upper bounded by \(\mathrm{poly}(N)\),
+        the leading term being \(\binom{N}{k-1} \approx N^{k-1} / (k-1)!\)
+        \(\implies\) \(m_{\mathcal{H}}(N)\) is \(\mathrm{poly}(N)\) if a break
+        point exists.
+\end{itemize}
+
+That settles \autoref{q:B-poly} and, through \(m_{\mathcal{H}}(N) \le B(N,
+k)\), proves \autoref{conj:break}.
+
+\begin{remark}
+    `\(\le\)' can be `\(=\)' actually --- go play and prove it if you are a
+    math lover! :-) (One way: exhibit a table of the right size, e.g.\ all
+    vectors with fewer than \(k\) entries \(\times\). It has \(\sum_{i<k}
+    \binom{N}{i}\) rows and cannot shatter \(k\) coordinates, since it never
+    shows \(\times\) on all of them at once.) The inequality is also known as
+    the Sauer--Shelah lemma.
+\end{remark}
+
+\subsection{The Three Break Points}
+
+Returning to the hypothesis sets with a break point, \autoref{thm:bounding}
+bounds each growth function from its break point alone (in orange, the bound):
+
+\begin{center}
+    \solidrules
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tabular}{@{}l|c|l|l@{}}
+            \toprule
+            \(\mathcal{H}\) & & \(m_{\mathcal{H}}(N)\) & break point\\
+            \midrule
+            positive rays & \dmark{o}\,\dmark{x}
+            & \(N + 1 \;\textcolor{orange!85!black}{\le N + 1}\)
+            & \(m_{\mathcal{H}}(2) = 3 < 2^2\): at \(2\)\\
+            positive intervals & \dmark{o}\,\dmark{x}\,\dmark{o}
+            & \(\tfrac{1}{2} N^2 + \tfrac{1}{2} N + 1 \;
+            \textcolor{orange!85!black}{\le \tfrac{1}{2} N^2 + \tfrac{1}{2} N
+            + 1}\)
+            & \(m_{\mathcal{H}}(3) = 7 < 2^3\): at \(3\)\\
+            2D perceptrons
+            & \tikz[baseline=(current bounding box.center), x=0.3cm, y=0.3cm]{%
+                \dmarkat{1}{2}{o}\dmarkat{0}{1}{x}\dmarkat{2}{1}{x}%
+                \dmarkat{1}{0}{o}}
+            & \(\textcolor{orange!85!black}{m_{\mathcal{H}}(N) = ? \le
+            \tfrac{1}{6} N^3 + \tfrac{5}{6} N + 1}\)
+            & \(m_{\mathcal{H}}(4) = 14 < 2^4\): at \(4\)\\
+            \bottomrule
+        \end{tabular}
+    \end{adjustbox}
+\end{center}
+
+For rays and intervals the bound is exact: \(\binom{N}{0} + \binom{N}{1} = N +
+1\), and \(\binom{N}{0} + \binom{N}{1} + \binom{N}{2} = \frac{1}{2} N^2 +
+\frac{1}{2} N + 1\). For 2D perceptrons we still do not know
+\(m_{\mathcal{H}}(N)\), but with \(k = 4\)
+\[
+    \sum_{i=0}^{3} \binom{N}{i}
+    = 1 + N + \frac{N(N-1)}{2} + \frac{N(N-1)(N-2)}{6}
+    = \frac{1}{6} N^3 + \frac{5}{6} N + 1 ,
+\]
+a polynomial, found without computing a single dichotomy beyond \(N = 4\).
+
+\begin{moral}
+    We can bound \(m_{\mathcal{H}}(N)\) by only one break point.
+\end{moral}
+
+\begin{exercise}[Fun Time]
+    For 1D perceptrons (positive and negative rays), we know that
+    \(m_{\mathcal{H}}(N) = 2N\). Let \(k\) be the minimum break point. Which of
+    the following is \emph{not} true?
+    \begin{enumerate}[(1)]
+        \item \(k = 3\);
+        \item for some integers \(N > 0\), \(m_{\mathcal{H}}(N) =
+            \sum_{i=0}^{k-1} \binom{N}{i}\);
+        \item for all integers \(N > 0\), \(m_{\mathcal{H}}(N) =
+            \sum_{i=0}^{k-1} \binom{N}{i}\);
+        \item for all integers \(N > 2\), \(m_{\mathcal{H}}(N) <
+            \sum_{i=0}^{k-1} \binom{N}{i}\).
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (3). The proof is generally trivial by listing the definitions. (1) is the
+    last Fun Time of \autoref{sec:break-point}. With \(k = 3\) the sum is
+    \(1 + N + \frac{N(N-1)}{2}\), which equals \(2\), \(4\), \(7\) at
+    \(N = 1, 2, 3\): so for (2), \(N = 1\) or \(2\) gives the equality, and
+    \(N = 3\) (\(6 \ne 7\)) breaks (3). One thing to notice is (4): the
+    difference \(1 + N + \frac{N(N-1)}{2} - 2N = \frac{(N-1)(N-2)}{2}\) is
+    positive for \(N > 2\), so the upper bound can be `loose'.
+\end{proof}
+
+\section{A Pictorial Proof}\label{sec:pictorial}
+
+\source{slides p.21--26}
+
+The growth function is now known to be polynomial whenever there is a break
+point. What remains is the `\(?\)' of \autoref{eq:wish}: may
+\(m_{\mathcal{H}}\) take the place of \(M\) in the bound at all?
+
+\subsection{BAD Bound for General \texorpdfstring{\(\mathcal{H}\)}{H}}
+
+Because \(\mathcal{A}\) may return any hypothesis, the event to control is that
+\emph{some} \(h\) is BAD. What we want is
+\[
+    \mathbb{P}\left[ \exists h \in \mathcal{H} \text{ s.t. }
+    \abs{\Ein(h) - \Eout(h)} > \epsilon \right]
+    \le 2 \cdot m_{\mathcal{H}}(N) \cdot \exp \left( -2 \epsilon^2 N \right) .
+\]
+What is actually true, when \(N\) is large enough, is
+\[
+    \mathbb{P}\left[ \exists h \in \mathcal{H} \text{ s.t. }
+    \abs{\Ein(h) - \Eout(h)} > \epsilon \right]
+    \le 2 \cdot 2 m_{\mathcal{H}}(2N) \cdot
+    \exp \left( -2 \cdot \frac{1}{16} \epsilon^2 N \right) .
+\]
+The wish survives with worse constants: \(m_{\mathcal{H}}(2N)\) in place of
+\(m_{\mathcal{H}}(N)\) (still polynomial), an extra factor \(2\), and
+\(\epsilon^2 / 16\) in the exponent (still exponential decay). Next: a sketch
+of the proof, in three steps, each of which removes one obstacle and costs one
+of those constants.
+
+\subsection{Step 1: Replace \texorpdfstring{\(\Eout\)}{Eout} by
+\texorpdfstring{\(\Ein'\)}{Ein'}}
+
+\[
+    \frac{1}{2} \mathbb{P}\left[ \exists h \in \mathcal{H} \text{ s.t. }
+    \abs{\Ein(h) - \Eout(h)} > \epsilon \right]
+    \le \mathbb{P}\left[ \exists h \in \mathcal{H} \text{ s.t. }
+    \abs{\Ein(h) - \textcolor{red!80!black}{\Ein'(h)}} > \frac{\epsilon}{2}
+    \right]
+\]
+
+\begin{itemize}
+    \item \(\Ein(h)\) takes finitely many values across \(\mathcal{H}\) (one
+        per dichotomy), while \(\Eout(h)\) takes infinitely many --- so replace
+        the evil \(\Eout\) first.
+    \item How? Sample a \vocab{verification set} \(\mathcal{D}'\) of size \(N\)
+        to calculate \(\Ein'\), the error on \(\mathcal{D}'\).
+    \item BAD \(h\) of \(\Ein - \Eout\) \(\overset{\text{probably}}{\implies}\)
+        BAD \(h\) of \(\Ein - \Ein'\).
+\end{itemize}
+
+\(\mathcal{D}'\) is never actually collected; it exists only inside the proof.
+
+\begin{center}
+    \begin{tikzpicture}[x=1.15cm, y=1.75cm]
+        \fill[green!12] (0,0) -- plot[domain=0:2, samples=60]
+            (\x, {exp(-(\x-2)^2/0.5)}) -- (2,0) -- cycle;
+        \fill[red!15] (3.45,0) -- plot[domain=3.45:4.4, samples=30]
+            (\x, {exp(-(\x-2)^2/0.5)}) -- (4.4,0) -- cycle;
+        \draw[black!70] (0,0) -- (4.4,0);
+        \draw[black!70] (0,0) -- (0,1.12);
+        \draw[thick] plot[domain=0:4.4, samples=120]
+            (\x, {exp(-(\x-2)^2/0.5)});
+        \draw[black!70] (2,0) -- (2,1.0);
+        \node[below, font=\small] at (2,0) {\(\Eout\)};
+        \draw[-{Stealth[length=2mm]}, thick] (2,0.07) -- (1.15,0.07);
+        \node[font=\small, text=green!50!black] at (1.45,0.19) {\(\Ein'\)};
+        \node[font=\small, text=red!80!black] at (4.12,0.19) {\(\Ein\)};
+        \node[rotate=90, font=\scriptsize, align=center] at (-0.32,0.56)
+            {probability distribution\\of \(\Ein, \Ein'\)};
+    \end{tikzpicture}
+\end{center}
+
+The picture is for one fixed \(h\). Both \(\Ein\) and \(\Ein'\) are averages of
+\(N\) independent errors, so they share the same bell-shaped distribution
+centred on \(\Eout\). Suppose \(\mathcal{D}\) is BAD, with \(\Ein\) out in the
+red tail, more than \(\epsilon\) above \(\Eout\). The ghost sample is drawn
+independently, so \(\Ein'\) lands in the green half, at or below \(\Eout\),
+with probability about \(\frac{1}{2}\); and then \(\Ein\) and \(\Ein'\) are
+more than \(\epsilon\) apart. So a BAD \(\mathcal{D}\) produces a large gap
+\(\abs{\Ein - \Ein'}\) at least half the time, which is the \(\frac{1}{2}\) on
+the left.
+
+\begin{remark}
+    The rigorous version uses a margin instead of symmetry. On the event that
+    \(\abs{\Ein(h) - \Eout(h)} > \epsilon\) for some \(h\), fix one such \(h\)
+    (it depends only on \(\mathcal{D}\)). By Hoeffding on \(\mathcal{D}'\),
+    \(\abs{\Ein'(h) - \Eout(h)} \le \frac{\epsilon}{2}\) with probability at
+    least \(1 - 2\exp(-\frac{1}{2} \epsilon^2 N)\), which is at least
+    \(\frac{1}{2}\) once \(N\) is large enough --- the `\(N\) large enough' in
+    the statement. When it happens, the triangle inequality gives
+    \(\abs{\Ein(h) - \Ein'(h)} > \epsilon - \frac{\epsilon}{2} =
+    \frac{\epsilon}{2}\). The halved \(\epsilon\) is the price of this margin.
+\end{remark}
+
+\begin{moral}
+    The evil \(\Eout\) is removed by verification with `ghost data'.
+\end{moral}
+
+\subsection{Step 2: Decompose \texorpdfstring{\(\mathcal{H}\)}{H} by Kind}
+
+\begin{align*}
+    \text{BAD}
+    &\le 2 \mathbb{P}\left[ \exists h \in \mathcal{H} \text{ s.t. }
+    \abs{\Ein(h) - \Ein'(h)} > \frac{\epsilon}{2} \right]\\
+    &\le 2 \textcolor{blue!75!black}{m_{\mathcal{H}}(2N)}
+    \mathbb{P}\left[ \textcolor{blue!75!black}{\text{fixed } h} \text{ s.t. }
+    \abs{\Ein(h) - \Ein'(h)} > \frac{\epsilon}{2} \right]
+\end{align*}
+
+\begin{itemize}
+    \item \(\Ein\) is computed with \(\mathcal{D}\) and \(\Ein'\) with
+        \(\mathcal{D}'\) --- and now \(m_{\mathcal{H}}\) comes to play.
+    \item How? Both errors depend on \(h\) only through its values on the
+        \(2N\) points of \(\mathcal{D} \cup \mathcal{D}'\), so the infinite
+        \(\mathcal{H}\) becomes \(\abs{\mathcal{H}(\bm{x}_1, \dots , \bm{x}_N,
+        \bm{x}_1', \dots , \bm{x}_N')}\) kinds, at most
+        \(m_{\mathcal{H}}(2N)\).
+    \item Union bound on the \(m_{\mathcal{H}}(2N)\) kinds.
+\end{itemize}
+
+The first line is Step 1 with both sides doubled; `BAD' abbreviates the
+left-hand probability we started from. The price of this step is
+\(m_{\mathcal{H}}(2N)\) rather than \(m_{\mathcal{H}}(N)\): the dichotomies
+must be counted on the ghost points too.
+
+\begin{center}
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tikzpicture}[x=1.4cm, y=1.4cm]
+            % (a) one hypothesis: one small BAD region
+            \draw[plotbox] (0,0) rectangle (1.8,2.8);
+            \badblob[20]{0.90}{2.10}{red}
+            \node[font=\scriptsize, align=center] at (0.90,1.35)
+                {space of\\data sets};
+            \node[circle, fill=black, inner sep=0.9pt] (d) at (0.55,0.50) {};
+            \draw[-{Stealth[length=1.6mm]}] (-0.20,0.08) -- (d);
+            \node[font=\scriptsize] at (-0.28,0.02) {\(\mathcal{D}\)};
+            \node[font=\scriptsize, align=center, below] at (0.90,-0.08) {(a) Hoeffding\\inequality};
+            % (b) union bound: every BAD region counted as if disjoint
+            \begin{scope}[shift={(2.3,0)}]
+                \draw[plotbox] (0,0) rectangle (1.8,2.8);
+                \badblob[333]{0.31}{0.27}{red}
+                \badblob[48]{0.84}{0.33}{cyan!80!black}
+                \badblob[259]{1.45}{0.26}{blue!80!black}
+                \badblob[214]{0.29}{0.63}{ForestGreen}
+                \badblob[217]{0.84}{0.63}{Brown}
+                \badblob[114]{1.41}{0.68}{pink}
+                \badblob[31]{0.35}{1.05}{magenta}
+                \badblob[113]{0.91}{1.03}{Goldenrod}
+                \badblob[148]{1.41}{1.08}{violet}
+                \badblob[292]{0.32}{1.41}{orange}
+                \badblob[92]{0.87}{1.44}{teal}
+                \badblob[96]{1.41}{1.42}{Purple}
+                \badblob[32]{0.31}{1.78}{LimeGreen}
+                \badblob[254]{0.91}{1.79}{RoyalBlue}
+                \badblob[160]{1.50}{1.77}{red}
+                \badblob[185]{0.33}{2.19}{cyan!80!black}
+                \badblob[357]{0.87}{2.18}{blue!80!black}
+                \badblob[153]{1.51}{2.11}{ForestGreen}
+                \badblob[229]{0.33}{2.56}{Brown}
+                \badblob[60]{0.87}{2.57}{pink}
+                \badblob[175]{1.47}{2.49}{magenta}
+                \node[font=\scriptsize, align=center, below] at (0.90,-0.08) {(b) union\\bound};
+            \end{scope}
+            % (c) now: the BAD regions of one kind overlap
+            \begin{scope}[shift={(4.6,0)}]
+                \draw[plotbox] (0,0) rectangle (1.8,2.8);
+                \badblob[20]{0.99}{2.14}{red}
+                \badblob[285]{0.95}{2.04}{cyan!80!black}
+                \badblob[160]{0.64}{1.96}{blue!80!black}
+                \badblob[254]{0.83}{2.13}{ForestGreen}
+                \badblob[47]{0.76}{2.00}{Brown}
+                \badblob[340]{1.05}{2.01}{pink}
+                \badblob[158]{1.11}{2.11}{magenta}
+                \badblob[228]{0.63}{1.80}{Goldenrod}
+                \badblob[342]{0.87}{2.15}{violet}
+                \badblob[181]{0.71}{2.24}{orange}
+                \badblob[30]{0.93}{2.09}{teal}
+                \badblob[126]{0.92}{2.13}{Purple}
+                \badblob[254]{0.65}{2.18}{LimeGreen}
+                \badblob[281]{1.03}{2.10}{RoyalBlue}
+                \node[font=\scriptsize, align=center, below] at (0.90,-0.08) {(c) now\\\strut};
+            \end{scope}
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{center}
+
+Each box is the space of all possible data sets, and each coloured scribble the
+BAD region of one hypothesis --- the data sets on which it is fooled. (a)~Hoeffding
+says one hypothesis's region is small, so a random \(\mathcal{D}\) usually
+misses it. (b)~The union bound adds up all the regions as if they were
+disjoint, so with many hypotheses they seem to fill the whole space. (c)~In
+truth, hypotheses of the same kind are BAD on nearly the same data sets, and
+their regions pile on top of one another; counting kinds instead of hypotheses
+counts each pile once.
+
+\begin{moral}
+    Use \(m_{\mathcal{H}}(2N)\) to calculate the BAD-overlap properly.
+\end{moral}
+
+\subsection{Step 3: Use Hoeffding without Replacement}
+
+\begin{align*}
+    \text{BAD}
+    &\le 2 m_{\mathcal{H}}(2N) \mathbb{P}\left[ \text{fixed } h \text{ s.t. }
+    \abs{\Ein(h) - \Ein'(h)} > \frac{\epsilon}{2} \right]\\
+    &\le 2 m_{\mathcal{H}}(2N) \cdot 2 \exp \left( -2
+    \left( \frac{\epsilon}{4} \right)^2 N \right)
+\end{align*}
+
+\begin{itemize}
+    \item Consider a bin of the \(2N\) examples; choose \(N\) of them for
+        \(\Ein\), and leave the others for \(\Ein'\). Since the average of the
+        two halves is the bin's own error rate,
+        \[
+            \abs{\Ein - \Ein'} > \frac{\epsilon}{2}
+            \iff
+            \abs{\Ein - \frac{\Ein + \Ein'}{2}} > \frac{\epsilon}{4} .
+        \]
+    \item So? It is just a `smaller bin', a `smaller \(\epsilon\)', and
+        Hoeffding without replacement.
+\end{itemize}
+
+\begin{center}
+    \begin{tikzpicture}
+        \begin{scope}[scale=1.9]
+            \foreach \i in {0,...,9}{
+                \pgfmathsetmacro{\xx}{-0.324+0.072*\i}
+                \ifodd\i
+                    \node[morange=3.8pt] at (\xx,0.050) {};
+                    \node[mgreen=3.8pt] at (\xx+0.036,0.118) {};
+                \else
+                    \node[mgreen=3.8pt] at (\xx,0.050) {};
+                    \node[morange=3.8pt] at (\xx+0.036,0.118) {};
+                \fi}
+        \end{scope}
+        \draw[binwall, scale=1.9] \binpath;
+        \node[font=\small\bfseries, below] at (0,-0.10) {small bin};
+        \draw[scoop] (0.05,1.95) .. controls (0.85,2.75) and (2.20,2.45) ..
+            (2.55,1.10);
+        \node[font=\small\bfseries] at (1.40,2.70) {sample for \(\Ein\)};
+        \foreach \i/\c in {0/mgreen,1/mgreen,2/morange,3/mgreen,4/morange,
+            5/mgreen,6/mgreen,7/morange,8/morange,9/mgreen}{
+            \node[\c=4.5pt] at (2.05+0.17*\i,0.85) {};}
+    \end{tikzpicture}
+\end{center}
+
+Everything is now conditioned on the \(2N\) points in the bin, and \(h\) is
+fixed. Which \(N\) of them are \(\mathcal{D}\) and which are \(\mathcal{D}'\)
+is a uniformly random split, so \(\Ein\) is the orange fraction of a sample of
+\(N\) drawn \emph{without} replacement from a bin whose orange fraction is
+\(\frac{\Ein + \Ein'}{2}\). Hoeffding's inequality holds for sampling without
+replacement as well (Hoeffding proved it in that form), with the tolerance now
+\(\frac{\epsilon}{4}\): that gives \(2\exp(-2(\epsilon/4)^2 N)\).
+
+\begin{moral}
+    Use Hoeffding after zooming to a fixed \(h\).
+\end{moral}
+
+\subsection{That's All!}
+
+Collecting the constants, \(2 m_{\mathcal{H}}(2N) \cdot 2 \exp(-2
+\frac{\epsilon^2}{16} N) = 4 m_{\mathcal{H}}(2N) \exp(-\frac{1}{8} \epsilon^2
+N)\).
+
+\begin{theorem}[Vapnik--Chervonenkis (VC) bound]\label{thm:vc}
+    For \(N\) large enough,
+    \[
+        \mathbb{P}\left[ \exists h \in \mathcal{H} \text{ s.t. }
+        \abs{\Ein(h) - \Eout(h)} > \epsilon \right]
+        \le 4 m_{\mathcal{H}}(2N) \exp \left( -\frac{1}{8} \epsilon^2 N
+        \right) .
+    \]
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+    \leavevmode
+    \begin{itemize}
+        \item replace \(\Eout\) by \(\Ein'\) (Step 1);
+        \item decompose \(\mathcal{H}\) by kind (Step 2);
+        \item use Hoeffding without replacement (Step 3). \qedhere
+    \end{itemize}
+\end{proof}
+
+Since the event covers every \(h\), it covers the \(g\) returned by any
+\(\mathcal{A}\), exactly as \autoref{thm:finite-hoeffding} did for finite
+\(\mathcal{H}\). Applied to 2D perceptrons:
+
+\begin{itemize}
+    \item break point? \(4\);
+    \item \(m_{\mathcal{H}}(N)\)? \(O(N^3)\), by \autoref{thm:bounding}, so
+        \(m_{\mathcal{H}}(2N)\) is \(O(N^3)\) as well, and the bound goes to
+        \(0\) as \(N\) grows.
+\end{itemize}
+
+\begin{moral}
+    Learning with 2D perceptrons is feasible! :-)
+\end{moral}
+
+\begin{exercise}[Fun Time]
+    For positive rays, \(m_{\mathcal{H}}(N) = N + 1\). Plug it into the VC
+    bound for \(\epsilon = 0.1\) and \(N = 10000\). What is the VC bound of
+    BAD events?
+    \[
+        \mathbb{P}\left[ \exists h \in \mathcal{H} \text{ s.t. }
+        \abs{\Ein(h) - \Eout(h)} > \epsilon \right]
+        \le 4 m_{\mathcal{H}}(2N) \exp \left( -\frac{1}{8} \epsilon^2 N
+        \right)
+    \]
+    \begin{enumerate*}[(1)]
+        \item \(2.77 \times 10^{-87}\); \item \(5.54 \times 10^{-83}\);
+        \item \(2.98 \times 10^{-1}\); \item \(2.29 \times 10^{2}\).
+    \end{enumerate*}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (3). Simple calculation:
+    \[
+        4 \cdot (2 \cdot 10000 + 1) \cdot \exp \left( -\frac{1}{8} (0.1)^2
+        \cdot 10000 \right)
+        = 80004 \, e^{-12.5} \approx 0.298 .
+    \]
+    Note that the BAD probability bound is not very small even with \(10000\)
+    examples --- the constants lost in the three steps are expensive.
+\end{proof}
+
+\hrulebar
+
+\subsection*{Summary}
+
+\begin{description}
+    \item[Restriction of Break Point] A break point `breaks' consequent points.
+    \item[Bounding Function: Basic Cases] \(B(N, k)\) bounds
+        \(m_{\mathcal{H}}(N)\) with break point \(k\).
+    \item[Bounding Function: Inductive Cases] \(B(N, k)\) is
+        \(\mathrm{poly}(N)\).
+    \item[A Pictorial Proof] \(m_{\mathcal{H}}(N)\) can replace \(M\) with a
+        few changes.
+\end{description}
+
+The chapter closed both gaps left by the last one. A break point \(k\) caps
+\(m_{\mathcal{H}}(N)\) by \(\sum_{i<k} \binom{N}{i} = O(N^{k-1})\), and the VC
+bound puts \(m_{\mathcal{H}}(2N)\) where \(M\) used to be; so any
+\(\mathcal{H}\) with a break point generalises, however infinite it is. Next:
+how to `use' the break point --- the minimum break point turns out to be the
+one number that summarises an \(\mathcal{H}\)'s capacity.

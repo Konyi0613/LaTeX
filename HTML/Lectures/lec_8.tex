@@ -1,0 +1,1100 @@
+\chapter{Noise and Error}
+\lecture{8}{30 Sep.}{}
+
+\begin{prev}
+    \autoref{sec:vc-interpret} ended with the VC message: learning happens if
+    \(\dvc\) is finite, \(N\) is large, and \(\Ein\) is low. The whole
+    derivation, however, assumed a deterministic target \(f\), labels
+    \(y_n = f(\bm{x}_n)\) with no noise, and binary classification measured by
+    the fraction of mistakes.
+\end{prev}
+
+This chapter relaxes the first two assumptions and questions the third. Noise
+turns the target function into a target \emph{distribution}, and the VC bound
+survives the change. Once the target is a distribution, `the best prediction'
+depends on how errors are measured, so the error measure becomes a component of
+the learning problem in its own right --- chosen by the application, and then
+often replaced by something the algorithm can actually optimise. The last
+section works one such case, weighted classification, end to end.
+
+\section{Noise and Probabilistic Target}\label{sec:noise}
+
+\source{slides p.2--7}
+
+\subsection{Recap: The Learning Flow}
+
+\begin{center}
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tikzpicture}
+            \node[mlbox, minimum width=4.4cm] (f) at (0,2.5)
+                {unknown target function\\
+                 \(f\colon \mathcal{X} \to \mathcal{Y}\)\\
+                 \colorbox{WildStrawberry!20}{\(+\) noise}\\[2pt]
+                 {\scriptsize (ideal credit approval formula)}};
+            \node[mlbox, minimum width=2.6cm] (P) at (5.4,2.5)
+                {unknown\\\(P\) on \(\mathcal{X}\)};
+            \node[mlbox, minimum width=5.2cm] (D) at (0,0)
+                {training examples\\
+                 \(\mathcal{D}\colon (\bm{x}_1, y_1), \dots , (\bm{x}_N, y_N)\)\\[2pt]
+                 {\scriptsize (historical records in bank)}};
+            \node[mlop, minimum width=2.4cm] (A) at (5.4,0)
+                {learning\\algorithm\\\(\mathcal{A}\)};
+            \node[mlbox, minimum width=4.4cm] (g) at (10.2,0)
+                {final hypothesis\\\(g \approx f\)\\[2pt]
+                 {\scriptsize (`learned' formula to be used)}};
+            \node[mlbox, minimum width=3.4cm] (H) at (5.4,-2.4)
+                {hypothesis set\\\(\mathcal{H}\)\\[2pt]
+                 {\scriptsize (set of candidate formulas)}};
+            \draw[mlarrow] (f) -- (D);
+            \draw[mlarrow, dashed] (P) -- (D)
+                node[pos=0.58, font=\scriptsize, fill=white, inner sep=1.5pt]
+                {\(\bm{x}_1, \bm{x}_2, \dots , \bm{x}_N\)};
+            \draw[mlarrow, dashed] (P.east) -| (g.north)
+                node[pos=0.25, above, font=\scriptsize] {\(\bm{x}\)};
+            \draw[mlarrow] (D) -- (A);
+            \draw[mlarrow] (A) -- (g);
+            \draw[mlarrow] (H) -- (A);
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{center}
+
+This is the flow of \autoref{sec:bin-learning}, with one addition in the target
+box.
+
+\begin{question}
+    What if there is noise?
+\end{question}
+
+\subsection{Noise}
+
+\begin{center}
+    \begin{minipage}[c]{0.3\textwidth}
+        \centering
+        \begin{tikzpicture}[scale=0.7]
+            \fill[poshalf] (0,3.2) -- (3.2,0) -- (3.2,3.2) -- cycle;
+            \fill[neghalf] (0,3.2) -- (3.2,0) -- (0,0) -- cycle;
+            \draw[sepline] (0,3.2) -- (3.2,0);
+            \draw[black!45] (0,0) rectangle (3.2,3.2);
+            \foreach \p in {(1.5,2.4), (2.2,2.8), (2.6,1.6), (1.9,1.9),
+                (2.9,2.4), (0.4,3.0)}{\node[dpos] at \p {};}
+            \foreach \p in {(0.5,0.9), (1.2,1.0), (0.8,1.9), (1.8,0.6),
+                (0.4,2.0), (2.7,0.3)}{\node[dneg] at \p {\(\times\)};}
+            \node[dneg] at (2.4,2.1) {\(\times\)};
+            \node[dneg] at (1.3,2.9) {\(\times\)};
+            \node[dpos] at (0.9,0.7) {};
+            \node[dpos] at (0.3,0.25) {};
+        \end{tikzpicture}
+    \end{minipage}%
+    \begin{minipage}[c]{0.62\textwidth}
+        Noise was briefly introduced before the \textbf{pocket} algorithm
+        (\autoref{sec:nonsep}), as the reason a data set might not be linearly
+        separable even when the underlying rule is a line: a few examples sit
+        on the wrong side of the best line.
+    \end{minipage}
+\end{center}
+
+But there is more! Take the credit applicant again:
+
+\begin{center}
+    \begin{minipage}[c]{0.4\textwidth}
+        \centering
+        \small
+        \begin{tabular}{@{}|c|c|@{}}
+            \hline
+            age & 23 years\\
+            gender & female\\
+            annual salary & NTD 1,000,000\\
+            year in residence & 1 year\\
+            year in job & 0.5 year\\
+            current debt & 200,000\\
+            \hline
+        \end{tabular}\\[3pt]
+        credit? \(\left\{ \text{no}(-1), \text{yes}(+1) \right\}\)
+    \end{minipage}%
+    \begin{minipage}[c]{0.55\textwidth}
+        \begin{itemize}
+            \item \textbf{noise in \(y\)}: good customer, `mislabeled' as bad?
+            \item \textbf{noise in \(y\)}: same customers, different labels?
+            \item \textbf{noise in \(\bm{x}\)}: inaccurate customer
+                information?
+        \end{itemize}
+    \end{minipage}
+\end{center}
+
+The first is a clerical error on the label; the second is two applicants with
+identical records but different credit histories, which no function of
+\(\bm{x}\) can fit; the third corrupts the input rather than the label. In
+every case the pair \((\bm{x}, y)\) is no longer tied by a function \(y =
+f(\bm{x})\).
+
+\begin{question}
+    Does the VC bound work under noise?
+\end{question}
+
+\subsection{Probabilistic Marbles}
+
+One key of the VC bound is the marbles of \autoref{sec:hoeffding}:
+
+\begin{center}
+    \begin{tikzpicture}
+        \begin{scope}
+            \clip[scale=1.3] \binpath -- cycle;
+            \foreach \r in {0,...,13}{
+                \foreach \c in {0,...,11}{
+                    \pgfmathtruncatemacro{\m}{mod(\r*7 + \c*5 + \r*\c, 4)}
+                    \pgfmathsetmacro{\xx}{-0.62 + 0.113*\c + 0.056*mod(\r,2)}
+                    \pgfmathsetmacro{\yy}{0.05 + 0.093*\r}
+                    \ifnum\m=0
+                        \node[morange=3.2pt] at (\xx,\yy) {};
+                    \else
+                        \node[mgreen=3.2pt] at (\xx,\yy) {};
+                    \fi}}
+        \end{scope}
+        \draw[binwall, scale=1.3] \binpath;
+        \node[font=\scriptsize\bfseries, below] at (0,-0.02) {bin};
+        \draw[scoop] (0.1,1.35) .. controls (0.8,2.0) and (1.8,1.8) ..
+            (2.0,0.85);
+        \node[font=\scriptsize\bfseries] at (1.0,2.0) {sample};
+        \foreach \i/\c in {0/mgreen,1/mgreen,2/morange,3/mgreen,4/mgreen,
+            5/mgreen,6/morange,7/mgreen,8/mgreen,9/morange}{
+            \node[\c=3.4pt] at (1.55+0.14*\i,0.65) {};}
+    \end{tikzpicture}
+\end{center}
+
+Noise changes how a marble gets its colour, and nothing else:
+
+\begin{center}
+    \solidrules
+    \begin{tabular}{@{}l|l@{}}
+        \toprule
+        `deterministic' marbles & `probabilistic' (noisy) marbles\\
+        \midrule
+        marble \(\bm{x} \sim P(\bm{x})\) & marble \(\bm{x} \sim P(\bm{x})\)\\
+        deterministic colour \(\llbracket f(\bm{x}) \neq h(\bm{x})
+        \rrbracket\)
+        & probabilistic colour \(\llbracket y \neq h(\bm{x}) \rrbracket\)
+        with \(y \sim P(y \mid \bm{x})\)\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+A noisy marble is one whose colour is decided afresh, by a coin flip, each time
+it is drawn. Hoeffding's inequality never cared how the colour was produced:
+all it needs is that the draws are i.i.d.\ and each is orange with the same
+probability.
+
+\begin{moral}
+    Same nature: can estimate \(\mathbb{P}[\text{orange}]\) if
+    \(\overset{\text{i.i.d.}}{\sim}\).
+\end{moral}
+
+So the whole chain of the last three chapters goes through if the examples are
+drawn as
+\[
+    \text{VC holds for }
+    \underbrace{\bm{x} \overset{\text{i.i.d.}}{\sim} P(\bm{x}), \;
+    y \overset{\text{i.i.d.}}{\sim} P(y \mid \bm{x})}_{(\bm{x}, y)
+    \overset{\text{i.i.d.}}{\sim} P(\bm{x}, y)} .
+\]
+The out-of-sample error of \(h\) now reads \(\Eout(h) = \mathbb{P}_{(\bm{x},
+y)}\left[ h(\bm{x}) \neq y \right]\), the orange fraction of the noisy bin.
+
+\subsection{Target Distribution \texorpdfstring{\(P(y \mid \bm{x})\)}{P(y|x)}}
+
+\begin{definition}[Target distribution]\label{def:target-dist}
+    The \vocab{target distribution} \(P(y \mid \bm{x})\) characterizes the
+    behaviour of the `mini-target' on one \(\bm{x}\).
+\end{definition}
+
+\begin{itemize}
+    \item It can be viewed as `ideal mini-target' \(+\) noise, e.g.
+    \begin{itemize}
+        \item \(P(\circ \mid \bm{x}) = 0.7\), \(P(\times \mid \bm{x}) = 0.3\);
+        \item ideal mini-target \(f(\bm{x}) = \circ\);
+        \item `flipping' noise level \(= 0.3\).
+    \end{itemize}
+    \item A deterministic target \(f\) is a \textbf{special case of target
+        distribution}:
+    \begin{itemize}
+        \item \(P(y \mid \bm{x}) = 1\) for \(y = f(\bm{x})\);
+        \item \(P(y \mid \bm{x}) = 0\) for \(y \neq f(\bm{x})\).
+    \end{itemize}
+\end{itemize}
+
+So nothing is lost by switching: every earlier setting is a target distribution
+concentrated on one label. The two distributions divide the work:
+
+\begin{moral}
+    Goal of learning: predict the ideal mini-target (w.r.t.\ \(P(y \mid
+    \bm{x})\)) on often-seen inputs (w.r.t.\ \(P(\bm{x})\)).
+\end{moral}
+
+\(P(y \mid \bm{x})\) is what we try to learn; \(P(\bm{x})\) only decides where
+it matters to get it right.
+
+\subsection{The New Learning Flow}
+
+In the flow, the target function box becomes a target distribution, which now
+supplies the labels \(y_1, \dots , y_N\) of the training set \emph{and} the
+label \(y\) against which \(g\) is judged on a future \(\bm{x}\).
+
+\begin{center}
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tikzpicture}
+            \node[mlbox, minimum width=4.4cm, draw=orange!85!black,
+                fill=orange!8] (f) at (0,2.5)
+                {unknown target\\
+                 distribution \(P(y \mid \bm{x})\)\\
+                 containing \(f(\bm{x})\) \(+\) noise\\[2pt]
+                 {\scriptsize (ideal credit approval formula)}};
+            \node[mlbox, minimum width=2.6cm] (P) at (5.4,2.5)
+                {unknown\\\(P\) on \(\mathcal{X}\)};
+            \node[mlbox, minimum width=5.2cm] (D) at (0,0)
+                {training examples\\
+                 \(\mathcal{D}\colon (\bm{x}_1, y_1), \dots , (\bm{x}_N, y_N)\)\\[2pt]
+                 {\scriptsize (historical records in bank)}};
+            \node[mlop, minimum width=2.4cm] (A) at (5.4,0)
+                {learning\\algorithm\\\(\mathcal{A}\)};
+            \node[mlbox, minimum width=4.4cm] (g) at (10.2,0)
+                {final hypothesis\\\(g \approx f\)\\[2pt]
+                 {\scriptsize (`learned' formula to be used)}};
+            \node[mlbox, minimum width=3.4cm] (H) at (5.4,-2.4)
+                {hypothesis set\\\(\mathcal{H}\)\\[2pt]
+                 {\scriptsize (set of candidate formulas)}};
+            \draw[mlarrow, dashed, draw=orange!85!black] (f) -- (D)
+                node[midway, left, font=\scriptsize, text=orange!85!black]
+                {\(y_1, y_2, \dots , y_N\)};
+            \draw[mlarrow, dashed, draw=orange!85!black] (f.north)
+                .. controls (1,4.4) and (11.1,4.4) .. ([xshift=0.9cm]g.north)
+                node[pos=0.5, above, font=\scriptsize, text=orange!85!black]
+                {\(y\)};
+            \draw[mlarrow, dashed] (P) -- (D)
+                node[pos=0.58, font=\scriptsize, fill=white, inner sep=1.5pt]
+                {\(\bm{x}_1, \bm{x}_2, \dots , \bm{x}_N\)};
+            \draw[mlarrow, dashed] (P.east) -| ([xshift=-0.9cm]g.north)
+                node[pos=0.3, above, font=\scriptsize] {\(\bm{x}\)};
+            \draw[mlarrow] (D) -- (A);
+            \draw[mlarrow] (A) -- (g);
+            \draw[mlarrow] (H) -- (A);
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{center}
+
+\begin{moral}
+    VC still works, pocket algorithm explained :-)
+\end{moral}
+
+Pocket was introduced for data that no line fits. With noise, that is the
+normal case even when the ideal mini-target is linear; the VC bound says the
+line with the smallest \(\Ein\) still has \(\Eout \approx \Ein\), so pocket's
+choice is justified.
+
+\begin{exercise}[Fun Time]
+    Let's revisit PLA/pocket. Which of the following claim is true?
+    \begin{enumerate}[(1)]
+        \item In practice, we should try to compute if \(\mathcal{D}\) is
+            linear separable before deciding to use PLA.
+        \item If we know that \(\mathcal{D}\) is not linear separable, then the
+            target function \(f\) must not be a linear function.
+        \item If we know that \(\mathcal{D}\) is linear separable, then the
+            target function \(f\) must be a linear function.
+        \item None of the above.
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (4). (1) After computing if \(\mathcal{D}\) is linear separable, we shall
+    know \(\bm{w}^*\) and then there is no need to use PLA. (2) What about
+    noise? A linear target plus flipping noise gives non-separable data.
+    (3) What about `sampling luck'? :-) A curved target can happen to produce a
+    sample that some line separates.
+\end{proof}
+
+\section{Error Measure}\label{sec:error-measure}
+
+\source{slides p.8--13}
+
+The target is now a distribution, and \(g\) is supposed to be \(\approx f\).
+Before learning anything, we need to say what `\(\approx\)' means.
+
+\subsection{Error Measure}
+
+\begin{center}
+    \tikz\node[mlbox, minimum width=3cm] {final hypothesis\\\(g \approx f\)};
+\end{center}
+
+\begin{itemize}
+    \item How well? Previously, we considered the out-of-sample measure
+        \[
+            \Eout(g) = \mathop{\mathcal{E}}_{\bm{x} \sim P}
+            \llbracket g(\bm{x}) \neq f(\bm{x}) \rrbracket .
+        \]
+    \item More generally, an \vocab{error measure} \(E(g, f)\).
+    \item Naturally considered:
+    \begin{itemize}
+        \item out-of-sample: averaged over unknown \(\bm{x}\);
+        \item pointwise: evaluated on one \(\bm{x}\);
+        \item classification: \(\llbracket \text{prediction} \neq
+            \text{target} \rrbracket\).
+    \end{itemize}
+\end{itemize}
+
+Here \(\mathcal{E}\) denotes expectation. The three adjectives are three
+independent choices that \(\Eout\) happened to make at once, and each could be
+made differently.
+
+\begin{moral}
+    Classification error \(\llbracket \dots \rrbracket\): often also called
+    `0/1 error'.
+\end{moral}
+
+\subsection{Pointwise Error Measure}
+
+We can often express \(E(g, f)\) as an average of \(\err(g(\bm{x}),
+f(\bm{x}))\), like
+\[
+    \Eout(g) = \mathop{\mathcal{E}}_{\bm{x} \sim P}
+    \underbrace{\llbracket g(\bm{x}) \neq f(\bm{x}) \rrbracket}_{\err(g(\bm{x}),
+    f(\bm{x}))} .
+\]
+
+\begin{definition}[Pointwise error measure]\label{def:pointwise}
+    The function \(\err\) above is called a \vocab{pointwise error measure}.
+    With it,
+    \[
+        \underbrace{\Ein(g) = \frac{1}{N} \sum_{n=1}^N \err(g(\bm{x}_n),
+        f(\bm{x}_n))}_{\text{in-sample}}
+        \qquad
+        \underbrace{\Eout(g) = \mathop{\mathcal{E}}_{\bm{x} \sim P}
+        \err(g(\bm{x}), f(\bm{x}))}_{\text{out-of-sample}} .
+    \]
+\end{definition}
+
+Not every sensible measure is pointwise --- the area under an ROC curve, say,
+compares predictions on different inputs --- but we will mainly consider
+pointwise \(\err\) for simplicity.
+
+\subsection{Two Important Pointwise Error Measures}
+
+Write the prediction and the target as
+\[
+    \err\bigl( \underbrace{g(\bm{x})}_{\tilde{y}},
+    \underbrace{f(\bm{x})}_{y} \bigr) .
+\]
+
+\begin{center}
+    \solidrules
+    \begin{tabular}{@{}l|l@{}}
+        \toprule
+        \textbf{0/1 error} & \textbf{squared error}\\
+        \midrule
+        \(\err(\tilde{y}, y) = \llbracket \tilde{y} \neq y \rrbracket\)
+        & \(\err(\tilde{y}, y) = (\tilde{y} - y)^2\)\\
+        correct or incorrect? & how far is \(\tilde{y}\) from \(y\)?\\
+        often for classification & often for regression\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\begin{question}
+    How does \(\err\) `guide' learning?
+\end{question}
+
+\subsection{Ideal Mini-Target}
+
+The interplay between noise and error:
+
+\begin{moral}
+    \(P(y \mid \bm{x})\) and \(\err\) define the ideal mini-target
+    \(f(\bm{x})\).
+\end{moral}
+
+With noise there is no single `true' label to recover at \(\bm{x}\): what
+nature gives is the whole distribution \(P(y \mid \bm{x})\). The \(f\) we aim
+at is therefore not a target function handed to us but the best
+\emph{prediction} against that distribution, and `best' only means something
+once \(\err\) is fixed.
+
+\begin{definition}[Ideal mini-target]\label{def:mini-target}
+    Given \(P(y \mid \bm{x})\) and \(\err\), the \vocab{ideal mini-target}
+    at \(\bm{x}\) is the prediction of smallest expected error,
+    \[
+        f(\bm{x}) = \argmin_{\tilde{y}} \;
+        \mathop{\mathcal{E}}_{y \sim P(y \mid \bm{x})} \err(\tilde{y}, y) .
+    \]
+\end{definition}
+
+So from here on \(f\) denotes the error-minimising function, not a function
+that generated the labels; for a deterministic target (\(P(y \mid \bm{x}) =
+1\) at \(y = f(\bm{x})\)) and any \(\err\) with \(\err(y, y) = 0 \le
+\err(\tilde{y}, y)\), the two coincide.
+
+Take one input whose labels are
+\[
+    P(y = 1 \mid \bm{x}) = 0.2, \quad P(y = 2 \mid \bm{x}) = 0.7, \quad
+    P(y = 3 \mid \bm{x}) = 0.1 ,
+\]
+and ask which prediction \(\tilde{y}\) has the smallest average error under
+each measure:
+
+\begin{center}
+    \solidrules
+    \begin{tabular}{@{}c|l|l@{}}
+        \toprule
+        \(\tilde{y}\) & \(\err(\tilde{y}, y) = \llbracket \tilde{y} \neq y
+        \rrbracket\) & \(\err(\tilde{y}, y) = (\tilde{y} - y)^2\)\\
+        \midrule
+        \(1\) & avg.\ \(\err\) \(0.8\) & avg.\ \(\err\) \(1.1\)\\
+        \(2\) & avg.\ \(\err\) \(0.3\) \((*)\) & avg.\ \(\err\) \(0.3\)\\
+        \(3\) & avg.\ \(\err\) \(0.9\) & avg.\ \(\err\) \(1.5\)\\
+        \(1.9\) & avg.\ \(\err\) \(1.0\) (\textcolor{orange!85!black}{really?
+        :-)}) & avg.\ \(\err\) \(0.29\) \((*)\)\\
+        \midrule
+        & \cellcolor{vcregion}\(f(\bm{x}) = \displaystyle\argmax_{y \in
+        \mathcal{Y}} P(y \mid \bm{x})\)
+        & \cellcolor{vcregion}\(f(\bm{x}) = \displaystyle\sum_{y \in
+        \mathcal{Y}} y \cdot P(y \mid \bm{x})\)\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+The two starred rows are no accident: they are the two minimisers below.
+
+\begin{proposition}[Ideal mini-targets of 0/1 and squared error]
+    \label{prop:mini-target}
+    Fix \(\bm{x}\) and write \(\mathcal{E}\) for expectation over \(y \sim
+    P(y \mid \bm{x})\).
+    \begin{enumerate}
+        \item For \(\err(\tilde{y}, y) = \llbracket \tilde{y} \neq y
+            \rrbracket\), \(f(\bm{x}) = \argmax_{y \in \mathcal{Y}} P(y \mid
+            \bm{x})\) (any maximiser, if there are ties).
+        \item For \(\err(\tilde{y}, y) = (\tilde{y} - y)^2\), \(f(\bm{x}) =
+            \sum_{y \in \mathcal{Y}} y \cdot P(y \mid \bm{x}) = \mathcal{E}[y]\),
+            and this minimiser is unique.
+    \end{enumerate}
+\end{proposition}
+
+\begin{proof}
+    (1) For any real \(\tilde{y}\),
+    \[
+        \mathcal{E} \llbracket \tilde{y} \neq y \rrbracket
+        = \mathbb{P}[y \neq \tilde{y}]
+        = 1 - P(y = \tilde{y} \mid \bm{x}) ,
+    \]
+    where \(P(y = \tilde{y} \mid \bm{x}) = 0\) if \(\tilde{y} \notin
+    \mathcal{Y}\). Minimising the left side is maximising \(P(y = \tilde{y}
+    \mid \bm{x})\). A \(\tilde{y}\) outside \(\mathcal{Y}\) scores the worst
+    possible value \(1\), so the minimum is attained exactly at the labels of
+    largest probability.
+
+    (2) Let \(\mu = \mathcal{E}[y]\). Add and subtract \(\mu\):
+    \[
+        \mathcal{E} (\tilde{y} - y)^2
+        = \mathcal{E} \bigl[ (\tilde{y} - \mu) + (\mu - y) \bigr]^2
+        = (\tilde{y} - \mu)^2 + 2 (\tilde{y} - \mu)\, \mathcal{E}[\mu - y]
+        + \mathcal{E} (\mu - y)^2 .
+    \]
+    The middle term vanishes because \(\mathcal{E}[\mu - y] = \mu - \mu = 0\),
+    and the last term is \(\Var(y)\), which does not depend on \(\tilde{y}\).
+    Hence
+    \[
+        \mathcal{E} (\tilde{y} - y)^2 = (\tilde{y} - \mu)^2 + \Var(y)
+        \ge \Var(y) ,
+    \]
+    with equality if and only if \(\tilde{y} = \mu\).
+\end{proof}
+
+On the example, (1) gives \(1 - 0.7 = 0.3\) at \(\tilde{y} = 2\), and \(1\) at
+\(\tilde{y} = 1.9\), which is never a label and so is always wrong. (2) gives
+\(\mu = 0.2 + 1.4 + 0.3 = 1.9\) and \(\Var(y) = 3.9 - 1.9^2 = 0.29\), the
+table's minimum; predicting \(2\) instead costs \((2 - 1.9)^2 + 0.29 = 0.3\).
+Same noise, different \(\err\), different ideal mini-target.
+
+\subsection{Learning Flow with Error Measure}
+
+The error measure therefore joins the flow as a component: it is what `\(g
+\approx f\)' is judged by.
+
+\begin{center}
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tikzpicture}
+            \node[mlbox, minimum width=4.4cm, draw=orange!85!black,
+                fill=orange!8] (f) at (0,2.5)
+                {unknown target\\
+                 distribution \(P(y \mid \bm{x})\)\\
+                 containing \(f(\bm{x})\) \(+\) noise\\[2pt]
+                 {\scriptsize (ideal credit approval formula)}};
+            \node[mlbox, minimum width=2.6cm] (P) at (5.4,2.5)
+                {unknown\\\(P\) on \(\mathcal{X}\)};
+            \node[mlbox, minimum width=5.2cm] (D) at (0,0)
+                {training examples\\
+                 \(\mathcal{D}\colon (\bm{x}_1, y_1), \dots , (\bm{x}_N, y_N)\)\\[2pt]
+                 {\scriptsize (historical records in bank)}};
+            \node[mlop, minimum width=2.4cm] (A) at (5.4,0)
+                {learning\\algorithm\\\(\mathcal{A}\)};
+            \node[mlbox, minimum width=4.4cm] (g) at (10.2,0)
+                {final hypothesis\\\(g \approx f\)\\[2pt]
+                 {\scriptsize (`learned' formula to be used)}};
+            \node[mlbox, minimum width=3.4cm] (H) at (5.4,-2.4)
+                {hypothesis set\\\(\mathcal{H}\)\\[2pt]
+                 {\scriptsize (set of candidate formulas)}};
+            \node[mlbox, minimum width=2.6cm, draw=blue!80!black, very thick]
+                (e) at (10.2,-2.4) {error measure\\\(\err\)};
+            \draw[mlarrow, dashed, draw=orange!85!black] (f) -- (D)
+                node[midway, left, font=\scriptsize, text=orange!85!black]
+                {\(y_1, y_2, \dots , y_N\)};
+            \draw[mlarrow, dashed, draw=orange!85!black] (f.north)
+                .. controls (1,4.4) and (11.1,4.4) .. ([xshift=0.9cm]g.north)
+                node[pos=0.5, above, font=\scriptsize, text=orange!85!black]
+                {\(y\)};
+            \draw[mlarrow, dashed] (P) -- (D)
+                node[pos=0.58, font=\scriptsize, fill=white, inner sep=1.5pt]
+                {\(\bm{x}_1, \bm{x}_2, \dots , \bm{x}_N\)};
+            \draw[mlarrow, dashed] (P.east) -| ([xshift=-0.9cm]g.north)
+                node[pos=0.3, above, font=\scriptsize] {\(\bm{x}\)};
+            \draw[mlarrow] (D) -- (A);
+            \draw[mlarrow] (A) -- (g);
+            \draw[mlarrow] (H) -- (A);
+            \draw[mlarrow, draw=blue!80!black] (e) -- (g);
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{center}
+
+\begin{moral}
+    Extended VC theory/`philosophy' works for most \(\mathcal{H}\) and
+    \(\err\).
+\end{moral}
+
+The proof in \autoref{sec:pictorial} was for 0/1 error; analogous bounds exist
+for other bounded error measures, with \(\dvc\) replaced by suitable
+generalisations. We take the philosophy on trust from here.
+
+\begin{exercise}[Fun Time]
+    Consider the following \(P(y \mid \bm{x})\) and \(\err(\tilde{y}, y) =
+    \abs{\tilde{y} - y}\). Which of the following is the ideal mini-target
+    \(f(\bm{x})\)?
+    \[
+        \begin{gathered}
+            P(y = 1 \mid \bm{x}) = 0.10, \quad P(y = 2 \mid \bm{x}) = 0.35,\\
+            P(y = 3 \mid \bm{x}) = 0.15, \quad P(y = 4 \mid \bm{x}) = 0.40.
+        \end{gathered}
+    \]
+    \begin{enumerate}[(1)]
+        \item \(2.5 =\) average within \(\mathcal{Y} = \left\{ 1, 2, 3, 4
+            \right\}\);
+        \item \(2.85 =\) weighted mean from \(P(y \mid \bm{x})\);
+        \item \(3 =\) weighted median from \(P(y \mid \bm{x})\);
+        \item \(4 = \argmax P(y \mid \bm{x})\).
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (3). For the `absolute error', the weighted median provably results in the
+    minimum average \(\err\). The average errors of the four candidates are
+    \(1.0\), \(0.965\), \(0.95\) and \(1.15\). Moving \(\tilde{y}\) to the
+    right by a little changes the average by (mass to the left) \(-\) (mass to
+    the right); that is negative until half the mass is on the left, which
+    happens at \(3\) (\(0.10 + 0.35 + 0.15 = 0.6 \ge 0.5\)).
+\end{proof}
+
+\section{Algorithmic Error Measure}\label{sec:algo-error}
+
+\source{slides p.14--19}
+
+The last section treated \(\err\) as given. Who gives it?
+
+\subsection{Choice of Error Measure}
+
+\paragraph{Fingerprint verification.} A fingerprint goes in, and the target says
+whether it belongs to you:
+
+\begin{center}
+    \begin{tikzpicture}
+        \node (fp) at (0,0)
+            {\includegraphics[width=1.3cm]{Figures/fingerprint.jpg}};
+        \node[mlbox, minimum width=1.6cm, minimum height=7mm] (f) at (2.6,0)
+            {\(f\)};
+        \draw[mlarrow] (fp) -- (f);
+        \draw[mlarrow] (f) -- (4.2,0);
+        \node[anchor=west] at (4.2,0)
+            {\(\left\{ \begin{array}{@{}ll@{}}
+                +1 & \textcolor{ForestGreen}{\text{you}}\\
+                -1 & \textcolor{red!80!black}{\text{intruder}}
+            \end{array} \right.\)};
+    \end{tikzpicture}
+\end{center}
+
+There are two types of error: \textcolor{orange!85!black}{false accept} and
+\textcolor{Purple}{false reject}.
+
+\begin{center}
+    \solidrules
+    \begin{tabular}{@{}cc|cc@{}}
+        \toprule
+        & & \multicolumn{2}{c}{\(g\)}\\
+        & & \(+1\) & \(-1\)\\
+        \midrule
+        \multirow{2}{*}{\(f\)} & \(+1\) & \textcolor{black!45}{no error}
+        & \textcolor{Purple}{false reject}\\
+        & \(-1\) & \textcolor{orange!85!black}{false accept}
+        & \textcolor{black!45}{no error}\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\begin{moral}
+    0/1 error penalizes both types equally.
+\end{moral}
+
+Whether that is right depends entirely on who uses the verifier.
+
+\subsection{Fingerprint Verification for Supermarket}
+
+\begin{center}
+    \solidrules
+    \begin{tabular}{@{}cc|cc@{}}
+        \toprule
+        & & \multicolumn{2}{c}{\(g\)}\\
+        & & \(+1\) & \(-1\)\\
+        \midrule
+        \multirow{2}{*}{\(f\)} & \(+1\) & \textcolor{black!45}{\(0\)}
+        & \textcolor{Purple}{\(10\)}\\
+        & \(-1\) & \textcolor{orange!85!black}{\(1\)}
+        & \textcolor{black!45}{\(0\)}\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\begin{itemize}
+    \item Supermarket: fingerprint for discount.
+    \item False reject: \textbf{very unhappy customer, lose future business}.
+    \item False accept: give away a minor discount, intruder left fingerprint
+        :-)
+\end{itemize}
+
+\subsection{Fingerprint Verification for CIA}
+
+\begin{center}
+    \solidrules
+    \begin{tabular}{@{}cc|cc@{}}
+        \toprule
+        & & \multicolumn{2}{c}{\(g\)}\\
+        & & \(+1\) & \(-1\)\\
+        \midrule
+        \multirow{2}{*}{\(f\)} & \(+1\) & \textcolor{black!45}{\(0\)}
+        & \textcolor{Purple}{\(1\)}\\
+        & \(-1\) & \textcolor{orange!85!black}{\(1000\)}
+        & \textcolor{black!45}{\(0\)}\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\begin{itemize}
+    \item CIA: fingerprint for entrance.
+    \item False accept: \textbf{very serious consequences!}
+    \item False reject: unhappy employee, but so what? :-)
+\end{itemize}
+
+Same inputs, same target, same two kinds of mistake --- and cost ratios of
+\(10 : 1\) one way and \(1 : 1000\) the other. The best \(g\) for one
+application is a poor \(g\) for the other.
+
+\subsection{Take-home Message for Now}
+
+\begin{moral}
+    \(\err\) is application/user-dependent.
+\end{moral}
+
+In practice the user rarely writes the true \(\err\) down, so the algorithm
+works with a stand-in.
+
+\begin{definition}[Algorithmic error measure]\label{def:errhat}
+    An \vocab{algorithmic error measure} \(\errhat\) is the error measure
+    \(\mathcal{A}\) actually uses in place of \(\err\). It may be
+    \begin{itemize}
+        \item true: just \(\err\);
+        \item plausible:
+        \begin{itemize}
+            \item 0/1: minimum `flipping noise' --- NP-hard to optimize,
+                remember? :-)
+            \item squared: minimum Gaussian noise;
+        \end{itemize}
+        \item friendly: easy to optimize for \(\mathcal{A}\):
+        \begin{itemize}
+            \item closed-form solution;
+            \item convex objective function.
+        \end{itemize}
+    \end{itemize}
+\end{definition}
+
+`Plausible' means justified by a belief about the noise: if labels are flipped
+at random, the best one can do is make the fewest disagreements, which is 0/1
+error --- and minimising it over perceptrons is the NP-hard problem of
+\autoref{sec:nonsep}; if the noise is Gaussian, maximum likelihood is least
+squares. `Friendly' means justified by what the optimiser can do.
+
+\begin{moral}
+    \(\errhat\): more in next lectures.
+\end{moral}
+
+\subsection{Learning Flow with Algorithmic Error Measure}
+
+\begin{center}
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tikzpicture}
+            \node[mlbox, minimum width=4.4cm, draw=orange!85!black,
+                fill=orange!8] (f) at (0,2.5)
+                {unknown target\\
+                 distribution \(P(y \mid \bm{x})\)\\
+                 containing \(f(\bm{x})\) \(+\) noise\\[2pt]
+                 {\scriptsize (ideal credit approval formula)}};
+            \node[mlbox, minimum width=2.6cm] (P) at (5.4,2.5)
+                {unknown\\\(P\) on \(\mathcal{X}\)};
+            \node[mlbox, minimum width=5.2cm] (D) at (0,0)
+                {training examples\\
+                 \(\mathcal{D}\colon (\bm{x}_1, y_1), \dots , (\bm{x}_N, y_N)\)\\[2pt]
+                 {\scriptsize (historical records in bank)}};
+            \node[mlop, minimum width=2.4cm] (A) at (5.4,0)
+                {learning\\algorithm\\\(\mathcal{A}\)\\
+                 \colorbox{Purple!18}{\(\errhat\)}};
+            \node[mlbox, minimum width=4.4cm] (g) at (10.2,0)
+                {final hypothesis\\\(g \approx f\)\\[2pt]
+                 {\scriptsize (`learned' formula to be used)}};
+            \node[mlbox, minimum width=3.4cm] (H) at (5.4,-2.6)
+                {hypothesis set\\\(\mathcal{H}\)\\[2pt]
+                 {\scriptsize (set of candidate formulas)}};
+            \node[mlbox, minimum width=2.6cm] (e) at (10.2,-2.6)
+                {error measure\\\(\err\)};
+            \draw[mlarrow, dashed, draw=orange!85!black] (f) -- (D)
+                node[midway, left, font=\scriptsize, text=orange!85!black]
+                {\(y_1, y_2, \dots , y_N\)};
+            \draw[mlarrow, dashed, draw=orange!85!black] (f.north)
+                .. controls (1,4.4) and (11.1,4.4) .. ([xshift=0.9cm]g.north)
+                node[pos=0.5, above, font=\scriptsize, text=orange!85!black]
+                {\(y\)};
+            \draw[mlarrow, dashed] (P) -- (D)
+                node[pos=0.58, font=\scriptsize, fill=white, inner sep=1.5pt]
+                {\(\bm{x}_1, \bm{x}_2, \dots , \bm{x}_N\)};
+            \draw[mlarrow, dashed] (P.east) -| ([xshift=-0.9cm]g.north)
+                node[pos=0.3, above, font=\scriptsize] {\(\bm{x}\)};
+            \draw[mlarrow] (D) -- (A);
+            \draw[mlarrow] (A) -- (g);
+            \draw[mlarrow] (H) -- (A);
+            \draw[mlarrow, draw=blue!80!black] (e) -- (g);
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{center}
+
+\begin{moral}
+    \(\err\): application goal; \(\errhat\): a key part of many
+    \(\mathcal{A}\).
+\end{moral}
+
+\(\err\) sits outside the algorithm and judges \(g\); \(\errhat\) sits inside and
+steers the search. The art is choosing \(\errhat\) close enough to \(\err\) to
+aim at the right goal, and friendly enough to be optimised.
+
+\begin{exercise}[Fun Time]
+    Consider \(\err\) below for CIA. What is \(\Ein(g)\) when using this
+    \(\err\)?
+    \begin{center}
+        \solidrules
+        \begin{tabular}{@{}cc|cc@{}}
+            \toprule
+            & & \multicolumn{2}{c}{\(g\)}\\
+            & & \(+1\) & \(-1\)\\
+            \midrule
+            \multirow{2}{*}{\(f\)} & \(+1\) & \(0\) & \(1\)\\
+            & \(-1\) & \(1000\) & \(0\)\\
+            \bottomrule
+        \end{tabular}
+    \end{center}
+    \begin{enumerate}[(1)]
+        \item \(\displaystyle \frac{1}{N} \sum_{n=1}^N \llbracket y_n \neq
+            g(\bm{x}_n) \rrbracket\);
+        \item \(\displaystyle \frac{1}{N} \left( \sum_{y_n = +1} \llbracket
+            y_n \neq g(\bm{x}_n) \rrbracket + 1000 \sum_{y_n = -1} \llbracket
+            y_n \neq g(\bm{x}_n) \rrbracket \right)\);
+        \item \(\displaystyle \frac{1}{N} \left( \sum_{y_n = +1} \llbracket
+            y_n \neq g(\bm{x}_n) \rrbracket - 1000 \sum_{y_n = -1} \llbracket
+            y_n \neq g(\bm{x}_n) \rrbracket \right)\);
+        \item \(\displaystyle \frac{1}{N} \left( 1000 \sum_{y_n = +1}
+            \llbracket y_n \neq g(\bm{x}_n) \rrbracket + \sum_{y_n = -1}
+            \llbracket y_n \neq g(\bm{x}_n) \rrbracket \right)\).
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (2). When \(y_n = -1\), the false positive made on such \((\bm{x}_n,
+    y_n)\) is penalized \(1000\) times more!
+\end{proof}
+
+\section{Weighted Classification}\label{sec:weighted}
+
+\source{slides p.20--24}
+
+The CIA error of the quiz is a concrete, useful \(\err\) that is not 0/1. This
+section shows how to learn with it using nothing but the tools of
+\autoref{sec:nonsep}.
+
+\subsection{Weighted Classification}
+
+\paragraph{CIA cost (error, loss, \dots) matrix.}
+\begin{center}
+    \solidrules
+    \begin{tabular}{@{}cc|cc@{}}
+        \toprule
+        & & \multicolumn{2}{c}{\(h(\bm{x})\)}\\
+        & & \(+1\) & \(-1\)\\
+        \midrule
+        \multirow{2}{*}{\(y\)} & \(+1\) & \(0\) & \(1\)\\
+        & \(-1\) & \(1000\) & \(0\)\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+Out-of-sample,
+\[
+    \Eout(h) = \mathop{\mathcal{E}}_{(\bm{x}, y) \sim P}
+    \left\{ \begin{array}{@{}ll@{}}
+        1 & \text{if } y = +1\\
+        1000 & \text{if } y = -1
+    \end{array} \right\} \cdot \llbracket y \neq h(\bm{x}) \rrbracket ;
+\]
+in-sample,
+\[
+    \Ein(h) = \frac{1}{N} \sum_{n=1}^N
+    \left\{ \begin{array}{@{}ll@{}}
+        1 & \text{if } y_n = +1\\
+        1000 & \text{if } y_n = -1
+    \end{array} \right\} \cdot \llbracket y_n \neq h(\bm{x}_n) \rrbracket .
+\]
+The cost of a mistake depends only on the true label, so the matrix collapses
+into one weight per example.
+
+\begin{definition}[Weighted classification]\label{def:weighted}
+    \vocab{Weighted classification} is classification with a different
+    `weight' for different \((\bm{x}, y)\): the pointwise error is \(w(\bm{x},
+    y) \cdot \llbracket y \neq h(\bm{x}) \rrbracket\) for a given weight
+    \(w(\bm{x}, y) \ge 0\).
+\end{definition}
+
+\subsection{Minimizing \texorpdfstring{\(\Ein\)}{Ein} for Weighted
+Classification}
+
+Write \(\Ein^{\mathrm{w}}\) for the weighted in-sample error,
+\[
+    \Ein^{\mathrm{w}}(h) = \frac{1}{N} \sum_{n=1}^N
+    \left\{ \begin{array}{@{}ll@{}}
+        1 & \text{if } y_n = +1\\
+        1000 & \text{if } y_n = -1
+    \end{array} \right\} \cdot \llbracket y_n \neq h(\bm{x}_n) \rrbracket ,
+\]
+and \(\Ein^{0/1}\) for the plain fraction of mistakes.
+
+\paragraph{Naïve thoughts.}
+\begin{itemize}
+    \item PLA: doesn't matter if linear separable. :-) Then some \(\bm{w}\)
+        has \(\Ein^{\mathrm{w}} = 0\), whatever the weights, and PLA finds it.
+    \item Pocket: modify the pocket-replacement rule --- if \(\bm{w}_{t+1}\)
+        reaches smaller \(\Ein^{\mathrm{w}}\) than \(\hat{\bm{w}}\), replace
+        \(\hat{\bm{w}}\) by \(\bm{w}_{t+1}\).
+\end{itemize}
+
+\begin{question}
+    Pocket has some guarantee on \(\Ein^{0/1}\); does the modified pocket have
+    a similar guarantee on \(\Ein^{\mathrm{w}}\)?
+\end{question}
+
+\subsection{Systematic Route: Connect
+\texorpdfstring{\(\Ein^{\mathrm{w}}\)}{Einw} and
+\texorpdfstring{\(\Ein^{0/1}\)}{Ein01}}
+
+Rather than re-prove anything about pocket, turn the weighted problem into an
+unweighted one.
+
+\begin{center}
+    \begin{minipage}[t]{0.44\textwidth}
+        \centering
+        \textbf{original problem}\\[3pt]
+        \solidrules
+        \begin{tabular}{@{}cc|cc@{}}
+            \toprule
+            & & \multicolumn{2}{c}{\(h(\bm{x})\)}\\
+            & & \(+1\) & \(-1\)\\
+            \midrule
+            \multirow{2}{*}{\(y\)} & \(+1\) & \(0\) & \(1\)\\
+            & \(-1\) & \textcolor{orange!85!black}{\(1000\)} & \(0\)\\
+            \bottomrule
+        \end{tabular}\\[6pt]
+        \(\mathcal{D}\colon\)
+        \(\begin{array}{c}
+            (\bm{x}_1, +1)\\
+            \textcolor{red!80!black}{(\bm{x}_2, -1)}\\
+            \textcolor{red!80!black}{(\bm{x}_3, -1)}\\
+            \dots\\
+            (\bm{x}_{N-1}, +1)\\
+            (\bm{x}_N, +1)
+        \end{array}\)
+    \end{minipage}
+    \begin{minipage}[t]{0.54\textwidth}
+        \centering
+        \textbf{equivalent problem}\\[3pt]
+        \solidrules
+        \begin{tabular}{@{}cc|cc@{}}
+            \toprule
+            & & \multicolumn{2}{c}{\(h(\bm{x})\)}\\
+            & & \(+1\) & \(-1\)\\
+            \midrule
+            \multirow{2}{*}{\(y\)} & \(+1\) & \(0\) & \(1\)\\
+            & \(-1\) & \(1\) & \(0\)\\
+            \bottomrule
+        \end{tabular}\\[6pt]
+        \(\begin{array}{c}
+            (\bm{x}_1, +1)\\
+            \textcolor{red!80!black}{(\bm{x}_2, -1), (\bm{x}_2, -1), \dots ,
+            (\bm{x}_2, -1)}\\
+            \textcolor{red!80!black}{(\bm{x}_3, -1), (\bm{x}_3, -1), \dots ,
+            (\bm{x}_3, -1)}\\
+            \dots\\
+            (\bm{x}_{N-1}, +1)\\
+            (\bm{x}_N, +1)
+        \end{array}\)
+    \end{minipage}
+\end{center}
+
+\begin{moral}
+    After copying \(-1\) examples \(1000\) times, \(\Ein^{\mathrm{w}}\) for LHS
+    \(\equiv\) \(\Ein^{0/1}\) for RHS!
+\end{moral}
+
+A mistake on \((\bm{x}_2, -1)\) costs \(1000\) on the left and is repeated on
+all \(1000\) copies on the right, so the two error counts agree term by term
+for every \(h\). (The normalisations differ, \(N\) against the size of the
+copied set, but that is a constant factor and does not change which \(h\)
+minimises.) Pocket's guarantee for \(\Ein^{0/1}\) on the copied data therefore
+\emph{is} a guarantee for \(\Ein^{\mathrm{w}}\) on the original.
+
+\subsection{Weighted Pocket Algorithm}
+
+Copying \(1000\) times is wasteful; the copies only need to exist in how often
+examples are picked and how errors are counted.
+
+\begin{center}
+    \solidrules
+    \begin{tikzpicture}[scale=0.8]
+        \fill[poshalf] (0,3.2) -- (3.2,0) -- (3.2,3.2) -- cycle;
+        \fill[neghalf] (0,3.2) -- (3.2,0) -- (0,0) -- cycle;
+        \draw[sepline] (0,3.2) -- (3.2,0);
+        \draw[black!45] (0,0) rectangle (3.2,3.2);
+        \foreach \p in {(1.5,2.4), (2.2,2.8), (2.6,1.6), (1.9,1.9),
+            (2.9,2.4), (0.4,3.0)}{\node[dpos] at \p {};}
+        \foreach \p in {(0.5,0.9), (1.2,1.0), (0.8,1.9), (1.8,0.6),
+            (0.4,2.0), (2.7,0.3)}{\node[dneg] at \p {\(\times\)};}
+        \node[dneg] at (2.4,2.1) {\(\times\)};
+        \node[dneg] at (1.3,2.9) {\(\times\)};
+        \node[dpos] at (0.9,0.7) {};
+        \node[dpos] at (0.3,0.25) {};
+    \end{tikzpicture}
+    \qquad
+    \begin{tabular}[b]{@{}cc|cc@{}}
+        \toprule
+        & & \multicolumn{2}{c}{\(h(\bm{x})\)}\\
+        & & \(+1\) & \(-1\)\\
+        \midrule
+        \multirow{2}{*}{\(y\)} & \(+1\) & \(0\) & \(1\)\\
+        & \(-1\) & \(1000\) & \(0\)\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+Using `virtual copying', the \vocab{weighted pocket algorithm} includes:
+
+\begin{itemize}
+    \item weighted PLA: randomly check \(-1\) example mistakes with \(1000\)
+        times more probability;
+    \item weighted pocket replacement: if \(\bm{w}_{t+1}\) reaches smaller
+        \(\Ein^{\mathrm{w}}\) than \(\hat{\bm{w}}\), replace \(\hat{\bm{w}}\) by
+        \(\bm{w}_{t+1}\).
+\end{itemize}
+
+Against \autoref{alg:pocket}, only two lines change:
+
+\begin{algorithm}[H]
+    \caption{Weighted Pocket Algorithm}\label{alg:weighted-pocket}
+    \KwIn{training examples \(\mathcal{D}\), weights \(1\) for \(y_n = +1\) and
+        \(1000\) for \(y_n = -1\), an iteration budget}
+    \KwOut{\(\hat{\bm{w}}\), returned as \(g\)}
+    initialize the pocket weights \(\hat{\bm{w}}\)\;
+    \For{\(t = 0, 1, \dots\) until enough iterations}{
+        find a random mistake of \(\bm{w}_t\), \((\bm{x}_{n(t)}, y_{n(t)})\),
+        picking each mistake with probability proportional to its weight\;
+        (try to) correct the mistake by
+        \(\bm{w}_{t+1} \gets \bm{w}_t + y_{n(t)} \bm{x}_{n(t)}\)\;
+        \lIf{\(\Ein^{\mathrm{w}}(\bm{w}_{t+1}) < \Ein^{\mathrm{w}}(\hat{\bm{w}})\)}
+            {\(\hat{\bm{w}} \gets \bm{w}_{t+1}\)}
+    }
+    \Return \(\hat{\bm{w}}\) as \(g\)\;
+\end{algorithm}
+
+Picking a random mistake of the copied data set is exactly picking an original
+mistake with probability proportional to its weight, and the copied data's
+\(\Ein^{0/1}\) is \(\Ein^{\mathrm{w}}\) up to a constant; so this \emph{is}
+pocket on the copied data, run without making the copies.
+
+\begin{moral}
+    Systematic route (called `reduction'): can be applied to many other
+    algorithms!
+\end{moral}
+
+\begin{exercise}[Fun Time]
+    Consider the CIA cost matrix. If there are \(10\) examples with
+    \(y_n = -1\) (intruder) and \(999{,}990\) examples with \(y_n = +1\)
+    (you). What would \(\Ein^{\mathrm{w}}(h)\) be for a constant \(h(\bm{x})\)
+    that always returns \(+1\)?
+    \begin{center}
+        \solidrules
+        \begin{tabular}{@{}cc|cc@{}}
+            \toprule
+            & & \multicolumn{2}{c}{\(h(\bm{x})\)}\\
+            & & \(+1\) & \(-1\)\\
+            \midrule
+            \multirow{2}{*}{\(y\)} & \(+1\) & \(0\) & \(1\)\\
+            & \(-1\) & \(1000\) & \(0\)\\
+            \bottomrule
+        \end{tabular}
+        \qquad
+        \begin{enumerate*}[(1)]
+            \item \(0.001\); \item \(0.01\); \item \(0.1\); \item \(1\).
+        \end{enumerate*}
+    \end{center}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (2). The constant \(h\) is wrong on exactly the \(10\) intruders, each
+    costing \(1000\), out of \(N = 10^6\) examples: \(\Ein^{\mathrm{w}} = 10
+    \cdot 1000 / 10^6 = 0.01\). While the quiz is a simple evaluation, it is not
+    uncommon that the data is very unbalanced for such an application. Properly
+    `setting' the weights can be used to avoid the lazy constant prediction:
+    under plain 0/1 error the same \(h\) would score \(10^{-5}\), and look
+    nearly perfect.
+\end{proof}
+
+\hrulebar
+
+\subsection*{Summary}
+
+\begin{description}
+    \item[Noise and Probabilistic Target] can replace \(f(\bm{x})\) by \(P(y
+        \mid \bm{x})\).
+    \item[Error Measure] affects the `ideal' target.
+    \item[Algorithmic Error Measure] user-dependent \(\implies\) plausible or
+        friendly.
+    \item[Weighted Classification] easily done by virtual `example copying'.
+\end{description}
+
+The \emph{Why can machines learn?} part closes here: with noise and a general
+error measure, the VC philosophy still says a finite \(\dvc\) and enough data
+make \(\Ein\) a trustworthy proxy for \(\Eout\). What remains is to make
+\(\Ein\) small, and so far the only tools are PLA and pocket. Next: more
+algorithms, please? :-)

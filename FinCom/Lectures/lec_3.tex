@@ -39,6 +39,10 @@
 A bond pays its coupons whether the world turns out well or badly; the only uncertainty is the rate at which we discount them, and all of Chapters~3 and~4 was about that rate.
 An option is the first instrument in this course whose cash flow at expiration is \vocab{contingent}: it depends on what the underlying asset happens to be worth on that day.
 
+\begin{remark}
+	\vocab{或有的}（contingent）：現金流「視情況而定」。債券的票息與本金在簽約時就寫死，唯一的不確定是折現率；選擇權到期時能拿到多少錢，卻要看標的資產當天的價格——這正是它比債券難定價的根本原因。
+\end{remark}
+
 That single change is what makes the pricing problem hard, and it is the problem the rest of the course solves.
 This chapter, however, prices nothing.
 Its job is to fix
@@ -66,6 +70,14 @@ The holder pays for that right up front.
 The price paid is the \vocab{option premium}, and it is the only cash flow that is certain: the cash flow at expiration is contingent, because the holder will simply walk away if buying at the strike is a bad deal.
 \autoref{fig:call-cashflow} draws the two dates.
 
+\begin{remark}
+	\begin{itemize}[nosep]
+		\item \vocab{買權}（call）：持有人有權利（但沒有義務）\emph{買進}一單位標的資產。
+		\item \vocab{履約價}（strike price，又稱 exercise price）：履約時買進（或賣出）標的所用的約定價格。
+		\item \vocab{權利金}（option premium）：買方今天為取得這個權利付給賣方的價格。它是整筆交易中唯一\emph{確定}會發生的現金流；到期時的交割則不一定發生，因為若按履約價買進不划算，持有人會直接放棄。
+	\end{itemize}
+\end{remark}
+
 \begin{figure}[H]
 	\centering
 	\begin{tikzpicture}[font=\small, >={Stealth[length=5pt]}]
@@ -92,6 +104,20 @@ The price paid is the \vocab{option premium}, and it is the only cash flow that 
 \begin{definition}
 	A \vocab{put} gives its holder the right to \emph{sell} one unit of the underlying asset for the strike price.
 \end{definition}
+
+\begin{remark}
+	\vocab{賣權}（put）：持有人有權利以履約價\emph{賣出}一單位標的資產。與買權恰好相反——買權是「付履約價、拿股票」，賣權是「交出股票、收履約價」；權利金一樣是今天先付。
+\end{remark}
+
+\begin{remark}
+	\vocab{多頭／買方部位}（long）與\vocab{空頭／賣方部位}（short）：描述你站在合約的哪一邊。
+	\begin{itemize}[nosep]
+		\item \textbf{Long}：買進並持有。long a call／long a put 就是買進買權／賣權、付出權利金、拿到權利；long a stock 就是持有股票。
+		\item \textbf{Short}：賣出。short a call／short a put 就是賣出選擇權、收下權利金，並承擔對方行使權利時必須配合的義務；short a stock 則是賣出股票，連自己沒有的股票也能賣（做法留待後面 Short Selling 一節說明）。
+	\end{itemize}
+	同一份合約，long 方賺的就是 short 方賠的，兩邊損益正好互為相反數（零和）。
+	注意：long／short 說的是「買或賣這份合約」，不是「看漲或看跌」——long a put 是買進賣權，押的其實是股價下跌。
+\end{remark}
 
 The put reverses the two contingent arrows: the holder delivers the stock and receives the strike price (\autoref{fig:put-cashflow}).
 The premium still leaves today.
@@ -122,6 +148,11 @@ The premium still leaves today.
 \end{notation}
 
 \begin{remark}
+	\vocab{內嵌選擇權}（embedded option）：附在其他證券上、無法單獨拆出來交易的選擇權；相對的是單獨買賣的\emph{獨立}（standalone）選擇權。
+	例如第三章的可贖回債券：發行人「可提前贖回」的權利本質上是一個選擇權，但它只能跟著債券一起買賣。
+\end{remark}
+
+\begin{remark}
 	How to price options?
 	That is the question the next several chapters answer, and it is old: it can be traced to Aristotle's (384 B.C.--322 B.C.) \emph{Politics}, if not earlier.\footnote{Aristotle reports that Thales, foreseeing a large olive harvest, paid deposits in winter for the use of every olive press in Miletus and Chios --- the deposits are option premiums, and the presses are the underlying asset.}
 \end{remark}
@@ -141,9 +172,20 @@ To \vocab{exercise} an option is to invoke the right it grants, and the mechanic
 \noindent The counterparty --- the \vocab{writer}, who sold the option and pocketed the premium --- has no choice in the matter: the writer must take the other side whenever the holder exercises.
 This asymmetry is the whole content of the word ``option''.
 
+\begin{remark}
+	\begin{itemize}[nosep]
+		\item \vocab{履約}（exercise）：持有人行使選擇權賦予的權利——買權履約是付履約價換股票，賣權履約是交出股票換履約價。
+		\item \vocab{賣方}（writer，又稱立權人）：賣出選擇權、收下權利金的一方。賣方沒有選擇：只要持有人要履約，就必須配合交割。「權利在買方、義務在賣方」這個不對稱，就是「選擇權」這個名字的意思。
+	\end{itemize}
+\end{remark}
+
 Some options may be exercised \emph{before} the expiration date.
 This is called \vocab{early exercise}, and deciding whether to do it is an optimization problem in its own right, not a detail of the contract.
 \autoref{sec:early-exercise} settles the question completely for calls; for puts it stays open for the rest of the course.
+
+\begin{remark}
+	\vocab{提前履約}（early exercise）：在到期日之前就履約。這不是合約的小細節，而是一個最佳化問題——提前履約就放棄了「繼續等、看股價會不會更有利」的機會，何時划算需要計算。後面會證明：在一定條件下買權永遠不該提前履約；賣權則沒有這麼簡單的答案。
+\end{remark}
 
 %─────§3 American and European───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{American and European}
@@ -154,6 +196,11 @@ This is called \vocab{early exercise}, and deciding whether to do it is an optim
 	An \vocab{American option} can be exercised at any time up to the expiration date.
 	A \vocab{European option} can only be exercised at expiration.
 \end{definition}
+
+\begin{remark}
+	\vocab{美式選擇權}（American option）到期日前任何時刻都能履約；\vocab{歐式選擇權}（European option）只能在到期日當天履約。
+	名稱與地理無關，差別只在「什麼時候可以履約」。美式多了提前履約的權利，所以價值至少不低於歐式。
+\end{remark}
 
 \begin{proposition}
 	\label{prop:amer-ge-euro}
@@ -196,6 +243,15 @@ This is called \vocab{early exercise}, and deciding whether to do it is an optim
 	When the time matters we write $S_{t}$ for the stock price at time $t$, and $S_{T}$ for its value at expiration.
 \end{notation}
 
+\begin{remark}
+	$C$（call value）與 $P$（put value）指的是一份買權、一份賣權\emph{這張合約本身}值多少錢，而不是履約後拿到多少。
+	\begin{itemize}[nosep]
+		\item \textbf{到期前}：就是選擇權的市場價格，也就是現在買進它要付的權利金。例如 $C=3$ 代表現在花 \$3 可以買到一份買權。
+		\item \textbf{到期時}：已經沒有未來可等，合約的價值就只剩「現在履約能拿到多少錢」——下一節會把它寫成 $S$ 和 $X$ 的式子。
+	\end{itemize}
+	所以同一個符號 $C$、$P$，在到期前代表價格，到期時才剛好等於履約所得。
+\end{remark}
+
 %─────§5 Payoffs────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Payoff, Mathematically Speaking}
 \label{sec:payoff}
@@ -220,6 +276,11 @@ At expiration the holder's decision is trivial, because there is no future left 
 The $\max(0,\cdot)$ is the contract's optionality made arithmetic.
 A call will be exercised only if the stock price is \emph{higher} than the strike price --- otherwise the stock can be bought more cheaply in the market, and the holder lets the option lapse.
 Symmetrically, a put will be exercised only if the stock price is \emph{less} than the strike price.
+
+\begin{remark}
+	\vocab{到期報酬}（payoff）：選擇權在到期日當天的價值（\emph{尚未}扣掉權利金，扣掉後才是利潤 profit）。
+	到期時沒有未來可以等，決策很單純：有錢賺就履約，否則放棄。所以買權拿到 $\max(0,S-X)$、賣權拿到 $\max(0,X-S)$，外面那層 $\max(0,\cdot)$ 就是「可以選擇不履約」寫成算式。
+\end{remark}
 
 \begin{moral}
 	Two facts about \eqref{eq:call-payoff} and \eqref{eq:put-payoff} drive everything that follows.
@@ -297,10 +358,26 @@ The intrinsic value is what the option would pay if expiration were today.
 It is a \emph{lower} bound on an American option's value (exercising is always available) and, as \autoref{lem:call-intrinsic} will show, a lower bound on a European \emph{call}'s value as well --- though not, it turns out, on a European put's.
 Whatever the option is worth above its intrinsic value is its \vocab{time value} --- the market's charge for the remaining chance that the stock moves further in the holder's favour.
 
+\begin{remark}
+	\begin{itemize}[nosep]
+		\item \vocab{內含價值}（intrinsic value）：假如\emph{現在}就是到期日，選擇權能拿到的錢——買權 $\max(0,S_{t}-X)$、賣權 $\max(0,X-S_{t})$。
+		\item \vocab{時間價值}（time value）：選擇權價格超過內含價值的部分，是市場對「剩下的時間裡股價還可能往有利方向走」所收的費用。到期時歸零。
+	\end{itemize}
+	所以「選擇權價格 $=$ 內含價值 $+$ 時間價值」。
+\end{remark}
+
 \begin{definition}
 	A call is \vocab{in the money} if $S>X$, \vocab{at the money} if $S=X$, and \vocab{out of the money} if $S<X$.
 	A put is in the money if $S<X$, at the money if $S=X$, and out of the money if $S>X$.
 \end{definition}
+
+\begin{remark}
+	\begin{itemize}[nosep]
+		\item \vocab{價內}（in the money）：現在履約有正的內含價值（買權 $S>X$、賣權 $S<X$）。
+		\item \vocab{價平}（at the money）：$S=X$，現在履約不賺不賠。
+		\item \vocab{價外}（out of the money）：現在履約沒有好處，內含價值為 $0$（買權 $S<X$、賣權 $S>X$）。
+	\end{itemize}
+\end{remark}
 
 \begin{note}
 	The direction reverses between calls and puts, so the words describe \emph{whether the option currently has positive intrinsic value}, not whether the stock is high or low.
@@ -377,6 +454,14 @@ Exchange-traded stock options are \emph{not} cash dividend-protected (or simply 
 
 Why this matters: on the \vocab{ex-dividend} date the stock price falls by an amount roughly equal to the cash dividend, because a buyer from that day on no longer receives it.
 The drop is mechanical, but the unprotected option absorbs it in full.
+
+\begin{remark}
+	\begin{itemize}[nosep]
+		\item \vocab{受保護}（protected）：合約會因應現金股利調整條款（例如調降履約價），就稱為受股利保護。交易所掛牌的股票選擇權\emph{不}受保護。
+		\item \vocab{除息}（ex-dividend）：從除息日起買進股票的人拿不到這次股利，所以股價在除息日會下跌約一個股利的金額。
+	\end{itemize}
+	兩者合起來：除息造成的股價下跌全數反映在不受保護的選擇權上，所以買權變便宜、賣權變貴。
+\end{remark}
 Consequently
 
 \begin{center}
@@ -406,6 +491,14 @@ Accordingly, the option is rewritten so that
 \noindent Exchange-traded stock options are adjusted for \vocab{stock dividends} in the same way.
 The point of the adjustment is that the total strike outlay $X\times(\text{shares covered})$ is unchanged, so the split --- which alters nothing real about the company --- alters nothing about the option.
 
+\begin{remark}
+	\begin{itemize}[nosep]
+		\item \vocab{$n$ 換 $m$ 股票分割}（$n$-for-$m$ stock split）：原本 $m$ 股變成 $n$ 股，每股價格約變成原來的 $m/n$ 倍，公司總價值不變。
+		\item \vocab{股票股利}（stock dividends，台灣俗稱配股）：以新股代替現金發放股利，效果與股票分割相同。
+	\end{itemize}
+	這兩種事件選擇權\emph{會}調整：履約價乘 $m/n$、每口涵蓋股數乘 $n/m$，使履約總金額不變——公司實質沒變，選擇權的價值也就不該變。
+\end{remark}
+
 \begin{eg}
 	Consider an option to buy 100 shares of a company for \$50 per share.
 	A 2-for-1 split changes the terms to a strike price of \$25 per share for 200 shares.
@@ -428,6 +521,11 @@ Several of the portfolios below, and essentially every no-arbitrage argument lat
 \begin{definition}
 	\vocab{Short selling} (or \vocab{shorting})\footnote{Invented by Le Maire (1558--1624) in 1608.} means selling an asset that is not owned, with the intention of buying it back later.
 \end{definition}
+
+\begin{remark}
+	\vocab{放空}（short selling / shorting）：賣出自己沒有的資產，打算之後再買回來歸還。實際做法是向券商借股票賣掉、日後買回還給對方，所以股價下跌就賺錢。
+	放空讓我們能持有「負的」股票部位，下面的投資組合以及後面章節的定價論證幾乎都要用到。
+\end{remark}
 
 Concretely, if you short 1{,}000 XYZ shares:
 
@@ -496,6 +594,13 @@ Three families are worth naming: \emph{hedges}, which combine an option with its
 	A \vocab{hedge} combines an option with its underlying stock in such a way that one protects the other against loss.
 \end{definition}
 
+\begin{remark}
+	\begin{itemize}[nosep]
+		\item \vocab{有掩護部位}（covered position）：選擇權與其他證券組合成的部位，分三類——避險（搭配標的股票）、價差（同類型選擇權）、組合（買權搭賣權）。
+		\item \vocab{避險}（hedge）：選擇權搭配其標的股票，讓其中一方為另一方的損失提供保護。
+	\end{itemize}
+\end{remark}
+
 \noindent Two hedges account for almost all practical use:
 
 \begin{itemize}[itemsep=0.35em]
@@ -505,6 +610,13 @@ Three families are worth naming: \emph{hedges}, which combine an option with its
 	\item \vocab{Protective put}: a long position in the stock together with a \emph{long} put.
 	      The put is an insurance policy on the shares: whatever happens, they can be sold for at least $X$.
 \end{itemize}
+
+\begin{remark}
+	\begin{itemize}[nosep]
+		\item \vocab{掩護性買權}（covered call）：持有股票，同時賣出買權。被履約時手上已有股票可交，所以叫「有掩護」；代價是股價漲過 $X$ 的部分讓給買方，報酬被\emph{封頂}在 $X$。
+		\item \vocab{保護性賣權}（protective put）：持有股票，同時買進賣權。賣權就像股票的保險，股價再怎麼跌都能以 $X$ 賣出，報酬有\emph{地板} $X$。
+	\end{itemize}
+\end{remark}
 
 Writing $S_{T}$ for the stock price at expiration, the two payoffs are
 \begin{equation}
@@ -576,6 +688,10 @@ So the covered call \emph{caps} the outcome at $X$ and the protective put \emph{
 	A \vocab{spread} consists of options of the same type and on the same underlying asset, but with different strike prices or expiration dates.
 \end{definition}
 
+\begin{remark}
+	\vocab{價差}（spread）：同一標的、同一類型（全是買權或全是賣權），但履約價或到期日不同的選擇權組合。一買一賣互相抵掉一部分成本與風險，主要用來押股價的\emph{方向}。
+\end{remark}
+
 Throughout this section we use $X_{L}$, $X_{M}$, and $X_{H}$ to denote strike prices with
 \[
 	X_{L} \;<\; X_{M} \;<\; X_{H} .
@@ -589,6 +705,10 @@ All options in a spread are calls, or all are puts; mixing types produces a \emp
 \begin{definition}
 	A \vocab{bull call spread} consists of a long $X_{L}$ call and a short $X_{H}$ call with the same expiration date.
 \end{definition}
+
+\begin{remark}
+	\vocab{多頭買權價差}（bull call spread）：買進低履約價 $X_{L}$ 的買權、賣出高履約價 $X_{H}$ 的買權（到期日相同）。賣出的買權幫忙付掉一部分成本，但也把股價超過 $X_{H}$ 的獲利讓出去，所以賺賠都有上限——押的是「股價會漲，但漲不多」。
+\end{remark}
 
 Since $C_{L}>C_{H}$ (a lower strike is worth more), the position costs money to enter.
 Its accounting is completely determined by \eqref{eq:call-payoff}:
@@ -657,6 +777,11 @@ The ramp becomes vertical, and a (Heaviside) step function emerges as the payoff
 	The security with this payoff is the \vocab{binary} (or \vocab{digital}) \vocab{call}: it pays \$1 if the stock finishes above the strike, and nothing otherwise.
 \end{definition}
 
+\begin{remark}
+	\vocab{二元買權}／\vocab{數位買權}（binary call / digital call）：到期時股價高於履約價就付 \$1，否則付 $0$，報酬是一個階梯函數。
+	它是「$(X_{H}-X_{L})^{-1}$ 份多頭價差、兩個履約價無限靠近」的極限，所以價格就是買權價格對履約價的導數 $-\partial C/\partial X$。
+\end{remark}
+
 Its price is the limit of the prices of the spreads that converge to it.
 Writing $C(X)$ for the price of a standard call struck at $X$, that limit is a difference quotient:
 \[
@@ -693,6 +818,13 @@ The same directional bet can be built out of puts, and reversed.
 	      It profits from declining stock prices.
 \end{itemize}
 
+\begin{remark}
+	\begin{itemize}[nosep]
+		\item \vocab{多頭賣權價差}（bull put spread）：賣出高履約價 $X_{H}$ 的賣權、買進低履約價 $X_{L}$ 的賣權。因為 $P_{H}>P_{L}$，建倉時是先\emph{收}錢，但獲利形狀與多頭買權價差相同，一樣押股價上漲。
+		\item \vocab{空頭價差}（bear spread）：把多頭價差反過來做（賣出一個多頭價差），股價下跌時獲利。
+	\end{itemize}
+\end{remark}
+
 \begin{note}
 	A bull put spread collects cash up front and, most of the time, expires worthless --- which is precisely what makes it dangerous.
 	Its maximum loss, $X_{H}-X_{L}$ less the credit, is many times the credit received, so a single move can wipe out a long string of profitable months.\footnote{See \url{https://www.businesstoday.com.tw/article/category/80392/post/201803070} for a sad example in Taiwan on February 6, 2018.}
@@ -721,6 +853,11 @@ The first spread's ramp goes up over $[X_{L},X_{M}]$ and the second's comes down
 
 A butterfly spread has a positive payoff at expiration only if the asset price falls between $X_{L}$ and $X_{H}$.
 It is therefore a bet on the stock \emph{not moving}, as opposed to the directional bets above.
+
+\begin{remark}
+	\vocab{蝶式價差}（butterfly spread）：用三個履約價 $X_{L}<X_{M}<X_{H}$ 的同類選擇權組成；買權版是買一個 $X_{L}$、買一個 $X_{H}$、賣兩個 $X_{M}$。
+	到期報酬像一個帳篷，只有股價落在 $X_{L}$ 與 $X_{H}$ 之間才為正、在 $X_{M}$ 最高，所以它押的不是方向，而是「股價不太會動」。
+\end{remark}
 
 \begin{figure}[H]
 	\centering
@@ -782,6 +919,13 @@ When $X_{H}-X_{L}\to 0$ the tent becomes infinitely tall and infinitely thin, an
 	Its price is called a \vocab{state price}.\footnote{As a function of the state it is the \emph{state-price density} (A\"{\i}t-Sahalia \& Lo, 1998).}
 \end{definition}
 
+\begin{remark}
+	\begin{itemize}[nosep]
+		\item \vocab{狀態或有求償權}（state contingent claim），又稱 \vocab{Arrow 證券}（Arrow security）：只在某一個特定狀態（例如 $S_{T}=X$）付 \$1、其他狀態都付 $0$ 的證券。它是最基本的積木，任何報酬都能拆成它們的組合。
+		\item \vocab{狀態價格}（state price）：這種證券今天的價格。由蝶式價差取極限可知，它等於 $\partial^{2}C/\partial X^{2}$。
+	\end{itemize}
+\end{remark}
+
 Its price follows from the same difference-quotient argument that produced \eqref{eq:binary-call}, applied twice --- for the butterfly is precisely a second difference of call prices in the strike.
 Writing $h=X_{M}-X_{L}$ and $X=X_{M}$, the cost of $h^{-2}$ butterflies is
 \begin{equation}
@@ -830,6 +974,10 @@ Since \eqref{eq:state-price} needed no model, neither does this: \textbf{the for
 	The distinction is made precise in \autoref{sec:risk-neutral-prob}, where the risk-neutral probability is constructed explicitly; for now the point is only that a density is there and that it is observable.
 \end{note}
 
+\begin{remark}
+	\vocab{風險中立}（risk-neutral）：從報價反推出的密度 $f$ 不是股價「真實」的機率分布，而是市場\emph{拿來定價}的分布——投資人的風險偏好已經被揉進機率裡。在這個分布下，所有資產的期望報酬都等於無風險利率，因此用無風險利率折現期望報酬就得到價格。
+\end{remark}
+
 The practical reading of \autoref{thm:breeden-litzenberger} closes the loop with \autoref{fig:butterfly}.
 A butterfly spread centred at $X$ is, up to scale, a bet on $S_{T}\approx X$, and \autoref{thm:breeden-litzenberger} says what the market charges for that bet.
 So:
@@ -861,6 +1009,10 @@ Getting that distinction requires mixing the two option types, which is exactly 
 	These options must be either all bought or all written.
 \end{definition}
 
+\begin{remark}
+	\vocab{組合}（combination）：同一標的、但同時包含買權與賣權（\emph{不同類型}）的部位，而且必須全部買進或全部賣出。價差押的是方向，組合押的是股價變動的\emph{幅度}。
+\end{remark}
+
 \begin{note}
 	The ``all bought or all written'' clause is what separates a combination from the hedges of \autoref{sec:hedges} and the spreads of \autoref{sec:option-spreads}.
 	Buying a call and writing a put is not a combination; by \eqref{eq:call-payoff} and \eqref{eq:put-payoff} its payoff is $S_{T}-X$, a straight line with no kink at all --- the position is a synthetic forward, not an option strategy.
@@ -875,6 +1027,10 @@ Getting that distinction requires mixing the two option types, which is exactly 
 	A \vocab{straddle} is a long call and a long put with the same strike price and expiration date.
 \end{definition}
 
+\begin{remark}
+	\vocab{跨式}（straddle）：同時買進履約價、到期日都相同的一個買權與一個賣權。到期報酬 $\abs{S_{T}-X}$ 呈 V 字形：不論漲跌，只要動得夠多就賺，最多賠掉兩份權利金。
+\end{remark}
+
 By \eqref{eq:call-payoff} and \eqref{eq:put-payoff} the payoff is
 \begin{equation}
 	\max(0,S_{T}-X)+\max(0,X-S_{T}) \;=\; \abs{S_{T}-X} ,
@@ -885,6 +1041,10 @@ The holder is paid for movement and is indifferent to its direction; the loss is
 
 Since it profits from high volatility, a person who buys a straddle is said to be \vocab{long volatility}.
 Selling a straddle benefits from low volatility --- the writer collects both premiums and keeps them if the stock stays put.
+
+\begin{remark}
+	\vocab{做多波動率}（long volatility）：部位價值隨波動度上升而增加。買進跨式賺的是「股價大幅變動」而不在乎方向，所以是做多波動率；反過來賣出跨式就是做空波動率，希望股價不動、把兩份權利金收進口袋。
+\end{remark}
 
 \begin{figure}[H]
 	\centering
@@ -928,6 +1088,10 @@ Selling a straddle benefits from low volatility --- the writer collects both pre
 \begin{definition}
 	A \vocab{strangle} is identical to a straddle except that the call's strike price is higher than the put's.
 \end{definition}
+
+\begin{remark}
+	\vocab{勒式}（strangle）：和跨式一樣同時買進買權與賣權，但買權的履約價 $X_{H}$ 高於賣權的履約價 $X_{L}$。兩個都是價外，所以比跨式便宜；代價是 $[X_{L},X_{H}]$ 之間報酬為 $0$，股價要動得更遠才開始賺。
+\end{remark}
 
 Writing $X_{L}$ for the put's strike and $X_{H}$ for the call's, the payoff is
 \begin{equation}
@@ -1025,6 +1189,13 @@ It supplies the argument for option pricing.
 \begin{definition}
 	A \vocab{riskless arbitrage opportunity} is one that, without any initial investment, generates nonnegative returns under all circumstances and positive returns under some.
 \end{definition}
+
+\begin{remark}
+	\begin{itemize}[nosep]
+		\item \vocab{無套利原則}（no-arbitrage principle）：天下沒有白吃的午餐——市場上不存在零成本、零風險卻穩賺的機會。這是本章所有定價論證的唯一工具。
+		\item \vocab{無風險套利機會}（riskless arbitrage opportunity）：不需任何初始投入，所有情況下報酬 $\ge 0$、且某些情況下 $>0$ 的交易。
+	\end{itemize}
+\end{remark}
 
 In an efficient market such opportunities do not exist --- at least not for long.\footnote{Heakal (2013): ``In the real world of investments, however, there are obvious arguments against the EMH [efficient market hypothesis]. There are investors who have beaten the market---Warren Buffett.''}
 
@@ -1253,12 +1424,24 @@ That is the source of their power --- \textbf{these relations hold regardless of
 	Combinations such as this create \vocab{synthetic securities} --- the same move that built the synthetic bonds of \autoref{sec:synthetic-bonds}.
 \end{moral}
 
+\begin{remark}
+	\vocab{合成證券}（synthetic securities）：用其他證券組合出與某證券現金流完全相同的部位，也就是把它「複製」出來。由買賣權平價，任一種歐式選擇權都能用另一種選擇權加上股票與借貸合成。
+\end{remark}
+
 Rearranging \eqref{eq:put-call-parity} reads off the other synthetics:
 
 \begin{itemize}[itemsep=0.3em]
 	\item $S = C - P + \mathrm{PV}(X)$: a stock is equivalent to a portfolio containing a long call, a short put, and lending $\mathrm{PV}(X)$.
 	\item $C - P = S - \mathrm{PV}(X)$: a long call and a short put amount to a long position in stock together with borrowing the PV of the strike price --- that is, buying stock on margin.
 \end{itemize}
+
+\begin{remark}
+	\vocab{融資}（financing）：泛指「取得資金」，最常見的方式就是借錢。
+	投資上的\vocab{融資買進}（buying on margin）是指買股票時自己只出一部分錢，其餘向券商借，也就是「借錢買股票」：股價漲時報酬被放大，跌時虧損也被放大，這就是\emph{槓桿}（leverage）。
+
+	第二個式子正是這個意思：$S-\mathrm{PV}(X)$ 代表買一股、但其中 $\mathrm{PV}(X)$ 是借來的，自己只出 $S-\mathrm{PV}(X)$；到期時要還 $X$。
+	所以「long call $+$ short put」就等於用融資的方式買進股票。
+\end{remark}
 
 \begin{note}
 	The second identity is the one promised in \autoref{sec:combinations}: buying a call and writing a put is not a combination but a synthetic forward, and \eqref{eq:put-call-parity} is why its payoff $S_{\tau}-X$ carries no kink and costs $S-\mathrm{PV}(X)$ today.
@@ -1293,6 +1476,10 @@ Parity immediately sharpens what \autoref{sec:payoff} could only assert by pictu
 \end{proof}
 
 Such calls are said to have a nonnegative \vocab{time value}, defined as $C-\max(S-X,0)$.
+
+\begin{remark}
+	\vocab{時間價值}（time value）：這裡正式定義為 $C-\max(S-X,0)$，即價格減去內含價值。上面的引理說明，美式買權及不配息股票的歐式買權，時間價值一定非負。
+\end{remark}
 
 Puts are different, and the difference is visible in \autoref{fig:option-value}.
 
@@ -1439,6 +1626,10 @@ This chapter supplies the missing ingredient --- a model of how the stock price 
 	\item The breakthrough came in 1973, when Black (1938--1995) and Scholes, with help from Merton, published their celebrated option pricing model,\footnote{The results were obtained as early as June 1969. Merton and Scholes were winners of the 1997 Nobel Prize in Economic Sciences.} known as the \vocab{Black--Scholes option pricing model}.
 \end{itemize}
 
+\begin{remark}
+	\vocab{Black--Scholes 選擇權定價模型}（Black--Scholes option pricing model）：1973 年由 Black 與 Scholes（Merton 協助）提出，第一次在給定股價模型下算出選擇權的確切價格。關鍵在於不需要風險調整後的折現率：選擇權可以用股票和債券複製，價格就是複製的成本。
+\end{remark}
+
 \begin{note}
 	The third bullet is the crux, and it is worth dwelling on before the machinery starts.
 
@@ -1484,6 +1675,10 @@ This chapter supplies the missing ingredient --- a model of how the stock price 
 	We start from the discrete-time binomial model.
 \end{notation}
 
+\begin{remark}
+	\vocab{總報酬}（gross return）：$R=e^{\hat{r}}$，今天存入 \$1 無風險資金，一期後變成 $R$ 元。因為包含本金所以叫「總」報酬，淨報酬是 $R-1$。
+\end{remark}
+
 %─────§ BOPM────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{The Binomial Option Pricing Model}
 \label{sec:bopm}
@@ -1500,6 +1695,10 @@ This chapter supplies the missing ingredient --- a model of how the stock price 
 	\]
 	where $0<q<1$ and $d<u$.
 \end{definition}
+
+\begin{remark}
+	\vocab{二項式選擇權定價模型}（binomial option pricing model, BOPM）：把時間切成離散的期，每一期股價只有兩種可能——乘上 $u$（上漲）或乘上 $d$（下跌）。模型雖簡單，卻已足以用複製的方法算出選擇權價格。
+\end{remark}
 
 In fact $d\le R\le u$ must hold to rule out arbitrage.\footnote{See Exercise 9.2.1 of the textbook. The sufficient condition is the strict one, $d<R<u$ (Björk, 2009), which we shall assume.}
 
@@ -1572,6 +1771,10 @@ The trick is to build something with the same two terminal values out of instrum
 	It costs $hS+B$ today, and $h$ is called the \vocab{hedge ratio} or \vocab{delta}.
 \end{definition}
 
+\begin{remark}
+	\vocab{避險比率}（hedge ratio），又稱 \vocab{Delta}：複製選擇權所需持有的股數 $h$。由 \eqref{eq:bopm-hb}，$h=\frac{C_{u}-C_{d}}{Su-Sd}$，就是「選擇權價值變動 / 股價變動」，也就是選擇權對股價的敏感度。
+\end{remark}
+
 The value of this portfolio at time one is
 \[
 	\begin{cases}
@@ -1608,6 +1811,10 @@ Two linear equations in two unknowns, with a nonsingular matrix because $u\ne d$
 \begin{proof}
 	By construction the portfolio and the call have identical payoffs in both states at time~1, so \autoref{cor:same-payoff} forces identical prices at time~0.
 \end{proof}
+
+\begin{remark}
+	\vocab{複製投資組合}（replicating portfolio）：在每一個狀態下報酬都與選擇權完全相同的「股票 $+$ 債券」組合。既然現金流一模一樣，由無套利，選擇權價格就必須等於這個組合今天的成本 $hS+B$。
+\end{remark}
 
 \begin{note}
 	Read off the signs. $h\ge 0$: the replicating portfolio is \emph{long} stock, as one would expect of a call. And since $uC_{d}-dC_{u}<0$ we have $B<0$, so the equivalent portfolio is a \textbf{levered long position in stocks} --- buy $h$ shares, borrow $\abs{B}$ to help pay for them.
@@ -1719,6 +1926,10 @@ Substituting \eqref{eq:risk-neutral-p} verifies it in one line.
 Now, the expected rates of return of \emph{all} securities must equal the riskless rate when investors are risk-neutral --- a risk-neutral investor demands no compensation for bearing risk.
 Equation \eqref{eq:rn-stock} says the stock behaves that way under $p$, and for this reason $p$ is called the \vocab{risk-neutral probability}.
 
+\begin{remark}
+	\vocab{風險中立機率}（risk-neutral probability）：$p=\frac{R-d}{u-d}$。在這個機率下，股票的期望報酬恰好等於無風險利率，就像身處一個投資人不要求風險補償的世界。它\emph{不是}股價真正上漲的機率 $q$，只是讓定價公式變成「期望值再用無風險利率折現」的計算工具。
+\end{remark}
+
 \begin{moral}
 	The value of an option is the expectation of its discounted future payoff \emph{in a risk-neutral economy}.
 	So the rate used for discounting is the riskless rate --- and the obstacle raised in \autoref{sec:pricing-setting} is gone, not by being solved but by being made irrelevant.
@@ -1740,6 +1951,13 @@ Under the binomial model the stock can take on three possible prices at time two
 There are four \emph{paths} --- $uu$, $ud$, $du$, $dd$ --- but the tree \vocab{recombines}, since $ud=du$, so there are only three terminal prices.
 
 At any node the next two stock prices depend only on the current price, not on the prices of earlier times; the model is \vocab{Markovian}.
+
+\begin{remark}
+	\begin{itemize}[nosep]
+		\item \vocab{重合}（recombine）：先漲後跌與先跌後漲會到達同一個價格（$ud=du$），所以樹的分支會合併；$n$ 期只有 $n+1$ 個終點，而不是 $2^{n}$ 個，計算量大幅減少。
+		\item \vocab{馬可夫性}（Markovian）：下一期的股價只取決於\emph{現在}的價格，與過去怎麼走到這裡無關。
+	\end{itemize}
+\end{remark}
 
 \begin{figure}[H]
 	\centering
@@ -1825,6 +2043,10 @@ So the call will not be exercised at present either, and
 
 The expression above calculates $C$ from the two successor nodes $C_{u}$ and $C_{d}$ and none beyond; and the same computation happened at $C_{u}$ and $C_{d}$ themselves, in \eqref{eq:bopm-step-back}.
 This recursive procedure is called \vocab{backward induction}.\footnote{Ernst Zermelo (1871--1953).}
+
+\begin{remark}
+	\vocab{逆向歸納法}（backward induction）：從到期日已知的報酬出發，用 \eqref{eq:bopm-expectation} 一期一期往回推算每個節點的價值，推到根節點就是今天的價格。美式選擇權則在每個節點再與立即履約的價值取 $\max$。
+\end{remark}
 
 Unrolling it for two periods,
 \begin{equation}
@@ -1937,6 +2159,10 @@ So the conclusion generalises at once.
 
 The ``equivalence'' between arbitrage freedom in a model and the existence of a risk-neutral probability is called the \vocab{(first) fundamental theorem of asset pricing}.\footnote{Dybvig \& Ross (1987).}
 
+\begin{remark}
+	\vocab{資產定價第一基本定理}（first fundamental theorem of asset pricing）：一個模型沒有套利機會，若且唯若存在風險中立機率。換句話說，「無套利」與「可以用風險中立期望值定價」是同一件事的兩種說法。
+\end{remark}
+
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.34\textwidth}
@@ -1978,6 +2204,10 @@ It does not.
 	\label{prop:self-financing}
 	The replicating strategy is \vocab{self-financing}: there is neither injection nor withdrawal of funds throughout.\footnote{Except at the beginning, of course, when the option premium is paid before the replication starts.}
 \end{proposition}
+
+\begin{remark}
+	\vocab{自我融資}（self-financing）：「融資」就是取得資金（見 \autoref{sec:put-call-parity} 的融資買進），「自我」融資是指所需資金全由組合本身提供——複製策略從頭到尾不需要再投入、也不會提出資金。每期結束時組合的價值剛好等於下一期新組合的成本，所以動態調整部位不用額外的錢；價值的變化完全來自資本利得。
+\end{remark}
 
 The reason is already in \eqref{eq:bopm-replicate}.
 At the end of the current period the portfolio is worth $hSu+RB$ or $hSd+RB$, which \emph{is} $C_{u}$ or $C_{d}$ --- and $C_{u}$ and $C_{d}$ are, by \eqref{eq:bopm-price} applied one period later, exactly the cost of the next portfolio.

@@ -1,0 +1,294 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xeCJK}
+\setCJKmainfont{Noto Serif CJK TC}
+\setCJKsansfont{Noto Sans CJK TC}
+
+\tcbuselibrary{skins,breakable}
+\newtcolorbox{keybox}[1]{colback=blue!4,colframe=blue!50!black,
+  fonttitle=\bfseries,title={#1},breakable}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+
+\title{Financial Computing HW1 \\ 商業不動產貸款的再融資分析}
+\author{}
+\date{Due: 2026/10/8 08:00 (GMT+8)}
+
+\begin{document}
+\maketitle
+
+%======================================================================
+\section{原題（English）}
+
+Consider a commercial property loan of amount $V$ with a total duration of
+$n_3$ years and $m$ compounding payments per year at annual interest rate
+$r_1$. In the first $n_1$ years, payments only cover interest (the
+interest-only grace period, with no principal amortization). In the next
+$n_3-n_1$ years, equal periodic amortizing payments repay the loan.
+
+After a duration of $n_2$ years from loan inception (where $n_1<n_2<n_3$),
+immediately after making the year-end payment, the borrower has an option to
+refinance the remaining loan balance $B$ into a new loan at annual interest
+rate $r_2$ for the remaining $n_3-n_2$ years again with $m$ payments per year.
+Refinancing incurs a fixed upfront fee $F$ and a prepayment penalty fraction
+$\alpha$ on the remaining balance $B$, both paid out-of-pocket in cash by the
+borrower at year $n_2$.
+
+Write a program to calculate:
+\begin{enumerate}[nosep]
+  \item Regular periodic payment amount after the grace period;
+  \item Remaining loan balance $B$;
+  \item Total interest saved by refinancing over the $n_3-n_2$ years;
+  \item Annualized net internal rate of return (IRR) of the refinancing decision.
+\end{enumerate}
+
+The annualized net IRR is defined as $m\times y$, where the periodic IRR $y$
+is the unique rate satisfying
+\[
+  C_0=\sum_{t=1}^{K}\frac{\Delta\mathrm{PMT}}{(1+y)^t}
+     =\Delta\mathrm{PMT}\times\frac{1-(1+y)^{-K}}{y},
+\]
+where
+\begin{itemize}[nosep]
+  \item $C_0=F+\alpha B$ is the upfront cash outflow (refinancing fee plus the
+        prepayment penalty on $B$);
+  \item $K=(n_3-n_2)\,m$ is the total number of payments;
+  \item $\Delta\mathrm{PMT}=\mathrm{PMT}_{\text{old}}-\mathrm{PMT}_{\text{new}}$
+        is the periodic cash savings from refinancing.
+\end{itemize}
+
+\textbf{Inputs.}
+\begin{itemize}[nosep]
+  \item $V$: original loan amount in dollars, a float or integer;
+  \item $m$: number of payments per annum, a positive integer;
+  \item $n_1$: duration of the initial interest-only grace period in years, a positive integer;
+  \item $n_2$: duration from loan inception to refinancing in years ($n_1<n_2<n_3$), an integer;
+  \item $n_3$: duration of the original loan in years, a positive integer;
+  \item $r_1$: annual interest rate of the original loan (compounded $m$ times per annum), a float;
+  \item $r_2$: annual interest rate of the refinanced loan (compounded $m$ times per annum), a float;
+  \item $F$: upfront closing fee for the new loan in dollars, a float;
+  \item $\alpha$: prepayment penalty rate on the remaining loan balance (a
+        fraction between 0 and 1, e.g., 0.01 for 1\%), a float.
+\end{itemize}
+
+\textbf{Outputs.} regular payment amount after grace period; remaining balance
+after duration $n_2$; total interest saved over the remaining term; annualized
+net IRR.
+
+\textbf{Example.} If $V=10000000$, $m=12$, $n_1=3$, $n_2=5$, $n_3=20$,
+$r_1=0.025$, $r_2=0.018$, $F=50000$, and $\alpha=0.01$:
+\begin{verbatim}
+python3 D13922016_HW_1.py 10000000 12 3 5 20 0.025 0.018 50000 0.01
+\end{verbatim}
+Output (comma-separated):
+\begin{verbatim}
+60222.193744, 9031668.918858, 527518.711395, 0.243936
+\end{verbatim}
+
+\textbf{Submission.} Submit source (and executable) code and a brief
+explanation text file (if not Python, describe how to compile and run it) via
+Gradescope in NTU COOL before 08:00 AM (GMT+8) 2026 Oct 8. No late
+submissions. Compress all files into a single zip named \texttt{ID\_HW\_i.zip}
+(ID = student ID in uppercase, $i$ = homework number), e.g.\
+\texttt{D13922016\_HW\_1.zip}. If the code is not written in Python, you may be
+asked to demonstrate it to the TA.
+
+%======================================================================
+\section{中文翻譯}
+
+考慮一筆金額為 $V$ 的商業不動產貸款，總期限為 $n_3$ 年，每年付款（並複利）$m$
+次，年利率為 $r_1$。在前 $n_1$ 年，每期付款只繳利息（稱為\textbf{只繳息寬限期}，
+本金不攤還）。在接下來的 $n_3-n_1$ 年，每期繳交金額相同的本息攤還款，把貸款還清。
+
+在貸款開始後第 $n_2$ 年（$n_1<n_2<n_3$），\textbf{剛繳完該年年底那一期款項之後}，
+借款人可以選擇\textbf{再融資（轉貸）}：把剩餘的貸款餘額 $B$ 轉成一筆新貸款，
+新年利率為 $r_2$，期限為剩下的 $n_3-n_2$ 年，同樣每年付款 $m$ 次。
+再融資需要支付一筆固定的前置手續費 $F$，以及按剩餘餘額 $B$ 的比例 $\alpha$
+計算的\textbf{提前清償違約金}；這兩筆錢都由借款人在第 $n_2$ 年\textbf{自掏腰包以現金支付}
+（不是加進新貸款裡）。
+
+請寫一個程式計算：
+\begin{enumerate}[nosep]
+  \item 寬限期結束後的每期固定付款金額；
+  \item 剩餘貸款餘額 $B$；
+  \item 在剩下的 $n_3-n_2$ 年中，再融資總共省下的利息；
+  \item 再融資決策的年化淨內部報酬率（IRR）。
+\end{enumerate}
+
+年化淨 IRR 定義為 $m\times y$，其中每期 IRR $y$ 是滿足下式的唯一利率：
+\[
+  C_0=\sum_{t=1}^{K}\frac{\Delta\mathrm{PMT}}{(1+y)^t}
+     =\Delta\mathrm{PMT}\times\frac{1-(1+y)^{-K}}{y},
+\]
+其中 $C_0=F+\alpha B$ 為期初現金流出（手續費加上違約金）；
+$K=(n_3-n_2)m$ 為剩餘的付款總期數；
+$\Delta\mathrm{PMT}=\mathrm{PMT}_{\text{old}}-\mathrm{PMT}_{\text{new}}$
+為再融資後每期省下的現金。
+
+輸入依序為 $V, m, n_1, n_2, n_3, r_1, r_2, F, \alpha$（意義同上），
+輸出為上述四個數字，以逗號分隔。繳交方式：把程式碼（以及可執行檔）和一份簡短說明文字檔
+壓成 \texttt{學號\_HW\_1.zip}（學號大寫），於 2026/10/8 早上 8:00 前上傳到 NTU COOL
+的 Gradescope，逾時不收；若不是用 Python 寫，要在說明檔寫清楚如何編譯與執行，
+且可能被要求向助教 demo。
+
+%======================================================================
+\section{題目解說}
+
+\subsection{時間軸：整筆貸款分三段}
+
+以「期」為單位（每期 $=1/m$ 年），令每期利率
+\[
+  i_1=\frac{r_1}{m},\qquad i_2=\frac{r_2}{m}.
+\]
+
+\begin{center}
+\begin{tikzpicture}[x=0.7cm,y=1cm]
+  \draw[thick,->] (0,0) -- (20.8,0) node[right] {年};
+  \foreach \x/\l in {0/0,3/n_1,5/n_2,20/n_3}{
+    \draw[thick] (\x,0.15) -- (\x,-0.15) node[below] {$\l$};
+  }
+  \fill[orange!25] (0,0.25) rectangle (3,0.85);
+  \node at (1.5,0.55) {\small 只繳息};
+  \fill[blue!20] (3,0.25) rectangle (5,0.85);
+  \node at (4,0.55) {\scriptsize 舊貸攤還};
+  \fill[green!25] (5,0.25) rectangle (20,0.85);
+  \node at (12.5,0.55) {\small 新貸攤還（利率 $r_2$），共 $K=(n_3-n_2)m$ 期};
+  \draw[dashed,blue!60!black] (5,0.25) -- (5,1.1)
+     node[above,align=center] {\small 繳完這期後轉貸\\\small 付 $F+\alpha B$};
+  \draw[decorate,decoration={brace,mirror,amplitude=5pt}]
+     (3,-0.7) -- (20,-0.7) node[midway,below=6pt] {\small 原貸款的攤還期 $N=(n_3-n_1)m$ 期};
+\end{tikzpicture}
+\end{center}
+
+\begin{itemize}
+  \item \textbf{第一段 $[0,n_1]$：只繳息。}本金一直維持 $V$，每期只付利息 $V i_1$。
+        所以到第 $n_1$ 年時欠款仍然是 $V$。
+  \item \textbf{第二段 $[n_1,n_3]$（原計畫）：}把 $V$ 在剩下的
+        $N=(n_3-n_1)m$ 期內用等額本息（像房貸那樣）還清。
+  \item \textbf{第 $n_2$ 年可以轉貸：}這時舊貸款已經攤還了 $p=(n_2-n_1)m$ 期，
+        還剩 $K=(n_3-n_2)m$ 期。把此時欠的 $B$ 用新利率 $r_2$、同樣 $K$ 期重新攤還。
+\end{itemize}
+
+\subsection{(1) 寬限期後的每期付款 $\mathrm{PMT}_{\text{old}}$}
+
+年金公式：借 $V$、每期利率 $i_1$、分 $N$ 期等額還清，則
+\begin{keybox}{公式}
+\[
+  \mathrm{PMT}_{\text{old}}=\frac{V\,i_1}{1-(1+i_1)^{-N}},\qquad N=(n_3-n_1)m.
+\]
+\end{keybox}
+注意用的是 $N=(n_3-n_1)m$，\textbf{不是} $n_3 m$；因為寬限期沒有還本金，
+本金 $V$ 要在寬限期之後的期數內還完。
+
+\subsection{(2) 剩餘餘額 $B$}
+
+$B$ ＝ 第 $n_2$ 年\textbf{剛繳完那一期後}，舊貸款還欠的本金（也就是轉貸時要向新銀行借的金額）。
+
+\textbf{每期怎麼變：}設期初欠 $b$，這期利息 $b\,i_1$，繳 $\mathrm{PMT}_{\text{old}}$ 後
+\[
+  b_{\text{new}} = b(1+i_1)-\mathrm{PMT}_{\text{old}}.
+\]
+從第 $n_1$ 年的 $b=V$ 開始（寬限期本金沒減），做 $p=(n_2-n_1)m$ 次（含第 $n_2$ 年那期），結果就是 $B$。
+
+\textbf{直接公式：}舊貸款此時還剩 $N-p=(n_3-n_2)m=K$ 期，這 $K$ 期付款剛好把 $B$ 還清，
+所以 $B$ 就是它們用舊利率 $i_1$ 折現的現值：
+\begin{keybox}{公式}
+\[
+  B=\mathrm{PMT}_{\text{old}}\cdot\frac{1-(1+i_1)^{-K}}{i_1},\qquad K=(n_3-n_2)m.
+\]
+\end{keybox}
+\textbf{等價寫法：}把遞迴展開 $p$ 次，得
+\[
+  B=V(1+i_1)^{p}-\mathrm{PMT}_{\text{old}}\cdot\frac{(1+i_1)^{p}-1}{i_1},\qquad p=(n_2-n_1)m,
+\]
+即「本金滾到 $n_2$ 的值，減掉已繳款項滾到 $n_2$ 的值」。
+把 $V=\mathrm{PMT}_{\text{old}}\frac{1-(1+i_1)^{-N}}{i_1}$ 代入並用 $N-p=K$ 化簡，就會得到上面的公式，所以兩者相等。
+
+範例：$p=24$、$K=180$，得 $B=10512164.20-1480495.28=9031668.92$。
+
+\textbf{注意：}期數從 $n_1$ 開始算、剩 $K$ 期不是 $K+1$、用舊利率 $i_1$ 不是 $i_2$。
+
+\subsection{(3) 省下的總利息}
+
+轉貸後的新每期付款：
+\[
+  \mathrm{PMT}_{\text{new}}=\frac{B\,i_2}{1-(1+i_2)^{-K}}.
+\]
+在剩下 $K$ 期裡：
+\begin{align*}
+  \text{不轉貸要付的利息} &= K\cdot\mathrm{PMT}_{\text{old}}-B,\\
+  \text{轉貸後要付的利息} &= K\cdot\mathrm{PMT}_{\text{new}}-B.
+\end{align*}
+（總付款減掉還的本金 $B$ 就是利息。）兩者相減，$B$ 消掉：
+\begin{keybox}{公式}
+\[
+  \text{Interest saved}=K\,(\mathrm{PMT}_{\text{old}}-\mathrm{PMT}_{\text{new}})=K\cdot\Delta\mathrm{PMT}.
+\]
+\end{keybox}
+注意這裡\textbf{沒有扣掉} $F$ 和 $\alpha B$（它們不是利息）；
+範例答案 $527518.71$ 也驗證了這點。
+
+\subsection{(4) 年化淨 IRR}
+
+把「轉貸」當作一項投資來看：
+\begin{itemize}
+  \item 第 0 期（第 $n_2$ 年）：付出現金 $C_0=F+\alpha B$；
+  \item 第 $1,\dots,K$ 期：每期少付 $\Delta\mathrm{PMT}$，等同每期收到 $\Delta\mathrm{PMT}$。
+\end{itemize}
+IRR 就是讓「未來收入的現值 $=$ 期初付出」的折現率 $y$：
+\[
+  f(y)=\Delta\mathrm{PMT}\cdot\frac{1-(1+y)^{-K}}{y}-C_0=0.
+\]
+這個方程沒有封閉解，要用\textbf{數值方法}求根。
+由於 $f(y)$ 對 $y>0$ 嚴格遞減（折現率越高，現值越小），且當 $\Delta\mathrm{PMT}\cdot K>C_0$ 時
+$f(0^+)=K\Delta\mathrm{PMT}-C_0>0$、$f(\infty)=-C_0<0$，所以根唯一，
+用\textbf{二分法}（或 Newton 法）即可。最後輸出年化值 $m\cdot y$
+（是名目年利率，不是 $(1+y)^m-1$）。
+
+\subsection{範例驗算}
+
+$V=10^7$, $m=12$, $n_1=3$, $n_2=5$, $n_3=20$, $r_1=2.5\%$, $r_2=1.8\%$, $F=50000$, $\alpha=1\%$：
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+量 & 算式 & 數值\\
+\midrule
+$i_1,\ i_2$ & $0.025/12,\ 0.018/12$ & $0.0020833,\ 0.0015$\\
+寬限期每期利息 & $V i_1$ & $20833.33$\\
+$N$ & $(20-3)\times12$ & $204$\\
+$K$ & $(20-5)\times12$ & $180$\\
+$\mathrm{PMT}_{\text{old}}$ & $V i_1/(1-(1+i_1)^{-204})$ & $\mathbf{60222.193744}$\\
+$B$ & $\mathrm{PMT}_{\text{old}}\,(1-(1+i_1)^{-180})/i_1$ & $\mathbf{9031668.918858}$\\
+$\mathrm{PMT}_{\text{new}}$ & $B i_2/(1-(1+i_2)^{-180})$ & $57291.534237$\\
+$\Delta\mathrm{PMT}$ & & $2930.659508$\\
+Interest saved & $180\times\Delta\mathrm{PMT}$ & $\mathbf{527518.711395}$\\
+$C_0$ & $50000+0.01B$ & $140316.689189$\\
+$y$ & 解 $f(y)=0$ & $0.0203280$\\
+年化 IRR & $12y$ & $\mathbf{0.243936}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+四個粗體數字與題目範例輸出一致。
+
+\subsection{實作提醒}
+\begin{itemize}[nosep]
+  \item 從命令列讀 9 個參數（\texttt{sys.argv[1:]}），$m,n_1,n_2,n_3$ 轉成 \texttt{int}，其餘 \texttt{float}。
+  \item 輸出格式：四個數各保留小數點後 6 位，用 \texttt{", "} 分隔，例如\\
+        \texttt{print(f"\{a:.6f\}, \{b:.6f\}, \{c:.6f\}, \{d:.6f\}")}。
+  \item 若 $r_1=0$ 或 $r_2=0$，年金公式分母為 0，應改用 $\mathrm{PMT}=\text{本金}/\text{期數}$（邊界情況）。
+  \item IRR 二分法：下界取很小的正數（如 $10^{-12}$），上界取夠大（如 $1$ 或逐步加倍直到 $f<0$），迭代到區間夠小。
+  \item 檔名：\texttt{你的學號\_HW\_1.py}（學號大寫），壓縮成 \texttt{你的學號\_HW\_1.zip}，裡面附一份簡短說明 \texttt{.txt}。
+\end{itemize}
+
+\end{document}
