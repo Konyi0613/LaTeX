@@ -1,0 +1,211 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{bbding,combelow,textcomp,amsfonts,amsthm,amsmath,amssymb,graphicx,color,hyperref,etoolbox}
+\usepackage[utf8x]{inputenc}
+\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+\newtoggle{story}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Customisation options --- update as necessary
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Course details: title, semester, instructors
+
+\newcommand{\courseTitle}{Probabilistic Combinatorics (Math 5390)}
+\newcommand{\semester}{Fall 2026}
+\newcommand{\instructorA}{Shagnik Das}
+\newcommand{\instructorB}{}
+
+%% Sheet number
+
+\newcommand{\sheetNumber}{1}
+
+
+%% Submission details
+
+\newcommand{\dueDate}{15:30, Oct 6th.}
+\newcommand{\lateWarning}{Late submissions will receive no credit.}
+
+
+%% Display irrelevant footnotes?  \toggletrue for yes, \togglefalse for no
+
+\toggletrue{story}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End of customisation options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pdfpagewidth 8.5in
+\pdfpageheight 11in
+\topmargin -1in
+\headheight 0in
+\headsep 0in
+\textheight 8.5in
+\textwidth 6.5in
+\oddsidemargin 0in
+\evensidemargin 0in
+\headheight 77pt
+\headsep 0in
+\footskip .75in
+
+\makeatletter
+\newcommand{\buildtitle}[4]{
+\begin{flushleft}
+{\large
+#1
+\hfill{}
+#2
+\par
+#3
+}
+\end{flushleft}
+\vskip 4pt
+\begin{center}
+{\large\bfseries#4\par}
+\end{center}
+\bigskip
+}
+\makeatother
+
+\renewcommand{\thesection}{\normalsize\arabic{section}}
+
+\renewcommand{\deg}{\textrm{deg}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\ceil}[1]{\left \lceil #1 \right \rceil}
+
+\newcommand{\hint}{\begin{flushright} [Hint at \url{\hintURL}.] \end{flushright}}
+
+\newcommand{\card}[1]{\left| #1 \right|}
+\newcommand{\mb}[1]{\mathbb{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+
+
+\newcommand{\story}[1]{\iftoggle{story}{\footnote{#1}}{}}
+\newcommand{\storymark}[1][42]{\iftoggle{story}{\footnotemark[#1]}{}}
+\newcommand{\storytext}[2][42]{\iftoggle{story}{\footnotetext[#1]{#2}}{}}
+
+\newcommand{\bonus}[2]{\paragraph{Bonus (#1 pt\ifstrequal{#1}{1}{}{s})} #2}
+
+
+\begin{document}
+
+
+\buildtitle{\courseTitle{}}{\semester}{\instructorA{} \hfill \instructorB{}}{Exercise Sheet \sheetNumber{}}
+
+\vspace{-0.2in}
+
+\begin{center}
+
+{\bf Due date: \dueDate \\ \lateWarning}
+
+\end{center}
+
+\noindent You and your partner should try to solve all of the exercises below, and then submit a total of two solutions to be graded --- each problem is worth $10$ points. Both partners should author one solution each, making clear who wrote which solution, but you will earn credit for both solutions. Make sure to clearly justify your answers, defining everything precisely and stating any results you are using. You should then submit your solutions on NTU COOL, either as a typed PDF or a clear picture or scan of your handwritten answers.
+
+\paragraph{Exercise 1}  Given natural numbers $k, \ell$, we define the asymmetric Ramsey number $R(k,\ell)$ as the smallest $n$ such that every red-/blue-colouring of the edges of $K_n$ contains a red $K_k$ or a blue $K_{\ell}$.
+\begin{itemize}
+	\item[(a)] Show that for $k, \ell \ge 2$, we have $R(k, \ell) \le R(k, \ell-1) + R(k-1, \ell)$.
+	\item[(b)] Deduce that for $k, \ell \ge 1$, we have $R(k, \ell) \le \binom{k + \ell - 2}{k-1}$.
+	\item[(c)] Sharpen this bound to show $R(3,4) \le 9$.
+\end{itemize}
+
+\paragraph{Solution.} Throughout, note that $R(1, \ell) = R(k, 1) = 1$, since $K_1$ has no edges and hence is trivially both a red $K_1$ and a blue $K_1$.
+
+\begin{proof}[Proof of (a)]
+	If $R(k, \ell - 1)$ or $R(k-1, \ell)$ is infinite there is nothing to prove, so assume both are finite and let $n = R(k, \ell-1) + R(k-1, \ell)$. Take an arbitrary red-/blue-colouring of the edges of $K_n$ and fix a vertex $v$. Let $N_R$ (resp.\ $N_B$) be the set of vertices joined to $v$ by a red (resp.\ blue) edge. Then $\card{N_R} + \card{N_B} = n - 1$, so either $\card{N_R} \ge R(k-1, \ell)$ or $\card{N_B} \ge R(k, \ell-1)$; otherwise $n - 1 \le R(k-1,\ell) + R(k,\ell-1) - 2 = n - 2$, a contradiction.
+
+	\begin{center}
+	\begin{tikzpicture}[vtx/.style={circle,fill=black,inner sep=1.5pt}, scale=0.9]
+		\node[vtx,label=left:$v$] (v) at (0,0) {};
+		\draw[thick,red!70!black] (4.6,1.6) ellipse (2 and 1);
+		\draw[thick,blue!70!black] (4.6,-1.6) ellipse (2 and 1);
+		\node[red!70!black] at (7.1,1.6) {$N_R$};
+		\node[blue!70!black] at (7.1,-1.6) {$N_B$};
+		\foreach \y in {1.2,1.6,2.0} {\draw[red,thick] (v) -- (3.1,\y); \node[vtx] at (3.1,\y) {};}
+		\foreach \y in {-1.2,-1.6,-2.0} {\draw[blue,thick] (v) -- (3.1,\y); \node[vtx] at (3.1,\y) {};}
+		\node[font=\footnotesize,align=center] at (4.9,1.6) {red $K_{k-1}$\\or blue $K_\ell$};
+		\node[font=\footnotesize,align=center] at (4.9,-1.6) {red $K_{k}$\\or blue $K_{\ell-1}$};
+		\node[font=\footnotesize] at (1.2,1.5) {red};
+		\node[font=\footnotesize] at (1.2,-1.5) {blue};
+	\end{tikzpicture}
+	\end{center}
+
+	\emph{Case 1: $\card{N_R} \ge R(k-1, \ell)$.} The colouring restricted to the complete graph on $N_R$ contains a red $K_{k-1}$ or a blue $K_\ell$. A blue $K_\ell$ is what we want. If it contains a red $K_{k-1}$, then adding $v$, which is joined to all of its vertices by red edges, gives a red $K_k$.
+
+	\emph{Case 2: $\card{N_B} \ge R(k, \ell-1)$.} Symmetrically, the complete graph on $N_B$ contains a red $K_k$, or a blue $K_{\ell-1}$, which together with $v$ forms a blue $K_\ell$.
+
+	Hence every colouring of $K_n$ contains a red $K_k$ or a blue $K_\ell$, so $R(k,\ell) \le n = R(k, \ell-1) + R(k-1, \ell)$.
+\end{proof}
+
+\begin{proof}[Proof of (b)]
+	We induct on $k + \ell$. If $k = 1$ or $\ell = 1$, then $R(k, \ell) = 1 = \binom{k+\ell-2}{k-1}$, since $\binom{\ell-1}{0} = \binom{k-1}{k-1} = 1$. Now let $k, \ell \ge 2$ and assume the claim for all pairs with smaller sum. In particular $R(k,\ell-1)$ and $R(k-1,\ell)$ are finite, and by (a) and Pascal's rule,
+	\[
+		R(k, \ell) \le R(k, \ell - 1) + R(k-1, \ell) \le \binom{k + \ell - 3}{k-1} + \binom{k + \ell - 3}{k - 2} = \binom{k + \ell - 2}{k-1}.
+	\]
+\end{proof}
+
+\begin{proof}[Proof of (c)]
+	By (b), $R(3,3) \le \binom{4}{2} = 6$. Suppose, for contradiction, that some colouring of $K_9$ has neither a red $K_3$ nor a blue $K_4$. Fix a vertex $v$ and define $N_R, N_B$ as in (a), so $\card{N_R} + \card{N_B} = 8$.
+
+	\begin{center}
+	\begin{tikzpicture}[vtx/.style={circle,fill=black,inner sep=1.5pt}, scale=0.9]
+		\node[vtx,label=below:$v$] (v) at (0,0) {};
+		% red neighbourhood: 3 vertices, all edges among them blue
+		\foreach \i/\a in {1/150,2/180,3/210} \node[vtx] (r\i) at ($(v)+(\a:3)$) {};
+		\foreach \i in {1,2,3} \draw[red,thick] (v) -- (r\i);
+		\draw[blue,thick,dashed] (r1) -- (r2) -- (r3) to[bend left=40] (r1);
+		\node[red!70!black,align=center,font=\footnotesize] at (-4.3,0) {$N_R$\\no red\\edges};
+		% blue neighbourhood: 5 vertices
+		\foreach \i/\a in {1/50,2/25,3/0,4/-25,5/-50} \node[vtx] (b\i) at ($(v)+(\a:3)$) {};
+		\foreach \i in {1,...,5} \draw[blue,thick] (v) -- (b\i);
+		\draw[gray,rounded corners] (1.6,-2.6) rectangle (3.4,2.6);
+		\node[blue!70!black,align=center,font=\footnotesize] at (5,0) {$N_B$\\no red $K_3$,\\no blue $K_3$};
+	\end{tikzpicture}
+	\end{center}
+
+	\begin{itemize}
+		\item $\card{N_R} \le 3$: if $x, y \in N_R$ were joined by a red edge, then $\{v, x, y\}$ would be a red $K_3$. So all edges inside $N_R$ are blue, and if $\card{N_R} \ge 4$, any four vertices of $N_R$ form a blue $K_4$.
+		\item $\card{N_B} \le 5$: if $\card{N_B} \ge 6 \ge R(3,3)$, then $N_B$ contains a red $K_3$, or a blue $K_3$, which together with $v$ forms a blue $K_4$.
+	\end{itemize}
+	Thus $\card{N_R} = 8 - \card{N_B} \ge 3$, so $\card{N_R} = 3$. That is, every vertex is incident to exactly $3$ red edges, so the red edges form a $3$-regular graph on $9$ vertices. But by the handshake lemma the sum of degrees, $9 \cdot 3 = 27$, must equal twice the number of red edges, which is impossible since $27$ is odd. Hence every colouring of $K_9$ contains a red $K_3$ or a blue $K_4$, i.e.\ $R(3,4) \le 9$.
+\end{proof}
+
+\paragraph{Exercise 2}  Let $H$ be a $k$-uniform hypergraph on $n$ vertices $V$ with edges $E = \{ e_1, e_2, \hdots, e_m \}$. To each vertex $v \in V$, associate a uniformly random number $x(v) \in [0,1]$. Order the vertices in increasing order of the numbers $x(v)$, and colour them greedily --- colour the vertex red, unless it would create an all-red edge, in which case colour it blue.
+
+Fix some $\varepsilon > 0$, and consider the following events:
+\begin{itemize}
+	\item $E_i$: the event that for every vertex $v$ in the edge $e_i$, we have $x(v) \le \frac12(1- \varepsilon)$.
+	\item $L_i$: the event that for every vertex $v$ in the edge $e_i$, we have $x(v) \ge \frac12(1 + \varepsilon)$.
+	\item $M_{i,j}$: the event that edges $e_i$ and $e_j$ have a single common vertex $w$, with $\frac12(1 - \varepsilon) < x(w) < \frac12(1 + \varepsilon)$, and that for every vertex $u \in e_i$ we have $x(u) \le x(w)$, and for every vertex $v \in e_j$ we have $x(v) \ge x(w)$.
+\end{itemize}
+
+\begin{itemize}
+	\item[(a)] Show that $H$ has Property B (i.e. is two-colourable), unless the event $\left( \cup_{i \in [m]} E_i \right) \cup \left( \cup_{i \in [m]} L_i \right) \cup \left( \cup_{i,j \in [m]} M_{i,j} \right)$ occurs.
+	\item[(b)] Bound the probability of this event in terms of $m$ and $\varepsilon$.
+	\item[(c)] By choosing $\varepsilon$ appropriately, show that $m(k) \ge c \left( \frac{k}{\log k} \right)^{1/2} 2^k$, for some constant $c > 0$.
+\end{itemize}
+
+\paragraph{Exercise 3}  Show that there is some constant $c > 0$ such that, if $n$ is sufficiently large and every vertex of an $n$-vertex graph $G$ has degree at least $\log n - c \log \log n$, then we can colour the vertices of $G$ red and blue in such a way that every vertex has both a red neighbour and a blue neighbour.
+
+\paragraph{Exercise 4}  Prove that there is some constant $c > 0$ such that if a tournament has the $k$-Sch\"utte property, it must have at least $c k 2^k$ vertices.
+
+\paragraph{Exercise 5}  We say a $k$-uniform hypergraph is rainbow-$r$-colourable if its vertices can be $r$-coloured such that every edge sees all $r$ colours.
+\begin{itemize}
+	\item[(a)] Prove that if a $k$-uniform hypergraph $H$ has at most $\frac{r^{k-1}}{(r-1)^k}$ edges, then it is rainbow-$r$-colourable.
+	\item[(b)] By considering a random hypergraph, or otherwise, show that there exists, for some constant $C = C(r) > 0$ and arbitrarily large $k$, a $k$-uniform hypergraph $H$ with $C k^2 \left( \frac{r}{r-1} \right)^k$ edges that is not rainbow-$r$-colourable.
+\end{itemize}
+
+% \newpage
+
+% \section*{Hints}  The following QR codes contain hints for some of the homework exercises.  You should be able to decode them using any QR code scanner, including this one: \url{https://zxing.org/w/decode.jspx}.
+
+% \paragraph{Exercise ?} Also available at \url{https://i.ibb.co/???????/S??E?.png}.
+
+\begin{center}
+% \includegraphics[scale=0.5]{Hints/S??E?.png}
+\end{center}
+
+\end{document}

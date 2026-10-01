@@ -438,6 +438,28 @@ Three features are visible and will be proved later:
 	\label{fig:option-value}
 \end{figure}
 
+\begin{remark}
+	\textbf{怎麼讀這張圖。}
+	兩張圖都是「離到期還有一個月」這個時間點的快照。
+	橫軸是\emph{當下}的股價 $S$；實線是在這個股價下選擇權現在值多少錢（$C$ 或 $P$）；虛線是在這個股價下的內含價值（買權 $\max(0,S-95)$、賣權 $\max(0,95-S)$）。
+	同一個 $S$ 上，實線減虛線就是時間價值。
+
+	\textbf{時間價值可以是負的嗎？}
+	可以，右圖左端就是例子；但\emph{買權}不會。
+	持有買權而不馬上履約，有兩個好處：
+	\begin{enumerate}[(i),nosep]
+		\item 履約價 $X$ 晚一個月才付，這段期間的錢還能生利息；
+		\item 到期時若股價跌到 $X$ 以下，可以直接不履約，不必承擔損失。
+	\end{enumerate}
+	兩者都只會讓價值變高，不會變低，所以買權的實線永遠在虛線之上（\autoref{lem:call-intrinsic} 會正式證明）。
+
+	\textbf{賣權為什麼在股價很低時跑到虛線下面？}
+	賣權的好處 (ii) 還在，但 (i) 反過來了：賣權履約是\emph{收}到 $X$，而歐式賣權要等到期才能收，晚一個月拿到的 $X$ 比今天拿到的 $X$ 少了一個月利息，對持有人不利。
+	股價很低時，這個賣權幾乎一定會被履約，(ii) 的保護用不太到；而且股價最低只到 $0$，再往下跌的空間也有限。
+	剩下的主要就是 (i) 的利息損失，於是價值大約是「一個月後收 $X$ 的現值 $-S$」，比內含價值 $X-S$ 還小，時間價值變成負的。
+	美式賣權則可以現在就履約拿 $X-S$，所以不會掉到虛線以下。
+\end{remark}
+
 %─────§6 Dividends and splits────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Corporate Actions: Dividends and Splits}
 \label{sec:corporate-actions}
@@ -474,6 +496,18 @@ Consequently
 	So a call on a dividend-paying stock is worth less than a call on an otherwise identical stock that retains its cash, and a put is worth correspondingly more.
 	This is also the reason early exercise of an American call can be optimal: exercising just before the ex-dividend date is the only way to capture the dividend. \autoref{thm:merton-dividend} makes that precise --- those dates are the \emph{only} ones at which it can pay to exercise early.
 \end{intuition}
+
+\begin{remark}
+	舉例：股價 100、每股配現金股利 3 元。除息日之後買的人領不到這 3 元，只願意付約 97，所以股價掉到約 97。
+	\begin{itemize}[nosep]
+		\item \textbf{股東}不吃虧：股價少 3 元，但口袋多了 3 元現金，總財富不變。
+		\item \textbf{選擇權持有人}手上沒有股票，領不到這 3 元；合約又不受保護、履約價不調整，所以他只看到股價少了 3 元。
+	\end{itemize}
+	買權是股價愈高愈值錢，股價平白少 3 元就是損失；賣權是股價愈低愈值錢，反而得利。
+	這就是上面那句話的意思：股利把價值從「股價」搬進「股東口袋」，而選擇權只連結到股價那一邊。
+
+	這也解釋了美式買權為什麼可能提前履約：在除息\emph{前}先履約、把股票拿到手，就能領到那 3 元股利，而不是眼睜睜看著股價下跌。
+\end{remark}
 
 \subsection{Stock Splits and Stock Dividends}
 
@@ -581,6 +615,21 @@ The payoff of a short position is the payoff of a long position with the sign fl
 	The short seller pays a borrowing fee, can be forced to close the position when the lender recalls the shares, faces an unbounded loss, and may be barred from shorting altogether by regulators in a falling market.
 \end{note}
 
+\begin{remark}
+	上面這段提醒：課程裡的模型會把放空當成「持有 $-1$ 股」，損益剛好是持有股票的相反數；但現實中放空沒有這麼理想。
+	\begin{enumerate}[(i),nosep]
+		\item \textbf{不是什麼都能放空。}放空要先借到股票，得有人願意出借、市場上也要有足夠可借的量，這兩件事都不一定成立，借券也不是免費的。
+		\item \textbf{放空不只是「買進的反面」。}放空者還要面對幾個買進者沒有的問題：
+		      \begin{itemize}[nosep]
+		      	\item 要付\emph{借券費}；
+		      	\item 出借人可以\emph{隨時要回股票}，放空者就得被迫買回平倉，不一定挑得到好時機；
+		      	\item \emph{損失沒有上限}：買股票最多賠光本金（股價跌到 $0$），但放空時股價可以一直漲，買回的成本也跟著無限增加；
+		      	\item 股市大跌時，主管機關可能直接\emph{禁止放空}。
+		      \end{itemize}
+	\end{enumerate}
+	之後的定價論證會把這些摩擦全部忽略，假設想放空多少就能放空多少、而且沒有成本。
+\end{remark}
+
 %─────§8 Covered positions: hedges───────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Covered Positions: Hedges}
 \label{sec:hedges}
@@ -629,6 +678,26 @@ Writing $S_{T}$ for the stock price at expiration, the two payoffs are
 So the covered call \emph{caps} the outcome at $X$ and the protective put \emph{floors} it at $X$.
 
 \begin{note}
+	\textbf{Payoff 是什麼？}
+	到期時手上這整個部位\emph{值多少錢}，\emph{不}扣掉期初建立部位花的錢（買股票的錢、付或收的權利金）。
+	扣掉期初成本之後才是利潤（profit），也就是 \autoref{fig:hedge-profit} 裡的虛線。
+	兩種避險都持有一股股票，而股價不會小於 $0$，所以 payoff 一定 $\ge 0$；但利潤可以是負的。
+
+	\textbf{左邊怎麼來的？}
+	把部位裡每樣東西到期時的價值加起來：
+	\begin{itemize}[nosep]
+		\item \textbf{掩護性買權} = 持有一股 $+$ 賣出一個買權。
+		      股票到期值 $S_{T}$；賣出的買權如果被履約，你要付給對方 $\max(0,S_{T}-X)$（\eqref{eq:call-payoff}，站在 short 方所以是減號）。
+		      合起來是 $S_{T}-\max(0,S_{T}-X)$。
+		\item \textbf{保護性賣權} = 持有一股 $+$ 買進一個賣權。
+		      股票到期值 $S_{T}$；買來的賣權到期值 $\max(0,X-S_{T})$（\eqref{eq:put-payoff}，long 方所以是加號）。
+		      合起來是 $S_{T}+\max(0,X-S_{T})$。
+	\end{itemize}
+	分 $S_{T}\ge X$ 與 $S_{T}<X$ 代入，就得到右邊的 $\min(S_{T},X)$ 和 $\max(S_{T},X)$。
+\end{note}
+
+\begin{note}
+	\label{note:hedge-bullish}
 	Both strategies break even only if the stock price rises above a certain level, so \textbf{both are bullish}.
 	This is easy to miss, because a covered call is often described as ``defensive''.
 	The premium received merely offsets a fixed amount of downside; the position still loses roughly dollar-for-dollar with the stock once that cushion is gone, as the left-hand tail in \autoref{fig:hedge-profit} shows.
@@ -678,6 +747,52 @@ So the covered call \emph{caps} the outcome at $X$ and the protective put \emph{
 	\label{fig:hedge-profit}
 \end{figure}
 
+\begin{remark}
+	\textbf{圖在畫什麼。}
+	兩張圖都是在 $S_{0}=95$、離到期一個月時建立部位，履約價 $X=95$。
+	當時的賣權價格 $P_{0}\approx 3.08$、買權價格 $C_{0}\approx 3.48$（和 \autoref{fig:option-value} 一樣由 Black--Scholes 公式算出，公式後面才推導，這裡當成市場報價即可）。
+	縱軸是\emph{利潤} $=$ 部位價值 $-$ 期初成本，其中保護性賣權的成本是 $S_{0}+P_{0}$，掩護性買權是 $S_{0}-C_{0}$（賣出買權會先收錢）。
+	\begin{itemize}[nosep]
+		\item \textbf{虛線}：\emph{到期時}的利潤，橫軸是到期股價 $S_{T}$。
+		\item \textbf{實線}：\emph{建倉當下}的利潤——若股價馬上變成橫軸上的 $S$（離到期仍有一個月），部位值多少、扣掉成本賺賠多少。
+	\end{itemize}
+
+	\textbf{虛線為什麼是折線。}把 \eqref{eq:hedge-payoffs} 減掉成本：
+	\[
+		\text{保護性賣權：}\ \max(S_{T},X)-(S_{0}+P_{0}) ,
+		\qquad
+		\text{掩護性買權：}\ \min(S_{T},X)-(S_{0}-C_{0}) .
+	\]
+	兩者都只在 $S_{T}=X$ 折一次，每段斜率不是 $0$ 就是 $1$。
+	保護性賣權在 $X$ 以下是高度 $X-S_{0}-P_{0}=-3.08$ 的水平線（賣權托底，最多賠權利金），$X$ 以上斜率 $1$，要漲過 $S_{0}+P_{0}=98.08$ 才賺錢。
+	掩護性買權反過來：$X$ 以上是高度 $X-S_{0}+C_{0}=+3.48$ 的水平線（被封頂，最多賺權利金），$X$ 以下斜率 $1$，跌破 $S_{0}-C_{0}=91.52$ 就開始賠。
+
+	\textbf{實線為什麼是平滑曲線。}建倉當下部位值 $S+P(S)$ 或 $S-C(S)$。把選擇權價格拆成內含價值加時間價值 $\mathrm{TV}$：
+	\[
+		\text{實線} = \text{虛線} + \mathrm{TV}_{\text{put}}(S) ,
+		\qquad
+		\text{實線} = \text{虛線} - \mathrm{TV}_{\text{call}}(S) .
+	\]
+	所以兩線的差距就是時間價值。時間價值在價平附近最大，於是實線在折點附近離虛線最遠，折角被磨圓。
+	保護性賣權是\emph{買}賣權，中間實線在虛線上方；最左端歐式賣權的時間價值為負（\autoref{fig:option-value}），實線略低於虛線。
+	掩護性買權是\emph{賣}買權，減掉 $\mathrm{TV}_{\text{call}}\ge 0$，實線處處在虛線下方。
+
+	\textbf{回到 \autoref{note:hedge-bullish}。}
+	那個 note 的主張是：保護性賣權和掩護性買權\emph{都是看漲}（bullish）的部位；並提醒掩護性買權雖然常被說成「防守型」，其實擋不住大跌。
+	現在可以從圖上直接看出來：
+	\begin{itemize}[nosep]
+		\item \textbf{都看漲}：兩張圖的虛線與實線都往右上升（斜率 $\ge 0$），股價愈高利潤愈高、股價跌就不賺甚至賠，方向和單純持有股票一樣。
+		\item \textbf{掩護性買權不防守}：它比單純持股多出來的，只有期初收的權利金 $C_{0}=3.48$，這就是 \autoref{note:hedge-bullish} 說的「只抵銷固定金額的下跌」。
+		      股價跌破 $S_{0}-C_{0}=91.52$ 之後，虛線左段斜率 $1$，股價每跌 1 元就賠 1 元，跟持股完全一樣——也就是 \autoref{note:hedge-bullish} 說的「墊子用完之後，幾乎一塊錢對一塊錢地跟著股票虧」。
+	\end{itemize}
+
+	\textbf{那兩者各防什麼？}和單純持股（利潤 $S_{T}-S_{0}$）比：
+	\begin{itemize}[nosep]
+		\item \textbf{保護性賣權防大跌}：股價跌得再深，最多賠 $P_{0}=3.08$。代價是其他情況都比持股少賺 $P_{0}$——就像付保費買保險。
+		\item \textbf{掩護性買權防小跌與盤整}：股價在 $S_{0}+C_{0}=98.48$ 以下時，都比持股多 $C_{0}=3.48$，所以小跌能被抵掉、不動也有收入；但大跌照賠。代價是放棄大漲——漲過 $98.48$ 後比持股少賺，漲愈多差愈多。它其實比較像把「大漲那段獲利」以 $C_{0}$ 的價格賣掉，換取收入。
+	\end{itemize}
+\end{remark}
+
 %─────§9 Covered positions: spreads──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Covered Positions: Spreads}
 \label{sec:option-spreads}
@@ -699,6 +814,7 @@ Throughout this section we use $X_{L}$, $X_{M}$, and $X_{H}$ to denote strike pr
 All options in a spread are calls, or all are puts; mixing types produces a \emph{combination} instead, which is \autoref{sec:combinations}.
 
 \subsection{Bull Spreads}
+\label{sec:bull-spreads}
 
 \source{Slides pp.~207--208}
 
@@ -757,6 +873,58 @@ The investor is betting that the stock rises, but only so far.
 	\label{fig:bull-spread}
 \end{figure}
 
+\begin{remark}
+	同樣看漲、賺賠都有上限的價差，也可以只用賣權做：賣出 $X_{H}$ 賣權、買進 $X_{L}$ 賣權（到期日相同），稱為多頭賣權價差（bull put spread，\autoref{sec:bear-spreads} 會再提到）。用和上面同樣的方式記帳：
+	\begin{itemize}[itemsep=0.3em]
+		\item 期初\emph{收到} $P_{H}-P_{L}>0$（履約價愈高的賣權愈值錢）。
+		\item 到期 payoff 是 $\max(0,X_{L}-S_{T})-\max(0,X_{H}-S_{T})\le 0$：
+		      $S_{T}\ge X_{H}$ 時兩個都不履約，payoff $=0$；
+		      $X_{L}<S_{T}<X_{H}$ 時只有賣出的 $X_{H}$ 賣權被履約，payoff $=S_{T}-X_{H}$；
+		      $S_{T}\le X_{L}$ 時兩個都履約，payoff $=-(X_{H}-X_{L})$。
+		\item 最大利潤是 $P_{H}-P_{L}$，發生在 $S_{T}\ge X_{H}$：兩個賣權都作廢，權利金全部落袋。
+		\item 最大虧損是 $(X_{H}-X_{L})-(P_{H}-P_{L})$，發生在 $S_{T}\le X_{L}$。
+		\item 損益兩平點在 $S_{T}=X_{H}-(P_{H}-P_{L})$。
+	\end{itemize}
+	和多頭買權價差對照：那邊是先付錢、payoff $\ge 0$；這邊是先收錢、payoff $\le 0$。但扣掉（或加回）期初的錢之後，利潤都是「$X_{L}$ 以下平、中間斜率 $1$、$X_{H}$ 以上平」的斜坡，所以同樣是看漲、同樣賺賠都有上限。
+
+	\autoref{fig:bull-put-spread} 用和 \autoref{fig:bull-spread} 相同的設定：$X_{L}=90$、$X_{H}=100$，建倉時 $S=95$、離到期一個月。
+	此時 $P_{H}\approx 6.14$、$P_{L}\approx 1.20$，淨收入約 $4.94$；於是最大利潤 $4.94$、最大虧損 $10-4.94=5.06$、損益兩平點 $95.06$。
+	這和多頭買權價差的 $4.98$、$5.02$、$95.02$ 幾乎一樣，只差約 $0.04$：一個是期初付錢、到期可能收錢，另一個是期初收錢、到期可能付錢，兩者差的就是這一個月的利息。
+\end{remark}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[font=\footnotesize]
+		\begin{axis}[
+				width=0.72\textwidth, height=5.2cm,
+				xmin=81, xmax=111, xtick={85,90,95,100,105,110},
+				ymin=-6, ymax=6, ytick={-4,-2,2,4},
+				axis lines=middle,
+				axis line style={-{Stealth[length=4pt]}, thin},
+				tick label style={font=\scriptsize},
+				title style={font=\small, text=Gray!40!black},
+				title={Bull spread (put)},
+				xlabel={Stock price}, ylabel={Profit},
+				every axis x label/.style={at={(ticklabel cs:1.0)}, anchor=west},
+				every axis y label/.style={at={(ticklabel cs:1.0)}, rotate=0,
+						anchor=south},
+				clip=false,
+			]
+			\addplot[Gray!55!black, densely dashed, thick]
+			coordinates {(81,-5.058) (90,-5.058) (100,4.942) (111,4.942)};
+			\addplot[RawSienna, very thick, domain=81:110,
+				samples=120] {bsput(x,90)-bsput(x,100)+4.942};
+		\end{axis}
+	\end{tikzpicture}
+	\caption{Profit of a bull put spread with $X_{L}=90$, $X_{H}=100$,
+		entered when $S=95$ one month before expiration for a net credit of
+		$P_{H}-P_{L}=4.94$. Dashed: profit at expiration. Solid: profit at the
+		moment of entry as the stock price varies. The shape is that of
+		\autoref{fig:bull-spread}; the plateaus sit at $4.94$ and $-5.06$
+		instead of $4.98$ and $-5.02$.}
+	\label{fig:bull-put-spread}
+\end{figure}
+
 \subsection{The Binary Call: A Model-Free Price}
 \label{sec:binary-call}
 
@@ -772,6 +940,53 @@ The ramp becomes vertical, and a (Heaviside) step function emerges as the payoff
 		0, & S_{T}<X_{L} .
 	\end{cases}
 \]
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[font=\footnotesize]
+		\begin{axis}[
+				width=0.55\textwidth, height=3.4cm,
+				xmin=86, xmax=111, xtick={90,95,97,100,105,110},
+				ymin=0, ymax=1.35, ytick={0.5,1},
+				axis lines=middle,
+				axis line style={-{Stealth[length=4pt]}, thin},
+				tick label style={font=\scriptsize},
+				xlabel={$S_{T}$}, ylabel={Payoff},
+				every axis x label/.style={at={(ticklabel cs:1.0)}, anchor=west},
+				every axis y label/.style={at={(ticklabel cs:1.0)}, rotate=0,
+						anchor=south},
+				legend style={font=\scriptsize, draw=none, fill=none,
+						at={(1.12,1)}, anchor=north west},
+				legend cell align=left,
+				clip=false,
+			]
+			\addplot[Gray!40, thick] coordinates {(86,0) (95,0) (105,1) (110,1)};
+			\addlegendentry{$X_{H}=105$}
+			\addplot[Gray!70!black, thick] coordinates {(86,0) (95,0) (100,1) (110,1)};
+			\addlegendentry{$X_{H}=100$}
+			\addplot[RawSienna, thick] coordinates {(86,0) (95,0) (97,1) (110,1)};
+			\addlegendentry{$X_{H}=97$}
+			\addplot[MidnightBlue!80!black, very thick] coordinates {(86,0) (95,0)};
+			\addlegendentry{limit: binary call}
+			\addplot[MidnightBlue!80!black, very thick, forget plot] coordinates {(95,1) (110,1)};
+			\addplot[MidnightBlue!80!black, densely dotted, forget plot] coordinates {(95,0) (95,1)};
+		\end{axis}
+	\end{tikzpicture}
+	\caption{$(X_{H}-X_{L})^{-1}$ units of the bull call spread, $X_{L}=95$
+		fixed: every ramp climbs to $1$ and steepens into the binary call's step.}
+	\label{fig:binary-limit}
+\end{figure}
+
+\begin{remark}
+	\textbf{為什麼要買 $(X_{H}-X_{L})^{-1}$ 份？}
+	一份多頭買權價差的 payoff 是一段斜坡：$X_{L}$ 以下是 $0$，$X_{H}$ 以上是 $X_{H}-X_{L}$，中間斜率 $1$。斜坡的\emph{高度等於寬度} $X_{H}-X_{L}$。
+	如果只是讓 $X_{H}$ 靠近 $X_{L}$，斜坡會變窄、也同時變矮，最後縮成 $0$，什麼都沒得到。
+	所以改買 $(X_{H}-X_{L})^{-1}$ 份，把高度固定拉回 $1$；這時中間段的斜率變成 $(X_{H}-X_{L})^{-1}$。
+
+	\textbf{取極限。}
+	\autoref{fig:binary-limit} 固定 $X_{L}=95$，讓 $X_{H}$ 從 $105$、$100$ 到 $97$ 往下靠近：每條斜坡都從 $0$ 爬到 $1$，但寬度愈來愈窄、愈來愈陡。
+	寬度趨近 $0$ 時，斜坡變成垂直，payoff 只剩兩種值：$S_{T}$ 在 $X_{L}$ 以上拿 $1$，以下拿 $0$——這就是下面要定義的二元買權。
+\end{remark}
 
 \begin{definition}
 	The security with this payoff is the \vocab{binary} (or \vocab{digital}) \vocab{call}: it pays \$1 if the stock finishes above the strike, and nothing otherwise.
@@ -803,9 +1018,11 @@ today, where $C$ is the price of the standard call.
 	Given the observed call prices, the binary call's price is \emph{forced}.
 
 	This is the first appearance of a theme that organises the whole course: some facts follow from no-arbitrage alone, and only the remaining facts need a model.
+	（這是貫穿整門課的主題第一次出現：有些結論只靠「無套利」——市場上不存在零成本、零風險卻穩賺的機會，下一章會正式介紹——就能推出來；只有剩下推不出來的部分，才需要假設股價怎麼變動的\emph{模型}。像這裡的二元買權價格，只用到其他買權的報價，完全不需要模型。）
 \end{moral}
 
 \subsection{Bear Spreads}
+\label{sec:bear-spreads}
 
 \source{Slides p.~210}
 
@@ -826,9 +1043,24 @@ The same directional bet can be built out of puts, and reversed.
 \end{remark}
 
 \begin{note}
+	\label{note:bull-put-danger}
 	A bull put spread collects cash up front and, most of the time, expires worthless --- which is precisely what makes it dangerous.
 	Its maximum loss, $X_{H}-X_{L}$ less the credit, is many times the credit received, so a single move can wipe out a long string of profitable months.\footnote{See \url{https://www.businesstoday.com.tw/article/category/80392/post/201803070} for a sad example in Taiwan on February 6, 2018.}
 \end{note}
+
+\begin{remark}
+	回顧 \autoref{sec:bull-spreads} 對多頭賣權價差的記帳：期初收 $P_{H}-P_{L}$；股價只要到期時在 $X_{H}$ 以上，兩個賣權都作廢，這筆錢全部落袋（最大利潤）；跌到 $X_{L}$ 以下則賠最多，$(X_{H}-X_{L})-(P_{H}-P_{L})$。
+
+	\autoref{fig:bull-put-spread} 的兩個履約價夾著現價（$90<95<100$），賺賠上限差不多（$4.94$ 對 $5.06$），還看不出危險。
+	但實務上賣這種價差的人，通常把兩個履約價都放在現價\emph{下方很遠}，好讓「股價不要大跌」就能賺。例如同樣 $S=95$、一個月到期，改用 $X_{L}=80$、$X_{H}=85$：
+	\begin{itemize}[nosep]
+		\item 兩個賣權都很價外、很便宜，只收到 $P_{H}-P_{L}\approx 0.27$；
+		\item 股價一個月內跌破 $85$ 的可能性不高，大約九成的情況兩個賣權都作廢、穩穩賺 $0.27$——這就是 \autoref{note:bull-put-danger} 說的「多數時候到期作廢」；
+		\item 但一旦股價跌破 $80$，要賠 $(85-80)-0.27\approx 4.73$，約是每次收入的 $17$ 倍——這就是「最大虧損是收入的好幾倍」。
+	\end{itemize}
+	所以這個策略的損益是「經常小賺、偶爾大賠」：連續十幾個月每月賺 $0.27$，一次大跌就賠 $4.73$，把之前的獲利一次吐光。
+	看起來穩定的月收入，其實是在承擔一個機率小但代價很大的風險，這正是 \autoref{note:bull-put-danger} 說它危險的原因；註腳中 2018 年 2 月 6 日台股的例子，就是市場突然大跌時這類部位集體爆虧。
+\end{remark}
 
 \subsection{Butterfly Spreads}
 
@@ -904,15 +1136,54 @@ It is therefore a bet on the stock \emph{not moving}, as opposed to the directio
 	\label{fig:butterfly}
 \end{figure}
 
+\begin{remark}
+	用和多頭買權價差同樣的方式記帳（買權版：買一個 $X_{L}$、買一個 $X_{H}$、賣兩個 $X_{M}$，$X_{M}$ 在正中間）。
+	\begin{itemize}[itemsep=0.3em]
+		\item 期初成本是 $C_{L}+C_{H}-2C_{M}$。它一定是正的：這個部位到期時的 payoff 從不為負、有時為正，不可能免費拿到。
+		\item 到期 payoff 分四段：
+		      \begin{center}
+		      	\begin{tabular}{@{}cccc@{}}
+		      		\toprule
+		      		$S_{T}\le X_{L}$ & $X_{L}<S_{T}\le X_{M}$ & $X_{M}<S_{T}<X_{H}$ & $S_{T}\ge X_{H}$ \\
+		      		\midrule
+		      		$0$              & $S_{T}-X_{L}$          & $X_{H}-S_{T}$       & $0$              \\
+		      		\bottomrule
+		      	\end{tabular}
+		      \end{center}
+		      中間兩段就是兩個多頭價差的斜坡一上一下：$X_{L}$ 買權先開始賺；過了 $X_{M}$，賣出的兩個 $X_{M}$ 買權開始賠，而且賠得比 $X_{L}$ 買權賺得快，payoff 往下掉；到 $X_{H}$ 時 $X_{H}$ 買權接手，四者剛好抵銷成 $0$。
+		\item 最大 payoff 是 $X_{M}-X_{L}$，發生在 $S_{T}=X_{M}$（帳篷頂點）。
+		\item 最大利潤 $=(X_{M}-X_{L})-(C_{L}+C_{H}-2C_{M})$，同樣發生在 $S_{T}=X_{M}$。
+		\item 最大虧損 $=$ 期初成本 $C_{L}+C_{H}-2C_{M}$，發生在 $S_{T}\le X_{L}$ 或 $S_{T}\ge X_{H}$（股價動太多，帳篷外面）。
+		\item 兩個損益兩平點：$X_{L}+\text{成本}$ 與 $X_{H}-\text{成本}$。
+	\end{itemize}
+	對照 \autoref{fig:butterfly}：$X_{L}=90$、$X_{M}=95$、$X_{H}=100$，成本 $1.17$，所以最大利潤 $5-1.17=3.83$（股價剛好停在 $95$）、最大虧損 $1.17$（股價跑出 $[90,100]$）、股價在 $91.17$ 到 $98.83$ 之間才賺錢。
+	賠有上限、賺也有上限，押的是「股價到期時停在 $X_{M}$ 附近」。
+\end{remark}
+
 \subsection{State Contingent Claims and State Prices}
+\label{sec:state-claims}
 
 \source{Slides p.~213}
 
 The binary call came from squeezing a bull spread; squeezing a butterfly gives something sharper still.
 
-Assume $X_{M}=(X_{H}+X_{L})/2$, so the tent in \autoref{fig:butterfly} is symmetric with half-width $X_{M}-X_{L}$ and height $X_{M}-X_{L}$.
-Take a position in $(X_{M}-X_{L})^{-2}$ units of the butterfly spread: the tent now has unit \emph{area} whatever its width.
-When $X_{H}-X_{L}\to 0$ the tent becomes infinitely tall and infinitely thin, and in the limit it approximates a security that pays \$1 only in the state $S=X_{M}$.\footnote{See Exercise 7.4.5 of the textbook.}
+\textbf{想做什麼。}
+我們想要一個「只有到期股價剛好是某個值才付錢」的證券；它的價格就代表市場對「股價落在那裡」這件事願意付多少。
+蝶式價差已經很接近了：它只在 $X_{L}$ 到 $X_{H}$ 之間付錢、在 $X_{M}$ 付最多。
+把三個履約價往 $X_{M}$ 擠，付錢的範圍就愈來愈集中在 $X_{M}$ 這一點。問題是：擠的時候要買幾份？
+
+\textbf{帳篷的大小。}
+取 $X_{M}=(X_{H}+X_{L})/2$ 在正中間，記 $h=X_{M}-X_{L}=X_{H}-X_{M}$。
+一份蝶式價差的到期 payoff 畫在 $S_{T}$ 橫軸上是一個三角形（\autoref{fig:butterfly} 虛線的形狀）：底從 $X_{L}$ 到 $X_{H}$，寬 $2h$；頂點在 $X_{M}$，高 $h$；所以三角形面積是 $\tfrac12\cdot 2h\cdot h=h^{2}$。
+買 $k$ 份，高度和面積都乘上 $k$。
+
+\textbf{為什麼要固定面積，而不是高度。}
+\begin{itemize}[itemsep=0.3em]
+	\item \emph{固定高度} $1$（像二元買權那樣買 $h^{-1}$ 份）行不通：$h\to 0$ 時帳篷縮成一根寬度 $0$ 的細線，只有股價\emph{剛好}等於 $X_{M}$ 才拿得到錢。股價可以是任何實數，剛好停在某個精確數字的機率是 $0$，所以這東西的價格趨近 $0$，什麼也得不到。
+	\item \emph{固定面積} $1$ 才行：帳篷變窄的同時變高，兩者剛好抵銷。帳篷很窄時，平均能拿到的錢 $\approx$（股價落進帳篷的機率）$\times$（帳篷的平均高度）$\approx$（$X_{M}$ 附近每單位股價的機率）$\times$（面積）。面積固定為 $1$，拿到的錢就只反映「股價落在 $X_{M}$ 附近的機率有多集中」，極限是一個有限、不為零的數。
+\end{itemize}
+所以買 $h^{-2}=(X_{M}-X_{L})^{-2}$ 份：面積是 $h^{-2}\cdot h^{2}=1$，不管寬度多少都一樣（高度則變成 $1/h$）。
+$h\to 0$ 時帳篷無限高、無限窄，極限就近似一個「只在 $S=X_{M}$ 這個狀態付 \$1」的證券——這裡的 \$1 精確地說是「面積 $1$」，也就是按每單位股價的機率來計的 \$1。\footnote{See Exercise 7.4.5 of the textbook.}
 
 \begin{definition}
 	A security that pays \$1 in one state of the world and nothing in any other is a \vocab{state contingent claim}, or an \vocab{Arrow security} in honour of Kenneth Arrow (1921--2017).\footnote{Co-winner of the 1972 Nobel Prize in Economic Sciences.}
@@ -967,6 +1238,16 @@ Hence
 \]
 where $\tau$ is the time to maturity.
 Since \eqref{eq:state-price} needed no model, neither does this: \textbf{the formula is model independent}, and a full set of quoted call prices determines the whole density.
+
+\begin{remark}
+	這段是直觀推理，不是嚴格證明：
+	\begin{enumerate}[(i),nosep]
+		\item 由 \autoref{sec:state-claims}，面積為 $1$、以 $X$ 為中心的窄帳篷，今天價格是 $\partial^{2}C/\partial X^{2}$。
+		\item 它到期平均拿到 $\approx$（$X$ 附近的機率密度 $f(X)$）$\times$（面積 $1$）$=f(X)$。
+		\item 價格 $=$ 平均拿到的錢折現 $\tau$ 時間，即 $e^{-r\tau}f(X)$；兩邊乘 $e^{r\tau}$（換成到期時的價值，即 ``future value''）就得到 $f(X)$。
+	\end{enumerate}
+	注意 (iii) 的「價格 $=$ 期望值折現」一般不成立，所以這個 $f$ 不是真實的機率分布，見下面的 note。
+\end{remark}
 
 \begin{note}
 	The $f$ recovered this way is not the density under which the stock ``really'' evolves.
