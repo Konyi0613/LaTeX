@@ -431,7 +431,7 @@ Three features are visible and will be proved later:
 	\caption{Value of a European call and put with strike $X=95$ one month
 		before expiration (solid), against their intrinsic values (dashed).
 		Computed from Black--Scholes with $r=5\%$ and $\sigma=30\%$; the
-		formula itself is derived much later, and only the \emph{shape}
+		formula itself is derived in \autoref{thm:black-scholes}, and only the \emph{shape}
 		matters here. The vertical gap between the two lines is the time
 		value, largest at the money and vanishing deep in or out of the
 		money.}
@@ -676,6 +676,7 @@ Writing $S_{T}$ for the stock price at expiration, the two payoffs are
 	\label{eq:hedge-payoffs}
 \end{equation}
 So the covered call \emph{caps} the outcome at $X$ and the protective put \emph{floors} it at $X$.
+A firm's bonds are a covered call on the firm's total value (\autoref{sec:merton-model}).
 
 \begin{note}
 	\textbf{Payoff 是什麼？}
@@ -827,6 +828,7 @@ All options in a spread are calls, or all are puts; mixing types produces a \emp
 \end{remark}
 
 Since $C_{L}>C_{H}$ (a lower strike is worth more), the position costs money to enter.
+Subordinated debt is a bull call spread on the firm's value (\autoref{sec:corporate-further}).
 Its accounting is completely determined by \eqref{eq:call-payoff}:
 
 \begin{itemize}[itemsep=0.3em]
@@ -1010,6 +1012,7 @@ So the binary call costs
 	\label{eq:binary-call}
 \end{equation}
 today, where $C$ is the price of the standard call.
+Under the Black--Scholes model this evaluates to $e^{-r\tau}N(x-\sigma\sqrt{\tau})$ (\autoref{eg:bs-binary}).
 
 \begin{moral}
 	\eqref{eq:binary-call} is \textbf{model independent}.
@@ -1322,6 +1325,7 @@ The holder is paid for movement and is indifferent to its direction; the loss is
 
 Since it profits from high volatility, a person who buys a straddle is said to be \vocab{long volatility}.
 Selling a straddle benefits from low volatility --- the writer collects both premiums and keeps them if the stock stays put.
+A straddle is delta-neutral when $X=Se^{(r+\sigma^{2}/2)\tau}$, by \eqref{eq:straddle-zero-delta}.
 
 \begin{remark}
 	\vocab{做多波動率}（long volatility）：部位價值隨波動度上升而增加。買進跨式賺的是「股價大幅變動」而不在乎方向，所以是做多波動率；反過來賣出跨式就是做空波動率，希望股價不動、把兩份權利金收進口袋。
@@ -1489,6 +1493,11 @@ In an efficient market such opportunities do not exist --- at least not for long
 	That is an assumption about markets, not a theorem, and it is the one assumption every result below rests on.
 \end{note}
 
+\begin{remark}
+	\emph{效率市場}（efficient market）指價格會很快反映所有資訊的市場：一出現套利機會，大家就會搶著做，價格立刻被推回去，機會跟著消失。
+	所以這裡並不是說套利從不發生，而是說它消失得夠快，算價格時可以\emph{當作}它不存在——這是對市場的假設，不是定理，而本章所有結果都建立在它上面。
+\end{remark}
+
 %─────§ Portfolio dominance──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{The Portfolio Dominance Principle}
 \label{sec:dominance}
@@ -1508,6 +1517,10 @@ The no-arbitrage principle is easier to apply in the following comparative form.
 	If not, buy $A$ and short $B$.
 	The initial cash flow is nonnegative, every future cash flow is nonnegative, and at least one is positive --- a riskless arbitrage opportunity.
 \end{proof}
+
+\begin{remark}
+	這裡的 payoff（以及下面兩個 corollary 的 return）指部位建立\emph{之後}拿到的所有現金流——只在 $T$ 付一次就是 $T$ 時的價值，分好幾期付就是每一期的錢——\emph{不}扣期初成本，因為期初成本正是要比較的價格。
+\end{remark}
 
 Two corollaries do almost all the work in this chapter.
 
@@ -1606,6 +1619,12 @@ Here is the derivation, and it uses nothing but \autoref{sec:arbitrage}.
 	The short sale is only the mechanism that converts a price discrepancy into cash; it is \autoref{cor:same-payoff} that does the reasoning.
 \end{note}
 
+\begin{remark}
+	（翻譯）這個論證值得再看一次，因為整章都照這個模板走。
+	這張證券和那組對應的零息債券，在未來每個時點的現金流都\emph{完全相同}，所以由 \autoref{cor:same-payoff}，兩者今天的價格必須一樣；而那組零息債券的價格照構造就是 $\sum_{i}C_{i}d(i)$。
+	放空只是把「價格不一致」變成實際現金的操作手段；真正在做推理的是 \autoref{cor:same-payoff}。
+\end{remark}
+
 Here is a second example, on the instruments of Chapter~\ref{ch:option-basics}.
 
 \begin{theorem}
@@ -1649,6 +1668,15 @@ That is the source of their power --- \textbf{these relations hold regardless of
 	The nonnegative-interest-rate assumption is doing more than it looks: it is what gives $d(\tau)\le 1$, hence $\mathrm{PV}(X)\le X$.
 	That single inequality is the reason a call is worth more than its intrinsic value and a put can be worth less --- see \autoref{lem:call-intrinsic} and \autoref{lem:put-bound}.
 \end{note}
+
+\begin{remark}
+	這一節只是在為後面幾節\emph{鋪設定}：
+	\begin{itemize}[nosep]
+		\item \textbf{相對定價}：後面的結果都不是算出「買權值多少」，而是「買權和賣權（或股票、債券）的價格之間必須滿足什麼關係」，例如下一節的 $C=P+S-\mathrm{PV}(X)$。因為只用到無套利、不用假設股價怎麼動，所以不管股價模型是什麼都成立。
+		\item \textbf{假設}：沒有交易成本與保證金、可以用無風險利率自由借錢和存錢、利率不為負、沒有套利機會。
+		\item \textbf{記號}：$\mathrm{PV}(x)=x\,d(\tau)$ 是「到期時的 $x$ 元，換算成今天值多少」，$d(\tau)$ 就是第二章的折現因子。 第三個假設「利率不為負」能推出來$\mathrm{PV}(X)\le X$ （$d(\tau)\le1$，再乘上正的 $X$）：晚拿到的錢不會比現在拿到的值錢，這個不等式後面會一直用到。
+	\end{itemize}
+\end{remark}
 
 %─────§ Put-call parity──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Put-Call Parity}
@@ -1707,6 +1735,16 @@ That is the source of their power --- \textbf{these relations hold regardless of
 
 \begin{remark}
 	\vocab{合成證券}（synthetic securities）：用其他證券組合出與某證券現金流完全相同的部位，也就是把它「複製」出來。由買賣權平價，任一種歐式選擇權都能用另一種選擇權加上股票與借貸合成。
+
+	\textbf{例：用買權合成賣權。}把 \eqref{eq:put-call-parity} 改寫成 $P=C-S+\mathrm{PV}(X)$，也就是「買一個買權、放空一股、存 $\mathrm{PV}(X)$ 元（到期變成 $X$）」。到期時：
+	\begin{itemize}[nosep]
+		\item $S_{\tau}\ge X$：$(S_{\tau}-X)-S_{\tau}+X=0$；
+		\item $S_{\tau}<X$：$0-S_{\tau}+X=X-S_{\tau}$。
+	\end{itemize}
+	和賣權的 payoff $\max(0,X-S_{\tau})$ 一模一樣，所以這個組合就是一個「合成賣權」，價格也必須等於 $P$。
+	而且 \eqref{eq:put-call-parity} 中的 $\tau$ 是\emph{剩餘時間}，公式在到期前任何時點 $t$ 都成立：$P_{t}=C_{t}-S_{t}+\mathrm{PV}_{t}(X)$；到期時 $\tau=0$、$\mathrm{PV}(X)=X$，就退化成上面驗證的 payoff。
+	正因為對任意時點都對，這個組合在每個時刻的價值都等於賣權，什麼時候平倉都一樣，才能真正當成賣權來用。
+	所以只要市場上有買權，就不需要另外的賣權——這就是「只有一種歐式選擇權」的意思。
 \end{remark}
 
 Rearranging \eqref{eq:put-call-parity} reads off the other synthetics:
@@ -1727,6 +1765,12 @@ Rearranging \eqref{eq:put-call-parity} reads off the other synthetics:
 \begin{note}
 	The second identity is the one promised in \autoref{sec:combinations}: buying a call and writing a put is not a combination but a synthetic forward, and \eqref{eq:put-call-parity} is why its payoff $S_{\tau}-X$ carries no kink and costs $S-\mathrm{PV}(X)$ today.
 \end{note}
+
+\begin{remark}
+	這是在兌現 \autoref{sec:combinations} 那個 note 的伏筆：「買一個買權、賣一個賣權」為什麼不算組合。
+	到期時股價高於 $X$，你會履約買權；低於 $X$，對方會對你履約賣權——不論哪種，你都是\emph{以 $X$ 買進一股}，payoff 恆為 $S_{\tau}-X$，是一條沒有折角的直線，已經沒有「可以不履約」的選擇性了。
+	這種「約定到期時一定以 $X$ 買進」的合約叫\vocab{遠期合約}（forward），所以這個部位是\emph{合成遠期}；它今天的價格由第二個式子給出，是 $S-\mathrm{PV}(X)$。
+\end{remark}
 
 %─────§ Intrinsic value bounds───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Bounds from Parity}
@@ -1756,6 +1800,16 @@ Parity immediately sharpens what \autoref{sec:payoff} could only assert by pictu
 	the intrinsic value.
 \end{proof}
 
+\begin{note}
+	以美式買權為例，看兩種情況為何一邊違反無套利、一邊不會（設 $S>X$）。
+	\begin{itemize}[itemsep=0.3em]
+		\item \textbf{$C<S-X$ 違反無套利。}今天買進買權（$-C$）、立刻履約（$-X$，拿到一股）、把股票賣掉（$+S$），淨現金 $S-X-C>0$。
+		      三步都在今天完成、之後沒有任何現金流，是穩賺的套利，所以這種價格不可能存在。
+		\item \textbf{$C>S-X$ 不違反。}賣出買權今天收到 $C$，但部位沒有結清：持有人日後可在股價 $S_{t}$ 很高時履約，你要付出 $S_{t}-X$，可能大於 $C$，所以不是套利。
+	\end{itemize}
+	差別在於：前者今天就能把部位\emph{完全結清}，後者會留下未來的義務。多出來的 $C-(S-X)$ 正是時間價值，是賣方承擔這個義務的補償。
+\end{note}
+
 Such calls are said to have a nonnegative \vocab{time value}, defined as $C-\max(S-X,0)$.
 
 \begin{remark}
@@ -1777,10 +1831,9 @@ Puts are different, and the difference is visible in \autoref{fig:option-value}.
 	The bound is $\mathrm{PV}(X)-S$, \emph{not} $X-S$, and since $\mathrm{PV}(X)\le X$ the two differ by the interest on the strike.
 	So a European put on a non-dividend-paying stock may be worth less than its intrinsic value $X-S$, and this is exactly the dip at the left edge of the right-hand panel of \autoref{fig:option-value}.
 
-	The reason is worth stating plainly.
-	Deep in the money, a put is essentially a promise to receive $X$ at expiration --- but only \emph{at} expiration.
-	A European holder cannot take the money early, so the position is worth the \emph{discounted} strike, $\mathrm{PV}(X)-S$, not $X-S$.
-	An American put has no such handicap, which is the first hint that early exercise of a put can be worth something.
+	直觀原因：股價很低（深度價內）時，賣權幾乎一定會被履約，等於「到期時交出一股、收到 $X$」。
+	但歐式賣權只能等到期才拿到這 $X$，它今天只值 $\mathrm{PV}(X)$；交出的那一股今天值 $S$。所以整個部位大約值 $\mathrm{PV}(X)-S$，比「現在就履約」的 $X-S$ 少了 $X$ 這段時間的利息。
+	美式賣權可以現在就履約、立刻拿到 $X-S$，沒有這個損失——這也是第一個跡象：提前履約賣權可能是划算的。
 \end{note}
 
 %─────§ Early exercise───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -1798,12 +1851,24 @@ For calls on a non-dividend-paying stock, parity closes it entirely: \textbf{Eur
 \end{theorem}
 
 \begin{proof}
-	Sharpening \autoref{lem:call-intrinsic} gives $C\ge\max\bigl(S-\mathrm{PV}(X),\,0\bigr)$.\footnote{By Exercise 8.3.2 of the textbook.}
-	If the call is exercised, the value realised is $S-X$.
-	But interest rates are nonnegative, so $\mathrm{PV}(X)\le X$ and therefore
+	Write $C_{A}$ and $C_{E}$ for the American and the otherwise identical European call.
+
+	\emph{Step 1: a sharper bound for the European call.}
+	Rearrange \eqref{eq:put-call-parity} as $C_{E}=P+S-\mathrm{PV}(X)$; since $P\ge 0$ by \autoref{thm:option-nonneg}, $C_{E}\ge S-\mathrm{PV}(X)$, and together with $C_{E}\ge 0$,
 	\[
-		\max\bigl(S-\mathrm{PV}(X),\,0\bigr) \;\ge\; S-X .
+		C_{E} \;\ge\; \max\bigl(S-\mathrm{PV}(X),\,0\bigr) .
 	\]
+	This sharpens \autoref{lem:call-intrinsic}, whose proof threw away the nonnegative term $X-\mathrm{PV}(X)$.\footnote{By Exercise 8.3.2 of the textbook.}
+
+	\emph{Step 2: pass to the American call.}
+	By \autoref{prop:amer-ge-euro}, $C_{A}\ge C_{E}$.
+
+	\emph{Step 3: compare holding with exercising.}
+	Exercising now realises $S-X$. Interest rates are nonnegative, so $\mathrm{PV}(X)\le X$, and chaining the steps gives
+	\[
+		C_{A} \;\ge\; C_{E} \;\ge\; \max\bigl(S-\mathrm{PV}(X),\,0\bigr) \;\ge\; S-X .
+	\]
+	The left end is what the call is worth if held (or sold); the right end is what exercising yields.
 	Holding is thus worth at least as much as exercising, at every moment before expiration.
 \end{proof}
 
@@ -1811,7 +1876,7 @@ For calls on a non-dividend-paying stock, parity closes it entirely: \textbf{Eur
 	The theorem does \emph{not} mean American calls should be kept until maturity.
 	What it does imply is that when early exercise is being considered, a better alternative is to \emph{sell} the call --- the market will pay at least the intrinsic value the holder was about to settle for, and generally more.
 
-	Early exercise may become optimal for American calls on a \emph{dividend-paying} stock, however.
+	Early exercise may become optimal for American calls on a \emph{dividend-paying} stock, however --- and on a foreign currency (\autoref{sec:forex}).
 	Recall from \autoref{sec:corporate-actions} that options are assumed unprotected, and that the stock price declines as the stock goes ex-dividend: the holder who does not exercise watches that decline without being compensated for it.
 \end{remark}
 
@@ -1832,8 +1897,13 @@ In contrast, it might be optimal to exercise an American \emph{put} even if the 
 	A call holder pays the strike; waiting earns interest on it, so waiting is (weakly) optimal, and \autoref{thm:merton-dividend} reduces the American call to a European one priced at finitely many candidate dates.
 	A put holder \emph{receives} the strike; waiting forgoes that interest, so exercising early can pay.
 
-	This is why the American put has no closed-form price and the American call effectively does --- and why so much of the numerical machinery in the remaining chapters exists for puts.
+	This is why the American put has no closed-form price and the American call effectively does --- and why so much of the numerical machinery in the remaining chapters exists for puts (\autoref{sec:american-puts}).
 \end{moral}
+
+\begin{remark}
+	買權與賣權的差別全來自「履約價 $X$ 是付出去還是收進來」：買權履約要\emph{付} $X$，晚點付可以多賺利息，所以等待不吃虧，美式買權（不配息時）等同歐式，頂多在除息前幾個時點要檢查；賣權履約是\emph{收} $X$，晚點收就少賺利息，所以提前履約可能划算。
+	也因此美式買權的價格幾乎可以直接套歐式公式，美式賣權卻沒有公式，只能用後面章節的數值方法去算。
+\end{remark}
 
 %─────§ General replication──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{A General Result}
@@ -1848,6 +1918,70 @@ One last theorem says how far the replication arguments of this chapter reach.\f
 	Any piecewise linear payoff function can be replicated using a portfolio of calls and puts.
 \end{theorem}
 
+\begin{remark}
+	\textbf{設定。}設到期 payoff $g(S_{T})$ 是一條折線（\autoref{fig:piecewise-replication}）：在 $S_{T}=0$ 的值是 $g(0)$；折角在 $K_{1}<K_{2}<\cdots<K_{m}$；最左段斜率 $s_{0}$，過了 $K_{j}$ 之後斜率變成 $s_{j}$。
+
+	\textbf{從左到右一段一段拼。}
+	\begin{enumerate}[(i),itemsep=0.3em]
+		\item \emph{最左段}：它是直線 $g(0)+s_{0}S_{T}$，用「到期付 $g(0)$ 的零息債券 $+$ 持有 $s_{0}$ 股」就能做出來（負的就是借錢或放空）。
+		\item \emph{過 $K_{1}$}：上面那條直線會照斜率 $s_{0}$ 繼續延伸（圖中虛線），但目標的斜率要變成 $s_{1}$，差了 $s_{1}-s_{0}$。
+		      加上 $s_{1}-s_{0}$ 個履約價 $K_{1}$ 的買權即可：買權 $\max(0,S_{T}-K_{1})$ 在 $K_{1}$ 以左是 $0$，\emph{不會動到已經對好的左段}；在 $K_{1}$ 以右斜率是 $1$，乘上 $s_{1}-s_{0}$ 剛好把斜率補成 $s_{1}$。
+		\item \emph{過 $K_{2},\dots,K_{m}$}：同理，在每個 $K_{j}$ 加 $s_{j}-s_{j-1}$ 個履約價 $K_{j}$ 的買權（斜率變大就買、變小就賣）。
+	\end{enumerate}
+	全部加起來就是
+	\[
+		g(S_{T}) \;=\; \underbrace{g(0)}_{\text{債券}} \;+\; \underbrace{s_{0}\,S_{T}}_{\text{股票}} \;+\; \sum_{j=1}^{m}\,\underbrace{(s_{j}-s_{j-1})\max(0,\,S_{T}-K_{j})}_{\text{$K_{j}$ 的買權}} .
+	\]
+
+	\textbf{例：跨式。}$\abs{S_{T}-X}$ 只在 $X$ 折一次：$g(0)=X$，斜率由 $-1$ 變 $+1$，差 $+2$，所以 $\abs{S_{T}-X}=X-S_{T}+2\max(0,S_{T}-X)$：債券 $X$、放空一股、買兩個 $X$ 買權。
+	由 \eqref{eq:put-call-parity}，一個賣權等於「一個買權、放空一股、到期收 $X$ 的債券」，所以這和「一個買權加一個賣權」是同一個部位——複製方式並不唯一。
+\end{remark}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[font=\footnotesize]
+		\begin{axis}[
+				width=0.72\textwidth, height=5.6cm,
+				xmin=0, xmax=4.3, ymin=0, ymax=3.1,
+				xtick={1,2,3}, xticklabels={$K_{1}$,$K_{2}$,$K_{3}$},
+				ytick={1.2}, yticklabels={$g(0)$},
+				axis lines=middle,
+				axis line style={-{Stealth[length=4pt]}, thin},
+				tick label style={font=\scriptsize},
+				xlabel={$S_{T}$}, ylabel={$g(S_{T})$},
+				every axis x label/.style={at={(ticklabel cs:1.0)}, anchor=west},
+				every axis y label/.style={at={(ticklabel cs:1.0)}, rotate=0, anchor=south},
+				clip=false,
+			]
+			% grid lines at the kinks
+			\foreach \k in {1,2,3} {
+					\edef\tmp{\noexpand\draw[Gray!30, thin] (axis cs:\k,0) -- (axis cs:\k,3.0);}\tmp
+				}
+			% extensions of the previous slope past each kink
+			\addplot[Gray!60!black, densely dashed] coordinates {(1,0.8) (1.9,0.44)};
+			\addplot[Gray!60!black, densely dashed] coordinates {(2,1.7) (2.85,2.47)};
+			\addplot[Gray!60!black, densely dashed] coordinates {(3,1.7) (4.0,1.7)};
+			% the payoff
+			\addplot[MidnightBlue!80!black, very thick]
+			coordinates {(0,1.2) (1,0.8) (2,1.7) (3,1.7) (4,2.5)};
+			% slope labels
+			\node[font=\scriptsize, MidnightBlue!80!black] at (axis cs:0.5,1.18) {$s_{0}$};
+			\node[font=\scriptsize, MidnightBlue!80!black] at (axis cs:1.35,1.38) {$s_{1}$};
+			\node[font=\scriptsize, MidnightBlue!80!black] at (axis cs:2.5,1.92) {$s_{2}$};
+			\node[font=\scriptsize, MidnightBlue!80!black] at (axis cs:3.55,2.38) {$s_{3}$};
+			% what the calls add
+			\node[font=\scriptsize, RawSienna, anchor=west] at (axis cs:1.05,0.22) {$+(s_{1}-s_{0})$ calls};
+			\node[font=\scriptsize, RawSienna, anchor=south] at (axis cs:2.5,2.55) {$+(s_{2}-s_{1})$ calls};
+			\node[font=\scriptsize, RawSienna, anchor=west] at (axis cs:3.45,1.5) {$+(s_{3}-s_{2})$ calls};
+		\end{axis}
+	\end{tikzpicture}
+	\caption{A piecewise linear payoff with kinks $K_{1},K_{2},K_{3}$ and slopes
+		$s_{0},\ldots,s_{3}$. The bond and the stock produce the first segment;
+		at each kink the dashed line is where the previous segment would have
+		gone, and the calls struck there (labelled in red) bend it onto the next slope.}
+	\label{fig:piecewise-replication}
+\end{figure}
+
 \begin{corollary}
 	\label{cor:approx-replication}
 	Any sufficiently well-behaved payoff function can be approximated by a portfolio of calls and puts.
@@ -1857,6 +1991,17 @@ One last theorem says how far the replication arguments of this chapter reach.\f
 	\label{thm:bakshi-madan}
 	Any payoff function with bounded expectation can be replicated by a continuum of out-of-the-money European calls and puts.
 \end{theorem}
+
+\begin{remark}
+	\emph{A continuum of options} 指不是買有限幾個選擇權，而是對連續一整段的\emph{每個}履約價 $K$ 都買一點點（數量 $w(K)\,dK$），把加總換成積分。
+	平滑的 payoff 每一點都在微微彎曲，可看成「到處都是無限小的折角」；照 \autoref{thm:piecewise-replication} 的做法，履約價 $K$ 的數量就是斜率在那裡的變化率 $f''(K)$。取參考點 $S_{0}$，可寫成
+	\[
+		f(S_{T}) = \underbrace{f(S_{0})+f'(S_{0})(S_{T}-S_{0})}_{\text{債券與股票}}
+		+\int_{0}^{S_{0}} f''(K)\,(K-S_{T})^{+}\,dK
+		+\int_{S_{0}}^{\infty} f''(K)\,(S_{T}-K)^{+}\,dK ,
+	\]
+	$S_{0}$ 以下用賣權、以上用買權，兩邊都是價外選擇權，這就是定理中的 out-of-the-money。
+\end{remark}
 
 \begin{moral}
 	Calls and puts are a \emph{basis}.
@@ -1903,7 +2048,13 @@ This chapter supplies the missing ingredient --- a model of how the stock price 
 \begin{itemize}[itemsep=0.35em]
 	\item The no-arbitrage principle is insufficient to pin down the exact option value.
 	\item We need a model of the probabilistic behaviour of stock prices.
-	\item An obstacle is that it seems a \emph{risk-adjusted} interest rate is needed to discount the option's expected payoff --- as in \eqref{eq:lognormal-partial}, where the expected payoff was computed but no rate was named.
+	\item 障礙在於\emph{折現率}（discount rate）。
+	      有了 $S_{T}$ 的模型（例如對數常態 lognormal，密度 $f$），買權的\emph{期望報酬}（expected payoff）其實已經算得出來：
+	      \[
+	      	E\bigl[\max(0,S_{T}-X)\bigr] \;=\; \int_{X}^{\infty} y\,f(y)\,dy \;-\; X\,\Pr[S_{T}>X] ,
+	      \]
+	      第一項正是 \eqref{eq:lognormal-partial} 取 $a=X$，這也是當初要推導那個部分期望值（partial expectation）的原因。
+	      但這是\emph{到期時}的值，要變成\emph{今天}的價格必須折現；而報酬有風險，投資人會要求額外的\emph{風險溢酬}（risk premium），所以不能用一般的\emph{無風險利率}（riskless rate），要用\emph{風險調整後的折現率}（risk-adjusted discount rate）$=$ 無風險利率 $+$ 風險溢酬——偏偏模型本身沒告訴我們這個溢酬是多少，1973 年以前的定價嘗試都卡在這裡。
 	\item The breakthrough came in 1973, when Black (1938--1995) and Scholes, with help from Merton, published their celebrated option pricing model,\footnote{The results were obtained as early as June 1969. Merton and Scholes were winners of the 1997 Nobel Prize in Economic Sciences.} known as the \vocab{Black--Scholes option pricing model}.
 \end{itemize}
 
@@ -1984,9 +2135,14 @@ This chapter supplies the missing ingredient --- a model of how the stock price 
 In fact $d\le R\le u$ must hold to rule out arbitrage.\footnote{See Exercise 9.2.1 of the textbook. The sufficient condition is the strict one, $d<R<u$ (Björk, 2009), which we shall assume.}
 
 \begin{intuition}
-	If $R<d$ the stock beats the bond in \emph{every} state: borrow, buy stock, and collect a riskless profit.
-	If $R>u$ the reverse trade does it.
-	So $d<R<u$ is not a modelling convenience --- it is precisely the condition that \autoref{sec:arbitrage} is not violated by the model itself.
+	回憶 $R$ 是\emph{總報酬}（gross return）：今天借（或存）\$1，一期後要還（或拿回）$R$ 元。
+	\begin{itemize}[itemsep=0.3em]
+		\item \textbf{若 $R<d$}：今天借 $S$ 元買一股，淨支出 $0$。一期後股票值 $Su$ 或 $Sd$，要還 $RS$，淨得 $Su-RS$ 或 $Sd-RS$；因為 $u>d>R$，兩者都 $>0$。
+		      不花錢、一定賺，就是\emph{套利}（arbitrage）。直觀上，股票連「跌」的時候都比存銀行好，沒人會想持有債券。
+		\item \textbf{若 $R>u$}：反過來做——放空一股拿到 $S$ 元存起來。一期後拿回 $RS$，買回股票還掉要 $Su$ 或 $Sd$，淨得 $RS-Su>0$ 或 $RS-Sd>0$，同樣是套利。
+		\item \textbf{邊界 $R=d$ 或 $R=u$}：例如 $R=d$ 時，上面的交易在下跌時淨得 $0$、上漲時 $>0$，仍符合「不虧且有機會賺」的套利定義，所以要用嚴格的 $d<R<u$（即註腳說的充分條件）。
+	\end{itemize}
+	所以 $d<R<u$ 不是為了方便而加的假設，而是確保這個模型\emph{本身}不違反 \autoref{sec:arbitrage} 無套利原則（no-arbitrage principle）的條件：無風險利率必須落在股票的「最差」與「最好」報酬之間。
 \end{intuition}
 
 \begin{figure}[H]
@@ -2082,7 +2238,7 @@ Two linear equations in two unknowns, with a nonsingular matrix because $u\ne d$
 
 \begin{theorem}
 	\label{thm:bopm-call}
-	By the no-arbitrage principle, the European call must cost the same as the equivalent portfolio:\footnote{Also called the \vocab{replicating portfolio}, since it replicates the option.}
+	By the no-arbitrage principle, a European call expiring one period from now must cost the same as the equivalent portfolio:\footnote{Also called the \vocab{replicating portfolio}, since it replicates the option.}
 	\begin{equation}
 		C \;=\; hS+B .
 		\label{eq:bopm-price}
@@ -2103,10 +2259,18 @@ Two linear equations in two unknowns, with a nonsingular matrix because $u\ne d$
 	This also explains an option's reputation for leverage: it packages exactly that trade, and its percentage swings are correspondingly larger than the stock's.
 \end{note}
 
+\begin{remark}
+	照組合的定義，「持有 $B$ 元的無風險債券」在 $B<0$ 時代表\emph{賣出} $\abs{B}$ 元的無風險債券，也就是今天借入 $\abs{B}$ 元、一期後連本帶利還 $R\abs{B}$ 元。
+	所以這是\vocab{槓桿多頭部位}（levered long position），也就是 \autoref{sec:put-call-parity} 說的\emph{融資買進}：買股票（long），但錢有一部分是借來的。
+	自己只出 $C=hS-\abs{B}$，卻承擔 $h$ 股的漲跌，所以同樣的股價變動，換算成自己出的錢，百分比漲跌會被放大——這就是\vocab{槓桿}（leverage），也是買權漲跌幅通常比股票大的原因。
+\end{remark}
+
 \subsection{American Calls and Puts over One Period}
 \label{sec:american-one-period}
 
 \source{Slides pp.~254--255}
+
+As in \autoref{sec:bopm-one-period}, every option in this subsection expires \emph{one period from now}; $hS+B$ is the value of the replicating portfolio, i.e.\ what the option is worth if it is held to expiration.
 
 For an American call we have to consider immediate exercise, so
 \[
@@ -2116,20 +2280,34 @@ When $hS+B\ge S-X$ the call should not be exercised immediately; when $hS+B<S-X$
 For non-dividend-paying stocks the first case always holds, by \autoref{thm:merton-no-early}, so once again $C=hS+B$.
 
 Puts are priced the same way.
-Their delta is
+Replicating the put's terminal values $P_{u}$ and $P_{d}$ with $h$ shares and $B$ dollars of bonds means solving, as in \eqref{eq:bopm-replicate},
+\[
+	\begin{aligned}
+		hSu+RB & \;=\; P_{u} , \\
+		hSd+RB & \;=\; P_{d} .
+	\end{aligned}
+\]
+Subtracting the second equation from the first eliminates $B$: $h(Su-Sd)=P_{u}-P_{d}$.
+Multiplying the first by $d$, the second by $u$ and subtracting eliminates $h$: $(u-d)RB=uP_{d}-dP_{u}$.
+So the put's delta is
 \[
 	h \;=\; \frac{P_{u}-P_{d}}{Su-Sd} \;\le\; 0 ,
 	\qquad
 	P_{u} = \max(0,\,X-Su) , \quad P_{d} = \max(0,\,X-Sd) ,
 \]
-and with $B=(uP_{d}-dP_{u})/\bigl((u-d)R\bigr)$ the European put is worth $hS+B$, while the American put is worth
+and
+\[
+	B \;=\; \frac{uP_{d}-dP_{u}}{(u-d)\,R} \;\ge\; 0 ,
+\]
+since $P_{d}\ge P_{u}\ge 0$ and $u>d$ give $uP_{d}\ge uP_{u}\ge dP_{u}$.
+The European put is worth $hS+B$, while the American put is worth
 \[
 	\max\bigl(hS+B,\; X-S\bigr) .
 \]
 
 \begin{note}
 	The $\max$ cannot be dropped this time: early exercise \emph{can} be optimal with American puts, exactly as \autoref{sec:early-exercise} warned.
-	Note also that $h\le 0$ --- replicating a put means \emph{shorting} stock and lending, the mirror image of the call.
+	Note also that $h\le 0$ and $B\ge 0$ --- replicating a put means \emph{shorting} $\abs{h}$ shares and \emph{lending} $B$ dollars (buying the riskless bond, which pays $RB$ one period later), the mirror image of the call's borrowing.
 \end{note}
 
 %─────§ Risk────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -2208,11 +2386,11 @@ Now, the expected rates of return of \emph{all} securities must equal the riskle
 Equation \eqref{eq:rn-stock} says the stock behaves that way under $p$, and for this reason $p$ is called the \vocab{risk-neutral probability}.
 
 \begin{remark}
-	\vocab{風險中立機率}（risk-neutral probability）：$p=\frac{R-d}{u-d}$。在這個機率下，股票的期望報酬恰好等於無風險利率，就像身處一個投資人不要求風險補償的世界。它\emph{不是}股價真正上漲的機率 $q$，只是讓定價公式變成「期望值再用無風險利率折現」的計算工具。
+	\vocab{風險中立機率}（risk-neutral probability）：\eqref{eq:risk-neutral-p} 的 $p=\frac{R-d}{u-d}$。\eqref{eq:rn-stock} 說在這個機率下，股票的期望報酬恰好等於無風險利率，就像身處一個投資人不要求風險補償的世界。它\emph{不是}股價真正上漲的機率 $q$，只是讓 \eqref{eq:bopm-expectation} 可以讀成「用 $p$ 算期望值，再用無風險利率 $R$ 折現」的計算工具。
 \end{remark}
 
 \begin{moral}
-	The value of an option is the expectation of its discounted future payoff \emph{in a risk-neutral economy}.
+	Read \eqref{eq:bopm-expectation} with $p$ as a probability: the value of an option is the expectation of its discounted future payoff \emph{in a risk-neutral economy}.
 	So the rate used for discounting is the riskless rate --- and the obstacle raised in \autoref{sec:pricing-setting} is gone, not by being solved but by being made irrelevant.
 
 	The risk-neutral economy is a computational fiction. Real investors are not risk-neutral, and $p\ne q$ in general.
@@ -2235,8 +2413,8 @@ At any node the next two stock prices depend only on the current price, not on t
 
 \begin{remark}
 	\begin{itemize}[nosep]
-		\item \vocab{重合}（recombine）：先漲後跌與先跌後漲會到達同一個價格（$ud=du$），所以樹的分支會合併；$n$ 期只有 $n+1$ 個終點，而不是 $2^{n}$ 個，計算量大幅減少。
-		\item \vocab{馬可夫性}（Markovian）：下一期的股價只取決於\emph{現在}的價格，與過去怎麼走到這裡無關。
+		\item \vocab{重合}（recombine）：兩期之後，「先漲再跌」的股價是 $Sud$，「先跌再漲」是 $Sdu$，兩者相等。所以這兩條路走到同一個點，樹在那裡合起來，畫出來就像 \autoref{fig:binomial-two-step}：四條路徑，卻只有三個終點。期數愈多省愈多——$n$ 期只有 $n+1$ 個終點，不用算 $2^{n}$ 個。
+		\item \vocab{馬可夫性}（Markovian）：股價下一步會變成什麼，只看它\emph{現在}是多少，不管之前是怎麼走過來的。例如走到 $Sud$ 的那個點，不論是先漲還是先跌到達，接下來的可能股價都一樣。
 	\end{itemize}
 \end{remark}
 
@@ -2289,29 +2467,43 @@ The call values at time~1 are then obtained by applying \eqref{eq:bopm-expectati
 	C_{d} \;=\; \frac{p\,C_{ud}+(1-p)\,C_{dd}}{R} .
 	\label{eq:bopm-step-back}
 \end{equation}
-Deltas come from \eqref{eq:bopm-hb}; for example the delta at $C_{u}$ is $(C_{uu}-C_{ud})/(Suu-Sud)$.
+Each step is a one-period problem, so each node has its \emph{own} replicating portfolio, given by \eqref{eq:bopm-hb} with that node's two successors in place of $C_{u},C_{d}$:
+\begin{itemize}[itemsep=0.3em]
+	\item at the time-1 node $Su$ (successors $C_{uu},C_{ud}$): \ $h_{u}=\dfrac{C_{uu}-C_{ud}}{Suu-Sud}$, \ $B_{u}=\dfrac{uC_{ud}-dC_{uu}}{(u-d)R}$, and $C_{u}=h_{u}\,Su+B_{u}$;
+	\item at the time-1 node $Sd$ (successors $C_{ud},C_{dd}$): \ $h_{d}=\dfrac{C_{ud}-C_{dd}}{Sud-Sdd}$, \ $B_{d}=\dfrac{uC_{dd}-dC_{ud}}{(u-d)R}$, and $C_{d}=h_{d}\,Sd+B_{d}$.
+\end{itemize}
+These are the portfolios held from time~1 to time~2.
 
-We now reach the current period and compute
+We now reach the current period (time~0).
+Its portfolio, held from time~0 to time~1, is again \eqref{eq:bopm-hb} with successors $C_{u},C_{d}$ --- which are now the time-1 \emph{values} just computed in \eqref{eq:bopm-step-back}, not payoffs:
 \[
-	C \;=\; \frac{p\,C_{u}+(1-p)\,C_{d}}{R} ,
+	h=\frac{C_{u}-C_{d}}{Su-Sd} , \qquad
+	B=\frac{uC_{d}-dC_{u}}{(u-d)R} , \qquad
+	C \;=\; hS+B \;=\; \frac{p\,C_{u}+(1-p)\,C_{d}}{R} .
 \]
-with $h$ and $B$ again from \eqref{eq:bopm-hb}.
 
 \subsection{Early Exercise, Again}
 
 \source{Slides p.~266}
 
-The tree lets us re-derive \autoref{thm:merton-no-early} by direct computation.
-Since the call will not be exercised at time~1 even if it is American, $C_{u}\ge Su-X$ and $C_{d}\ge Sd-X$.
-Therefore
+The tree lets us re-derive \autoref{thm:merton-no-early} by direct computation for an American call two periods from expiration.
+Throughout, $h$ and $B$ are the \emph{time-0} portfolio just displayed, and $C_{u},C_{d}$ are the call's values at the two time-1 nodes.
+
+\emph{At time~1.} Each time-1 node is one period from expiration, so by \autoref{sec:american-one-period} the call is not exercised there even if it is American; its value is the held value, which is at least the exercise value:
+\[
+	C_{u}\;\ge\; Su-X , \qquad C_{d}\;\ge\; Sd-X .
+\]
+
+\emph{At time~0.} Holding is worth $hS+B$; substitute the two bounds, then use \eqref{eq:rn-stock}, $pu+(1-p)d=R$:
 \[
 	hS+B \;=\; \frac{p\,C_{u}+(1-p)\,C_{d}}{R}
-	\;\ge\; \frac{\bigl[\,pu+(1-p)\,d\,\bigr]S-X}{R}
+	\;\ge\; \frac{p\,(Su-X)+(1-p)\,(Sd-X)}{R}
+	\;=\; \frac{RS-X}{R}
 	\;=\; S-\frac{X}{R}
 	\;>\; S-X ,
 \]
-using \eqref{eq:rn-stock} for the middle equality and $R>1$ for the last.
-So the call will not be exercised at present either, and
+the last step because $R>1$.
+The right end $S-X$ is what exercising at time~0 yields, so the call is not exercised at time~0 either, and
 \[
 	C \;=\; hS+B \;=\; \frac{p\,C_{u}+(1-p)\,C_{d}}{R} .
 \]
@@ -2322,11 +2514,11 @@ So the call will not be exercised at present either, and
 
 \source{Slides pp.~267--268}
 
-The expression above calculates $C$ from the two successor nodes $C_{u}$ and $C_{d}$ and none beyond; and the same computation happened at $C_{u}$ and $C_{d}$ themselves, in \eqref{eq:bopm-step-back}.
+The formula $C=\bigl(p\,C_{u}+(1-p)\,C_{d}\bigr)/R$ at the end of \autoref{sec:bopm-multi} calculates $C$ from the two successor nodes $C_{u}$ and $C_{d}$ and none beyond; and the same computation happened at $C_{u}$ and $C_{d}$ themselves, in \eqref{eq:bopm-step-back}.
 This recursive procedure is called \vocab{backward induction}.\footnote{Ernst Zermelo (1871--1953).}
 
 \begin{remark}
-	\vocab{逆向歸納法}（backward induction）：從到期日已知的報酬出發，用 \eqref{eq:bopm-expectation} 一期一期往回推算每個節點的價值，推到根節點就是今天的價格。美式選擇權則在每個節點再與立即履約的價值取 $\max$。
+	\vocab{逆向歸納法}（backward induction）：從到期日已知的報酬出發，用 \eqref{eq:bopm-expectation} 一期一期往回推算每個節點的價值，推到根節點就是今天的價格。美式選擇權則在每個節點再與立即履約的價值取 $\max$（如 \autoref{sec:american-one-period}）。
 \end{remark}
 
 Unrolling it for two periods,
@@ -2339,7 +2531,7 @@ Unrolling it for two periods,
 	\label{eq:bopm-two-period}
 \end{equation}
 
-The coefficient $2$ on the middle term is the number of paths reaching that state, and it is the only trace the paths leave.
+The coefficient $2$ on the middle term of \eqref{eq:bopm-two-period} is the number of paths reaching that state ($ud$ and $du$), and it is the only trace the paths leave.
 
 \begin{figure}[H]
 	\centering
@@ -2384,9 +2576,13 @@ and similarly for the put,
 \end{equation}
 
 \begin{moral}
-	The value of a call on a non-dividend-paying stock is the expected discounted payoff at expiration in a risk-neutral economy --- literally the sum in \eqref{eq:bopm-call-n}, with $\binom{n}{j}p^{j}(1-p)^{n-j}$ as the probability of finishing in state $j$.
+	\textbf{\eqref{eq:bopm-call-n} 在說什麼。}股價走 $n$ 期，若其中 $j$ 期上漲、$n-j$ 期下跌，到期價格就是 $Su^{j}d^{n-j}$，稱為 state $j$，此時買權的 payoff 是 $\max(0,Su^{j}d^{n-j}-X)$。
+	在 risk-neutral probability $p$ 下，走到 state $j$ 的機率是 $\binom{n}{j}p^{j}(1-p)^{n-j}$（有 $\binom{n}{j}$ 條路徑，每條機率 $p^{j}(1-p)^{n-j}$）。
+	所以分子就是到期 payoff 的期望值（expected payoff），再除以 $R^{n}$ 折現 $n$ 期。
+	結論：不配息股票的買權價格 $=$ 在 risk-neutral economy 裡，到期 payoff 的期望值折現回今天。
 
-	Note what \eqref{eq:bopm-call-n} is \emph{not}: it is not a shortcut that skips the tree. It is the tree, summed. For a European option the two agree; for an American one only the tree works, because the $\max$ against intrinsic value has to be taken at every node.
+	\textbf{它不是繞過樹的捷徑。}\eqref{eq:bopm-call-n} 只是把 backward induction 在樹上一期一期往回算的結果，一次展開加總起來（\eqref{eq:bopm-two-period} 就是 $n=2$ 的情形）。
+	對 European option 兩者完全相同；但 American option 在\emph{每個節點}都要和立即履約的 intrinsic value 取 $\max$，這個 $\max$ 沒辦法塞進一條加總公式裡，所以只能在樹上一步步往回算。
 \end{moral}
 
 \subsection{Reading the Weights as State Prices}
@@ -2415,9 +2611,29 @@ and \eqref{eq:bopm-call-n} and \eqref{eq:bopm-put-n} are two instances of it.
 		X_{H}=Su^{j+1}d^{n-j-1} ,
 	\]
 	that is, struck at the state itself and its two neighbours.
-	No stock price strictly between $X_{L}$ and $X_{H}$ is attainable except $X_{M}$, so the tent's \emph{whole} payoff is the single value $1$ at state $j$; the exponent $-1$ replaces the $-2$ of the continuous case, where the tent had to be scaled by area instead.
+	No stock price strictly between $X_{L}$ and $X_{H}$ is attainable except $X_{M}$, so the tent's \emph{whole} payoff is the single value $1$ at state $j$; the exponent $-1$ replaces the $-2$ of the continuous case in \autoref{sec:state-claims}, where the tent had to be scaled by area instead.
 	Its price is therefore $p_{j}$, and $R^{n}p_{j}=\binom{n}{j}p^{j}(1-p)^{n-j}$ is the undiscounted state price --- the risk-neutral probability.
 \end{note}
+
+\begin{remark}
+	\textbf{\eqref{eq:bopm-state-price} 的 $p_{j}$ 是什麼。}把 \eqref{eq:bopm-call-n} 的每一項拆成「權重 $\times$ payoff」：權重就是 $p_{j}$，也就是走到 state $j$（到期股價 $Su^{j}d^{n-j}$）的 risk-neutral probability 再除以 $R^{n}$ 折現。
+
+	\textbf{為什麼叫 state price。}想像一張 Arrow security：到期時股價剛好是 state $j$ 就付 \$1，其他 state 都付 $0$。
+	照 \eqref{eq:bopm-call-n} 同樣的算法（期望 payoff 再折現），它今天的價格是 $1\times\binom{n}{j}p^{j}(1-p)^{n-j}/R^{n}=p_{j}$。
+	所以 $p_{j}$ 就是「在 state $j$ 拿 \$1」今天的價格，和 \autoref{sec:state-claims} 定義的 state price 是同一個東西。
+
+	\textbf{所以任何選擇權都是一籃 Arrow securities。}一個在 state $j$ 付 payoff$_{j}$ 的選擇權，等於買 payoff$_{j}$ 張 state $j$ 的 Arrow security，每個 $j$ 都買。價格相加，就是
+	\[
+		\text{option price}=\sum_{j}p_{j}\times\text{payoff}_{j} ;
+	\]
+	\eqref{eq:bopm-call-n} 與 \eqref{eq:bopm-put-n} 只是把買權、賣權的 payoff 代進去。
+
+	\textbf{上面 note 在做什麼。}它說明這張 Arrow security 真的可以用買權做出來：取以 state $j$ 和左右相鄰兩個 state 為履約價的 butterfly spread。
+	因為股價只會落在樹的節點上，在 $X_{L}$ 與 $X_{H}$ 之間只可能出現 $X_{M}$ 這一個價格，所以帳篷只在 state $j$ 有正的 payoff，其他 state 都是 $0$；再把份數調到使這個 payoff 剛好是 $1$。
+	離散的情況下只要固定\emph{高度}為 $1$，不必像 \autoref{sec:state-claims} 的連續情況那樣固定\emph{面積}——那裡是因為股價剛好落在某一點的機率為 $0$。
+	最後 $R^{n}p_{j}$ 把價格換回到期時的價值，得到的正是 risk-neutral probability，對應 \autoref{thm:breeden-litzenberger}「state price 的 future value 是機率（密度）」。
+	（嚴格說，乘法樹的三個履約價間距不相等，$X_{M}-X_{L}\ne X_{H}-X_{M}$，要讓帳篷兩端都歸零，兩側買權的份數必須不同：買 $(X_{M}-X_{L})^{-1}$ 個 $X_{L}$、$(X_{H}-X_{M})^{-1}$ 個 $X_{H}$，賣兩者之和個 $X_{M}$。）
+\end{remark}
 
 %─────§ Risk-neutral pricing methodology─────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{The Risk-Neutral Pricing Methodology}
@@ -2425,7 +2641,7 @@ and \eqref{eq:bopm-call-n} and \eqref{eq:bopm-put-n} are two instances of it.
 
 \source{Slides p.~271}
 
-Nothing in the argument used the payoff $\max(0,S-X)$ beyond the fact that it was a function of the terminal stock price.
+Nothing in the derivation of \eqref{eq:bopm-call-n} used the payoff $\max(0,S-X)$ beyond the fact that it was a function of the terminal stock price --- \eqref{eq:bopm-put-n} is the same sum with the put's payoff swapped in.
 So the conclusion generalises at once.
 
 \begin{moral}
@@ -2442,6 +2658,13 @@ The ``equivalence'' between arbitrage freedom in a model and the existence of a 
 
 \begin{remark}
 	\vocab{資產定價第一基本定理}（first fundamental theorem of asset pricing）：一個模型沒有套利機會，若且唯若存在風險中立機率。換句話說，「無套利」與「可以用風險中立期望值定價」是同一件事的兩種說法。
+
+	一般情況的證明很難（要用泛函分析），這裡沒有證；但在二項式模型裡它其實已經證完了：
+	\begin{itemize}[nosep]
+		\item 無套利 $\iff d<R<u$：\autoref{sec:bopm} 的 intuition 證過，$R\le d$ 或 $R\ge u$ 都能做出套利。
+		\item 存在 risk-neutral probability $\iff d<R<u$：\eqref{eq:rn-stock} 的唯一解是 \eqref{eq:risk-neutral-p} 的 $p=\frac{R-d}{u-d}$，它落在 $(0,1)$（真的是一個機率）恰好等價於 $d<R<u$。
+	\end{itemize}
+	兩邊等價於同一個條件，所以定理成立；多期模型則是在每個節點各用一次。
 \end{remark}
 
 \begin{figure}[H]
@@ -2487,13 +2710,25 @@ It does not.
 \end{proposition}
 
 \begin{remark}
-	\vocab{自我融資}（self-financing）：「融資」就是取得資金（見 \autoref{sec:put-call-parity} 的融資買進），「自我」融資是指所需資金全由組合本身提供——複製策略從頭到尾不需要再投入、也不會提出資金。每期結束時組合的價值剛好等於下一期新組合的成本，所以動態調整部位不用額外的錢；價值的變化完全來自資本利得。
+	\vocab{自我融資}（self-financing）：「融資」就是取得資金（見 \autoref{sec:put-call-parity} 的融資買進），「自我」融資是指所需資金全由組合本身提供，中途不必再投入、也不會提出任何錢。
+
+	\textbf{為什麼要擔心。}在 \autoref{sec:bopm-multi}，每個節點的複製組合都不一樣：time 0 持有 $(h,B)$，到了 time 1 的節點 $Su$ 要改成 $(h_{u},B_{u})$，節點 $Sd$ 要改成 $(h_{d},B_{d})$。每期都得調整部位（rebalance），若調整時要額外補錢，選擇權的價格就不只是一開始的 $hS+B$ 了。
+
+	\textbf{為什麼不用補錢}（以兩期為例，上漲的情況）：
+	\begin{enumerate}[(i),nosep]
+		\item time 0 花 $C=hS+B$ 建立 $(h,B)$。
+		\item 到 time 1 股價變成 $Su$，這個舊組合值 $hSu+RB$；由 \eqref{eq:bopm-replicate}，它正好等於 $C_{u}$。
+		\item 在節點 $Su$ 要建的新組合 $(h_{u},B_{u})$，成本是 $h_{u}Su+B_{u}$；由 \eqref{eq:bopm-price} 用在這個節點，它也等於 $C_{u}$。
+		\item 所以把舊組合賣掉的錢，剛好夠買新組合，不多也不少。下跌的情況同理，兩邊都是 $C_{d}$。
+	\end{enumerate}
+	一路做到到期，組合的價值就是選擇權的 payoff；整個過程唯一付出的錢是一開始的 $C$。這就是下一段原文和 \autoref{prop:self-financing} 的意思。
 \end{remark}
 
 The reason is already in \eqref{eq:bopm-replicate}.
 At the end of the current period the portfolio is worth $hSu+RB$ or $hSd+RB$, which \emph{is} $C_{u}$ or $C_{d}$ --- and $C_{u}$ and $C_{d}$ are, by \eqref{eq:bopm-price} applied one period later, exactly the cost of the next portfolio.
 The portfolio's value at the end of each period is therefore precisely the amount needed to set up the next one.
 Changes in value are due entirely to capital gains.
+\autoref{sec:bopm-arbitrage-walk} runs the strategy through a three-period example.
 
 \begin{moral}
 	Rebalancing does not depend on predicting future stock prices.

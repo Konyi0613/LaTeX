@@ -1,0 +1,1285 @@
+%─────Lecture 5──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\chapter{Extensions of Options Theory}
+\label{ch:extensions}
+\marginpar{\footnotesize\textsf{\raggedright Lecture 5\\ October 8, 2026}}
+
+\source{Slides pp.~375--376}
+
+\begin{flushright}
+	\itshape As I never learnt mathematics,\\
+	so I have had to think.\\
+	\upshape --- Joan Robinson (1903--1983)
+\end{flushright}
+
+\bigskip
+
+\noindent Chapters~\ref{ch:pricing-models} and~\ref{ch:greeks} priced one security, the plain European option on a stock, and asked how its price moves.
+This chapter shows how far the same machinery reaches.
+Three directions:
+\begin{enumerate}[(i)]
+	\item \textbf{a different underlying}: the total value of a firm, which turns its stock and bonds into options, and a foreign currency, which is a stock paying a dividend yield;
+	\item \textbf{a different payoff that still depends only on a few states}: barrier options, still easy on a tree;
+	\item \textbf{a payoff that depends on the whole path}: Asian options, where the tree stops recombining and the algorithmic questions of \autoref{sec:bopm-algorithms} come back with a vengeance.
+\end{enumerate}
+
+%─────§ Corporate securities─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\section{Pricing Corporate Securities}
+\label{sec:merton-model}
+
+\source{Slide p.~377}
+
+Interpret the underlying asset as the firm's total value.\footnote{More realistic models posit firm value $=$ asset value $+$ tax benefits $-$ bankruptcy costs (Leland \& Toft, 1996).}
+Then the option pricing methodology can be applied to price corporate securities.\footnote{Black \& Scholes (1973); Merton (1974).}
+The result is Merton's (1974) \vocab{structural model}.
+Its assumptions are:
+\begin{itemize}[nosep]
+	\item A firm can finance payouts by the sale of assets.
+	\item If a promised payment to an obligation other than stock is missed, the claim holders take ownership of the firm and the stockholders get nothing.
+\end{itemize}
+
+\begin{remark}
+	\vocab{結構式模型}（structural model）：把公司的總資產價值 $V$ 當成標的資產，股票與債券都是 $V$ 上的衍生性商品；違約是 $V$ 跌到不足以償債時「內生」發生的事件，而不是另外假設的外生機率。
+\end{remark}
+
+\subsection{Risky Zero-Coupon Bonds and Stock}
+
+\source{Slides pp.~378--381}
+
+Consider XYZ.com, with a simple capital structure:
+\begin{itemize}[nosep]
+	\item $n$ shares of its own common stock, each worth $S$;
+	\item zero-coupon bonds with an aggregate par value of $X$.
+\end{itemize}
+What is the value of the bonds, $B$?
+What is the value of the XYZ.com stock, $S$?
+
+On the bonds' maturity date, suppose the total value of the firm $V^{*}$ is less than the bondholders' claim $X$.
+Then the firm declares bankruptcy, and the stock becomes worthless.
+If $V^{*}>X$, then the bondholders obtain $X$ and the stockholders $V^{*}-X$:
+\begin{center}
+	\begin{tabular}{lcc}
+		\toprule
+		      & $V^{*}\le X$ & $V^{*}>X$ \\
+		\midrule
+		Bonds & $V^{*}$      & $X$       \\
+		Stock & $0$          & $V^{*}-X$ \\
+		\bottomrule
+	\end{tabular}
+\end{center}
+
+\begin{moral}
+	The stock has the same payoff as a call!
+	It is a call on the total value of the firm with a strike price of $X$ and an expiration date equal to the bonds'.
+	This call provides the \vocab{limited liability} for the stockholders.
+
+	The bonds pay $\min(V^{*},X)$: they are a covered call on the total value of the firm (\autoref{sec:hedges}).
+\end{moral}
+
+\begin{remark}
+	\vocab{有限責任}（limited liability）：股東最多賠掉投資的錢，不必用個人財產償還公司債務。用選擇權的語言，就是買權的報酬 $\max(V^{*}-X,0)$ 不會是負的。
+\end{remark}
+
+Let $V$ stand for the total value of the firm and $C$ for a call on $V$ with strike $X$.
+Thus
+\begin{align*}
+	nS & \;=\; C \qquad\text{(market capitalization of XYZ.com)}, \\
+	B  & \;=\; V-C .
+\end{align*}
+Knowing $C$ amounts to knowing how the value of the firm is divided between stockholders and bondholders.
+Whatever the value of $C$, the total value of the stock and bonds at maturity remains $V^{*}$, so the relative size of debt and equity is irrelevant to the firm's current value $V$.
+
+\begin{note}
+	最後這句話就是 Modigliani--Miller irrelevance proposition，這裡只用一行 portfolio 論證就得到：股票和債券合起來在每個 state 都支付 $V^{*}$，所以由 \autoref{cor:same-payoff}，不論 payoff 怎麼切分，兩者合起來的價值都是 $V$。
+\end{note}
+
+\source{Slides pp.~382--383}
+
+From \autoref{thm:black-scholes} and put--call parity,
+\begin{align}
+	nS & \;=\; VN(x)-Xe^{-r\tau}N\bigl(x-\sigma\sqrt{\tau}\bigr) , \label{eq:merton-stock} \\
+	B  & \;=\; VN(-x)+Xe^{-r\tau}N\bigl(x-\sigma\sqrt{\tau}\bigr) , \label{eq:merton-bond}
+\end{align}
+where now $\sigma$ is the volatility of the firm value and
+\[
+	x \;\triangleq\; \frac{\ln(V/X)+\bigl(r+\sigma^{2}/2\bigr)\tau}{\sigma\sqrt{\tau}} .
+\]
+The second line is $V-C$ with $1-N(x)=N(-x)$.
+
+\begin{note}
+	反過來用 parity 讀 \eqref{eq:merton-bond}：$B=V-C=Xe^{-r\tau}-P$，其中 $P$ 是標的為 $V$、strike 為 $X$ 的 put。
+	risky bond 就是 riskless bond \emph{減去}一個 put --- bondholders 等於賣給 stockholders 一個權利：可以交出公司來代替支付 $X$。
+\end{note}
+
+The continuously compounded yield to maturity of the firm's bond is $\ln(X/B)/\tau$.
+
+\begin{definition}
+	The \vocab{credit spread} or \vocab{default premium} is the yield difference between risky and riskless bonds, $\ln(X/B)/\tau-r$.
+\end{definition}
+
+\begin{proposition}
+	\label{prop:merton-spread}
+	\begin{equation}
+		\frac{\ln(X/B)}{\tau}-r \;=\; -\frac{1}{\tau}\,\ln\left[\,N(-z)+\frac{1}{\omega}\,N\bigl(z-\sigma\sqrt{\tau}\bigr)\right] ,
+		\label{eq:merton-spread}
+	\end{equation}
+	where
+	\[
+		\omega \;\triangleq\; Xe^{-r\tau}/V ,
+		\qquad
+		z \;\triangleq\; \frac{\ln\omega}{\sigma\sqrt{\tau}}+\frac12\,\sigma\sqrt{\tau} \;=\; -x+\sigma\sqrt{\tau} .
+	\]
+\end{proposition}
+
+\begin{proof}
+	$\ln(X/B)/\tau-r=-\frac1\tau\ln\bigl(Be^{r\tau}/X\bigr)$, and dividing \eqref{eq:merton-bond} by $Xe^{-r\tau}$ gives $Be^{r\tau}/X=N(x-\sigma\sqrt{\tau})+N(-x)/\omega$.
+	With $z=-x+\sigma\sqrt{\tau}$ these are $N(-z)$ and $N(z-\sigma\sqrt{\tau})/\omega$.
+	Finally $-x+\sigma\sqrt{\tau}=\bigl[\ln(X/V)-r\tau-\sigma^{2}\tau/2+\sigma^{2}\tau\bigr]/(\sigma\sqrt{\tau})=\bigl[\ln\omega+\sigma^{2}\tau/2\bigr]/(\sigma\sqrt{\tau})$.
+\end{proof}
+
+Note that $\omega$ is the debt-to-total-value ratio (debt valued at the riskless rate).
+So the spread depends only on the capital structure $\omega$, the operating risk $\sigma$, and the debt maturity $\tau$ --- not on $r$ separately.
+It is the model-based counterpart of the static spread of \autoref{sec:spreads}.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[font=\footnotesize]
+		\begin{axis}[
+				width=0.72\textwidth, height=5.0cm,
+				xmin=0, xmax=10, ymin=0, ymax=450,
+				xlabel={Maturity $\tau$ (years)}, ylabel={Spread (bp)},
+				axis lines=left, axis line style={thin},
+				label style={font=\scriptsize}, tick label style={font=\scriptsize},
+				legend style={font=\scriptsize, draw=none, fill=none, at={(0.98,0.98)}, anchor=north east},
+				legend cell align=left,
+			]
+			\addplot[RawSienna, very thick, smooth] coordinates {(0.05,29.3) (0.10,132.5) (0.15,218.0) (0.20,277.2) (0.25,317.9) (0.30,346.2) (0.35,366.1) (0.40,380.4) (0.45,390.6) (0.50,397.8) (0.55,402.9) (0.60,406.4) (0.65,408.6) (0.70,409.9) (0.75,410.5) (0.80,410.5) (0.85,410.1) (0.90,409.3) (0.95,408.2) (1.00,407.0) (1.25,398.6) (1.50,388.8) (1.75,379.0) (2.00,369.5) (2.25,360.6) (2.50,352.2) (2.75,344.4) (3.00,337.1) (3.25,330.3) (3.50,323.9) (3.75,318.0) (4.00,312.4) (4.25,307.1) (4.50,302.1) (4.75,297.5) (5.00,293.0) (5.25,288.8) (5.50,284.8) (5.75,281.0) (6.00,277.4) (6.25,273.9) (6.50,270.6) (6.75,267.4) (7.00,264.4) (7.25,261.5) (7.50,258.7) (7.75,256.0) (8.00,253.4) (8.25,250.9) (8.50,248.5) (8.75,246.1) (9.00,243.9) (9.25,241.7) (9.50,239.6) (9.75,237.6) (10.00,235.6)};
+			\addlegendentry{$\omega=0.9$}
+			\addplot[MidnightBlue!80!black, very thick, smooth] coordinates {(0.05,-0.0) (0.10,0.0) (0.15,0.0) (0.20,0.0) (0.25,0.2) (0.30,0.7) (0.35,1.5) (0.40,2.7) (0.45,4.3) (0.50,6.3) (0.55,8.6) (0.60,11.2) (0.65,14.0) (0.70,16.9) (0.75,19.9) (0.80,23.0) (0.85,26.1) (0.90,29.3) (0.95,32.4) (1.00,35.5) (1.25,50.2) (1.50,63.1) (1.75,74.2) (2.00,83.7) (2.25,91.7) (2.50,98.5) (2.75,104.4) (3.00,109.4) (3.25,113.7) (3.50,117.4) (3.75,120.6) (4.00,123.4) (4.25,125.8) (4.50,127.9) (4.75,129.8) (5.00,131.4) (5.25,132.8) (5.50,134.1) (5.75,135.1) (6.00,136.1) (6.25,136.9) (6.50,137.6) (6.75,138.2) (7.00,138.8) (7.25,139.2) (7.50,139.6) (7.75,140.0) (8.00,140.3) (8.25,140.5) (8.50,140.7) (8.75,140.8) (9.00,141.0) (9.25,141.0) (9.50,141.1) (9.75,141.1) (10.00,141.1)};
+			\addlegendentry{$\omega=0.7$}
+			\addplot[Gray!60!black, thick, densely dashed, smooth] coordinates {(0.05,-0.0) (0.10,-0.0) (0.15,-0.0) (0.20,0.0) (0.25,0.0) (0.30,0.0) (0.35,0.0) (0.40,0.0) (0.45,0.0) (0.50,0.0) (0.55,0.0) (0.60,0.0) (0.65,0.0) (0.70,0.0) (0.75,0.0) (0.80,0.0) (0.85,0.1) (0.90,0.1) (0.95,0.1) (1.00,0.2) (1.25,0.7) (1.50,1.6) (1.75,2.9) (2.00,4.6) (2.25,6.6) (2.50,8.9) (2.75,11.2) (3.00,13.7) (3.25,16.2) (3.50,18.7) (3.75,21.2) (4.00,23.6) (4.25,26.0) (4.50,28.3) (4.75,30.6) (5.00,32.7) (5.25,34.8) (5.50,36.8) (5.75,38.7) (6.00,40.6) (6.25,42.4) (6.50,44.1) (6.75,45.7) (7.00,47.3) (7.25,48.8) (7.50,50.2) (7.75,51.6) (8.00,52.9) (8.25,54.2) (8.50,55.4) (8.75,56.6) (9.00,57.7) (9.25,58.8) (9.50,59.8) (9.75,60.8) (10.00,61.7)};
+			\addlegendentry{$\omega=0.5$}
+		\end{axis}
+	\end{tikzpicture}
+	\caption{The term structure of credit spreads \eqref{eq:merton-spread} with
+		$\sigma=20\%$. Low leverage gives a spread rising from zero; high leverage
+		gives a hump. (For $\omega\ge1$ the spread explodes as $\tau\to0$: the firm is
+		already insolvent in PV terms.)}
+	\label{fig:merton-spread}
+\end{figure}
+
+\begin{intuition}
+	For short maturities a low-leverage firm simply cannot fall far enough in time to default, so the spread starts at zero --- one of the model's well-known weaknesses, since observed short-term spreads are not zero.
+	Over long horizons the firm value drifts at $r$ in the risk-neutral world and outruns a debt that does not grow, so the annualized spread eventually declines.
+\end{intuition}
+
+\source{Slide p.~384}
+
+In general, suppose the firm has a dividend yield at rate $q$ and the bankruptcy costs are a constant proportion $\alpha$ of the remaining firm value.
+Then \eqref{eq:merton-stock}--\eqref{eq:merton-bond} become, respectively,\footnote{Collin-Dufresne \& Goldstein (2000).}
+\begin{align*}
+	nS & \;=\; Ve^{-q\tau}N(x)-Xe^{-r\tau}N\bigl(x-\sigma\sqrt{\tau}\bigr) ,                \\
+	B  & \;=\; (1-\alpha)\,Ve^{-q\tau}N(-x)+Xe^{-r\tau}N\bigl(x-\sigma\sqrt{\tau}\bigr) ,
+\end{align*}
+with $x\triangleq\bigl[\ln(V/X)+(r-q+\sigma^{2}/2)\tau\bigr]/(\sigma\sqrt{\tau})$ as in \eqref{eq:bs-x-q}.
+The stock is unaffected by bankruptcy costs --- it gets nothing in default anyway --- while the bondholders recover only $(1-\alpha)V^{*}$.
+
+\subsection{A Numerical Example}
+\label{sec:merck-example}
+
+\source{Slides pp.~385--388}
+
+XYZ.com's assets consist of 1,000 shares of Merck as of March 20, 1995, when Merck's market value per share is \$44.5.
+It issues 1,000 shares of XYZ.com common stock and 30 zero-coupon bonds maturing on July 21, 1995, each promising to pay \$1,000 at maturity.
+So
+\[
+	n=1{,}000 , \qquad V=44.5\times n=44{,}500 , \qquad X=30\times1{,}000=30{,}000 .
+\]
+As the Merck calls are being traded, we do not need formulas to price them (\autoref{tab:merck}).
+
+\begin{table}[H]
+	\centering
+	\small
+	\begin{tabular}{lllrrrr}
+		\toprule
+		         &        &      & \multicolumn{2}{c}{Call} & \multicolumn{2}{c}{Put}                                   \\
+		\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+		Option   & Strike & Exp. & Vol.                     & Last                    & Vol.  & Last                     \\
+		\midrule
+		Merck    & 30     & Jul  & 328                      & $15\frac14$             & \ldots & \ldots                  \\
+		$44\frac12$ & 35  & Jul  & 150                      & $9\frac12$              & 10    & $\frac1{16}$             \\
+		$44\frac12$ & 40  & Apr  & 887                      & $4\frac34$              & 136   & $\frac1{16}$             \\
+		$44\frac12$ & 40  & Jul  & 220                      & $5\frac12$              & 297   & $\frac14$                \\
+		$44\frac12$ & 40  & Oct  & 58                       & $6$                     & 10    & $\frac12$                \\
+		$44\frac12$ & 45  & Apr  & 3050                     & $\frac78$               & 100   & $1\frac18$               \\
+		$44\frac12$ & 45  & May  & 462                      & $1\frac38$              & 50    & $1\frac38$               \\
+		$44\frac12$ & 45  & Jul  & 883                      & $1\frac{15}{16}$        & 147   & $1\frac34$               \\
+		$44\frac12$ & 45  & Oct  & 367                      & $2\frac34$              & 188   & $2\frac1{16}$            \\
+		\bottomrule
+	\end{tabular}
+	\caption{Merck option quotations, March 20, 1995 (textbook Fig.~11.1).}
+	\label{tab:merck}
+\end{table}
+
+The Merck option relevant for pricing is the July call with a strike price of $X/n=30$ dollars, selling for \$15.25.
+So XYZ.com's stock is worth $15.25\times n=15{,}250$ dollars, and the entire bond issue is worth
+\[
+	B \;=\; 44{,}500-15{,}250 \;=\; 29{,}250
+\]
+dollars, or \$975 per bond.
+
+The XYZ.com bonds are equivalent to a default-free zero-coupon bond with \$$X$ par value plus $n$ written European puts on Merck at a strike price of \$30, by put--call parity (\autoref{thm:put-call-parity}).
+The difference between $B$ and the price of the default-free bond is the value of these puts.
+
+\source{Slides pp.~389--390}
+
+\autoref{tab:capital-structure} shows the total market values of the XYZ.com stock and bonds under various debt amounts $X$.
+For example, if the promised payment is \$45,000, the relevant option is the July call with a strike price of $45{,}000/n=45$ dollars; since it sells for $\$1\frac{15}{16}$, the stock is worth $(1+15/16)\times n=1{,}937.5$ dollars.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{rrrr}
+		\toprule
+		Promised payment & Current market & Current market & Current total \\
+		to bondholders   & value of bonds & value of stock & value of firm \\
+		$X$              & $B$            & $nS$           & $V$           \\
+		\midrule
+		30{,}000         & 29{,}250.0     & 15{,}250.0     & 44{,}500      \\
+		35{,}000         & 35{,}000.0     & 9{,}500.0      & 44{,}500      \\
+		40{,}000         & 39{,}000.0     & 5{,}500.0      & 44{,}500      \\
+		45{,}000         & 42{,}562.5     & 1{,}937.5      & 44{,}500      \\
+		\bottomrule
+	\end{tabular}
+	\caption{Distribution of corporate value under alternative capital
+		structures, from the July calls in \autoref{tab:merck}. The last column
+		never changes.}
+	\label{tab:capital-structure}
+\end{table}
+
+The market value of the stock decreases as the debt-to-equity ratio increases.
+
+\begin{note}
+	$X=35{,}000$ 那一列看起來很怪：$B=35{,}000$ 表示債券以 par 出售，也就是四個月的 yield 為\emph{零}。
+	這只是報價造成的：July 35 call 最後成交價是 $9\frac12$，剛好等於 intrinsic value $44.5-35$，所以隱含的 put 價值為零，利息也被忽略了。
+	1995 年那些過時或四捨五入的報價，本來就不會精確到每一分錢都符合 no-arbitrage。
+\end{note}
+
+\subsection{Conflicts between Stockholders and Bondholders}
+\label{sec:claim-dilution}
+
+\source{Slides pp.~391--395}
+
+There are conflicts between stockholders and bondholders.
+An option's terms cannot be changed after issuance, but a firm can change its capital structure.
+There lies one key difference between options and corporate securities: parameters such as volatility,\footnote{This is called the \vocab{asset substitution problem} (Myers, 1977).} dividend, and strike price are under partial control of the stockholders or boards.
+
+\paragraph{Issuing more debt.}
+Suppose XYZ.com issues 15 more bonds with the same terms to buy back stock.
+The total debt is now $X=45{,}000$ dollars, and \autoref{tab:capital-structure} says the total market value of the bonds should be \$42,562.5.
+The new bondholders pay
+\[
+	42{,}562.5\times(15/45) \;=\; 14{,}187.5
+\]
+dollars, and the remaining stock is worth \$1,937.5.
+The stockholders therefore gain
+\[
+	14{,}187.5+1{,}937.5-15{,}250 \;=\; 875
+\]
+dollars, and the original bondholders lose an equal amount,
+\[
+	29{,}250-\frac{30}{45}\times42{,}562.5 \;=\; 875 .
+\]
+This is called \vocab{claim dilution}.\footnote{Fama \& M.~H.~Miller (1972).}
+
+\begin{remark}
+	\vocab{債權稀釋}（claim dilution）：新發行同等順位的債券，讓原債權人在違約時要和更多人分 $V^{*}$。股東拿新債的錢買回股票，等於把原債權人的一部分價值移轉給自己；公司總價值 $V$ 不變，只是分配變了。
+\end{remark}
+
+\paragraph{Paying a dividend.}
+Suppose instead the stockholders sell $(1/3)\times n$ Merck shares to fund a \$14,833.3 cash dividend.
+The stockholders now have \$14,833.3 in cash plus a call on $(2/3)\times n$ Merck shares, and the strike price remains $X=30{,}000$.
+This is equivalent to owning $2/3$ of a call on $n$ Merck shares with a strike price of \$45,000, since $\max\bigl(\tfrac23V^{*}-30{,}000,0\bigr)=\tfrac23\max(V^{*}-45{,}000,0)$.
+As $n$ such calls are worth \$1,937.5 (\autoref{tab:capital-structure}), the XYZ.com stock is worth $(2/3)\times1{,}937.5=1{,}291.67$ dollars, and the bonds are worth
+\[
+	(2/3)\times n\times44.5-1{,}291.67 \;=\; 28{,}375
+\]
+dollars.
+Hence the stockholders gain $14{,}833.3+1{,}291.67-15{,}250\approx875$ dollars, and the bondholders watch their value drop from \$29,250 to \$28,375, a loss of \$875.
+
+\begin{moral}
+	Two different actions, the same \$875 transfer --- because both leave the bondholders with the same claim: $2/3$ of the old firm against the old promise.
+	The same logic explains why bondholders loathe risky investments: the stock is a call, its vega is positive (\autoref{sec:vega}), and raising $\sigma$ moves value from the bonds to the stock with $V$ unchanged.
+	Covenants in bond indentures exist to limit exactly these moves.
+\end{moral}
+
+\subsection{Further Topics}
+\label{sec:corporate-further}
+
+\source{Slides pp.~396--397}
+
+Other examples:\footnote{Cox \& Rubinstein (1985); Geske (1977). See Section 11.1 of the textbook.}
+\begin{itemize}[itemsep=0.3em]
+	\item \textbf{Stock as a compound call} when the company issues coupon bonds: paying each coupon buys the right to keep the firm until the next payment --- an option on an option.
+	\item \textbf{Subordinated debts as bull call spreads.} With senior debt $X_{s}$ and junior debt $X_{j}$ of the same maturity, the junior debt pays $0$, $V^{*}-X_{s}$, or $X_{j}$ according as $V^{*}\le X_{s}$, $X_{s}<V^{*}\le X_{s}+X_{j}$, or $V^{*}>X_{s}+X_{j}$: a long $X_{s}$ call and a short $X_{s}+X_{j}$ call on $V$ (\autoref{sec:bull-spreads}).
+	\item \textbf{Warrants as calls.} A warrant is a call issued by the firm on its own new shares. With $n$ shares and $m$ warrants of strike $X$, each warrant is worth $W=\frac{n}{n+m}\,C$, where $C$ is the call value on $S+(m/n)W$; the dilution makes this an equation in $W$ to solve numerically.
+	\item \textbf{Callable bonds as American calls with 2 strike prices.} If the firm may call the bonds at any time for $X_{c}$, the stock is an American call on $V$ with strike $X_{c}$ before maturity and $X$ at maturity.
+	\item \textbf{Convertible bonds}: bonds the holder may convert into new shares, adding a call on a fraction of the firm.
+	\item \textbf{Bonds with safety covenants as barrier options}: if the firm must pass to the bondholders when $V$ falls below $H$, the stock is a down-and-out call (\autoref{sec:barrier}).
+\end{itemize}
+Securities issued by firms with a complex capital structure must be solved by numerical methods such as trees.\footnote{T.~Dai (\texttt{B82506025}, \texttt{R86526008}, \texttt{D8852600}), Lyuu, \& C.~Wang (\texttt{F95922018}) (2010).}
+
+\subsection{Distance to Default}
+
+\source{Slide p.~398}
+
+Let $\mu$ be the total value $V$'s rate of expected return.\footnote{This parameter is generally hard to estimate. Campbell, Hilscher, and Szilagyi (2008) use $r+0.06$ for simplicity.}
+The firm defaults at maturity exactly when $V^{*}<X$.
+Under the real-world dynamics, $\ln(V^{*}/V)$ is normal with mean $(\mu-\sigma^{2}/2)\tau$ and variance $\sigma^{2}\tau$ (\autoref{sec:toward-bs} with $\mu-\sigma^{2}/2$ for the log drift), so by \autoref{prop:lognormal-tail} the probability of default $\tau$ years from now equals
+\[
+	N(-\mathrm{DTD}) ,
+	\qquad\text{where}\qquad
+	\mathrm{DTD} \;\triangleq\; \frac{\ln(V/X)+(\mu-\sigma^{2}/2)\,\tau}{\sigma\sqrt{\tau}} .
+\]
+$V/X$ is called the \vocab{leverage ratio}.\footnote{Merton (1974). Useful in forecasting defaults (Bharath \& Shumway, 2008).}
+
+\begin{remark}
+	\vocab{違約距離}（distance to default, DTD）：公司價值的對數距離違約門檻 $\ln X$ 有幾個標準差。DTD 越大越安全；違約機率就是標準常態落在 $-\mathrm{DTD}$ 以下的機率。與 \eqref{eq:merton-stock} 中 $N(x-\sigma\sqrt{\tau})$ 的差別只是把風險中立的 $r$ 換成真實的 $\mu$。
+\end{remark}
+
+%─────§ Barrier options──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\section{Barrier Options}
+\label{sec:barrier}
+
+\source{Slides pp.~399--401}
+
+\vocab{Barrier options} have a payoff that depends on whether the underlying asset's price reaches a certain price level $H$ throughout its life.\footnote{A former MBA student in finance told the lecturer on March 26, 2004, that she did not understand why barrier options were covered until she started working in a bank. She was working for Lehman Brothers in Hong Kong as of April, 2006.}
+
+\begin{definition}
+	\begin{itemize}[nosep]
+		\item A \vocab{knock-out} (KO) option is an ordinary European option which ceases to exist if the barrier $H$ is reached by the price of its underlying asset.
+		      A knock-out call is sometimes called a \vocab{down-and-out} option if $H<S$; a knock-out put is sometimes called an \vocab{up-and-out} option when $H>S$.
+		\item A \vocab{knock-in} (KI) option comes into existence if a certain barrier is reached.
+		      A \vocab{down-and-in} option is a knock-in call that comes into existence only when the barrier is reached and $H<S$; an \vocab{up-and-in} option is a knock-in put that comes into existence only when the barrier is reached and $H>S$.
+	\end{itemize}
+\end{definition}
+
+\begin{remark}
+	\vocab{障礙選擇權}（barrier option）：報酬取決於存續期間內股價是否\emph{碰過}障礙 $H$。\vocab{出局}（knock-out）型一碰就作廢；\vocab{入局}（knock-in）型要碰到才生效。down/up 指障礙在目前股價的下方或上方。
+\end{remark}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[font=\small, >={Stealth[length=5pt]}]
+		\draw[->] (0,0) -- (7.2,0) node[right] {Time};
+		\draw[->] (0,0) -- (0,4.0) node[above] {Price};
+		\draw[Gray!70!black] (0,2.7) node[left, text=black] {$H$} -- (6.8,2.7);
+		\node[left] at (0,1.3) {$S$};
+		\draw[MidnightBlue!80!black, thick, densely dotted]
+		(0,1.3) .. controls (0.8,1.1) and (1.2,1.9) .. (1.8,1.7)
+		.. controls (2.3,1.5) and (2.6,2.2) .. (3.0,2.7)
+		.. controls (3.4,3.25) and (4.1,3.3) .. (4.6,2.6)
+		.. controls (5.2,1.8) and (5.9,1.5) .. (6.8,1.6);
+		\draw[<-, thick] (3.02,2.62) -- (3.9,1.6) node[below right=-2pt] {barrier hit};
+	\end{tikzpicture}
+	\caption{A price path that touches the barrier $H$: a knock-out option on this
+		path is dead from that moment on, and a knock-in option comes alive --- even
+		though the path ends below $H$.}
+	\label{fig:barrier-path}
+\end{figure}
+
+The two kinds are tied by a parity relation.
+
+\begin{proposition}[In--out parity]
+	\label{prop:in-out-parity}
+	A European call is equivalent to a portfolio of a European down-and-out call and a European down-and-in call with an identical barrier and strike.
+	Likewise for puts with up-and-out and up-and-in.
+\end{proposition}
+
+\begin{proof}
+	On every path exactly one of the two barrier options is alive at expiration, and the live one pays $\max(S_{\tau}-X,0)$.
+	So the portfolio's payoff equals the call's path by path; apply \autoref{cor:same-payoff}.
+\end{proof}
+
+The argument never used that $H$ is constant, so the parity holds for any barrier.\footnote{Comment 11.2.1 of the textbook.}
+Formulas exist for all the possible barrier options mentioned above.\footnote{Haug (2006).}
+
+\subsection{Merton's Formulas}
+
+\source{Slides pp.~402--403}
+
+\begin{theorem}[Merton, 1973]
+	\label{thm:down-and-in}
+	Assume $X\ge H$.
+	The value of a European down-and-in call on a stock paying a dividend yield of $q$ is
+	\begin{equation}
+		Se^{-q\tau}\Bigl(\frac{H}{S}\Bigr)^{2\lambda}N(x)-Xe^{-r\tau}\Bigl(\frac{H}{S}\Bigr)^{2\lambda-2}N\bigl(x-\sigma\sqrt{\tau}\bigr) ,
+		\label{eq:down-and-in}
+	\end{equation}
+	where
+	\[
+		x \;\triangleq\; \frac{\ln\bigl(H^{2}/(SX)\bigr)+\bigl(r-q+\sigma^{2}/2\bigr)\tau}{\sigma\sqrt{\tau}} ,
+		\qquad
+		\lambda \;\triangleq\; \frac{r-q+\sigma^{2}/2}{\sigma^{2}} .
+	\]
+\end{theorem}
+
+See Exercise 17.1.6 of the textbook for a proof.
+A European down-and-out call can then be priced via the in--out parity: \eqref{eq:bs-call-q} minus \eqref{eq:down-and-in}.
+
+\begin{theorem}[Merton, 1973]
+	Assume $X\le H$.
+	The value of a European up-and-in put is
+	\[
+		Xe^{-r\tau}\Bigl(\frac{H}{S}\Bigr)^{2\lambda-2}N\bigl(-x+\sigma\sqrt{\tau}\bigr)-Se^{-q\tau}\Bigl(\frac{H}{S}\Bigr)^{2\lambda}N(-x) .
+	\]
+\end{theorem}
+
+Again, a European up-and-out put can be priced via the in--out parity.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[font=\footnotesize]
+		\begin{axis}[
+				width=0.72\textwidth, height=5.2cm,
+				xmin=90, xmax=130, ymin=0, ymax=41,
+				xlabel={Stock price $S$}, ylabel={Value},
+				axis lines=left, axis line style={thin},
+				label style={font=\scriptsize}, tick label style={font=\scriptsize},
+				legend style={font=\scriptsize, draw=none, fill=none, at={(0.02,0.98)}, anchor=north west},
+				legend cell align=left,
+			]
+			\addplot[Gray!60!black, thick, densely dashed] coordinates {(90,8.7371) (91,9.2871) (92,9.8545) (93,10.4389) (94,11.0399) (95,11.6574) (96,12.2907) (97,12.9397) (98,13.6038) (99,14.2826) (100,14.9758) (101,15.6829) (102,16.4034) (103,17.1370) (104,17.8832) (105,18.6416) (106,19.4116) (107,20.1930) (108,20.9853) (109,21.7880) (110,22.6007) (111,23.4230) (112,24.2546) (113,25.0950) (114,25.9438) (115,26.8007) (116,27.6653) (117,28.5373) (118,29.4163) (119,30.3020) (120,31.1941) (121,32.0922) (122,32.9960) (123,33.9054) (124,34.8199) (125,35.7394) (126,36.6635) (127,37.5921) (128,38.5248) (129,39.4616) (130,40.4021)};
+			\addlegendentry{European call}
+			\addplot[MidnightBlue!80!black, very thick] coordinates {(90,0.0000) (91,1.2738) (92,2.5063) (93,3.7017) (94,4.8640) (95,5.9968) (96,7.1035) (97,8.1868) (98,9.2497) (99,10.2945) (100,11.3234) (101,12.3384) (102,13.3414) (103,14.3340) (104,15.3176) (105,16.2936) (106,17.2631) (107,18.2272) (108,19.1869) (109,20.1430) (110,21.0961) (111,22.0471) (112,22.9964) (113,23.9446) (114,24.8921) (115,25.8393) (116,26.7866) (117,27.7342) (118,28.6823) (119,29.6313) (120,30.5812) (121,31.5322) (122,32.4844) (123,33.4380) (124,34.3929) (125,35.3493) (126,36.3072) (127,37.2667) (128,38.2276) (129,39.1902) (130,40.1542)};
+			\addlegendentry{down-and-out}
+			\addplot[RawSienna, very thick] coordinates {(90,8.7371) (91,8.0133) (92,7.3482) (93,6.7372) (94,6.1759) (95,5.6605) (96,5.1873) (97,4.7528) (98,4.3541) (99,3.9881) (100,3.6524) (101,3.3445) (102,3.0620) (103,2.8031) (104,2.5656) (105,2.3480) (106,2.1485) (107,1.9658) (108,1.7984) (109,1.6450) (110,1.5045) (111,1.3759) (112,1.2581) (113,1.1503) (114,1.0517) (115,0.9614) (116,0.8787) (117,0.8032) (118,0.7340) (119,0.6707) (120,0.6129) (121,0.5600) (122,0.5116) (123,0.4674) (124,0.4270) (125,0.3900) (126,0.3563) (127,0.3254) (128,0.2972) (129,0.2714) (130,0.2479)};
+			\addlegendentry{down-and-in \eqref{eq:down-and-in}}
+		\end{axis}
+	\end{tikzpicture}
+	\caption{Down-and-in and down-and-out calls with $X=100$, $H=90$, $r=10\%$,
+		$\sigma=25\%$, $\tau=1$, $q=0$, as functions of $S\ge H$. At $S=H$ the
+		down-and-in call \emph{is} the European call and the down-and-out call is
+		worthless; the two always add up to the European call. At $S=95$ the
+		down-and-in call is worth $5.6605$.}
+	\label{fig:down-and-in}
+\end{figure}
+
+\begin{note}
+	兩個 sanity check。
+	當 $S=H$ 時，$(H/S)^{\cdot}=1$ 且 $x$ 變成 \eqref{eq:bs-x-q}，所以 \eqref{eq:down-and-in} 化簡為 \eqref{eq:bs-call-q}：barrier 一開始就被碰到。
+	當 $S\to\infty$ 時，因子 $(H/S)^{2\lambda}$ 讓價值趨近零：barrier 太遠，碰不到。
+\end{note}
+
+\subsection{Popularity}
+
+\source{Slide p.~404}
+
+Knock-out options were issued in the U.S.\ in 1967.\footnote{Cox \& Rubinstein (1985).}
+Knock-in puts are the most popular barrier options, knock-out puts are the second most popular, and knock-out calls are the most popular among barrier call options.\footnote{Bennett (2014).}
+
+\begin{intuition}
+	Barrier options are cheaper than their vanilla counterparts (by in--out parity each piece is worth less than the whole), and the buyer gives up only scenarios they consider unlikely or irrelevant.
+	A knock-in put, for instance, is crash insurance that only switches on once the market has already fallen through $H$.
+\end{intuition}
+
+\subsection{Are American Options Barrier Options?}
+\label{sec:american-vs-barrier}
+
+\source{Slides pp.~405--406}
+
+American options look like barrier options with the exercise boundary (\autoref{sec:exercise-boundary}) as the barrier and the payoff as the rebate.\footnote{Contributed by Mr.~Yang, Jui-Chung (\texttt{D97723002}) on March 25, 2009.}
+One salient difference is that the exercise boundary must be found by backward induction; it cannot be specified arbitrarily.
+But the barrier is fixed by a contract,\footnote{Cox \& Rubinstein (1985).} and the barrier option remains European-style, without the right to early exercise.\footnote{Contributed by Ms.~Chen, Sin-Huei (Amber) (\texttt{P00922005}) on March 31, 2021.}
+
+They become equal if the barrier happens to be identical to the exercise boundary and the rebate equals the intrinsic value.\footnote{Contributed by Mr.~Chuang, Chin-Yu (\texttt{D12922014}) and Mr.~Hsiao, Huan-Wen (\texttt{B90902081}, \texttt{R94922010}, \texttt{D13922016}) on October 2, 2025.}
+One can also have American barrier options; one then needs to specify whether the option can be exercised early if the stock price has not touched the barrier.\footnote{Contributed by Mr.~Lu, Yu-Ming (\texttt{R06723032}, \texttt{D08922008}) on March 31, 2021.}
+
+\subsection{Interesting Observations}
+\label{sec:barrier-reflection}
+
+\source{Slides pp.~407--408}
+
+Assume $H<X$ and write $C(S)$ for the Merton formula \eqref{eq:bs-call-q} as a function of the stock price.
+\begin{itemize}[itemsep=0.3em]
+	\item Replace $S$ in \eqref{eq:bs-call-q} with $H^{2}/S$.
+	      Then \eqref{eq:down-and-in} becomes $C(H^{2}/S)$ when $r-q=\sigma^{2}/2$, and $(S/H)\,C(H^{2}/S)$ when $r-q=0$.
+	\item Conversely, replace $S$ in \eqref{eq:down-and-in} with $H^{2}/S$.
+	      It becomes $C(S)$ when $r-q=\sigma^{2}/2$, and $(H/S)\,C(S)$ when $r-q=0$.\footnote{Contributed by Mr.~Chou, Ming-Hsin (\texttt{R02723073}) on April 24, 2014.}
+\end{itemize}
+
+\begin{proof}[Verification]
+	If $r-q=\sigma^{2}/2$ then $\lambda=1$, the factor $(H/S)^{2\lambda-2}$ disappears, $Se^{-q\tau}(H/S)^{2}=(H^{2}/S)\,e^{-q\tau}$, and $x$ is \eqref{eq:bs-x-q} with $S$ replaced by $H^{2}/S$.
+	If $r=q$ then $\lambda=1/2$, and $Se^{-q\tau}(H/S)=(S/H)(H^{2}/S)e^{-q\tau}$ while $Xe^{-r\tau}(H/S)^{-1}=(S/H)Xe^{-r\tau}$.
+	The second bullet is the first one read backwards, since $S\mapsto H^{2}/S$ is an involution.
+\end{proof}
+
+Why?
+Take $r-q=\sigma^{2}/2$, which by \autoref{lem:rn-lognormal} (with $r-q$ in place of $r$) makes $\ln S_{t}$ \emph{driftless} under the risk-neutral measure.
+A driftless random walk is symmetric, so we may reflect any path about $\ln H$ from the first moment it touches the barrier --- the \vocab{reflection principle}.
+Since $X>H$, a path starting at $S>H$ that finishes above $X$ \emph{after having touched $H$} corresponds one-to-one to a path finishing above $X$ that started at the mirror image of $S$, namely $\ln(H^{2}/S)=2\ln H-\ln S$ (which lies below $H$, so it automatically crosses the barrier).
+Hence the down-and-in call at $S$ is the plain call at $H^{2}/S$.
+With drift, the reflected paths carry different probabilities, and the powers of $H/S$ in \eqref{eq:down-and-in} are the correction.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[font=\small, >={Stealth[length=4pt]}, x=0.95cm, y=0.6cm]
+		\draw[->] (0,-3.4) -- (8.4,-3.4) node[right] {$t$};
+		\draw[->] (0,-3.4) -- (0,4.2) node[above] {$\ln S_{t}$};
+		\draw[Gray!70!black] (0,0) node[left, text=black] {$\ln H$} -- (8,0);
+		\draw[Gray!50, densely dashed] (0,3) -- (8,3) node[right, text=black] {$\ln X$};
+		\node[left] at (0,1.8) {$\ln S$};
+		\node[left] at (0,-1.8) {$\ln\frac{H^{2}}{S}$};
+		\draw[MidnightBlue!80!black, thick] (0,1.8) -- (0.8,1.2) -- (1.5,1.7) -- (2.3,0.6) -- (3,0);
+		\draw[RawSienna, thick, densely dotted] (0,-1.8) -- (0.8,-1.2) -- (1.5,-1.7) -- (2.3,-0.6) -- (3,0);
+		\draw[MidnightBlue!80!black, thick] (3,0) -- (3.8,1.0) -- (4.6,0.5) -- (5.5,2.2) -- (6.3,1.8) -- (7.2,3.6) -- (8,3.4);
+		\fill (3,0) circle (1.6pt);
+	\end{tikzpicture}
+	\caption{The reflection principle. Every path from $\ln S$ that touches $\ln H$
+		and ends above $\ln X$ (solid) pairs with the path from $\ln(H^{2}/S)$ that
+		mirrors it up to the first touch (dotted) and coincides with it afterwards.}
+	\label{fig:reflection}
+\end{figure}
+
+This equality can be used to replicate barrier options with European options.\footnote{Derman, Ergener, \& Kani (1995).}
+
+\subsection{Binomial Tree Algorithms}
+\label{sec:barrier-tree}
+
+\source{Slides pp.~409--410}
+
+Barrier options can be priced by binomial tree algorithms.
+For the down-and-out option, backward induction runs as usual, except that any node whose stock price is at or below the barrier has its option value set to $0$ (or to the rebate, if there is one).
+Pricing down-and-in options is subtler: whether a node's option is alive depends on whether the path to it touched $H$, which the node does not know.
+The in--out parity sidesteps this --- price the down-and-out call and subtract it from the European call.
+
+\begin{eg}
+	\label{eg:down-and-out-tree}
+	$S=8$, $X=6$, $H=4$, $R=1.25$, $u=2$ and $d=0.5$, so $p=(1.25-0.5)/1.5=0.5$ and backward induction is $C=(0.5\times C_{u}+0.5\times C_{d})/1.25$ (\autoref{fig:down-and-out-tree}).
+	At the node $S=4$, the plain backward-induction value $(4.0+0)/2.5=1.6$ is replaced by $0$ because the barrier is touched.
+	So the down-and-out call is worth $12.48/2.5=4.992$.
+	Without the barrier the root would be $(12.48+1.6)/2.5=5.632$, so by in--out parity the down-and-in call is worth $5.632-4.992=0.64$.
+\end{eg}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[font=\small, every node/.style={inner sep=1.5pt},
+			ln/.style={MidnightBlue!70!black}]
+		\begin{scope}
+			\node[font=\footnotesize\bfseries, text=Gray!40!black] at (2.5,3.4) {Stock price};
+			\node (a) at (0,0) {$8$};
+			\node (b0) at (1.6,1) {$16$}; \node (b1) at (1.6,-1) {$4$};
+			\node (c0) at (3.2,2) {$32$}; \node (c1) at (3.2,0) {$8$}; \node (c2) at (3.2,-2) {$2$};
+			\node (d0) at (4.8,3) {$64$}; \node (d1) at (4.8,1) {$16$}; \node (d2) at (4.8,-1) {$4$}; \node (d3) at (4.8,-3) {$1$};
+			\foreach \x/\y in {a/b0,a/b1,b0/c0,b0/c1,b1/c1,b1/c2,c0/d0,c0/d1,c1/d1,c1/d2,c2/d2,c2/d3} \draw[ln] (\x)--(\y);
+		\end{scope}
+		\begin{scope}[xshift=7.2cm]
+			\node[font=\footnotesize\bfseries, text=Gray!40!black] at (2.5,3.4) {Down-and-out call};
+			\draw[Gray!60, densely dashed] (-0.6,0.55) -- (5.6,0.55) node[right, text=black] {$X$};
+			\draw[RawSienna, thick] (-0.6,-1) -- (5.6,-1) node[right, text=black] {$H$};
+			\node (a) at (0,0) {$4.992$};
+			\node (b0) at (1.6,1) {$12.48$}; \node[fill=white] (b1) at (1.6,-1) {$\cancel{1.6}\ 0$};
+			\node (c0) at (3.2,2) {$27.2$}; \node (c1) at (3.2,0) {$4.0$}; \node (c2) at (3.2,-2) {$0$};
+			\node (d0) at (4.8,3) {$58$}; \node (d1) at (4.8,1) {$10$}; \node[fill=white] (d2) at (4.8,-1) {$0$}; \node (d3) at (4.8,-3) {$0$};
+			\foreach \x/\y in {a/b0,a/b1,b0/c0,b0/c1,b1/c1,b1/c2,c0/d0,c0/d1,c1/d1,c1/d2,c2/d2,c2/d3} \draw[ln] (\x)--(\y);
+		\end{scope}
+	\end{tikzpicture}
+	\caption{\autoref{eg:down-and-out-tree}. Nodes on or below $H=4$ are set to
+		zero. ($X=6$ falls between the stock prices $4$ and $8$; the dashed line is only
+		schematic.)}
+	\label{fig:down-and-out-tree}
+\end{figure}
+
+\begin{algorithm}[H]
+	\caption{Binomial tree algorithm for down-and-out calls on a non-dividend-paying stock}
+	\label{alg:down-and-out}
+	\KwIn{$S,u,d,X,H,n,\hat{r}$ \quad ($H<X$, $H<S$, $ud=1$)}
+	$R:=e^{\hat{r}}$\; $p:=(R-d)/(u-d)$\;
+	$h:=\lfloor\ln(H/S)/\ln u\rfloor$\tcp*{effective barrier $Su^{h}\le H$}
+	\For{$i=0,1,\ldots,n$}{
+		$C[\,i\,]:=\max\bigl(0,\,Su^{n-i}d^{i}-X\bigr)$\;
+	}
+	\If{$n-h$ is even and $0\le(n-h)/2\le n$}{$C[\,(n-h)/2\,]:=0$\tcp*{a hit}}
+	\For{$j=n-1$ \KwTo $0$}{
+		\For{$i=0,1,\ldots,j$}{
+			$C[\,i\,]:=\bigl(p\times C[\,i\,]+(1-p)\times C[\,i+1\,]\bigr)/R$\;
+		}
+		\If{$j-h$ is even and $0\le(j-h)/2\le j$}{$C[\,(j-h)/2\,]:=0$\tcp*{a hit}}
+	}
+	\Return{$C[\,0\,]$}\;
+\end{algorithm}
+
+\begin{note}
+	因為 $ud=1$，時間 $j$ 時經過 $i$ 次下跌的節點價格為 $Su^{j-2i}$，它恰好在 $i=(j-h)/2$ 時等於 effective barrier $Su^{h}$。
+	只要把那個節點設為零就夠了：它下面的每個節點都只能經由 barrier 那一層到達，而那裡的值已經是 $0$。
+	若有 rebate $K$，就把那個節點設成 $K$ 而不是 $0$。\footnote{課本 Figure 11.4。}
+\end{note}
+
+\source{Slides pp.~411--412}
+
+But convergence is erratic, because $H$ is not at a price level on the tree.\footnote{Boyle \& Lau (1994).}
+The barrier $H$ is moved lower (or higher, if you so choose) to the nearest node price, and this \vocab{effective barrier} changes as $n$ increases.
+In fact, the binomial tree is only $O(1/\sqrt{n})$ convergent.\footnote{Tavella \& Randall (2000); J.~Lin (\texttt{R95221010}) (2008); J.~Lin (\texttt{R95221010}) \& Palmer (2013).}
+Solutions will be presented later.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[font=\footnotesize]
+		\begin{axis}[
+				width=0.86\textwidth, height=5.0cm,
+				xmin=100, xmax=400, ymin=4.0, ymax=5.9,
+				xlabel={$n$}, ylabel={Down-and-in call value},
+				axis lines=left, axis line style={thin},
+				label style={font=\scriptsize}, tick label style={font=\scriptsize},
+			]
+			\addplot[Gray!60, thick, densely dashed] coordinates {(100,5.6605) (400,5.6605)};
+			\addplot[MidnightBlue!80!black, thin] coordinates {(100,4.1296) (101,4.1832) (102,4.1782) (103,4.2295) (104,4.2257) (105,4.2749) (106,4.2723) (107,4.3193) (108,4.3179) (109,4.3629) (110,4.3625) (111,4.4056) (112,4.4063) (113,4.4475) (114,4.4492) (115,4.4886) (116,4.4912) (117,4.5288) (118,4.5325) (119,4.5684) (120,4.5729) (121,4.6072) (122,4.6126) (123,4.6453) (124,4.6516) (125,4.6827) (126,4.6899) (127,4.7195) (128,4.7275) (129,4.7556) (130,4.7644) (131,4.7911) (132,4.8006) (133,4.8260) (134,4.8363) (135,4.8603) (136,4.8713) (137,4.8940) (138,4.9057) (139,4.9272) (140,4.9395) (141,4.9598) (142,4.9728) (143,4.9919) (144,5.0056) (145,5.0235) (146,5.0378) (147,5.0546) (148,5.0695) (149,5.0852) (150,5.1007) (151,5.1154) (152,5.1314) (153,5.1451) (154,5.1616) (155,5.1743) (156,5.1914) (157,5.2031) (158,5.2207) (159,5.2315) (160,5.2496) (161,5.2594) (162,5.2781) (163,5.2870) (164,5.3061) (165,5.3142) (166,5.3337) (167,5.3409) (168,5.3610) (169,5.3673) (170,5.3878) (171,5.3934) (172,5.4143) (173,5.4191) (174,5.4404) (175,5.4444) (176,5.4661) (177,5.4694) (178,5.4915) (179,5.4941) (180,5.5166) (181,5.5184) (182,5.5413) (183,5.5424) (184,5.5657) (185,5.5661) (186,5.5897) (187,5.5895) (188,5.6135) (189,5.6126) (190,5.6369) (191,5.6354) (192,5.6600) (193,4.3386) (194,4.3631) (195,4.3626) (196,4.3873) (197,4.3863) (198,4.4113) (199,4.4098) (200,4.4351) (201,4.4330) (202,4.4585) (203,4.4559) (204,4.4818) (205,4.4787) (206,4.5047) (207,4.5011) (208,4.5275) (209,4.5234) (210,4.5500) (211,4.5454) (212,4.5722) (213,4.5672) (214,4.5942) (215,4.5893) (216,4.6160) (217,4.6115) (218,4.6376) (219,4.6335) (220,4.6589) (221,4.6553) (222,4.6801) (223,4.6768) (224,4.7010) (225,4.6981) (226,4.7217) (227,4.7193) (228,4.7422) (229,4.7402) (230,4.7625) (231,4.7608) (232,4.7826) (233,4.7813) (234,4.8025) (235,4.8016) (236,4.8222) (237,4.8217) (238,4.8417) (239,4.8416) (240,4.8611) (241,4.8613) (242,4.8802) (243,4.8808) (244,4.8992) (245,4.9001) (246,4.9180) (247,4.9193) (248,4.9366) (249,4.9382) (250,4.9551) (251,4.9570) (252,4.9734) (253,4.9756) (254,4.9915) (255,4.9941) (256,5.0094) (257,5.0123) (258,5.0272) (259,5.0305) (260,5.0449) (261,5.0484) (262,5.0623) (263,5.0662) (264,5.0797) (265,5.0838) (266,5.0968) (267,5.1013) (268,5.1139) (269,5.1186) (270,5.1307) (271,5.1357) (272,5.1475) (273,5.1528) (274,5.1641) (275,5.1696) (276,5.1805) (277,5.1863) (278,5.1968) (279,5.2029) (280,5.2130) (281,5.2194) (282,5.2290) (283,5.2356) (284,5.2449) (285,5.2518) (286,5.2607) (287,5.2678) (288,5.2764) (289,5.2837) (290,5.2919) (291,5.2995) (292,5.3073) (293,5.3151) (294,5.3225) (295,5.3306) (296,5.3377) (297,5.3460) (298,5.3527) (299,5.3613) (300,5.3676) (301,5.3764) (302,5.3824) (303,5.3914) (304,5.3971) (305,5.4063) (306,5.4116) (307,5.4211) (308,5.4261) (309,5.4357) (310,5.4404) (311,5.4503) (312,5.4547) (313,5.4647) (314,5.4688) (315,5.4791) (316,5.4828) (317,5.4933) (318,5.4967) (319,5.5074) (320,5.5105) (321,5.5214) (322,5.5242) (323,5.5353) (324,5.5378) (325,5.5490) (326,5.5513) (327,5.5627) (328,5.5647) (329,5.5763) (330,5.5780) (331,5.5898) (332,5.5912) (333,5.6032) (334,5.6043) (335,5.6165) (336,5.6173) (337,5.6297) (338,5.6302) (339,5.6428) (340,5.6431) (341,5.6558) (342,5.6558) (343,4.6522) (344,4.6529) (345,4.6658) (346,4.6663) (347,4.6794) (348,4.6796) (349,4.6929) (350,4.6928) (351,4.7062) (352,4.7060) (353,4.7195) (354,4.7190) (355,4.7327) (356,4.7320) (357,4.7459) (358,4.7449) (359,4.7589) (360,4.7577) (361,4.7719) (362,4.7705) (363,4.7847) (364,4.7831) (365,4.7975) (366,4.7957) (367,4.8102) (368,4.8082) (369,4.8229) (370,4.8206) (371,4.8354) (372,4.8330) (373,4.8479) (374,4.8453) (375,4.8603) (376,4.8575) (377,4.8727) (378,4.8696) (379,4.8849) (380,4.8817) (381,4.8971) (382,4.8940) (383,4.9092) (384,4.9063) (385,4.9212) (386,4.9186) (387,4.9332) (388,4.9307) (389,4.9451) (390,4.9428) (391,4.9569) (392,4.9548) (393,4.9687) (394,4.9668) (395,4.9804) (396,4.9786) (397,4.9920) (398,4.9904) (399,5.0035) (400,5.0022)};
+		\end{axis}
+	\end{tikzpicture}
+	\caption{CRR binomial values of the down-and-in call of \autoref{fig:down-and-in}
+		($S=95$, $X=100$, $H=90$, $r=10\%$, $\sigma=25\%$, $\tau=1$), computed by
+		in--out parity, for $n=100,\ldots,400$. Dashed: the analytical value
+		$5.6605$. Each jump down happens when the effective barrier moves to the
+		next lattice level; in between the value creeps up with an odd--even
+		wobble. Cf.\ Lyuu (1998).}
+	\label{fig:barrier-convergence}
+\end{figure}
+
+\begin{intuition}
+	The effective barrier $Su^{h}$ sits below $H$ by a random-looking fraction of one step $\sigma\sqrt{\Delta t}$.
+	A barrier misplaced by $O(\sqrt{\Delta t})=O(1/\sqrt{n})$ shifts the knock-in probability by the same order, and that is the error.
+	As $n$ grows the lattice level just below $H$ creeps up towards $H$, the value rises, until a new level appears below $H$ and the effective barrier drops back --- the saw-tooth.
+	The cure is to choose $n$ (or shift the lattice) so that $H$ falls exactly on a node.
+\end{intuition}
+
+\subsection{Other Types of Barrier Options}
+
+\source{Slide p.~413}
+
+Partial barrier options (the barrier is active during only an initial period), forward-starting barrier options (only the latter part), window barrier options, rolling barrier options,\footnote{The barrier is a step function. There is a pricing formula as a multiple integral (H.~Lee, G.~Lee, \& Song, 2022). There is also an $O(n\ln n)$-time tree algorithm by Y.~Lu (\texttt{R06723032}, \texttt{D08922008}) and Lyuu (2021, 2023).} and moving barrier options.\footnote{Armstrong (2001); Carr \& A.~Chou (1997); Davydov \& Linetsky (2001/2002); Haug (1998).}
+
+\subsection{Daily Monitoring}
+
+\source{Slides pp.~414--416}
+
+Many barrier options monitor the barrier only for daily closing prices.
+If so, only nodes at the end of a day need to check for the barrier condition.
+We can even remove intraday nodes to create a \vocab{multinomial tree}: a node is then followed by $d+1$ nodes if each day is partitioned into $d$ periods (\autoref{fig:heptanomial}), with branching probabilities $b(j;d,p)$.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[x=1cm, y=0.55cm]
+		\foreach \k in {-3,...,3} {
+				\draw[MidnightBlue!70!black] (0,0) -- (4,2*\k/1);
+				\fill[MidnightBlue!80!black] (4,2*\k/1) circle (2.6pt);
+			}
+		\fill[MidnightBlue!80!black] (0,0) circle (2.6pt);
+		\draw[|-|, Gray!60!black] (0,-7) -- (4,-7) node[midway, below, font=\footnotesize] {1 day};
+	\end{tikzpicture}
+	\caption{A heptanomial tree: 6 periods per day, intraday nodes removed. The
+		seven successors are the end-of-day prices $Su^{6-2j}$, $j=0,\ldots,6$.}
+	\label{fig:heptanomial}
+\end{figure}
+
+Does this save time or space?\footnote{Contributed by Ms.~Chen, Tzu-Chun (\texttt{R94922003}) and others on April 12, 2006.}
+Not asymptotically.
+Over $D$ days with $d$ periods each, the binomial tree visits $\sim(Dd)^{2}/2$ nodes at two operations each, about $D^{2}d^{2}$ operations; the multinomial tree visits only the $\sim D^{2}d/2$ end-of-day nodes but at $d+1$ operations each, again of order $D^{2}d^{2}/2$.
+Space is a single column of $O(Dd)$ nodes either way.
+
+\paragraph{Discrete versus continuous monitoring.}
+Discrete barriers are more expensive for knock-out options than continuous ones, and less expensive for knock-in options --- a path can cross $H$ between two closes without being seen.
+Discrete barriers are far less popular than continuous ones for individual stocks; they are equally popular for indices.\footnote{Bennett (2014).}
+
+%─────§ Foreign currencies──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\section{Foreign Currencies}
+\label{sec:forex}
+
+\source{Slides pp.~417--419}
+
+\begin{flushright}
+	\itshape Data! data! data!\\
+	\upshape --- Arthur Conan Doyle (1892), \itshape The Adventures of Sherlock Holmes
+\end{flushright}
+
+\begin{notation}
+	\begin{itemize}[nosep]
+		\item $S$: the spot exchange rate in domestic/foreign terms, i.e., the number of domestic currencies per unit of foreign currency;\footnote{The market convention is the opposite: A/B $=x$ means one unit of currency A (the reference or base currency) is equal to $x$ units of currency B (the counter-value currency).}
+		\item $\sigma$: the volatility of the exchange rate;
+		\item $r$: the domestic interest rate;
+		\item $r_{f}$: the foreign interest rate. (The slides write $\hat{r}$; we keep $\hat{r}$ for the per-period rate of \autoref{sec:pricing-setting}.)
+	\end{itemize}
+\end{notation}
+
+A foreign currency is analogous to a stock paying a known dividend yield: holding foreign currency means holding foreign bonds, which pay a ``continuous dividend yield'' equal to $r_{f}$ in the foreign currency.
+
+\begin{remark}
+	站在本國投資人的角度，持有一單位外幣（存在外國銀行）會以利率 $r_{f}$ 連續生出更多外幣，就像股票以殖利率 $q$ 連續配息。所以 \autoref{sec:continuous-yield} 的所有結果，把 $q$ 換成 $r_{f}$ 就能直接用。
+\end{remark}
+
+\source{Slides pp.~420--429, 435--437}
+
+The slides then plot daily and minutely Euro--USD and GBP--USD rates (2005--2017), the distribution of GBP--USD between the collapse of Lehman Brothers and the Brexit referendum (September 15, 2008--June 23, 2016), and the daily JPY--USD rate, with their log returns.
+As for stocks (\autoref{fig:sp500-density}), the log returns have sharper peaks and heavier tails than the normal --- most visibly at the minute scale --- and the volatility clusters in time.
+
+\subsection{Foreign Exchange Options}
+
+\source{Slide p.~430}
+
+In 2000 the total notional volume of foreign exchange options was US\$13 trillion:\footnote{Lipton (2002).}
+\begin{itemize}[nosep]
+	\item 38.5\% were vanilla calls and puts with a maturity less than one month;
+	\item 52.5\% were vanilla calls and puts with a maturity between one and 18 months;
+	\item 4\% were barrier options (\autoref{sec:barrier});
+	\item 1.5\% were vanilla calls and puts with a maturity more than 18 months;
+	\item 1\% were binary options (\autoref{sec:binary-call});
+	\item 0.7\% were Asian options (\autoref{sec:path-dependent}).
+\end{itemize}
+
+\source{Slides pp.~431--433}
+
+Foreign exchange options are settled via delivery of the underlying currency, and a primary use of them is to hedge currency risk.
+
+\begin{eg}
+	A U.S.\ company expects to receive 100 million Japanese yen in March 2000, to be exchanged for U.S.\ dollars.
+	The contract size for the Japanese yen option is JPY6,250,000, so the company purchases
+	\[
+		\frac{100{,}000{,}000}{6{,}250{,}000} \;=\; 16
+	\]
+	puts on the Japanese yen with a strike of \$.0088/JPY1 and an exercise month in March 2000.
+	This put is in the money if the JPY--USD exchange rate drops below 0.0088, and it gives the company the right to sell 100,000,000 Japanese yen for $100{,}000{,}000\times.0088=880{,}000$ U.S.\ dollars.
+\end{eg}
+
+Note that these puts are equivalent to the right to \emph{buy} 880,000 U.S.\ dollars with 100,000,000 Japanese yen.
+From this angle, they become calls --- on the dollar, with strike $1/0.0088\approx113.6$ yen per dollar.
+A put on one currency is a call on the other.
+
+\subsection{The Black--Scholes Model for Forex Options}
+
+\source{Slide p.~434}
+
+Assume the exchange rate $S$ is lognormally distributed.
+The formulas \eqref{eq:bs-call-q}--\eqref{eq:bs-put-q} apply with the dividend yield equal to $r_{f}$:
+\begin{align}
+	C & \;=\; Se^{-r_{f}\tau}N(x)-Xe^{-r\tau}N\bigl(x-\sigma\sqrt{\tau}\bigr) , \label{eq:forex-call} \\
+	P & \;=\; Xe^{-r\tau}N\bigl(-x+\sigma\sqrt{\tau}\bigr)-Se^{-r_{f}\tau}N(-x) , \label{eq:forex-put}
+\end{align}
+where
+\[
+	x \;\triangleq\; \frac{\ln(S/X)+\bigl(r-r_{f}+\sigma^{2}/2\bigr)\tau}{\sigma\sqrt{\tau}} .
+\]
+These are the \vocab{Garman--Kohlhagen} formulas.
+On a tree, use the risk-neutral probability \eqref{eq:rn-p-yield} with $q=r_{f}$.
+
+\begin{note}
+	dividend 的類比也把 early exercise 的結論一起帶過來。
+	現在 no-arbitrage 下界是 $C\ge\max\bigl(Se^{-r_{f}\tau}-Xe^{-r\tau},0\bigr)$，當 $r_{f}>r$ 時它可能\emph{低於} intrinsic value $S-X$。
+	所以和 \autoref{thm:merton-no-early} 不同，American forex call 可能會在到期前 early exercise。\footnote{課本 Theorem 11.5.1。}
+\end{note}
+
+%─────§ Path-dependent derivatives──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\section{Path-Dependent Derivatives}
+\label{sec:path-dependent}
+
+\source{Slides pp.~438--439}
+
+\begin{flushright}
+	\itshape Bar the roads! Bar the paths!\\
+	Wert thou to flee from here, wert thou\\
+	to find all the roads of the world,\\
+	the way thou seekst\\
+	the path to that thou'dst find not[.]\\
+	\upshape --- Richard Wagner (1813--1883), \itshape Parsifal
+\end{flushright}
+
+Let $S_{0},S_{1},\ldots,S_{n}$ denote the prices of the underlying asset over the life of the option; $S_{0}$ is the known price at time zero and $S_{n}$ is the price at expiration.
+The standard European call has a terminal value $\max(S_{n}-X,0)$ depending only on the last price, so its value depends only on the underlying asset's terminal price regardless of how it gets there.\footnote{Called \vocab{simple claims} (Björk, 2009).}
+
+\source{Slides pp.~440--441}
+
+Some derivatives are \vocab{path-dependent}: their terminal payoff depends explicitly on the path.
+
+\begin{definition}
+	The (arithmetic) \vocab{average-rate call} and \vocab{average-rate put} have terminal values
+	\[
+		\max\left(\frac{1}{n+1}\sum_{i=0}^{n}S_{i}-X,\ 0\right) ,
+		\qquad
+		\max\left(X-\frac{1}{n+1}\sum_{i=0}^{n}S_{i},\ 0\right) .
+	\]
+\end{definition}
+
+Average-rate options are also called \vocab{Asian options}.
+They are very popular:\footnote{As of the late 1990s, the outstanding volume was in the range of 5--10 billion U.S.\ dollars (Nielsen \& Sandmann, 2003).} they are useful hedging tools for firms that will make a stream of purchases over a time period, because the costs are likely to be linked to the average price.
+They are mostly European for the same reason.
+The averaging clause is also common in convertible bonds and structured notes.
+
+\begin{remark}
+	\vocab{亞式選擇權}（Asian option）：報酬取決於存續期間股價的\emph{平均}而非到期價。平均比單一價格難操縱、波動也小，因此比歐式選擇權便宜，適合持續採購原料的公司避險。名稱據說來自最早用在亞洲交易量較小的股票上。
+\end{remark}
+
+\source{Slides pp.~442--443}
+
+\begin{definition}
+	\begin{itemize}[nosep]
+		\item A \vocab{lookback call} on the minimum pays $S_{n}-\min_{0\le i\le n}S_{i}$; a \vocab{lookback put} on the maximum pays $\max_{0\le i\le n}S_{i}-S_{n}$.
+		\item The \vocab{fixed-strike lookback option} (also called forward lookback option) pays
+		      \[
+			      \max\Bigl(\max_{0\le i\le n}S_{i}-X,\,0\Bigr)\ \text{(call)},
+			      \qquad
+			      \max\Bigl(X-\min_{0\le i\le n}S_{i},\,0\Bigr)\ \text{(put)}.
+		      \]
+		\item Lookback calls and puts on the average (instead of a constant $X$) are called \vocab{average-strike options}.
+	\end{itemize}
+\end{definition}
+
+The lookback call lets the holder buy at the lowest price of the period, the lookback put sell at the highest: ``selling at the high and buying at the low.''
+The CRR tree converges uniformly for path-dependent options.\footnote{Jiang \& M.~Dai (2004).}
+
+\subsection{Average-Rate Options Are Hard}
+
+\source{Slides pp.~444--447}
+
+Average-rate options are notoriously hard to price.
+The binomial tree for the averages does not combine: the paths $(S_{0},S_{0}u,S_{0}u^{2},S_{0}u^{2}d)$ and $(S_{0},S_{0}d,S_{0}du,S_{0}du^{2})$ end at the same price but with different averages, hence different payoffs (\autoref{fig:asian-tree}).
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[font=\scriptsize, every node/.style={inner sep=1.2pt},
+			ln/.style={MidnightBlue!70!black}]
+		\node (s) at (0,0) {$S$};
+		\node (u) at (1.6,1.5) {$Su$}; \node (d) at (1.6,-1.5) {$Sd$};
+		\node (uu) at (3.2,2.4) {$Suu$}; \node (ud) at (3.2,0.8) {$Sud$};
+		\node (du) at (3.2,-0.8) {$Sdu$}; \node (dd) at (3.2,-2.4) {$Sdd$};
+		\foreach \x/\y in {s/u,s/d,u/uu,u/ud,d/du,d/dd} \draw[ln] (\x)--(\y);
+		\node[anchor=west] (cuu) at (5.4,2.4) {$C_{uu}=\max\bigl(\frac{S+Su+Suu}{3}-X,0\bigr)$};
+		\node[anchor=west] (cud) at (5.4,0.8) {$C_{ud}=\max\bigl(\frac{S+Su+Sud}{3}-X,0\bigr)$};
+		\node[anchor=west] (cdu) at (5.4,-0.8) {$C_{du}=\max\bigl(\frac{S+Sd+Sdu}{3}-X,0\bigr)$};
+		\node[anchor=west] (cdd) at (5.4,-2.4) {$C_{dd}=\max\bigl(\frac{S+Sd+Sdd}{3}-X,0\bigr)$};
+		\node (cu) at (4.6,1.6) {$C_{u}$}; \node (cd) at (4.6,-1.6) {$C_{d}$};
+		\node (c) at (3.9,0) {$C$};
+		\draw[ln] (c)--(cu); \draw[ln] (c)--(cd);
+		\draw[ln] (cu)--(cuu.west); \draw[ln] (cu)--(cud.west);
+		\draw[ln] (cd)--(cdu.west); \draw[ln] (cd)--(cdd.west);
+	\end{tikzpicture}
+	\caption{Two periods of an average-rate call. The stock tree on the left
+		recombines ($Sud=Sdu$); the pricing tree on the right does not, since
+		$C_{ud}\ne C_{du}$ in general. With $C_{u}=\bigl[pC_{uu}+(1-p)C_{ud}\bigr]/e^{\hat{r}}$
+		and similarly for $C_{d}$ and $C$, the pricing tree grows exponentially.}
+	\label{fig:asian-tree}
+\end{figure}
+
+A naive algorithm enumerates the $2^{n}$ paths for an $n$-period binomial tree and then averages the payoffs, but the complexity is exponential.\footnote{T.~Dai (\texttt{B82506025}, \texttt{R86526008}, \texttt{D8852600}) \& Lyuu (2007) reduce it to $2^{O(\sqrt{n})}$.}
+The Monte Carlo method and approximation algorithms are some of the alternatives left.
+
+\paragraph{States and their transitions.}
+The tuple $(i,S,P)$ captures the state for the Asian option --- a ``sufficient statistic,'' if you will --- where $i$ is the time, $S$ the prevailing stock price, and $P$ the running sum.\footnote{When the average is a moving average, a different technique is needed (C.~Kao (\texttt{R89723057}) \& Lyuu, 2003).}
+For the binomial model the state transition is
+\[
+	(i,S,P) \;\longrightarrow\;
+	\begin{cases}
+		(i+1,\,Su,\,P+Su), & \text{for the up move},   \\
+		(i+1,\,Sd,\,P+Sd), & \text{for the down move}.
+	\end{cases}
+\]
+The number of states is exponential: $(i,S)$ takes $O(n^{2})$ values, but the running sum $P$ distinguishes paths.
+
+\begin{remark}
+	關鍵在於「狀態」要包含哪些資訊才足以決定未來報酬。歐式選擇權只需要 $(i,S)$，所以二項樹會重合；亞式選擇權還需要目前的累積和 $P$，而不同路徑到同一個 $(i,S)$ 幾乎都有不同的 $P$，樹就不再重合。
+\end{remark}
+
+\subsection{Geometric Averages}
+
+\source{Slides pp.~448--449}
+
+Not all path-dependent derivatives are hard to price; barrier options are easy, for example.
+When averaging is done geometrically, the option payoffs are
+\[
+	\max\Bigl((S_{0}S_{1}\cdots S_{n})^{1/(n+1)}-X,\ 0\Bigr) ,
+	\qquad
+	\max\Bigl(X-(S_{0}S_{1}\cdots S_{n})^{1/(n+1)},\ 0\Bigr) .
+\]
+
+\begin{theorem}[Angus, 1999]
+	\label{thm:geometric-asian}
+	The limiting analytical solutions are the Black--Scholes formulas
+	\begin{align}
+		C & \;=\; Se^{-q_{a}\tau}N(x)-Xe^{-r\tau}N\bigl(x-\sigma_{a}\sqrt{\tau}\bigr) , \label{eq:geo-call} \\
+		P & \;=\; Xe^{-r\tau}N\bigl(-x+\sigma_{a}\sqrt{\tau}\bigr)-Se^{-q_{a}\tau}N(-x) , \notag
+	\end{align}
+	with the volatility set to $\sigma_{a}\triangleq\sigma/\sqrt{3}$, the dividend yield set to $q_{a}\triangleq(r+q+\sigma^{2}/6)/2$, and
+	\[
+		x \;\triangleq\; \frac{\ln(S/X)+\bigl(r-q_{a}+\sigma_{a}^{2}/2\bigr)\tau}{\sigma_{a}\sqrt{\tau}} .
+	\]
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+	Write $\ln S_{i}=\ln S_{0}+\sum_{k=1}^{i}\varepsilon_{k}$, where under the risk-neutral measure the $\varepsilon_{k}$ are (in the limit) independent normals with mean $m\Delta t$, $m\triangleq r-q-\sigma^{2}/2$, and variance $\sigma^{2}\Delta t$ (\autoref{lem:rn-lognormal}).
+	Swapping the order of summation,
+	\[
+		\ln G \;\triangleq\; \frac{1}{n+1}\sum_{i=0}^{n}\ln S_{i} \;=\; \ln S_{0}+\sum_{k=1}^{n}\frac{n-k+1}{n+1}\,\varepsilon_{k} .
+	\]
+	A weighted sum of independent normals is normal (\autoref{cor:normal-closure}), with
+	\begin{align*}
+		E[\ln G]   & \;=\; \ln S_{0}+m\Delta t\sum_{k=1}^{n}\frac{n-k+1}{n+1}\;\to\;\ln S_{0}+\frac{m\tau}{2} ,                  \\
+		\Var[\ln G] & \;=\; \sigma^{2}\Delta t\sum_{k=1}^{n}\Bigl(\frac{n-k+1}{n+1}\Bigr)^{2}\;\to\;\frac{\sigma^{2}\tau}{3} ,
+	\end{align*}
+	since $\sum_{k}(n-k+1)\sim n^{2}/2$ and $\sum_{k}(n-k+1)^{2}\sim n^{3}/3$.
+	So $G$ is lognormal, and by \autoref{cor:lognormal-call} the call is priced by \eqref{eq:bs-call-q} for \emph{any} $(q_{a},\sigma_{a})$ that reproduces this distribution as that of $S_{\tau}$: $\sigma_{a}^{2}\tau=\sigma^{2}\tau/3$ and $(r-q_{a}-\sigma_{a}^{2}/2)\tau=m\tau/2$.
+	The first gives $\sigma_{a}=\sigma/\sqrt{3}$; the second gives $q_{a}=r-\sigma^{2}/6-(r-q-\sigma^{2}/2)/2=(r+q+\sigma^{2}/6)/2$.
+\end{proof}
+
+See the textbook for a proof based on the binomial model.
+Note that $\sigma_{a}<\sigma$: averaging cancels part of the noise, which is why average-rate options are cheaper than their vanilla counterparts.
+
+\begin{note}
+	geometric average 之所以好算，正是因為 $\ln G$ 是 log return 的\emph{線性}函數，而 normal 的和仍是 normal。
+	arithmetic average $\frac1{n+1}\sum S_{i}$ 是一堆 \emph{lognormal} 的和，它不是 lognormal，也沒有 closed-form 的分布。
+	實務上，average-rate options 幾乎都使用 arithmetic average。
+\end{note}
+
+\subsection{An Approximate Formula for Asian Calls}
+
+\source{Slide p.~450}
+
+For the continuously sampled arithmetic average there is an accurate approximation:\footnote{Rogers \& Shi (1995); Thompson (1999); K.~Chen (\texttt{R92723061}) (2005); K.~Chen (\texttt{R92723061}) \& Lyuu (2006).}
+\[
+	C \;=\; e^{-r\tau}\left[\,\frac{S}{\tau}\int_{0}^{\tau}e^{\mu t+\sigma^{2}t/2}\,N\!\left(\frac{-\gamma+(\sigma t/\tau)(\tau-t/2)}{\sqrt{\tau/3}}\right)dt
+		\;-\;XN\!\left(\frac{-\gamma}{\sqrt{\tau/3}}\right)\right] ,
+\]
+where $\mu\triangleq r-\sigma^{2}/2$ and $\gamma$ is the unique value that satisfies
+\[
+	\frac{S}{\tau}\int_{0}^{\tau}e^{3\gamma\sigma t(\tau-t/2)/\tau^{2}+\mu t+\sigma^{2}[\,t-(3t^{2}/\tau^{3})(\tau-t/2)^{2}\,]/2}\,dt \;=\; X .
+\]
+
+\begin{note}
+	結構還是 \autoref{thm:black-scholes} 熟悉的「$S\times$機率 $-\,X\times$機率」。
+	想法是對平均值最依賴的一個 normal 變數 $Z$ 取條件（$Z$ 基本上就是 Brownian path 的積分，變異數為 $\tau/3$）；$\gamma$ 是讓「給定 $Z$ 時平均值的條件期望」等於 $X$ 的那個 $Z$ 值，而對 payoff 中只由 $Z$ 決定的部分，這個公式是精確的。
+\end{note}
+
+%─────§ Hull–White approximation algorithm──────────────────────────────────────────────────────────────────────────────────────────────────────────
+\section{Approximation Algorithm for Asian Options}
+\label{sec:asian-algorithm}
+
+\source{Slides pp.~451--453}
+
+The following algorithm, due to Hull and White, is based on the BOPM.
+Consider a node at time $j$ with the underlying asset price equal to $S_{0}u^{j-i}d^{i}$, and name it $N(j,i)$.
+
+\begin{proposition}
+	The running sum $\sum_{m=0}^{j}S_{m}$ at node $N(j,i)$ has a maximum value of
+	\[
+		S_{0}\bigl(1+u+u^{2}+\cdots+u^{j-i}+u^{j-i}d+\cdots+u^{j-i}d^{i}\bigr)
+		\;=\; S_{0}\,\frac{1-u^{j-i+1}}{1-u}+S_{0}u^{j-i}d\,\frac{1-d^{i}}{1-d} ,
+	\]
+	and a minimum value of
+	\[
+		S_{0}\bigl(1+d+d^{2}+\cdots+d^{i}+d^{i}u+\cdots+d^{i}u^{j-i}\bigr)
+		\;=\; S_{0}\,\frac{1-d^{i+1}}{1-d}+S_{0}d^{i}u\,\frac{1-u^{j-i}}{1-u} .
+	\]
+\end{proposition}
+
+\begin{proof}
+	Every path to $N(j,i)$ uses $j-i$ up moves and $i$ down moves in some order.
+	Exchanging an adjacent ``down, up'' pair for ``up, down'' raises exactly one intermediate price (from $\cdot d$ to $\cdot u$) and leaves the rest unchanged.
+	So the sum is maximized by all ups first and minimized by all downs first, giving the two geometric series.
+\end{proof}
+
+Divide these values by $j+1$ and call them $A_{\max}(j,i)$ and $A_{\min}(j,i)$; they are running averages (\autoref{fig:max-min-paths}).
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[font=\footnotesize, x=1cm, y=0.5cm]
+		\draw[Gray!50] (0,0) -- (6,6) -- (6,-6) -- cycle;
+		\draw[MidnightBlue!80!black, very thick] (0,0) -- (4,4) -- (6,2);
+		\draw[RawSienna, very thick] (0,0) -- (2,-2) -- (6,2);
+		\fill (0,0) circle (2pt); \fill (6,2) circle (2pt) node[right] {$N(j,i)$};
+		\node[MidnightBlue!80!black, anchor=south east] at (3.6,4) {path with maximum running average};
+		\node[RawSienna, anchor=north west] at (2.2,-2) {path with minimum running average};
+	\end{tikzpicture}
+	\caption{All up moves first gives the largest running sum to $N(j,i)$, all
+		down moves first the smallest; every other path lies in between.}
+	\label{fig:max-min-paths}
+\end{figure}
+
+\source{Slides pp.~454--455}
+
+The number of paths to $N(j,i)$ is far too large: $\binom{j}{i}$, and for example $\binom{j}{j/2}\sim2^{j}\sqrt{2/(\pi j)}$.
+Moreover, the distribution of the running averages at any given time seems to be bimodal.\footnote{Contributed by Mr.~Liu, Jun (\texttt{R99944027}) on April 15, 2014. The slide's plot uses $n=24$, $u=5/4$ and $d=4/5$.}
+
+\subsection{Bucketing}
+
+\source{Slides pp.~456--458}
+
+But all averages must lie between $A_{\min}(j,i)$ and $A_{\max}(j,i)$.
+Pick $k+1$ equally spaced values in this range and treat them as the true and only running averages:
+\[
+	A_{m}(j,i) \;\triangleq\; \Bigl(\frac{k-m}{k}\Bigr)A_{\min}(j,i)+\Bigl(\frac{m}{k}\Bigr)A_{\max}(j,i) ,
+	\qquad m=0,1,\ldots,k .
+\]
+Such \vocab{bucketing} or \vocab{binning} introduces errors, but it works reasonably well in practice.\footnote{J.~Hull \& White (1993); Ritchken, Sankarasubramanian, \& Vijh (1993).}
+A better alternative picks values whose logarithms are equally spaced;\footnote{Called \vocab{log-linear interpolation}.} still other alternatives are possible, considering the bimodal distribution of averages.
+
+\begin{remark}
+	\vocab{分桶}（bucketing）：每個節點不再追蹤所有可能的平均值（指數多個），而是只保留 $A_{\min}$ 到 $A_{\max}$ 之間等距的 $k+1$ 個代表值，每個代表值各存一個選擇權價格。狀態數從指數降到 $O(kn^{2})$，代價是近似誤差。
+\end{remark}
+
+\subsection{Backward Induction with Interpolation}
+
+\source{Slides pp.~459--463}
+
+Backward induction calculates the option values at each node for the $k+1$ running averages.
+Suppose the current node is $N(j,i)$ and the running average is $a$, and consider the next node $N(j+1,i)$, after an up move.
+As the asset price there is $S_{0}u^{j+1-i}d^{i}$, we seek the option value corresponding to the new running average
+\[
+	A_{u} \;\triangleq\; \frac{(j+1)\,a+S_{0}u^{j+1-i}d^{i}}{j+2} .
+\]
+But $A_{u}$ is not likely to be one of the $k+1$ running averages at $N(j+1,i)$!
+Find the two running averages that bracket it,
+\[
+	A_{\ell}(j+1,i) \;\le\; A_{u} \;<\; A_{\ell+1}(j+1,i) .
+\]
+In ``most'' cases, the fastest way to nail $\ell$ is via
+\[
+	\ell \;=\; \left\lfloor\frac{A_{u}-A_{\min}(j+1,i)}{\bigl[A_{\max}(j+1,i)-A_{\min}(j+1,i)\bigr]/k}\right\rfloor .
+\]
+But watch out for
+\begin{itemize}[nosep]
+	\item the rare case where $A_{u}=A_{\ell}(j+1,i)$ for some $\ell$ (floating-point rounding may put it on either side);
+	\item the case where $A_{u}=A_{\max}(j+1,i)$, which gives $\ell=k$ and no $A_{\ell+1}$;
+	\item the degenerate case where $A_{0}(j+1,i)=\cdots=A_{k}(j+1,i)$, which happens to the two extreme paths ($i=0$ or $i=j+1$), where the formula divides by zero.
+\end{itemize}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[font=\footnotesize, every node/.style={inner sep=1pt}]
+		\foreach \y/\l in {0.9/0, 0/m, -0.9/k} {\draw[thick] (0,\y) -- (0.6,\y); \node[left] at (-0.1,\y) {$\l$};}
+		\node at (0.3,0.5) {$\vdots$}; \node at (0.3,-0.4) {$\vdots$};
+		\foreach \s in {2.1,-2.1}{
+				\begin{scope}[yshift=\s cm]
+					\foreach \y in {1.0,0.3,-0.3,-1.0} \draw[thick] (3.6,\y) -- (4.2,\y);
+					\node at (3.9,0.72) {$\vdots$}; \node at (3.9,-0.58) {$\vdots$};
+					\node[right] at (4.3,1.0) {$0$}; \node[right] at (4.3,-1.0) {$k$};
+				\end{scope}
+			}
+		\node[right] at (4.3,2.4) {$\ell$}; \node[right] at (4.3,1.8) {$\ell+1$};
+		\node[right] at (4.3,-1.8) {$\ell'$}; \node[right] at (4.3,-2.4) {$\ell'+1$};
+		\draw[-{Stealth[length=4pt]}, MidnightBlue!70!black] (3.55,2.1) -- (1.3,0) -- (0.65,0);
+		\draw[MidnightBlue!70!black] (1.3,0) -- (3.55,-2.1);
+		\node[font=\scriptsize, text=Gray!50!black, anchor=south east] at (2.3,1.1) {$N(j+1,i)$};
+		\node[font=\scriptsize, text=Gray!50!black, anchor=north east] at (2.3,-1.1) {$N(j+1,i+1)$};
+		\node[font=\scriptsize, text=Gray!50!black, anchor=south] at (0.3,1.15) {$N(j,i)$};
+	\end{tikzpicture}
+	\caption{Backward induction for arithmetic average-rate options. The $k+1$
+		option values at $N(j,i)$ are stored in an array; each depends on two
+		values at $N(j+1,i)$ (buckets $\ell$, $\ell+1$) and two at $N(j+1,i+1)$
+		(buckets $\ell'$, $\ell'+1$).}
+	\label{fig:asian-buckets}
+\end{figure}
+
+Express $A_{u}$ as a linearly interpolated value of the two running averages,
+\[
+	A_{u} \;=\; x\,A_{\ell}(j+1,i)+(1-x)\,A_{\ell+1}(j+1,i) ,
+	\qquad 0<x\le1 .
+\]
+Let $C_{\ell}(t,s)$ denote the option value at node $N(t,s)$ with running average $A_{\ell}(t,s)$.
+Obtain the approximate option value given the running average $A_{u}$ via
+\[
+	C_{u} \;\triangleq\; x\,C_{\ell}(j+1,i)+(1-x)\,C_{\ell+1}(j+1,i) .
+\]
+
+\source{Slides pp.~464--466}
+
+This interpolation introduces the second source of error; alternatives to linear interpolation exist.
+The same steps are repeated for the down node $N(j+1,i+1)$ to obtain another approximate option value $C_{d}$.
+Finally obtain the option value as
+\[
+	\bigl[\,pC_{u}+(1-p)\,C_{d}\,\bigr]e^{-r\Delta t} .
+\]
+
+\begin{algorithm}[H]
+	\caption{Approximation algorithm for European arithmetic average-rate calls}
+	\label{alg:asian}
+	\KwIn{$S_{0},u,d,X,n,\hat{r},k$}
+	$p:=(e^{\hat{r}}-d)/(u-d)$\;
+	\For(\tcp*[f]{terminal price $S_{0}u^{n-i}d^{i}$}){$i=0,1,\ldots,n$}{
+		\For{$m=0,1,\ldots,k$}{$C[\,i\,][\,m\,]:=\max\bigl(0,\,A_{m}(n,i)-X\bigr)$\;}
+	}
+	\For{$j=n-1$ \KwTo $0$}{
+		\For{$i=0,1,\ldots,j$}{
+			\For{$m=0,1,\ldots,k$}{
+				$a:=A_{m}(j,i)$\;
+				$A_{u}:=\bigl((j+1)\,a+S_{0}u^{j+1-i}d^{i}\bigr)/(j+2)$\;
+				find $\ell,x$ with $A_{u}=xA_{\ell}(j+1,i)+(1-x)A_{\ell+1}(j+1,i)$\;
+				$C_{u}:=x\,C[\,i\,][\,\ell\,]+(1-x)\,C[\,i\,][\,\ell+1\,]$\;
+				$A_{d}:=\bigl((j+1)\,a+S_{0}u^{j-i}d^{i+1}\bigr)/(j+2)$\;
+				find $\ell',x'$ likewise at $N(j+1,i+1)$\;
+				$C_{d}:=x'\,C[\,i+1\,][\,\ell'\,]+(1-x')\,C[\,i+1\,][\,\ell'+1\,]$\;
+				$D[\,m\,]:=\bigl(pC_{u}+(1-p)\,C_{d}\bigr)e^{-\hat{r}}$\;
+			}
+			copy $D[\,0..k\,]$ to $C[\,i\,][\,0..k\,]$\;
+		}
+	}
+	\Return{$C[\,0\,][\,0\,]$}\;
+\end{algorithm}
+
+\begin{note}
+	需要先複製到 $D$，是因為下一個 $i$ 計算它的 $C_{d}$ 時還會讀 $C[\,i\,][\,\cdot\,]$ --- 和 \autoref{alg:bopm-european} 一樣是「proper updating」的問題。
+	若是 American option，把對 $D[\,m\,]$ 的指定改成 $\max\bigl(a-X,\ (pC_{u}+(1-p)C_{d})e^{-\hat{r}}\bigr)$。
+\end{note}
+
+The running time is $O(kn^{2})$: there are $O(n^{2})$ nodes, and each node has $O(k)$ buckets.
+No interpolation is needed for the calculations at time step $n-1$:\footnote{Contributed by Mr.~Chen, Shih-Hang (\texttt{R02723031}) on April 9, 2014.} the option values there are simply (for calls) $C_{u}=\max(A_{u}-X,0)$ and $C_{d}=\max(A_{d}-X,0)$, which saves $O(nk)$ calculations and one layer of error.
+
+Arithmetic average-rate options were assumed to be newly issued, with no historical average to deal with.
+This problem can be easily addressed:\footnote{See Exercise 11.7.4 of the textbook.} if the running sum of the first $m+1$ prices is $P$, the payoff is
+\[
+	\max\Bigl(\frac{P+\sum_{i=m+1}^{n}S_{i}}{n+1}-X,\ 0\Bigr)
+	\;=\; \frac{n-m}{n+1}\,\max\Bigl(\frac{1}{n-m}\sum_{i=m+1}^{n}S_{i}-X',\ 0\Bigr) ,
+\]
+where $X'\triangleq\bigl[(n+1)X-P\bigr]/(n-m)$ ---
+a scaled, newly issued option on the remaining prices with an adjusted strike (when $X'\le0$, the option is sure to finish in the money and is priced as a forward).
+How about the Greeks?\footnote{Thanks to lively class discussions on March 31, 2004, and April 9, 2014.}
+Delta and gamma from the first two periods (\autoref{sec:numerical-greeks}) are available as before, but each $f_{u}$ and $f_{d}$ now carries bucketing and interpolation errors of its own, which the difference quotients amplify.
+
+\subsection{A Numerical Example}
+\label{sec:asian-example}
+
+\source{Slides pp.~467--473}
+
+Consider a European arithmetic average-rate call with strike price $50$, and assume zero interest rate in order to dispense with discounting.
+The tree has $u=1.069$, $d=0.936$, $p=0.483$ and $S_{0}=50$.
+Node A is 2 periods from the root (price $50$, after one up and one down move); its successors B and C are at expiration, with prices $53.447$ and $46.775$.
+Each node picks $k=3$, i.e., 4 equally spaced running averages (\autoref{fig:asian-example}).
+The minimum running average at node A is $48.925$, the maximum $51.149$.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[font=\scriptsize, every node/.style={inner sep=1.5pt}]
+		\node (A) at (0,0) {
+			\begin{tabular}{|c|c|}\hline
+				48.925 & 0.0269 \\ \hline
+				49.666 & 0.2956 \\ \hline
+				50.408 & 0.5782 \\ \hline
+				51.149 & 0.8617 \\ \hline
+			\end{tabular}};
+		\node[above=1pt of A] {$50$};
+		\node[below=1pt of A] {A};
+		\node (B) at (5.2,2.0) {
+			\begin{tabular}{|c|c|}\hline
+				50.056 & 0.056 \\ \hline
+				51.206 & 1.206 \\ \hline
+				52.356 & 2.356 \\ \hline
+				53.506 & 3.506 \\ \hline
+			\end{tabular}};
+		\node[above=1pt of B] {$53.447$};
+		\node[below=1pt of B] {B};
+		\node (C) at (5.2,-2.0) {
+			\begin{tabular}{|c|c|}\hline
+				46.827 & 0.000 \\ \hline
+				47.903 & 0.000 \\ \hline
+				48.979 & 0.000 \\ \hline
+				50.056 & 0.056 \\ \hline
+			\end{tabular}};
+		\node[above=1pt of C] {$46.775$};
+		\node[below=1pt of C] {C};
+		\draw[MidnightBlue!70!black] (A.east) -- node[above, sloped] {$50.612$} (B.west);
+		\draw[MidnightBlue!70!black] (A.east) -- node[below, sloped] {$48.944$} (C.west);
+		\node[draw, align=left, font=\scriptsize] at (1.0,-2.6) {$u=1.069$\\$d=0.936$\\$p=0.483$};
+	\end{tikzpicture}
+	\caption{Running averages (left columns) and option values at node A and its two
+		successors. The edges show the new averages reached from A's second bucket,
+		$49.666$.}
+	\label{fig:asian-example}
+\end{figure}
+
+Consider the up move from node A with running average $49.666$.
+Because the stock price at node B is $53.447$, the new running average is
+\[
+	\frac{3\times49.666+53.447}{4} \;\approx\; 50.612 .
+\]
+With $50.612$ lying between $50.056$ and $51.206$ at node B, we solve $50.612=x\times50.056+(1-x)\times51.206$ to obtain $x\approx0.517$.
+The option values corresponding to running averages $50.056$ and $51.206$ at node B are $0.056$ and $1.206$, so their contribution is weighted linearly as
+\[
+	x\times0.056+(1-x)\times1.206 \;\approx\; 0.611 .
+\]
+
+Now consider the down move.
+Because the stock price at node C is $46.775$, the new running average is $(3\times49.666+46.775)/4\approx48.944$, lying between $47.903$ and $48.979$, so $x\approx0.033$.
+The option values there are both $0.0$, so the contribution is $0.0$.
+Finally, the option value corresponding to running average $49.666$ at node A equals
+\[
+	p\times0.611+(1-p)\times0.0 \;\approx\; 0.2956 ,
+\]
+where $p=0.483$.
+The remaining three option values at node A can be computed similarly.
+
+\begin{note}
+	A 在時間 $n-1$，所以由上面的 shortcut 不需要 interpolation：精確計算 $C_{u}=\max(50.612-50,0)=0.612$，價值為 $0.2955$ --- 在這裡幾乎一樣。
+	第三個 bucket（$50.408$）差得比較多：interpolation 給出 $0.578$，精確計算是 $0.564$。
+	原因是 option 價值對 running average 是 \emph{convex} 的（到期時是 $\max(\cdot-X,0)$），所以 linear interpolation 用的弦會落在函數上方。
+	這正是下一個 remark 背後的機制。
+\end{note}
+
+%─────§ Remarks──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+\subsection{Remarks on Asian Option Pricing}
+
+\source{Slides pp.~474--478}
+
+Asian option pricing is an active research area.
+\begin{itemize}[itemsep=0.3em]
+	\item The above algorithm overestimates the ``true'' value, and to guarantee convergence, $k$ needs to grow with $n$ at least.\footnote{T.~Dai (\texttt{B82506025}, \texttt{R86526008}, \texttt{D8852600}), G.~Huang (\texttt{F83506075}), \& Lyuu (2002). With $k=50000$ the slide's plot of the value against $n=50,\ldots,140$ still drifts between about $0.325$ and $0.35$.}
+	\item There is a convergent approximation algorithm that does away with interpolation, with a running time of $2^{O(\sqrt{n})}$.\footnote{T.~Dai (\texttt{B82506025}, \texttt{R86526008}, \texttt{D8852600}) \& Lyuu (2002, 2004).}
+	\item There is an $O(kn^{2})$-time algorithm with an error bound of $O(Xn/k)$ from the naive $O(2^{n})$-time binomial tree algorithm in the case of European Asian options.\footnote{Aingworth, Motwani (1962--2009), \& Oldham (2000).}
+	      $k$ can be varied for trade-off between time and accuracy: picking $k=O(n^{2})$ gives an error of $O(1/n)$ and a running time of $O(n^{4})$.
+	\item Another approximation algorithm reduces the error to $O(X\sqrt{n}/k)$ by varying the number of buckets per node.\footnote{T.~Dai (\texttt{B82506025}, \texttt{R86526008}, \texttt{D8852600}), G.~Huang (\texttt{F83506075}), \& Lyuu (2002).}
+	      If we pick $k=O(n)$, the error is $O(n^{-0.5})$; if we pick $k=O(n^{1.5})$, the error is $O(1/n)$ and the running time is $O(n^{3.5})$.
+	\item Under ``reasonable assumptions,'' an $O(n^{2})$-time algorithm with an error bound of $O(1/n)$ exists.\footnote{Hsu (\texttt{R7526001}, \texttt{D89922012}) \& Lyuu (2004).}
+	      The basic idea is a nonuniform allocation of running averages $k_{ij}$ instead of a uniform $k$: few buckets where the range $A_{\max}-A_{\min}$ is narrow (near the edges of the tree), many where it is wide.
+	      It strikes a tight balance between error and complexity.
+\end{itemize}
+
+\begin{intuition}
+	Why can a nonuniform allocation help so much?
+	The bucketing error at a node is proportional to the bucket width $(A_{\max}-A_{\min})/k$.
+	That range is zero on the two edges of the tree and widest in the middle, so spending the same $k$ everywhere wastes buckets where they are not needed.
+\end{intuition}
+
+\subsection{A Grand Comparison}
+
+\source{Slides pp.~479--481}
+
+The slides compare several methods against exact values over a grid of strikes, volatilities and rates.\footnote{Hsu (\texttt{R7526001}, \texttt{D89922012}) \& Lyuu (2004); J.~E.~Zhang (2001, 2003); K.~Chen (\texttt{R92723061}) \& Lyuu (2006).}
+AA2 and AA3 are Zhang's analytical approximations; Hsu--Lyuu is the $O(n^{2})$ tree; Chen--Lyuu is the formula above.
+A selection:
+
+\begin{table}[H]
+	\centering
+	\small
+	\begin{tabular}{rrrrrrrr}
+		\toprule
+		$X$ & $\sigma$ & $r$  & Exact      & AA2        & AA3        & Hsu--Lyuu & Chen--Lyuu \\
+		\midrule
+		95  & 0.05     & 0.05 & 7.1777275  & 7.1777244  & 7.1777279  & 7.178812  & 7.177726   \\
+		100 &          &      & 2.7161745  & 2.7161755  & 2.7161744  & 2.715613  & 2.716168   \\
+		105 &          &      & 0.3372614  & 0.3372601  & 0.3372614  & 0.338863  & 0.337231   \\
+		\midrule
+		90  & 0.10     & 0.05 & 11.9510927 & 11.9509331 & 11.9510871 & 11.951610 & 11.951076  \\
+		100 &          &      & 3.6413864  & 3.6414032  & 3.6413875  & 3.642325  & 3.641344   \\
+		110 &          &      & 0.3312030  & 0.3312563  & 0.3311968  & 0.331348  & 0.331074   \\
+		\midrule
+		90  & 0.30     & 0.05 & 13.9538233 & 13.9555691 & 13.9540973 & 13.953937 & 13.952421  \\
+		100 &          &      & 7.9456288  & 7.9459286  & 7.9458549  & 7.945918  & 7.944357   \\
+		110 &          &      & 4.0717942  & 4.0702869  & 4.0720881  & 4.071945  & 4.070115   \\
+		\midrule
+		90  & 0.30     & 0.15 & 16.5129113 & 16.5133090 & 16.5128376 & 16.512963 & 16.512024  \\
+		100 &          &      & 10.2098305 & 10.2110681 & 10.2101058 & 10.210039 & 10.208724  \\
+		110 &          &      & 5.7301225  & 5.7296982  & 5.7303567  & 5.730357  & 5.728161   \\
+		\bottomrule
+	\end{tabular}
+	\caption{Arithmetic average-rate call values from the slides' comparison
+		(rows for $\sigma=0.05,0.10,0.30$; the slides also cover $\sigma=0.20$ and
+		$r=0.09,0.15$ throughout).}
+	\label{tab:asian-comparison}
+\end{table}
+
+\begin{moral}
+	All four methods agree to about three or four significant digits across the board; the analytical approximations lose digits as $\sigma$ grows, the tree is weakest at small $\sigma$.
+	A problem whose naive solution is exponential is, in practice, solved --- but every method trades accuracy, time and guarantees differently, and only some of them come with error bounds.
+\end{moral}

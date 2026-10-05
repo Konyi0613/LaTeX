@@ -269,6 +269,73 @@
 	\puzzlecell{0}{1}{#4}\puzzlecell{1}{1}{#5}\puzzlecell{2}{1}{#6}%
 	\puzzlecell{0}{0}{#7}\puzzlecell{1}{0}{#8}\puzzlecell{2}{0}{#9}}
 
+% Pictures of the linear models (regression chapters onwards).
+%   regpt / resid / regfit — a data point, its residual to the fitted
+%       line/plane, and the fit itself, in the `illustration of linear
+%       regression' plots;
+%   gdcurve / gdpath — an error curve E_in(w) and the path of the iterates on
+%       it, in the gradient-descent pictures;
+%   spanfill — the column span of X in the hat-matrix pictures.
+\tikzset{
+	regpt/.style={circle, draw=black, thick, fill=white, inner sep=0pt,
+			minimum size=4pt},
+	resid/.style={red!85!black, semithick},
+	regfit/.style={blue!85!black, thick},
+	gdcurve/.style={Maroon, line width=1pt},
+	gdpath/.style={black, thin, -{Stealth[length=1.6mm]}},
+	spanfill/.style={fill=red!22},
+}
+% \thetacurve[scale]: the logistic function theta(s) = 1/(1+e^{-s}) on its own
+% small axes, dashed asymptote at 1 --- it recurs beside every formula that
+% uses it.
+\newcommand{\thetacurve}[1][1]{%
+	\begin{tikzpicture}[scale=#1, baseline=(current bounding box.center)]
+		\draw[thin] (-1.9,0) -- (1.9,0);
+		\draw[thin] (0,-0.25) -- (0,1.35);
+		\draw[thin, dashed] (-1.9,1.1) -- (1.9,1.1);
+		\node[left, font=\scriptsize] at (-1.9,1.1) {\(1\)};
+		\node[left, font=\scriptsize] at (-1.9,0) {\(0\)};
+		\node[below left, font=\scriptsize] at (1.9,0) {\(s\)};
+		\draw[thick, blue] plot[domain=-1.9:1.9, samples=60]
+			(\x, {1.1/(1 + exp(-2.4*\x))});
+		\node[font=\scriptsize, text=blue] at (1.2,0.75) {\(\theta(s)\)};
+	\end{tikzpicture}}
+% \einbowl{label}: a smooth convex E_in(w) whose valley sits on the w axis,
+% with the minimiser marked by a dot and the flat tangent there drawn as an
+% arrow --- the picture of `gradient zero at the best w'.
+\newcommand{\einbowl}[1]{%
+	\begin{tikzpicture}[baseline=(current bounding box.center)]
+		\draw[thin] (0,2.0) -- (0,0) -- (2.3,0);
+		\node[left] at (0,1.05) {\(\Ein\)};
+		\draw[gdcurve] plot[domain=0:2.25, samples=60]
+			(\x, {1.9*((\x - 1.1)/1.1)^2});
+		\draw[-{Stealth[length=1.6mm]}, thin] (1.1,0) -- (1.75,0);
+		\fill (1.1,0) circle (1.5pt);
+		\node[below] at (1.1,0) {#1};
+	\end{tikzpicture}}
+% \scoreunit{sign|id|theta}: the `linear scoring' diagram of a linear model ---
+% inputs x_0, ..., x_d weighted into one score s, then the model's own
+% transform of s (a step, the identity, or the logistic S) and out comes h(x).
+\newcommand{\scoreunit}[1]{%
+	\begin{tikzpicture}[font=\scriptsize, baseline=(current bounding box.center)]
+		\foreach \lab/\yy in {x_0/0.75, x_1/0.45, x_2/0.05, x_d/-0.75}{%
+			\node[left, inner sep=1pt] at (0,\yy) {\(\lab\)};
+			\draw[thin] (0,\yy) -- (1.05,0);}
+		\fill (1.0,0.15) -- (1.35,0) -- (1.0,-0.15) -- cycle;
+		\draw (1.35,0) -- (1.8,0) node[midway, above] {\(s\)};
+		\draw (2.1,0) circle (0.3);
+		\ifthenelse{\equal{#1}{sign}}{%
+			\draw[red, thick] (1.92,-0.13) -- (2.1,-0.13) -- (2.1,0.13)
+				-- (2.28,0.13);}{}%
+		\ifthenelse{\equal{#1}{id}}{%
+			\draw[red, thick] (1.93,-0.17) -- (2.27,0.17);}{}%
+		\ifthenelse{\equal{#1}{theta}}{%
+			\draw[red, thick] plot[domain=-0.19:0.19, samples=30]
+				({2.1 + \x}, {-0.15 + 0.3/(1 + exp(-30*\x))});}{}%
+		\draw[-{Stealth[length=1.6mm]}] (2.4,0) -- (2.8,0)
+			node[right, inner sep=1pt] {\(h(\bm{x})\)};
+	\end{tikzpicture}}
+
 % Algorithm Env
 \usepackage[linesnumbered,lined,vlined,ruled,commentsnumbered,resetcount,algochapter]{algorithm2e}
 \SetKwComment{Comment}{// }{}
@@ -590,3 +657,9 @@
 \apptocmd{\subappendices}{\toggletrue{inappendix}}{}{\errmessage{failed to patch}}
 
 \setcounter{tocdepth}{1}
+
+% Room for three-digit page numbers in the table of contents (the bold chapter
+% entries overflow the default width from page 100 on).
+\makeatletter
+\renewcommand*{\@pnumwidth}{2.2em}
+\makeatother
