@@ -365,10 +365,12 @@ Differentiating once more gives the constant Hessian \(\frac{2}{N}
 
 Task: find \(\bm{w}_{\mathrm{LIN}}\) such that \(\frac{2}{N} \left(
 \mathrm{X}^\top \mathrm{X} \bm{w} - \mathrm{X}^\top \bm{y} \right) = \nabla
-\Ein(\bm{w}) = \bm{0}\), i.e.\ solve the linear system \(\mathrm{X}^\top
-\mathrm{X} \bm{w} = \mathrm{X}^\top \bm{y}\) (the \vocab{normal equations}).
-Whether it is easy depends on the \((d+1) \times (d+1)\) matrix
-\(\mathrm{X}^\top \mathrm{X}\):
+\Ein(\bm{w}) = \bm{0}\), i.e.\ solve the linear system
+\begin{equation}\label{eq:normal-eq}
+    \mathrm{X}^\top \mathrm{X} \bm{w} = \mathrm{X}^\top \bm{y}
+\end{equation}
+(the \vocab{normal equations}). Whether it is easy depends on the \((d+1)
+\times (d+1)\) matrix \(\mathrm{X}^\top \mathrm{X}\):
 
 \begin{center}
     \begin{minipage}[t]{0.47\textwidth}
@@ -398,15 +400,76 @@ Whether it is easy depends on the \((d+1) \times (d+1)\) matrix
     \end{minipage}
 \end{center}
 
-\(\mathrm{X}^\top \mathrm{X}\) is invertible exactly when the \(d + 1\) columns
-of \(\mathrm{X}\) are linearly independent, which needs at least \(d + 1\)
-examples and holds for generic data once \(N \gg d + 1\). It fails, for
-instance, when one feature is a copy of another; then the weight can be split
-between the two copies in many ways, all giving the same predictions. The
-normal equations always have a solution (\(\mathrm{X}^\top \bm{y}\) lies in the
-column space of \(\mathrm{X}^\top\), which is that of \(\mathrm{X}^\top
-\mathrm{X}\)); the usual `other way' of defining \(\mathrm{X}^\dagger\), via the
-singular value decomposition, picks the solution of smallest norm.
+\begin{lemma}[When \(\mathrm{X}^\top \mathrm{X}\) is invertible]
+    \label{lem:xtx-invertible}
+    \(\ker(\mathrm{X}^\top \mathrm{X}) = \ker \mathrm{X}\), so
+    \(\mathrm{X}^\top \mathrm{X}\) is invertible iff \(\operatorname{rank}
+    \mathrm{X} = d + 1\); in particular this needs \(N \ge d + 1\). If the
+    \(\bm{x}_n\) are i.i.d.\ with \(\Sigma = \mathcal{E}[\bm{x} \bm{x}^\top]\)
+    finite and invertible, then \(\mathrm{X}^\top \mathrm{X}\) is invertible for
+    all large enough \(N\), with probability \(1\).
+\end{lemma}
+
+\begin{proof}
+    \(\mathrm{X}^\top \mathrm{X} \bm{v} = \bm{0}\) implies \(0 = \bm{v}^\top
+    \mathrm{X}^\top \mathrm{X} \bm{v} = \norm{\mathrm{X} \bm{v}}^2\), i.e.\
+    \(\mathrm{X} \bm{v} = \bm{0}\); the converse is clear. A square matrix is
+    invertible iff its kernel is \(\left\{ \bm{0} \right\}\), and by
+    rank--nullity \(\ker \mathrm{X} = \left\{ \bm{0} \right\}\) iff
+    \(\operatorname{rank} \mathrm{X} = d + 1\), which is impossible when
+    \(\operatorname{rank} \mathrm{X} \le N < d + 1\).
+
+    For large \(N\): by the strong law of large numbers, entrywise,
+    \[
+        \frac{1}{N} \mathrm{X}^\top \mathrm{X} = \frac{1}{N} \sum_{n=1}^N
+        \bm{x}_n \bm{x}_n^\top \longrightarrow \Sigma \quad \text{a.s.}
+    \]
+    The determinant is continuous, so \(\det \bigl( \frac{1}{N} \mathrm{X}^\top
+    \mathrm{X} \bigr) \to \det \Sigma \neq 0\), and it is nonzero for all large
+    \(N\).
+\end{proof}
+
+\(\Sigma\) fails to be invertible only if \(\bm{v}^\top \Sigma \bm{v} =
+\mathcal{E}[(\bm{x}^\top \bm{v})^2] = 0\) for some \(\bm{v} \neq \bm{0}\), i.e.\
+\(P(\bm{x})\) lives on a hyperplane --- the features are linearly dependent,
+such as \(x_2 = x_1\) for every input. That is the one case more data cannot
+fix.
+
+\begin{lemma}[The normal equations are always solvable]
+    \label{lem:normal-eq}
+    \eqref{eq:normal-eq} has a solution \(\bm{w}^*\) for every \(\bm{y}\), and
+    its solution set is \(\bm{w}^* + \ker \mathrm{X}\). Hence if
+    \(\mathrm{X}^\top \mathrm{X}\) is singular there are infinitely many
+    solutions, all with the same predictions \(\mathrm{X} \bm{w}^*\) and the
+    same \(\Ein\).
+\end{lemma}
+
+\begin{proof}
+    \emph{Existence.} Clearly \(\operatorname{range}(\mathrm{X}^\top
+    \mathrm{X}) \subseteq \operatorname{range}(\mathrm{X}^\top)\). By
+    rank--nullity, \autoref{lem:xtx-invertible} and row rank \(=\) column rank,
+    \[
+        \operatorname{rank}(\mathrm{X}^\top \mathrm{X}) = (d+1) - \dim \ker
+        \mathrm{X} = \operatorname{rank} \mathrm{X} = \operatorname{rank}
+        \mathrm{X}^\top ,
+    \]
+    so the two subspaces are equal and \(\mathrm{X}^\top \bm{y} \in
+    \operatorname{range}(\mathrm{X}^\top \mathrm{X})\).
+
+    \emph{Solution set.} Two solutions differ by an element of
+    \(\ker(\mathrm{X}^\top \mathrm{X}) = \ker \mathrm{X}\)
+    (\autoref{lem:xtx-invertible}), and adding \(\bm{v} \in \ker \mathrm{X}\)
+    changes neither \(\mathrm{X}^\top \mathrm{X} \bm{w}\) nor \(\mathrm{X}
+    \bm{w}\). If \(\mathrm{X}^\top \mathrm{X}\) is singular, \(\ker \mathrm{X}
+    \neq \left\{ \bm{0} \right\}\) has positive dimension.
+\end{proof}
+
+Geometrically, existence is the projection theorem: \(\bm{y} = \hat{\bm{y}} +
+\bm{r}\) with \(\hat{\bm{y}}\) in the column space of \(\mathrm{X}\) and
+\(\mathrm{X}^\top \bm{r} = \bm{0}\); writing \(\hat{\bm{y}} = \mathrm{X}
+\bm{w}^*\) gives \(\mathrm{X}^\top (\bm{y} - \mathrm{X} \bm{w}^*) = \bm{0}\).
+Among the solutions, the SVD-based \(\mathrm{X}^\dagger \bm{y}\) is the one in
+\((\ker \mathrm{X})^\perp\), which by Pythagoras has the smallest norm.
 
 \begin{moral}
     Practical suggestion: use well-implemented \(\dagger\) routine instead of
