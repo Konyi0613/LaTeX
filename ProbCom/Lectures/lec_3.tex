@@ -319,85 +319,108 @@ The Erd\H{o}s--Ko--Rado theorem says that for \(n \ge 2k\) a star is already opt
 
 \subsection{Katona's Cycle Method}
 
-The proof we give is Katona's, and it is a probabilistic argument of a shape we have not used yet. Rather than bounding \(\abs{\mathcal{F}}\) directly, we exhibit a random \(k\)-set \(A\) that is uniform on \(\binom{[n]}{k}\), so that \(\mathbb{P}(A \in \mathcal{F}) = \abs{\mathcal{F}} / \binom{n}{k}\), and then bound that same probability by \(\frac{k}{n}\) using a completely different description of \(A\). Comparing the two expressions gives the theorem.
-
-The second description arranges \([n]\) around a circle. Fix \(n\) positions \(1, 2, \ldots, n\) around a circle, and let a \vocab{cyclic permutation} \(\sigma\) of \([n]\) be a placement of the \(n\) elements at those positions, i.e.\ a bijection from positions to elements, with \(\sigma(i)\) the element at position \(i\). There are \(n!\) of them. The word \emph{cyclic} refers to the positions being read modulo \(n\), so that position \(n\) is followed by position \(1\). Call
+The proof is Katona's. We build a random \(k\)-set \(A\) that is uniform on \(\binom{[n]}{k}\), so that
 \[
-    I_i^\sigma = \{\sigma(i), \sigma(i+1), \ldots, \sigma(i+k-1)\}, \qquad i \in [n],
+    \mathbb{P}(A \in \mathcal{F}) = \frac{\abs{\mathcal{F}}}{\binom{n}{k}},
 \]
-with indices read modulo \(n\), the \vocab{intervals of length \(k\)} of \(\sigma\). There are exactly \(n\) of them, one per starting position, and most \(k\)-sets are not intervals of any given \(\sigma\).
+and then bound the same probability by \(\frac{k}{n}\) by first conditioning on a cyclic permutation \(\sigma\) of \([n]\), which arranges \([n]\) on a circle.
+
+\begin{definition}[Cyclic permutation]
+    A permutation \(\sigma\) of \([n]\) is \vocab{cyclic} if its cycle representation is a single \(n\)-cycle \((x_1 \; x_2 \; \cdots \; x_n)\), i.e.\ \(\sigma(x_j) = x_{j+1}\) with indices mod \(n\). Each of the \(n!\) orderings \((x_1, \ldots, x_n)\) of \([n]\) gives a cyclic permutation, and an \(n\)-cycle can be written in exactly \(n\) ways, one for each choice of starting element. So there are \(n!/n = (n-1)!\) cyclic permutations.
+\end{definition}
+
+Place \(x_1, \ldots, x_n\) around a circle in this order, so that \(\sigma\) moves every element one step clockwise. For \(x \in [n]\), the \vocab{interval of length \(k\)} of \(\sigma\) starting at \(x\) is
+\[
+    I_x^\sigma \coloneqq \{x, \sigma(x), \sigma^2(x), \ldots, \sigma^{k-1}(x)\},
+\]
+the set of \(k\) consecutive elements on the circle beginning at \(x\). For \(k < n\), \(x\) is the only element of \(I_x^\sigma\) whose predecessor \(\sigma^{-1}(x)\) is not in \(I_x^\sigma\). So distinct starting points give distinct intervals, and \(\sigma\) has exactly \(n\) of them.
 \begin{center}
-    \begin{tikzpicture}[thick, every node/.style={font=\small}]
-        \draw[gray!60] (0,0) circle (1.5);
+    \begin{tikzpicture}[thick, >={Stealth[length=5pt]}, every node/.style={font=\small}]
+        \draw[red!80!black, opacity=0.25, line width=9pt, line cap=round] (90:1.5) arc (90:0:1.5);
+        \foreach \i in {0,...,7}
+            \draw[->, gray] (90-45*\i-7:1.5) arc (90-45*\i-7:90-45*\i-38:1.5);
         \foreach \i in {0,...,7} \fill (90-45*\i:1.5) circle (2.2pt);
-        \draw[red!80!black, line width=1.8pt] (90:1.5) arc (90:0:1.5);
         \foreach \i in {0,1,2} \fill[red!80!black] (90-45*\i:1.5) circle (2.6pt);
-        \foreach \i/\lab in {0/1, 1/2, 2/3, 3/4, 4/5, 5/6, 6/7, 7/8}
-            \node at (90-45*\i:2.0) {$\sigma(\lab)$};
-        \node[red!80!black] at (45:2.75) {$I_1^\sigma$};
+        \foreach \i in {1,...,8} \node at (135-45*\i:1.95) {$x_{\i}$};
+        \node[gray] at (-22.5:1.1) {$\sigma$};
+        \node[red!80!black] at (45:2.65) {$I_{x_1}^\sigma$};
     \end{tikzpicture}
 \end{center}
 
-The point of intervals is that a circle has very little room for pairwise intersecting ones.
+A circle has very little room for pairwise intersecting intervals.
 
 \begin{lemma}[Katona]\label{lem:katona}
-    Let \(n \ge 2k\) and let \(\mathcal{F} \subseteq \binom{[n]}{k}\) be intersecting. Then for any cyclic permutation \(\sigma\) of \([n]\), at most \(k\) of the \(n\) intervals of length \(k\) of \(\sigma\) belong to \(\mathcal{F}\).
+    Let \(n \ge 2k\) and let \(\mathcal{F} \subseteq \binom{[n]}{k}\) be intersecting. Then for every cyclic permutation \(\sigma\) of \([n]\), at most \(k\) of the \(n\) intervals \(I_x^\sigma\) belong to \(\mathcal{F}\).
 \end{lemma}
 
 \begin{proof}
-    Fix \(\sigma\). If no interval lies in \(\mathcal{F}\) we are done, so fix an interval \(F \in \mathcal{F}\); after rotating the labels we may assume \(F = \{\sigma(1), \ldots, \sigma(k)\}\).
+    If no interval of \(\sigma\) lies in \(\mathcal{F}\) there is nothing to prove, so fix one, \(F \in \mathcal{F}\). Write \(\sigma = (x_1 \; x_2 \; \cdots \; x_n)\) starting at the first element of \(F\), so that \(F = \{x_1, \ldots, x_k\}\) and, with indices mod \(n\), \(I_{x_j}^\sigma = \{x_j, \ldots, x_{j+k-1}\}\).
 
-    First we count the other intervals meeting \(F\). An interval other than \(F\) meets \(F\) exactly when it starts at one of \(\sigma(2), \ldots, \sigma(k)\), or ends at one of \(\sigma(1), \ldots, \sigma(k-1)\). Since \(n \ge 2k\), these \((k-1) + (k-1) = 2k-2\) intervals are distinct and none of them is \(F\).
-
-    Now pair them up. For each \(i\) with \(1 \le i \le k-1\), pair
+    Every interval of \(\mathcal{F}\) other than \(F\) meets \(F\), and an interval \(I_{x_j}^\sigma\) meets \(F\) iff \(j \in \{2-k, \ldots, k\}\). Excluding \(j = 1\) (that is \(F\)), these are the \(2k-2\) intervals that
+    \begin{itemize}
+        \item start at \(x_{i+1}\) for some \(1 \le i \le k-1\), or
+        \item end at \(x_i\) for some \(1 \le i \le k-1\) (i.e.\ start at \(x_{i-k+1}\)).
+    \end{itemize}
+    They are distinct because their starting indices \(2-k, \ldots, 0, 2, \ldots, k\) lie in a window of \(2k-1 \le n\) consecutive integers. For each \(1 \le i \le k-1\), pair
     \[
-        \underbrace{\{\sigma(i-k+1), \ldots, \sigma(i)\}}_{\text{the interval ending at } \sigma(i)}
+        \underbrace{\{x_{i-k+1}, \ldots, x_i\}}_{\text{ends at } x_i}
         \quad \text{with} \quad
-        \underbrace{\{\sigma(i+1), \ldots, \sigma(i+k)\}}_{\text{the interval starting at } \sigma(i+1)}.
+        \underbrace{\{x_{i+1}, \ldots, x_{i+k}\}}_{\text{starts at } x_{i+1}}.
     \]
+    These two intervals occupy the \(2k\) consecutive indices \(i-k+1, \ldots, i+k\), which are distinct mod \(n\) since \(n \ge 2k\), so the two intervals are \emph{disjoint}.
     \begin{center}
         \begin{tikzpicture}[thick, every node/.style={font=\small}]
             \draw[gray!60] (0,0) circle (2);
             \foreach \i in {0,...,9} \fill (90-36*\i:2) circle (2.2pt);
             \draw[red!80!black, line width=2pt] (90:2) arc (90:-18:2);
             \node[red!80!black] at (36:2.45) {$F$};
+            \node at (90:1.6) {$x_1$};
             \draw[blue!70!black, line width=1.6pt] (162:2.35) arc (162:54:2.35);
             \node[blue!70!black] at (108:2.72) {$I$};
             \fill[blue!70!black] (54:2) circle (2.8pt);
+            \node[blue!70!black] at (54:1.6) {$x_i$};
             \draw[green!45!black, line width=1.6pt] (18:2.35) arc (18:-90:2.35);
             \node[green!45!black] at (-36:2.72) {$I'$};
             \fill[green!45!black] (18:2) circle (2.8pt);
+            \node[green!45!black] at (18:1.5) {$x_{i+1}$};
             \node[anchor=west, align=left] at (3.3,0.35)
-                {\(I\) ends at the blue vertex \(\sigma(i)\),\\\(I'\) starts at the green vertex \(\sigma(i+1)\);\\together they span \(2k \le n\) positions,\\so \(I \cap I' = \emptyset\).};
+                {\(I\) ends at \(x_i\), \(I'\) starts at \(x_{i+1}\);\\together they cover \(2k \le n\)\\consecutive elements, so \(I \cap I' = \emptyset\).};
         \end{tikzpicture}
     \end{center}
-    These two intervals occupy \(2k\) consecutive positions of the circle, and \(n \ge 2k\), so they are \emph{disjoint}. Every one of the \(2k-2\) intervals meeting \(F\) occurs in exactly one such pair, so they split into \(k-1\) disjoint pairs.
-
-    Since \(\mathcal{F}\) is intersecting it contains at most one interval from each disjoint pair, and every interval of \(\mathcal{F}\) other than \(F\) must meet \(F\). Hence \(\mathcal{F}\) contains at most \((k-1) + 1 = k\) intervals of \(\sigma\).
+    As \(i\) runs over \(1, \ldots, k-1\), every one of the \(2k-2\) intervals meeting \(F\) appears in exactly one pair, so they split into \(k-1\) disjoint pairs. An intersecting family contains at most one interval of each pair, so \(\mathcal{F}\) contains at most \((k-1) + 1 = k\) intervals of \(\sigma\), counting \(F\).
 \end{proof}
 
 \begin{proof}[Proof of \autoref{thm:ekr}]
-    Define a random \(k\)-set \(A \in \binom{[n]}{k}\) as follows.
+    Let \(n \ge 2k\) and let \(\mathcal{F} \subseteq \binom{[n]}{k}\) be an intersecting family; we show \(\abs{\mathcal{F}} \le \binom{n-1}{k-1}\) by computing \(\mathbb{P}(A \in \mathcal{F})\) in two ways for the following random \(k\)-set \(A\), which does not depend on \(\mathcal{F}\).
     \begin{enumerate}[(1)]
         \item Choose a uniformly random cyclic permutation \(\sigma\) of \([n]\).
-        \item Choose \(i \in [n]\) uniformly at random, independently of \(\sigma\), and set \(A = I_i^\sigma = \{\sigma(i), \sigma(i+1), \ldots, \sigma(i+k-1)\}\).
+        \item Choose \(x \in [n]\) uniformly at random, independently of \(\sigma\), and set
+        \[
+            A = I_x^\sigma = \{x, \sigma(x), \ldots, \sigma^{k-1}(x)\}.
+        \]
     \end{enumerate}
-    We first check that \(A\) is uniform on \(\binom{[n]}{k}\). Fix \(S \in \binom{[n]}{k}\) and count the pairs \((\sigma, i)\) with \(I_i^\sigma = S\): the start \(i\) is any of the \(n\) positions, and \(\sigma\) must then place \(S\) at the positions \(i, \ldots, i+k-1\) and \([n] \setminus S\) at the rest, in \(k! \, (n-k)!\) ways. So \(n \cdot k! \, (n-k)!\) pairs produce \(S\), a count not depending on \(S\), and as \((\sigma, i)\) is uniform among all \(n \cdot n!\) pairs,
+    \emph{\(A\) is uniform on \(\binom{[n]}{k}\).} Fix \(S \in \binom{[n]}{k}\) and count the pairs \((\sigma, x)\) with \(I_x^\sigma = S\). Writing \(\sigma\) as a cycle that starts at \(x\), the condition says that the cycle lists
+    \begin{itemize}
+        \item first \(x \in S\), in \(k\) ways;
+        \item then the other \(k-1\) elements of \(S\) in some order, in \((k-1)!\) ways;
+        \item then the \(n-k\) elements of \([n] \setminus S\) in some order, in \((n-k)!\) ways.
+    \end{itemize}
+    A cycle written from a given starting element is unique, so these choices give distinct pairs, \(k \cdot (k-1)! \, (n-k)! = k! \, (n-k)!\) in total. As \((\sigma, x)\) is uniform among all \((n-1)! \cdot n = n!\) pairs,
     \[
-        \mathbb{P}(A = S) = \frac{n \cdot k! \, (n-k)!}{n \cdot n!} = \frac{1}{\binom{n}{k}} \quad \text{for every } S.
+        \mathbb{P}(A = S) = \frac{k! \, (n-k)!}{n!} = \frac{1}{\binom{n}{k}} \quad \text{for every } S,
     \]
-    Therefore
+    and therefore
     \begin{equation}\tag{1}\label{eq:ekr-one}
-        \mathbb{P}(A \in \mathcal{F}) = \frac{\abs{\mathcal{F}}}{\bigl\lvert \binom{[n]}{k} \bigr\rvert} = \frac{\abs{\mathcal{F}}}{\binom{n}{k}}.
+        \mathbb{P}(A \in \mathcal{F}) = \frac{\abs{\mathcal{F}}}{\binom{n}{k}}.
     \end{equation}
-    On the other hand, condition on \(\sigma\). As \(i\) was chosen independently of \(\sigma\), it is still uniform on \([n]\), so \(A\) is one of the \(n\) intervals of \(\sigma\), each with probability \(\frac{1}{n}\), and
+    \emph{Conditioning on \(\sigma\).} Given \(\sigma\), \(x\) is still uniform on \([n]\), and distinct \(x\) give distinct intervals, so \(A\) is a uniformly random one of the \(n\) intervals of length \(k\) of \(\sigma\), and
     \[
-        \mathbb{P}(A \in \mathcal{F} \mid \sigma) = \frac{\#\{ i \in [n] : I_i^\sigma \in \mathcal{F} \}}{n} \le \frac{k}{n}
-        \quad \text{for \emph{every} } \sigma.
+        \mathbb{P}(A \in \mathcal{F} \mid \sigma) = \frac{\#\{\text{intervals of length } k \text{ of } \sigma \text{ in } \mathcal{F}\}}{\#\{\text{intervals of length } k \text{ of } \sigma\}} = \frac{\#\{x \in [n] : I_x^\sigma \in \mathcal{F}\}}{n} \le \frac{k}{n}
+        \quad \text{for \emph{every} } \sigma
     \]
-    The inequality is \autoref{lem:katona}: since \(k < n\), distinct starts give distinct intervals, so the numerator counts the intervals of \(\sigma\) lying in \(\mathcal{F}\). Averaging over \(\sigma\),
+    by \autoref{lem:katona}. Averaging over \(\sigma\),
     \begin{equation}\tag{2}\label{eq:ekr-two}
-        \mathbb{P}(A \in \mathcal{F}) = \sum_{\sigma} \mathbb{P}(\sigma) \, \underbrace{\mathbb{P}(A \in \mathcal{F} \mid \sigma)}_{\le \, k/n} \le \frac{k}{n} \sum_{\sigma} \mathbb{P}(\sigma) = \frac{k}{n}.
+        \mathbb{P}(A \in \mathcal{F}) = \sum_{\sigma} \mathbb{P}(\sigma) \, \mathbb{P}(A \in \mathcal{F} \mid \sigma) \le \frac{k}{n}.
     \end{equation}
     Comparing \eqref{eq:ekr-one} and \eqref{eq:ekr-two},
     \[
