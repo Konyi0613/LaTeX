@@ -99,9 +99,9 @@ A remark on the bookkeeping before we start: the two defects are counted by two 
     \[
         \mathbb{E}[X_s] = \sum_{C \in \mathcal{E}_s} \mathbb{P}\bigl( C \subseteq G(n,p) \bigr) \le \frac{n^{s}}{2s} \, p^{s} = \frac{(np)^{s}}{2s}.
     \]
-    Summing over \(s\) and using that \(np \ge 1\) makes \((np)^{s}\) largest at \(s = \ell - 1\),
+    Since \(np \ge 1\), the map \(s \mapsto (np)^{s}\) is non-decreasing, so every \(3 \le s \le \ell - 1\) has \((np)^{s} \le (np)^{\ell-1}\) and \(2s \ge 6\); there are \(\ell - 3\) such \(s\). Summing over \(s\),
     \[
-        \mathbb{E}[X] = \sum_{s=3}^{\ell-1} \mathbb{E}[X_s] \le \sum_{s=3}^{\ell-1} \frac{(np)^{s}}{2s} \le \ell \, (np)^{\ell-1}. \qedhere
+        \mathbb{E}[X] = \sum_{s=3}^{\ell-1} \mathbb{E}[X_s] \le \sum_{s=3}^{\ell-1} \frac{(np)^{s}}{2s} \le (\ell - 3) \cdot \frac{(np)^{\ell-1}}{6} \le \ell \, (np)^{\ell-1}. \qedhere
     \]
 \end{proof}
 
@@ -210,7 +210,11 @@ For \(\mathbb{E}[Y]\) to be \(o(1)\) we need the exponent to beat \(n \log 2\), 
 
 \begin{remark}\hfill
     \begin{enumerate}[(1)]
-        \item The case \(\ell = 4\) already says something striking: there are triangle-free graphs of arbitrarily large chromatic number, so \(\chi\) cannot be bounded by any function of \(\omega\).
+        \item The case \(\ell = 4\) already says something striking: \(\chi\) cannot be bounded by any function of \(\omega\), i.e.\ there is no \(f \colon \mathbb{N} \to \mathbb{N}\) with \(\chi(G) \le f(\omega(G))\) for all \(G\). Indeed, for each \(k\) \autoref{thm:erdos-girth} with \(\ell = 4\) gives a \(G_k\) with \(g(G_k) \ge 4\); as \(K_3\) is a \(3\)-cycle, \(G_k\) is triangle-free, so \(\omega(G_k) \le 2\), while \(\chi(G_k) \ge k\). Such an \(f\) would force
+            \[
+                k \le \chi(G_k) \le f(\omega(G_k)) \le \max\{ f(1), f(2) \} \quad\text{for every } k,
+            \]
+            which is absurd. So the lower bound \(\chi \ge \omega\) of \autoref{prop:chromatic-bounds} has no converse: a graph can need many colors with no large clique to blame.
         \item Nothing in the proof identifies a graph; it is one of the first results for which the probabilistic argument came long before any construction. Explicit constructions of graphs with large girth and large chromatic number do exist --- Lov\'asz gave one in 1968 --- but they are considerably harder than the argument above.
         \item The choice \(\theta = \frac{1}{2(\ell-1)}\) was for definiteness only; any \(\theta \in \bigl( 0, \frac{1}{\ell-1} \bigr)\) works, and pushing \(\theta\) towards the upper end is what the lecture's choice \(p \approx n^{-\frac{\ell-2}{\ell-1}}\) does. Nothing is gained in the statement, since \(k\) and \(\ell\) are fixed constants and \(n\) is free.
         \item The two defects were deleted against a single budget \(\frac{n}{2}\). This is why we needed \(\mathbb{E}[X] = o(n)\) rather than merely \(\mathbb{E}[X] < 1\): the first moment principle is applied once, to \(X + Y\), and produces one graph in which both counts are small at the same time.

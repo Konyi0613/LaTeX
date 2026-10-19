@@ -331,9 +331,9 @@ and then bound the same probability by \(\frac{k}{n}\) by first conditioning on 
 
 Place \(x_1, \ldots, x_n\) around a circle in this order, so that \(\sigma\) moves every element one step clockwise. For \(x \in [n]\), the \vocab{interval of length \(k\)} of \(\sigma\) starting at \(x\) is
 \[
-    I_x^\sigma \coloneqq \{x, \sigma(x), \sigma^2(x), \ldots, \sigma^{k-1}(x)\},
+    I_{x,k}^\sigma \coloneqq \{x, \sigma(x), \sigma^2(x), \ldots, \sigma^{k-1}(x)\},
 \]
-the set of \(k\) consecutive elements on the circle beginning at \(x\). For \(k < n\), \(x\) is the only element of \(I_x^\sigma\) whose predecessor \(\sigma^{-1}(x)\) is not in \(I_x^\sigma\). So distinct starting points give distinct intervals, and \(\sigma\) has exactly \(n\) of them.
+the set of \(k\) consecutive elements on the circle beginning at \(x\). For \(k < n\), \(x\) is the only element of \(I_{x,k}^\sigma\) whose predecessor \(\sigma^{-1}(x)\) is not in \(I_{x,k}^\sigma\). So distinct starting points give distinct intervals, and \(\sigma\) has exactly \(n\) of them.
 \begin{center}
     \begin{tikzpicture}[thick, >={Stealth[length=5pt]}, every node/.style={font=\small}]
         \draw[red!80!black, opacity=0.25, line width=9pt, line cap=round] (90:1.5) arc (90:0:1.5);
@@ -343,20 +343,20 @@ the set of \(k\) consecutive elements on the circle beginning at \(x\). For \(k 
         \foreach \i in {0,1,2} \fill[red!80!black] (90-45*\i:1.5) circle (2.6pt);
         \foreach \i in {1,...,8} \node at (135-45*\i:1.95) {$x_{\i}$};
         \node[gray] at (-22.5:1.1) {$\sigma$};
-        \node[red!80!black] at (45:2.65) {$I_{x_1}^\sigma$};
+        \node[red!80!black] at (45:2.65) {$I_{x_1,k}^\sigma$};
     \end{tikzpicture}
 \end{center}
 
 A circle has very little room for pairwise intersecting intervals.
 
 \begin{lemma}[Katona]\label{lem:katona}
-    Let \(n \ge 2k\) and let \(\mathcal{F} \subseteq \binom{[n]}{k}\) be intersecting. Then for every cyclic permutation \(\sigma\) of \([n]\), at most \(k\) of the \(n\) intervals \(I_x^\sigma\) belong to \(\mathcal{F}\).
+    Let \(n \ge 2k\) and let \(\mathcal{F} \subseteq \binom{[n]}{k}\) be intersecting. Then for every cyclic permutation \(\sigma\) of \([n]\), at most \(k\) of the \(n\) intervals \(I_{x,k}^\sigma\) belong to \(\mathcal{F}\).
 \end{lemma}
 
 \begin{proof}
-    If no interval of \(\sigma\) lies in \(\mathcal{F}\) there is nothing to prove, so fix one, \(F \in \mathcal{F}\). Write \(\sigma = (x_1 \; x_2 \; \cdots \; x_n)\) starting at the first element of \(F\), so that \(F = \{x_1, \ldots, x_k\}\) and, with indices mod \(n\), \(I_{x_j}^\sigma = \{x_j, \ldots, x_{j+k-1}\}\).
+    If no interval of \(\sigma\) lies in \(\mathcal{F}\) there is nothing to prove, so fix one, \(F \in \mathcal{F}\). Write \(\sigma = (x_1 \; x_2 \; \cdots \; x_n)\) starting at the first element of \(F\), so that \(F = \{x_1, \ldots, x_k\}\) and, with indices mod \(n\), \(I_{x_j,k}^\sigma = \{x_j, \ldots, x_{j+k-1}\}\).
 
-    Every interval of \(\mathcal{F}\) other than \(F\) meets \(F\), and an interval \(I_{x_j}^\sigma\) meets \(F\) iff \(j \in \{2-k, \ldots, k\}\). Excluding \(j = 1\) (that is \(F\)), these are the \(2k-2\) intervals that
+    Every interval of \(\mathcal{F}\) other than \(F\) meets \(F\), and an interval \(I_{x_j,k}^\sigma\) meets \(F\) iff \(j \in \{2-k, \ldots, k\}\). Excluding \(j = 1\) (that is \(F\)), these are the \(2k-2\) intervals that
     \begin{itemize}
         \item start at \(x_{i+1}\) for some \(1 \le i \le k-1\), or
         \item end at \(x_i\) for some \(1 \le i \le k-1\) (i.e.\ start at \(x_{i-k+1}\)).
@@ -396,10 +396,10 @@ A circle has very little room for pairwise intersecting intervals.
         \item Choose a uniformly random cyclic permutation \(\sigma\) of \([n]\).
         \item Choose \(x \in [n]\) uniformly at random, independently of \(\sigma\), and set
         \[
-            A = I_x^\sigma = \{x, \sigma(x), \ldots, \sigma^{k-1}(x)\}.
+            A = I_{x,k}^\sigma = \{x, \sigma(x), \ldots, \sigma^{k-1}(x)\}.
         \]
     \end{enumerate}
-    \emph{\(A\) is uniform on \(\binom{[n]}{k}\).} Fix \(S \in \binom{[n]}{k}\) and count the pairs \((\sigma, x)\) with \(I_x^\sigma = S\). Writing \(\sigma\) as a cycle that starts at \(x\), the condition says that the cycle lists
+    \emph{\(A\) is uniform on \(\binom{[n]}{k}\).} Fix \(S \in \binom{[n]}{k}\) and count the pairs \((\sigma, x)\) with \(I_{x,k}^\sigma = S\). Writing \(\sigma\) as a cycle that starts at \(x\), the condition says that the cycle lists
     \begin{itemize}
         \item first \(x \in S\), in \(k\) ways;
         \item then the other \(k-1\) elements of \(S\) in some order, in \((k-1)!\) ways;
@@ -415,7 +415,7 @@ A circle has very little room for pairwise intersecting intervals.
     \end{equation}
     \emph{Conditioning on \(\sigma\).} Given \(\sigma\), \(x\) is still uniform on \([n]\), and distinct \(x\) give distinct intervals, so \(A\) is a uniformly random one of the \(n\) intervals of length \(k\) of \(\sigma\), and
     \[
-        \mathbb{P}(A \in \mathcal{F} \mid \sigma) = \frac{\#\{\text{intervals of length } k \text{ of } \sigma \text{ in } \mathcal{F}\}}{\#\{\text{intervals of length } k \text{ of } \sigma\}} = \frac{\#\{x \in [n] : I_x^\sigma \in \mathcal{F}\}}{n} \le \frac{k}{n}
+        \mathbb{P}(A \in \mathcal{F} \mid \sigma) = \frac{\#\{\text{intervals of length } k \text{ of } \sigma \text{ in } \mathcal{F}\}}{\#\{\text{intervals of length } k \text{ of } \sigma\}} = \frac{\#\{x \in [n] : I_{x,k}^\sigma \in \mathcal{F}\}}{n} \le \frac{k}{n}
         \quad \text{for \emph{every} } \sigma
     \]
     by \autoref{lem:katona}. Averaging over \(\sigma\),
@@ -506,7 +506,7 @@ So each \(B_i\) is a set that \(A_i\) avoids but that every other \(A_j\) hits: 
         \[
             x \in A_i \cap B_j \qquad \text{and} \qquad y \in A_j \cap B_i.
         \]
-        Since \(E_i\) occurs and \(x \in A_i\), \(y \in B_i\), the element \(x\) comes before \(y\). Since \(E_j\) occurs and \(y \in A_j\), \(x \in B_j\), the element \(y\) comes before \(x\). This is a contradiction.
+        These are distinct elements: \(x \in A_i\) and \(y \in B_i\), while \(A_i \cap B_i = \emptyset\) by condition (1) of \autoref{def:set-pair}, so \(x \ne y\), and it makes sense to ask which comes first. Since \(E_i\) occurs and \(x \in A_i\), \(y \in B_i\), the element \(x\) comes before \(y\). Since \(E_j\) occurs and \(y \in A_j\), \(x \in B_j\), the element \(y\) comes before \(x\). This is a contradiction.
         \begin{center}
             \begin{tikzpicture}[thick, >={Stealth[length=6pt]}, every node/.style={font=\small}]
                 \draw[-{Stealth}] (0,0) -- (6.4,0) node[right] {order};
@@ -604,7 +604,7 @@ So the greedy algorithm computes a \emph{maximal} \(H\)-free graph rather than a
 \end{definition}
 
 \begin{remark}[Why the minimum]
-    The maximum gives nothing new: it is the Tur\'an number \(\ex(n,H)\) of \autoref{q:turan} again. An \(H\)-saturated graph is \(H\)-free, so has at most \(\ex(n,H)\) edges; conversely an \(H\)-free graph with \(\ex(n,H)\) edges is saturated, as adding any edge leaves too many for an \(H\)-free graph. So \(\sat(n,H) \le e(G) \le \ex(n,H)\), with both ends attained.
+    The maximum gives nothing new: it is the Tur\'an number \(\ex(n,H)\) of \autoref{q:turan} again. An \(H\)-saturated graph is \(H\)-free, so has at most \(\ex(n,H)\) edges; conversely an \(H\)-free graph with \(\ex(n,H)\) edges is saturated, as adding any edge leaves too many for an \(H\)-free graph. So every \(n\)-vertex \(H\)-saturated graph \(G\) satisfies \(\sat(n,H) \le e(G) \le \ex(n,H)\), with both ends attained.
 \end{remark}
 
 \begin{notation}[Subscripted \(O\)]\label{not:O-subscript}
@@ -644,13 +644,16 @@ Here \(\sat(n, K_k) = (k-2)n - \binom{k-1}{2} \le (k-2) n\), so \(C_k = k-2\) wo
     \[
         \binom{k-2}{2} + (k-2)(n-k+2) = \binom{n}{2} - \binom{n-k+2}{2},
     \]
-    so \(\sat(n, K_k)\) is at most the claimed value.
+    so
+    \[
+        \sat(n, K_k) \le \binom{n}{2} - \binom{n-k+2}{2}.
+    \]
 \end{remark}
 
 It remains to prove the matching lower bound, and this is where set pairs enter: the missing edges of a saturated graph, together with the cliques they complete, form a set-pair system.
 
 \begin{proof}[Proof of the lower bound in \autoref{thm:sat}]
-    Let \(G\) be a smallest \(K_k\)-saturated graph on \(n\) vertices, and let \(e_1, e_2, \ldots, e_m\) be its missing edges, so that
+    Let \(G\) be any \(K_k\)-saturated graph on \(n\) vertices, and let \(e_1, e_2, \ldots, e_m\) be its missing edges, so that
     \[
         m = \binom{n}{2} - e(G).
     \]
@@ -677,7 +680,12 @@ It remains to prove the matching lower bound, and this is where set pairs enter:
     Thus \(\{(A_i, B_i) : 1 \le i \le m\}\) is a set-pair system with \(\abs{A_i} = 2\) and \(\abs{B_i} = n - k\) for all \(i\), and \autoref{thm:bollobas} gives
     \[
         m \le \binom{2 + (n - k)}{2} = \binom{n-k+2}{2}
-        \implies e(G) = \binom{n}{2} - m \ge \binom{n}{2} - \binom{n-k+2}{2}. \qedhere
+        \implies e(G) = \binom{n}{2} - m \ge \binom{n}{2} - \binom{n-k+2}{2}.
+    \]
+    As \(G\) was an arbitrary \(n\)-vertex \(K_k\)-saturated graph, combining this with the upper bound of \autoref{rmk:sat-sharp},
+    \[
+        \binom{n}{2} - \binom{n-k+2}{2} \le \sat(n, K_k) \le \binom{n}{2} - \binom{n-k+2}{2}
+        \implies \sat(n, K_k) = \binom{n}{2} - \binom{n-k+2}{2}. \qedhere
     \]
 \end{proof}
 

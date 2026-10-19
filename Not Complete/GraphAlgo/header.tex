@@ -302,6 +302,26 @@
 	\marginpar{\footnotesize\textsf{\raggedright #1 #2 #3 #5}}
 }
 
+% KOMA-Script >= 3.31 makes a starred heading (\section*, \subsection*, ...)
+% reset every counter numbered within it. Here unnumbered headings -- \lecture
+% and in-text \section* -- sit in the middle of a numbered section, so the
+% counters are saved when the starred branch starts and restored right after
+% KOMA's reset, at the beginning of the heading's group. (KOMA calls each hook
+% with one trailing argument, hence the \@gobble.)
+\def\@starhead@restore{}
+\def\@starhead@save#1{%
+	\xdef\@starhead@restore{\unexpanded\expandafter{\@starhead@restore}\noexpand\setcounter{#1}{\the\value{#1}}}%
+	\begingroup\let\@elt\@starhead@save\csname cl@#1\endcsname\endgroup
+}
+\def\@starhead@keepcounters#1{%
+	\AddtoDoHook{heading/branch/star/#1}{%
+		\gdef\@starhead@restore{}\@starhead@save{#1}\@gobble}%
+	\AddtoDoHook{heading/begingroup/#1}{%
+		\@starhead@restore\global\let\@starhead@restore\@empty\@gobble}%
+}
+\@starhead@keepcounters{section}
+\@starhead@keepcounters{subsection}
+\@starhead@keepcounters{subsubsection}
 \def\@lecture{}%
 \newcommand{\lecture}[3]{
 	\ifthenelse{\isempty{#3}}{%

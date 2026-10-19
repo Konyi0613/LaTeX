@@ -76,6 +76,64 @@ label:
     classification \(\err\).
 \end{moral}
 
+\begin{proposition}[Ideal mini-target of binary classification]
+    \label{prop:binary-mini-target}
+    Let \(\mathcal{Y} = \{-1, +1\}\), \(\err(\tilde{y}, y) = \llbracket
+    \tilde{y} \neq y \rrbracket\), fix \(\bm{x}\) and write \(p = P(+1 \mid
+    \bm{x})\). The minimisers in \autoref{def:mini-target}, over all
+    \(\tilde{y} \in \mathbb{R}\), are
+    \[
+        \argmin_{\tilde{y}} \mathop{\mathcal{E}}_{y \sim P(y \mid \bm{x})}
+        \llbracket \tilde{y} \neq y \rrbracket
+        = \begin{cases}
+            \{+1\}, & p > \frac{1}{2},\\
+            \{-1\}, & p < \frac{1}{2},\\
+            \{-1, +1\}, & p = \frac{1}{2},
+        \end{cases}
+    \]
+    so \(f(\bm{x}) = \sign \bigl( p - \frac{1}{2} \bigr)\) is an ideal
+    mini-target, with either label allowed when \(p = \frac{1}{2}\).
+\end{proposition}
+
+\begin{proof}
+    Write \(R(\tilde{y})\) for the expected error at the fixed \(\bm{x}\).
+    The expectation of an indicator is the probability of its event, and here
+    \(y\) is drawn from \(P(y \mid \bm{x})\), so, as in part (1) of
+    \autoref{prop:mini-target},
+    \[
+        R(\tilde{y})
+        = \mathop{\mathcal{E}}_{y \sim P(y \mid \bm{x})}
+        \llbracket \tilde{y} \neq y \rrbracket
+        = \mathbb{P}[y \neq \tilde{y} \mid \bm{x}]
+        = 1 - P(y = \tilde{y} \mid \bm{x}) .
+    \]
+    Since \(y\) takes only the values \(\pm 1\), with \(P(-1 \mid \bm{x}) = 1
+    - p\),
+    \[
+        R(+1) = 1 - p, \qquad R(-1) = p, \qquad R(\tilde{y}) = 1 \text{ for }
+        \tilde{y} \notin \{-1, +1\} .
+    \]
+    \emph{Values outside \(\mathcal{Y}\) never minimise:} \(\min \{R(+1),
+    R(-1)\} = \min\{p, 1 - p\} \le \frac{1}{2} < 1\), so the minimum over
+    \(\mathbb{R}\) is attained only within \(\{-1, +1\}\).
+
+    \emph{Comparing the two labels:}
+    \[
+        R(-1) - R(+1) = p - (1 - p) = 2 \left( p - \tfrac{1}{2} \right) .
+    \]
+    If \(p > \frac{1}{2}\) this is positive, so \(+1\) is the unique
+    minimiser; if \(p < \frac{1}{2}\) it is negative and \(-1\) is; if \(p =
+    \frac{1}{2}\) it is zero and both are. In the first two cases the
+    minimiser is \(\sign(p - \frac{1}{2})\), and in the third any value of
+    \(\sign(0)\) in \(\{-1, +1\}\) is a minimiser.
+\end{proof}
+
+So \(\sign(p - \frac{1}{2})\) is literally the sign of \(R(-1) - R(+1)\): it
+picks whichever label is cheaper. The threshold is \(\frac{1}{2}\) because 0/1
+error charges both kinds of mistake the same; the error still left at the
+optimum, \(\min\{p, 1 - p\}\), is the noise no hypothesis can remove at
+\(\bm{x}\).
+
 \subsection{Heart Attack Prediction Problem (2/2)}
 
 Same flow, same patient, a different question:
@@ -141,6 +199,19 @@ actually get carry one label drawn from each:
         \end{tabular}
     \end{adjustbox}
 \end{center}
+
+\begin{note}
+    Each actual label is \emph{one draw} from the distribution at its input:
+    \(y_n = +1\) with probability \(P(+1 \mid \bm{x}_n)\) and \(y_n = -1\)
+    with probability \(1 - P(+1 \mid \bm{x}_n)\), independently across \(n\).
+    The draw usually lands on the likelier side --- \(y_1 = \dmark{o}\) at
+    \(P(+1 \mid \bm{x}_1) = 0.9\), \(y_2 = \dmark{x}\) at \(P(+1 \mid
+    \bm{x}_2) = 0.2\) --- but not always: \(y_N = \dmark{x}\) although \(P(+1
+    \mid \bm{x}_N) = 0.6\). Such a draw on the less likely side is the
+    \emph{noise}; it disagrees with the ideal mini-target \(\sign \bigl( P(+1
+    \mid \bm{x}_N) - \frac{1}{2} \bigr) = +1\) of
+    \autoref{prop:binary-mini-target}, yet it is a perfectly legitimate sample.
+\end{note}
 
 The last column rewrites each noisy label as a number, \(1\) if the draw came
 out \(\dmark{o}\) and \(0\) otherwise: a noisy version of the ideal \(y'_n\),
@@ -326,6 +397,23 @@ independently, so:
 The right column is the same computation with \(h\) pretending to be \(f\); a
 probability of observed data, viewed as a function of the hypothesis, is
 called its \vocab{likelihood}.
+
+\begin{note}
+    In symbols: read \(h\) as a conditional distribution \(P_h(y \mid \bm{x})\),
+    with \(P_h(+1 \mid \bm{x}) = h(\bm{x})\) and \(P_h(-1 \mid \bm{x}) = 1 -
+    h(\bm{x})\), exactly as \(f\) is read in the display above. Then
+    \[
+        \text{likelihood}(h) = \prod_{n=1}^N P(\bm{x}_n) \, P_h(y_n \mid
+        \bm{x}_n) ,
+    \]
+    the probability that the process above --- \(\bm{x}_n \sim P(\bm{x})\),
+    then \(y_n \sim P_h(y \mid \bm{x}_n)\) instead of \(P(y \mid \bm{x}_n)\)
+    --- produces exactly the observed \(\mathcal{D}\); the product comes from
+    the independence of the \(N\) examples. Only the label part is swapped: the
+    inputs still come from the true \(P(\bm{x})\), which is why those factors
+    are common to every \(h\). And it is a function \emph{of \(h\)} with
+    \(\mathcal{D}\) held fixed, not a probability distribution over \(h\).
+\end{note}
 
 \begin{itemize}
     \item if \(h \approx f\), then likelihood(\(h\)) \(\approx\) probability
@@ -727,7 +815,55 @@ A greedy approach for some given \(\eta > 0\):
 
 The approximation is the first-order Taylor expansion of \(\Ein\) at
 \(\bm{w}_t\); its error is \(O(\eta^2)\), negligible against the linear term
-when \(\eta\) is small and \(\nabla \Ein(\bm{w}_t) \neq \bm{0}\).
+when \(\eta\) is small and \(\nabla \Ein(\bm{w}_t) \neq \bm{0}\). The
+multivariate expansion is just the one-variable one, taken along the line
+through \(\bm{w}_t\) in direction \(\bm{v}\).
+
+\begin{lemma}[First-order expansion along a direction]\label{lem:taylor-dir}
+    Let \(\Ein\) be twice continuously differentiable, \(\norm{\bm{v}} = 1\)
+    and \(\eta > 0\). Then
+    \[
+        \Ein(\bm{w}_t + \eta \bm{v}) = \Ein(\bm{w}_t) + \eta \bm{v}^\top
+        \nabla \Ein(\bm{w}_t) + \frac{\eta^2}{2} \bm{v}^\top \nabla^2
+        \Ein(\bm{w}_t + \xi \bm{v}) \, \bm{v}
+    \]
+    for some \(\xi \in (0, \eta)\). In particular, if \(\norm{\nabla^2
+    \Ein} \le M\) (operator norm) on the ball of radius \(\eta\) around
+    \(\bm{w}_t\), the remainder is at most \(\frac{M}{2} \eta^2\) for
+    \emph{every} unit \(\bm{v}\).
+\end{lemma}
+
+\begin{proof}
+    Restrict \(\Ein\) to the line: \(\varphi(s) = \Ein(\bm{w}_t + s
+    \bm{v})\) for real \(s\), so \(\varphi(0) = \Ein(\bm{w}_t)\) and
+    \(\varphi(\eta)\) is the left side. By the chain rule, with \(\bm{u}(s) =
+    \bm{w}_t + s \bm{v}\) and \(\bm{u}'(s) = \bm{v}\),
+    \begin{align*}
+        \varphi'(s) &= \sum_{i=0}^d \frac{\partial \Ein}{\partial w_i}
+        \bigl( \bm{u}(s) \bigr) \, v_i = \bm{v}^\top \nabla \Ein \bigl(
+        \bm{u}(s) \bigr) ,\\
+        \varphi''(s) &= \sum_{i, j = 0}^d v_i \frac{\partial^2 \Ein}{\partial
+        w_i \partial w_j} \bigl( \bm{u}(s) \bigr) \, v_j = \bm{v}^\top
+        \nabla^2 \Ein \bigl( \bm{u}(s) \bigr) \, \bm{v} ,
+    \end{align*}
+    and \(\varphi\) is \(C^2\). Taylor's theorem in one variable with
+    Lagrange remainder gives \(\varphi(\eta) = \varphi(0) + \eta \varphi'(0)
+    + \frac{\eta^2}{2} \varphi''(\xi)\) for some \(\xi \in (0, \eta)\);
+    substituting \(\varphi'(0) = \bm{v}^\top \nabla \Ein(\bm{w}_t)\) and
+    \(\varphi''(\xi)\) is the claim. For the bound, write \(\mathrm{H} =
+    \nabla^2 \Ein(\bm{u}(\xi))\); then \(\abs{\bm{v}^\top \mathrm{H} \bm{v}} \le \norm{\bm{v}} \norm{\mathrm{H} \bm{v}} \le M
+    \norm{\bm{v}}^2 = M\) by Cauchy--Schwarz, since \(\norm{\bm{u}(\xi) -
+    \bm{w}_t} = \xi < \eta\).
+\end{proof}
+
+So \(\bm{v}^\top \nabla \Ein(\bm{w}_t)\) is the slope of \(\Ein\) when walking
+from \(\bm{w}_t\) along \(\bm{v}\) (the directional derivative), and the
+linear formula is the tangent plane at \(\bm{w}_t\). Dropping the remainder
+costs \(O(\eta^2)\) uniformly over \(\bm{v}\), while the kept term is of size
+\(\eta\), which is what makes `\(\eta\) really small' a valid excuse. The
+logistic \(\Ein\) of \autoref{sec:logreg-error} is an average of the terms
+\(\ln \bigl( 1 + \exp(-y_n \bm{w}^\top \bm{x}_n) \bigr)\), each smooth in
+\(\bm{w}\), so the lemma applies.
 
 \begin{moral}
     An \textcolor{orange!85!black}{approximate} greedy approach for some given
