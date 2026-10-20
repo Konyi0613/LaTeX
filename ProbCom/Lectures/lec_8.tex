@@ -177,11 +177,14 @@ Only the dependent pairs contribute, which suggests the following bookkeeping.
     \[
         \Delta \coloneqq \sum_{i \sim j} \mathbb{P}(E_i \cap E_j),
     \]
-    the sum being over \emph{ordered} pairs \((i,j)\) with \(i \sim j\). Since \(\sim\) is symmetric, each unordered pair is counted twice.
+    the sum being over \emph{unordered} pairs \(\{i,j\}\) with \(i \sim j\), each counted once. Since \(\sim\) is symmetric, the sum over \emph{ordered} pairs counts each such pair twice:
+    \begin{equation}\label{eq:delta-ordered}
+        \sum_{(i,j) \,:\, i \sim j} \mathbb{P}(E_i \cap E_j) = 2\Delta .
+    \end{equation}
 \end{definition}
 
 \begin{lemma}\label{lem:variance-indicators}
-    With the notation above, \(\Var(X) \le \mathbb{E}[X] + \Delta\).
+    With the notation above, \(\Var(X) \le \mathbb{E}[X] + 2\Delta\).
 \end{lemma}
 
 \begin{proof}
@@ -189,7 +192,10 @@ Only the dependent pairs contribute, which suggests the following bookkeeping.
     \[
         \Cov(X_i, X_j) = \mathbb{P}(E_i \cap E_j) - \mathbb{P}(E_i)\mathbb{P}(E_j) \le \mathbb{P}(E_i \cap E_j).
     \]
-    Summing over ordered pairs, \(\sum_{i \ne j} \Cov(X_i,X_j) \le \sum_{i \sim j} \mathbb{P}(E_i \cap E_j) = \Delta\).
+    The sum \(\sum_{i \ne j}\) in \(\Var(X)\) runs over ordered pairs, so by \eqref{eq:delta-ordered}
+    \[
+        \sum_{i \ne j} \Cov(X_i,X_j) \le \sum_{(i,j) \,:\, i \sim j} \mathbb{P}(E_i \cap E_j) = 2\Delta . \qedhere
+    \]
 \end{proof}
 
 \begin{intuition}
@@ -226,9 +232,9 @@ The corollary below supplies the missing second case: it says that \(\mathbb{E}[
     \[
         \mathbb{P}\bigl( \abs{X - \mathbb{E}[X]} \ge \varepsilon \mathbb{E}[X] \bigr)
         \le \frac{\Var(X)}{\varepsilon^{2} \mathbb{E}[X]^{2}}
-        \le \frac{\mathbb{E}[X] + \Delta}{\varepsilon^{2} \mathbb{E}[X]^{2}}
+        \le \frac{\mathbb{E}[X] + 2\Delta}{\varepsilon^{2} \mathbb{E}[X]^{2}}
         = \underbrace{\frac{1}{\varepsilon^{2} \mathbb{E}[X]}}_{\to\, 0 \text{ as } \mathbb{E}[X] \to \infty}
-        + \underbrace{\frac{\Delta}{\varepsilon^{2} \mathbb{E}[X]^{2}}}_{\to\, 0 \text{ as } \Delta \,=\, o(\mathbb{E}[X]^{2})}
+        + \underbrace{\frac{2\Delta}{\varepsilon^{2} \mathbb{E}[X]^{2}}}_{\to\, 0 \text{ as } \Delta \,=\, o(\mathbb{E}[X]^{2})}
         = o(1).
     \]
     Hence with probability \(1 - o(1)\) we have \((1-\varepsilon)\mathbb{E}[X] \le X \le (1+\varepsilon)\mathbb{E}[X]\). As \(\varepsilon > 0\) was an arbitrary constant, this says \(X = (1+o(1))\mathbb{E}[X]\) with high probability.
@@ -247,7 +253,7 @@ The corollary below supplies the missing second case: it says that \(\mathbb{E}[
         \node[blue!60!black, anchor=north, font=\footnotesize] at (2.55,-0.08) {$(1-\varepsilon)\mathbb{E}[X]$};
         \node[blue!60!black, anchor=north, font=\footnotesize] at (5.45,-0.08) {$(1+\varepsilon)\mathbb{E}[X]$};
         \node[anchor=west, align=left] at (8.4,1.4)
-            {mass outside the window is at most\\$\dfrac{\mathbb{E}[X] + \Delta}{\varepsilon^{2}\mathbb{E}[X]^{2}} = o(1)$};
+            {mass outside the window is at most\\$\dfrac{\mathbb{E}[X] + 2\Delta}{\varepsilon^{2}\mathbb{E}[X]^{2}} = o(1)$};
     \end{tikzpicture}
 \end{center}
 
@@ -332,13 +338,13 @@ i.e.\ \(i \not\sim j\). Hence \(i \sim j\) exactly when \(\abs{T_i \cap T_j} = 2
     \end{tikzpicture}
 \end{center}
 
-\emph{How many.} Such a pair of triples, taken unordered, is determined by its \(4\) vertices together with which of the \(6\) pairs among them is the shared edge, and conversely each such choice gives one. So there are \(6\binom{n}{4}\) of them, hence \(12\binom{n}{4} = \Theta(n^{4})\) ordered pairs \((i,j)\) with \(i \sim j\).
+\emph{How many.} Such a pair of triples, taken unordered, is determined by its \(4\) vertices together with which of the \(6\) pairs among them is the shared edge, and conversely each such choice gives one. So there are \(6\binom{n}{4} = \Theta(n^{4})\) unordered pairs \(\{i,j\}\) with \(i \sim j\).
 
 \emph{With what probability.} As the picture shows, \(E_i \cap E_j\) asks for \(3 + 3 - 1 = 5\) distinct edges, so \(\mathbb{P}(E_i \cap E_j) = p^{5}\).
 
 Putting the three together,
 \[
-    \Delta = \sum_{i \sim j} \mathbb{P}(E_i \cap E_j) = 12\binom{n}{4} p^{5} = \Theta\bigl( n^{4} p^{5} \bigr).
+    \Delta = \sum_{i \sim j} \mathbb{P}(E_i \cap E_j) = 6\binom{n}{4} p^{5} = \Theta\bigl( n^{4} p^{5} \bigr).
 \]
 
 \begin{proposition}\label{prop:triangle-dense}
@@ -365,7 +371,7 @@ Putting the three together,
     \]
 \end{theorem}
 
-So \(p = \frac{1}{n}\) is a \vocab{threshold} for containing a triangle: on one side the property fails with high probability, on the other it holds with high probability.
+So the answer switches at \(p = \frac{1}{n}\): below it a triangle is absent with high probability, above it one is present with high probability.
 \begin{center}
     \begin{tikzpicture}[thick, every node/.style={font=\small}]
         \fill[blue!10] (0.2,-0.3) rectangle (4.1,0.3);
@@ -380,10 +386,653 @@ So \(p = \frac{1}{n}\) is a \vocab{threshold} for containing a triangle: on one 
     \end{tikzpicture}
 \end{center}
 
-\begin{remark}\hfill
+\section{Thresholds}\label{sec:thresholds}
+
+\autoref{thm:triangle-threshold} is one instance of a general phenomenon: for a large class of graph properties, the probability that \(G(n,p)\) has the property jumps from \(0\) to \(1\) around a single value of \(p\). The class is the following.
+
+\begin{definition}[Monotone increasing property]\label{def:monotone-property}
+    A \vocab{graph property} \(\mathcal{P}\) is a family of graphs on the vertex set \([n]\), closed under isomorphism.\footnote{That is, \(G \in \mathcal{P}\) and \(G' \cong G\) imply \(G' \in \mathcal{P}\), where \(G' \cong G\) means \(G'\) is obtained from \(G\) by relabelling the vertices via a bijection \(\sigma \colon [n] \to [n]\). So \(\mathcal{P}\) depends only on the structure of the graph, not on vertex labels: \emph{containing a triangle} qualifies, while \(\{G : \{1,2\} \in E(G)\}\) does not.} It is \vocab{monotone increasing} if adding edges cannot destroy it: whenever \(G \in \mathcal{P}\) and \(G \subseteq H\) (with \(V(G) = V(H) = [n]\)), also \(H \in \mathcal{P}\).
+\end{definition}
+
+For example, \emph{containing a triangle}, \emph{being connected} and \emph{having chromatic number at least \(k\)} are monotone increasing; \emph{being triangle-free} is not (it is monotone decreasing).
+
+\begin{lemma}[Monotone coupling]\label{lem:monotone-coupling}
+    If \(\mathcal{P}\) is monotone increasing, then the function
+    \[
+        f(p) \coloneqq \mathbb{P}\bigl( G(n,p) \in \mathcal{P} \bigr), \qquad p \in [0,1],
+    \]
+    is non-decreasing: \(p \le p'\) implies \(f(p) \le f(p')\).
+\end{lemma}
+
+The claim is intuitive, since a larger \(p\) gives more edges and edges can only help \(\mathcal{P}\). The difficulty is that \(G(n,p)\) and \(G(n,p')\) are two separate random graphs, so ``\(G(n,p) \subseteq G(n,p')\)'' does not even make sense yet. The proof builds both on one probability space, in such a way that the smaller graph is always contained in the larger one; this is called a \vocab{coupling}.
+
+\begin{proof}
     \begin{enumerate}[(1)]
-        \item The threshold is where \(\mathbb{E}[X]\) itself changes behavior, namely where \(n^{3}p^{3}\) crosses a constant. This is not an accident, and identifying thresholds by computing a first moment and then controlling the second is the standard route.
-        \item It is worth looking back at \autoref{thm:erdos-girth} with this in hand. There we took \(p = n^{\theta-1}\) with \(\theta > 0\), which is \emph{above} the threshold, so that random graph contains \(\Theta(n^{3\theta})\) triangles with high probability --- it is nowhere near triangle-free. The alteration was unavoidable; what made it work was not that the short cycles were absent but that there were \(o(n)\) of them.
-        \item The regime \(p = \frac{c}{n}\) is left open here. There \(\mathbb{E}[X] \to \frac{c^{3}}{6}\), a constant, and the number of triangles converges to a Poisson distribution rather than concentrating; neither \thmref{thm:markov} nor \autoref{cor:second-moment} settles it.
+        \item \textbf{One space for all \(p\).} For each pair \(e \in \binom{[n]}{2}\) take \(U_e \sim \mathrm{Unif}[0,1]\), all independent, and for every \(p \in [0,1]\) define the graph
+        \[
+            G_p \coloneqq \bigl\{ e \in \tbinom{[n]}{2} : U_e \le p \bigr\}.
+        \]
+        \item \textbf{Each \(G_p\) has the right law.} Each \(e\) lies in \(G_p\) with probability \(\mathbb{P}(U_e \le p) = p\), and these events are independent because the \(U_e\) are. This is \autoref{def:gnp}, so \(G_p \sim G(n,p)\) and therefore \(f(p) = \mathbb{P}(G_p \in \mathcal{P})\).
+        \item \textbf{The graphs are nested.} Let \(p \le p'\). For every outcome, \(U_e \le p\) implies \(U_e \le p'\), so \(G_p \subseteq G_{p'}\) holds \emph{pointwise}, not just on average.
+        \item \textbf{Apply monotonicity.} By \autoref{def:monotone-property}, \(G_p \in \mathcal{P}\) and \(G_p \subseteq G_{p'}\) give \(G_{p'} \in \mathcal{P}\). Hence \(\{G_p \in \mathcal{P}\} \subseteq \{G_{p'} \in \mathcal{P}\}\) as events, and taking probabilities,
+        \[
+            f(p) = \mathbb{P}(G_p \in \mathcal{P}) \le \mathbb{P}(G_{p'} \in \mathcal{P}) = f(p'). \qedhere
+        \]
+    \end{enumerate}
+\end{proof}
+
+Think of \(U_e\) as the time at which edge \(e\) is switched on: raising \(p\) from \(0\) to \(1\) adds edges one at a time and never removes any, so once \(\mathcal{P}\) holds it keeps holding. This is why the curve in the figure below only goes up, and why it makes sense to speak of a single point \(p^{*}\) where it jumps from \(0\) to \(1\).
+
+\begin{definition}[Threshold]\label{def:threshold}
+    Let \(\mathcal{P}\) be a monotone increasing graph property. We say \(p^{*} = p^{*}(n)\) is a \vocab{threshold} for \(\mathcal{P}\) if
+    \[
+        p = o(p^{*}) \implies \mathbb{P}\bigl( G(n,p) \in \mathcal{P} \bigr) \to 0,
+        \qquad
+        p = \omega(p^{*}) \implies \mathbb{P}\bigl( G(n,p) \in \mathcal{P} \bigr) \to 1 .
+    \]
+\end{definition}
+
+\begin{center}
+    \begin{tikzpicture}[thick, every node/.style={font=\small}]
+        \draw[->] (0,0) -- (7.2,0) node[right] {$p$};
+        \draw[->] (0,0) -- (0,3.1) node[above] {$\mathbb{P}\bigl(G(n,p) \in \mathcal{P}\bigr)$};
+        \draw[gray, thin, dashed] (0,2.4) -- (6.5,2.4);
+        \node[left] at (0,2.4) {$1$};
+        \node[left] at (0,0) {$0$};
+        \draw[purple] plot[domain=0:6.5, samples=150]
+            (\x, {2.4/(1+exp(-3.5*(\x-2.6)))});
+        \draw[red!80!black, thin] (2.6,-0.1) -- (2.6,2.6);
+        \node[red!80!black, below] at (2.6,-0.1) {$p^{*}$};
+        \node[below] at (6.5,-0.1) {$1$};
+        \draw[gray, thin] (6.5,-0.08) -- (6.5,0.08);
+        \node[blue!60!black, align=center, font=\footnotesize] at (1.1,0.6) {$p = o(p^{*})$:\\$\to 0$};
+        \node[blue!60!black, align=center, font=\footnotesize] at (4.6,1.75) {$p = \omega(p^{*})$:\\$\to 1$};
+    \end{tikzpicture}
+\end{center}
+
+\begin{eg}\label{eg:triangle-threshold}
+    \autoref{thm:triangle-threshold} says exactly that \(p^{*} = \frac{1}{n}\) is a threshold for containing a triangle.
+\end{eg}
+
+A threshold is determined only up to a constant factor: if \(p^{*}\) is a threshold, so is \(c\,p^{*}\) for any constant \(c > 0\), since \(o(p^{*}) = o(c\,p^{*})\). In particular \autoref{def:threshold} says nothing about \(p = c\,p^{*}\). The stronger notion below pins the transition down to a window of width \(o(p^{*})\).
+
+\begin{definition}[Sharp threshold]\label{def:sharp-threshold}
+    We say \(p^{*}\) is a \vocab{sharp threshold} for \(\mathcal{P}\) if for every constant \(\varepsilon > 0\),
+    \[
+        p \le (1-\varepsilon) p^{*} \implies \mathbb{P}\bigl( G(n,p) \in \mathcal{P} \bigr) \to 0,
+        \qquad
+        p \ge (1+\varepsilon) p^{*} \implies \mathbb{P}\bigl( G(n,p) \in \mathcal{P} \bigr) \to 1 .
+    \]
+\end{definition}
+
+\begin{remark}[Sharp \(\Rightarrow\) threshold, but not conversely]\label{rmk:sharp-vs-threshold}\hfill
+    \begin{enumerate}[(1)]
+        \item \emph{A sharp threshold is a threshold.} If \(p = o(p^{*})\), then \(p \le \frac{1}{2}p^{*}\) for all large \(n\), so \autoref{def:sharp-threshold} with \(\varepsilon = \frac{1}{2}\) gives \(\mathbb{P}\bigl( G(n,p) \in \mathcal{P} \bigr) \to 0\); if \(p = \omega(p^{*})\), then \(p \ge 2p^{*}\) eventually, and \(\varepsilon = 1\) gives \(\to 1\).
+        \item \emph{A threshold need not be sharp.} Suppose \(p^{*}\) is a sharp threshold for \(\mathcal{P}\), and let \(q^{*} \coloneqq 2p^{*}\).
+        \begin{itemize}
+            \item \(q^{*}\) is a threshold: \(o(q^{*}) = o(p^{*})\) and \(\omega(q^{*}) = \omega(p^{*})\), so the two conditions of \autoref{def:threshold} for \(q^{*}\) are exactly those for \(p^{*}\), which hold by (1).
+            \item \(q^{*}\) is not sharp: take \(p = \frac{3}{2}p^{*}\). Then \(p = (1 - \frac{1}{4})\,q^{*}\), so if \(q^{*}\) were sharp, \autoref{def:sharp-threshold} with \(\varepsilon = \frac{1}{4}\) would give \(\mathbb{P}\bigl( G(n,p) \in \mathcal{P} \bigr) \to 0\). But \(p = (1 + \frac{1}{2})\,p^{*}\), so sharpness of \(p^{*}\) with \(\varepsilon = \frac{1}{2}\) gives \(\mathbb{P}\bigl( G(n,p) \in \mathcal{P} \bigr) \to 1\).
+        \end{itemize}
+        So a threshold cannot tell \(p^{*}\) from \(2p^{*}\), whereas a sharp threshold is determined up to a factor \(1 + o(1)\).
     \end{enumerate}
 \end{remark}
+
+\section{Symmetric Events and \texorpdfstring{\(\Delta^{*}\)}{Delta*}}\label{sec:delta-star}
+
+Every threshold proof so far used \autoref{cor:second-moment}, whose hypothesis \(\Delta = o\bigl( \mathbb{E}[X]^{2} \bigr)\) needs \(\Delta\) computed. In the applications the events all look alike, and then \(\Delta\) factors. Return to the setting of \autoref{sec:variance-indicators}: \(X = \sum_{i=1}^{m} \mathbbm{1}_{E_i}\), \(\mathbb{E}[X] = \sum_i \mathbb{P}(E_i)\). Passing to ordered pairs by \eqref{eq:delta-ordered}, writing \(\mathbb{P}(E_i \cap E_j) = \mathbb{P}(E_i)\,\mathbb{P}(E_j \mid E_i)\) and summing over \(j\) first,
+\begin{equation}\label{eq:delta-factor}
+    \Delta
+    = \frac{1}{2} \sum_{(i,j) \,:\, i \sim j} \mathbb{P}(E_i \cap E_j)
+    = \frac{1}{2} \sum_{i=1}^{m} \mathbb{P}(E_i) \sum_{j \,:\, j \sim i} \mathbb{P}(E_j \mid E_i).
+\end{equation}
+
+The inner sum in \eqref{eq:delta-factor} depends on \(i\) in general. It does not when the events all ``look the same'', and the way to say this formally is through automorphisms.
+
+\begin{definition}[Automorphism of a probability space]\label{def:prob-automorphism}
+    An \vocab{automorphism} of \((\Omega, \mathbb{P})\) is a bijection \(\sigma \colon \Omega \to \Omega\) that does not change probabilities: \(\mathbb{P}\bigl( \sigma(A) \bigr) = \mathbb{P}(A)\) for every event \(A\). For finite \(\Omega\) this just says \(\mathbb{P}(\{\sigma(\omega)\}) = \mathbb{P}(\{\omega\})\) for every outcome \(\omega\).
+\end{definition}
+
+\begin{definition}[Symmetric events]\label{def:delta-star}
+    The events \(E_1, \ldots, E_m\) are \vocab{symmetric} if for all \(i, j\) there are an automorphism \(\sigma\) of \((\Omega, \mathbb{P})\) and a permutation \(\tau\) of \([m]\) with
+    \[
+        \sigma(E_l) = E_{\tau(l)} \quad \text{for all } l \in [m],
+        \qquad\text{and}\qquad
+        \tau(i) = j .
+    \]
+    That is, \(\sigma\) permutes the family \(\{E_1, \ldots, E_m\}\) and sends \(E_i\) to \(E_j\).
+\end{definition}
+
+\begin{lemma}\label{lem:delta-star-const}
+    If \(E_1, \ldots, E_m\) are symmetric, then \(\sum_{l \,:\, l \sim i} \mathbb{P}(E_l \mid E_i)\) is the same for every \(i\). We call this common value
+    \[
+        \Delta^{*} \coloneqq \sum_{l \,:\, l \sim i} \mathbb{P}(E_l \mid E_i).
+    \]
+\end{lemma}
+
+The proof uses the following fact about bijections.
+
+\begin{claim}\label{claim:bijection-cap}
+    If \(\sigma \colon \Omega \to \Omega\) is a bijection, then \(\sigma(A \cap B) = \sigma(A) \cap \sigma(B)\) for all \(A, B \subseteq \Omega\). Hence, if \(\sigma\) is an automorphism,
+    \[
+        \mathbb{P}\bigl( \sigma(A) \cap \sigma(B) \bigr) = \mathbb{P}\bigl( \sigma(A \cap B) \bigr) = \mathbb{P}(A \cap B).
+    \]
+\end{claim}
+\begin{proof}
+    \(\subseteq\): if \(\omega \in A \cap B\), then \(\sigma(\omega) \in \sigma(A)\) and \(\sigma(\omega) \in \sigma(B)\). \(\supseteq\): if \(\eta \in \sigma(A) \cap \sigma(B)\), then \(\eta = \sigma(a) = \sigma(b)\) for some \(a \in A\), \(b \in B\); injectivity gives \(a = b \in A \cap B\), so \(\eta \in \sigma(A \cap B)\). The second statement is \autoref{def:prob-automorphism} applied to the event \(A \cap B\).
+\end{proof}
+
+\begin{proof}[Proof of \autoref{lem:delta-star-const}]
+    For each index \(i\) write \(D_i \coloneqq \sum_{l \,:\, l \sim i} \mathbb{P}(E_l \mid E_i)\). Fix one index \(j\). We show \(D_i = D_j\) for an arbitrary \(i\); then every \(D_i\) equals the same number \(D_j\), which is the claim of the lemma.
+
+    So let \(i\) be arbitrary, and take \(\sigma, \tau\) as in \autoref{def:delta-star} for this pair \(i, j\), so \(\sigma(E_l) = E_{\tau(l)}\) and \(\sigma(E_i) = E_j\). For every \(l\), \autoref{claim:bijection-cap} with \(A = E_l\), \(B = E_i\), together with \(\mathbb{P}(\sigma(E)) = \mathbb{P}(E)\), gives
+    \begin{equation}\label{eq:sigma-preserves}
+        \mathbb{P}\bigl( E_{\tau(l)} \cap E_j \bigr) = \mathbb{P}(E_l \cap E_i),
+        \qquad
+        \mathbb{P}\bigl( E_{\tau(l)} \bigr) = \mathbb{P}(E_l),
+        \qquad
+        \mathbb{P}(E_j) = \mathbb{P}(E_i).
+    \end{equation}
+    \begin{itemize}
+        \item \emph{Conditional probabilities are preserved.} By \eqref{eq:sigma-preserves},
+        \[
+            \mathbb{P}\bigl( E_{\tau(l)} \mid E_j \bigr)
+            = \frac{\mathbb{P}\bigl( E_{\tau(l)} \cap E_j \bigr)}{\mathbb{P}(E_j)}
+            = \frac{\mathbb{P}(E_l \cap E_i)}{\mathbb{P}(E_i)}
+            = \mathbb{P}(E_l \mid E_i).
+        \]
+        \item \emph{Dependence is preserved.} By \eqref{eq:sigma-preserves},
+        \[
+            \mathbb{P}\bigl( E_{\tau(l)} \cap E_j \bigr) - \mathbb{P}\bigl( E_{\tau(l)} \bigr)\mathbb{P}(E_j)
+            = \mathbb{P}(E_l \cap E_i) - \mathbb{P}(E_l)\mathbb{P}(E_i),
+        \]
+        so \(E_l, E_i\) are independent iff \(E_{\tau(l)}, E_{\tau(i)}\) are. Hence \(l \sim i \iff \tau(l) \sim \tau(i) = j\).
+    \end{itemize}
+    Re-indexing the sum by \(l' = \tau(l)\) and using the first bullet,
+    \[
+        D_j = \sum_{l' \,:\, l' \sim j} \mathbb{P}(E_{l'} \mid E_j)
+        = \sum_{l \,:\, l \sim i} \mathbb{P}\bigl( E_{\tau(l)} \mid E_j \bigr)
+        = \sum_{l \,:\, l \sim i} \mathbb{P}(E_l \mid E_i) = D_i. \qedhere
+    \]
+\end{proof}
+
+\begin{lemma}\label{lem:delta-star}
+    If \(E_1, \ldots, E_m\) are symmetric, then \(\Delta = \frac{1}{2}\Delta^{*} \, \mathbb{E}[X]\). Consequently
+    \[
+        \Delta = o\bigl( \mathbb{E}[X]^{2} \bigr) \iff \Delta^{*} = o\bigl( \mathbb{E}[X] \bigr).
+    \]
+\end{lemma}
+
+\begin{proof}
+    By \autoref{lem:delta-star-const}, the inner sum in \eqref{eq:delta-factor} equals \(\Delta^{*}\) for every \(i\), so
+    \[
+        \Delta = \frac{1}{2} \sum_{i=1}^{m} \mathbb{P}(E_i) \cdot \Delta^{*} = \frac{1}{2}\Delta^{*} \sum_{i=1}^{m} \mathbb{P}(E_i) = \frac{1}{2}\Delta^{*}\,\mathbb{E}[X].
+    \]
+    Dividing by \(\mathbb{E}[X]^{2}\) gives \(\dfrac{\Delta}{\mathbb{E}[X]^{2}} = \dfrac{1}{2} \cdot \dfrac{\Delta^{*}}{\mathbb{E}[X]}\), so one side is \(o(1)\) iff the other is.
+\end{proof}
+
+Combining \autoref{lem:delta-star} with \autoref{cor:second-moment}:
+
+\begin{corollary}[Second moment method, symmetric form]\label{cor:second-moment-sym}
+    If \(E_1, \ldots, E_m\) are symmetric, \(\mathbb{E}[X] \to \infty\) and \(\Delta^{*} = o\bigl( \mathbb{E}[X] \bigr)\), then \(X = (1+o(1))\,\mathbb{E}[X]\) with high probability.
+\end{corollary}
+
+The gain is that \(\Delta^{*}\) only asks about a \emph{single fixed} event \(E_i\): which \(E_j\) depend on it, and how likely each is once \(E_i\) is known to hold.
+
+In \(G(n,p)\) the symmetry comes from relabelling vertices. A \vocab{copy} of a graph \(H\) is a subgraph of \(K_n\) isomorphic to \(H\).
+
+\begin{lemma}\label{lem:copies-symmetric}
+    Fix a graph \(H\), and for each copy \(S\) of \(H\) let \(E_S \coloneqq \{S \subseteq G(n,p)\}\). Then the events \(E_S\) are symmetric.
+\end{lemma}
+
+\begin{proof}
+    Let \(S, S'\) be copies of \(H\). Since \(S \cong H \cong S'\), there is a bijection \(V(S) \to V(S')\) mapping edges of \(S\) onto edges of \(S'\); extend it to a permutation \(\pi\) of \([n]\), so that \(\pi(S) = S'\). For a graph \(G\) on \([n]\) let \(\pi(G)\) be the graph with edges \(\{\pi(u), \pi(v)\}\), \(\{u,v\} \in E(G)\), and set \(\sigma(G) \coloneqq \pi(G)\).
+    \begin{itemize}
+        \item \(\sigma\) is an automorphism: it is a bijection with inverse \(G \mapsto \pi^{-1}(G)\), and since \(e(\pi(G)) = e(G)\),
+        \[
+            \mathbb{P}(\{\sigma(G)\}) = p^{e(\pi(G))}(1-p)^{\binom{n}{2} - e(\pi(G))} = p^{e(G)}(1-p)^{\binom{n}{2} - e(G)} = \mathbb{P}(\{G\}).
+        \]
+        \item \(\sigma\) permutes the events: for every copy \(T\),
+        \[
+            G' \in \sigma(E_T) \iff \pi^{-1}(G') \in E_T \iff T \subseteq \pi^{-1}(G') \iff \pi(T) \subseteq G' \iff G' \in E_{\pi(T)},
+        \]
+        so \(\sigma(E_T) = E_{\pi(T)}\). The map \(\tau(T) \coloneqq \pi(T)\) is a permutation of the copies of \(H\) (with inverse \(T \mapsto \pi^{-1}(T)\)) and \(\tau(S) = S'\).
+    \end{itemize}
+    This is \autoref{def:delta-star}.
+\end{proof}
+
+\begin{eg}[Triangles, again]\label{eg:triangle-delta-star}
+    Let \(X\) count triangles in \(G(n,p)\) as in \autoref{sec:triangles-gnp}. The triangle events are symmetric by \autoref{lem:copies-symmetric} with \(H = K_3\). Fix a triple \(T_i\). The \(T_j \sim T_i\) are those sharing an edge with \(T_i\): \(3\) choices of the shared edge times \(n-3\) choices of the fourth vertex. Given \(E_i\), the event \(E_j\) needs only the \(2\) edges of \(T_j\) not in \(T_i\), so \(\mathbb{P}(E_j \mid E_i) = p^{2}\). Hence
+    \[
+        \Delta^{*} = 3(n-3)\,p^{2} = \Theta(np^{2}),
+        \qquad
+        \frac{\Delta^{*}}{\mathbb{E}[X]} = \Theta\Bigl( \frac{np^{2}}{n^{3}p^{3}} \Bigr) = \Theta\Bigl( \frac{1}{n^{2}p} \Bigr) = o(1)
+        \quad\text{when } p \gg \tfrac{1}{n},
+    \]
+    which is \autoref{prop:triangle-dense} again. As a check,
+    \[
+        \frac{1}{2}\Delta^{*}\,\mathbb{E}[X] = \frac{1}{2} \cdot 3(n-3)p^{2} \cdot \frac{n(n-1)(n-2)}{6}p^{3} = \frac{n(n-1)(n-2)(n-3)}{4}p^{5} = 6\binom{n}{4}p^{5},
+    \]
+    which by \autoref{lem:delta-star} is \(\Delta\), and agrees with the value of \(\Delta\) computed directly in \autoref{sec:triangles-gnp}.
+\end{eg}
+
+\section{Cliques in a Random Graph}\label{sec:cliques-gnp}
+
+\begin{question}\label{q:clique-threshold}
+    For fixed \(k \ge 3\), what is the threshold for \(G(n,p)\) to contain \(K_k\)?
+\end{question}
+
+The property \(\mathcal{P} = \{G : K_k \subseteq G\}\) is monotone increasing (\autoref{def:monotone-property}): if \(K_k \subseteq G \subseteq H\), then \(K_k \subseteq H\). So \autoref{def:threshold} applies, and it makes sense to look for a threshold.
+
+\subsection{The First Moment}
+
+For each \(S \in \binom{[n]}{k}\) let \(E_S\) be the event that \(S\) spans a clique in \(G(n,p)\). This needs all \(\binom{k}{2}\) pairs inside \(S\) to be edges, each present independently with probability \(p\), so \(\mathbb{P}(E_S) = p^{\binom{k}{2}}\). Let
+\[
+    X \coloneqq \sum_{S \in \binom{[n]}{k}} \mathbbm{1}_{E_S}
+\]
+be the number of copies of \(K_k\). By \autoref{thm:linearity}, and since \(k\) is fixed while \(n \to \infty\),
+\begin{equation}\label{eq:clique-mean}
+    \mathbb{E}[X] = \sum_{S} \mathbb{P}(E_S) = \binom{n}{k} p^{\binom{k}{2}}
+    = (1+o(1)) \frac{n^{k}}{k!}\, p^{\frac{k(k-1)}{2}}
+    = (1+o(1)) \frac{\bigl( n p^{\frac{k-1}{2}} \bigr)^{k}}{k!},
+\end{equation}
+where \(\binom{n}{k} = \frac{n(n-1)\cdots(n-k+1)}{k!} = (1+o(1))\frac{n^{k}}{k!}\) because each of the \(k\) factors \(n - r\) with \(r < k\) fixed is \((1+o(1))n\), and \(p^{\binom{k}{2}} = p^{\frac{k(k-1)}{2}} = \bigl( p^{\frac{k-1}{2}} \bigr)^{k}\). So \(\mathbb{E}[X]\) is governed by \(np^{(k-1)/2} = \bigl( n^{\frac{2}{k-1}} p \bigr)^{\frac{k-1}{2}}\), and
+\[
+    np^{\frac{k-1}{2}} \to 0 \iff p = o\bigl( n^{-\frac{2}{k-1}} \bigr),
+    \qquad
+    np^{\frac{k-1}{2}} \to \infty \iff p = \omega\bigl( n^{-\frac{2}{k-1}} \bigr).
+\]
+In the first case \eqref{eq:clique-mean} gives \(\mathbb{E}[X] \to 0\), and \thmref{thm:markov} gives \(\mathbb{P}(X \ge 1) \le \mathbb{E}[X] \to 0\): no \(K_k\) with high probability. In the second case \(\mathbb{E}[X] \to \infty\). The events \(E_S\) are symmetric by \autoref{lem:copies-symmetric} with \(H = K_k\), so by \autoref{cor:second-moment-sym} it is enough to show \(\Delta^{*} = o\bigl( \mathbb{E}[X] \bigr)\).
+
+\subsection{Computing \texorpdfstring{\(\Delta^{*}\)}{Delta*}}
+
+Fix a \(k\)-set \(S\), and let \(T \ne S\) be another \(k\)-set with \(i \coloneqq \abs{S \cap T}\). Write \(P_S \coloneqq \binom{S}{2}\) for the set of pairs inside \(S\), so \(\abs{P_S} = \binom{k}{2}\) and \(E_S\) is the event that every pair in \(P_S\) is an edge. A pair lies inside both \(S\) and \(T\) iff it lies inside \(S \cap T\), so
+\[
+    \abs{P_S \cap P_T} = \binom{i}{2},
+    \qquad
+    \abs{P_S \cup P_T} = \abs{P_S} + \abs{P_T} - \abs{P_S \cap P_T} = 2\binom{k}{2} - \binom{i}{2}.
+\]
+\begin{itemize}
+    \item If \(i \le 1\), then \(P_S \cap P_T = \varnothing\). The event \(E_S\) depends only on the pairs in \(P_S\) and \(E_T\) only on those in \(P_T\); these are disjoint sets of pairs, which are independent in \(G(n,p)\), so \(E_S\) and \(E_T\) are independent.
+    \item If \(i \ge 2\), then the event \(E_S \cap E_T\) says that every pair in \(P_S \cup P_T\) is an edge, so for \(0 < p < 1\)
+    \[
+        \mathbb{P}(E_S \cap E_T) = p^{\abs{P_S \cup P_T}} = p^{2\binom{k}{2} - \binom{i}{2}} > p^{2\binom{k}{2}} = \mathbb{P}(E_S)\,\mathbb{P}(E_T),
+    \]
+    the inequality because \(\binom{i}{2} \ge 1\). So \(E_S\) and \(E_T\) are not independent.
+\end{itemize}
+Hence
+\[
+    T \sim S
+    \iff \text{the cliques on } S \text{ and } T \text{ share an edge}
+    \iff \abs{S \cap T} \ge 2 .
+\]
+\begin{center}
+    \begin{tikzpicture}[thick, every node/.style={font=\small}]
+        % T_1: shares the edge between S's vertices at 90 and 18 degrees
+        \begin{scope}[shift={(0.951,1.309)}, blue!60!black]
+            \foreach \i in {0,...,4}{\foreach \j in {0,...,4}{\draw[thin] (198+72*\i:1) -- (198+72*\j:1);}}
+            \foreach \i in {0,...,4} \fill (198+72*\i:1) circle (2pt);
+            \node at (54:1.35) {$T_1$};
+        \end{scope}
+        % T_2: shares the single vertex of S at 162 degrees
+        \begin{scope}[shift={(-1.902,0.618)}, green!50!black]
+            \foreach \i in {0,...,4}{\foreach \j in {0,...,4}{\draw[thin] (-18+72*\i:1) -- (-18+72*\j:1);}}
+            \foreach \i in {0,...,4} \fill (-18+72*\i:1) circle (2pt);
+            \node at (162:1.4) {$T_2$};
+        \end{scope}
+        % T_3: disjoint from S
+        \begin{scope}[shift={(2.7,-1.2)}, orange!85!black]
+            \foreach \i in {0,...,4}{\foreach \j in {0,...,4}{\draw[thin] (90+72*\i:1) -- (90+72*\j:1);}}
+            \foreach \i in {0,...,4} \fill (90+72*\i:1) circle (2pt);
+            \node at (-30:1.4) {$T_3$};
+        \end{scope}
+        % S
+        \foreach \i in {0,...,4}{\foreach \j in {0,...,4}{\draw (90+72*\i:1) -- (90+72*\j:1);}}
+        \draw[red!80!black, line width=1.8pt] (90:1) -- (18:1);
+        \foreach \i in {0,...,4} \fill (90+72*\i:1) circle (2.4pt);
+        \node at (-90:1.35) {$S$};
+        \node[anchor=west, align=left] at (4.3,0.6)
+            {$\abs{S \cap T_1} = 2$: share the red edge, $T_1 \sim S$;\\[2pt]
+             $\abs{S \cap T_2} = 1$: no common edge, $T_2 \not\sim S$;\\[2pt]
+             $\abs{S \cap T_3} = 0$: $T_3 \not\sim S$.};
+    \end{tikzpicture}
+\end{center}
+Grouping the dependent \(T\) by \(i = \abs{S \cap T} \in \{2, \ldots, k-1\}\),
+\[
+    \Delta^{*} = \sum_{T \,:\, T \sim S} \mathbb{P}(E_T \mid E_S)
+    = \sum_{i=2}^{k-1} \ \sum_{T \,:\, \abs{T \cap S} = i} \mathbb{P}(E_T \mid E_S).
+\]
+For each \(i\) we need the conditional probability and the number of such \(T\).
+
+\emph{Conditional probability.} Suppose \(\abs{S \cap T} = i \ge 2\). By the second bullet above,
+\[
+    \mathbb{P}(E_T \mid E_S) = \frac{\mathbb{P}(E_S \cap E_T)}{\mathbb{P}(E_S)} = \frac{p^{2\binom{k}{2} - \binom{i}{2}}}{p^{\binom{k}{2}}} = p^{\binom{k}{2} - \binom{i}{2}}.
+\]
+
+\emph{Number of \(T\).} To build \(T\) with \(\abs{T \cap S} = i\), choose the \(i\) vertices of \(S\) that lie in \(T\) and then the \(k-i\) vertices of \(T\) outside \(S\):
+\[
+    \#\bigl\{ T : \abs{T \cap S} = i \bigr\}
+    = \underbrace{\binom{k}{i}}_{\Theta(1)} \underbrace{\binom{n-k}{k-i}}_{\Theta(n^{k-i})}
+    = \Theta\bigl( n^{k-i} \bigr),
+\]
+where \(\binom{n-k}{k-i} = (1+o(1))\frac{n^{k-i}}{(k-i)!}\) as for \(\binom{n}{k}\) above.
+
+Putting the two together and writing \(q_i \coloneqq n^{k-i} p^{\binom{k}{2} - \binom{i}{2}}\),
+\[
+    \Delta^{*} = \sum_{i=2}^{k-1} \binom{k}{i}\binom{n-k}{k-i} \, p^{\binom{k}{2} - \binom{i}{2}}
+    = \sum_{i=2}^{k-1} \Theta(q_i)
+    = \Theta\Bigl( \max_{2 \le i \le k-1} q_i \Bigr),
+\]
+the last step because \(\max_i q_i \le \sum_{i=2}^{k-1} q_i \le (k-2) \max_i q_i\) and \(k - 2\) is a constant.
+
+\subsection{Which Term Dominates}
+
+\begin{lemma}\label{lem:qi-endpoints}
+    \(\max_{2 \le i \le k-1} q_i = \max\{ q_2, q_{k-1} \}\).
+\end{lemma}
+
+\begin{proof}
+    Consecutive ratios are
+    \[
+        \frac{q_{i+1}}{q_i}
+        = \frac{n^{k-(i+1)} p^{\binom{k}{2} - \binom{i+1}{2}}}{n^{k-i} p^{\binom{k}{2} - \binom{i}{2}}}
+        = n^{-1} p^{\binom{i}{2} - \binom{i+1}{2}}
+        = n^{-1} p^{-i},
+    \]
+    using \(\binom{i+1}{2} - \binom{i}{2} = i\). Write \(r_i \coloneqq q_{i+1}/q_i = n^{-1}p^{-i}\). Then \(r_{i+1}/r_i = p^{-1} \ge 1\), so \(r_2 \le r_3 \le \cdots \le r_{k-2}\). Let \(i_0\) be the least \(i \in \{2, \ldots, k-2\}\) with \(r_i > 1\), or \(i_0 = k-1\) if there is none. For \(i < i_0\) we have \(r_i \le 1\), i.e.\ \(q_{i+1} \le q_i\); for \(i \ge i_0\) we have \(r_i \ge r_{i_0} > 1\), i.e.\ \(q_{i+1} > q_i\). So
+    \[
+        q_2 \ge q_3 \ge \cdots \ge q_{i_0} < q_{i_0+1} < \cdots < q_{k-1},
+    \]
+    and every \(q_i\) is at most \(q_2\) (if \(i \le i_0\)) or at most \(q_{k-1}\) (if \(i \ge i_0\)).
+\end{proof}
+
+\begin{center}
+    \begin{tikzpicture}[thick, every node/.style={font=\small}]
+        \draw[->] (0,0) -- (6.2,0) node[right] {$i$};
+        \draw[->] (0,0) -- (0,2.6) node[above] {$\log q_i$};
+        \foreach \x/\y [count=\c from 2] in {0.8/2.0, 1.7/1.15, 2.6/0.65, 3.5/0.55, 4.4/0.9, 5.3/1.75}{
+            \fill[purple] (\x,\y) circle (2.2pt);
+            \draw[gray, thin] (\x,-0.06) -- (\x,0.06);
+        }
+        \draw[purple, thin] plot[smooth] coordinates {(0.8,2.0) (1.7,1.15) (2.6,0.65) (3.5,0.55) (4.4,0.9) (5.3,1.75)};
+        \node[below] at (0.8,0) {$2$};
+        \node[below] at (5.3,0) {$k-1$};
+        \node[anchor=west, align=left, font=\footnotesize] at (6.6,1.2)
+            {ratios $q_{i+1}/q_i = n^{-1}p^{-i}$ increase,\\so $\log q_i$ is convex in $i$\\and the maximum is at $i = 2$ or $i = k-1$};
+    \end{tikzpicture}
+\end{center}
+
+So it suffices to compare the two endpoints with \(\mathbb{E}[X] = \Theta\bigl( n^{k} p^{\binom{k}{2}} \bigr)\) from \eqref{eq:clique-mean}, assuming throughout that \(p = \omega\bigl( n^{-\frac{2}{k-1}} \bigr)\).
+\begin{itemize}
+    \item \(i = 2\): here \(q_2 = n^{k-2} p^{\binom{k}{2} - 1}\), so
+    \[
+        \frac{q_2}{\mathbb{E}[X]} = \Theta\Biggl( \frac{n^{k-2} p^{\binom{k}{2} - 1}}{n^{k} p^{\binom{k}{2}}} \Biggr) = \Theta\Bigl( \frac{1}{n^{2}p} \Bigr) = o(1),
+    \]
+    because \(k \ge 3\) gives \(\frac{2}{k-1} \le 1\), hence \(p \gg n^{-\frac{2}{k-1}} \ge n^{-1}\) and \(n^{2}p \gg n \to \infty\).
+    \item \(i = k-1\): here \(\binom{k}{2} - \binom{k-1}{2} = \frac{(k-1)\bigl(k - (k-2)\bigr)}{2} = k-1\), so \(q_{k-1} = np^{k-1}\) and, using \(\binom{k}{2} - (k-1) = \binom{k-1}{2} = \frac{(k-1)(k-2)}{2}\),
+    \[
+        \frac{q_{k-1}}{\mathbb{E}[X]} = \Theta\Biggl( \frac{np^{k-1}}{n^{k} p^{\binom{k}{2}}} \Biggr)
+        = \Theta\Bigl( n^{-(k-1)} p^{-\frac{(k-1)(k-2)}{2}} \Bigr)
+        = \Theta\Bigl( \bigl( np^{\frac{k-2}{2}} \bigr)^{-(k-1)} \Bigr) = o(1),
+    \]
+    because raising \(p \gg n^{-\frac{2}{k-1}}\) to the power \(\frac{k-2}{2} > 0\) gives \(p^{\frac{k-2}{2}} \gg n^{-\frac{k-2}{k-1}}\), hence \(np^{\frac{k-2}{2}} \gg n^{1 - \frac{k-2}{k-1}} = n^{\frac{1}{k-1}} \to \infty\).
+\end{itemize}
+By \autoref{lem:qi-endpoints}, \(\Delta^{*} = \Theta(\max\{q_2, q_{k-1}\}) = o\bigl( \mathbb{E}[X] \bigr)\), and \autoref{cor:second-moment-sym} applies. For \(k = 3\) the two endpoints coincide, \(q_2 = np^{2}\), matching \autoref{eg:triangle-delta-star}.
+
+\begin{theorem}\label{thm:clique-threshold}
+    Fix \(k \ge 3\) and let \(X\) be the number of copies of \(K_k\) in \(G(n,p)\). With high probability,
+    \[
+        X = \begin{cases}
+            0, & \text{if } p \ll n^{-\frac{2}{k-1}}, \\[2pt]
+            (1+o(1)) \dbinom{n}{k} p^{\binom{k}{2}} \to \infty, & \text{if } p \gg n^{-\frac{2}{k-1}}.
+        \end{cases}
+    \]
+    In particular \(p^{*} = n^{-\frac{2}{k-1}}\) is a threshold for \(K_k \subseteq G(n,p)\).
+\end{theorem}
+
+\section{Arbitrary Subgraphs}\label{sec:subgraph-threshold}
+
+\begin{question}\label{q:subgraph-threshold}
+    Given a fixed graph \(H\), what is the threshold for \(H \subseteq G(n,p)\)?
+\end{question}
+
+As in \autoref{sec:cliques-gnp}, the property \(\{G : H \subseteq G\}\) is monotone increasing, since \(H \subseteq G \subseteq G'\) gives \(H \subseteq G'\), so \autoref{def:threshold} applies.
+
+Write \(v(H)\) and \(e(H)\) for the numbers of vertices and edges of \(H\), and assume \(e(H) \ge 1\). As in \autoref{lem:copies-symmetric}, a copy of \(H\) is a subgraph of \(K_n\) isomorphic to \(H\); let \(X_H\) be the number of copies of \(H\) contained in \(G(n,p)\).
+
+\subsection{The First Moment}
+
+To compute \(\mathbb{E}[X_H]\) we need two things: how many copies of \(H\) there are in \(K_n\), and the probability that a given one is present.
+
+\emph{Number of copies.} An \vocab{automorphism} of \(H\) is a permutation \(\alpha\) of \(V(H)\) with \(\{u,w\} \in E(H) \iff \{\alpha(u), \alpha(w)\} \in E(H)\), i.e.\ a way of mapping \(H\) onto itself: it rearranges the vertices of \(H\) but leaves the edge set unchanged. They form a group \(\mathrm{Aut}(H)\), so \(\abs{\mathrm{Aut}(H)}\) is the number of such self-maps. The identity is one of them and there are \(v(H)!\) permutations in total, so \(1 \le \abs{\mathrm{Aut}(H)} \le v(H)!\). For an injective map \(\varphi \colon V(H) \to [n]\), write \(\varphi(H)\) for the graph on \(\varphi(V(H))\) with edges \(\{\varphi(u), \varphi(w)\}\), \(\{u,w\} \in E(H)\); it is a copy of \(H\), and every copy arises this way (take \(\varphi\) to be an isomorphism \(H \to S\)).
+
+\begin{lemma}\label{lem:count-copies}
+    With \(v = v(H)\),
+    \[
+        \#\{\text{copies of } H \text{ in } K_n\} = \frac{n(n-1)\cdots(n-v+1)}{\abs{\mathrm{Aut}(H)}} = \Theta\bigl( n^{v} \bigr).
+    \]
+\end{lemma}
+
+\begin{proof}
+    There are \(n(n-1)\cdots(n-v+1)\) injective maps \(\varphi \colon V(H) \to [n]\), and \(\varphi \mapsto \varphi(H)\) maps them onto the copies. We show that each copy is hit exactly \(\abs{\mathrm{Aut}(H)}\) times, by showing
+    \[
+        \varphi'(H) = \varphi(H) \iff \varphi' = \varphi \circ \alpha \text{ for some } \alpha \in \mathrm{Aut}(H).
+    \]
+    \(\Leftarrow\): \(\alpha\) maps \(V(H)\) onto itself and \(E(H)\) onto itself, so \(\varphi \circ \alpha\) has the same image vertices and edges as \(\varphi\). \(\Rightarrow\): if \(\varphi'(H) = \varphi(H) =: S\), then \(\varphi'\) and \(\varphi\) are bijections \(V(H) \to V(S)\), so \(\alpha \coloneqq \varphi^{-1} \circ \varphi'\) is a permutation of \(V(H)\) with \(\varphi' = \varphi \circ \alpha\), and
+    \[
+        \begin{aligned}
+            \{u,w\} \in E(H) &\iff \{\varphi'(u), \varphi'(w)\} \in E(S) \\
+            &\iff \{\varphi(\alpha(u)), \varphi(\alpha(w))\} \in E(S) \iff \{\alpha(u), \alpha(w)\} \in E(H),
+        \end{aligned}
+    \]
+    so \(\alpha \in \mathrm{Aut}(H)\). Distinct \(\alpha\) give distinct \(\varphi \circ \alpha\) since \(\varphi\) is injective, so each copy has exactly \(\abs{\mathrm{Aut}(H)}\) preimages, which gives the formula. For the order of magnitude, \(n(n-1)\cdots(n-v+1) = (1+o(1))\,n^{v}\) as \(v\) is fixed, and \(\abs{\mathrm{Aut}(H)} \in [1, v!]\) is a constant.
+\end{proof}
+
+\emph{Probability of one copy.} A given copy \(S\) is in \(G(n,p)\) if and only if each of its \(e(H)\) edges is, and these appear independently with probability \(p\), so \(\mathbb{P}(S \subseteq G(n,p)) = p^{e(H)}\).
+
+Since \(X_H = \sum_{S} \mathbbm{1}_{\{S \subseteq G(n,p)\}}\), \autoref{thm:linearity} and \autoref{lem:count-copies} give, with \(v = v(H)\) and \(e = e(H)\),
+\begin{equation}\label{eq:subgraph-mean}
+    \mathbb{E}[X_H] = \#\{\text{copies}\} \cdot p^{e} = \Theta\bigl( n^{v} p^{e} \bigr) = \Theta\Bigl( \bigl( n^{\frac{v}{e}} p \bigr)^{e} \Bigr)
+    \longrightarrow
+    \begin{cases}
+        0, & \text{if } p \ll n^{-\frac{v}{e}}, \\
+        \infty, & \text{if } p \gg n^{-\frac{v}{e}}.
+    \end{cases}
+\end{equation}
+since \(\bigl( n^{v/e}p \bigr)^{e} \to 0\) iff \(n^{v/e}p \to 0\) iff \(p = o(n^{-v/e})\), and likewise for \(\infty\).
+
+\begin{proposition}\label{prop:subgraph-sparse}
+    If \(p \ll n^{-v(H)/e(H)}\), then \(\mathbb{P}(X_H \ge 1) \to 0\).
+\end{proposition}
+
+\begin{proof}
+    By \thmref{thm:markov} and \eqref{eq:subgraph-mean}, \(\mathbb{P}(X_H \ge 1) \le \mathbb{E}[X_H] \to 0\).
+\end{proof}
+
+For \(H = K_k\) this is the lower half of \autoref{thm:clique-threshold}, since \(v/e = k / \binom{k}{2} = \frac{2}{k-1}\). It is tempting to guess that \(n^{-v/e}\) is always the threshold, but the next example shows it is not.
+
+\begin{eg}\label{eg:k4-pendant}
+    Let \(H\) be \(K_4\) with \(5\) pendant edges attached to one of its vertices, so \(v(H) = 9\) and \(e(H) = 6 + 5 = 11\).
+    \begin{center}
+        \begin{tikzpicture}[thick, every node/.style={font=\small}]
+            \coordinate (a) at (0,2.6);
+            \coordinate (b) at (-0.9,1.6);
+            \coordinate (c) at (0.9,1.6);
+            \coordinate (d) at (0,0.6);
+            \draw[orange!85!black, thin] (0,1.6) ellipse (1.35 and 1.35);
+            \node[orange!85!black] at (1.55,2.55) {$K_4$};
+            \draw (a) -- (b) -- (d) -- (c) -- (a) (a) -- (d) (b) -- (c);
+            \foreach \x [count=\c] in {-1.6,-0.8,0,0.8,1.6}{
+                \coordinate (l\c) at (\x,-0.7);
+                \draw (d) -- (l\c);
+                \fill (l\c) circle (2.2pt);
+            }
+            \foreach \p in {a,b,c,d} \fill (\p) circle (2.4pt);
+            \node[anchor=west, align=left] at (2.6,1.0)
+                {$v(H) = 9$, $e(H) = 11$, $\dfrac{v(H)}{e(H)} = \dfrac{9}{11}$;\\[6pt]
+                 the subgraph $K_4$ has $\dfrac{v}{e} = \dfrac{4}{6} = \dfrac{2}{3} < \dfrac{9}{11}$};
+        \end{tikzpicture}
+    \end{center}
+    Is \(p^{*} = n^{-9/11}\)? Take \(p = n^{-3/4}\). Since \(\frac{2}{3} < \frac{3}{4} < \frac{9}{11}\),
+    \[
+        n^{-\frac{9}{11}} \ll p = n^{-\frac{3}{4}} \ll n^{-\frac{2}{3}}.
+    \]
+    By \eqref{eq:subgraph-mean}, \(\mathbb{E}[X_H] \to \infty\). But by \autoref{thm:clique-threshold} with \(k = 4\), \(G(n,p)\) contains no \(K_4\) with high probability, and \(H \supseteq K_4\), so it contains no copy of \(H\) either. So \(n^{-9/11}\) is not the threshold: the many expected copies are concentrated on the rare outcomes that contain a \(K_4\), which then carries a huge number of pendant stars.
+\end{eg}
+
+The argument in \autoref{eg:k4-pendant} works for any subgraph. If \(H' \subseteq H\), every copy of \(H\) contains a copy of \(H'\), so \(\{X_H \ge 1\} \subseteq \{X_{H'} \ge 1\}\), and \autoref{prop:subgraph-sparse} applied to \(H'\) gives
+\[
+    \mathbb{P}(X_H \ge 1) \le \mathbb{P}(X_{H'} \ge 1) \to 0
+    \qquad\text{whenever } p \ll n^{-v(H')/e(H')}.
+\]
+The best bound comes from the densest subgraph.
+
+\begin{definition}[Maximum density]\label{def:max-density}
+    For a graph \(H\) with \(e(H) \ge 1\), let
+    \[
+        m(H) \coloneqq \max_{\substack{H' \subseteq H \\ e(H') \ge 1}} \frac{e(H')}{v(H')} .
+    \]
+\end{definition}
+
+\begin{proposition}\label{prop:subgraph-sparse-m}
+    If \(p \ll n^{-1/m(H)}\), then \(\mathbb{P}\bigl( H \subseteq G(n,p) \bigr) \to 0\).
+\end{proposition}
+
+\begin{proof}
+    Take \(H' \subseteq H\) attaining the maximum in \autoref{def:max-density}, so \(n^{-1/m(H)} = n^{-v(H')/e(H')}\). Then \(p \ll n^{-v(H')/e(H')}\), and the display above gives \(\mathbb{P}(X_H \ge 1) \le \mathbb{P}(X_{H'} \ge 1) \to 0\).
+\end{proof}
+
+Since \(H' = H\) is allowed, \(m(H) \ge e(H)/v(H)\), so \(n^{-1/m(H)} \ge n^{-v(H)/e(H)}\) and \autoref{prop:subgraph-sparse-m} is at least as strong as \autoref{prop:subgraph-sparse}. In \autoref{eg:k4-pendant}, \(m(H) = \frac{6}{4} = \frac{3}{2}\), attained by \(K_4\), and \(n^{-1/m(H)} = n^{-2/3}\).
+
+\begin{question}\label{q:subgraph-converse}
+    If \(p \gg n^{-1/m(H)}\), is it true that \(\mathbb{P}\bigl( H \subseteq G(n,p) \bigr) \to 1\)?
+\end{question}
+
+\subsection{Balanced Graphs}
+
+For some graphs the densest subgraph is \(H\) itself, and then the guess \(n^{-v(H)/e(H)}\) from \autoref{prop:subgraph-sparse} already equals \(n^{-1/m(H)}\).
+
+\begin{definition}[Balanced]\label{def:balanced}
+    A graph \(H\) is \vocab{balanced} if \(m(H) = \frac{e(H)}{v(H)}\), i.e.\ \(\frac{e(H')}{v(H')} \le \frac{e(H)}{v(H)}\) for every \(H' \subseteq H\) with \(e(H') \ge 1\). It is \vocab{strictly balanced} if moreover equality holds only for \(H' = H\).
+\end{definition}
+
+For balanced \(H\), \(n^{-1/m(H)} = n^{-v(H)/e(H)}\), so the bound of \autoref{prop:subgraph-sparse} is already the best one available from first moments. Every clique \(K_k\) is strictly balanced: a subgraph \(H'\) on \(j \le k\) vertices has \(e(H') \le \binom{j}{2}\), so
+\[
+    \frac{e(H')}{v(H')} \le \frac{\binom{j}{2}}{j} = \frac{j-1}{2} \le \frac{k-1}{2} = \frac{e(K_k)}{v(K_k)},
+\]
+with equality throughout only if \(j = k\) and \(e(H') = \binom{k}{2}\), i.e.\ \(H' = K_k\).
+
+\begin{eg}\label{eg:balanced}
+    Four graphs, each labelled with its density \(\frac{e}{v}\) and, where relevant, a densest proper subgraph \(H'\):
+    \begin{center}
+        \begin{tikzpicture}[thick, every node/.style={font=\small}]
+            % (a) K4 + 5 pendant edges
+            \begin{scope}[shift={(0,0)}]
+                \coordinate (a) at (0,2.2); \coordinate (b) at (-0.7,1.5);
+                \coordinate (c) at (0.7,1.5); \coordinate (d) at (0,0.8);
+                \draw[orange!85!black, thin] (0,1.5) circle (1.0);
+                \draw (a) -- (b) -- (d) -- (c) -- (a) (a) -- (d) (b) -- (c);
+                \foreach \x in {-1,-0.5,0,0.5,1}{\draw (d) -- (\x,-0.1); \fill (\x,-0.1) circle (1.8pt);}
+                \foreach \p in {a,b,c,d} \fill (\p) circle (2pt);
+                \node[orange!85!black] at (1.15,2.35) {$H'$};
+                \node[align=center] at (0,-0.75) {(a) not balanced\\$\tfrac{11}{9} < \tfrac{6}{4}$};
+            \end{scope}
+            % (b) K_{3,3} drawn as a hexagon with long diagonals
+            \begin{scope}[shift={(5.6,1.2)}]
+                \foreach \i in {0,...,5}{\coordinate (h\i) at (60*\i:1.0);}
+                \draw (h0) -- (h1) -- (h2) -- (h3) -- (h4) -- (h5) -- (h0);
+                \draw (h0) -- (h3) (h1) -- (h4) (h2) -- (h5);
+                \foreach \i in {0,...,5} \fill (h\i) circle (2pt);
+                \node[align=center] at (0,-1.95) {(b) $K_{3,3}$: strictly balanced\\$\tfrac{9}{6}$};
+            \end{scope}
+            % (c) two disjoint K4's
+            \begin{scope}[shift={(0,-3.4)}]
+                \foreach \s in {-0.85,0.85}{
+                    \begin{scope}[shift={(\s,0)}]
+                        \foreach \i in {0,...,3}{\coordinate (q\i) at (45+90*\i:0.6);}
+                        \draw (q0) -- (q1) -- (q2) -- (q3) -- (q0) (q0) -- (q2) (q1) -- (q3);
+                        \foreach \i in {0,...,3} \fill (q\i) circle (2pt);
+                    \end{scope}}
+                \draw[blue!60!black, thin] (0.85,0) circle (0.8);
+                \node[blue!60!black] at (1.75,0.75) {$H'$};
+                \node[align=center] at (0,-1.95) {(c) $2K_4$: balanced, not strictly\\$\tfrac{12}{8} = \tfrac{6}{4}$};
+            \end{scope}
+            % (d) K4 with a path of two extra vertices
+            \begin{scope}[shift={(5.6,-3.4)}]
+                \coordinate (u1) at (-1.2,0.6); \coordinate (u2) at (0,0.6); \coordinate (u3) at (1.2,0.6);
+                \coordinate (w1) at (-1.2,-0.6); \coordinate (w2) at (0,-0.6); \coordinate (w3) at (1.2,-0.6);
+                \draw[orange!85!black, thin, rounded corners=8pt] (-1.5,-0.9) rectangle (0.3,0.9);
+                \draw (u1) -- (u2) -- (w2) -- (w1) -- (u1) (u1) -- (w2) (u2) -- (w1);
+                \draw (u2) -- (u3) -- (w3) -- (w2);
+                \foreach \p in {u1,u2,u3,w1,w2,w3} \fill (\p) circle (2pt);
+                \node[orange!85!black] at (-1.25,1.15) {$H'$};
+                \node[align=center] at (0,-1.95) {(d) balanced, not strictly\\$\tfrac{9}{6} = \tfrac{6}{4}$};
+            \end{scope}
+        \end{tikzpicture}
+    \end{center}
+    \begin{enumerate}[(a)]
+        \item The graph of \autoref{eg:k4-pendant}: \(H' = K_4\) has \(\frac{6}{4} > \frac{11}{9}\), so it is not balanced.
+        \item \(K_{3,3}\) (a hexagon with its three long diagonals) has \(\frac{e}{v} = \frac{9}{6}\). A proper subgraph on all \(6\) vertices has at most \(8\) edges, so density \(\le \frac{8}{6} < \frac{9}{6}\). A subgraph on \(a\) vertices of one side and \(b\) of the other, with \(a + b \le 5\) and \(a, b \le 3\), has at most \(ab\) edges, and \(\frac{ab}{a+b} \le \frac{6}{5} < \frac{9}{6}\) (the maximum is at \(\{a,b\} = \{2,3\}\)). So it is strictly balanced.
+        \item Two disjoint copies of \(K_4\) have \(\frac{12}{8} = \frac{3}{2}\). A subgraph \(H'\) splits into parts \(H'_1, H'_2\) in the two copies, each of density \(\le \frac{3}{2}\) (as \(K_4\) is balanced), so \(\frac{e(H')}{v(H')} = \frac{e(H'_1) + e(H'_2)}{v(H'_1) + v(H'_2)} \le \frac{3}{2}\). Each \(K_4\) on its own attains \(\frac{6}{4} = \frac{3}{2}\): balanced, but not strictly.
+        \item \(K_4\) plus two vertices joined to each other and to two vertices of the \(K_4\), as drawn: \(\frac{e}{v} = \frac{9}{6} = \frac{6}{4}\), equal to the density of the \(K_4\) inside it. A subgraph on \(j \le 4\) vertices has density \(\le \frac{j-1}{2} \le \frac{3}{2}\); one on \(5\) vertices misses a vertex of degree \(\ge 2\), so has \(\le 7\) edges and density \(\le \frac{7}{5}\); one on \(6\) vertices has \(\le 9\) edges. Balanced, but not strictly.
+    \end{enumerate}
+\end{eg}
+
+\subsection{The Threshold for Containing \texorpdfstring{\(H\)}{H}}
+
+The answer to \autoref{q:subgraph-converse} is yes, for every \(H\).
+
+\begin{theorem}\label{thm:subgraph-threshold}
+    Let \(H\) be a graph with \(e(H) \ge 1\). If \(p \gg n^{-1/m(H)}\), then with high probability
+    \[
+        X_H = (1+o(1))\,\mathbb{E}[X_H] = \Theta\bigl( n^{v(H)} p^{e(H)} \bigr) \to \infty;
+    \]
+    in particular \(\mathbb{P}\bigl( H \subseteq G(n,p) \bigr) \to 1\). Together with \autoref{prop:subgraph-sparse-m}, \(p^{*} = n^{-1/m(H)}\) is a threshold for \(H \subseteq G(n,p)\). For balanced \(H\) this is \(n^{-v(H)/e(H)}\), and for \(H = K_k\) it recovers \autoref{thm:clique-threshold}.
+\end{theorem}
+
+\begin{proof}
+    Write \(v = v(H)\), \(e = e(H)\), \(m = m(H)\). The events \(E_S = \{S \subseteq G(n,p)\}\), \(S\) ranging over copies of \(H\), are symmetric by \autoref{lem:copies-symmetric}, so by \autoref{cor:second-moment-sym} it suffices to show \(\mathbb{E}[X_H] \to \infty\) and \(\Delta^{*} = o\bigl( \mathbb{E}[X_H] \bigr)\).
+
+    \emph{The key inequality.} If \(J \subseteq H\) has \(e(J) \ge 1\), then \(\frac{e(J)}{v(J)} \le m\) by \autoref{def:max-density}, so, as \(p \le 1\),
+    \begin{equation}\label{eq:subgraph-density-bound}
+        n^{v(J)} p^{e(J)} = \bigl( n\, p^{e(J)/v(J)} \bigr)^{v(J)} \ge \bigl( n\, p^{m} \bigr)^{v(J)} .
+    \end{equation}
+    Here \(n\,p^{m} \to \infty\), since \(p \gg n^{-1/m}\). Taking \(J = H\) and using \eqref{eq:subgraph-mean}, \(\mathbb{E}[X_H] = \Theta(n^{v}p^{e}) \to \infty\).
+
+    Now fix a copy \(S\), let \(T \ne S\) be another copy, and let \(J\) be the graph of common edges, \(E(J) = E(S) \cap E(T)\), on the endpoints of those edges.
+    \begin{itemize}
+        \item \emph{Which \(T\).} If \(e(J) = 0\), then \(E_S, E_T\) are determined by disjoint sets of pairs and are independent. If \(e(J) \ge 1\), then
+        \[
+            \mathbb{P}(E_S \cap E_T) = p^{2e - e(J)} > p^{2e} = \mathbb{P}(E_S)\,\mathbb{P}(E_T)
+        \]
+        for \(0 < p < 1\). So \(T \sim S\) iff \(e(J) \ge 1\), and then \(i \coloneqq \abs{V(S) \cap V(T)} \ge 2\), as a common edge has both ends in \(V(S) \cap V(T)\).
+        \item \emph{Conditional probability.} By the definition of conditional probability and the previous bullet,
+        \[
+            \mathbb{P}(E_T \mid E_S) = \frac{\mathbb{P}(E_S \cap E_T)}{\mathbb{P}(E_S)} = \frac{p^{2e - e(J)}}{p^{e}} = p^{e - e(J)}.
+        \]
+        Since \(J \subseteq S \cong H\), \(J\) is isomorphic to a subgraph of \(H\) with \(e(J) \ge 1\), and \(V(J) \subseteq V(S) \cap V(T)\) gives \(v(J) \le i\). Hence, using \(n^{i} \ge n^{v(J)}\), then \eqref{eq:subgraph-density-bound} together with \((n\,p^{m})^{v(J)} \ge n\,p^{m}\) (true for large \(n\), as \(n\,p^{m} \ge 1\) and \(v(J) \ge 1\)),
+        \[
+            \mathbb{P}(E_T \mid E_S) = p^{e} \cdot \frac{1}{p^{e(J)}} = n^{v}p^{e} \cdot \frac{1}{n^{v-i}} \cdot \frac{1}{n^{i}\, p^{e(J)}}
+            \le n^{v}p^{e} \cdot \frac{1}{n^{v-i}} \cdot \frac{1}{n^{v(J)} p^{e(J)}}
+            \le n^{v}p^{e} \cdot \frac{1}{n^{v-i}} \cdot \frac{1}{n\,p^{m}} .
+        \]
+        \item \emph{Number of \(T\) with \(\abs{V(S) \cap V(T)} = i\).} Choose the \(i\) shared vertices among the \(v\) vertices of \(S\), the other \(v - i\) vertices among \([n]\), and a copy of \(H\) on the resulting \(v\)-set (at most \(v!\) of them):
+        \[
+            \#\bigl\{ T : \abs{V(S) \cap V(T)} = i \bigr\} \le \binom{v}{i} \cdot n^{v-i} \cdot v! = O\bigl( n^{v-i} \bigr).
+        \]
+    \end{itemize}
+    Grouping the \(T \sim S\) by \(i\), bounding each \(\mathbb{P}(E_T \mid E_S)\) by the second bullet and the number of terms by the third,
+    \[
+        \begin{aligned}
+            \Delta^{*}
+            &= \sum_{i=2}^{v} \ \sum_{\substack{T \sim S \\ \abs{V(S) \cap V(T)} = i}} \mathbb{P}(E_T \mid E_S)
+            \le \sum_{i=2}^{v} \#\bigl\{ T : \abs{V(S) \cap V(T)} = i \bigr\} \cdot \max_{\substack{T \sim S \\ \abs{V(S) \cap V(T)} = i}} \mathbb{P}(E_T \mid E_S) \\
+            &\le \sum_{i=2}^{v} O\bigl( n^{v-i} \bigr) \cdot n^{v}p^{e} \cdot \frac{1}{n^{v-i}} \cdot \frac{1}{n\,p^{m}}
+            = \sum_{i=2}^{v} O\Bigl( \frac{n^{v}p^{e}}{n\,p^{m}} \Bigr)
+            = O\Bigl( \frac{n^{v}p^{e}}{n\,p^{m}} \Bigr) \\
+            &
+            = o\bigl( n^{v}p^{e} \bigr)
+            = o\bigl( \mathbb{E}[X_H] \bigr),
+        \end{aligned}
+    \]
+    where the sum has only \(v - 1\) terms, \(n\,p^{m} \to \infty\), and \(\mathbb{E}[X_H] = \Theta(n^{v}p^{e})\) by \eqref{eq:subgraph-mean}.
+\end{proof}
