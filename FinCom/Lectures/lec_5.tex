@@ -25,7 +25,7 @@ Three directions:
 	\item \textbf{a payoff that depends on the whole path}: Asian options, where the tree stops recombining and the algorithmic questions of \autoref{sec:bopm-algorithms} come back with a vengeance.
 \end{enumerate}
 
-\zh{前兩章只處理股票上的 European option。這一章看同一套方法能延伸多遠：(i) 換標的——公司總價值（股票和債券都變成 option）、外幣（等於有 dividend yield 的股票）；(ii) 換成仍只看少數 state 的 payoff——barrier option，在 tree 上仍然容易；(iii) 看整條 path 的 payoff——Asian option，tree 不再 recombine，\autoref{sec:bopm-algorithms} 的演算法問題又回來了。}
+\zh{前兩章只處理以股票為標的的 European option。這一章看同一套方法能延伸多遠：(i) 換標的——公司總價值（股票和債券都變成 option）、外幣（等於有 dividend yield 的股票）；(ii) 換成仍只看少數 state 的 payoff——barrier option，在 tree 上仍然容易；(iii) 看整條 path 的 payoff——Asian option，tree 不再 recombine，\autoref{sec:bopm-algorithms} 的演算法問題又回來了。}
 
 %─────§ Corporate securities─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Pricing Corporate Securities}
@@ -45,7 +45,12 @@ Its assumptions are:
 \zh{把標的資產解讀成公司總價值，就能用 option 定價方法替公司發行的證券定價，這是 Merton（1974）的 structural model。假設：公司可以賣資產來付款；若沒付到對債權人的承諾款項，債權人接管公司，股東什麼都拿不到。}
 
 \begin{remark}
-	\vocab{結構式模型}（structural model）：把公司的總資產價值 $V$ 當成標的資產，股票與債券都是 $V$ 上的衍生性商品；違約是 $V$ 跌到不足以償債時「內生」發生的事件，而不是另外假設的外生機率。
+	\vocab{結構式模型}（structural model）：把公司總資產價值 $V$ 當成標的資產，股票與債券都是以 $V$ 為標的的衍生性商品。
+	\begin{itemize}[nosep]
+		\item \textbf{違約由 $V$ 決定（endogenous）。}違約就是事件 $\{V^{*}<X\}$：到期時資產不夠還債。一旦給定 $V$ 的模型（例如 $V$ 是 lognormal），違約機率就是 $\Pr[V^{*}<X]$，從模型\emph{算出來}，不是另外輸入的參數。
+		\item \textbf{對照：外生（exogenous）違約。}另一類模型（reduced-form model）直接假設「每單位時間以機率 $\lambda$ 違約」，$\lambda$ 由市場資料校準，和 $V$ 的高低沒有關係。
+	\end{itemize}
+	所以 structural model 能回答「公司為什麼違約」：$V$ 越接近 $X$、波動 $\sigma$ 越大，違約機率就越高。
 \end{remark}
 
 \subsection{Risky Zero-Coupon Bonds and Stock}
@@ -86,7 +91,7 @@ If $V^{*}>X$, then the bondholders obtain $X$ and the stockholders $V^{*}-X$:
 	The bonds pay $\min(V^{*},X)$: they are a covered call on the total value of the firm (\autoref{sec:hedges}).
 \end{moral}
 
-\zh{股票的 payoff 和 call 一樣：它是公司總價值上 strike $X$、到期日同債券的 call，這個 call 給了股東 limited liability。債券拿 $\min(V^{*},X)$，等於公司總價值上的 covered call。}
+\zh{股票的 payoff 和 call 一樣：它是以公司總價值為標的、履約價 $X$、到期日同債券的 call，這個 call 給了股東 limited liability。債券拿 $\min(V^{*},X)$，等於以公司總價值為標的的 covered call。}
 
 \begin{remark}
 	\vocab{有限責任}（limited liability）：股東最多賠掉投資的錢，不必用個人財產償還公司債務。用選擇權的語言，就是買權的報酬 $\max(V^{*}-X,0)$ 不會是負的。
@@ -101,7 +106,7 @@ Thus
 Knowing $C$ amounts to knowing how the value of the firm is divided between stockholders and bondholders.
 Whatever the value of $C$, the total value of the stock and bonds at maturity remains $V^{*}$, so the relative size of debt and equity is irrelevant to the firm's current value $V$.
 
-\zh{令 $V$ 為公司總價值、$C$ 為 $V$ 上 strike $X$ 的 call，則市值 $nS=C$、$B=V-C$。知道 $C$ 就知道公司價值怎麼分給股東和債權人。不論 $C$ 多少，到期時股票加債券總是 $V^{*}$，所以負債與股權的比例不影響公司現在的價值 $V$。}
+\zh{令 $V$ 為公司總價值、$C$ 為以 $V$ 為標的、履約價 $X$ 的 call，則市值 $nS=C$、$B=V-C$。知道 $C$ 就知道公司價值怎麼分給股東和債權人。不論 $C$ 多少，到期時股票加債券總是 $V^{*}$，所以負債與股權的比例不影響公司現在的價值 $V$。}
 
 \begin{remark}
 	\textbf{$nS=C$ 怎麼來。}
@@ -134,14 +139,15 @@ The second line is $V-C$ with $1-N(x)=N(-x)$.
 \begin{remark}
 	\begin{enumerate}[(1),nosep]
 		\item \textbf{\eqref{eq:merton-stock}。}$nS=C$，而 $C$ 是標的為 $V$、strike 為 $X$ 的 call，所以就是 \eqref{eq:bs-call} 把 $S$ 換成 $V$（$x$ 也一樣換）。
-		\item \textbf{\eqref{eq:merton-bond}。}$B=V-C=V-VN(x)+Xe^{-r\tau}N(x-\sigma\sqrt{\tau})=V\bigl(1-N(x)\bigr)+Xe^{-r\tau}N(x-\sigma\sqrt{\tau})$，再用 $1-N(x)=N(-x)$。
+		\item \textbf{\eqref{eq:merton-bond}，兩條路。}
+		      \begin{enumerate}[(a),nosep]
+			      \item 直接用 $B=V-C$：$B=V\bigl(1-N(x)\bigr)+Xe^{-r\tau}N(x-\sigma\sqrt{\tau})$，再用 $1-N(x)=N(-x)$。
+			      \item 用 put--call parity（\autoref{thm:put-call-parity}，$S$ 換成 $V$）：$V-C=Xe^{-r\tau}-P$，代入 \eqref{eq:bs-put}：
+			            $B=Xe^{-r\tau}\bigl[1-N(-x+\sigma\sqrt{\tau})\bigr]+VN(-x)$，再用 $1-N(-z)=N(z)$。
+		      \end{enumerate}
+		      兩者等價，因為 $B=V-C$ 和 parity 是同一個式子。
 	\end{enumerate}
 \end{remark}
-
-\begin{note}
-	反過來用 parity 讀 \eqref{eq:merton-bond}：$B=V-C=Xe^{-r\tau}-P$，其中 $P$ 是標的為 $V$、strike 為 $X$ 的 put。
-	risky bond 就是 riskless bond \emph{減去}一個 put --- bondholders 等於賣給 stockholders 一個權利：可以交出公司來代替支付 $X$。
-\end{note}
 
 The continuously compounded yield to maturity of the firm's bond is $\ln(X/B)/\tau$.
 
@@ -220,12 +226,33 @@ It is the model-based counterpart of the static spread of \autoref{sec:spreads}.
 
 \zh{圖：$\sigma=20\%$ 下 credit spread 對期限的曲線。槓桿低時 spread 從 $0$ 開始上升；槓桿高時先升後降。$\omega\ge1$ 時公司以現值計已資不抵債，$\tau\to0$ 時 spread 爆掉。}
 
+\begin{remark}
+	\vocab{槓桿}（leverage）：用借來的錢（債）撐起資產，\autoref{fig:merton-spread} 用 $\omega=Xe^{-r\tau}/V$ 衡量，$\omega$ 越大槓桿越高。
+	叫「槓桿」是因為它像槓桿一樣\emph{放大}股東的報酬：股權 $nS=V-B$，$V$ 的漲跌（債權人最多拿 $X$）大部分落在較小的 $nS$ 上。
+	例：$V=100$、$B\approx90$、$nS\approx10$，$V$ 漲 $5\%$ 時 $nS$ 約漲 $50\%$；反之 $V$ 跌一點，股權就大幅縮水、離違約 $\{V^{*}<X\}$ 也更近，所以 $\omega$ 越大 spread 越高。
+\end{remark}
+
 \begin{intuition}
-	For short maturities a low-leverage firm simply cannot fall far enough in time to default, so the spread starts at zero --- one of the model's well-known weaknesses, since observed short-term spreads are not zero.
-	Over long horizons the firm value drifts at $r$ in the risk-neutral world and outruns a debt that does not grow, so the annualized spread eventually declines.
+	Write $s(\tau)$ for the spread \eqref{eq:merton-spread}.
+	Since $\ln(V/X)=-\ln\omega-r\tau$, \autoref{lem:rn-lognormal} (with $V$ for $S$) gives, under $\pi$,
+	\[
+		\ln(V^{*}/X)\;\sim\;N\bigl(-\ln\omega-\sigma^{2}\tau/2,\ \sigma^{2}\tau\bigr) ,
+	\]
+	and default $\{V^{*}<X\}$ means this falls below $0$.
+	So the firm starts a distance $-\ln\omega>0$ above default, and the noise has size $\sigma\sqrt{\tau}$.
+	\begin{itemize}[nosep]
+		\item \textbf{Rising.} While $\sigma\sqrt{\tau}\ll-\ln\omega$, default is almost impossible and $s\approx0$ (a known weakness: observed short spreads are not zero).
+		      As $\sigma\sqrt{\tau}$ approaches $-\ln\omega$, i.e.\ $\tau\approx(\ln\omega/\sigma)^{2}$ ($\approx0.3$, $3$, $12$ years for $\omega=0.9,0.7,0.5$), default becomes likely and $s$ climbs.
+		\item \textbf{Falling.} $s\tau=-\ln(Be^{r\tau}/X)$ is the total discount for default over $[0,\tau]$, and $s$ is its per-year average.
+		      Paths that survive the early dangerous period mostly sit well above $X$, so each extra year adds less than the average so far, and the average falls.
+	\end{itemize}
+	So every curve is a hump; within $10$ years only $\omega=0.9$ shows its peak ($\omega=0.7$ peaks near $10$ years, $\omega=0.5$ near $44$).
 \end{intuition}
 
-\zh{期限很短時，低槓桿的公司來不及跌到違約，所以 spread 從 $0$ 開始——這是模型有名的缺點，因為實際的短期 spread 不是 $0$。期限很長時，risk-neutral 下公司價值以 $r$ 成長、甩開不會成長的負債，所以年化 spread 最後會下降。}
+\zh{記 spread 為 $s(\tau)$。由 $\ln(V/X)=-\ln\omega-r\tau$ 和 \autoref{lem:rn-lognormal}，risk-neutral 下 $\ln(V^{*}/X)\sim N(-\ln\omega-\sigma^{2}\tau/2,\sigma^{2}\tau)$，違約就是它掉到 $0$ 以下：公司一開始離違約 $-\ln\omega$，雜訊大小 $\sigma\sqrt{\tau}$。
+	\textbf{上升}：$\sigma\sqrt{\tau}\ll-\ln\omega$ 時幾乎不會違約，$s\approx0$（模型的缺點：實際短期 spread 不是 $0$）；$\tau\approx(\ln\omega/\sigma)^{2}$（$\omega=0.9,0.7,0.5$ 分別約 $0.3$、$3$、$12$ 年）時雜訊追上距離，違約變得可能，$s$ 上升。
+	\textbf{下降}：$s\tau=-\ln(Be^{r\tau}/X)$ 是 $[0,\tau]$ 上的總違約折價，$s$ 是每年平均；撐過前期危險期的 path 大多已遠高於 $X$，之後每多一年增加的折價小於目前平均，所以平均下降。
+	因此每條曲線都是先升後降，只是 $10$ 年內只看得到 $\omega=0.9$ 的峰（$\omega=0.7$ 約在 $10$ 年、$\omega=0.5$ 約在 $44$ 年）。}
 
 \source{Slide p.~384}
 
@@ -240,13 +267,36 @@ The stock is unaffected by bankruptcy costs --- it gets nothing in default anywa
 
 \zh{一般情況：公司有 dividend yield $q$、破產成本是剩餘價值的固定比例 $\alpha$，股票和債券就變成上面兩式。股票不受破產成本影響（違約時本來就拿不到），債權人則只拿回 $(1-\alpha)V^{*}$。}
 
+\begin{remark}
+	\vocab{破產成本}（bankruptcy costs）：公司違約後走破產程序本身耗掉的價值，不歸股東也不歸債權人。
+	包括直接成本（律師、會計師、法院費用）和間接成本（資產被迫低價拍賣（fire sale）、客戶和員工流失）。
+	這裡假設它是剩餘價值的固定比例：違約 $\{V^{*}\le X\}$ 時 $\alpha V^{*}$ 被耗掉，債權人只拿到 $(1-\alpha)V^{*}$；$\alpha=0$ 就是前面 \eqref{eq:merton-bond} 的情形。
+\end{remark}
+
 \begin{remark}[補充]
-	\textbf{$B$ 怎麼來。}到期時債券的 payoff 是 $(1-\alpha)V^{*}\mathbf{1}_{\{V^{*}\le X\}}+X\mathbf{1}_{\{V^{*}>X\}}$，分兩項取現值：
-	\begin{enumerate}[(1),nosep]
-		\item call 的公式 $Ve^{-q\tau}N(x)-Xe^{-r\tau}N(x-\sigma\sqrt{\tau})$ 中，第一項是 $V^{*}\mathbf{1}_{\{V^{*}>X\}}$ 的現值、第二項是 $X\mathbf{1}_{\{V^{*}>X\}}$ 的現值。
-		\item $V^{*}$ 本身的現值是 $Ve^{-q\tau}$（\autoref{sec:continuous-yield}），所以 $V^{*}\mathbf{1}_{\{V^{*}\le X\}}$ 的現值是 $Ve^{-q\tau}\bigl(1-N(x)\bigr)=Ve^{-q\tau}N(-x)$，乘上 $(1-\alpha)$。
-		\item 兩項相加就是上面的 $B$。$\alpha=0$、$q=0$ 時回到 \eqref{eq:merton-bond}。
+	\textbf{$B$ 怎麼來：仍是「總價值 $-\,C$」，再扣破產成本。}
+	到期時 $V^{*}$ 分給三方：股東拿 $\max(V^{*}-X,0)$、破產成本吃掉 $\alpha V^{*}\mathbf{1}_{\{V^{*}\le X\}}$、債權人拿剩下的。
+	現值是 risk-neutral 期望值再折現（\eqref{eq:rn-pricing}），對 payoff 是線性的，所以
+	\[
+		B \;=\; \mathrm{PV}(V^{*}) \;-\; C \;-\; \alpha\,\mathrm{PV}\bigl(V^{*}\mathbf{1}_{\{V^{*}\le X\}}\bigr) .
+	\]
+	三個現值逐一來：
+	\begin{enumerate}[(a),nosep]
+		\item \textbf{$\mathrm{PV}(V^{*})=Ve^{-q\tau}$。}\autoref{sec:continuous-yield} remark (2)：以 $q$ 配出去的部分在到期前就離開公司。和 $B=V-C$ 相比，這是第一個調整。
+		\item \textbf{$C=Ve^{-q\tau}N(x)-Xe^{-r\tau}N(x-\sigma\sqrt{\tau})$。}\eqref{eq:bs-call-q} 把 $S$ 換成 $V$。
+		\item \textbf{$\mathrm{PV}\bigl(V^{*}\mathbf{1}_{\{V^{*}\le X\}}\bigr)=Ve^{-q\tau}N(-x)$。}這是「只在違約時拿到 $V^{*}$」的現值，沒有現成公式，要從 (a)(b) 湊：
+		      \begin{enumerate}[(i),nosep]
+			      \item 用 $\mathbf{1}_{\{V^{*}\le X\}}=1-\mathbf{1}_{\{V^{*}>X\}}$：它等於 $\mathrm{PV}(V^{*})-\mathrm{PV}\bigl(V^{*}\mathbf{1}_{\{V^{*}>X\}}\bigr)$。
+			      \item 求 $\mathrm{PV}\bigl(V^{*}\mathbf{1}_{\{V^{*}>X\}}\bigr)$：把 call 的 payoff 拆開，$\max(V^{*}-X,0)=V^{*}\mathbf{1}_{\{V^{*}>X\}}-X\mathbf{1}_{\{V^{*}>X\}}$，取現值得
+			            $C=\mathrm{PV}\bigl(V^{*}\mathbf{1}_{\{V^{*}>X\}}\bigr)-Xe^{-r\tau}N(x-\sigma\sqrt{\tau})$，
+			            其中 $\mathrm{PV}(\mathbf{1}_{\{V^{*}>X\}})=e^{-r\tau}N(x-\sigma\sqrt{\tau})$ 是 binary call（\autoref{eg:bs-binary}，$S$ 換成 $Ve^{-q\tau}$）。
+			            和 (b) 對照，$\mathrm{PV}\bigl(V^{*}\mathbf{1}_{\{V^{*}>X\}}\bigr)=Ve^{-q\tau}N(x)$，就是 (b) 的第一項。
+			      \item 相減：$Ve^{-q\tau}-Ve^{-q\tau}N(x)=Ve^{-q\tau}N(-x)$。
+		      \end{enumerate}
 	\end{enumerate}
+	代入：$B=Ve^{-q\tau}-\bigl[Ve^{-q\tau}N(x)-Xe^{-r\tau}N(x-\sigma\sqrt{\tau})\bigr]-\alpha Ve^{-q\tau}N(-x)=(1-\alpha)Ve^{-q\tau}N(-x)+Xe^{-r\tau}N(x-\sigma\sqrt{\tau})$；$\alpha=q=0$ 時回到 \eqref{eq:merton-bond}。
+	$-C$ 那一項不必拆；拆 $C$ 只是為了得到 (c)，因為破產成本看的是違約時的 $V^{*}$，$C$ 本身不直接給這個量。
+	另外 $nS+B=Ve^{-q\tau}\bigl(1-\alpha N(-x)\bigr)$：破產成本讓證券總值變小，Modigliani--Miller 不再成立。
 \end{remark}
 
 \subsection{A Numerical Example}
@@ -296,7 +346,8 @@ As the Merck calls are being traded, we do not need formulas to price them (\aut
 		$44\frac12$ & 45  & Oct  & 367                      & $2\frac34$              & 188   & $2\frac1{16}$            \\
 		\bottomrule
 	\end{tabular}
-	\caption{Merck option quotations, March 20, 1995 (textbook Fig.~11.1).}
+	\caption{Merck option quotations, March 20, 1995 (textbook Fig.~11.1).
+		第一欄是 Merck 當天股價 $44\frac12$；Vol.\ 是成交量（volume，當天成交幾口，不是 volatility）；Last 是當天最後成交價（每股）；「\ldots」表示當天沒有成交。1995 年美股以 $\frac1{16}$ 美元報價。}
 	\label{tab:merck}
 \end{table}
 
@@ -311,15 +362,26 @@ dollars, or \$975 per bond.
 
 The XYZ.com bonds are equivalent to a default-free zero-coupon bond with \$$X$ par value plus $n$ written European puts on Merck at a strike price of \$30, by put--call parity (\autoref{thm:put-call-parity}).
 
-\begin{remark}
-	\begin{enumerate}[(1),nosep]
-		\item \textbf{為什麼用 strike $X/n$ 的 Merck call。}記 $M^{*}$ 為到期時一股 Merck 的價格，$V^{*}=nM^{*}$。股票的 payoff 是 $\max(V^{*}-X,0)=n\max(M^{*}-X/n,0)$，也就是 $n$ 個 strike $X/n=30$ 的 Merck call。
-		\item \textbf{債券 $=$ riskless bond $-$ puts。}由 parity，$B=V-C=Xe^{-r\tau}-P$，$P$ 是標的 $V$、strike $X$ 的 put；同 (1)，$P$ 就是 $n$ 個 strike $30$ 的 Merck put。
-	\end{enumerate}
-\end{remark}
 The difference between $B$ and the price of the default-free bond is the value of these puts.
 
 \zh{由 put--call parity，XYZ.com 的債券等於面額 $X$ 的無違約 zero-coupon bond 加上賣出 $n$ 個 strike 30 的 Merck European put；$B$ 和無違約債券價格的差就是這些 put 的價值。}
+
+\begin{remark}
+	\textbf{這個例子在做什麼。}目標是算出 XYZ.com 的股票 $nS$ 和債券 $B$ 值多少。由 $nS=C$，只要知道 call $C$ 的價格；而 XYZ.com 的資產全是 Merck 股票，所以 $C$ 可以直接用市場上 Merck option 的成交價，不必用 Black--Scholes（也就不用估 $\sigma$）。
+	\begin{enumerate}[(1),nosep]
+		\item \textbf{股票 $=n$ 個 Merck call。}記 $M^{*}$ 為 7/21 一股 Merck 的價格，公司持有 $n=1{,}000$ 股 Merck，所以 $V^{*}=nM^{*}$，股東 payoff $\max(V^{*}-X,0)=n\max(M^{*}-X/n,0)$：$n$ 個 strike $X/n$、到期日和債券相同（July）的 Merck call。代入上面的 $n=1{,}000$、$X=30{,}000$，strike $X/n=30$。由 \autoref{cor:same-payoff}，$nS=n\times15.25=15{,}250$（\autoref{tab:merck} 第一列的 Last）。
+		\item \textbf{債券。}$B=V-nS=44{,}500-15{,}250=29{,}250$，30 張平分，每張 $975$。
+		\item \textbf{債券 $=$ riskless bond $-$ puts（第二段英文）。}英文說：債券等於「面額 $X$ 的無違約 zero-coupon bond」加上「賣出（written）$n$ 個 strike $30$ 的 Merck put」。看到期 payoff 就知道：
+		      \[
+			      \underbrace{\min(V^{*},X)}_{\text{債券}}=\underbrace{X}_{\text{無違約債券}}-\underbrace{\max(X-V^{*},0)}_{\text{put}} .
+		      \]
+		      $V^{*}\ge X$ 時兩邊都是 $X$；$V^{*}<X$ 時右邊是 $X-(X-V^{*})=V^{*}$。
+		      也就是債權人先「保證拿 $X$」，但賣了一個 put 給股東：公司不夠還時，債權人要吞下差額 $X-V^{*}$。
+		      同 (1)，$\max(X-V^{*},0)=n\max(30-M^{*},0)$，是 $n$ 個 strike $30$ 的 July Merck put。
+		      取現值：$B=Xe^{-r\tau}-n\,P_{\text{Merck}}$（和 put--call parity $V-C=Xe^{-r\tau}-P$ 是同一件事）。
+		      所以英文第二句「$B$ 和無違約債券價格 $Xe^{-r\tau}$ 的差是這些 put 的價值」就是 $Xe^{-r\tau}-B=n\,P_{\text{Merck}}$：違約風險讓債券少值的部分。
+	\end{enumerate}
+\end{remark}
 
 \source{Slides pp.~389--390}
 
@@ -367,7 +429,7 @@ The market value of the stock decreases as the debt-to-equity ratio increases.
 
 There are conflicts between stockholders and bondholders.
 An option's terms cannot be changed after issuance, but a firm can change its capital structure.
-There lies one key difference between options and corporate securities: parameters such as volatility,\footnote{This is called the \vocab{asset substitution problem} (Myers, 1977).} dividend, and strike price are under partial control of the stockholders or boards.
+There lies one key difference between options and corporate securities: parameters such as volatility,\footnote{This is called the \vocab{asset substitution problem} (Myers, 1977). 這裡的 $\sigma$ 是公司資產 $V$ 的 volatility，由公司投資什麼決定（例如 XYZ.com 把 Merck 換成更高風險的資產），所以股東可以調整。股票是以 $V$ 為標的的 call，vega $>0$（\autoref{sec:vega}），提高 $\sigma$ 會讓 $C$ 變大、$B=V-C$ 變小：價值從債權人移到股東。} dividend, and strike price are under partial control of the stockholders or boards.
 
 \zh{股東和債權人之間有利益衝突。option 發行後條款不能改，公司卻可以改資本結構——這是 option 和公司證券的關鍵差別：volatility（asset substitution problem）、股利、strike 等參數部分由股東或董事會控制。}
 
@@ -402,11 +464,23 @@ This is called \vocab{claim dilution}.\footnote{Fama \& M.~H.~Miller (1972).}
 \end{remark}
 
 \begin{remark}
-	\vocab{債權稀釋}（claim dilution）：新發行同等順位的債券，讓原債權人在違約時要和更多人分 $V^{*}$，違約機率也變高。股東拿新債的錢買回股票，等於把原債權人的一部分價值移轉給自己；公司總價值 $V$ 不變，只是分配變了。
+	\vocab{債權稀釋}（claim dilution）：新債的錢拿去買回股票，\emph{沒有}留在公司，所以資產仍是同樣的 $1{,}000$ 股 Merck，要分的人卻從 $30$ 張變 $45$ 張。每張舊債券的到期 payoff：
+	\begin{center}
+		\begin{tabular}{lccc}
+			\toprule
+			   & $V^{*}<30{,}000$ & $30{,}000\le V^{*}<45{,}000$ & $V^{*}\ge45{,}000$ \\
+			\midrule
+			發新債前 & $V^{*}/30$       & $1{,}000$                    & $1{,}000$          \\
+			發新債後 & $V^{*}/45$       & $V^{*}/45<1{,}000$           & $1{,}000$          \\
+			\bottomrule
+		\end{tabular}
+	\end{center}
+	每個 state 都不會更多、有些 state 更少（違約門檻從 $30{,}000$ 升到 $45{,}000$，違約時又要和新債權人平分），所以每張價值從 $975$ 降到 $42{,}562.5/45\approx945.8$，$30$ 張共少 $875$。
+	$V$ 不變，這 $875$ 就移轉給了股東。
 \end{remark}
 
 \paragraph{Paying a dividend.}
-Suppose instead the stockholders sell $(1/3)\times n$ Merck shares to fund a \$14,833.3 cash dividend.
+Suppose instead the stockholders sell $(1/3)\times n$ Merck shares to fund a \$14,833.3 cash dividend.\footnote{Merck 股票是 XYZ.com 這家公司的資產，不是股東個人的；但股東透過董事會控制公司決策，可以讓公司賣掉資產、把錢當股利發給自己。這正是 \autoref{sec:merton-model} 開頭的假設「公司可以賣資產來付款」。}
 The stockholders now have \$14,833.3 in cash plus a call on $(2/3)\times n$ Merck shares, and the strike price remains $X=30{,}000$.
 This is equivalent to owning $2/3$ of a call on $n$ Merck shares with a strike price of \$45,000, since $\max\bigl(\tfrac23V^{*}-30{,}000,0\bigr)=\tfrac23\max(V^{*}-45{,}000,0)$.
 As $n$ such calls are worth \$1,937.5 (\autoref{tab:capital-structure}), the XYZ.com stock is worth $(2/3)\times1{,}937.5=1{,}291.67$ dollars, and the bonds are worth
@@ -416,7 +490,7 @@ As $n$ such calls are worth \$1,937.5 (\autoref{tab:capital-structure}), the XYZ
 dollars.
 Hence the stockholders gain $14{,}833.3+1{,}291.67-15{,}250\approx875$ dollars, and the bondholders watch their value drop from \$29,250 to \$28,375, a loss of \$875.
 
-\zh{發股利：改為賣掉 $\frac13n$ 股 Merck 發 14{,}833.3 現金股利。股東有現金加上 $\frac23n$ 股 Merck 上 strike 30{,}000 的 call，等於 $\frac23$ 個 strike 45{,}000 的 call，值 1{,}291.67；債券值 28{,}375。股東同樣賺約 875、債權人賠 875。}
+\zh{發股利：改為賣掉 $\frac13n$ 股 Merck 發 14{,}833.3 現金股利。股東有現金加上 以 $\frac23n$ 股 Merck 為標的、履約價 30{,}000 的 call，等於 $\frac23$ 個履約價 45{,}000 的 call，值 1{,}291.67；債券值 28{,}375。股東同樣賺約 875、債權人賠 875。}
 
 \begin{remark}
 	\begin{enumerate}[(1),nosep]
@@ -440,25 +514,29 @@ Hence the stockholders gain $14{,}833.3+1{,}291.67-15{,}250\approx875$ dollars, 
 \source{Slides pp.~396--397}
 
 Other examples:\footnote{Cox \& Rubinstein (1985); Geske (1977). See Section 11.1 of the textbook.}
-\begin{itemize}[itemsep=0.3em]
-	\item \textbf{Stock as a compound call} when the company issues coupon bonds: paying each coupon buys the right to keep the firm until the next payment --- an option on an option.
-	\item \textbf{Subordinated debts as bull call spreads.} With senior debt $X_{s}$ and junior debt $X_{j}$ of the same maturity, the junior debt pays $0$, $V^{*}-X_{s}$, or $X_{j}$ according as $V^{*}\le X_{s}$, $X_{s}<V^{*}\le X_{s}+X_{j}$, or $V^{*}>X_{s}+X_{j}$: a long $X_{s}$ call and a short $X_{s}+X_{j}$ call on $V$ (\autoref{sec:bull-spreads}).
-
-	\textit{說明：}senior 先拿，junior 拿剩下的、最多 $X_{j}$，所以 junior 的 payoff 是 $\min\bigl(\max(V^{*}-X_{s},0),\,X_{j}\bigr)=\max(V^{*}-X_{s},0)-\max(V^{*}-X_{s}-X_{j},0)$；逐段檢查三種情況即可驗證。
-	\item \textbf{Warrants as calls.} A warrant is a call issued by the firm on its own new shares. With $n$ shares and $m$ warrants of strike $X$, each warrant is worth $W=\frac{n}{n+m}\,C$, where $C$ is the call value on $S+(m/n)W$; the dilution makes this an equation in $W$ to solve numerically.
-
-	\textit{說明：}warrant 被履約時，公司收到 $mX$ 並發行 $m$ 股新股。記到期時公司的總價值（股票 $+$ warrant）為 $V^{*}$，履約後公司值 $V^{*}+mX$，由 $n+m$ 股平分，所以每個 warrant 的 payoff 是
-	\[
-		\frac{V^{*}+mX}{n+m}-X=\frac{n}{n+m}\Bigl(\frac{V^{*}}{n}-X\Bigr) .
-	\]
-	也就是 $\frac{n}{n+m}$ 個標的為 $V/n$、strike 為 $X$ 的 call。今天 $V=nS+mW$，所以 $V/n=S+(m/n)W$；$W$ 同時出現在兩邊，要用數值方法解。
-	\item \textbf{Callable bonds as American calls with 2 strike prices.} If the firm may call the bonds at any time for $X_{c}$, the stock is an American call on $V$ with strike $X_{c}$ before maturity and $X$ at maturity.
-	\item \textbf{Convertible bonds}: bonds the holder may convert into new shares, adding a call on a fraction of the firm.
-	\item \textbf{Bonds with safety covenants as barrier options}: if the firm must pass to the bondholders when $V$ falls below $H$, the stock is a down-and-out call (\autoref{sec:barrier}).
+\begin{itemize}[nosep]
+	\item \textbf{Stock as a compound call} when the company issues coupon bonds.
+	\item \textbf{Subordinated debts as bull call spreads.}
+	\item \textbf{Warrants as calls.}
+	\item \textbf{Callable bonds as American calls with 2 strike prices.}
+	\item \textbf{Convertible bonds.}
+	\item \textbf{Bonds with safety covenants as barrier options.}
 \end{itemize}
 Securities issued by firms with a complex capital structure must be solved by numerical methods such as trees.\footnote{T.~Dai (\texttt{B82506025}, \texttt{R86526008}, \texttt{D8852600}), Lyuu, \& C.~Wang (\texttt{F95922018}) (2010).}
 
-\zh{其他例子：發 coupon bond 時股票是 compound call（每付一次 coupon 就買到繼續持有公司到下次付款的權利）；次順位債是 bull call spread；warrant 是 call；可贖回債券讓股票成為有兩個 strike 的 American call；可轉債加上一個對部分公司的 call；有安全條款的債券讓股票成為 down-and-out call。資本結構複雜時只能用 tree 等數值方法。}
+\zh{其他例子：發 coupon bond 時，股票是 compound call；次順位債是 bull call spread；warrant 是 call；可贖回債券讓股票成為有兩個履約價的 American call；可轉債；有安全條款的債券是 barrier option。資本結構複雜時，只能用 tree 等數值方法求解。}
+
+\begin{remark}
+	各項的意思（$V$ 為公司總價值）：
+	\begin{enumerate}[(1),nosep]
+		\item \textbf{Compound call。}債券分期付 coupon，每期股東決定付不付：付了才能繼續擁有公司，不付就違約。每期都像一個 call，疊起來就是以 option 為標的的 option（compound option）。
+		\item \textbf{次順位債（subordinated debt）。}違約時要等 senior debt 拿完，junior debt 才拿剩下的，最多拿到自己的面額。這種「從 $X_{s}$ 開始拿、拿到 $X_{s}+X_{j}$ 為止」的 payoff 就是 bull call spread（\autoref{sec:bull-spreads}）。
+		\item \textbf{認股權證（warrant）。}公司自己發行的 call，履約時公司發\emph{新股}給持有人，會稀釋原股東。
+		\item \textbf{可贖回債（callable bond）。}公司可在到期前用約定價格 $X_{c}$ 把債券買回。股東因此多了提前「付錢拿回公司」的權利，股票變成有兩個履約價的 American call。
+		\item \textbf{可轉債（convertible bond）。}持有人可以把債券換成公司的新股，等於普通債券再加上一個以公司股權為標的的 call。
+		\item \textbf{安全條款（safety covenant）。}約定 $V$ 一跌到某水準 $H$，公司就提前交給債權人，股東拿 $0$。所以股票是碰到 $H$ 就作廢的 call，即 barrier option（\autoref{sec:barrier}）。
+	\end{enumerate}
+\end{remark}
 
 \subsection{Distance to Default}
 

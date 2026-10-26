@@ -357,9 +357,9 @@ and the tournament has disappeared: what is left is a question about \(\{0,1\}\)
 \end{question}
 
 Let \(r_i = \sum_{j=1}^{n} a_{ij}\) be the number of \(1\)s in the \(i\)-th row. A permutation \(\sigma\) contributing to \(\perm(A)\) must pick a \(1\) in every row, and there are \(r_i\) choices in row \(i\), so
-\[
+\begin{equation}\label{eq:perm-trivial}
     \perm(A) \le r_1 r_2 \cdots r_n.
-\]
+\end{equation}
 This overcounts badly, because the choices in different rows may land in the same column, and then they do not form a permutation at all. The following theorem quantifies exactly how much is lost.
 
 \begin{theorem}[Minc's conjecture, 1963; Br\'egman, 1973]\label{thm:bregman}
@@ -371,32 +371,22 @@ This overcounts badly, because the choices in different rows may land in the sam
 
 \begin{remark}\hfill
     \begin{enumerate}[(1)]
-        \item This is sharper than the trivial bound: \(r_i! \le r_i^{\,r_i}\) gives \((r_i!)^{1/r_i} \le r_i\). The gain per row is roughly a factor \(e\), since \((r!)^{1/r} \approx r/e\).
+        \item Since \(r! = 1 \cdot 2 \cdots r \le r^r\), each factor satisfies \((r_i!)^{1/r_i} \le r_i\), so \autoref{thm:bregman} improves \eqref{eq:perm-trivial} row by row; by Stirling \((r!)^{1/r} \sim r/e\), a gain of about \(e\) per row.
+        \item \((r!)^{1/r} = \sqrt[r]{1 \cdot 2 \cdots r}\) is the geometric mean of \(r, r-1, \ldots, 1\). This is what happens when \(r\) rows have their \(1\)s in the \emph{same} \(r\) columns: the first row has \(r\) free columns, the next \(r-1\), \ldots, the last \(1\), so these rows contribute \(r!\) instead of the \(r^r\) counted in \eqref{eq:perm-trivial}. \autoref{thm:bregman} says no \(\{0,1\}\) matrix does better than this.
+        \item The bound is attained. Let \(J_d\) be the \(d \times d\) all-\(1\) matrix and \(A = \operatorname{diag}(J_{d_1}, \ldots, J_{d_m})\) with \(d_1 + \cdots + d_m = n\). Then \(\prod_i a_{i\sigma(i)} = 1\) iff \(\sigma\) maps each block of indices to itself, so \(\perm(A) = \prod_j d_j!\); each of the \(d_j\) rows of block \(j\) has \(r_i = d_j\), so \(\prod_i (r_i!)^{1/r_i} = \prod_j \bigl( (d_j!)^{1/d_j} \bigr)^{d_j} = \prod_j d_j!\). For instance, with \((d_1, d_2, d_3) = (2, 3, 1)\),
+        \[
+            A = \left( \begin{array}{cc|ccc|c}
+                1 & 1 & 0 & 0 & 0 & 0 \\
+                1 & 1 & 0 & 0 & 0 & 0 \\ \hline
+                0 & 0 & 1 & 1 & 1 & 0 \\
+                0 & 0 & 1 & 1 & 1 & 0 \\
+                0 & 0 & 1 & 1 & 1 & 0 \\ \hline
+                0 & 0 & 0 & 0 & 0 & 1
+            \end{array} \right),
+            \qquad (r_1, \ldots, r_6) = (2, 2, 3, 3, 3, 1),
+        \]
+        \eqref{eq:perm-trivial} gives \(2^2 \cdot 3^3 \cdot 1 = 108\), while \autoref{thm:bregman} gives \(2! \cdot 3! \cdot 1! = 12 = \perm(A)\).
         \item A row with \(r_i = 0\) forces \(\perm(A) = 0\), so we may assume \(r_i \ge 1\) throughout.
-        \item The bound is best possible: let \(A\) be block diagonal with all-\(1\) blocks of sizes \(d_1, \ldots, d_m\), where \(d_1 + \cdots + d_m = n\). A permutation contributes iff it preserves each block, so \(\perm(A) = \prod_{j} d_j!\); and every row inside the \(j\)-th block has \(r_i = d_j\), so \(\prod_i (r_i!)^{1/r_i} = \prod_j \bigl( (d_j!)^{1/d_j} \bigr)^{d_j} = \prod_j d_j!\) as well.
-        \begin{center}
-            \begin{tikzpicture}[scale=0.42, every node/.style={font=\small}]
-                % left: identity, all blocks of size 1
-                \foreach \i in {1,...,6} \fill[blue!25] (\i-1,6-\i) rectangle (\i,7-\i);
-                \draw[gray!60, thin] (0,0) grid (6,6);
-                \draw (0,0) rectangle (6,6);
-                \foreach \i in {1,...,6}
-                    \draw[blue!60!black, very thick] (\i-1,6-\i) rectangle (\i,7-\i);
-                \node[align=center] at (3,-1.6) {sizes $(1,1,1,1,1,1)$\\$\perm = 1$};
-                % right: blocks of sizes 2, 3, 1
-                \begin{scope}[xshift=10cm]
-                    \fill[blue!25] (0,4) rectangle (2,6);
-                    \fill[blue!25] (2,1) rectangle (5,4);
-                    \fill[blue!25] (5,0) rectangle (6,1);
-                    \draw[gray!60, thin] (0,0) grid (6,6);
-                    \draw (0,0) rectangle (6,6);
-                    \draw[blue!60!black, very thick] (0,4) rectangle (2,6);
-                    \draw[blue!60!black, very thick] (2,1) rectangle (5,4);
-                    \draw[blue!60!black, very thick] (5,0) rectangle (6,1);
-                    \node[align=center] at (3,-1.6) {sizes $(2,3,1)$\\$\perm = 2!\,3!\,1! = 12$};
-                \end{scope}
-            \end{tikzpicture}
-        \end{center}
     \end{enumerate}
 \end{remark}
 
@@ -470,7 +460,7 @@ This is the only information we have about the \(r_i\), so we must maximise the 
     \[
         \perm(A) \le \prod_{i=1}^{n} (r_i!)^{1/r_i} \le \bigl( (R!)^{1/R} \bigr)^{n}.
     \]
-    Stirling's formula in the form \(R! = \sqrt{2\pi R} \, (\frac{R}{e})^{R} e^{\theta/(12R)}\) with \(0 < \theta < 1\) gives
+    Stirling's formula in the form \(R! = \sqrt{2\pi R} \, (\frac{R}{e})^{R} e^{\theta/(12R)}\) with \(0 < \theta < 1\)\footnote{This is the non-asymptotic form of Stirling's formula: \(\sqrt{2\pi R} \, (\frac{R}{e})^{R} < R! < \sqrt{2\pi R} \, (\frac{R}{e})^{R} e^{1/(12R)}\) for every \(R \ge 1\) (H.~Robbins, \emph{A remark on Stirling's formula}, Amer.\ Math.\ Monthly \textbf{62} (1955)). Only the upper bound is used. The asymptotic form \(R! \sim \sqrt{2\pi R} \, (\frac{R}{e})^{R}\) would also do, since \(n/R \le 2\) makes \((1 + o(1))^{n/R} = O(1)\), with the finitely many small \(n\) absorbed into \(c_1\).} gives
     \[
         \bigl( (R!)^{1/R} \bigr)^{n} = \Bigl( \frac{R}{e} \Bigr)^{n} (2\pi R)^{\frac{n}{2R}} e^{\frac{\theta n}{12 R^2}}.
     \]
@@ -511,9 +501,26 @@ The second inequality points the wrong way: it bounds cycles by paths, whereas w
         \end{tikzpicture}
     \end{center}
 
-    Every Hamilton cycle of \(T^*\) passes through \(y\), and deleting \(y\) from it leaves a Hamilton path of \(T\). Conversely, a Hamilton path \(v_1 \to \cdots \to v_n\) of \(T\) closes up into a Hamilton cycle of \(T^*\) exactly when \((v_n, y) \in E(T^*)\) and \((y, v_1) \in E(T^*)\), which are two of the \(n\) independent coin flips, so this happens with probability \(\frac{1}{4}\). Writing \(C(T^*)\) as a sum of indicators over the \(P(T)\) Hamilton paths of \(T\), linearity of expectation gives
+    Only the \(n\) edges at \(y\) are random; \(T\) itself is fixed. Let \(\mathcal{P}(T)\) be the set of Hamilton paths of \(T\), so \(\abs{\mathcal{P}(T)} = P(T)\), and for each \(p = (v_1 \to \cdots \to v_n) \in \mathcal{P}(T)\) define
     \[
-        \mathbb{E}\bigl[ C(T^*) \bigr] = \sum_{\text{Hamilton paths of } T} \mathbb{P}(\text{the path closes up}) = \frac{P(T)}{4}.
+        E_p \coloneqq \bigl\{ (v_n, y) \in E(T^*) \bigr\} \cap \bigl\{ (y, v_1) \in E(T^*) \bigr\},
+        \qquad X_p \coloneqq \mathbbm{1}_{E_p},
+    \]
+    the event that \(p\) closes up through \(y\) into the Hamilton cycle \((v_1, \ldots, v_n, y)\) of \(T^*\).
+
+    \begin{claim}
+        \(C(T^*) = \sum_{p \in \mathcal{P}(T)} X_p\).
+    \end{claim}
+    \begin{subproof}
+        A Hamilton cycle of \(T^*\) visits \(y\) exactly once, so rotating its cyclic ordering it can be written uniquely as \((v_1, \ldots, v_n, y)\). Its arcs \((v_i, v_{i+1})\), \(i < n\), join vertices of \(T\), hence lie in \(T\), so \(\varphi(v_1, \ldots, v_n, y) \coloneqq (v_1 \to \cdots \to v_n) \in \mathcal{P}(T)\); its remaining two arcs are \((v_n, y)\) and \((y, v_1)\), so \(E_{\varphi(\cdot)}\) occurs. Conversely, if \(E_p\) occurs then \((v_1, \ldots, v_n, y)\) is a Hamilton cycle of \(T^*\) mapped to \(p\). So \(\varphi\) is a bijection from the Hamilton cycles of \(T^*\) onto \(\{ p \in \mathcal{P}(T) : E_p \text{ occurs} \}\), and
+        \[
+            C(T^*) = \#\{ p \in \mathcal{P}(T) : E_p \text{ occurs} \} = \sum_{p \in \mathcal{P}(T)} X_p. \qedhere
+        \]
+    \end{subproof}
+
+    For \(n \ge 2\) we have \(v_1 \ne v_n\), so \(\{v_n, y\}\) and \(\{y, v_1\}\) are two distinct edges at \(y\), oriented by independent fair coins, and \(\mathbb{P}(E_p) = \frac{1}{2} \cdot \frac{1}{2} = \frac{1}{4}\). By \autoref{thm:linearity},
+    \[
+        \mathbb{E}\bigl[ C(T^*) \bigr] = \sum_{p \in \mathcal{P}(T)} \mathbb{E}[X_p] = \sum_{p \in \mathcal{P}(T)} \mathbb{P}(E_p) = \frac{P(T)}{4}.
     \]
     By \autoref{lem:first-moment} some outcome \(T^*\) has \(C(T^*) \ge \frac{P(T)}{4}\). Applying \autoref{lem:perm-tournament} to this \((n+1)\)-vertex tournament,
     \[
@@ -592,7 +599,7 @@ The same bound has a second proof, with no randomness at all, which is worth com
     \end{center}
     Summing the claim over all vertices, each crossing edge being counted twice,
     \[
-        2 \cdot \#\{\text{crossing edges}\} = \sum_{v \in V} \#\{\text{crossing edges at } v\} \ge \sum_{v \in V} \frac{d(v)}{2} = e(G). \qedhere
+        2 \cdot \#\{\text{crossing edges}\} = \sum_{v \in V} \#\{\text{crossing edges at } v\} \ge \sum_{v \in V} \frac{\deg(v)}{2} = e(G). \qedhere
     \]
 \end{proof}
 
@@ -667,7 +674,12 @@ The last application of this chapter returns to where the course began, the Rams
 \end{proof}
 
 \begin{remark}
-    \autoref{lem:count-mono} says strictly more than the union bound of \autoref{thm:erdos-ramsey}: it gives a coloring with \emph{few} monochromatic cliques even when the expectation is much larger than \(1\), whereas the union bound is silent as soon as the sum of probabilities reaches \(1\). Compare \autoref{eg:union-bound-expectation}.
+    Let \(X\) be the number of monochromatic \(K_t\) in the random coloring, as in the proof of \autoref{lem:count-mono}, and \(\mu \coloneqq \mathbb{E}[X] = \binom{n}{t} 2^{1-\binom{t}{2}}\). The two arguments extract different information from \(\mu\):
+    \begin{itemize}
+        \item The union bound of \autoref{thm:erdos-ramsey} only controls \(\mathbb{P}(X \ge 1) \le \mu\) (this is the inequality of \autoref{eg:union-bound-expectation}). For \(\mu \ge 1\) this is vacuous, so the union bound says something only when \(\mu < 1\), and then it gives a coloring with \(X = 0\).
+        \item \autoref{lem:first-moment} gives a coloring with \(X \le \mu\) for \emph{every} \(n\), including \(\mu \ge 1\).
+    \end{itemize}
+    So \autoref{cor:ramsey-lower} is the case \(\mu < 1\) of \autoref{lem:count-mono}, but the lemma is still informative beyond that range: deleting one vertex from each of the \(\le \mu\) monochromatic \(K_t\) leaves \(\ge n - \mu\) vertices with none, i.e.\ \(R(t) > n - \mu\). This is \autoref{thm:ramsey-alteration} in the next chapter.
 \end{remark}
 
 \subsection{Hypergraph Ramsey Numbers}
@@ -679,7 +691,7 @@ The last application of this chapter returns to where the course began, the Rams
 Two-color the \(k\)-element edges \(\binom{[n]}{k}\) of the complete \(k\)-uniform hypergraph \(K_n^{(k)}\), and look for a set \(S\) of \(t\) vertices all of whose \(\binom{t}{k}\) edges have the same color.
 
 \begin{definition}\label{def:hypergraph-ramsey}
-    The \vocab{\(k\)-uniform Ramsey number} \(R^{(k)}(t)\) is the smallest \(n\) s.t.\ every red/blue coloring of \(\binom{[n]}{k}\) contains a monochromatic set of \(t\) vertices. So \(R^{(2)}(t) = R(t)\).
+    The \vocab{\(k\)-uniform Ramsey number} \(R^{(k)}(t)\) is the smallest \(n\) s.t.\ every red/blue coloring of \(\binom{[n]}{k}\) contains a \vocab{monochromatic} set of \(t\) vertices, i.e.\ some \(S \in \binom{[n]}{t}\) all of whose \(\binom{t}{k}\) edges \(e \in \binom{S}{k}\) (the \(k\)-subsets of \(S\)) receive the same color. So \(R^{(2)}(t) = R(t)\).
 \end{definition}
 
 \begin{remark}

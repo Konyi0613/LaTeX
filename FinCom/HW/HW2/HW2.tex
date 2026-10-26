@@ -1,0 +1,275 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xeCJK}
+\setCJKmainfont{Noto Serif CJK TC}
+\setCJKsansfont{Noto Sans CJK TC}
+
+\tcbuselibrary{skins,breakable}
+\newtcolorbox{keybox}[1]{colback=blue!4,colframe=blue!50!black,
+  fonttitle=\bfseries,title={#1},breakable}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+
+\title{Financial Computing HW2 \\ 匯率連結結構型商品（Dual Currency Note）的定價}
+\author{}
+\date{Due: 2026/11/5 08:00 (GMT+8)}
+
+\begin{document}
+\maketitle
+
+%======================================================================
+\section{原題（English）}
+
+Write a program to price a structured note and calculate its key financial
+metrics. Consider an investor who deposits a domestic principal amount $D$ into
+a structured note that pays an enhanced coupon rate $c$ (annualized) at
+maturity $T$. Let $S_t$ denote the FX spot rate at time $t$, expressed as
+domestic currency per unit of foreign currency. At maturity $T$, if the terminal
+FX spot rate $S_T\ge X$, the investor receives the guaranteed coupon payment
+$D\times c\times T$ along with its full principal $D$ back in domestic currency.
+If $S_T<X$, the entire principal-plus-coupon amount is converted into foreign
+currency at the conversion strike rate $X$. Your goal is to compute the fair
+value of the note at $t=0$ (in domestic currency), the delta of the note with
+respect to the initial FX spot rate $S_0$, the breakeven spot rate at maturity
+($S_T^{*}$ such that total terminal payout equals initial principal $D$).
+
+\textbf{Inputs.}
+\begin{itemize}[nosep]
+  \item $D$: domestic principal amount, a float;
+  \item $T$: time to maturity in years, a float;
+  \item $c$: enhanced annual coupon rate, a float;
+  \item $S_0$: initial FX spot rate at $t=0$, domestic per unit of foreign, a float;
+  \item $X$: conversion strike exchange rate, a float;
+  \item $r_d$: domestic risk-free interest rate, a float;
+  \item $r_f$: foreign risk-free interest rate, a float;
+  \item $\sigma$: FX spot volatility, a float.
+\end{itemize}
+
+\textbf{Outputs.}
+\begin{itemize}[nosep]
+  \item Fair value of the note in domestic currency;
+  \item Delta with respect to $S_0$;
+  \item Breakeven spot rate $S_T^{*}$ at maturity.
+\end{itemize}
+
+\textbf{Example.} If $D=1000000$, $T=1.0$, $c=0.06$, $S_0=32.0$, $X=31.5$,
+$r_d=0.015$, $r_f=0.005$, $\sigma=0.12$, the outputs are
+$1006065.998257$, $13119.408633$, $29.716981$.
+Input format (for Python codes, replace the student ID with uppercase):
+\begin{verbatim}
+python3 D13922016_HW_2.py 1000000 1.0 0.06 32.0 31.5 0.015 0.005 0.12
+\end{verbatim}
+Output format:
+\begin{verbatim}
+1006065.998257, 13119.408633, 29.716981
+\end{verbatim}
+
+\textbf{Submission.} Please submit your source (and executable) code and a brief
+explanation text file (if the code is not written in Python, describe how to
+compile and run it) via Gradescope in NTU COOL before 08:00 AM (GMT+8) 2026
+Nov 5. No late submissions will be accepted. Compress all files into a single
+zip file named \texttt{ID\_HW\_i.zip}, where \texttt{ID} is your student ID in
+uppercase and \texttt{i} is the homework number (e.g.,
+\texttt{D13922016\_HW\_2.zip}). If the code is not written in Python, you may
+be asked to demonstrate your code to the TA.
+
+%======================================================================
+\section{中文翻譯}
+
+寫一個程式為一個\textbf{結構型商品}（structured note）定價，並計算它的幾個關鍵指標。
+一位投資人把本國貨幣本金 $D$ 存進一個結構型商品，它在到期日 $T$ 支付一個\textbf{加碼的}
+年化票息率 $c$（比一般定存高）。令 $S_t$ 為時間 $t$ 的即期匯率，以「一單位外幣值多少本國貨幣」表示。
+
+到期時：
+\begin{itemize}[nosep]
+  \item 若 $S_T\ge X$：投資人拿回全部本金 $D$ 和保證的票息 $D\times c\times T$，都以\textbf{本國貨幣}支付；
+  \item 若 $S_T<X$：整筆「本金加票息」以\textbf{轉換匯率} $X$ 換成\textbf{外幣}支付。
+\end{itemize}
+
+要算的是：(1) 這張商品在 $t=0$ 的公平價值（以本國貨幣計）；(2) 商品價值對期初匯率 $S_0$ 的 delta；
+(3) 到期的\textbf{損益兩平匯率} $S_T^{*}$，也就是讓到期總支付（換算成本國貨幣）剛好等於期初本金 $D$ 的匯率。
+
+輸入依序為 $D, T, c, S_0, X, r_d, r_f, \sigma$（本國本金、到期年數、加碼年票息率、期初匯率、
+轉換匯率、本國無風險利率、外國無風險利率、匯率波動率），輸出三個數字，以逗號分隔、小數點後 6 位。
+繳交：程式碼（和可執行檔）加一份簡短說明文字檔，壓成 \texttt{學號\_HW\_2.zip}（學號大寫），
+於 2026/11/5 早上 8:00 前上傳到 NTU COOL 的 Gradescope，逾時不收；
+若不是用 Python，說明檔要寫怎麼編譯執行，並可能要向助教 demo。
+
+%======================================================================
+\section{題目解說}
+
+\subsection{這是什麼商品？}
+
+這就是銀行常賣的「\textbf{雙元貨幣存款}」（dual currency deposit）：
+存本國幣（例如台幣），利率比定存高很多（範例 $6\%$，而 $r_d=1.5\%$）；
+代價是到期時若外幣\textbf{貶值}到 $X$ 以下，銀行就把本利和用（對你不利的）匯率 $X$ 換成外幣給你。
+用到的知識都在筆記裡：
+\begin{itemize}[nosep]
+  \item \textbf{Payoff 拆解}：put 的 payoff $\max(X-S_\tau,0)$（Option Basics, Payoff）；
+  \item \textbf{零息債券}：到期付 $A$ 的債券今天值 $Ae^{-r_dT}$（Bonds, zero-coupon；連續複利 $\mathrm{PV}=\mathrm{FV}e^{-rn}$）；
+  \item \textbf{外匯選擇權}：外幣是 dividend yield $q=r_f$ 的資產，European FX put 用
+        \textbf{Garman--Kohlhagen} 公式（Foreign Currencies 一節）；
+  \item \textbf{Delta}：有 dividend yield $q$ 的 put，$\partial P/\partial S=-e^{-q\tau}N(-x)$（Greeks, Dividends, Straddles and Strangles）；
+  \item 補充角度：binary call 的價格 $e^{-r\tau}N(x-\sigma\sqrt\tau)$（Black--Scholes 的 binary 例子）。
+\end{itemize}
+
+\subsection{第一步：寫下到期 payoff（換算成本國貨幣）}
+
+令到期本利和
+\[
+  A\;\triangleq\;D(1+cT).
+\]
+\begin{itemize}
+  \item $S_T\ge X$：拿到 $A$ 元本國幣。
+  \item $S_T<X$：$A$ 元本國幣以匯率 $X$（每單位外幣 $X$ 元）換成外幣，得到
+        \[
+          \frac{A}{X}\ \text{單位外幣}.
+        \]
+        這些外幣在到期日的市價是 $S_T$ 元/單位，所以換回本國幣值 $\dfrac{A}{X}S_T$。
+        因為 $S_T<X$，這比 $A$ 少：投資人被迫用比市價貴的 $X$ 買外幣。
+\end{itemize}
+合起來：
+\begin{keybox}{到期 payoff（本國貨幣）}
+\[
+  \Pi(S_T)=\begin{cases}A, & S_T\ge X,\\[2pt] \dfrac{A}{X}S_T, & S_T<X\end{cases}
+  \;=\;A\min\Bigl(1,\frac{S_T}{X}\Bigr)
+  \;=\;A-\frac{A}{X}\max(X-S_T,0).
+\]
+\end{keybox}
+最後一個等號：$S_T\ge X$ 時 $\max(X-S_T,0)=0$；$S_T<X$ 時 $A-\frac AX(X-S_T)=\frac AX S_T$。
+
+\begin{center}
+\begin{tikzpicture}[x=0.25cm,y=0.055cm]
+  \draw[->] (0,0) -- (46,0) node[right] {$S_T$};
+  \draw[->] (0,0) -- (0,78) node[above] {payoff};
+  % payoff: slope A/X up to X=31.5, then flat at A (scaled: A -> 60)
+  \draw[very thick,blue!70!black] (0,0) -- (31.5,60) -- (45,60);
+  \draw[dashed] (31.5,0) node[below] {$X$} -- (31.5,60);
+  \draw[dashed] (0,60) node[left] {$A=D(1+cT)$} -- (31.5,60);
+  \draw[dashed,red!70!black] (0,56.6) -- (45,56.6) node[right] {$D$};
+  \draw[dashed,red!70!black] (29.72,0) -- (29.72,56.6);
+  \node[below,red!70!black] at (26.8,0) {$S_T^{*}$};
+  \node[blue!70!black] at (38,68) {本國幣 $A$};
+  \node[blue!70!black,rotate=22,below] at (17,30) {外幣 $\frac AX$ 單位，值 $\frac AX S_T$};
+\end{tikzpicture}
+\end{center}
+
+\subsection{第二步：拆成「零息債券 $-$ FX put」}
+
+由上面最後一個寫法：
+\[
+  \Pi(S_T)=\underbrace{A}_{\text{零息債券}}\;-\;\frac{A}{X}\underbrace{\max(X-S_T,0)}_{\text{FX put payoff}}.
+\]
+所以這張商品 $=$「到期付 $A$ 的本國零息債券」$+$「\textbf{賣出} $A/X$ 單位、strike $X$ 的 European FX put」。
+也就是說，投資人其實把一個外幣 put 賣給了銀行；高票息就是 put 的權利金。
+
+兩部分都能定價（價值的線性：payoff 的線性組合，價格也是同樣的線性組合）：
+\begin{itemize}
+  \item 零息債券：今天值 $Ae^{-r_dT}$（連續複利折現）。
+  \item FX put：外幣像 dividend yield $q=r_f$ 的股票，所以 Garman--Kohlhagen 公式（$\tau=T$、$S=S_0$、$r=r_d$）
+  \[
+    P=Xe^{-r_dT}N\bigl(-x+\sigma\sqrt T\bigr)-S_0e^{-r_fT}N(-x),\qquad
+    x=\frac{\ln(S_0/X)+\bigl(r_d-r_f+\sigma^2/2\bigr)T}{\sigma\sqrt T}.
+  \]
+\end{itemize}
+
+\begin{keybox}{(1) 公平價值}
+\[
+  V_0=Ae^{-r_dT}-\frac{A}{X}\,P
+     =Ae^{-r_dT}N\bigl(x-\sigma\sqrt T\bigr)+\frac{A}{X}\,S_0e^{-r_fT}N(-x).
+\]
+\end{keybox}
+第二個等號：把 $P$ 代入，$Ae^{-r_dT}-\frac AX Xe^{-r_dT}N(-x+\sigma\sqrt T)=Ae^{-r_dT}\bigl[1-N(-(x-\sigma\sqrt T))\bigr]=Ae^{-r_dT}N(x-\sigma\sqrt T)$。
+
+\textbf{第二種寫法的直覺}（兩個 state 分開算）：
+\begin{itemize}
+  \item $Ae^{-r_dT}N(x-\sigma\sqrt T)$：「$S_T>X$ 時付 $A$ 元」——就是 $A$ 張 binary call，
+        $N(x-\sigma\sqrt T)$ 是 risk-neutral 下 $S_T>X$ 的機率。
+  \item $\frac AX S_0e^{-r_fT}N(-x)$：「$S_T<X$ 時付 $\frac AX$ 單位外幣」。
+        $S_0e^{-r_fT}$ 是「到期拿到 1 單位外幣」今天的價值（今天買 $e^{-r_fT}$ 單位外幣存在國外，
+        以 $r_f$ 生息到期剛好 1 單位），$N(-x)$ 是以外幣為 numeraire 時 $S_T<X$ 的機率。
+\end{itemize}
+
+\subsection{第三步：Delta}
+
+$Ae^{-r_dT}$ 不含 $S_0$；由有 dividend yield $q$ 的 put delta $\partial P/\partial S=-e^{-q\tau}N(-x)$，取 $q=r_f$：
+\begin{keybox}{(2) Delta}
+\[
+  \Delta=\frac{\partial V_0}{\partial S_0}
+        =-\frac{A}{X}\,\frac{\partial P}{\partial S_0}
+        =\frac{A}{X}\,e^{-r_fT}N(-x)\;>\;0.
+\]
+\end{keybox}
+\begin{itemize}[nosep]
+  \item 正號：投資人\textbf{賣}了 put，put 的 delta 是負的，所以商品的 delta 是正的——
+        外幣升值（$S_0$ 變大）對投資人有利，因為比較不會被換成外幣。
+  \item 單位：$V_0$ 是本國幣、$S_0$ 是「本國幣/外幣」，所以 $\Delta$ 的單位是\textbf{外幣}。
+        $\Delta=13119.41$ 表示這張商品的匯率曝險相當於持有約 13119 單位外幣；
+        銀行要避險就持有/放空這麼多外幣。
+  \item 上界：$\Delta\le\frac AX e^{-r_fT}$，也就是「確定會被換成外幣」時的曝險（深度價內，$N(-x)\to1$）。
+\end{itemize}
+（也可以直接對第二種寫法的 $V_0$ 微分，$N'$ 的項會因為 $S_0e^{-r_fT}N'(x)=Xe^{-r_dT}N'(x-\sigma\sqrt T)$ 互相抵銷，得到同樣結果。）
+
+\subsection{第四步：損益兩平匯率 $S_T^{*}$}
+
+要讓到期 payoff $\Pi(S_T)=D$。
+\begin{itemize}[nosep]
+  \item $S_T\ge X$ 時 $\Pi=A=D(1+cT)>D$（$c>0$），永遠賺，不可能等於 $D$；
+  \item 所以 $S_T^{*}<X$，落在「換成外幣」那段：$\dfrac{A}{X}S_T^{*}=D$。
+\end{itemize}
+\begin{keybox}{(3) 損益兩平匯率}
+\[
+  S_T^{*}=\frac{DX}{A}=\frac{X}{1+cT}.
+\]
+\end{keybox}
+意義：外幣跌到 $S_T^{*}$ 以下，投資人換算回本國幣後\textbf{虧本金}；介於 $S_T^{*}$ 和 $X$ 之間，雖然被換成外幣，但票息還夠彌補匯損。
+注意 $S_T^{*}$ 和 $r_d,r_f,\sigma,S_0$ 都無關，只看 payoff 結構。
+
+\subsection{範例驗算}
+
+$D=10^6$, $T=1$, $c=0.06$, $S_0=32$, $X=31.5$, $r_d=1.5\%$, $r_f=0.5\%$, $\sigma=0.12$：
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+量 & 算式 & 數值\\
+\midrule
+$A$ & $D(1+cT)$ & $1060000$\\
+$A/X$ & & $33650.793651$\\
+$x$ & $\frac{\ln(32/31.5)+(0.015-0.005+0.0072)}{0.12}$ & $0.274570$\\
+$x-\sigma\sqrt T$ & & $0.154570$\\
+$N(x-\sigma\sqrt T),\ N(-x)$ & & $0.561420,\ 0.391823$\\
+零息債券 & $Ae^{-r_dT}$ & $1044218.655979$\\
+FX put $P$ & Garman--Kohlhagen & $1.133782$\\
+賣出的 put & $\frac AX P$ & $38152.657723$\\
+$V_0$ & $Ae^{-r_dT}-\frac AX P$ & $\mathbf{1006065.998257}$\\
+$\Delta$ & $\frac AX e^{-r_fT}N(-x)$ & $\mathbf{13119.408633}$\\
+$S_T^{*}$ & $X/(1+cT)=31.5/1.06$ & $\mathbf{29.716981}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+三個粗體數字和題目範例輸出一致。另外用第二種寫法：binary 部分 $586244.92$ $+$ 外幣部分 $419821.08$ $=1006066.00$，也吻合。
+
+$V_0>D$：在這組參數下這張商品對投資人略有利（公平價值比付出的 $D$ 多約 $6066$）。
+
+\subsection{實作提醒}
+\begin{itemize}[nosep]
+  \item 從 \texttt{sys.argv[1:]} 讀 8 個 float。
+  \item 標準常態 CDF 不用 scipy：$N(z)=\frac12\operatorname{erfc}(-z/\sqrt2)$（\texttt{math.erfc}），比 $\frac12(1+\operatorname{erf}(z/\sqrt2))$ 在尾端更準。
+  \item 輸出：\texttt{print(f"\{V:.6f\}, \{delta:.6f\}, \{S\_star:.6f\}")}。
+  \item 邊界：$\sigma\sqrt T=0$ 時 $x$ 分母為 $0$。此時 $S_T$ 是確定的 forward $F=S_0e^{(r_d-r_f)T}$，
+        直接用 $V_0=e^{-r_dT}A\min(1,F/X)$、$\Delta=\frac AX e^{-r_fT}\mathbf 1[F<X]$。
+  \item 檔名：\texttt{B13902024\_HW\_2.py} 和說明 \texttt{README.txt}，壓成 \texttt{B13902024\_HW\_2.zip}。
+\end{itemize}
+
+\end{document}

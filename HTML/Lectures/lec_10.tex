@@ -815,11 +815,91 @@ A greedy approach for some given \(\eta > 0\):
 
 The approximation is the first-order Taylor expansion of \(\Ein\) at
 \(\bm{w}_t\); its error is \(O(\eta^2)\), negligible against the linear term
-when \(\eta\) is small and \(\nabla \Ein(\bm{w}_t) \neq \bm{0}\). The
-multivariate expansion is just the one-variable one, taken along the line
-through \(\bm{w}_t\) in direction \(\bm{v}\).
+when \(\eta\) is small and \(\nabla \Ein(\bm{w}_t) \neq \bm{0}\).
 
-\begin{lemma}[First-order expansion along a direction]\label{lem:taylor-dir}
+\begin{theorem}[Taylor expansion of \(\bm{f} \colon \mathbb{R}^n \to \mathbb{R}^m\)]
+    \label{thm:taylor}
+    Write \(\bm{f} = (f_1, \dots, f_m)^\top\) with each \(f_j \colon
+    \mathbb{R}^n \to \mathbb{R}\), and let \(\bm{x} = (x_1, \dots, x_n)^\top\)
+    be the expansion point and \(\bm{h} = (h_1, \dots, h_n)^\top\) the
+    displacement. For each \(f_j\) define
+    \begin{itemize}
+        \item the gradient \(\nabla f_j(\bm{x}) = \bigl( \partial f_j /
+            \partial x_1, \dots, \partial f_j / \partial x_n \bigr)^\top\),
+            evaluated at \(\bm{x}\);
+        \item the Hessian \(\nabla^2 f_j(\bm{x})\), the \(n \times n\) matrix
+            with \((a, b)\)-entry \(\partial^2 f_j / \partial x_a \partial
+            x_b\) at \(\bm{x}\);
+    \end{itemize}
+    and let the Jacobian \(\mathrm{J}_{\bm{f}}(\bm{x})\) be the \(m \times n\)
+    matrix whose \(j\)-th row is \(\nabla f_j(\bm{x})^\top\).
+    \begin{enumerate}[(i)]
+        \item If \(\bm{f}\) is real analytic at \(\bm{x}\), then for
+            \(\norm{\bm{h}}\) small
+            \[
+                f_j(\bm{x} + \bm{h}) = f_j(\bm{x}) + \sum_{k=1}^{\infty}
+                \frac{1}{k!} \sum_{i_1 = 1}^{n} \cdots \sum_{i_k = 1}^{n}
+                \frac{\partial^k f_j (\bm{x})}{\partial x_{i_1} \cdots
+                \partial x_{i_k}} \, h_{i_1} \cdots h_{i_k} , \qquad j = 1,
+                \dots, m .
+            \]
+            The \(k = 1\) and \(k = 2\) terms are
+            \[
+                \sum_{i = 1}^{n} \frac{\partial f_j(\bm{x})}{\partial x_i} \,
+                h_i = \nabla f_j(\bm{x})^\top \bm{h} , \qquad
+                \frac{1}{2} \sum_{a = 1}^{n} \sum_{b = 1}^{n} \frac{\partial^2
+                f_j(\bm{x})}{\partial x_a \partial x_b} \, h_a h_b =
+                \frac{1}{2} \bm{h}^\top \nabla^2 f_j(\bm{x}) \, \bm{h} ,
+            \]
+            so stacking the \(m\) components,
+            \[
+                \bm{f}(\bm{x} + \bm{h}) = \bm{f}(\bm{x}) +
+                \mathrm{J}_{\bm{f}}(\bm{x}) \, \bm{h} + \frac{1}{2}
+                \begin{pmatrix}
+                    \bm{h}^\top \nabla^2 f_1(\bm{x}) \, \bm{h}\\
+                    \vdots\\
+                    \bm{h}^\top \nabla^2 f_m(\bm{x}) \, \bm{h}
+                \end{pmatrix}
+                + \cdots .
+            \]
+        \item If \(m = 1\) and \(f\) is \(C^2\), the series may be cut after
+            \(k = 1\) with an exact remainder:
+            \[
+                f(\bm{x} + \bm{h}) = f(\bm{x}) + \nabla f(\bm{x})^\top \bm{h}
+                + \frac{1}{2} \bm{h}^\top \nabla^2 f(\bm{x} + \theta \bm{h})
+                \, \bm{h} \qquad \text{for some } \theta \in (0, 1) .
+            \]
+    \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+    (i) Real analytic means \(f_j\) equals a convergent power series in
+    \(h_1, \dots, h_n\) near \(\bm{h} = \bm{0}\); differentiating it term by
+    term at \(\bm{h} = \bm{0}\) identifies the coefficients as the partial
+    derivatives above. The \(k = 1, 2\) identities are the definitions of
+    \(\nabla f_j\) and \(\nabla^2 f_j\) written out.
+
+    (ii) Restrict \(f\) to the segment: \(\varphi(s) = f(\bm{u}(s))\) with
+    \(\bm{u}(s) = \bm{x} + s \bm{h}\), so \(\bm{u}'(s) = \bm{h}\). By the
+    chain rule,
+    \begin{align*}
+        \varphi'(s) &= \sum_{a=1}^n \frac{\partial f}{\partial x_a}
+        \bigl( \bm{u}(s) \bigr) \, h_a = \nabla f \bigl( \bm{u}(s)
+        \bigr)^\top \bm{h} ,\\
+        \varphi''(s) &= \sum_{a=1}^n \sum_{b=1}^n h_a \frac{\partial^2
+        f}{\partial x_a \partial x_b} \bigl( \bm{u}(s) \bigr) \, h_b =
+        \bm{h}^\top \nabla^2 f \bigl( \bm{u}(s) \bigr) \, \bm{h} ,
+    \end{align*}
+    and \(\varphi\) is \(C^2\). Taylor's theorem in one variable with
+    Lagrange remainder gives \(\varphi(1) = \varphi(0) + \varphi'(0) +
+    \frac{1}{2} \varphi''(\theta)\) for some \(\theta \in (0, 1)\), which is
+    the claim.
+\end{proof}
+
+For \(m > 1\), (ii) holds only component by component, each \(f_j\) with its
+own \(\theta_j\).
+
+\begin{corollary}[First-order expansion along a direction]\label{cor:taylor-dir}
     Let \(\Ein\) be twice continuously differentiable, \(\norm{\bm{v}} = 1\)
     and \(\eta > 0\). Then
     \[
@@ -831,29 +911,15 @@ through \(\bm{w}_t\) in direction \(\bm{v}\).
     \Ein} \le M\) (operator norm) on the ball of radius \(\eta\) around
     \(\bm{w}_t\), the remainder is at most \(\frac{M}{2} \eta^2\) for
     \emph{every} unit \(\bm{v}\).
-\end{lemma}
+\end{corollary}
 
 \begin{proof}
-    Restrict \(\Ein\) to the line: \(\varphi(s) = \Ein(\bm{w}_t + s
-    \bm{v})\) for real \(s\), so \(\varphi(0) = \Ein(\bm{w}_t)\) and
-    \(\varphi(\eta)\) is the left side. By the chain rule, with \(\bm{u}(s) =
-    \bm{w}_t + s \bm{v}\) and \(\bm{u}'(s) = \bm{v}\),
-    \begin{align*}
-        \varphi'(s) &= \sum_{i=0}^d \frac{\partial \Ein}{\partial w_i}
-        \bigl( \bm{u}(s) \bigr) \, v_i = \bm{v}^\top \nabla \Ein \bigl(
-        \bm{u}(s) \bigr) ,\\
-        \varphi''(s) &= \sum_{i, j = 0}^d v_i \frac{\partial^2 \Ein}{\partial
-        w_i \partial w_j} \bigl( \bm{u}(s) \bigr) \, v_j = \bm{v}^\top
-        \nabla^2 \Ein \bigl( \bm{u}(s) \bigr) \, \bm{v} ,
-    \end{align*}
-    and \(\varphi\) is \(C^2\). Taylor's theorem in one variable with
-    Lagrange remainder gives \(\varphi(\eta) = \varphi(0) + \eta \varphi'(0)
-    + \frac{\eta^2}{2} \varphi''(\xi)\) for some \(\xi \in (0, \eta)\);
-    substituting \(\varphi'(0) = \bm{v}^\top \nabla \Ein(\bm{w}_t)\) and
-    \(\varphi''(\xi)\) is the claim. For the bound, write \(\mathrm{H} =
-    \nabla^2 \Ein(\bm{u}(\xi))\); then \(\abs{\bm{v}^\top \mathrm{H} \bm{v}} \le \norm{\bm{v}} \norm{\mathrm{H} \bm{v}} \le M
-    \norm{\bm{v}}^2 = M\) by Cauchy--Schwarz, since \(\norm{\bm{u}(\xi) -
-    \bm{w}_t} = \xi < \eta\).
+    Apply \autoref{thm:taylor}(ii) with \(f = \Ein\), \(\bm{x} = \bm{w}_t\),
+    \(\bm{h} = \eta \bm{v}\), and set \(\xi = \theta \eta\). For the bound,
+    write \(\mathrm{H} = \nabla^2 \Ein(\bm{w}_t + \xi \bm{v})\); since
+    \(\norm{\xi \bm{v}} = \xi < \eta\), Cauchy--Schwarz gives
+    \(\abs{\bm{v}^\top \mathrm{H} \bm{v}} \le \norm{\bm{v}} \norm{\mathrm{H}
+    \bm{v}} \le M \norm{\bm{v}}^2 = M\).
 \end{proof}
 
 So \(\bm{v}^\top \nabla \Ein(\bm{w}_t)\) is the slope of \(\Ein\) when walking
@@ -863,7 +929,7 @@ costs \(O(\eta^2)\) uniformly over \(\bm{v}\), while the kept term is of size
 \(\eta\), which is what makes `\(\eta\) really small' a valid excuse. The
 logistic \(\Ein\) of \autoref{sec:logreg-error} is an average of the terms
 \(\ln \bigl( 1 + \exp(-y_n \bm{w}^\top \bm{x}_n) \bigr)\), each smooth in
-\(\bm{w}\), so the lemma applies.
+\(\bm{w}\), so the corollary applies.
 
 \begin{moral}
     An \textcolor{orange!85!black}{approximate} greedy approach for some given

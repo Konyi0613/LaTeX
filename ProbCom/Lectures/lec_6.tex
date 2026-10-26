@@ -124,7 +124,11 @@ The content is the uniformity in \(f\): for each single \(f\) the existence of s
         If the two colors were equally distributed over the \(\binom{\abs{S}}{k}\) edges inside \(S\), then \(\chi(S) = 0\). So a dominant color on \(S\) is exactly the statement that \(\abs{\chi(S)}\) is a positive proportion of \(\binom{\abs{S}}{k}\), and we want to find a large \(S\) with \(\abs{\chi(S)}\) big.
     \end{observation}
 
-    \textbf{The random set.} Choose \(S \subseteq A_1 \cup \cdots \cup A_k\) at random: if \(v \in A_i\), let \(v \in S\) with probability \(p_i\), independently over all vertices, where \(p_1, \ldots, p_k \in [0,1]\) are to be determined. For an edge \(e \subseteq A_1 \cup \cdots \cup A_k\) set
+    \textbf{The random set.} Fix \(p_1, \ldots, p_k \in [0,1]\), to be determined. Give each vertex \(v \in A_1 \cup \cdots \cup A_k\) its own coin
+    \[
+        \xi_v \sim \operatorname{Ber}(p_i) \quad \text{for } v \in A_i, \qquad \{\xi_v\}_{v} \text{ independent},
+    \]
+    and let \(S \coloneqq \{ v : \xi_v = 1 \}\). Each vertex flips exactly once, so \(S\) is a set with \(\mathbbm{1}_{\{v \in S\}} = \xi_v\); this is not sampling a fixed number of vertices, and \(\abs{S \cap A_i} \sim \operatorname{Bin}(m, p_i)\) is itself random. For an edge \(e \subseteq A_1 \cup \cdots \cup A_k\) set
     \[
         X_e =
         \begin{cases}
@@ -141,7 +145,11 @@ The content is the uniformity in \(f\): for each single \(f\) the existence of s
         = \sum_{e \in \binom{A_1 \cup \cdots \cup A_k}{k}} \chi(e) \, \mathbb{P}(e \subseteq S).
     \]
 
-    \textbf{Grouping the edges by type.} Say that \(e\) is of \vocab{type} \((a_1, a_2, \ldots, a_k)\) if \(\abs{e \cap A_i} = a_i\) for all \(i\); the types are the tuples of non-negative integers with \(a_1 + \cdots + a_k = k\). All the vertices of \(e\) are chosen independently, so an edge of type \((a_1, \ldots, a_k)\) satisfies \(\mathbb{P}(e \subseteq S) = p_1^{a_1} p_2^{a_2} \cdots p_k^{a_k}\), and this depends only on the type. Hence
+    \textbf{Grouping the edges by type.} Say that \(e\) is of \vocab{type} \((a_1, a_2, \ldots, a_k)\) if \(\abs{e \cap A_i} = a_i\) for all \(i\); the types are the tuples of non-negative integers with \(a_1 + \cdots + a_k = k\). The \(k\) vertices of \(e\) are distinct, so their coins are distinct independent \(\xi_v\), and for \(e\) of type \((a_1, \ldots, a_k)\)
+    \[
+        \mathbb{P}(e \subseteq S) = \mathbb{P}\Bigl( \bigcap_{v \in e} \{\xi_v = 1\} \Bigr) = \prod_{v \in e} \mathbb{P}(\xi_v = 1) = p_1^{a_1} p_2^{a_2} \cdots p_k^{a_k},
+    \]
+    which depends only on the type. Hence
     \[
         \mathbb{E}\bigl[ \chi(S) \bigr]
         = \sum_{\substack{(a_1, \ldots, a_k) \\ a_i \ge 0, \ \sum_i a_i = k}}
@@ -191,7 +199,11 @@ The content is the uniformity in \(f\): for each single \(f\) the existence of s
     \]
     so by \autoref{lem:first-moment} some set \(S \subseteq A_1 \cup \cdots \cup A_k\) satisfies \(\abs{\chi(S)} \ge c_k m^k\). Fix this \(S\).
 
-    \textbf{Reading off the conclusion.} First, \(S\) is large: since \(\abs{\chi(S)}\) is a sum of \(\binom{\abs{S}}{k}\) terms of absolute value \(1\),
+    \textbf{Reading off the conclusion.} First, \(S\) is large. By definition \(\chi(S) = \sum_{e \in \binom{S}{k}} \chi(e)\) has one term for each of the \(\binom{\abs{S}}{k}\) edges inside \(S\), and each term is \(\chi(e) = \pm 1\), so by the triangle inequality
+    \[
+        \abs{\chi(S)} \le \sum_{e \in \binom{S}{k}} \abs{\chi(e)} = \binom{\abs{S}}{k}.
+    \]
+    Hence
     \[
         c_k m^k \le \abs{\chi(S)} \le \binom{\abs{S}}{k} \le \abs{S}^k
         \implies \abs{S} \ge c_k^{1/k} m = \Omega(m) = \Omega\bigl( (\log n)^{1/(k-1)} \bigr).
@@ -355,7 +367,7 @@ so by \autoref{thm:linearity}
 \[
     \mathbb{E}[X] = \sum_{e \in E(G)} \mathbb{E}[X_e] = \sum_{e \in E(G)} \mathbb{P}(e \subseteq S) = m p^2.
 \]
-If \(mp^2 < 1\), i.e.\ \(p < \frac{1}{\sqrt{m}}\), then by \autoref{lem:first-moment} some outcome has \(X \le \mathbb{E}[X] < 1\), hence \(X = 0\), i.e.\ \(S\) is independent. By itself this says nothing about \(\abs{S}\): \(S = \varnothing\) is also independent. The heuristic is to \emph{pretend} that this independent \(S\) has the typical size of \(\abs{S} \sim \operatorname{Bin}(n,p)\), namely \(\mathbb{E}\abs{S} = np\). Taking \(p\) just below \(\frac{1}{\sqrt{m}}\) would then give
+If \(mp^2 < 1\), i.e.\ \(p < \frac{1}{\sqrt{m}}\), then by \autoref{lem:first-moment} some outcome has \(X \le \mathbb{E}[X] < 1\), hence \(X = 0\), i.e.\ \(S\) is independent. By itself this says nothing about \(\abs{S}\): \(S = \varnothing\) is also independent. The heuristic is to \emph{pretend} that this independent \(S\) has the typical size of \(\abs{S} \sim \operatorname{Bin}(n,p)\), namely \(\mathbb{E}\bigl[ \abs{S} \bigr] = np\). Taking \(p\) just below \(\frac{1}{\sqrt{m}}\) would then give
 \[
     \alpha(G) \ge \abs{S} \approx np \approx \frac{n}{\sqrt{m}},
 \]
@@ -432,14 +444,12 @@ Indeed, if \(v\) precedes all of \(N(v)\) then none of its neighbours has been c
 \begin{center}
     \begin{tikzpicture}[thick, every node/.style={font=\small}]
         \foreach \i in {1,...,7} \coordinate (o\i) at (0.95*\i,0);
+        \foreach \i in {4,6,7} \draw[blue!60!black] (o2) to[out=60, in=120] (o\i);
         \foreach \i in {1,...,7} \fill (o\i) circle (2.2pt);
         \draw[->, gray] (0.5,-0.7) -- (7.3,-0.7) node[right, gray] {random order};
         \fill[red!80!black] (o2) circle (2.8pt);
         \node[red!80!black, below=5pt] at (o2) {$v$};
-        \foreach \i in {4,6,7} {
-            \fill[blue!60!black] (o\i) circle (2.6pt);
-            \draw[blue!60!black] (o2) to[out=60, in=120] (o\i);
-        }
+        \foreach \i in {4,6,7} \fill[blue!60!black] (o\i) circle (2.6pt);
         \node[anchor=west, align=left] at (7.9,0.4)
             {\(v\) precedes all of its\\neighbours \(N(v)\) (blue),\\so \(v\) is chosen};
     \end{tikzpicture}

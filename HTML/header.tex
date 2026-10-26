@@ -139,6 +139,34 @@
 	plotbox/.style={draw=black!55, semithick},
 }
 
+% The deck's own four-class scatter plots (multiclass sections of `Linear Models
+% for Classification'): one marker shape per class --- mcsq (square), mcdia
+% (diamond), mctri (triangle), mcstar (star) --- and one pale tint per class,
+% rgsq / rgdia / rgtri / rgstar, for the decision regions of a combined
+% multiclass classifier.  `tieregion' marks inputs on which the combination has
+% no unique answer.  \mcmark{sq|dia|tri|star} gives the marker at text size,
+% for captions such as `square or not?'.
+\usetikzlibrary{shapes.geometric}
+\definecolor{clsq}{HTML}{86AD86}
+\definecolor{cldia}{HTML}{A3A374}
+\definecolor{cltri}{HTML}{AD86AD}
+\definecolor{clstar}{HTML}{86ADB8}
+\colorlet{rgsq}{green!13}
+\colorlet{rgdia}{yellow!24}
+\colorlet{rgtri}{magenta!12}
+\colorlet{rgstar}{cyan!13}
+\tikzset{
+	mcsq/.style={rectangle, fill=clsq, inner sep=0pt, minimum size=4.2pt},
+	mcdia/.style={diamond, fill=cldia, inner sep=0pt, minimum width=4.6pt,
+			minimum height=6.6pt},
+	mctri/.style={regular polygon, regular polygon sides=3, fill=cltri,
+			inner sep=0pt, minimum size=6.8pt},
+	mcstar/.style={star, star points=5, star point ratio=2.3, fill=clstar,
+			inner sep=0pt, minimum size=6.6pt},
+	tieregion/.style={pattern=crosshatch dots, pattern color=black!40},
+}
+\newcommand{\mcmark}[1]{\tikz[baseline=-0.6ex]{\node[mc#1] at (0,0) {};}}
+
 % Panels of the `how many kinds of lines' figures.  A panel is a small framed
 % box holding one fixed layout of inputs, each drawn as a circle (+1) or a cross
 % (-1); the mandatory argument is one letter per input, `o' or `x', in index
@@ -334,6 +362,97 @@
 				({2.1 + \x}, {-0.15 + 0.3/(1 + exp(-30*\x))});}{}%
 		\draw[-{Stealth[length=1.6mm]}] (2.4,0) -- (2.8,0)
 			node[right, inner sep=1pt] {\(h(\bm{x})\)};
+	\end{tikzpicture}}
+
+% The running example of the nonlinear-transform chapter, measured off the
+% handout: twenty inputs in [-1,1]^2, nine circles inside the circle
+% x1^2 + x2^2 = 0.6 and eleven crosses outside it.  \circdataX draws them in
+% X-space and \circdataZ their images z = (x1^2, x2^2) in Z-space, both in a
+% picture whose unit is the data unit.  The first circle and the last cross are
+% the examples the deck names x_1 and x_2; \circlabelsX and \circlabelsZ put
+% those names (z_1, z_2 after the transform) beside them.  \xplotframe frames
+% [-1,1]^2 with ticks at -1, 0, 1 and \zplotframe frames the deck's Z-space
+% window [-0.05,1]^2 with ticks at 0, 0.5, 1.
+\newcommand{\circdataX}{%
+	\foreach \p in {(-0.494,0.363), (-0.311,-0.101), (-0.189,0.717),
+			(-0.009,-0.173), (-0.007,0.374), (0.002,0.138), (0.085,0.322),
+			(0.142,0.568), (0.171,-0.302)}{\node[dpos] at \p {};}%
+	\foreach \p in {(-0.893,-0.946), (-0.803,0.877), (-0.774,0.551),
+			(-0.748,-0.853), (-0.721,-0.720), (-0.647,0.772), (-0.634,-0.905),
+			(0.491,0.920), (0.519,-0.715), (0.724,-0.794), (0.944,0.801)}%
+		{\node[dneg] at \p {\(\times\)};}}
+\newcommand{\circdataZ}{%
+	\foreach \p in {(0.244,0.132), (0.097,0.010), (0.036,0.514),
+			(0.000,0.030), (0.000,0.140), (0.000,0.019), (0.007,0.104),
+			(0.020,0.323), (0.029,0.091)}{\node[dpos] at \p {};}%
+	\foreach \p in {(0.797,0.895), (0.645,0.769), (0.599,0.304),
+			(0.560,0.728), (0.520,0.518), (0.419,0.596), (0.402,0.819),
+			(0.241,0.846), (0.269,0.511), (0.524,0.630), (0.891,0.642)}%
+		{\node[dneg] at \p {\(\times\)};}}
+\newcommand{\circlabelsX}{%
+	\node[font=\scriptsize, below left, inner sep=1pt] at (-0.494,0.363)
+		{\(\bm{x}_1\)};%
+	\node[font=\scriptsize, below, inner sep=4pt] at (0.944,0.801)
+		{\(\bm{x}_2\)};}
+\newcommand{\circlabelsZ}{%
+	\node[font=\scriptsize, below, inner sep=2pt] at (0.244,0.132)
+		{\(\bm{z}_1\)};%
+	\node[font=\scriptsize, below, inner sep=4pt] at (0.891,0.642)
+		{\(\bm{z}_2\)};}
+\newcommand{\xplotframe}{%
+	\draw[plotbox] (-1,-1) rectangle (1,1);
+	\foreach \t in {-1,0,1}{%
+		\draw[plotbox] (\t,-1) -- (\t,-0.96);
+		\draw[plotbox] (-1,\t) -- (-0.96,\t);
+		\node[font=\tiny, below, inner sep=3pt] at (\t,-1) {\(\t\)};
+		\node[font=\tiny, left, inner sep=1.5pt] at (-1,\t) {\(\t\)};}}
+\newcommand{\zplotframe}{%
+	\draw[plotbox] (-0.05,-0.05) rectangle (1,1);
+	\foreach \t in {0,0.5,1}{%
+		\draw[plotbox] (\t,-0.05) -- (\t,-0.03);
+		\draw[plotbox] (-0.05,\t) -- (-0.03,\t);
+		\node[font=\tiny, below, inner sep=3pt] at (\t,-0.05) {\(\t\)};
+		\node[font=\tiny, left, inner sep=1.5pt] at (-0.05,\t) {\(\t\)};}}
+
+% \vccurve: the `THE VC message' picture of the VC-dimension chapter --- in-sample
+% error falling, model complexity rising and their sum, the out-of-sample
+% bound, smallest at d_VC^* --- for chapters that point back at it.
+\newcommand{\vccurve}{%
+	\begin{tikzpicture}[baseline=(current bounding box.center)]
+		\begin{axis}[
+			width=7.0cm, height=4.8cm,
+			xmin=0, xmax=10, ymin=0, ymax=10,
+			axis lines=left, xtick={3.1}, xticklabels={\(d_{\mathrm{VC}}^*\)},
+			ytick=\empty, xlabel={VC dimension, \(\dvc\)},
+			ylabel={Error}, label style={font=\small},
+			clip=false]
+			\addplot[blue!80!black, thick, domain=0.3:10, samples=80]
+				{6.5*exp(-0.55*x) + 0.4};
+			\addplot[red!80!black, thick, domain=0:10, samples=40]
+				{0.75*x};
+			\addplot[Purple, thick, domain=0.3:10, samples=80]
+				{6.5*exp(-0.55*x) + 0.4 + 0.75*x};
+			\draw[dashed, Purple] (axis cs:3.1,0) -- (axis cs:3.1,4.54);
+			\node[font=\scriptsize, text=blue!80!black, anchor=west]
+				at (axis cs:6.2,1.1) {in-sample error};
+			\node[font=\scriptsize, text=red!80!black, anchor=north west]
+				at (axis cs:6.0,4.3) {model complexity};
+			\node[font=\scriptsize, text=Purple, anchor=west]
+				at (axis cs:6.5,9.7) {out-of-sample error};
+		\end{axis}
+	\end{tikzpicture}}
+
+% \nestedH: the nested hypothesis sets H_0 c H_1 c H_2 c H_3 c ... of the
+% structured-hypothesis-set pictures, as ellipses that share their leftmost
+% point, each one swallowing the one before.
+\newcommand{\nestedH}{%
+	\begin{tikzpicture}[baseline=(current bounding box.center),
+			font=\scriptsize]
+		\foreach \a/\b in {0.50/0.22, 1.15/0.38, 1.85/0.52, 2.60/0.66}{%
+			\draw[semithick] (\a,0) ellipse ({\a} and {\b});}
+		\foreach \x/\lab in {0.50/0, 1.65/1, 3.00/2, 4.45/3}{%
+			\node at (\x,0) {\(\mathcal{H}_{\lab}\)};}
+		\node at (5.65,0) {\(\cdots\)};
 	\end{tikzpicture}}
 
 % Algorithm Env

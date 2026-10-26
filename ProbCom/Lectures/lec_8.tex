@@ -156,7 +156,14 @@ If the \(X_i\) are pairwise independent, variances add, and each \(\Var(X_i) = p
 \[
     \Var(X) = \sum_{i=1}^{m} \Var(X_i) = \sum_{i=1}^{m} p_i (1 - p_i) \le \sum_{i=1}^{m} p_i = \mathbb{E}[X].
 \]
-This is already a very good sign: \(\Var(X) \le \mathbb{E}[X]\) means \(\Var(X) = o\bigl( \mathbb{E}[X]^{2} \bigr)\) as soon as \(\mathbb{E}[X] \to \infty\), which by \thmref{thm:chebyshev} is concentration.
+This is already a very good sign. Fix a constant \(\varepsilon > 0\) and apply \thmref{thm:chebyshev} with \(a = \varepsilon \mathbb{E}[X]\), measuring the deviation relative to \(\mathbb{E}[X]\):
+\[
+    \mathbb{P}\bigl( \abs{X - \mathbb{E}[X]} \ge \varepsilon \mathbb{E}[X] \bigr)
+    \le \frac{\Var(X)}{\varepsilon^{2} \mathbb{E}[X]^{2}}
+    \le \frac{\mathbb{E}[X]}{\varepsilon^{2} \mathbb{E}[X]^{2}}
+    = \frac{1}{\varepsilon^{2} \mathbb{E}[X]}.
+\]
+So if \(\mathbb{E}[X] \to \infty\), then \((1 - \varepsilon) \mathbb{E}[X] < X < (1 + \varepsilon) \mathbb{E}[X]\) with probability \(\to 1\), for every \(\varepsilon > 0\), i.e.\ \(X\) is \vocab{concentrated} around \(\mathbb{E}[X]\). All that was used is \(\Var(X) / \mathbb{E}[X]^{2} \to 0\), i.e.\ \(\Var(X) = o\bigl( \mathbb{E}[X]^{2} \bigr)\), which \(\Var(X) \le \mathbb{E}[X]\) gives as soon as \(\mathbb{E}[X] \to \infty\).
 
 \subsection{The General Case}
 
@@ -362,7 +369,7 @@ Putting the three together,
 \subsection{Summary}
 
 \begin{theorem}\label{thm:triangle-threshold}
-    Let \(X\) be the number of triangles in \(G(n,p)\). Then, with high probability,
+    Let \(p = p(n)\) and let \(X\) be the number of triangles in \(G(n,p)\). Then, as \(n \to \infty\), with high probability
     \[
         X = \begin{cases}
             0, & \text{if } p \ll \frac{1}{n}, \\[2pt]
