@@ -1,0 +1,169 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{amsfonts,amsthm,amsmath,amssymb,hyperref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Course details
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\courseTitle}{Probabilistic Combinatorics (Math 5390)}
+\newcommand{\semester}{Fall 2026}
+\newcommand{\instructorA}{Shagnik Das}
+\newcommand{\instructorB}{}
+
+\topmargin -1in
+\textheight 8.5in
+\textwidth 6.5in
+\oddsidemargin 0in
+\evensidemargin 0in
+\headheight 77pt
+\headsep 0in
+\footskip .75in
+
+\newcommand{\buildtitle}[4]{
+\begin{flushleft}
+{\large
+#1
+\hfill{}
+#2
+\par
+#3
+}
+\end{flushleft}
+\vskip 4pt
+\begin{center}
+{\large\bfseries#4\par}
+\end{center}
+\bigskip
+}
+
+\newcommand{\eps}{\varepsilon}
+\newcommand{\card}[1]{\left| #1 \right|}
+\newcommand{\mb}[1]{\mathbb{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\theoremstyle{plain}
+\newtheorem{lemma}{Lemma}
+\newcommand{\definitionautorefname}{Definition}
+\newcommand{\lemmaautorefname}{Lemma}
+
+
+\begin{document}
+
+\buildtitle{\courseTitle{}}{\semester}{\instructorA{} \hfill \instructorB{}}{Midterm Practice --- Solutions}
+
+Throughout, $\Pr$ and $\mb E$ refer to the random experiment described in each solution, and $\card{\cdot}$ denotes cardinality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Problem 1.2} \emph{Suppose $n \ge 4$, and let $H$ be an $n$-uniform hypergraph with at most $4^{n-1}/3^n$ edges. Prove that there is a coloring of the vertices of $H$ by four colors so that in every edge all colors are represented.}
+
+\paragraph{Solution.} If $H$ has no edges there is nothing to prove, so assume $1 \le \card{E(H)} \le 4^{n-1}/3^n$. Color every vertex independently and uniformly at random with one of the colors $1,2,3,4$. Fix an edge $e$, and for $c \in \{1,2,3,4\}$ let $M_c$ be the event that color $c$ does not appear on $e$. Since $\card e = n$ and the colors are independent, for any set $C$ of colors with $\card C = j$,
+\[
+	\Pr\Big( \bigcap_{c \in C} M_c \Big) = \Big( \frac{4-j}{4} \Big)^n .
+\]
+Call $e$ \emph{bad} if some color is missing on $e$. By inclusion--exclusion,
+\[
+	\Pr(e \text{ bad}) = \Pr\Big( \bigcup_{c=1}^4 M_c \Big) = 4 \Big(\frac34\Big)^n - 6 \Big(\frac12\Big)^n + 4 \Big(\frac14\Big)^n < 4 \Big(\frac34\Big)^n,
+\]
+where the strict inequality holds because $6 \cdot 2^{-n} > 4 \cdot 4^{-n}$. By the union bound over the edges,
+\[
+	\Pr(\text{some edge is bad}) \le \sum_{e \in E(H)} \Pr(e \text{ bad}) < \card{E(H)} \cdot 4 \Big(\frac34\Big)^n \le \frac{4^{n-1}}{3^n} \cdot \frac{4 \cdot 3^n}{4^n} = 1 .
+\]
+Hence with positive probability no edge is bad, so some coloring has all four colors on every edge. (The hypothesis $n \ge 4$ is what makes this possible at all: an edge with fewer than $4$ vertices cannot see four colors.) \qed
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Problem 1.5} \emph{Let $G = (V,E)$ be a graph on $n \ge 10$ vertices and suppose that if we add to $G$ any edge not in $G$ then the number of copies of a complete graph on $10$ vertices in it increases. Show that the number of edges of $G$ is at least $8n - 36$.}
+
+\paragraph{Solution.} We use Bollob\'as' theorem on set pairs.
+
+\begin{lemma}[Bollob\'as]\label{lem:bollobas}
+	Let $(A_i, B_i)$, $1 \le i \le h$, be pairs of finite sets with $\card{A_i} = k$, $\card{B_i} = \ell$, $A_i \cap B_i = \varnothing$ for all $i$, and $A_i \cap B_j \neq \varnothing$ for all $i \neq j$. Then $h \le \binom{k+\ell}{k}$.
+\end{lemma}
+
+Let $e_1, \dots, e_h$ be the non-edges of $G$, where $h = \binom n2 - \card E$. Adding $e_i = \{x_i, y_i\}$ creates a new copy of $K_{10}$, which must use the new edge $e_i$; so there is an $8$-set $D_i \subseteq V \setminus e_i$ such that $Q_i = D_i \cup e_i$ spans a $K_{10}$ in $G + e_i$. In other words,
+\begin{equation}\label{eq:Qi}
+	\text{every pair inside } Q_i \text{ other than } e_i \text{ is an edge of } G .
+\end{equation}
+Set
+\[
+	A_i = e_i, \qquad B_i = V \setminus Q_i, \qquad \card{A_i} = 2, \quad \card{B_i} = n - 10 .
+\]
+Clearly $A_i \cap B_i = \varnothing$ since $e_i \subseteq Q_i$. For $i \ne j$, if $A_i \cap B_j = \varnothing$ then $e_i \subseteq Q_j$ with $e_i \ne e_j$, so $e_i$ is an edge of $G$ by \eqref{eq:Qi}, contradicting that $e_i$ is a non-edge. Thus $A_i \cap B_j \ne \varnothing$, and \autoref{lem:bollobas} with $k = 2$, $\ell = n-10$ gives $h \le \binom{n-8}{2}$. Therefore
+\[
+	\card E = \binom n2 - h \ge \binom n2 - \binom{n-8}{2} = \frac{n(n-1) - (n-8)(n-9)}{2} = \frac{16n - 72}{2} = 8n - 36. \qquad \qed
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Problem 1.7} \emph{Let $\{(A_i, B_i), 1 \le i \le h\}$ be a family of pairs of subsets of the set of integers such that $\card{A_i} = k$ for all $i$ and $\card{B_i} = \ell$ for all $i$, $A_i \cap B_i = \varnothing$ for all $i$ and $(A_i \cap B_j) \cup (A_j \cap B_i) \ne \varnothing$ for all $i \ne j$. Prove that $h \le (k+\ell)^{k+\ell} / (k^k \ell^\ell)$.}
+
+\paragraph{Solution.} Let $X = \bigcup_i (A_i \cup B_i)$, a finite set, and let $p = \frac{k}{k+\ell}$ (with the convention $0^0 = 1$ if $k$ or $\ell$ is $0$). Color each $x \in X$ independently \emph{left} with probability $p$ and \emph{right} with probability $1 - p$. Let $E_i$ be the event that all of $A_i$ is left and all of $B_i$ is right. As $A_i \cap B_i = \varnothing$, these are $k + \ell$ distinct elements, so
+\[
+	\Pr(E_i) = p^k (1-p)^\ell = \frac{k^k \ell^\ell}{(k+\ell)^{k+\ell}} .
+\]
+The $E_i$ are pairwise disjoint: for $i \ne j$ there is some $x \in A_i \cap B_j$ or $x \in A_j \cap B_i$; in the first case $E_i$ forces $x$ left while $E_j$ forces $x$ right, and symmetrically in the second, so $E_i \cap E_j = \varnothing$. Hence
+\[
+	h \cdot \frac{k^k \ell^\ell}{(k+\ell)^{k+\ell}} = \sum_{i=1}^h \Pr(E_i) = \Pr\Big( \bigcup_i E_i \Big) \le 1,
+\]
+which is the claim. (The choice $p = k/(k+\ell)$ maximizes $p^k(1-p)^\ell$.) \qed
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Problem 1.10} \emph{Prove that there is an absolute constant $c > 0$ with the following property: let $A$ be an $n \times n$ matrix with pairwise distinct entries. Then there is a permutation of the rows of $A$ so that no column in the permuted matrix contains an increasing subsequence of length at least $c\sqrt n$.}
+
+\paragraph{Solution.} We show $c = 2e$ works. Let $m = \lceil 2e\sqrt n \rceil$. If $m > n$ there is nothing to prove, so assume $m \le n$. A column has an increasing subsequence of length $\ge c\sqrt n$ iff it has one of length exactly $m$ (lengths are integers, and a subsequence of an increasing sequence is increasing).
+
+Permute the rows by a uniformly random $\sigma \in S_n$, so the new row $r$ is old row $\sigma(r)$. Fix a column $j$ and positions $r_1 < \dots < r_m$. The tuple $(\sigma(r_1), \dots, \sigma(r_m))$ is uniform over ordered $m$-tuples of distinct rows, so conditioned on the \emph{set} $\{\sigma(r_1), \dots, \sigma(r_m)\}$ its order is uniform among the $m!$ orders. As the entries are distinct, exactly one order makes $A_{\sigma(r_1), j} < \dots < A_{\sigma(r_m), j}$, so this event has probability $1/m!$. Let $N_j$ be the number of increasing subsequences of length $m$ in column $j$. Then, using $\binom nm \le n^m / m!$ and $m! \ge (m/e)^m$ (from $e^m \ge m^m/m!$),
+\[
+	\Pr(N_j \ge 1) \le \mb E[N_j] = \binom nm \frac{1}{m!} \le \frac{n^m}{(m!)^2} \le \Big( \frac{e^2 n}{m^2} \Big)^m \le \Big( \frac14 \Big)^m,
+\]
+since $m \ge 2e\sqrt n$. By the union bound over the $n$ columns, and using $m \ge 2e\sqrt n$ and $\ln n \le \sqrt n$ for $n \ge 1$,
+\[
+	\Pr(\exists j : N_j \ge 1) \le n \, 4^{-m} \le \exp\big( \ln n - 2e \ln 4 \sqrt n \big) \le \exp\big( (1 - 2e\ln 4) \sqrt n \big) < 1 .
+\]
+So some permutation $\sigma$ leaves every column without an increasing subsequence of length $m$, hence of length $\ge c\sqrt n$. \qed
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Ramsey numbers.}
+
+\begin{definition}[Ramsey number]\label{def:ramsey}
+	For integers $k, \ell \ge 1$, the \emph{Ramsey number} $R(k,\ell)$ is the least integer $N$ such that every red/blue coloring of the edges of the complete graph $K_N$ contains a red $K_k$ or a blue $K_\ell$. Equivalently, every graph on $N$ vertices contains a clique of size $k$ or an independent set of size $\ell$. Ramsey's theorem says $R(k, \ell)$ is finite; in particular $R(k,k) > n$ iff there is a red/blue coloring of $E(K_n)$ with no monochromatic $K_k$.
+\end{definition}
+
+The bound used below comes from the deletion method: color $E(K_n)$ uniformly at random; each $k$-set is monochromatic with probability $2 \cdot 2^{-\binom k2}$, so the expected number of monochromatic $K_k$ is $\binom nk 2^{1 - \binom k2}$. Fix a coloring with at most this many, and delete one vertex from each monochromatic $K_k$; the remaining $\ge n - \binom nk 2^{1-\binom k2}$ vertices span a coloring with no monochromatic $K_k$, so by \autoref{def:ramsey}
+\begin{equation}\label{eq:deletion}
+	R(k,k) > n - \binom nk 2^{1 - \binom k2} \qquad \text{for every integer } n.
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Problem 3.1} \emph{As shown in Section 3.1, the Ramsey number $R(k,k)$ satisfies
+\[
+	R(k,k) > n - \binom nk 2^{1 - \binom k2}
+\]
+for every integer $n$. Conclude that
+\[
+	R(k,k) \ge (1 - o(1)) \frac ke 2^{k/2} .
+\]}
+
+\paragraph{Solution.} Here $o(1)$ is as $k \to \infty$. Take $n = \lfloor \frac ke 2^{k/2} \rfloor$, so $\frac{en}{k} \le 2^{k/2}$ and $n \ge \frac ke 2^{k/2} - 1$. Using $\binom nk \le n^k/k!$ and $k! \ge (k/e)^k$,
+\[
+	\binom nk 2^{1 - \binom k2} \le \Big( \frac{en}{k} \Big)^k 2^{1 - \frac{k(k-1)}{2}} \le 2^{\frac{k^2}{2}} \cdot 2^{1 - \frac{k^2}{2} + \frac k2} = 2 \cdot 2^{k/2} .
+\]
+Plugging into \eqref{eq:deletion},
+\[
+	R(k,k) > \frac ke 2^{k/2} - 1 - 2 \cdot 2^{k/2} = \frac ke 2^{k/2} \Big( 1 - \frac{2e}{k} - \frac{e}{k \, 2^{k/2}} \Big) = (1 - o(1)) \frac ke 2^{k/2},
+\]
+since $\frac{2e}{k} + \frac{e}{k 2^{k/2}} \to 0$. The point is that the deleted term $2 \cdot 2^{k/2}$ is smaller than $n \approx \frac ke 2^{k/2}$ by a factor $\Theta(1/k)$. \qed
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Problem 3.3} \emph{Prove that every three-uniform hypergraph with $n$ vertices and $m \ge n/3$ edges contains an independent set (i.e., a set of vertices containing no edges) of size at least
+\[
+	\frac{2 n^{3/2}}{3 \sqrt 3 \sqrt m} .
+\]}
+
+\paragraph{Solution.} Let $H$ be the hypergraph and $p = \sqrt{n / (3m)}$; the hypothesis $m \ge n/3$ is exactly $p \le 1$. Choose a random set $S \subseteq V(H)$ by including each vertex independently with probability $p$. Let $Y = \card S$ and let $Z$ be the number of edges $e \subseteq S$. Since each edge has $3$ vertices, by linearity of expectation
+\[
+	\mb E[Y - Z] = pn - p^3 m = p (n - p^2 m) = \sqrt{\frac{n}{3m}} \Big( n - \frac n3 \Big) = \frac{2 n^{3/2}}{3\sqrt 3 \sqrt m} .
+\]
+Fix an outcome with $Y - Z \ge \mb E[Y - Z]$, and delete from $S$ one vertex of each edge contained in $S$. The resulting set $I$ has $\card I \ge Y - Z$, and it is independent: an edge inside $I$ would be an edge inside $S$, one of whose vertices was deleted. Hence $\card I \ge \frac{2 n^{3/2}}{3\sqrt 3 \sqrt m}$. (The value of $p$ maximizes $pn - p^3 m$: the derivative $n - 3p^2 m$ vanishes at $p^2 = n/(3m)$.) \qed
+
+\end{document}
