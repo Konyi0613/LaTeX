@@ -283,12 +283,23 @@ Two routes then lead to \(\Eout^{0/1}\):
         derive.
 \end{itemize}
 Either way the right-hand side is small when \(\Ein^{\mathrm{CE}}(\bm{w})\) is,
-and the same argument with \autoref{prop:sqr-bound} covers linear regression.
+which is what logistic regression minimises. Linear regression minimises
+\(\Ein^{\mathrm{SQR}}\) instead, so its bound swaps in
+\autoref{prop:sqr-bound}, \(\err_{0/1} \le \err_{\mathrm{SQR}}\), where the
+left route used \autoref{prop:sce-bound}:
+\[
+    \Eout^{0/1}(\bm{w}) \le \Ein^{0/1}(\bm{w}) + \Omega^{0/1}
+    \le \Ein^{\mathrm{SQR}}(\bm{w}) + \Omega^{0/1} .
+\]
 
 \begin{moral}
-    Small \(\Ein^{\mathrm{CE}}(\bm{w}) \Longrightarrow\) small
-    \(\Eout^{0/1}(\bm{w})\): \textbf{logistic/linear reg.} for
-    \textcolor{blue}{linear classification}.
+    \textbf{logistic/linear reg.} for \textcolor{blue}{linear classification}:
+    \begin{itemize}
+        \item logistic reg.: small \(\Ein^{\mathrm{CE}}(\bm{w})
+            \Longrightarrow\) small \(\Eout^{0/1}(\bm{w})\);
+        \item linear reg.: small \(\Ein^{\mathrm{SQR}}(\bm{w})
+            \Longrightarrow\) small \(\Eout^{0/1}(\bm{w})\).
+    \end{itemize}
 \end{moral}
 
 \subsection{Regression for Classification}
@@ -1630,6 +1641,80 @@ for every other class, the relabelling of the figures.
                 the whole \(\mathcal{D}\), as in \autoref{sec:logreg-error}.
         \end{itemize}
 \end{itemize}
+
+\begin{remark}[Error of multinomial logistic regression]
+    Follow \autoref{sec:logreg-error} with \(\bm{W} = (\bm{w}_{[k]})_{k \in
+    \mathcal{Y}}\) and \(P_{\bm{W}}(k \mid \bm{x})\) the formula above.
+    Dropping the factors \(P(\bm{x}_n)\), common to every \(\bm{W}\),
+    \begin{align*}
+        &\max_{\bm{W}} \; \text{likelihood}(\bm{W}) \propto \prod_{n=1}^N
+        P_{\bm{W}}(y_n \mid \bm{x}_n) = \prod_{n=1}^N
+        \frac{\exp(\bm{w}_{[y_n]}^\top \bm{x}_n)}{\sum_{j \in \mathcal{Y}}
+        \exp(\bm{w}_{[j]}^\top \bm{x}_n)}\\
+        \iff{} &\max_{\bm{W}} \; \ln \prod_{n=1}^N P_{\bm{W}}(y_n \mid
+        \bm{x}_n)\\
+        \iff{} &\min_{\bm{W}} \; \frac{1}{N} \sum_{n=1}^N \underbrace{\biggl(
+        \ln \sum_{j \in \mathcal{Y}} \exp(\bm{w}_{[j]}^\top \bm{x}_n) -
+        \bm{w}_{[y_n]}^\top \bm{x}_n \biggr)}_{\err(\bm{W}, \bm{x}_n, y_n)} .
+    \end{align*}
+    The symmetry \(1 - \theta(s) = \theta(-s)\) is no longer needed: the
+    formula gives \(P_{\bm{W}}(y_n \mid \bm{x}_n)\) for every label directly.
+    Pulling \(\exp(\bm{w}_{[y]}^\top \bm{x})\) out of the sum,
+    \[
+        \err(\bm{W}, \bm{x}, y) = \ln \Bigl( 1 + \sum_{j \neq y} \exp \bigl(
+        -(\bm{w}_{[y]} - \bm{w}_{[j]})^\top \bm{x} \bigr) \Bigr) .
+    \]
+    \begin{itemize}
+        \item \textbf{Still cross-entropy}: read the observed label as a
+            distribution \(q\) over \(\mathcal{Y}\) that puts all its mass on
+            \(y\), \(q(k) = \llbracket y = k \rrbracket\), and the model's
+            output as \(p(k) = P_{\bm{W}}(k \mid \bm{x})\). Their
+            cross-entropy is
+            \[
+                -\sum_{k \in \mathcal{Y}} q(k) \ln p(k)
+                = -\ln P_{\bm{W}}(y \mid \bm{x})
+                = \err(\bm{W}, \bm{x}, y) ,
+            \]
+            since \(q(k) = 0\) kills every term but \(k = y\). This is the
+            two-term formula after \eqref{eq:ce-err} with
+            \((y', 1 - y')\) and \((p, 1 - p)\) replaced by \(K\) entries
+            each.
+        \item \textbf{\(K = 2\) gives back \eqref{eq:ce-err}}: take
+            \(\mathcal{Y} = \{-1, +1\}\). The sum over \(j \neq y\) has the
+            single term \(j = -y\), so
+            \[
+                \err = \ln \bigl( 1 + \exp(-(\bm{w}_{[y]} -
+                \bm{w}_{[-y]})^\top \bm{x}) \bigr) .
+            \]
+            Put \(\bm{w} = \bm{w}_{[+1]} - \bm{w}_{[-1]}\). For \(y = +1\),
+            \(\bm{w}_{[y]} - \bm{w}_{[-y]} = \bm{w}\); for \(y = -1\) it is
+            \(-\bm{w}\). In both cases it equals \(y \bm{w}\), and \(\err =
+            \ln(1 + \exp(-y \bm{w}^\top \bm{x}))\). Likewise
+            \(P_{\bm{W}}(+1 \mid \bm{x}) = 1 / (1 + \exp(-\bm{w}^\top
+            \bm{x})) = \theta(\bm{w}^\top \bm{x})\): only the difference of
+            the two weight vectors matters, and binary logistic regression
+            learns exactly that difference.
+        \item \textbf{Still a 0/1 bound}: we show \(\err_{0/1} \le \err / \ln
+            2\), the counterpart of \autoref{prop:sce-bound}, with
+            \(g(\bm{x}) = \argmax_k \bm{w}_{[k]}^\top \bm{x}\) and a tie
+            counted as a mistake, like \(\sign(0)\).
+            \begin{itemize}
+                \item If \(g(\bm{x}) = y\), then \(\err_{0/1} = 0 < \err / \ln
+                    2\), because every term inside the \(\ln\) is positive,
+                    so its argument exceeds \(1\).
+                \item If \(g(\bm{x}) \neq y\), then \(y\) is not the strict
+                    winner, so some \(j \neq y\) has \(\bm{w}_{[j]}^\top
+                    \bm{x} \ge \bm{w}_{[y]}^\top \bm{x}\). That \(j\)'s term
+                    is \(\exp(-(\bm{w}_{[y]} - \bm{w}_{[j]})^\top \bm{x})
+                    \ge e^0 = 1\), and the other terms are positive, so the
+                    argument of the \(\ln\) is at least \(1 + 1 = 2\). Hence
+                    \(\err \ge \ln 2\), i.e.\ \(\err / \ln 2 \ge 1 =
+                    \err_{0/1}\).
+            \end{itemize}
+            Put differently, a mistake means \(P_{\bm{W}}(y \mid \bm{x}) \le
+            \frac{1}{2}\), the multiclass version of \(ys \le 0\).
+    \end{itemize}
+\end{remark}
 
 \begin{moral}
     OVA: a simple multiclass \textcolor{orange!85!black}{\textbf{meta-algorithm}}
