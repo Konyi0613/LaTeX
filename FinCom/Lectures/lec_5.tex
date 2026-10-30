@@ -733,6 +733,25 @@ One can also have American barrier options; one then needs to specify whether th
 
 \zh{若 barrier 恰好等於 exercise boundary、rebate 等於 intrinsic value，兩者就相同。也有 American barrier option，這時要規定還沒碰到 barrier 時能不能提前履約。}
 
+\begin{remark}
+	\textbf{Rebate。}knock-out option 可以附帶 \vocab{rebate}：標的一碰到 $H$，option 作廢，持有人當下拿到合約事先寫好的金額 $K$ 作為補償。\autoref{sec:barrier} 的定義是 $K=0$ 的情形。
+
+	\textbf{這段在比什麼。}以 American put 為例。令 $t^{*}=\inf\{t:S(t)\le S^{*}(t)\}$ 為股價第一次碰到 exercise boundary $S^{*}(t)$（\autoref{def:exercise-boundary}）的時間；路徑連續，所以 $S(t^{*})=S^{*}(t^{*})$。持有人照最佳策略得到
+	\[
+		\begin{cases}
+			X-S^{*}(t^{*}),          & t^{*}\le\tau\quad\text{（在 $t^{*}$ 履約，合約結束）}, \\
+			\max(X-S_{\tau},0), & \text{到期前沒碰到}.
+		\end{cases}
+	\]
+	這和一個 barrier 隨時間變動的 down-and-out put 一模一樣：barrier $H(t)=S^{*}(t)$，碰到時付 rebate $X-S^{*}(t^{*})$，沒碰到就付普通 put 的 payoff。這就是「barrier $\leftrightarrow$ exercise boundary、rebate $\leftrightarrow$ intrinsic value」的意思（call 同理，改成 $S-X$）。
+
+	\textbf{差在哪。}(i) $S^{*}(t)$ 不能任意指定，它是 backward induction 算出的最佳履約點，碰到就履約是持有人自己選的；barrier option 的 $H$ 寫死在合約裡，碰到就強制結束，而且持有人不能提前履約。(ii) 一般的 rebate 是常數 $K$，這裡的「rebate」$X-S^{*}(t)$ 隨時間變。
+
+	\textbf{何時相同。}若合約剛好取 $H(t)=S^{*}(t)$、rebate $X-S^{*}(t)$，兩者每條路徑的 payoff 相同，由 \autoref{cor:same-payoff} 價格相同。
+
+	\textbf{American barrier option。}barrier option 本身也可以是 American 式。這時合約要多寫一條：例如 knock-in 型在股價還沒碰到 $H$（尚未生效）時能不能提前履約。
+\end{remark}
+
 \subsection{Interesting Observations}
 \label{sec:barrier-reflection}
 
@@ -891,6 +910,7 @@ The in--out parity sidesteps this --- price the down-and-out call and subtract i
 
 \begin{note}
 	\textbf{$h$ 是什麼。}因為 $ud=1$，tree 上所有股價都是 $Su^{k}$（$k$ 為整數）。effective barrier 是 $\le H$ 的最高那一層：$Su^{k}\le H\iff k\le\ln(H/S)/\ln u$，取最大的整數 $k$ 就是 $h=\lfloor\ln(H/S)/\ln u\rfloor$。
+	因為 $H<S$，$h<0$，$Su^{h}=Sd^{-h}$：$-h=\lceil\ln(S/H)/\ln u\rceil$ 就是跌到 barrier 所需的最少淨下跌次數。
 	\textbf{哪個 node 是 barrier。}時間 $j$ 時經過 $i$ 次下跌的節點價格為 $Su^{(j-i)-i}=Su^{j-2i}$，它等於 $Su^{h}$ 恰好在 $j-2i=h$，即 $i=(j-h)/2$。$i$ 必須是 $0$ 到 $j$ 之間的整數，所以演算法要檢查 $j-h$ 是偶數且 $0\le(j-h)/2\le j$。
 	只要把那個節點設為零就夠了：它下面的每個節點都只能經由 barrier 那一層到達，而那裡的值已經是 $0$。
 	若有 rebate $K$，就把那個節點設成 $K$ 而不是 $0$。\footnote{課本 Figure 11.4。}
@@ -974,6 +994,52 @@ We can even remove intraday nodes to create a \vocab{multinomial tree}: a node i
 
 \zh{圖：heptanomial tree：一天 6 期、拿掉盤中 node，七個後繼是當天收盤價 $Su^{6-2j}$，$j=0,\ldots,6$。}
 
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[x=0.8cm, y=0.32cm]
+		\begin{scope}
+			\node[font=\footnotesize\bfseries, text=Gray!40!black] at (3,8.2) {Binomial, $d=2$};
+			\foreach \t in {0,...,5} \foreach \i in {0,...,\t} {
+					\draw[Gray!60] (\t,{\t-2*\i}) -- (\t+1,{\t-2*\i+1});
+					\draw[Gray!60] (\t,{\t-2*\i}) -- (\t+1,{\t-2*\i-1});
+				}
+			\foreach \t in {1,3,5} \foreach \i in {0,...,\t}
+			\draw[Gray!70!black, fill=white] (\t,{\t-2*\i}) circle (2.2pt);
+			\foreach \t in {0,2,4,6} \foreach \i in {0,...,\t}
+			\fill[MidnightBlue!80!black] (\t,{\t-2*\i}) circle (2.4pt);
+			\foreach \k in {0,...,3}
+			\node[font=\scriptsize] at ({2*\k},-7.6) {day \k};
+		\end{scope}
+		\begin{scope}[xshift=7.2cm]
+			\node[font=\footnotesize\bfseries, text=Gray!40!black] at (3,8.2) {Intraday nodes removed};
+			\foreach \k in {0,1,2} {
+					\pgfmathtruncatemacro{\kk}{2*\k}
+					\foreach \i in {0,...,\kk} \foreach \s in {-2,0,2}
+					\draw[MidnightBlue!70!black] ({2*\k},{2*\k-2*\i}) -- ({2*\k+2},{2*\k-2*\i+\s});
+				}
+			\foreach \m in {-2,0,2}
+			\draw[RawSienna, very thick] (2,\m) -- (4,0);
+			\foreach \k in {0,...,3} {
+					\pgfmathtruncatemacro{\kk}{2*\k}
+					\foreach \i in {0,...,\kk}
+					\fill[MidnightBlue!80!black] ({2*\k},{2*\k-2*\i}) circle (2.4pt);
+					\node[font=\scriptsize] at ({2*\k},-7.6) {day \k};
+				}
+			\foreach \m in {-6,-4,...,6}
+			\node[right, font=\scriptsize] at (6.1,\m) {$Su^{\m}$};
+		\end{scope}
+	\end{tikzpicture}
+	\caption{Daily monitoring with $d=2$ periods per day over $D=3$ days. Left: the
+		binomial tree; hollow nodes are intraday, filled nodes are end of day. Right:
+		removing the intraday nodes leaves a trinomial tree in which $Su^{m}$ branches
+		to $Su^{m+2}$, $Su^{m}$, $Su^{m-2}$, and day $k$ has $2k+1$ nodes. It still
+		recombines: the day-2 node $S$ is reached from all three day-1 nodes
+		(highlighted).}
+	\label{fig:trinomial-daily}
+\end{figure}
+
+\zh{圖：$d=2$、$D=3$。左：binomial tree，空心是盤中 node、實心是收盤 node。右：拿掉盤中 node 後變成 trinomial tree，$Su^{m}$ 接到 $Su^{m+2},Su^{m},Su^{m-2}$，第 $k$ 天有 $2k+1$ 個 node；仍然會重合，例如第 2 天的 $S$ 可以從第 1 天的三個 node 到達（標色）。}
+
 Does this save time or space?\footnote{Contributed by Ms.~Chen, Tzu-Chun (\texttt{R94922003}) and others on April 12, 2006.}
 Not asymptotically.
 Over $D$ days with $d$ periods each, the binomial tree visits $\sim(Dd)^{2}/2$ nodes at two operations each, about $D^{2}d^{2}$ operations; the multinomial tree visits only the $\sim D^{2}d/2$ end-of-day nodes but at $d+1$ operations each, again of order $D^{2}d^{2}/2$.
@@ -983,9 +1049,11 @@ Space is a single column of $O(Dd)$ nodes either way.
 
 \begin{remark}
 	\begin{enumerate}[(1),nosep]
-		\item \textbf{multinomial 的分支機率。}一天有 $d$ 期，一天後股價由這 $d$ 期中上漲幾次決定：上漲 $j$ 次（$j=0,\ldots,d$）共 $d+1$ 種結果，機率是 $b(j;d,p)$（\autoref{sec:bopm-formula} 的 binomial distribution）。
-		\item \textbf{binomial tree 的工作量。}總共 $Dd$ 期，node 數 $\sum_{k=0}^{Dd}(k+1)\sim(Dd)^{2}/2$，每個 node 合併 $2$ 個子節點。
-		\item \textbf{multinomial tree 的工作量。}只留每天結束時的 node：第 $k$ 天結束時有 $kd+1$ 個，總共 $\sum_{k=0}^{D}(kd+1)\sim dD^{2}/2$ 個；但每個 node 要合併 $d+1$ 個子節點，總共 $\sim dD^{2}/2\times d=D^{2}d^{2}/2$。
+		\item \textbf{一天 $d$ 期。}tree 的步長是 $\Delta t=1\text{ 天}/d$，所以一天在橫向（時間軸）上有 $d$ 層 binomial step。（這裡的 $d$ 是期數，不是下跌因子。）
+		\item \textbf{為什麼接 $d+1$ 個 node。}從一個收盤 node 出發，要走完 $d$ 步才到下一個收盤。中間的盤中 node 不檢查 barrier，所以可以拿掉。因為 $ud=1$ 會重合，收盤價只由上漲次數 $j\sim\mathrm{Bin}(d,p)$ 決定：$j=0,\ldots,d$ 共 $d+1$ 種，價格 $Su^{2j-d}$，機率 $b(j;d,p)$（\autoref{sec:bopm-formula}）。例如 $d=2$（\autoref{fig:trinomial-daily}）：$S\to Su^{2},\,S,\,Su^{-2}$，機率 $p^{2},\,2p(1-p),\,(1-p)^{2}$。
+		\item \textbf{工作量 $=$ node 數 $\times$ 每個 node 的項數。}backward induction 算一個 node 的值，是對它的子節點做折現加權和，有幾個子節點就有幾項。binomial：$C=\bigl(pC_{+1}+(1-p)C_{-1}\bigr)/R$，$2$ 項；$d=2$ 的 trinomial：$C=\bigl(p^{2}C_{+2}+2p(1-p)C_{0}+(1-p)^{2}C_{-2}\bigr)/R^{2}$，$3$ 項；一般是 $d+1$ 項 $\sum_{j=0}^{d}b(j;d,p)\,C_{j}/R^{d}$。
+		\item \textbf{binomial tree 的工作量。}總共 $Dd$ 期，node 數 $\sum_{k=0}^{Dd}(k+1)\sim(Dd)^{2}/2$，每個 $2$ 項，共 $\sim D^{2}d^{2}$。
+		\item \textbf{multinomial tree 的工作量。}只留每天結束時的 node：第 $k$ 天結束時有 $kd+1$ 個，總共 $\sum_{k=0}^{D}(kd+1)\sim dD^{2}/2$ 個；但每個 $d+1$ 項，共 $\sim dD^{2}/2\times(d+1)\sim D^{2}d^{2}/2$。（\autoref{fig:trinomial-daily}：左邊 $28$ 個 node、右邊 $1+3+5+7=16$ 個。）
 	\end{enumerate}
 	兩者同為 $O(D^{2}d^{2})$，所以沒有省下。
 \end{remark}

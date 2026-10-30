@@ -1565,6 +1565,30 @@ In the continuous-time model, an American put should be exercised as soon as the
 
 \zh{連續時間模型中，American put 應在股價一跌到臨界價格 $S^{*}(t)$ 就履約，$S^{*}(t)$ 叫 exercise boundary。put 的 boundary 隨 $t$ 遞增（\autoref{fig:exercise-boundary}），call 的隨 $t$ 遞減；boundary 可用分段指數函數近似。之後 \autoref{sec:american-vs-barrier} 會問：這樣 American option 算不算 barrier option？}
 
+\begin{definition}[Exercise boundary]
+	\label{def:exercise-boundary}
+	令 $P(S,t)$ 為到期日 $T$、履約價 $X$ 的 American put 在時間 $t$、股價 $S$ 時的價值。因為隨時可以履約，$P(S,t)\ge X-S$。
+	\begin{itemize}[nosep]
+		\item \vocab{exercise region}：$P(S,t)=X-S$ 的 $(S,t)$。繼續持有不比立刻履約值錢，應立刻履約。
+		\item \vocab{continuation region}：$P(S,t)>X-S$ 的 $(S,t)$。應繼續持有。
+		\item \vocab{exercise boundary}：$S^{*}(t)=\sup\{S:P(S,t)=X-S\}$。exercise region 在每個 $t$ 恰為 $\{S\le S^{*}(t)\}$（見下方 note）。
+	\end{itemize}
+	American call 對稱：$S^{*}(t)=\inf\{S:C(S,t)=S-X\}$，exercise region 是 $\{S\ge S^{*}(t)\}$；不發股利時由 \autoref{thm:merton-no-early} 永不提前履約，$S^{*}(t)=\infty$（$t<T$）。
+	在 tree 上，exercise region 就是 \autoref{alg:american-put} 裡 $\max$ 取到 $X-Su^{j-i}d^{i}$ 的那些 node。
+\end{definition}
+
+\begin{note}
+	\textbf{為什麼 exercise region 是 $\{S\le S^{*}(t)\}$。}只要證 $g(S)=P(S,t)-(X-S)$ 對 $S$ 遞增：$g\ge0$，所以 $g(S)=0$ 時所有 $S'<S$ 也有 $g(S')=0$。
+	risk-neutral 下 $S_{\theta}=S\,Z_{\theta}$，$Z$ 與起始價 $S$ 無關，且 $e^{-r(\theta-t)}Z_{\theta}$ 是 martingale，由 optional stopping theorem，對任何 stopping time $\theta\in[t,T]$ 有 $E\bigl[e^{-r(\theta-t)}Z_{\theta}\bigr]=1$。對 $S'<S$，
+	\[
+		\max(X-S'Z_{\theta},0)\le\max(X-SZ_{\theta},0)+(S-S')Z_{\theta}.
+	\]
+	兩邊乘 $e^{-r(\theta-t)}$ 取期望，再對 $\theta$ 取 $\sup$（American put 的價值就是對所有履約時間 $\theta$ 取最大）：
+	\[
+		P(S',t)\le P(S,t)+(S-S'),\qquad\text{即}\qquad g(S')\le g(S).
+	\]
+\end{note}
+
 \begin{figure}[H]
 	\centering
 	\begin{tikzpicture}[font=\footnotesize]

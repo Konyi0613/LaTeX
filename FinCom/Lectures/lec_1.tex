@@ -18,9 +18,11 @@
 
 \bigskip
 
+\suppstart
 \noindent The two epigraphs above already frame the tension this course lives in.
 Finance is where quantitative modelling pays off most visibly, and it is also where a misplaced faith in a model does the most damage.
 Our job is to learn the models \emph{and} to keep track of what they assume.
+\suppend
 
 %─────§1 Class information───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Class Information}
@@ -87,7 +89,9 @@ The course runs from financial theory down to running code, in roughly this orde
 	\item Help in finding your thesis directions.
 \end{itemize}
 
+\suppstart
 The last two items are worth emphasising: pricing problems that are merely ``computable'' are usually not good enough, and the gap between a correct algorithm and a \emph{fast} one is exactly where the open research questions sit.
+\suppend
 
 \subsection{What This Course Is \texorpdfstring{\emph{Not}}{Not} About}
 
@@ -103,10 +107,12 @@ Equally important is what will \emph{not} be covered.
 	\item \textbf{Professional behavior.}
 \end{itemize}
 
+\suppstart
 \begin{moral}
 	Pricing theory tells you what a security is worth \emph{given} a model of the market.
 	It does not tell you what the market will do next.
 \end{moral}
+\suppend
 
 %─────§4 Journals───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Useful Journals}
@@ -180,24 +186,30 @@ Before writing down a single model, it is worth reading the oath proposed by Ema
 	\end{itemize}
 \end{quote}
 
+\suppstart
 \begin{intuition}
 	A model is a deliberate simplification.
 	The discipline is not in believing it, but in knowing precisely \emph{where} it is wrong and \emph{how much} that costs.
 \end{intuition}
+\suppend
 
 %─────§6 Markets───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{A First Look at the Markets and the Data}
 
 \source{Slides p.~15}
 
+\suppstart
 Two facts motivate everything that follows.
 First, the markets we want to price in are enormous, so even small pricing errors translate into large amounts of money.
 Second, the price series they produce have a very definite statistical shape, and any pricing model has to be compatible with it.
+\suppend
 
 \subsection{Outstanding U.S. Debts}
 
+\suppstart
 The fixed-income market alone is measured in tens of trillions of dollars, and over the period below it roughly quadrupled.
 Note in particular how the \vocab{mortgage-related} and \vocab{asset-backed} columns grow --- these are precisely the securities whose pricing requires the algorithmic machinery of this course.
+\suppend
 
 \newcommand{\zhcell}[1]{{\scriptsize\textcolor{black!55}{#1}}}
 \begin{table}[H]
@@ -243,8 +255,11 @@ Note in particular how the \vocab{mortgage-related} and \vocab{asset-backed} col
 
 \source{Slides p.~16}
 
+\suppstart
 Over-the-counter derivatives grew even faster, by close to an order of magnitude between 2000 and the 2008 crisis, after which the notional outstanding plateaued and then declined as trades were compressed and cleared centrally.
+\suppend
 
+\suppstart
 \begin{remark}
 	\vocab{衍生性商品}（derivative）是價值取決於某個標的（利率、匯率、股價、信用等）的合約。
 	\vocab{場外交易}（over-the-counter, OTC）指買賣雙方私下議定、不經交易所撮合的交易，與合約標準化、由結算所集中結算的\vocab{交易所交易}相對。
@@ -253,6 +268,7 @@ Over-the-counter derivatives grew even faster, by close to an order of magnitude
 	\autoref{fig:otc} 的縱軸為\vocab{名目本金}（notional amount）——僅是計算利息與收益的參考金額，並非真正易手的資金，故市場實際市值遠小於此。
 	2008 年金融危機後，美國 Dodd--Frank 法與歐盟 EMIR 要求標準化的 OTC 商品（尤其信用違約交換 CDS 與利率交換）改採\vocab{中央結算}（central clearing），並藉\vocab{壓縮}（compression）沖銷互相抵銷的部位，名目餘額因而在 2013 年前後見頂並回落。
 \end{remark}
+\suppend
 
 \begin{figure}[H]
 	\centering
@@ -330,6 +346,7 @@ Plotted in levels (\autoref{fig:sp500}), it is dominated by the post-1980 growth
 	\label{fig:sp500}
 \end{figure}
 
+\suppstart
 Levels are not what we model, however.
 Prices are non-stationary and their scale is arbitrary, so we work with the \vocab{log return} over one period,
 \[
@@ -349,6 +366,7 @@ where $S_t$ is the index level at time $t$.
 		\item 報酬率序列大致\textbf{定態}——繞著 0 波動、沒有趨勢，正適合建模。
 	\end{itemize}
 \end{remark}
+\suppend
 
 \begin{figure}[H]
 	\centering
@@ -381,6 +399,7 @@ where $S_t$ is the index level at time $t$.
 	\label{fig:sp500-returns}
 \end{figure}
 
+\suppstart
 Three features stand out, and they will constrain every model we build:
 
 \begin{itemize}[nosep]
@@ -397,6 +416,7 @@ The last point is easiest to see from the empirical density (\autoref{fig:sp500-
 	看\autoref{fig:sp500-density}：曲線畫的是每月報酬率的出現頻率，中央為 0 附近又高又尖的峰（多數月份幾乎不動），但兩側尾巴延伸到 $\pm 30\%$ 仍明顯高於零，而常態分佈在那裡的機率早已可忽略。
 	這種「尖峰厚尾」的形狀，正是接下來那句結論的依據。
 \end{remark}
+\suppend
 
 \begin{figure}[H]
 	\centering
@@ -429,12 +449,14 @@ The last point is easiest to see from the empirical density (\autoref{fig:sp500-
 	\label{fig:sp500-density}
 \end{figure}
 
+\suppstart
 \begin{moral}
 	Prices are not normally distributed, and their volatility is not constant.
 	Any model that assumes otherwise is buying tractability with realism.
 
 	價格並非常態分佈，波動率也非定值；凡是假設相反的模型，都是以寫實性為代價，換取數學上的易處理性。
 \end{moral}
+\suppend
 
 %─────§7 Analysis of algorithms────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Analysis of Algorithms}
@@ -479,6 +501,7 @@ Two standard examples --- both, uncomfortably, about programs themselves:
 Everything else is \vocab{computable}, and computable problems split again according to how expensive the algorithm is: \vocab{intractable} problems admit algorithms in principle but not ones we can afford to run, while \vocab{tractable} problems admit algorithms that are practical at the sizes we care about.
 \autoref{fig:computability} summarises the picture.
 
+\suppstart
 \begin{figure}[H]
 	\centering
 	\begin{tikzpicture}[font=\small]
@@ -533,6 +556,7 @@ Everything else is \vocab{computable}, and computable problems split again accor
 	The conventional formal criterion is how running time scales with the input size $n$.
 	A problem is counted \emph{tractable} when it admits an algorithm of \emph{polynomial} time, $O(n^{k})$ for some fixed $k$, and \emph{intractable} when it admits none --- every algorithm needs superpolynomial time, in most cases exponential. The rationale is practical: a polynomial bound keeps the cost manageable as $n$ grows, whereas anything superpolynomial blows up.
 \end{remark}
+\suppend
 
 \subsection{Complexity}
 \label{sec:complexity-conv}
@@ -583,10 +607,12 @@ Complexity is then expressed as a function of $n$, and the standard names are as
 \end{table}
 \footnotetext{E.g., T.~Dai (\texttt{B82506025}, \texttt{R86526008}, \texttt{D8852600}) \& Lyuu (2007); Lyuu \& C.~Wang (\texttt{F95922018}) (2011); H.~Chiu (\texttt{R98723059}) (2012).}
 
+\suppstart
 \begin{note}
 	The superpolynomial entry is not a curiosity.
 	Several pricing problems that were only known to admit exponential-time algorithms have been pushed down to $2^{O(\sqrt{n})}$ --- an improvement large enough to turn an unusable algorithm into a usable one, and precisely the kind of result this course aims at.
 \end{note}
+\suppend
 
 %─────Basic Financial Mathematics────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \chapter{Basic Financial Mathematics}
@@ -610,17 +636,21 @@ Complexity is then expressed as a function of $n$, and the standard names are as
 
 \bigskip
 
+\suppstart
 \noindent Everything in this chapter follows from one idea: a dollar today and a dollar next year are different goods, and the interest rate is the exchange rate between them.
 Once that exchange rate is pinned down, valuing a stream of payments is arithmetic --- and, as we will see, arithmetic whose cost we can still argue about.
+\suppend
 
 %─────§ The time line──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{The Time Line}
 
 \source{Slides p.~27}
 
+\suppstart
 Before any formula, fix the convention for talking about time.
 Time is measured in \vocab{periods}; time~$0$ is now, and period~$k$ is the interval running from time $k-1$ to time~$k$.
 A cash flow ``at time~$k$'' arrives at the \emph{end} of period~$k$.
+\suppend
 
 \begin{figure}[H]
 	\centering
@@ -652,6 +682,7 @@ A cash flow ``at time~$k$'' arrives at the \emph{end} of period~$k$.
 	\end{align}
 \end{definition}
 
+\suppstart
 \begin{intuition}
 	$(1+r)^{n}$ carries money forward in time and $(1+r)^{-n}$ carries it backward.
 	\emph{Discounting} --- the second operation --- is the one we use constantly, because a security's price is quoted today while its payoffs arrive later.
@@ -659,6 +690,7 @@ A cash flow ``at time~$k$'' arrives at the \emph{end} of period~$k$.
 	$(1+r)^{n}$ 把錢往未來搬，$(1+r)^{-n}$ 把錢往現在搬。
 	我們不斷用到的是後者—— \textbf{折現}（discounting）——因為證券的價格報在今天，收益卻在日後才到。
 \end{intuition}
+\suppend
 
 The idea is old: it goes back to Fibonacci (1170--1240), and was put on a modern footing by Irving Fisher (1867--1947).
 
@@ -721,8 +753,10 @@ Read in reverse: if a loan asks for a return of $1\%$ \emph{per month}, the \emp
 	\]
 \end{eg}
 
+\suppstart
 The $10.25\%$ in the example is the \vocab{effective annual rate}: the single annually-compounded rate that produces the same money after one year.
 The quoted $10\%$ is only a \vocab{nominal rate}, and by itself it does not determine anything.
+\suppend
 
 \begin{moral}
 	An interest rate is meaningless without the compounding frequency.
@@ -747,6 +781,7 @@ The \vocab{rule of 72} is a heuristic that estimates $T$ without a logarithm:
 \end{equation}
 So it takes about $72/12 = 6$ years to double the GDP if the annual growth rate is $12\%$.
 
+\suppstart
 \begin{proof}[Reason]
 	Expanding $\ln(1+r) = r - r^{2}/2 + O(r^{3})$ gives, for small $r$,
 	\[
@@ -765,9 +800,11 @@ So it takes about $72/12 = 6$ years to double the GDP if the annual growth rate 
 	The extra $+0.3466$ is a positive offset, so inflating the numerator to $72$ compensates for it over the range of rates one actually meets.
 	That $72$ is also divisible by $2,3,4,6,8,9,12$ is a large part of why it, rather than $70$, became the folk rule.
 \end{remark}
+\suppend
 
 \autoref{fig:rule72} plots the error of both variants: the true interest rate minus the approximation, in percent, against the number of years to double.
 
+\suppstart
 \begin{remark}
 	這張圖把 Eq.~\eqref{eq:rule72} \textbf{反過來用}：平常是「給利率 $r$，估翻倍要幾年 $T$」，這裡改成「給橫軸的 $T$（想要幾年翻倍），估需要多少利率」——把公式解成 $r\approx 72/T$。
 	縱軸畫的是兩個\textbf{利率}估計值的差：真正在 $T$ 年翻倍所需的 $r_{\text{真}}=2^{1/T}-1$，減去 Rule of 72 反解出的 $r_{\text{估}}=72/T$（兩者都乘 $100$ 化成百分比）。
@@ -775,6 +812,7 @@ So it takes about $72/12 = 6$ years to double the GDP if the annual growth rate 
 
 	代入數字比較有感覺：$T=1$ 年時，真正利率 $100\%$ 對 Rule of 72 的 $72\%$，差 $28$ 個百分點，極不準；$T=8$ 年時，真正利率約 $9.05\%$ 對 $9\%$，差只有 $0.05$，正是 caption 說的「超過約 8 年後極準」；$T=20$ 年時差變成負的（約 $-0.07$），代表 Rule of 72 在長期會略為高估所需利率（``overshoot''）。
 \end{remark}
+\suppend
 
 \begin{figure}[H]
 	\centering
@@ -833,6 +871,7 @@ after $n_{1}+n_{2}$ years --- no nested products, just a sum in the exponent.
 
 \source{Slides pp.~38--40}
 
+\suppstart
 The word ``equivalent'' has already been used twice in quotation marks. Here is what it means.
 
 \begin{definition}[Equivalent rates]
@@ -852,6 +891,7 @@ The word ``equivalent'' has already been used twice in quotation marks. Here is 
 	Each accumulation factor above is a pure power of its own one-year factor, $A(n)=A(1)^{n}$, so $A_{1}(1)=A_{2}(1)$ already forces $A_{1}(n)=A_{2}(n)$ for every $n\ge 0$.
 	Equivalently: two rates are equivalent exactly when they share the same \vocab{effective annual rate} $A(1)-1$ of \autoref{sec:rate-frequency}.
 \end{note}
+\suppend
 
 Let $r_{1}$ be the annual rate with continuous compounding and $r_{2}$ the \emph{equivalent} rate compounded $m$ times per annum.
 How are they related?
@@ -878,10 +918,12 @@ Then
 	= \Bigl(1+\frac{r_{2}}{m_{2}}\Bigr)^{m_{2}} . \label{eq:conversion}
 \end{equation}
 
+\suppstart
 \begin{observation}
 	Every conversion in this subsection is the same one-line demand: \emph{equal value after one year}.
 	There is nothing to memorise beyond that.
 \end{observation}
+\suppend
 
 %─────§ Present value───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Present Value}
@@ -899,10 +941,12 @@ Then
 	where $y$ is the discount rate per period.
 \end{definition}
 
+\suppstart
 \begin{remark}
 	我們想要衡量一筆包含未來的錢的現金流折算到現在價值多少，這條公式就是把單筆折現 $\mathrm{PV}=\mathrm{FV}(1+y)^{-n}$ \textbf{對每一筆現金流各做一次，再加起來}：在 time $k$ 收到的 $C_{k}$ 要往回搬 $k$ 期，所以除以 $(1+y)^{k}$—— 越晚到的錢折得越兇——加總便是整串現金流今天的總值。
 	$y$ 是每期折現率，字母取自 \emph{yield}，角色與前一章的 $r$ 相同。
 \end{remark}
+\suppend
 
 This formula and its variations are the engine behind most of financial calculations.\footnote{Cochrane (2005), ``Asset pricing theory all stems from one simple concept [\ldots]: price equals expected discounted payoff.''} The difficulty is never the algebra; it is deciding what goes into it:
 
@@ -961,10 +1005,12 @@ But there is a better route, which needs no exponentiation at all (\autoref{alg:
 
 The algorithm takes $O(n)$ time, and it is the most efficient possible in terms of the absolute number of arithmetic operations.\footnote{A.~Borodin \& Munro (1975).} It can also be computed in parallel in $O(\log n)$ time using prefix sums.\footnote{Contributed by Mr.~Chen, Yi-Feng (\texttt{R08922077}) on February 24, 2021.}
 
+\suppstart
 \begin{moral}
 	Two algorithms for the same formula, $O(n^{2})$ against $O(n)$ --- and the fast one is also the numerically simpler one.
 	This is the pattern the whole course chases.
 \end{moral}
+\suppend
 
 %─────§ Annuities────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Annuities}
@@ -1019,9 +1065,11 @@ Suppose instead that $m$ payments of $C$ dollars each are received per year (the
 	= C\,\frac{\bigl(1+\frac{r}{m}\bigr)^{nm}-1}{\frac{r}{m}} . \nonumber
 \end{align}
 
+\suppstart
 \begin{remark}
     Annuity is paid at the end of every year, so note the indices of above formulas.
 \end{remark}
+\suppend
 
 %─────§ Amortization──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Amortization}
@@ -1051,6 +1099,7 @@ Inverting Eq.~\eqref{eq:gen-annuity} therefore gives the regular payment,
 \end{equation}
 For monthly payments, take $m = 12$.
 
+\suppstart
 \begin{remark}
     每期還款總金額一樣，只是把每期還款拆賬成上期剩餘本金造成的利息跟一部分本金。
 \end{remark}
@@ -1103,6 +1152,7 @@ For monthly payments, take $m = 12$.
 	} (a) 的恆等式對\emph{任意}付款序列 $C_{1},\dots,C_{N}$ 都成立，此時 $B_{0} = \sum_{k} C_{k}(1+i)^{-k}$；「餘額計息」本身只保證這件事，與付款是否等額無關。
 	真正額外用到的假設是 \emph{等額付款}（$C_{k} \equiv C$），它使上式成為等比級數、能求和成封閉解 \eqref{eq:gen-annuity}，我們也才能反解出 \eqref{eq:amort-payment}。
 \end{remark}
+\suppend
 
 \subsection{Example: Home Mortgage}
 
@@ -1173,6 +1223,7 @@ Note also that:
 	\item If the borrower plans to pay off the mortgage right \emph{after} the 178th month's monthly payment, he needs to pay another \$4,730.899.\footnote{Contributed by Ms.~Wu, Japie (\texttt{R01921056}) on February 20, 2013.}
 \end{itemize}
 
+\suppstart
 \autoref{fig:amortization-split} shows the third bullet of \autoref{tab:amortization} graphically: the payment is level, but its composition rotates from almost all interest to almost all principal.
 
 \begin{figure}[H]
@@ -1207,6 +1258,7 @@ Note also that:
 		and the principal part is a geometric sequence with ratio $1+r/m$.}
 	\label{fig:amortization-split}
 \end{figure}
+\suppend
 
 \subsection{Calculating the Remaining Principal}
 
@@ -1245,9 +1297,11 @@ This method is much faster --- $O(1)$ instead of $O(k)$ --- but it is limited in
 	Use Eq.~\eqref{eq:remaining} together with Eq.~\eqref{eq:amort-payment} to prove that the \textsf{Principal} column of \autoref{tab:amortization} forms a geometric sequence.
 \end{exercise}
 
+\suppstart
 \begin{moral}
 	The same trade-off as in \autoref{alg:pv-horner}: the closed form is faster, the loop is more general. Which one you may use is decided by the contract, not by the mathematics.
 \end{moral}
+\suppend
 
 %─────§ Yields and IRR────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Yields and the Internal Rate of Return}
@@ -1272,6 +1326,7 @@ Recall Eq.~\eqref{eq:periodic}, $\mathrm{FV} = \mathrm{PV}\bigl(1+\frac{r}{m}\bi
 	BEY and MEY may differ numerically, but they refer to the same yield --- they are the same economic fact quoted under two different compounding conventions, exactly as in \autoref{eq:conversion}.
 \end{observation}
 
+\suppstart
 \begin{remark}
 	\vocab{殖利率}（yield）、\vocab{債券等值殖利率}（bond equivalent yield, BEY）、 \vocab{房貸等值殖利率}（mortgage equivalent yield, MEY）。
 
@@ -1286,6 +1341,7 @@ Recall Eq.~\eqref{eq:periodic}, $\mathrm{FV} = \mathrm{PV}\bigl(1+\frac{r}{m}\bi
 	兩個名字來自報價慣例——美國公債每半年付息（$m = 2$），房貸每月繳款（$m = 12$）。
 	因此跨市場比較前務必先換算，否則會誤判：房貸的 $8\%$ MEY 相當於債券的 $8.13\%$ BEY，兩個 $8\%$ 並不一樣。
 \end{remark}
+\suppend
 
 \subsection{The Internal Rate of Return}
 
@@ -1297,6 +1353,7 @@ Recall Eq.~\eqref{eq:periodic}, $\mathrm{FV} = \mathrm{PV}\bigl(1+\frac{r}{m}\bi
 	\]
 \end{definition}
 
+\suppstart
 \begin{remark}
 	\vocab{內部報酬率}（internal rate of return, IRR）；用在債券上時通常稱 \vocab{到期殖利率}（yield to maturity, YTM）。
 
@@ -1320,6 +1377,7 @@ Recall Eq.~\eqref{eq:periodic}, $\mathrm{FV} = \mathrm{PV}\bigl(1+\frac{r}{m}\bi
 
 	最後，$y$ 在定義式中同時出現在 $n$ 個不同的次方裡，求解 $y$ 等同於解一個 $n$ 次多項式的根，一般沒有公式解，只能用 \autoref{sec:numerical-irr} 的數值方法逼近。
 \end{remark}
+\suppend
 
 \begin{remark}
 	The IRR assumes all cash flows are reinvested at the \emph{same} rate as the internal rate of return, because
@@ -1352,6 +1410,7 @@ Even so, $-100\%$ should be a natural lower bound because why would anyone or fi
 	\label{prop:irr-unique}
 \end{proposition}
 
+\suppstart
 There is no closed form for $y$ in general, so we need iterative methods.
 The three below trade off robustness against speed.
 
@@ -1373,6 +1432,7 @@ The three below trade off robustness against speed.
 
 	實務上的求根程式（如 Brent's method）多半混用：先以二分法將根框住，再切換至割線或牛頓法加速，一旦迭代點跳出括號便退回二分法——保證來自二分法，速度來自另外兩者。
 \end{remark}
+\suppend
 
 \subsection{The Bisection Method}
 
@@ -1450,6 +1510,7 @@ Start with two approximations $x_{0}$ and $x_{1}$, then compute the $(k+1)$st ap
 \]
 so $[\,f(x_{k})-f(x_{k-1})\,]/(x_{k}-x_{k-1})$ replaces $f'(x_{k})$.
 
+\suppstart
 \begin{figure}[H]
 	\centering
 	\begin{tikzpicture}[font=\small]
@@ -1474,11 +1535,13 @@ so $[\,f(x_{k})-f(x_{k-1})\,]/(x_{k}-x_{k-1})$ replaces $f'(x_{k})$.
 		which follows the tangent at a single iterate instead.}
 	\label{fig:secant}
 \end{figure}
+\suppend
 
 Its convergence rate is $1.618$, slightly worse than the Newton--Raphson method's $2$.
 But the secant method does not evaluate $f'(x_{k})$, which saves about $50\%$ in computation efforts per iteration.
 For reference, the convergence rate of the bisection method is $1$.
 
+\suppstart
 \begin{table}[H]
 	\centering
 	\begin{tabular}{@{}l c c l@{}}
@@ -1511,6 +1574,7 @@ For reference, the convergence rate of the bisection method is $1$.
 	最後可與二分法對照：兩者都持有兩個點，但二分法只看 $f$ 的\emph{正負號}並取中點，割線法則利用 $f$ 的\emph{數值大小}外推。
 	多用了資訊所以更快，代價是失去保證——割線法不保證收斂，且當 $f(x_{k}) \approx f(x_{k-1})$ 時分母趨近於零，數值上會不穩定。
 \end{remark}
+\suppend
 
 \subsection{Systems of Nonlinear Equations}
 
@@ -1551,6 +1615,7 @@ Finally, set
 	y_{k+1} = y_{k} + \Delta y_{k+1} .
 \]
 
+\suppstart
 \begin{intuition}
 	Each step replaces the nonlinear system by its linearisation at the current point and solves that exactly.
 	In one dimension the linearisation is the tangent line of \autoref{fig:newton}; here it is the tangent plane.
@@ -1577,6 +1642,7 @@ Finally, set
 	把該矩陣方程記為 $J\Delta = -F$，則 $\Delta = -J^{-1}F$，亦即 $\mathbf{x}_{k+1} = \mathbf{x}_{k} - J^{-1}F(\mathbf{x}_{k})$：一維的「除以導數 $f'(x_{k})$」在多維成了「左乘 Jacobian 的反矩陣」，而一維要求 $f'(x_{k}) \neq 0$ 也正對應到此處要求 $J$ 可逆。
 	繞這一圈的用意則在於，非線性方程組難解，線性方程組卻可直接以高斯消去法解出。
 \end{remark}
+\suppend
 
 %─────§ Bonds─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Bonds}
@@ -1597,6 +1663,7 @@ Finally, set
 
 Zero-coupon bonds can be used to meet future obligations as there is no reinvestment risk --- the caveat attached to the IRR above simply does not arise.
 
+\suppstart
 \begin{remark}
 	\vocab{零息債券}（zero-coupon bond），亦稱\vocab{純折價債券}（pure discount bond）；$F$ 為\vocab{面值}（par value，即票面金額），$n$ 為到期期數。
 	口語地說，它就是一張「中途完全不付息、到期一次付你一筆固定金額」的債券——正因為中途沒有任何\vocab{票息}（coupon），才叫「零息」。
@@ -1608,6 +1675,7 @@ Zero-coupon bonds can be used to meet future obligations as there is no reinvest
 	例中 $20.83$ 這個數字採債券市場的報價慣例——以\emph{面額 100} 為基準，故 $20.83$ 意為面額 100 元的債券今天只賣 $20.83$ 元。
 	另可留意 $45.64\% \times 45.64\% \approx 20.83\%$：20 年期的價格恰為 10 年期價格的平方，因為折現是連乘而非相加。
 \end{remark}
+\suppend
 
 \begin{eg}
 	The interest rate is $8\%$ compounded semiannually.
@@ -1620,6 +1688,7 @@ Zero-coupon bonds can be used to meet future obligations as there is no reinvest
 A \vocab{level-coupon bond} is described by its \vocab{coupon rate} and its \vocab{par value}, paid at maturity.
 Write $F$ for the par value and $C$ for the coupon.
 
+\suppstart
 \begin{remark}
 	\label{rmk:level-coupon}
 	\vocab{固定票息債券}（level-coupon bond，亦稱附息債券）；$c$ 為\vocab{票面利率}（coupon rate），$F$ 為\vocab{面值}（par value），$C$ 為每期的\vocab{票息}（coupon）。
@@ -1639,6 +1708,7 @@ Write $F$ for the par value and $C$ for the coupon.
 	\]
 	而 $c = 0$ 即退化為前一小節的零息債券，價格恰為 \eqref{eq:zero-price}——零息債券只是本式的特例。
 \end{remark}
+\suppend
 
 \begin{figure}[H]
 	\centering
@@ -1658,6 +1728,7 @@ Write $F$ for the par value and $C$ for the coupon.
 	\label{fig:coupon-cashflow}
 \end{figure}
 
+\suppstart
 \begin{remark}
 	\autoref{fig:coupon-cashflow} 隱含一項理想化的假設：\emph{今天恰好站在付息日上}，故各筆現金流剛好落在 $1, 2, \ldots, n$ 這些整數期上。
 	真實的交割日多半落在兩個付息日之間，屆時每一筆現金流都要往前挪，指數由 $i$ 變成 $\omega + i$——這正是 \eqref{eq:full-price} 所處理的情形。
@@ -1665,6 +1736,7 @@ Write $F$ for the par value and $C$ for the coupon.
 	不過要留意，\emph{最後一期同時收到 $C$ 與 $F$ 並非理想化}，真實債券的最後一次付息本就與本金同日支付。
 	這一點在 \eqref{eq:full-price} 中依然成立：末筆票息（$i = n-1$）與 $F$ 的折現指數同為 $\omega+n-1$，可見放寬假設後兩者仍同時發生。
 \end{remark}
+\suppend
 
 \begin{moral}
 	Coupon bonds can be thought of as a matching package of zero-coupon bonds, at least theoretically.\footnote{``You see, Daddy didn't bake the cake, and Daddy isn't the one who gets to eat it.
@@ -1673,6 +1745,7 @@ Write $F$ for the par value and $C$ for the coupon.
 	And Daddy gets to eat those,'' wrote Tom Wolfe (1931--2018) in \emph{Bonfire of the Vanities} (1987).}
 \end{moral}
 
+\suppstart
 \begin{remark}
 	這條 moral 的具體意思是：一張 $n$ 期的附息債券，可視為 $n$ 張面額 $C$、到期日分別為 $1, 2, \ldots, n$ 的零息債券，再加上一張面額 $F$、到期日為 $n$ 的零息債券，所組成的投資組合。
 	下方的定價公式 \eqref{eq:bond-price} 正是把這個拆解逐項寫出來：第一項是 $n$ 張票息零息債券的現值之和，第二項則是面值那一張的現值。
@@ -1687,6 +1760,7 @@ Write $F$ for the par value and $C$ for the coupon.
 	至於註腳的典故，出自 Tom Wolfe 的小說 \emph{Bonfire of the Vanities}（1987）：書中債券業務員 Sherman McCoy 的妻子向女兒解釋爸爸的工作——蛋糕不是爸爸烤的，也不是爸爸吃的，但由爸爸負責切開、分送給大家；切的時候會掉下金色的碎屑，那些碎屑就歸爸爸。
 	放在此處是一語雙關：交易商正是把債券「切片」（strip）後分銷，自己既不創造現金流也不領取現金流，賺的就是買賣價差那些「碎屑」。
 \end{remark}
+\suppend
 
 Splitting the cash flow of \autoref{fig:coupon-cashflow} into an annuity of coupons plus a zero-coupon bond for the par value, and applying Eq.~\eqref{eq:gen-annuity} and Eq.~\eqref{eq:zero-price}, gives the pricing formula
 \begin{align}
@@ -1720,6 +1794,7 @@ Note $C = Fc/m$ when $c$ is the annual coupon rate.
 	So $15\%$ is the yield to maturity if the bond sells for $74.5138$.\footnote{Note that the yield $15\%$ exceeds the coupon rate $10\%$.}
 \end{eg}
 
+\suppstart
 \begin{remark}
 	\vocab{到期殖利率}（yield to maturity, YTM）的名稱可拆成兩半來理解：\emph{yield} 指報酬率，\emph{to maturity} 則指這個報酬率是在「\emph{一路持有到到期日}」的前提下算出來的。
 	換言之它回答的是：若今天以價格 $P$ 買進、此後每期領取票息、到期領回面值且中途不賣出，這串現金流相當於年利率多少？
@@ -1735,6 +1810,7 @@ Note $C = Fc/m$ when $c$ is the annual coupon rate.
 
 	儘管有這些但書，YTM 仍是債券市場的標準報價，因為它把價格、票息與到期日壓縮成單一數字，使票面利率與年期各異的債券得以直接比較。
 \end{remark}
+\suppend
 
 \subsection{Price Behavior}
 
@@ -1745,11 +1821,13 @@ Note $C = Fc/m$ when $c$ is the annual coupon rate.
 Bond prices fall when interest rates rise, and vice versa.
 This is immediate from Eq.~\eqref{eq:bond-price} --- every term is decreasing in $r$ --- and yet ``only 24 percent answered the question correctly.''\footnote{CNN, December 21, 2001.}
 
+\suppstart
 \begin{remark}
 	價格與市場利率反向的道理在於：票息 $C$ 與面值 $F$ 已由合約寫死，市場利率變動改變的\emph{不是你會收到多少錢，而是那些錢今天值多少}。
 	利率上升時，新發行的債券給得更多，你手上這張給得少的自然得降價才賣得掉；利率下跌則反之。
 	註腳所引 2001 年 CNN 的調查中僅 $24\%$ 的人答對，正是因為多數人誤把「利率上升」聯想成「債券更值錢」——真正在變動的是折現率，而非票息。
 \end{remark}
+\suppend
 
 \subsubsection*{(2) Premium, par, and discount}
 
@@ -1783,6 +1861,7 @@ Bonds selling at par, at a premium and at a discount are called \vocab{par bonds
 	\label{tab:coupon9}
 \end{table}
 
+\suppstart
 \begin{remark}
 	\label{rmk:premium-discount}
 	\vocab{溢價}（premium）、\vocab{平價}（par）與\vocab{折價}（discount）；依售價分類者分別稱為\vocab{平價債券}（par bonds）、\vocab{溢價債券}（premium bonds）與\vocab{折價債券}（discount bonds）。
@@ -1811,9 +1890,11 @@ Bonds selling at par, at a premium and at a discount are called \vocab{par bonds
 	粗體列即 $r = c = 9\%$ 的平價情形；其\emph{上方}各列殖利率較低故溢價，\emph{下方}各列殖利率較高故折價——留意表格說明裡的 \emph{above}／\emph{below} 指的是粗體列的上下方，而非殖利率的高低。
 	這七列也就是 \autoref{fig:convexity} 曲線上標出的七個點。
 \end{remark}
+\suppend
 
 \subsubsection*{(3) Convexity}
 
+\suppstart
 The price--yield relationship is not merely decreasing; it is \emph{convex}.
 Concretely, take any yield change of size $\Delta > 0$.
 The price \emph{gain} from a fall of $\Delta$ is larger than the price \emph{loss} from a rise of that same $\Delta$,
@@ -1821,6 +1902,7 @@ The price \emph{gain} from a fall of $\Delta$ is larger than the price \emph{los
 	P(r-\Delta) - P(r) \;>\; P(r) - P(r+\Delta) ,
 \]
 and the gap widens as $\Delta$ grows.
+\suppend
 
 \begin{figure}[H]
 	\centering
@@ -1855,11 +1937,13 @@ and the gap widens as $\Delta$ grows.
 	\label{fig:convexity}
 \end{figure}
 
+\suppstart
 \begin{remark}
 	凸性即 $\partial^{2}P/\partial r^{2} > 0$：\eqref{eq:bond-price} 的每一項皆形如 $A\bigl(1+\frac{r}{m}\bigr)^{-i}$，其二階導數 $\frac{i(i+1)A}{m^{2}}\bigl(1+\frac{r}{m}\bigr)^{-i-2} > 0$，逐項為凸，總和自然為凸。
 	其實際意涵是漲跌不對稱：由 \autoref{tab:coupon9}，殖利率自 $9\%$ 降至 $8\%$ 價格漲 $8.65$，升至 $10\%$ 卻只跌 $7.69$，且幅度愈大這個不對稱愈明顯。
 	換言之利率無論往哪個方向變動同樣幅度，持有人\emph{賺的總是多於賠的}，故凸性本身即具價值，市場會為凸性較高的債券付出較高的價格——這是日後存續期間與凸性避險的基礎。
 \end{remark}
+\suppend
 
 
 %─────§ Day count conventions─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -1880,6 +1964,7 @@ The first ``actual'' refers to the actual number of days in a month; the second 
 	The number of days between June 17, 1992, and October 1, 1992, is $106$: 13 days in June, 31 days in July, 31 days in August, 30 days in September, and 1 day in October.
 \end{eg}
 
+\suppstart
 \begin{remark}
 	此處的「幾天」指的是兩個日期之間\emph{經過}的天數，即「結束日減起始日」，而非兩端所涵蓋的日曆日數。
 	以上例而言，6 月只算 13 天（6/18 至 6/30，\emph{不含}起始日 6/17），10 月則算 1 天（\emph{含}結束日 10/1），故為「不算頭、算尾」。
@@ -1891,6 +1976,7 @@ The first ``actual'' refers to the actual number of days in a month; the second 
 	若兩端都算，銜接點 $B$ 便會被重複計入，串接多段期間時就會逐段多算一天。
 	下一小節的 \eqref{eq:days30360} 也正是「結束日減起始日」的形式，可見兩種慣例在這一點上完全一致——差別只在每月、每年各算幾天，不在端點怎麼取。
 \end{remark}
+\suppend
 
 \subsection{30/360}
 
@@ -1905,6 +1991,7 @@ In general, the number of days from date $(y_{1}, m_{1}, d_{1})$ to date $(y_{2}
 	The number of days between June 17, 1992, and October 1, 1992, is now $104$: 13 days in June, 30 days in July, 30 days in August, 30 days in September, and 1 day in October.
 \end{eg}
 
+\suppstart
 \begin{remark}
 	\eqref{eq:days30360} 看似繁瑣，其實只是「把每個日期換算成一個序號，再相減」。
 	既然每月一律 30 天、每年一律 360 天，日期 $(y, m, d)$ 在這套虛擬曆法上的序號就是 $360y + 30m + d$；兩個日期的序號相減即得該式，三項分別是「差幾年 $\times\, 360$」、「再差幾個月 $\times\, 30$」與「最後差幾號」。
@@ -1915,6 +2002,7 @@ In general, the number of days from date $(y_{1}, m_{1}, d_{1})$ to date $(y_{2}
 	如此的好處是完全不必查曆法——不管某月是 28、29、30 還是 31 天，任兩日期的間隔都能純以算術求得，且每個「月」所孳生的利息一律相等。
 	代價則是這套曆法裡沒有 31 號，故 $d_{1}$ 或 $d_{2}$ 為 31 時須先改成 30，即下文的調整。
 \end{remark}
+\suppend
 
 If $d_{1}$ or $d_{2}$ is 31, we must change it to 30 \emph{before} applying formula~\eqref{eq:days30360}.\footnote{This is the simplest of all the ``30/360'' variations (called the ``30E/360'' convention), used mainly in the Eurobond market (Kosowski \& Neftci, 2015).} Hence:
 
@@ -1933,6 +2021,7 @@ If $d_{1}$ or $d_{2}$ is 31, we must change it to 30 \emph{before} applying form
 	There are many variations on the ``30/360'' convention regarding 31, February 28, and February 29.\footnote{Kosowski \& Neftci (2015).}
 \end{remark}
 
+\suppstart
 \begin{remark}
 	上式的四項各有明確意義，合起來正是「\emph{起始月的殘餘 $+$ 中間的整月 $+$ 結束月已過的部分}」：
 	\begin{itemize}[nosep]
@@ -1954,6 +2043,7 @@ If $d_{1}$ or $d_{2}$ is 31, we must change it to 30 \emph{before} applying form
 	末句提醒的變體差異不可輕忽：本節採用的是歐式的 30E/360，對 $d_{1}$ 與 $d_{2}$ 一律截至 30，規則對稱；而美式的 30/360（Bond Basis）在 $d_{2} = 31$ 但 $d_{1} < 30$ 時並不把 $d_{2}$ 改為 30，對二月底的處理也另有規定，算出的天數因而可能不同。
 	故實務上合約必須載明採用哪一種慣例，否則利息金額會對不起來。
 \end{remark}
+\suppend
 
 %─────§ Full price─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Full Price, Accrued Interest, and the Clean Price}
@@ -2004,6 +2094,7 @@ Discounting each remaining cash flow over its true (fractional) number of period
 \end{align}
 This is the \vocab{full price}, also called the \vocab{dirty price} or \vocab{invoice price}.
 
+\suppstart
 \begin{remark}
 	\vocab{交割日}（settlement date）是債券易手之日：賣方交出債券、買方付錢，此後所有尚未發生的現金流都歸買方。
 	於是問題成了「這些剩餘現金流在交割日這一刻值多少」，而 \eqref{eq:full-price} 算的正是這個數，稱為\vocab{全價}（full price），亦稱\vocab{含息價}（dirty price）或\vocab{發票價格}（invoice price）。
@@ -2034,6 +2125,7 @@ This is the \vocab{full price}, also called the \vocab{dirty price} or \vocab{in
 	\end{center}
 	而淨價加應計利息為 $111.2891 + 3.3333 = 114.6224$，兩者相符（尾差來自四捨五入）——這就是該例所謂「可用 \eqref{eq:full-price} 驗證殖利率為 $3\%$」的意思。
 \end{remark}
+\suppend
 
 \subsection{Accrued Interest and the Clean Price}
 
@@ -2054,6 +2146,7 @@ Hence the yield to maturity is the $r$ satisfying Eq.~\eqref{eq:full-price} when
 	+ \frac{F}{\bigl(1+\frac{r}{m}\bigr)^{\omega+n-1}} .
 \]
 
+\suppstart
 \begin{intuition}
 	The clean price is quoted precisely so that it does \emph{not} saw-tooth: the full price jumps down by $C$ on every coupon date, and stripping out the accrued interest removes that artefact, leaving a number that moves only with the yield.
 \end{intuition}
@@ -2078,6 +2171,7 @@ Hence the yield to maturity is the $r$ satisfying Eq.~\eqref{eq:full-price} when
 
 	於是最容易出錯的一點是：反解殖利率時，\eqref{eq:full-price} 左邊的 PV 必須填\emph{發票價格}而非報價，這正是本小節末那條 ``clean price $+$ AI $= \cdots$'' 的用意。
 \end{remark}
+\suppend
 
 \subsection{Example (``30/360'')}
 
@@ -2097,6 +2191,7 @@ Hence the yield to maturity is the $r$ satisfying Eq.~\eqref{eq:full-price} when
 	This can be verified by Eq.~\eqref{eq:full-price} with $\omega = 60/180$, $n = 4$, $m = 2$, $F = 100$, $C = 5$, $\mathrm{PV} = 111.2891 + 3.3333$ and $r = 0.03$.
 \end{eg}
 
+\suppstart
 \begin{remark}
 	\textbf{疑問}：例中驗證 YTM 時，不由分說直接取 $F = 100$；但若不知道這張債券的面額究竟是多少，YTM 不是就算不出來了嗎？
 
@@ -2118,6 +2213,7 @@ Hence the yield to maturity is the $r$ satisfying Eq.~\eqref{eq:full-price} when
 	真正需要用到實際面額的只有結算金額：買方應匯出 $\dfrac{\text{報價} + \mathrm{AI}}{100} \times$ 實際面額。
 	以本例而言，若買的是 1,000,000 面額，實付 $1.146224 \times 1{,}000{,}000 = 1{,}146{,}224$ 元，但殖利率仍是 $3\%$。
 \end{remark}
+\suppend
 
 \subsection{Price Behavior (2) Revisited}
 
@@ -2127,6 +2223,7 @@ But that assumed the settlement date is \emph{on} a coupon payment date.
 Suppose the settlement date for a bond selling at par\footnote{The \emph{quoted price} equals the par value.} falls between two coupon payment dates.
 Then its yield to maturity is \emph{less} than the coupon rate.\footnote{See Exercise 3.5.6 of the textbook for proof.} The reason: exponential growth \emph{to} $C$ is replaced by linear growth, hence overpaying the accrued interest.
 
+\suppstart
 \begin{remark}
 	\textbf{疑問}：前面才說「殖利率等於票面利率 $\iff$ 賣在平價」，但這只在交割日是在付息日才會是對的，為何交割日一落在兩個付息日之間，平價的債券殖利率反而低於票面利率？
 	原文只丟下一句「指數成長被線性成長取代」與「見課本習題」。
@@ -2209,3 +2306,4 @@ Then its yield to maturity is \emph{less} than the coupon rate.\footnote{See Exe
 	The tidy statements about premium, par and discount are statements about a model with clean period boundaries.
 	Day count conventions are where that model meets the calendar --- and the tidy statements need amending.
 \end{moral}
+\suppend
