@@ -1,0 +1,378 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{bbding,combelow,textcomp,amsfonts,amsthm,amsmath,amssymb,graphicx,color,hyperref,etoolbox}
+\usepackage[utf8x]{inputenc}
+\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+
+\newtoggle{story}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Customisation options --- update as necessary
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Course details: title, semester, instructors
+
+\newcommand{\courseTitle}{Probabilistic Combinatorics (Math 5390)}
+\newcommand{\semester}{Fall 2026}
+\newcommand{\instructorA}{Shagnik Das}
+\newcommand{\instructorB}{}
+
+%% Sheet number
+
+\newcommand{\sheetNumber}{3}
+
+
+%% Submission details
+
+\newcommand{\dueDate}{15:30, Nov 10th.}
+\newcommand{\lateWarning}{Late submissions will receive no credit.}
+
+
+%% Display irrelevant footnotes?  \toggletrue for yes, \togglefalse for no
+
+\toggletrue{story}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End of customisation options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pdfpagewidth 8.5in
+\pdfpageheight 11in
+\topmargin -1in
+\headheight 0in
+\headsep 0in
+\textheight 8.5in
+\textwidth 6.5in
+\oddsidemargin 0in
+\evensidemargin 0in
+\headheight 77pt
+\headsep 0in
+\footskip .75in
+
+\makeatletter
+\newcommand{\buildtitle}[4]{
+\begin{flushleft}
+{\large
+#1
+\hfill{}
+#2
+\par
+#3
+}
+\end{flushleft}
+\vskip 4pt
+\begin{center}
+{\large\bfseries#4\par}
+\end{center}
+\bigskip
+}
+\makeatother
+
+\renewcommand{\thesection}{\normalsize\arabic{section}}
+
+\renewcommand{\deg}{\textrm{deg}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\ceil}[1]{\left \lceil #1 \right \rceil}
+
+\newcommand{\hint}{\begin{flushright} [Hint at \url{\hintURL}.] \end{flushright}}
+
+\newcommand{\card}[1]{\left| #1 \right|}
+\newcommand{\mb}[1]{\mathbb{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+
+
+\newcommand{\story}[1]{\iftoggle{story}{\footnote{#1}}{}}
+\newcommand{\storymark}[1][42]{\iftoggle{story}{\footnotemark[#1]}{}}
+\newcommand{\storytext}[2][42]{\iftoggle{story}{\footnotetext[#1]{#2}}{}}
+
+\newcommand{\bonus}[2]{\paragraph{Bonus (#1 pt\ifstrequal{#1}{1}{}{s})} #2}
+
+
+\begin{document}
+
+
+\buildtitle{\courseTitle{}}{\semester}{\instructorA{} \hfill \instructorB{}}{Exercise Sheet \sheetNumber{}}
+
+\vspace{-0.2in}
+
+\begin{center}
+
+{\bf Due date: \dueDate \\ \lateWarning}
+
+\end{center}
+
+\noindent You and your partner should try to solve all of the exercises below, and then submit a total of two solutions to be graded --- each problem is worth $10$ points. Both partners should author one solution each, making clear who wrote which solution, but you will earn credit for both solutions. Make sure to clearly justify your answers, defining everything precisely and stating any results you are using. You should then submit your solutions on NTU COOL, either as a typed PDF or a clear picture or scan of your handwritten answers.
+
+\paragraph{Exercise 1}  
+\begin{itemize}
+	\item[(a)] Show that for any random variable $X$, we have
+		\[ \mathbb{P}(X = 0) \le \frac{\mathrm{Var}(X)}{\mathbb{E}[X]^2}. \]
+	\item[(b)] When $X$ is a non-negative integer random variable, strengthen this by proving
+		\[ \mathbb{P}(X = 0) \le \frac{\mathrm{Var}(X)}{\mathbb{E}[X^2]}. \]
+\end{itemize}
+
+\paragraph{Solution.} Throughout, $\mb E[X^2] < \infty$ (otherwise $\mathrm{Var}(X) = \infty$ and there is nothing to prove), and the denominators are assumed non-zero: $\mb E[X] \neq 0$ in (a) and $\mb E[X^2] > 0$ in (b).
+
+\begin{proof}[Proof of (a)]
+	Let $\mu = \mb E[X] \neq 0$.
+
+	Removing the absolute value,
+	\[
+		\card{X - \mu} \ge \card \mu
+		\iff X - \mu \ge \card \mu \ \text{ or } \ X - \mu \le -\card \mu
+		\iff X \ge \mu + \card \mu \ \text{ or } \ X \le \mu - \card \mu,
+	\]
+	that is,
+	\[
+		\{ \card{X - \mu} \ge \card \mu \} =
+		\begin{cases}
+			\{ X \le 0 \} \cup \{ X \ge 2\mu \}, & \mu > 0, \\
+			\{ X \le 2\mu \} \cup \{ X \ge 0 \}, & \mu < 0.
+		\end{cases}
+	\]
+	In either case this event contains $\{X = 0\}$: when $\mu > 0$ via $\{X \le 0\}$, and when $\mu < 0$ via $\{X \ge 0\}$. So by Chebyshev's inequality $\mb P(\card{X - \mu} \ge a) \le \mathrm{Var}(X)/a^2$ with $a = \card \mu > 0$,
+	\[
+		\mb P(X = 0) \le \mb P\big( \card{X - \mu} \ge \card{\mu} \big) \le \frac{\mathrm{Var}(X)}{\card \mu^2} = \frac{\mathrm{Var}(X)}{\mb E[X]^2}. \qedhere
+	\]
+\end{proof}
+
+\begin{proof}[Proof of (b)]
+	We use the Cauchy--Schwarz inequality for sequences: for real $(u_j)_{j \ge 1}, (w_j)_{j \ge 1}$ with $\sum_j u_j^2 < \infty$ and $\sum_j w_j^2 < \infty$,
+	\[
+		\Big( \sum_j u_j w_j \Big)^2 \le \Big( \sum_j u_j^2 \Big) \Big( \sum_j w_j^2 \Big).
+	\]
+	(For finitely many terms this is the usual Cauchy--Schwarz inequality in $\mb R^N$; for countably many terms, apply it to the first $N$ terms and let $N \to \infty$.)
+
+	Write $p_x = \mb P(X = x)$ for $x \in \{0, 1, 2, \hdots\}$. The term $x = 0$ contributes nothing to $\mb E[X] = \sum_x x p_x$, so
+	\[
+		\mb E[X] = \sum_{x \ge 1} x p_x = \sum_{x \ge 1} \underbrace{\big( x \sqrt{p_x} \big)}_{u_x} \underbrace{\big( \sqrt{p_x} \big)}_{w_x}.
+	\]
+	Here $\sum_{x \ge 1} u_x^2 = \sum_{x \ge 1} x^2 p_x = \mb E[X^2] < \infty$ and $\sum_{x \ge 1} w_x^2 = \sum_{x \ge 1} p_x = \mb P(X \neq 0)$, so Cauchy--Schwarz gives
+	\[
+		\mb E[X]^2 \le \Big( \sum_{x \ge 1} x^2 p_x \Big) \Big( \sum_{x \ge 1} p_x \Big) = \mb E[X^2] \, \mb P(X \neq 0).
+	\]
+	This is the only case needed, since $X$ takes values in $\{0, 1, 2, \hdots\}$.
+
+	Dividing by $\mb E[X^2] > 0$,
+	\[
+		\mb P(X = 0) = 1 - \mb P(X \neq 0) \le 1 - \frac{\mb E[X]^2}{\mb E[X^2]} = \frac{\mb E[X^2] - \mb E[X]^2}{\mb E[X^2]} = \frac{\mathrm{Var}(X)}{\mb E[X^2]}.
+	\]
+\end{proof}
+
+\paragraph{Exercise 2}  Prove that there is some function $k: \mathbb{N} \to \mathbb{N}$ such that, as $n \to \infty$, we have $\omega\left(G(n,\frac12) \right) \in \{ k(n) - 1, k(n), k(n) + 1 \}$ with high probability, where $\omega \left( G(n,\frac12) \right)$ is the order of the largest clique in $G(n,\frac12)$.
+
+\paragraph{Solution.} For $1 \le k \le n$ let $X_k$ be the number of $k$-cliques in $G = G(n, \frac12)$. A fixed $k$-set spans a clique with probability $2^{-\binom k2}$, so by linearity of expectation
+\[
+	f(k) := \mb E[X_k] = \binom nk 2^{-\binom k2}, \qquad \frac{f(k+1)}{f(k)} = \frac{n-k}{k+1} \, 2^{-k},
+\]
+the ratio because $\binom{n}{k+1} / \binom nk = \frac{n-k}{k+1}$ and $\binom{k+1}{2} - \binom k2 = k$. Since every clique of order $\ge k$ contains a $k$-clique, $\omega(G) \ge k \iff X_k \ge 1$. All statements below are for $n$ sufficiently large; for small $n$, $k(n)$ may be defined arbitrarily.
+
+\begin{proof}[Step 1: defining $k(n)$]
+	\emph{(i) $f(k) < 1$ for all $k \ge 2 \log_2 n + 1$.} Then $2^{(k-1)/2} \ge n$ and $k \ge 2$, so using $\binom nk \le \frac{n^k}{k!}$,
+	\[
+		f(k) \le \frac{n^k}{k!} 2^{-\frac{k(k-1)}{2}} = \frac{1}{k!} \left( n 2^{-\frac{k-1}{2}} \right)^k \le \frac{1}{k!} < 1.
+	\]
+	\emph{(ii) $f(k_1) \ge 1$ for $k_1 = \lfloor 1.5 \log_2 n \rfloor$.} Using $\binom nk \ge (n/k)^k$ and $2^{-\binom k2} \ge 2^{-k^2/2}$,
+	\[
+		f(k_1) \ge \left( \frac{n}{k_1 2^{k_1/2}} \right)^{k_1} \ge \left( \frac{n}{1.5 \log_2 n \cdot n^{3/4}} \right)^{k_1} \ge 1,
+	\]
+	since $1.5 \log_2 n \le n^{1/4}$ for large $n$.
+
+	As $f(1) = n \ge 1$, by (i) the integer $k_0 = k_0(n) := \max\{ k \ge 1 : f(k) \ge 1 \}$ exists, and set $k(n) := k_0(n)$. By (i), (ii) and the definition of $k_0$,
+	\begin{equation}
+		1.5 \log_2 n - 1 < k_0 < 2 \log_2 n + 1, \qquad f(k_0) \ge 1 > f(k_0 + 1). \label{eq:k0} \tag{1}
+	\end{equation}
+\end{proof}
+
+\begin{proof}[Step 2: $\omega(G) \le k_0 + 1$ w.h.p.]
+	By the ratio formula with $k = k_0 + 1 > 1.5 \log_2 n$ and by \eqref{eq:k0},
+	\[
+		f(k_0 + 2) = f(k_0 + 1) \cdot \frac{n - k_0 - 1}{k_0 + 2} 2^{-(k_0+1)} < 1 \cdot n \cdot 2^{-1.5 \log_2 n} = n^{-1/2}.
+	\]
+	By Markov's inequality, $\mb P(\omega(G) \ge k_0 + 2) = \mb P(X_{k_0+2} \ge 1) \le f(k_0 + 2) < n^{-1/2} \to 0$.
+\end{proof}
+
+\begin{proof}[Step 3: $\omega(G) \ge k_0 - 1$ w.h.p.]
+	Let $k = k_0 - 1$, so $1.5 \log_2 n - 2 < k < 2 \log_2 n$ by \eqref{eq:k0}, and write $X = X_k$.
+
+	\emph{The mean.} By the ratio formula and $f(k_0) \ge 1$,
+	\[
+		f(k) = f(k_0) \cdot \frac{k+1}{n-k} 2^{k} \ge \frac{2^k}{n} > \frac{2^{1.5 \log_2 n - 2}}{n} = \frac{n^{1/2}}{4} \to \infty.
+	\]
+
+	\emph{The variance.} Write $X = \sum_S \mathbf 1_{E_S}$ over $k$-sets $S$, where $E_S$ is the event that $S$ spans a clique. If $\card{S \cap T} = i$, then $E_S \cap E_T$ requires $2\binom k2 - \binom i2$ edges, so $\mb P(E_S \cap E_T) = 2^{-2\binom k2 + \binom i2}$. For each $S$ there are $\binom ki \binom{n-k}{k-i}$ sets $T$ with $\card{S \cap T} = i$, so
+	\[
+		\frac{\mb E[X^2]}{\mb E[X]^2} = \frac{\binom nk \sum_{i=0}^{k} \binom ki \binom{n-k}{k-i} 2^{-2\binom k2 + \binom i2}}{\binom nk^2 2^{-2\binom k2}} = \sum_{i=0}^k \frac{\binom ki \binom{n-k}{k-i}}{\binom nk} 2^{\binom i2}.
+	\]
+	Subtracting $1 = \sum_i \binom ki \binom{n-k}{k-i} / \binom nk$ (Vandermonde's identity), and noting that the terms $i = 0, 1$ vanish as $\binom i2 = 0$,
+	\[
+		\frac{\mathrm{Var}(X)}{\mb E[X]^2} = \sum_{i=2}^k \frac{\binom ki \binom{n-k}{k-i}}{\binom nk} \left( 2^{\binom i2} - 1 \right) \le \sum_{i=2}^k g(i), \qquad g(i) := \frac{\binom ki \binom{n-k}{k-i}}{\binom nk} 2^{\binom i2}.
+	\]
+
+	\emph{Small $i$, $2 \le i \le k/2$.} We have $\binom ki \le k^i$ and
+	\[
+		\frac{\binom{n-k}{k-i}}{\binom nk} \le \frac{\binom{n}{k-i}}{\binom nk} = \prod_{j=0}^{i-1} \frac{k - j}{n - k + i - j} \le \left( \frac{k}{n-k} \right)^i \le \left( \frac{2k}{n} \right)^i,
+	\]
+	as $n - k \ge n/2$. Moreover $2^{(i-1)/2} \le 2^{k/4} < 2^{(\log_2 n)/2} = n^{1/2}$, so
+	\[
+		g(i) \le \left( \frac{2k^2}{n} 2^{\frac{i-1}{2}} \right)^i \le r^i, \qquad r := \frac{2k^2}{n^{1/2}} \le \frac{8 (\log_2 n)^2}{n^{1/2}} \to 0,
+	\]
+	and $\sum_{2 \le i \le k/2} g(i) \le \frac{r^2}{1 - r} \to 0$.
+
+	\emph{Large $i$, $k/2 < i \le k$.} Put $j = k - i \in [0, k/2)$. Since $\binom ki = \binom kj$, $\binom{n-k}{k-i} = \binom{n-k}{j}$ and $f(k) = \binom nk 2^{-\binom k2}$,
+	\[
+		g(i) = \frac{1}{f(k)} \binom kj \binom{n-k}{j} 2^{-\left( \binom k2 - \binom{k-j}{2} \right)}.
+	\]
+	Here $\binom k2 - \binom{k-j}2 = \frac{j(2k - j - 1)}{2} \ge \frac{j(3k - 2)}{4}$ because $j < k/2$, and $\binom kj \binom{n-k}{j} \le (kn)^j$. Since $3k - 2 > 4.5 \log_2 n - 8$, we get $2^{(3k-2)/4} > n^{9/8}/4$, and
+	\[
+		g(i) \le \frac{s^j}{f(k)}, \qquad s := \frac{kn}{2^{(3k-2)/4}} < \frac{4k}{n^{1/8}} \le \frac{8 \log_2 n}{n^{1/8}} \to 0.
+	\]
+	So, for large $n$ (so that $s \le \frac12$), $\sum_{k/2 < i \le k} g(i) \le \frac{1}{f(k)} \sum_{j \ge 0} s^j \le \frac{2}{f(k)} \le 8 n^{-1/2} \to 0$.
+
+	\emph{Conclusion.} By Exercise 1(a),
+	\[
+		\mb P(\omega(G) < k_0 - 1) = \mb P(X = 0) \le \frac{\mathrm{Var}(X)}{\mb E[X]^2} \le \sum_{2 \le i \le k/2} g(i) + \sum_{k/2 < i \le k} g(i) \to 0. \qedhere
+	\]
+\end{proof}
+
+By Steps 2 and 3, $\mb P\big( \omega(G(n, \frac12)) \in \{ k(n) - 1, k(n), k(n) + 1 \} \big) \ge 1 - \mb P(\omega \ge k_0 + 2) - \mb P(\omega < k_0 - 1) \to 1$.
+
+\paragraph{Exercise 3}  Suppose we have a collection of vectors $\vec{v}_1, \vec{v}_2, \hdots, \vec{v}_m \in [n]^2$ such that there are no disjoint non-empty sets $I, J \subseteq [m]$ with $\sum_{i \in I} \vec{v}_i = \sum_{j \in J} \vec{v}_j$.
+\begin{itemize}
+	\item[(a)] Prove that we must have $m \le 2 \log_2 n + \log_2 \log_2 n + O(1)$.
+	\item[(b)] Show that we can have $m \ge 2 \lfloor \log_2 n \rfloor + 1$.
+\end{itemize}
+
+\paragraph{Solution.} For $A \subseteq [m]$ write $\sigma(A) = \sum_{i \in A} \vec v_i$. We first show that the condition is equivalent to
+\begin{equation}
+	\sigma(A) \neq \sigma(B) \quad \text{for all distinct } A, B \subseteq [m]. \label{eq:distinct} \tag{2}
+\end{equation}
+If $A \neq B$ and $\sigma(A) = \sigma(B)$, then $I = A \setminus B$ and $J = B \setminus A$ are disjoint, not both empty, and $\sigma(I) = \sigma(J)$ (remove the common part $A \cap B$). If, say, $J = \emptyset$, then $\sigma(I) = \vec 0$, which is impossible for $I \neq \emptyset$ as every coordinate of every $\vec v_i$ is at least $1$; so both are non-empty, violating the condition. Conversely, disjoint non-empty $I, J$ are distinct, so \eqref{eq:distinct} implies the condition.
+
+\begin{proof}[Proof of (a)]
+	We may assume $n \ge 2$ and $m \ge 1$. Choose $\eps_1, \hdots, \eps_m \in \{0,1\}$ uniformly and independently, and let $\vec X = \sum_{i=1}^m \eps_i \vec v_i = (X^{(1)}, X^{(2)}) \in \mb Z^2$. For each coordinate $c \in \{1, 2\}$, independence and $\mathrm{Var}(\eps_i) = \frac14$, $v_i^{(c)} \le n$ give
+	\[
+		\mathrm{Var}(X^{(c)}) = \frac14 \sum_{i=1}^m \big( v_i^{(c)} \big)^2 \le \frac{mn^2}{4},
+	\]
+	so by Chebyshev's inequality with $a = n\sqrt m$, $\mb P\big( \card{X^{(c)} - \mb E X^{(c)}} \ge n \sqrt m \big) \le \frac14$. Hence with probability at least $1 - \frac14 - \frac14 = \frac12$, $\vec X$ lies in the open box
+	\[
+		B = \prod_{c=1}^2 \big( \mb E X^{(c)} - n\sqrt m, \; \mb E X^{(c)} + n\sqrt m \big),
+	\]
+	which contains at most $(2n\sqrt m + 1)^2 \le 9 n^2 m$ lattice points (as $n \sqrt m \ge 1$). The map $(\eps_i) \mapsto \{ i : \eps_i = 1 \}$ is a bijection onto the subsets of $[m]$, so by \eqref{eq:distinct} each $\vec z \in \mb Z^2$ satisfies $\mb P(\vec X = \vec z) \le 2^{-m}$. Therefore
+	\[
+		\frac12 \le \mb P(\vec X \in B) = \sum_{\vec z \in B \cap \mb Z^2} \mb P(\vec X = \vec z) \le \frac{9 n^2 m}{2^m}
+		\quad \Longrightarrow \quad
+		m \le 2 \log_2 n + \log_2 m + \log_2 18. \tag{3} \label{eq:mbound}
+	\]
+	Using $\log_2 m \le \frac m2 + 1$ for all $m \ge 1$, \eqref{eq:mbound} gives $\frac m2 \le 2 \log_2 n + 1 + \log_2 18$, so $m < 4 \log_2 n + 11 \le 15 \log_2 n$ (as $\log_2 n \ge 1$). Thus $\log_2 m < \log_2 \log_2 n + \log_2 15$, and plugging this back into \eqref{eq:mbound},
+	\[
+		m \le 2 \log_2 n + \log_2 \log_2 n + \log_2 270 = 2 \log_2 n + \log_2 \log_2 n + O(1). \qedhere
+	\]
+\end{proof}
+
+\begin{proof}[Proof of (b)]
+	Let $k = \lfloor \log_2 n \rfloor$, so $2^k \le n$. Take the $2k + 1$ vectors
+	\[
+		\vec a_i = (2^i, 2^k), \qquad \vec b_i = (2^k, 2^i) \quad (0 \le i \le k-1), \qquad \vec z = (2^k, 2^k),
+	\]
+	all in $[2^k]^2 \subseteq [n]^2$. By the equivalence above it suffices to check \eqref{eq:distinct}. A sub-collection is given by $A, B \subseteq \{0, \hdots, k-1\}$ (the indices of the chosen $\vec a_i$ and $\vec b_i$) and $\delta \in \{0,1\}$ (whether $\vec z$ is chosen), and its sum is
+	\[
+		\Big( \sum_{i \in A} 2^i + (\card B + \delta) 2^k, \;\; (\card A + \delta) 2^k + \sum_{i \in B} 2^i \Big).
+	\]
+	Since $0 \le \sum_{i \in A} 2^i < 2^k$, the first coordinate determines $\sum_{i \in A} 2^i$ (its residue mod $2^k$), hence $A$ by uniqueness of binary expansions. Then $\card A$ is known, the second coordinate determines $\sum_{i \in B} 2^i$ and $\card A + \delta$ in the same way, hence $B$ and $\delta$. So distinct sub-collections have distinct sums, and $m = 2k + 1 = 2 \lfloor \log_2 n \rfloor + 1$ is attained.
+\end{proof}
+
+\paragraph{Exercise 4}  Let $x$ be a uniformly random number from $[n]$, and let $X$ be the number of distinct prime numbers between $1$ and $\sqrt{n}$ that divide $x$. Using the fact that, as $m \to \infty$, we have $\sum_{p \; \textrm{prime}, p \le m} \frac{1}{p} = \ln \ln m + O(1)$, show that $\mathrm{Var}(X) = \ln \ln n + O(1)$, and deduce at almost all numbers in $[n]$ have $(1 + o(1)) \ln \ln n$ distinct prime factors.
+
+\paragraph{Solution.} Throughout, $p, q$ denote primes at most $\sqrt n$, and $\pi(\sqrt n) \le \sqrt n$ is their number. Applying the given fact with $m = \sqrt n$ and $\ln \ln \sqrt n = \ln \ln n - \ln 2$,
+\begin{equation}
+	\sum_{p \le \sqrt n} \frac 1p = \ln \ln n + O(1). \tag{4} \label{eq:mertens}
+\end{equation}
+Let $X_p = \mathbf 1_{\{p \mid x\}}$, so $X = \sum_p X_p$. Exactly $\lfloor n/d \rfloor$ elements of $[n]$ are divisible by $d$, and for distinct primes $p \mid x, q \mid x \iff pq \mid x$, so
+\[
+	\mb P(p \mid x) = \frac{\lfloor n/p \rfloor}{n} \in \left[ \frac 1p - \frac 1n, \frac 1p \right], \qquad \mb P(p \mid x, \, q \mid x) = \frac{\lfloor n/pq \rfloor}{n} \in \left[ \frac{1}{pq} - \frac 1n, \frac{1}{pq} \right].
+\]
+In particular $\mb E[X] = \sum_p \mb P(p \mid x) \in \big[ \sum_p \frac1p - \frac{\pi(\sqrt n)}{n}, \sum_p \frac1p \big]$, so $\mb E[X] = \ln \ln n + O(1)$ by \eqref{eq:mertens}.
+
+\begin{proof}[Proof that $\mathrm{Var}(X) = \ln \ln n + O(1)$]
+	We use $\mathrm{Var}(X) = \sum_p \mathrm{Var}(X_p) + \sum_{p \neq q} \mathrm{Cov}(X_p, X_q)$, the second sum over ordered pairs.
+
+	\emph{Diagonal terms.} $\mathrm{Var}(X_p) = \mb P(p \mid x)\big( 1 - \mb P(p \mid x) \big)$ satisfies
+	\[
+		\frac 1p \ge \mathrm{Var}(X_p) \ge \left( \frac 1p - \frac 1n \right)\left( 1 - \frac 1p \right) \ge \frac 1p - \frac{1}{p^2} - \frac1n.
+	\]
+	As $\sum_p \frac{1}{p^2} < \sum_{j \ge 2} \frac{1}{j^2} < 1$ and $\sum_p \frac 1n \le \frac{\sqrt n}{n} \le 1$, \eqref{eq:mertens} gives $\sum_p \mathrm{Var}(X_p) = \ln \ln n + O(1)$.
+
+	\emph{Covariances.} For $p \neq q$, using the bounds above (note $\frac 1p - \frac 1n \ge 0$),
+	\[
+		\mathrm{Cov}(X_p, X_q) \le \frac{1}{pq} - \left( \frac1p - \frac1n \right) \left( \frac1q - \frac1n \right) \le \frac1n \left( \frac 1p + \frac 1q \right), \]
+	\[ \mathrm{Cov}(X_p, X_q) \ge \frac{1}{pq} - \frac 1n - \frac{1}{pq} = -\frac1n.
+	\]
+	There are at most $\pi(\sqrt n)^2 \le n$ ordered pairs, and each prime $p$ occurs in fewer than $2\pi(\sqrt n)$ of them, so by \eqref{eq:mertens}
+	\[
+		-1 \le \sum_{p \neq q} \mathrm{Cov}(X_p, X_q) \le \frac{2 \pi(\sqrt n)}{n} \sum_p \frac1p \le \frac{2(\ln \ln n + O(1))}{\sqrt n} = o(1).
+	\]
+	Here the choice of the range $p \le \sqrt n$ is what makes the error terms $-\frac1n$ summable. Adding up, $\mathrm{Var}(X) = \ln \ln n + O(1)$.
+\end{proof}
+
+\begin{proof}[Deduction]
+	Let $\nu(x)$ be the number of distinct prime factors of $x$. Two distinct primes larger than $\sqrt n$ have product larger than $n \ge x$, so $x$ has at most one prime factor exceeding $\sqrt n$, and $X(x) \le \nu(x) \le X(x) + 1$. Fix a constant $C$ with $\card{\mb E[X] - \ln \ln n} \le C$ and $\mathrm{Var}(X) \le \ln \ln n + C$. By Chebyshev's inequality with $a = (\ln \ln n)^{3/4}$,
+	\[
+		\mb P\Big( \card{X - \mb E[X]} \ge (\ln \ln n)^{3/4} \Big) \le \frac{\ln \ln n + C}{(\ln \ln n)^{3/2}} \to 0.
+	\]
+	Outside this event,
+	\[
+		\card{\nu(x) - \ln \ln n} \le \card{X - \mb E[X]} + \card{\mb E[X] - \ln \ln n} + 1 \le (\ln \ln n)^{3/4} + C + 1 = o(\ln \ln n).
+	\]
+	Hence all but $o(n)$ numbers $x \in [n]$ have $\nu(x) = (1 + o(1)) \ln \ln n$.
+\end{proof}
+
+\paragraph{Exercise 5}  Let $a_1, a_2, \hdots, a_n$ be real numbers with $\sum_{i=1}^n a_i^2 = 1$, and let $( \varepsilon_1, \hdots, \varepsilon_n)$ be a uniformly random vector in $\{-1,1\}^n$.
+\begin{itemize}
+	\item[(a)] Prove that for every $K > 1$ there is a constant $c = c(K) > 0$ such that 
+	\[ \mathbb{P} \left( \card{ \sum_{i=1}^n \varepsilon_i a_i } \le K \right) \ge c. \]
+	\item[(b)] Prove that there is an absolute constant $c > 0$ such that
+	\[ \mathbb{P} \left( \card{ \sum_{i=1}^n \varepsilon_i a_i } \le 1 \right) \ge c. \]
+\end{itemize}
+
+\paragraph{Solution.} For $A \subseteq [n]$ let $S_A = \sum_{i \in A} \eps_i a_i$, and $S = S_{[n]}$. The $\eps_i$ are independent with mean $0$ and variance $1$, so $\mb E[S_A] = 0$ and $\mathrm{Var}(S_A) = \sum_{i \in A} a_i^2$; in particular $\mathrm{Var}(S) = 1$. Moreover $S_A$ is \emph{symmetric}, i.e.\ $S_A$ and $-S_A$ have the same distribution, since $(\eps_i)$ and $(-\eps_i)$ do.
+
+\begin{proof}[Proof of (a)]
+	By Chebyshev's inequality, $\mb P(\card S > K) \le \frac{\mathrm{Var}(S)}{K^2} = \frac{1}{K^2}$, so $\mb P(\card S \le K) \ge 1 - \frac{1}{K^2} =: c(K)$, which is positive as $K > 1$.
+\end{proof}
+
+\medskip
+\noindent \textbf{Lemma.} \emph{If $U, V$ are independent symmetric random variables, then $\mb P(\card{U + V} \le 1) \ge \frac14 \mb P(\card U \le 1) \, \mb P(\card V \le 1)$.}
+
+\begin{proof}
+	If $U \in [0,1]$ and $V \in [-1, 0]$, then $U + V \in [-1, 1]$. By symmetry $\mb P(U \in [0,1]) = \mb P(U \in [-1, 0])$, and the two sum to at least $\mb P(\card U \le 1)$, so $\mb P(U \in [0,1]) \ge \frac12 \mb P(\card U \le 1)$; likewise $\mb P(V \in [-1, 0]) \ge \frac12 \mb P(\card V \le 1)$. By independence,
+	\[
+		\mb P(\card{U + V} \le 1) \ge \mb P(U \in [0,1]) \, \mb P(V \in [-1, 0]) \ge \frac14 \mb P(\card U \le 1) \, \mb P(\card V \le 1). \qedhere
+	\]
+\end{proof}
+
+\begin{proof}[Proof of (b)]
+	We show $c = \frac{1}{64}$ works. We split $[n] = A \sqcup B$ and apply the Lemma to $U = S_A$, $V = S_B$, which are independent (they depend on disjoint sets of $\eps_i$) and symmetric. By Chebyshev's inequality, $\mb P(\card{S_A} \le 1) \ge 1 - \mathrm{Var}(S_A) = 1 - \sum_{i \in A} a_i^2$, and similarly for $B$.
+
+	\emph{Case 1: some $a_i^2 > \frac12$}, say $i = 1$. Take $A = \{1\}$, $B = [n] \setminus \{1\}$. Then $\card{S_A} = \card{a_1} \le 1$ always, as $a_1^2 \le \sum_i a_i^2 = 1$, and $\mathrm{Var}(S_B) = 1 - a_1^2 < \frac12$, so the Lemma gives $\mb P(\card S \le 1) \ge \frac14 \cdot 1 \cdot \frac12 = \frac18$.
+
+	\emph{Case 2: $a_i^2 \le \frac12$ for all $i$.} Let $r$ be the least index with $\sum_{i \le r} a_i^2 \ge \frac14$, which exists since the total is $1$, and take $A = [r]$, $B = [n] \setminus [r]$. By minimality of $r$,
+	\[
+		\sum_{i \in A} a_i^2 = \sum_{i < r} a_i^2 + a_r^2 < \frac14 + \frac12 = \frac34, \qquad \sum_{i \in B} a_i^2 = 1 - \sum_{i \le r} a_i^2 \le \frac34.
+	\]
+	So $\mb P(\card{S_A} \le 1), \mb P(\card{S_B} \le 1) \ge \frac14$, and the Lemma gives $\mb P(\card S \le 1) \ge \frac14 \cdot \frac14 \cdot \frac14 = \frac{1}{64}$.
+
+	In both cases $\mb P(\card S \le 1) \ge \frac{1}{64}$.
+\end{proof}
+
+% \newpage
+
+% \section*{Hints}  The following QR codes contain hints for some of the homework exercises.  You should be able to decode them using any QR code scanner, including this one: \url{https://zxing.org/w/decode.jspx}.
+
+% \paragraph{Exercise ?} Also available at \url{https://i.ibb.co/???????/S??E?.png}.
+
+\begin{center}
+% \includegraphics[scale=0.5]{Hints/S??E?.png}
+\end{center}
+
+\end{document}
