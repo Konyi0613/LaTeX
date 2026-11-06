@@ -1,0 +1,794 @@
+\chapter{Regularization}
+\lecture{14}{28 Oct.}{}
+
+\begin{prev}
+    Overfitting happens with excessive power, stochastic and deterministic
+    noise, and limited data. Of the remedies in the driving analogy, `start
+    from a simple model' and the data-side ones were covered; `put the brakes',
+    regularization, was left for later.
+\end{prev}
+
+This chapter builds the brakes. Stepping back from a large hypothesis set to a
+smaller one is the same as adding a constraint on the weights. Softening that
+constraint gives a family of sets \(\mathcal{H}(C)\), and solving the
+constrained problem turns into minimizing an \emph{augmented error}, which for
+linear regression has a closed form. VC theory explains why this works, and
+the chapter ends with other choices of regularizer and the question of how
+much to regularize.
+
+\section{Regularized Hypothesis Set}\label{sec:reg-hyp-set}
+
+\source{slides p.2--7}
+
+\subsection{Regularization: The Magic}
+
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[ovfplot, name=reg, title={`regularized fit'},
+            title style={font=\small}]
+            \ovfFiveData
+            \ovfFiveTarget
+            \ovfFiveGood
+            \legend{Data, Target, Fit}
+        \end{axis}
+        \node at (6.15,1.5) {\(\Longleftarrow\)};
+        \begin{axis}[ovfplot, at={(7.0cm,0)}, title={overfit},
+            title style={font=\small}]
+            \ovfFiveData
+            \ovfFiveTarget
+            \ovfFiveFit
+            \legend{Data, Target, Fit}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+The right plot is the overfit of \autoref{sec:what-overfit}: five examples
+from a 2nd-order target, fitted exactly by a 4th-order polynomial. The left
+plot is what regularization makes of the same data, a curve that stays close
+to the target. The arrow points from right to left: regularization starts from
+the overfit and pulls it back.
+
+\begin{itemize}
+    \item The idea is to `step back' from \(\mathcal{H}_{10}\) to
+        \(\mathcal{H}_2\) in the nested chain of polynomial hypothesis sets,
+        i.e.\ to move left in the picture below.
+        \begin{center}
+            \nestedH
+        \end{center}
+    \item The name has a history: it comes from function approximation for
+        \textbf{ill-posed problems}, where many functions fit the given
+        information equally well and an extra condition is needed to pick
+        one.
+\end{itemize}
+
+\begin{question}
+    How to step back?
+\end{question}
+
+\subsection{Stepping Back as Constraint}
+
+\begin{center}
+    \nestedH
+\end{center}
+
+Use the \(Q\)-th order polynomial transform for \(x \in \mathbb{R}\),
+\[
+    \bm{\Phi}_Q(x) = \left( 1, x, x^2, \ldots, x^Q \right),
+\]
+followed by linear regression, and from now on write the weights
+\(\tilde{\bm{w}}\) of \(\mathcal{Z}\)-space simply as \(\bm{w}\). A hypothesis
+in each set is then
+\begin{align*}
+    \text{hypothesis } \bm{w} \text{ in } \mathcal{H}_{10}&: \quad w_0 + w_1 x
+    + w_2 x^2 + w_3 x^3 + \ldots + w_{10} x^{10} ,\\
+    \text{hypothesis } \bm{w} \text{ in } \mathcal{H}_2&: \quad w_0 + w_1 x +
+    w_2 x^2 .
+\end{align*}
+The second line is the first one with the last eight terms gone. That is,
+\(\mathcal{H}_2 = \mathcal{H}_{10}\) AND `constraint that \(w_3 = w_4 = \ldots
+= w_{10} = 0\)'.
+
+\begin{moral}
+    Step back \(=\) \textbf{constraint}.
+\end{moral}
+
+\subsection{Regression with Constraint}
+
+Written as sets of weight vectors, both live in the same space
+\(\mathbb{R}^{10+1}\):
+\[
+    \mathcal{H}_{10} \equiv \left\{ \bm{w} \in \mathbb{R}^{10+1} \right\} ,
+    \qquad
+    \mathcal{H}_2 \equiv \left\{ \bm{w} \in \mathbb{R}^{10+1} \text{ while }
+    w_3 = w_4 = \ldots = w_{10} = 0 \right\} .
+\]
+Regression on each is the same minimization, with or without the constraint:
+\begin{align*}
+    \text{regression with } \mathcal{H}_{10}&: \quad \min_{\bm{w} \in
+    \mathbb{R}^{10+1}} \Ein(\bm{w}) ,\\
+    \text{regression with } \mathcal{H}_2&: \quad \min_{\bm{w} \in
+    \mathbb{R}^{10+1}} \Ein(\bm{w}) \quad \text{s.t. } w_3 = w_4 = \ldots =
+    w_{10} = 0 .
+\end{align*}
+
+\begin{moral}
+    Step back \(=\) constrained optimization of \(\Ein\).
+\end{moral}
+
+\begin{question}
+    Why don't you just use \(\bm{w} \in \mathbb{R}^{2+1}\)? :-)
+\end{question}
+
+For \(\mathcal{H}_2\) itself that would indeed be simpler. The point of
+writing it as a constraint is that the constraint can now be changed, giving
+sets between \(\mathcal{H}_2\) and \(\mathcal{H}_{10}\) that have no such
+shortcut.
+
+\subsection{Regression with Looser Constraint}
+
+The first change: instead of insisting that the \emph{last} eight weights are
+zero, ask only that \emph{some} eight are.
+\[
+    \mathcal{H}_2 \equiv \left\{ \bm{w} \in \mathbb{R}^{10+1} \text{ while }
+    w_3 = \ldots = w_{10} = 0 \right\} ,
+    \qquad
+    \mathcal{H}_2' \equiv \left\{ \bm{w} \in \mathbb{R}^{10+1} \text{ while }
+    \ge 8 \text{ of } w_q = 0 \right\} .
+\]
+Counting the nonzero weights with the Iverson bracket, regression becomes
+\begin{align*}
+    \text{regression with } \mathcal{H}_2&: \quad \min_{\bm{w} \in
+    \mathbb{R}^{10+1}} \Ein(\bm{w}) \quad \text{s.t. } w_3 = \ldots = w_{10}
+    = 0 ,\\
+    \text{regression with } \mathcal{H}_2'&: \quad \min_{\bm{w} \in
+    \mathbb{R}^{10+1}} \Ein(\bm{w}) \quad \text{s.t. } \sum_{q=0}^{10}
+    \llbracket w_q \neq 0 \rrbracket \le 3 .
+\end{align*}
+\begin{itemize}
+    \item \(\mathcal{H}_2'\) is more flexible than \(\mathcal{H}_2\):
+        \(\mathcal{H}_2 \subset \mathcal{H}_2'\), since any three weights may
+        be the free ones, not just \(w_0, w_1, w_2\).
+    \item \(\mathcal{H}_2'\) is less risky than \(\mathcal{H}_{10}\):
+        \(\mathcal{H}_2' \subset \mathcal{H}_{10}\), since it still uses at
+        most three weights.
+\end{itemize}
+
+\begin{moral}
+    Bad news for \vocab{sparse hypothesis set} \(\mathcal{H}_2'\):
+    \textbf{NP-hard to solve} :-(
+\end{moral}
+
+The difficulty is the choice of which three weights to keep. There are
+\(\binom{11}{3}\) choices here, and in general the count grows combinatorially,
+just like the 0/1 error of the perceptron.
+
+\subsection{Regression with Softer Constraint}
+
+The second change replaces `how many weights are nonzero' by `how large the
+weights are':
+\[
+    \mathcal{H}_2' \equiv \left\{ \bm{w} \in \mathbb{R}^{10+1} \text{ while }
+    \ge 8 \text{ of } w_q = 0 \right\} ,
+    \qquad
+    \mathcal{H}(C) \equiv \left\{ \bm{w} \in \mathbb{R}^{10+1} \text{ while }
+    \norm{\bm{w}}^2 \le C \right\} ,
+\]
+\begin{align*}
+    \text{regression with } \mathcal{H}_2'&: \quad \min_{\bm{w} \in
+    \mathbb{R}^{10+1}} \Ein(\bm{w}) \quad \text{s.t. } \sum_{q=0}^{10}
+    \llbracket w_q \neq 0 \rrbracket \le 3 ,\\
+    \text{regression with } \mathcal{H}(C)&: \quad \min_{\bm{w} \in
+    \mathbb{R}^{10+1}} \Ein(\bm{w}) \quad \text{s.t. } \sum_{q=0}^{10} w_q^2
+    \le C .
+\end{align*}
+\begin{itemize}
+    \item \(\mathcal{H}(C)\) overlaps with \(\mathcal{H}_2'\) but is not exactly
+        the same: both keep the weights `small', one by count and one by
+        size.
+    \item Over \(C \ge 0\), the sets form a soft and smooth structure:
+        \[
+            \mathcal{H}(0) \subset \mathcal{H}(1.126) \subset \ldots \subset
+            \mathcal{H}(1126) \subset \ldots \subset \mathcal{H}(\infty) =
+            \mathcal{H}_{10} .
+        \]
+        Unlike \(\mathcal{H}_0 \subset \mathcal{H}_1 \subset \cdots\), the
+        size can now be tuned continuously by \(C\).
+\end{itemize}
+
+\begin{definition}[Regularized hypothesis]\label{def:wreg}
+    The \vocab{regularized hypothesis} \(\wreg\) is the optimal solution from
+    the \vocab{regularized hypothesis set} \(\mathcal{H}(C)\).
+\end{definition}
+
+\begin{exercise}[Fun Time]
+    For \(Q \ge 1\), which of the following hypothesis (weight vector \(\bm{w}
+    \in \mathbb{R}^{Q+1}\)) is not in the regularized hypothesis set
+    \(\mathcal{H}(1)\)?
+    \begin{enumerate}[(1)]
+        \item \(\bm{w}^\top = [0, 0, \ldots, 0]\);
+        \item \(\bm{w}^\top = [1, 0, \ldots, 0]\);
+        \item \(\bm{w}^\top = [1, 1, \ldots, 1]\);
+        \item \(\bm{w}^\top = \left[ \sqrt{\frac{1}{Q+1}}, \sqrt{\frac{1}{Q+1}},
+            \ldots, \sqrt{\frac{1}{Q+1}} \right]\).
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (3). The squared length of \(\bm{w}\) in (3) is \(Q + 1\), which is not
+    \(\le 1\).
+\end{proof}
+
+\section{Weight Decay Regularization}\label{sec:weight-decay}
+
+\source{slides p.8--13}
+
+\subsection{Matrix Form of Regularized Regression Problem}
+
+The regularized regression problem, with \(\bm{z}_n = \bm{\Phi}_Q(x_n)\):
+\[
+    \min_{\bm{w} \in \mathbb{R}^{Q+1}} \Ein(\bm{w}) = \frac{1}{N}
+    \underbrace{\sum_{n=1}^{N} \left( \bm{w}^\top \bm{z}_n - y_n
+    \right)^2}_{(\mathrm{Z}\bm{w} - \bm{y})^\top (\mathrm{Z}\bm{w} - \bm{y})}
+    \quad \text{s.t.} \quad \underbrace{\sum_{q=0}^{Q} w_q^2}_{\bm{w}^\top
+    \bm{w}} \le C .
+\]
+\begin{itemize}
+    \item The sum \(\sum_n \ldots\) equals \((\mathrm{Z}\bm{w} -
+        \bm{y})^\top (\mathrm{Z}\bm{w} - \bm{y})\), the matrix form of linear
+        regression in \autoref{sec:linreg-algo}, remember? :-)
+    \item \(\bm{w}^\top \bm{w} \le C\) says the feasible \(\bm{w}\) lie within
+        a radius-\(\sqrt{C}\) hypersphere centred at the origin.
+\end{itemize}
+
+\begin{question}
+    How to solve the constrained optimization problem?
+\end{question}
+
+\subsection{The Lagrange Multiplier}
+
+\[
+    \min_{\bm{w} \in \mathbb{R}^{Q+1}} \Ein(\bm{w}) = \frac{1}{N} (\mathrm{Z}
+    \bm{w} - \bm{y})^\top (\mathrm{Z}\bm{w} - \bm{y}) \quad \text{s.t.} \quad
+    \bm{w}^\top \bm{w} \le C
+\]
+
+\begin{center}
+    \regconstraint{l2}
+\end{center}
+
+The picture is the problem in weight space. \(\bm{w}_{\mathrm{lin}}\), the
+unconstrained minimizer, lies outside the red sphere, so the best feasible
+\(\bm{w}\) sits on the sphere's boundary. The blue ellipse is the contour of
+\(\Ein\) through the current \(\bm{w}\).
+\begin{itemize}
+    \item The decreasing direction of \(\Ein\) is \(-\nabla \Ein(\bm{w})\), as
+        in gradient descent (\autoref{sec:gd}), remember? :-)
+    \item The normal vector of the boundary \(\bm{w}^\top \bm{w} = C\) at
+        \(\bm{w}\) is \(\bm{w}\) itself (red arrow), pointing straight out of
+        the sphere.
+    \item If \(-\nabla \Ein(\bm{w})\) and \(\bm{w}\) are not parallel, then
+        \(-\nabla \Ein(\bm{w})\) has a component along the boundary (green
+        arrow). Moving that way decreases \(\Ein(\bm{w})\) without violating
+        the constraint, so \(\bm{w}\) is not yet optimal.
+    \item Hence at the optimal solution \(\wreg\) no such component is left:
+        \(-\nabla \Ein(\wreg) \propto \wreg\).
+\end{itemize}
+
+\begin{moral}
+    Want: find \vocab{Lagrange multiplier} \(\lambda > 0\) and \(\wreg\) such
+    that \(\nabla \Ein(\wreg) + \frac{2\lambda}{N} \wreg = \bm{0}\).
+\end{moral}
+
+The proportionality constant is written as \(\frac{2\lambda}{N}\) only to make
+the next formulas clean; any positive constant would do.
+
+\begin{remark}
+    Why must \(\lambda\) be positive? The picture assumes \(\bm{w}_{\mathrm{lin}}\)
+    lies outside the sphere, so the constraint is active and \(\wreg\) is on
+    the boundary. There, \(\Ein\) decreases \emph{outward}, towards
+    \(\bm{w}_{\mathrm{lin}}\), which means \(-\nabla \Ein(\wreg)\) points the
+    same way as \(\wreg\) and the constant is positive. If it pointed inward
+    (\(\lambda < 0\)), moving inward would lower \(\Ein\) and stay feasible, so
+    \(\wreg\) would not be optimal. The remaining case is \(\lambda = 0\): then
+    \(\nabla \Ein(\wreg) = \bm{0}\), i.e.\ \(\wreg = \bm{w}_{\mathrm{lin}}\),
+    which happens when \(\bm{w}_{\mathrm{lin}}\) is already inside the sphere
+    and the constraint does nothing. That is why the next subsection allows
+    `\(\lambda > 0\) or \(\lambda = 0\)'.
+\end{remark}
+
+\subsection{Augmented Error}
+
+\begin{itemize}
+    \item If an oracle tells you \(\lambda > 0\), then solving
+        \[
+            \nabla \Ein(\wreg) + \frac{2\lambda}{N} \wreg = \bm{0}
+        \]
+        means, with the gradient of linear regression from
+        \autoref{sec:linreg-algo},
+        \[
+            \frac{2}{N} \left( \mathrm{Z}^\top \mathrm{Z} \wreg -
+            \mathrm{Z}^\top \bm{y} \right) + \frac{2\lambda}{N} \wreg =
+            \bm{0} .
+        \]
+    \item The optimal solution is
+        \[
+            \wreg \leftarrow (\mathrm{Z}^\top \mathrm{Z} + \lambda
+            \mathrm{I})^{-1} \mathrm{Z}^\top \bm{y} ,
+        \]
+        called \vocab{ridge regression} in Statistics. For \(\lambda > 0\) the
+        matrix \(\mathrm{Z}^\top \mathrm{Z} + \lambda \mathrm{I}\) is always
+        invertible, unlike \(\mathrm{Z}^\top \mathrm{Z}\) alone.
+\end{itemize}
+
+The same equation can also be read the other way round: it is exactly the
+condition `gradient \(= \bm{0}\)' of an unconstrained function.
+\begin{itemize}
+    \item If an oracle tells you \(\lambda > 0\), then solving
+        \(\nabla \Ein(\wreg) + \frac{2\lambda}{N} \wreg = \bm{0}\) is
+        equivalent to minimizing
+        \[
+            \underbrace{\Ein(\bm{w}) + \frac{\lambda}{N} \overbrace{\bm{w}^\top
+            \bm{w}}^{\text{regularizer}}}_{\text{augmented error }
+            \Eaug(\bm{w})} ,
+        \]
+        since the gradient of \(\frac{\lambda}{N} \bm{w}^\top \bm{w}\) is
+        \(\frac{2\lambda}{N} \bm{w}\).
+    \item So regularization can be done with the \vocab{augmented error}
+        instead of the constrained \(\Ein\):
+        \[
+            \wreg \leftarrow \argmin_{\bm{w}} \Eaug(\bm{w}) \quad \text{for
+            given } \lambda > 0 \text{ or } \lambda = 0 .
+        \]
+\end{itemize}
+
+\begin{moral}
+    Minimizing \textbf{unconstrained} \(\Eaug\) effectively minimizes
+    \textbf{some \(C\)-constrained} \(\Ein\).
+\end{moral}
+
+The trade is that we no longer specify \(C\) but \(\lambda\).
+
+\begin{remark}
+    `\(\lambda\) corresponds to \(C\)' means that both problems have the same
+    answer: the \(\bm{w}\) that minimizes \(\Eaug\) with this \(\lambda\) is also
+    the \(\bm{w}\) that minimizes \(\Ein\) under \(\bm{w}^\top \bm{w} \le C\).
+    Here is how to find that \(C\) for a given \(\lambda > 0\).
+    \begin{enumerate}[(1)]
+        \item \textbf{Solve the \(\lambda\) problem.} Let \(\wreg\) be the
+            minimizer of \(\Eaug(\bm{w}) = \Ein(\bm{w}) + \frac{\lambda}{N}
+            \bm{w}^\top \bm{w}\).
+        \item \textbf{Choose \(C\) from its answer.} Set \(C = \wreg^\top
+            \wreg\). Then \(\wreg\) itself satisfies the constraint \(\bm{w}^\top
+            \bm{w} \le C\), with equality.
+        \item \textbf{Compare with every other feasible \(\bm{w}\).} Take any
+            \(\bm{w}\) with \(\bm{w}^\top \bm{w} \le C\). Since \(\wreg\)
+            minimizes \(\Eaug\),
+            \[
+                \Ein(\bm{w}) + \frac{\lambda}{N} \bm{w}^\top \bm{w} \;\ge\;
+                \Ein(\wreg) + \frac{\lambda}{N} \underbrace{\wreg^\top
+                \wreg}_{= C} .
+            \]
+            Move the penalty term to the right:
+            \[
+                \Ein(\bm{w}) \;\ge\; \Ein(\wreg) + \frac{\lambda}{N}
+                \underbrace{\left( C - \bm{w}^\top \bm{w} \right)}_{\ge 0
+                \text{ since } \bm{w} \text{ is feasible}} \;\ge\;
+                \Ein(\wreg) .
+            \]
+        \item \textbf{Conclude.} No feasible \(\bm{w}\) has a smaller \(\Ein\)
+            than \(\wreg\), so \(\wreg\) is the solution of the
+            \(C\)-constrained problem.
+    \end{enumerate}
+    So each \(\lambda\) comes with the \(C\) equal to the squared length of its
+    own solution. A larger \(\lambda\) charges more for length, so the
+    solution comes out shorter, and its \(C\) is smaller.
+\end{remark}
+
+\subsection{The Results}
+
+\begin{center}
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tikzpicture}
+            \begin{axis}[ovfplot, width=4.4cm, height=3.8cm,
+                title={\(\lambda = 0\)}, title style={font=\small}]
+                \ovfFiveData
+                \ovfFiveTarget
+                \ovfFiveFit
+                \legend{Data, Target, Fit}
+            \end{axis}
+            \begin{axis}[ovfplot, width=4.4cm, height=3.8cm, at={(4.9cm,0)},
+                title={\(\lambda = 0.0001\)}, title style={font=\small}]
+                \ovfFiveData
+                \ovfFiveTarget
+                \regLambdaSmall
+            \end{axis}
+            \begin{axis}[ovfplot, width=4.4cm, height=3.8cm, at={(9.8cm,0)},
+                title={\(\lambda = 0.01\)}, title style={font=\small}]
+                \ovfFiveData
+                \ovfFiveTarget
+                \regLambdaMid
+            \end{axis}
+            \begin{axis}[ovfplot, width=4.4cm, height=3.8cm, at={(14.7cm,0)},
+                title={\(\lambda = 1\)}, title style={font=\small}]
+                \ovfFiveData
+                \ovfFiveTarget
+                \regLambdaOne
+            \end{axis}
+            \node[font=\small] at (1.75,-1.6) {overfitting};
+            \foreach \x in {4.2,9.1,14.0}{\node at (\x,-1.6) {\(\Longrightarrow\)};}
+            \node[font=\small] at (16.45,-1.6) {underfitting};
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{center}
+
+The same five examples, fitted with a 4th-order transform and increasing
+\(\lambda\). At \(\lambda = 0\) there is no regularization and the fit is the
+overfit from before. Already \(\lambda = 0.0001\) removes the large swing and
+gives the `regularized fit' of the first section. At \(\lambda = 1\) the
+weights are pressed so short that the fit can no longer follow the data, which
+is underfitting.
+
+\begin{moral}
+    Philosophy: \textbf{a little regularization} goes a long way!
+\end{moral}
+
+\begin{definition}[Weight-decay regularization]\label{def:weight-decay}
+    Adding \(+\frac{\lambda}{N} \bm{w}^\top \bm{w}\) to \(\Ein\) is called
+    \vocab{weight-decay regularization}:
+    \[
+        \text{larger } \lambda \iff \text{prefer shorter } \bm{w} \iff
+        \text{effectively smaller } C .
+    \]
+    It goes with `any' transform \(+\) linear model.
+\end{definition}
+
+The name comes from gradient descent: each step on \(\Eaug\) first shrinks the
+current \(\bm{w}\) by a constant factor and then moves along \(-\nabla \Ein\),
+so without support from the data the weights decay towards zero.
+
+\subsection{Some Detail: Legendre Polynomials}
+
+\[
+    \min_{\bm{w} \in \mathbb{R}^{Q+1}} \frac{1}{N} \sum_{n=1}^{N} \left(
+    \bm{w}^\top \bm{\Phi}(x_n) - y_n \right)^2 + \frac{\lambda}{N}
+    \sum_{q=0}^{Q} w_q^2
+\]
+Weight decay penalizes every \(w_q\) by the same amount, so the transform
+matters.
+\begin{itemize}
+    \item The naive polynomial transform is \(\bm{\Phi}(x) = \left( 1, x, x^2,
+        \ldots, x^Q \right)\). When \(x_n \in [-1, +1]\), \(x_n^q\) is really
+        small for large \(q\), so a high-order term needs a large \(w_q\) to
+        have any effect, and weight decay punishes it unfairly.
+    \item The normalized polynomial transform is \(\left( 1, L_1(x), L_2(x),
+        \ldots, L_Q(x) \right)\), using the `orthonormal basis functions' called
+        \vocab{Legendre polynomials}. Each \(L_q\) spans the whole range
+        \([-1, 1]\), so equal weights mean comparable effects.
+\end{itemize}
+
+\begin{center}
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tikzpicture}
+            \begin{groupplot}[group style={group size=5 by 1,
+                    horizontal sep=0.25cm},
+                width=3.6cm, height=3.0cm, xmin=-1, xmax=1, ymin=-1.1,
+                ymax=1.1, xtick=\empty, ytick=\empty,
+                title style={font=\small}, xlabel style={font=\scriptsize},
+                domain=-1:1, samples=80]
+                \nextgroupplot[title={\(L_1\)}, xlabel={\(x\)}]
+                \addplot[blue!85!black, thick] {x};
+                \nextgroupplot[title={\(L_2\)},
+                    xlabel={\(\frac{1}{2}(3x^2 - 1)\)}]
+                \addplot[blue!85!black, thick] {(3*x^2 - 1)/2};
+                \nextgroupplot[title={\(L_3\)},
+                    xlabel={\(\frac{1}{2}(5x^3 - 3x)\)}]
+                \addplot[blue!85!black, thick] {(5*x^3 - 3*x)/2};
+                \nextgroupplot[title={\(L_4\)},
+                    xlabel={\(\frac{1}{8}(35x^4 - 30x^2 + 3)\)}]
+                \addplot[blue!85!black, thick] {(35*x^4 - 30*x^2 + 3)/8};
+                \nextgroupplot[title={\(L_5\)},
+                    xlabel={\(\frac{1}{8}(63x^5 \cdots)\)}]
+                \addplot[blue!85!black, thick]
+                    {(63*x^5 - 70*x^3 + 15*x)/8};
+            \end{groupplot}
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{center}
+
+The plots show why: every \(L_q\) swings between \(-1\) and \(1\) on the whole
+interval, with \(q\) zero crossings, whereas \(x^q\) stays near \(0\) except
+close to \(\pm 1\).
+
+\begin{exercise}[Fun Time]
+    When would \(\wreg\) equal \(\bm{w}_{\mathrm{LIN}}\)?
+    \begin{enumerate}[(1)]
+        \item \(\lambda = 0\);
+        \item \(C = \infty\);
+        \item \(C \ge \norm{\bm{w}_{\mathrm{LIN}}}^2\);
+        \item all of the above.
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (4). (1) and (2) shall be easy; (3) means that there are effectively no
+    constraint on \(\bm{w}\), hence the equivalence: \(\bm{w}_{\mathrm{LIN}}\)
+    already lies inside the sphere, so the constraint never binds.
+\end{proof}
+
+\section{Regularization and VC Theory}\label{sec:reg-vc}
+
+\source{slides p.14--17}
+
+\subsection{Regularization and VC Theory}
+
+\begin{center}
+    \begin{tikzpicture}[font=\small]
+        \node[mlbox, text width=5.4cm] (con) at (0,0)
+            {Regularization by Constrained-Minimizing \(\Ein\)\\[2pt]
+            \(\min_{\bm{w}} \Ein(\bm{w})\) s.t.\ \(\bm{w}^\top \bm{w} \le C\)};
+        \node[mlbox, text width=5.4cm] (vc) at (7.6,0)
+            {VC Guarantee of Constrained-Minimizing \(\Ein\)\\[2pt]
+            \(\Eout(\bm{w}) \le \Ein(\bm{w}) + \Omega(\mathcal{H}(C))\)};
+        \node[mlbox, text width=5.4cm] (aug) at (0,-2.8)
+            {Regularization by Minimizing \(\Eaug\)\\[2pt]
+            \(\min_{\bm{w}} \Eaug(\bm{w}) = \Ein(\bm{w}) + \frac{\lambda}{N}
+            \bm{w}^\top \bm{w}\)};
+        \draw[mlarrow] (con) -- (vc);
+        \draw[mlarrow, {Stealth[length=2.2mm]}-{Stealth[length=2.2mm]}]
+            (con) -- (aug) node[midway, right] {\(C\) equivalent to some
+            \(\lambda\)};
+    \end{tikzpicture}
+\end{center}
+
+Read the diagram as a chain. Minimizing \(\Ein\) under \(\bm{w}^\top \bm{w} \le
+C\) is learning with the hypothesis set \(\mathcal{H}(C)\), so the VC bound
+applies with the complexity of \(\mathcal{H}(C)\) (top arrow). Minimizing
+\(\Eaug\) gives the same solution as the constrained problem for some \(C\)
+(vertical arrow). So minimizing \(\Eaug\) inherits that guarantee, even though
+it searches all of \(\mathbb{R}^{Q+1}\).
+
+\begin{moral}
+    Minimizing \(\Eaug\): indirectly getting VC guarantee \textbf{without
+    confining to \(\mathcal{H}(C)\)}.
+\end{moral}
+
+\subsection{Another View of Augmented Error}
+
+Put the two formulas side by side:
+\[
+    \text{augmented error: } \Eaug(\bm{w}) = \Ein(\bm{w}) + \frac{\lambda}{N}
+    \bm{w}^\top \bm{w} ,
+    \qquad
+    \text{VC bound: } \Eout(\bm{w}) \le \Ein(\bm{w}) + \Omega(\mathcal{H}) .
+\]
+Both add a complexity term to \(\Ein\), but of different things.
+\begin{itemize}
+    \item The regularizer \(\bm{w}^\top \bm{w}\), written \(\Omega(\bm{w})\),
+        measures the complexity of a \emph{single hypothesis}.
+    \item The generalization price \(\Omega(\mathcal{H})\) measures the
+        complexity of a \emph{hypothesis set}.
+    \item If \(\frac{\lambda}{N} \Omega(\bm{w})\) `represents'
+        \(\Omega(\mathcal{H})\) well, then \(\Eaug\) is a better proxy of
+        \(\Eout\) than \(\Ein\) is.
+\end{itemize}
+
+\begin{moral}
+    Minimizing \(\Eaug\):\\
+    (heuristically) operating with the better proxy;\\
+    (technically) enjoying flexibility of whole \(\mathcal{H}\).
+\end{moral}
+
+\subsection{Effective VC Dimension}
+
+\[
+    \min_{\bm{w} \in \mathbb{R}^{\tilde{d}+1}} \Eaug(\bm{w}) = \Ein(\bm{w}) +
+    \frac{\lambda}{N} \Omega(\bm{w})
+\]
+What is the model complexity of this learning?
+\begin{itemize}
+    \item Counted by the hypothesis set, \(\dvc(\mathcal{H}) = \tilde{d} + 1\),
+        because all \(\bm{w}\) are `considered' during the minimization.
+    \item The \(\bm{w}\) that are `actually needed', however, form only
+        \(\mathcal{H}(C)\), with some \(C\) equivalent to \(\lambda\).
+    \item \(\dvc(\mathcal{H}(C))\) is therefore the more honest count. It
+        depends on the algorithm as well as on \(\mathcal{H}\), and is called
+        the \vocab{effective VC dimension} \(\deff(\mathcal{H},
+        \mathcal{A})\), where \(\mathcal{A}\) is `\(\min \Eaug\)'.
+\end{itemize}
+
+\begin{moral}
+    Explanation of regularization: \(\dvc(\mathcal{H})\) large, while
+    \(\deff(\mathcal{H}, \mathcal{A})\) small if \(\mathcal{A}\) regularized.
+\end{moral}
+
+\begin{exercise}[Fun Time]
+    Consider the weight-decay regularization with regression. When increasing
+    \(\lambda\) in \(\mathcal{A}\), what would happen with \(\deff(\mathcal{H},
+    \mathcal{A})\)?
+    \begin{enumerate}[(1)]
+        \item \(\deff \uparrow\);
+        \item \(\deff \downarrow\);
+        \item \(\deff = \dvc(\mathcal{H})\) and does not depend on \(\lambda\);
+        \item \(\deff = 1126\) and does not depend on \(\lambda\).
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (2). Larger \(\lambda \iff\) smaller \(C \iff\) smaller \(\mathcal{H}(C)
+    \iff\) smaller \(\deff\).
+\end{proof}
+
+\section{General Regularizers}\label{sec:general-reg}
+
+\source{slides p.18--21}
+
+\subsection{General Regularizers \texorpdfstring{\(\Omega(\bm{w})\)}{Omega(w)}}
+
+Weight decay is one choice of \(\Omega(\bm{w})\). In general we want the
+constraint to point in the `direction' of the target function, so that what
+it removes is mostly what we would have got wrong anyway.
+\begin{itemize}
+    \item \emph{Target-dependent}: use some properties of the target, if known.
+        \begin{itemize}
+            \item For a symmetric target, the \textbf{symmetry} regularizer
+                \(\sum \llbracket q \text{ is odd} \rrbracket w_q^2\) penalizes
+                only the odd terms.
+        \end{itemize}
+    \item \emph{Plausible}: push in a direction towards \textbf{smoother} or
+        \textbf{simpler} hypotheses, because stochastic and deterministic
+        noise are both \textbf{non-smooth}, and fitting them is what
+        overfitting does.
+        \begin{itemize}
+            \item The \textbf{sparsity} (L1) regularizer \(\sum \abs{w_q}\)
+                is one such choice (next subsection).
+        \end{itemize}
+    \item \emph{Friendly}: make the problem easy to optimize.
+        \begin{itemize}
+            \item The \textbf{weight-decay} (L2) regularizer \(\sum w_q^2\)
+                keeps a closed-form solution.
+        \end{itemize}
+    \item \emph{Bad?} :-) No worries: a poor regularizer is guarded by
+        \(\lambda\), since \(\lambda = 0\) switches it off.
+\end{itemize}
+
+\begin{moral}
+    Augmented error \(=\) error \(\errhat\) \(+\) regularizer \(\Omega\).\\
+    Regularizer: target-dependent, plausible, or friendly.\\
+    Ringing a bell? :-)\\
+    Error measure: user-dependent, plausible, or friendly.
+\end{moral}
+
+The bell is \autoref{def:errhat}: the algorithmic error measure was chosen by
+the same three criteria. Both parts of \(\Eaug\) are design choices of the
+algorithm, made for the same kinds of reasons.
+
+\subsection{L2 and L1 Regularizer}
+
+\begin{center}
+    \regconstraint{l2}
+    \hspace{1cm}
+    \regconstraint{l1}
+\end{center}
+
+\begin{center}
+    \begin{tabular}{p{0.42\textwidth}p{0.42\textwidth}}
+        \textbf{L2 Regularizer} & \textbf{L1 Regularizer}\\[2pt]
+        \(\displaystyle \Omega(\bm{w}) = \sum_{q=0}^{Q} w_q^2 =
+        \norm{\bm{w}}_2^2\)
+        &
+        \(\displaystyle \Omega(\bm{w}) = \sum_{q=0}^{Q} \abs{w_q} =
+        \norm{\bm{w}}_1\)\\[10pt]
+        \begin{itemize}
+            \item convex, differentiable everywhere;
+            \item easy to optimize.
+        \end{itemize}
+        &
+        \begin{itemize}
+            \item convex, \textbf{not} differentiable everywhere;
+            \item \textbf{sparsity} in solution.
+        \end{itemize}
+    \end{tabular}
+\end{center}
+
+The left picture is the one from the Lagrange multiplier. On the right the
+sphere becomes the diamond \(\norm{\bm{w}}_1 = C\). Its normal direction on
+each flat face is the \textbf{sign} vector of \(\bm{w}\), the same at every
+point of that face. So along a face, \(-\nabla \Ein\) keeps a component that
+slides \(\bm{w}\) further, until it reaches a corner. The corners lie on the
+axes, where some \(w_q = 0\): the solution is often sparse.
+
+\begin{moral}
+    L1 useful if needing \textbf{sparse solution}.
+\end{moral}
+
+\subsection{The Optimal \texorpdfstring{\(\lambda\)}{lambda}}
+
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[width=6.4cm, height=4.6cm, xmin=0, xmax=2, ymin=0,
+            ymax=1.01, axis lines=left, axis line style={-},
+            xtick={0.5,1,1.5,2}, ytick={0.25,0.5,0.75,1},
+            tick label style={font=\scriptsize}, label style={font=\small},
+            xlabel={Regularization Parameter, \(\lambda\)},
+            ylabel={Expected \(\Eout\)}, title={stochastic noise},
+            title style={font=\small}, clip=false]
+            \regStochHigh \regStochMid \regStochZero
+            \regStochHighMin \regStochMidMin \regStochZeroMin
+            \node[font=\scriptsize, text=red!85!black, anchor=south] at
+                (axis cs:1.65,0.79) {\(\sigma^2 = 0.5\)};
+            \node[font=\scriptsize, text=green!60!black, anchor=south] at
+                (axis cs:1.65,0.52) {\(\sigma^2 = 0.25\)};
+            \node[font=\scriptsize, text=blue!85!black, anchor=south] at
+                (axis cs:1.65,0.18) {\(\sigma^2 = 0\)};
+        \end{axis}
+        \begin{axis}[at={(7.2cm,0)}, width=6.4cm, height=4.6cm, xmin=0,
+            xmax=2, ymin=0, ymax=0.6, axis lines=left, axis line style={-},
+            xtick={0.5,1,1.5,2}, ytick={0.2,0.4,0.6},
+            tick label style={font=\scriptsize}, label style={font=\small},
+            xlabel={Regularization Parameter, \(\lambda\)},
+            ylabel={Expected \(\Eout\)}, title={deterministic noise},
+            title style={font=\small}, clip=false]
+            \regDetHigh \regDetMid \regDetLow
+            \regDetHighMin \regDetMidMin \regDetLowMin
+            \node[font=\scriptsize, text=red!85!black, anchor=south] at
+                (axis cs:1.65,0.49) {\(Q_f = 100\)};
+            \node[font=\scriptsize, text=green!60!black, anchor=south] at
+                (axis cs:1.65,0.36) {\(Q_f = 30\)};
+            \node[font=\scriptsize, text=blue!85!black, anchor=south] at
+                (axis cs:1.65,0.16) {\(Q_f = 15\)};
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+Each curve is the expected \(\Eout\) of weight decay as \(\lambda\) grows, and
+the dot marks its minimum, the best \(\lambda\) for that setting. On the left
+the stochastic noise level \(\sigma^2\) varies; on the right the target
+complexity \(Q_f\), i.e.\ the deterministic noise.
+\begin{itemize}
+    \item More noise \(\iff\) more regularization needed: the dot moves right
+        as \(\sigma^2\) or \(Q_f\) grows, and without noise (\(\sigma^2 = 0\))
+        the best \(\lambda\) is \(0\). In driving terms, a more bumpy road
+        \(\iff\) putting on the brakes more.
+    \item The noise is unknown in practice, so it is important to make proper
+        choices of \(\lambda\). Too little leaves the overfitting; too much
+        climbs the right side of each curve.
+\end{itemize}
+
+\begin{question}
+    How to choose? Stay tuned for the next lecture! :-)
+\end{question}
+
+\begin{exercise}[Fun Time]
+    Consider using a regularizer \(\Omega(\bm{w}) = \sum_{q=0}^{Q} 2^q w_q^2\)
+    to work with Legendre polynomial regression. Which kind of hypothesis
+    does the regularizer prefer?
+    \begin{enumerate}[(1)]
+        \item symmetric polynomials satisfying \(h(x) = h(-x)\);
+        \item low-dimensional polynomials;
+        \item high-dimensional polynomials;
+        \item no specific preference.
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (2). There is a higher `penalty' for higher-order terms, and hence the
+    regularizer prefers low-dimensional polynomials.
+\end{proof}
+
+\hrulebar
+
+\subsection*{Summary}
+
+\begin{description}
+    \item[Regularized Hypothesis Set] original \(\mathcal{H}\) \(+\)
+        constraint.
+    \item[Weight Decay Regularization] add \(\frac{\lambda}{N} \bm{w}^\top
+        \bm{w}\) in \(\Eaug\).
+    \item[Regularization and VC Theory] regularization decreases \(\deff\).
+    \item[General Regularizers] target-dependent, [plausible], or [friendly].
+\end{description}
+
+Regularization trades a little \(\Ein\) for a large drop in effective
+complexity, and its strength is set by a single number \(\lambda\). The
+optimal-\(\lambda\) curves show that the right value depends on noise we
+cannot see. Next: choosing from the so-many models and parameters.
