@@ -283,17 +283,27 @@ The proportionality constant is written as \(\frac{2\lambda}{N}\) only to make
 the next formulas clean; any positive constant would do.
 
 \begin{remark}
-    Why must \(\lambda\) be positive? The picture assumes \(\bm{w}_{\mathrm{lin}}\)
-    lies outside the sphere, so the constraint is active and \(\wreg\) is on
-    the boundary. There, \(\Ein\) decreases \emph{outward}, towards
-    \(\bm{w}_{\mathrm{lin}}\), which means \(-\nabla \Ein(\wreg)\) points the
-    same way as \(\wreg\) and the constant is positive. If it pointed inward
-    (\(\lambda < 0\)), moving inward would lower \(\Ein\) and stay feasible, so
-    \(\wreg\) would not be optimal. The remaining case is \(\lambda = 0\): then
-    \(\nabla \Ein(\wreg) = \bm{0}\), i.e.\ \(\wreg = \bm{w}_{\mathrm{lin}}\),
-    which happens when \(\bm{w}_{\mathrm{lin}}\) is already inside the sphere
-    and the constraint does nothing. That is why the next subsection allows
-    `\(\lambda > 0\) or \(\lambda = 0\)'.
+    Why must \(\lambda\) be positive? Split by where the unconstrained
+    minimizer \(\bm{w}_{\mathrm{lin}}\) lies.
+    \begin{itemize}
+        \item \(\bm{w}_{\mathrm{lin}}\) inside the sphere (\(\bm{w}_{\mathrm{lin}}^\top
+            \bm{w}_{\mathrm{lin}} \le C\)): the constraint changes nothing.
+            Minimize \(\Ein\) as usual, by the closed form of linear regression
+            or by gradient descent; the answer \(\bm{w}_{\mathrm{lin}}\) is
+            feasible, so \(\wreg = \bm{w}_{\mathrm{lin}}\). In the equation
+            above this is \(\lambda = 0\), since \(\nabla
+            \Ein(\bm{w}_{\mathrm{lin}}) = \bm{0}\).
+        \item \(\bm{w}_{\mathrm{lin}}\) outside the sphere: this is the only
+            case that needs new work, and the one the picture shows. The
+            optimum is then on the boundary, and \(\Ein\) decreases
+            \emph{outward}, towards \(\bm{w}_{\mathrm{lin}}\). So
+            \(-\nabla \Ein(\wreg)\) points the same way as \(\wreg\), and the
+            constant is positive. If it pointed inward (\(\lambda < 0\)),
+            moving inward would lower \(\Ein\) and stay feasible, so \(\wreg\)
+            would not be optimal.
+    \end{itemize}
+    That is why the moral asks for \(\lambda > 0\), and why the next subsection
+    allows `\(\lambda > 0\) or \(\lambda = 0\)'.
 \end{remark}
 
 \subsection{Augmented Error}
@@ -319,6 +329,23 @@ the next formulas clean; any positive constant would do.
         matrix \(\mathrm{Z}^\top \mathrm{Z} + \lambda \mathrm{I}\) is always
         invertible, unlike \(\mathrm{Z}^\top \mathrm{Z}\) alone.
 \end{itemize}
+
+\begin{remark}
+    Why is \(\mathrm{Z}^\top \mathrm{Z} + \lambda \mathrm{I}\) invertible for
+    \(\lambda > 0\)? A square matrix is invertible exactly when the only
+    vector it sends to \(\bm{0}\) is \(\bm{0}\). For any \(\bm{v} \neq \bm{0}\),
+    \[
+        \bm{v}^\top \left( \mathrm{Z}^\top \mathrm{Z} + \lambda \mathrm{I}
+        \right) \bm{v} = \underbrace{\norm{\mathrm{Z} \bm{v}}^2}_{\ge 0} +
+        \underbrace{\lambda \norm{\bm{v}}^2}_{> 0} > 0 ,
+    \]
+    so \(\left( \mathrm{Z}^\top \mathrm{Z} + \lambda \mathrm{I} \right) \bm{v}\)
+    cannot be \(\bm{0}\). Without the \(\lambda\) term only \(\norm{\mathrm{Z}
+    \bm{v}}^2 \ge 0\) remains, which is \(0\) for any \(\bm{v}\) with
+    \(\mathrm{Z} \bm{v} = \bm{0}\). Such \(\bm{v} \neq \bm{0}\) exist whenever
+    the columns of \(\mathrm{Z}\) are linearly dependent, e.g.\ when \(N <
+    Q + 1\), and then \(\mathrm{Z}^\top \mathrm{Z}\) is singular.
+\end{remark}
 
 The same equation can also be read the other way round: it is exactly the
 condition `gradient \(= \bm{0}\)' of an unconstrained function.
@@ -348,7 +375,7 @@ condition `gradient \(= \bm{0}\)' of an unconstrained function.
 
 The trade is that we no longer specify \(C\) but \(\lambda\).
 
-\begin{remark}
+\begin{remark}\label{rem:lambda-c}
     `\(\lambda\) corresponds to \(C\)' means that both problems have the same
     answer: the \(\bm{w}\) that minimizes \(\Eaug\) with this \(\lambda\) is also
     the \(\bm{w}\) that minimizes \(\Ein\) under \(\bm{w}^\top \bm{w} \le C\).
@@ -380,8 +407,31 @@ The trade is that we no longer specify \(C\) but \(\lambda\).
             \(C\)-constrained problem.
     \end{enumerate}
     So each \(\lambda\) comes with the \(C\) equal to the squared length of its
-    own solution. A larger \(\lambda\) charges more for length, so the
-    solution comes out shorter, and its \(C\) is smaller.
+    own solution.
+
+    A larger \(\lambda\) gives a shorter solution, hence a smaller \(C\). The
+    penalty \(\frac{\lambda}{N} \bm{w}^\top \bm{w}\) charges \(\frac{\lambda}{N}\)
+    per unit of squared length, so raising \(\lambda\) makes length more
+    expensive compared with \(\Ein\). To see it exactly, take \(\lambda_1 <
+    \lambda_2\) with minimizers \(\bm{w}_1, \bm{w}_2\) of the two augmented
+    errors, and write \(a_i = \lambda_i / N\). Each \(\bm{w}_i\) is at least as
+    good as the other one for its own \(\Eaug\):
+    \begin{align*}
+        \Ein(\bm{w}_1) + a_1 \norm{\bm{w}_1}^2 &\le \Ein(\bm{w}_2) + a_1
+        \norm{\bm{w}_2}^2 ,\\
+        \Ein(\bm{w}_2) + a_2 \norm{\bm{w}_2}^2 &\le \Ein(\bm{w}_1) + a_2
+        \norm{\bm{w}_1}^2 .
+    \end{align*}
+    Adding the two lines cancels both \(\Ein\) terms:
+    \[
+        a_1 \norm{\bm{w}_1}^2 + a_2 \norm{\bm{w}_2}^2 \le a_1
+        \norm{\bm{w}_2}^2 + a_2 \norm{\bm{w}_1}^2
+        \iff
+        \underbrace{(a_2 - a_1)}_{> 0} \left( \norm{\bm{w}_2}^2 -
+        \norm{\bm{w}_1}^2 \right) \le 0 .
+    \]
+    Hence \(\norm{\bm{w}_2}^2 \le \norm{\bm{w}_1}^2\): the larger \(\lambda_2\)
+    gives the shorter solution and the smaller \(C\).
 \end{remark}
 
 \subsection{The Results}
@@ -442,9 +492,20 @@ is underfitting.
     It goes with `any' transform \(+\) linear model.
 \end{definition}
 
-The name comes from gradient descent: each step on \(\Eaug\) first shrinks the
-current \(\bm{w}\) by a constant factor and then moves along \(-\nabla \Ein\),
-so without support from the data the weights decay towards zero.
+The name comes from running gradient descent (\autoref{def:gd}) on \(\Eaug\)
+with step size \(\eta\). Since \(\nabla \Eaug(\bm{w}) = \nabla \Ein(\bm{w}) +
+\frac{2\lambda}{N} \bm{w}\), one step is
+\[
+    \bm{w}_{t+1} = \bm{w}_t - \eta \left( \nabla \Ein(\bm{w}_t) +
+    \frac{2\lambda}{N} \bm{w}_t \right) = \underbrace{\left( 1 -
+    \frac{2\eta\lambda}{N} \right)}_{< 1} \bm{w}_t - \eta \nabla
+    \Ein(\bm{w}_t) .
+\]
+Compared with plain gradient descent on \(\Ein\), the only change is the factor
+\(1 - \frac{2\eta\lambda}{N} < 1\): every step shrinks the weights a little
+before the usual move along \(-\nabla \Ein\). Weights that the data do not need
+are shrunk step after step and decay towards \(0\); weights the data need are
+pushed back up by \(-\nabla \Ein\) and stay.
 
 \subsection{Some Detail: Legendre Polynomials}
 
@@ -495,9 +556,13 @@ matters.
     \end{adjustbox}
 \end{center}
 
-The plots show why: every \(L_q\) swings between \(-1\) and \(1\) on the whole
-interval, with \(q\) zero crossings, whereas \(x^q\) stays near \(0\) except
-close to \(\pm 1\).
+The plots show the difference in scale. Each \(L_q\) takes values of size about
+\(1\) all over \([-1, 1]\). The plain power \(x^q\) is tiny on most of the
+interval: \(x^{10} \approx 0.001\) at \(x = 0.5\). To let the \(x^{10}\) term
+change the hypothesis by \(0.1\) there, its weight would have to be about
+\(100\), and weight decay would penalize that heavily. With the Legendre
+basis, a term of any order needs only a moderate weight to matter, so the
+same penalty \(\sum_q w_q^2\) treats every order fairly.
 
 \begin{exercise}[Fun Time]
     When would \(\wreg\) equal \(\bm{w}_{\mathrm{LIN}}\)?
@@ -662,6 +727,25 @@ The bell is \autoref{def:errhat}: the algorithmic error measure was chosen by
 the same three criteria. Both parts of \(\Eaug\) are design choices of the
 algorithm, made for the same kinds of reasons.
 
+\begin{remark}
+    Each regularizer is again a constrained problem in disguise: minimizing
+    \(\Ein(\bm{w}) + \frac{\lambda}{N} \Omega(\bm{w})\) gives the same solution
+    as
+    \[
+        \min_{\bm{w}} \Ein(\bm{w}) \quad \text{s.t.} \quad \Omega(\bm{w}) \le C
+    \]
+    with \(C = \Omega(\wreg)\). The argument of \autoref{rem:lambda-c} goes
+    through word for word with \(\bm{w}^\top \bm{w}\) replaced by
+    \(\Omega(\bm{w})\). Only the shape of the feasible region changes:
+    \begin{itemize}
+        \item symmetry: \(\sum \llbracket q \text{ is odd} \rrbracket w_q^2
+            \le C\) limits only the odd terms, and the even ones stay free;
+        \item L1: \(\norm{\bm{w}}_1 \le C\) is a diamond instead of a sphere;
+        \item weight decay (L2): \(\bm{w}^\top \bm{w} \le C\) is the sphere of
+            \(\mathcal{H}(C)\).
+    \end{itemize}
+\end{remark}
+
 \subsection{L2 and L1 Regularizer}
 
 \begin{center}
@@ -691,11 +775,107 @@ algorithm, made for the same kinds of reasons.
 \end{center}
 
 The left picture is the one from the Lagrange multiplier. On the right the
-sphere becomes the diamond \(\norm{\bm{w}}_1 = C\). Its normal direction on
-each flat face is the \textbf{sign} vector of \(\bm{w}\), the same at every
-point of that face. So along a face, \(-\nabla \Ein\) keeps a component that
-slides \(\bm{w}\) further, until it reaches a corner. The corners lie on the
-axes, where some \(w_q = 0\): the solution is often sparse.
+sphere becomes the diamond \(\norm{\bm{w}}_1 = C\).
+
+\begin{lemma}[Normal of the L1 ball]\label{lem:l1-normal}
+    Let \(\bm{w}\) have every \(w_q \neq 0\), and let \(\bm{s} =
+    \sign(\bm{w})\) componentwise. Then \(\norm{\cdot}_1\) is differentiable
+    at \(\bm{w}\) with \(\nabla \norm{\bm{w}}_1 = \bm{s}\), so the normal of the
+    boundary \(\norm{\bm{w}}_1 = C\) at \(\bm{w}\) is \(\bm{s}\).
+\end{lemma}
+
+\begin{proof}
+    Let \(\delta = \min_q \abs{w_q} > 0\). Every \(\bm{v}\) with \(\abs{v_q -
+    w_q} < \delta\) for all \(q\) has \(\sign(v_q) = s_q\), hence
+    \(\abs{v_q} = s_q v_q\) and
+    \[
+        \norm{\bm{v}}_1 = \sum_q s_q v_q = \bm{s}^\top \bm{v} .
+    \]
+    Near \(\bm{w}\) the norm is thus the linear function \(\bm{s}^\top
+    \bm{v}\), whose gradient is \(\bm{s}\). The gradient of a function is
+    normal to its level set, just as \(\nabla(\bm{w}^\top \bm{w}) = 2\bm{w}\)
+    gave the normal \(\bm{w}\) of the sphere.
+\end{proof}
+
+The proof also shows that near such \(\bm{w}\) the boundary is the flat
+hyperplane \(\bm{s}^\top \bm{v} = C\), a face of the L1 ball, with the same
+normal \(\bm{s}\) everywhere on it. Where some \(w_q = 0\), \(\abs{w_q}\) has a
+kink, there is no gradient, and \(\bm{w}\) sits on an edge or a corner.
+
+\paragraph{Why the solution is sparse.} The picture follows \(\bm{w}\) along one
+face of the diamond \(\norm{\bm{w}}_1 = C\) (red), with the contours of
+\(\Ein\) (blue ellipses) around \(\bm{w}_{\mathrm{lin}}\). At each point it
+shows \(-\nabla \Ein\) (blue), the face's normal \(\sign(\bm{w})\) (red), and
+the part of \(-\nabla \Ein\) along the face (green).
+
+\begin{center}
+    \begin{tikzpicture}[scale=4, >={Stealth[length=2mm]}]
+        \begin{scope}
+            \clip (-0.55,0.05) rectangle (1.15,1.42);
+            \draw[red!85!black, very thick] (1,0) -- (0,1) -- (-1,0);
+            \draw[blue!80!black, semithick, rotate around={-20:(0.72,1.17)}]
+                (0.72,1.17) ellipse (2.472 and 0.883);
+            \draw[blue!80!black, semithick, rotate around={-20:(0.72,1.17)}]
+                (0.72,1.17) ellipse (1.294 and 0.462);
+        \end{scope}
+        \draw[black!40] (0,0.05) -- (0,1.42) node[above, font=\small,
+            text=black!60] {\(w_1 = 0\)};
+        \fill (0.72,1.17) circle (0.5pt) node[above right, font=\small]
+            {\(\bm{w}_{\mathrm{lin}}\)};
+        % w^(0), w^(1), w^(2): sign (red), -grad E_in (blue), along the face (green)
+        \draw[->, red!85!black, semithick] (0.780,0.220) -- ++(0.12,0.12);
+        \draw[->, blue!80!black, semithick] (0.780,0.220) -- (0.942,0.754);
+        \draw[->, green!55!black, very thick] (0.780,0.220) -- (0.593,0.407);
+        \draw[->, red!85!black, semithick] (0.406,0.594) -- ++(0.12,0.12);
+        \draw[->, blue!80!black, semithick] (0.406,0.594) -- (0.556,0.981);
+        \draw[->, green!55!black, very thick] (0.406,0.594) -- (0.288,0.712);
+        \draw[->, red!85!black, semithick] (0.168,0.832) -- ++(0.12,0.12);
+        \draw[->, blue!80!black, semithick] (0.168,0.832) -- (0.310,1.125);
+        \draw[->, green!55!black, very thick] (0.168,0.832) -- (0.093,0.907);
+        % the corner: both neighbouring normals, -grad E_in between them
+        \draw[->, red!85!black, semithick, densely dashed] (0,1) -- ++(0.12,0.12);
+        \draw[->, red!85!black, semithick, densely dashed] (0,1) -- ++(-0.12,0.12);
+        \draw[->, blue!80!black, semithick] (0,1) -- (0.136,1.227);
+        \foreach \p in {(0.780,0.220), (0.406,0.594), (0.168,0.832), (0,1)}
+            {\fill[Purple] \p circle (0.6pt);}
+        \node[font=\small, text=Purple, anchor=north east] at (0.76,0.20)
+            {\(\bm{w}^{(0)}\)};
+        \node[font=\small, text=Purple, anchor=north east] at (0.39,0.57)
+            {\(\bm{w}^{(1)}\)};
+        \node[font=\small, text=Purple, anchor=north east] at (0.15,0.81)
+            {\(\bm{w}^{(2)}\)};
+        \node[font=\small, text=Purple, anchor=north east] at (-0.03,0.97)
+            {corner \(\bm{w}^{(3)}\)};
+        \node[font=\small, text=blue!80!black, anchor=south west] at
+            (0.94,0.76) {\(-\nabla \Ein\)};
+        \node[font=\small, text=red!85!black, anchor=west] at (0.91,0.33)
+            {\(\sign(\bm{w})\)};
+        \node[font=\small, text=red!85!black, anchor=north west] at
+            (-0.52,0.40) {\(\norm{\bm{w}}_1 = C\)};
+    \end{tikzpicture}
+\end{center}
+
+\begin{enumerate}[(1)]
+    \item At \(\bm{w}^{(0)}\), inside a face, the normal is \(\sign(\bm{w})\)
+        by \autoref{lem:l1-normal}. \(-\nabla \Ein\) is not parallel to it, so
+        it has a part along the face (green). Moving that way lowers \(\Ein\)
+        and stays on the boundary, so \(\bm{w}^{(0)}\) is not optimal and
+        \(\bm{w}\) moves on to \(\bm{w}^{(1)}\).
+    \item The same happens at \(\bm{w}^{(1)}\) and \(\bm{w}^{(2)}\). On the
+        whole face the normal stays the same vector \(\sign(\bm{w})\), while
+        \(-\nabla \Ein\) changes only a little, so it keeps missing the normal
+        and \(\bm{w}\) keeps sliding, until it reaches the corner.
+    \item At the corner two faces meet, with two different normals (dashed).
+        \(-\nabla \Ein\) points between them, so neither face offers a way down
+        and \(\bm{w}\) stops. The corner is on an axis, where \(w_1 = 0\): the
+        solution is sparse.
+\end{enumerate}
+In \(d\) dimensions the faces are pieces of the hyperplanes \(\bm{s}^\top
+\bm{w} = C\), and the corners and edges where they meet are exactly the points
+with some \(w_q = 0\). That is where the sliding ends. The L2 sphere has no
+corners: its normal \(\bm{w}\) turns as \(\bm{w}\) moves, so it lines up with
+\(-\nabla \Ein\) somewhere in the middle, and the weights are seldom exactly
+\(0\).
 
 \begin{moral}
     L1 useful if needing \textbf{sparse solution}.
