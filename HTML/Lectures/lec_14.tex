@@ -263,6 +263,17 @@ unconstrained minimizer, lies outside the red sphere, so the best feasible
 \begin{itemize}
     \item The decreasing direction of \(\Ein\) is \(-\nabla \Ein(\bm{w})\), as
         in gradient descent (\autoref{sec:gd}), remember? :-)
+        It is perpendicular to the contour through \(\bm{w}\), not aimed
+        at \(\bm{w}_{\mathrm{lin}}\): with \(\nabla \Ein\) of linear
+        regression and \(\mathrm{Z}^\top \mathrm{Z} \bm{w}_{\mathrm{lin}} =
+        \mathrm{Z}^\top \bm{y}\),
+        \[
+            -\nabla \Ein(\bm{w}) = \frac{2}{N} \mathrm{Z}^\top \mathrm{Z}
+            \left( \bm{w}_{\mathrm{lin}} - \bm{w} \right) ,
+        \]
+        the direction to \(\bm{w}_{\mathrm{lin}}\) bent by \(\mathrm{Z}^\top
+        \mathrm{Z}\). The two agree only when \(\mathrm{Z}^\top \mathrm{Z}
+        \propto \mathrm{I}\), i.e.\ when the contours are circles.
     \item The normal vector of the boundary \(\bm{w}^\top \bm{w} = C\) at
         \(\bm{w}\) is \(\bm{w}\) itself (red arrow), pointing straight out of
         the sphere.
@@ -374,6 +385,75 @@ condition `gradient \(= \bm{0}\)' of an unconstrained function.
 \end{moral}
 
 The trade is that we no longer specify \(C\) but \(\lambda\).
+
+The whole road from \(\mathcal{H}_{10}\) to the formula we actually run, one
+change per arrow. Each box is the problem being solved at that stage; the
+last two are the same answer computed in two ways.
+
+\begin{center}
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tikzpicture}[lbl/.style={anchor=west, font=\footnotesize,
+            align=left}]
+        \node[mlbox, minimum width=7.2cm] (h10) at (0,0)
+            {\textbf{Original:} regression with \(\mathcal{H}_{10}\)\\[2pt]
+            \(\displaystyle\min_{\bm{w} \in \mathbb{R}^{10+1}}
+            \Ein(\bm{w})\) \quad overfits};
+        \node[mlbox, minimum width=7.2cm] (h2) at (0,-2.1)
+            {regression with \(\mathcal{H}_2\)\\[2pt]
+            \(\displaystyle\min_{\bm{w}} \Ein(\bm{w})\) \ s.t.\ \(w_3 = \ldots =
+            w_{10} = 0\)};
+        \node[mlbox, minimum width=7.2cm] (h2p) at (0,-4.2)
+            {regression with \(\mathcal{H}_2'\)\\[2pt]
+            \(\displaystyle\min_{\bm{w}} \Ein(\bm{w})\) \ s.t.\
+            \(\sum_{q=0}^{10} \llbracket w_q \neq 0 \rrbracket \le 3\)\\[2pt]
+            \textcolor{red!80!black}{NP-hard to solve}};
+        \node[mlbox, minimum width=7.2cm] (hc) at (0,-6.6)
+            {regression with \(\mathcal{H}(C)\)\\[2pt]
+            \(\displaystyle\min_{\bm{w}} \Ein(\bm{w})\) \ s.t.\
+            \(\bm{w}^\top \bm{w} \le C\)};
+        \node[mlbox, minimum width=7.2cm] (lag) at (0,-8.7)
+            {optimality condition for some \(\lambda \ge 0\)\\[2pt]
+            \(\nabla \Ein(\wreg) + \frac{2\lambda}{N} \wreg = \bm{0}\)};
+        \node[mlop, minimum width=5.4cm, anchor=north] (ridge) at (-3.2,-10.75)
+            {ridge regression\\[2pt]
+            \(\wreg = (\mathrm{Z}^\top \mathrm{Z} + \lambda
+            \mathrm{I})^{-1} \mathrm{Z}^\top \bm{y}\)};
+        \node[mlop, minimum width=5.4cm, anchor=north] (aug) at (3.2,-10.75)
+            {unconstrained \(\Eaug\)\\[2pt]
+            \(\displaystyle\min_{\bm{w}} \Ein(\bm{w}) +
+            \tfrac{\lambda}{N} \bm{w}^\top \bm{w}\)};
+
+        \draw[mlarrow] (h10) -- (h2) node[lbl, midway, xshift=2pt]
+            {step back \(=\) constraint: only \(w_0, w_1, w_2\) free};
+        \draw[mlarrow] (h2) -- (h2p) node[lbl, midway, xshift=2pt]
+            {looser: \emph{any} three weights free};
+        \draw[mlarrow] (h2p) -- (hc) node[lbl, midway, xshift=2pt]
+            {softer: count of nonzero \(w_q\) \(\to\) size \(\bm{w}^\top
+            \bm{w}\)};
+        \draw[mlarrow] (hc) -- (lag) node[lbl, midway, xshift=2pt]
+            {Lagrange: \(-\nabla \Ein(\wreg) \propto \wreg\); \(C\) traded
+            for \(\lambda\)};
+        \draw[mlarrow] (lag.south) -- (0,-9.95) -| (ridge.north);
+        \draw[mlarrow] (0,-9.95) -| (aug.north);
+        \node[anchor=south east, font=\footnotesize] at (-0.15,-9.95)
+            {squared error: plug in its \(\nabla \Ein\)};
+        \node[anchor=south west, font=\footnotesize] at (0.15,-9.95)
+            {any \(\Ein\): read as \(\nabla \Eaug = \bm{0}\)};
+    \end{tikzpicture}
+    \end{adjustbox}
+\end{center}
+
+The first three arrows change the hypothesis set; the fourth changes only how
+the same problem is solved, with \(\lambda\) and \(C\) matched as shown in
+\autoref{rem:lambda-c} below. The fork at the bottom is not a choice between
+two methods: for a given \(\lambda\) both branches produce the same
+\(\wreg\), because for \(\lambda > 0\) the minimizer of \(\Eaug\) is the unique
+solution of \(\nabla \Eaug = \bm{0}\), and the ridge formula is that solution
+written out. The closed form exists only for the squared error of linear
+regression; the \(\Eaug\) reading works for any \(\Ein\), e.g.\ logistic
+regression by gradient descent (the update is worked out after
+\autoref{def:weight-decay}), and is the one \autoref{sec:general-reg} builds
+on.
 
 \begin{remark}\label{rem:lambda-c}
     `\(\lambda\) corresponds to \(C\)' means that both problems have the same
@@ -710,7 +790,16 @@ it removes is mostly what we would have got wrong anyway.
     \item \emph{Friendly}: make the problem easy to optimize.
         \begin{itemize}
             \item The \textbf{weight-decay} (L2) regularizer \(\sum w_q^2\)
-                keeps a closed-form solution.
+                keeps a closed-form solution. For squared error, \(\Ein\) is
+                quadratic in \(\bm{w}\); adding the quadratic \(\bm{w}^\top
+                \bm{w}\) keeps \(\Eaug\) quadratic, so \(\nabla \Eaug =
+                \bm{0}\) is a linear system, and its solution is the ridge formula of
+                \autoref{sec:weight-decay}. The L1 term \(\abs{w_q}\) has a
+                kink at \(w_q = 0\), so no such linear system exists and an
+                iterative solver is needed. When \(\Ein\) itself has no closed
+                form (e.g.\ logistic regression), L2 still keeps \(\Eaug\)
+                smooth, and gradient descent runs as before with only the
+                decay factor added.
         \end{itemize}
     \item \emph{Bad?} :-) No worries: a poor regularizer is guarded by
         \(\lambda\), since \(\lambda = 0\) switches it off.
@@ -728,15 +817,48 @@ the same three criteria. Both parts of \(\Eaug\) are design choices of the
 algorithm, made for the same kinds of reasons.
 
 \begin{remark}
-    Each regularizer is again a constrained problem in disguise: minimizing
-    \(\Ein(\bm{w}) + \frac{\lambda}{N} \Omega(\bm{w})\) gives the same solution
-    as
+    Each regularizer is again a constrained problem in disguise: for a given
+    \(\lambda > 0\), minimizing
+    \(\Eaug(\bm{w}) = \Ein(\bm{w}) + \frac{\lambda}{N} \Omega(\bm{w})\) gives the
+    same solution as
     \[
         \min_{\bm{w}} \Ein(\bm{w}) \quad \text{s.t.} \quad \Omega(\bm{w}) \le C
     \]
-    with \(C = \Omega(\wreg)\). The argument of \autoref{rem:lambda-c} goes
-    through word for word with \(\bm{w}^\top \bm{w}\) replaced by
-    \(\Omega(\bm{w})\). Only the shape of the feasible region changes:
+    for a suitable \(C\). The proof is that of \autoref{rem:lambda-c} with
+    \(\bm{w}^\top \bm{w}\) replaced by \(\Omega(\bm{w})\); nothing in it used
+    the form of \(\bm{w}^\top \bm{w}\).
+    \begin{enumerate}[(1)]
+        \item \textbf{Solve the \(\lambda\) problem.} Let \(\wreg\) be the
+            minimizer of \(\Ein(\bm{w}) + \frac{\lambda}{N} \Omega(\bm{w})\).
+        \item \textbf{Choose \(C\) from its answer.} Set \(C =
+            \Omega(\wreg)\). Then \(\wreg\) itself satisfies the constraint
+            \(\Omega(\bm{w}) \le C\), with equality.
+        \item \textbf{Compare with every other feasible \(\bm{w}\).} Take any
+            \(\bm{w}\) with \(\Omega(\bm{w}) \le C\). Since \(\wreg\)
+            minimizes \(\Eaug\),
+            \[
+                \Ein(\bm{w}) + \frac{\lambda}{N} \Omega(\bm{w}) \;\ge\;
+                \Ein(\wreg) + \frac{\lambda}{N} \underbrace{\Omega(\wreg)}_{=
+                C} .
+            \]
+            Move the penalty term to the right:
+            \[
+                \Ein(\bm{w}) \;\ge\; \Ein(\wreg) + \frac{\lambda}{N}
+                \underbrace{\left( C - \Omega(\bm{w}) \right)}_{\ge 0
+                \text{ since } \bm{w} \text{ is feasible}} \;\ge\;
+                \Ein(\wreg) .
+            \]
+        \item \textbf{Conclude.} No feasible \(\bm{w}\) has a smaller \(\Ein\)
+            than \(\wreg\), so \(\wreg\) is the solution of the
+            \(\Omega\)-constrained problem with \(C = \Omega(\wreg)\).
+    \end{enumerate}
+    The monotonicity argument of \autoref{rem:lambda-c} also carries over
+    with \(\norm{\bm{w}}^2\) replaced by \(\Omega(\bm{w})\): a larger
+    \(\lambda\) gives a solution with smaller \(\Omega(\wreg)\), hence a
+    smaller \(C\).
+
+    Only the shape of the feasible region \(\{\Omega(\bm{w}) \le C\}\)
+    depends on the regularizer:
     \begin{itemize}
         \item symmetry: \(\sum \llbracket q \text{ is odd} \rrbracket w_q^2
             \le C\) limits only the odd terms, and the even ones stay free;
@@ -775,7 +897,11 @@ algorithm, made for the same kinds of reasons.
 \end{center}
 
 The left picture is the one from the Lagrange multiplier. On the right the
-sphere becomes the diamond \(\norm{\bm{w}}_1 = C\).
+sphere becomes the diamond \(\norm{\bm{w}}_1 = C\), and the red arrow is
+\(\sign(\bm{w})\), which plays the role of the normal \(\bm{w}\) of the
+sphere. Here \(\bm{w}\) has both coordinates positive, so \(\sign(\bm{w}) =
+(1, 1)\), and it lies on the face \(w_1 + w_2 = C\), whose normal is exactly
+\((1, 1)\); \autoref{lem:l1-normal} shows the same in general.
 
 \begin{lemma}[Normal of the L1 ball]\label{lem:l1-normal}
     Let \(\bm{w}\) have every \(w_q \neq 0\), and let \(\bm{s} =
@@ -801,6 +927,17 @@ The proof also shows that near such \(\bm{w}\) the boundary is the flat
 hyperplane \(\bm{s}^\top \bm{v} = C\), a face of the L1 ball, with the same
 normal \(\bm{s}\) everywhere on it. Where some \(w_q = 0\), \(\abs{w_q}\) has a
 kink, there is no gradient, and \(\bm{w}\) sits on an edge or a corner.
+
+\paragraph{What sparse means.} `Sparsity in solution' means that many
+components of \(\wreg\) are exactly \(0\), not merely small. A zero \(w_q\)
+switches off the feature \(\Phi_q\), so the hypothesis uses only a few
+features: predicting needs only those (computing \(\bm{w}^\top \bm{z}\) touches
+the nonzero \(w_q\) only), and the zeros say which features were judged
+unnecessary. This is what the sparse \(\mathcal{H}_2'\) of
+\autoref{sec:reg-hyp-set} asked for, at most three nonzero weights, but L1
+gets there by a convex problem instead of an NP-hard search over which weights
+to keep. L2 shrinks every weight towards \(0\) but almost never makes one
+exactly \(0\).
 
 \paragraph{Why the solution is sparse.} The picture follows \(\bm{w}\) along one
 face of the diamond \(\norm{\bm{w}}_1 = C\) (red), with the contours of
@@ -877,6 +1014,81 @@ corners: its normal \(\bm{w}\) turns as \(\bm{w}\) moves, so it lines up with
 \(-\nabla \Ein\) somewhere in the middle, and the weights are seldom exactly
 \(0\).
 
+The pictures can be turned into a precise statement.
+
+\begin{definition}[Sparse solution]\label{def:sparse}
+    A weight vector \(\bm{w} \in \mathbb{R}^d\) is \vocab{sparse} if \(w_q = 0\)
+    for some \(q\); the more such \(q\), the sparser.
+\end{definition}
+
+For a sign pattern \(\bm{s} \in \{-1, +1\}^d\), let
+\[
+    F_{\bm{s}} = \left\{ \bm{w} \in \mathbb{R}^d : \bm{s}^\top \bm{w} = C
+    \text{ and } s_q w_q > 0 \text{ for every } q \right\} ,
+\]
+the points of \(\norm{\bm{w}}_1 = C\) with signs \(\bm{s}\) and no zero
+coordinate. In \(\mathbb{R}^2\), \(F_{(1,1)}\) is the open segment from \((C,
+0)\) to \((0, C)\), and the four \(F_{\bm{s}}\) are the four sides of the
+diamond without their endpoints.
+
+\begin{lemma}\label{lem:l1-zeros}
+    Every \(\bm{w}\) with \(\norm{\bm{w}}_1 = C\) either lies in
+    \(F_{\sign(\bm{w})}\) or is sparse. In \(\mathbb{R}^2\) the sparse ones are
+    exactly the four corners \((\pm C, 0)\), \((0, \pm C)\).
+\end{lemma}
+
+\begin{proof}
+    If every \(w_q \neq 0\), put \(\bm{s} = \sign(\bm{w})\). Then \(s_q w_q =
+    \abs{w_q} > 0\) and \(\bm{s}^\top \bm{w} = \sum_q \abs{w_q} = C\), so
+    \(\bm{w} \in F_{\bm{s}}\). Otherwise some \(w_q = 0\). In \(\mathbb{R}^2\),
+    \(w_1 = 0\) forces \(\abs{w_2} = C\) and \(w_2 = 0\) forces \(\abs{w_1} =
+    C\).
+\end{proof}
+
+\begin{proposition}\label{prop:l1-face-opt}
+    Let \(\wreg\) minimize \(\Ein\) subject to \(\norm{\bm{w}}_1 \le C\), with
+    \(\norm{\wreg}_1 = C\). If \(\wreg\) is not sparse, then \(\wreg \in
+    F_{\bm{s}}\) for \(\bm{s} = \sign(\wreg)\) and \(-\nabla \Ein(\wreg) = \mu
+    \bm{s}\) for some \(\mu \ge 0\).
+\end{proposition}
+
+\begin{proof}
+    \(\wreg \in F_{\bm{s}}\) by \autoref{lem:l1-zeros}, and by
+    \autoref{lem:l1-normal} the boundary near \(\wreg\) is the hyperplane
+    \(\bm{s}^\top \bm{w} = C\) with normal \(\bm{s}\). The Lagrange argument of
+    \autoref{sec:weight-decay}, with \(\bm{s}\) in place of the sphere's normal
+    \(\bm{w}\), applies: a component of \(-\nabla \Ein\) along the hyperplane,
+    or one pointing inward, would be a feasible direction that lowers
+    \(\Ein\).
+\end{proof}
+
+So if the equation \(-\nabla \Ein(\bm{w}) = \mu \bm{s}\), \(\mu \ge 0\), has no
+solution \(\bm{w} \in F_{\bm{s}}\) for any \(\bm{s}\), then \(\wreg\) is sparse.
+
+\begin{eg}[Two dimensions]
+    Take \(\Ein(\bm{w}) = \norm{\bm{w} - \bm{w}_{\mathrm{lin}}}^2\) and \(C =
+    2\), so \(-\nabla \Ein(\bm{w}) = 2(\bm{w}_{\mathrm{lin}} - \bm{w})\).
+    \begin{itemize}
+        \item \(\bm{w}_{\mathrm{lin}} = (1, 4)\). On \(F_{(1,1)}\) the equation
+            reads \(1 - w_1 = 4 - w_2\), i.e.\ \(w_2 = w_1 + 3\); with \(w_1 +
+            w_2 = 2\) this gives \(w_1 = -\frac{1}{2} < 0\), outside
+            \(F_{(1,1)}\). The other three faces fail in the same way. Hence
+            \(\wreg\) is a corner: \(\wreg = (0, 2)\), where \(-\nabla \Ein =
+            (2, 4) = 3\,(1, 1) + 1\,(-1, 1)\) lies between the normals of the
+            two sides meeting there, as in step (3) above. The solution is
+            sparse, \(w_1 = 0\).
+        \item \(\bm{w}_{\mathrm{lin}} = (3, 2)\). Now \(3 - w_1 = 2 - w_2\)
+            and \(w_1 + w_2 = 2\) give \(\bm{w} = (\frac{3}{2}, \frac{1}{2})
+            \in F_{(1,1)}\) with \(\mu = 3\), so \(\wreg = (\frac{3}{2},
+            \frac{1}{2})\): not sparse.
+    \end{itemize}
+    The first case is not a coincidence: the same computation sends every
+    \(\bm{w}_{\mathrm{lin}} = (a, b)\) with \(a \ge 0\), \(b \ge a + 2\) to
+    the corner \((0, 2)\), a whole wedge of targets. For comparison, the L2
+    constraint \(\bm{w}^\top \bm{w} \le 4\) with \(\bm{w}_{\mathrm{lin}} = (1,
+    4)\) gives \(\wreg = \frac{2}{\sqrt{17}}(1, 4)\), with no zero.
+\end{eg}
+
 \begin{moral}
     L1 useful if needing \textbf{sparse solution}.
 \end{moral}
@@ -937,6 +1149,12 @@ complexity \(Q_f\), i.e.\ the deterministic noise.
 \begin{question}
     How to choose? Stay tuned for the next lecture! :-)
 \end{question}
+
+Choosing \(\lambda\) by \(\Ein\) would always return \(\lambda = 0\), the
+setting that fits the data best, and choosing it by looking at the fitted
+curves is the data snooping of \autoref{sec:visual-choices}. The answer of the
+next lecture is to treat each candidate \(\lambda\) as its own model and pick
+by validation error.
 
 \begin{exercise}[Fun Time]
     Consider using a regularizer \(\Omega(\bm{w}) = \sum_{q=0}^{Q} 2^q w_q^2\)

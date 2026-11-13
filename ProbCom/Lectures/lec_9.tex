@@ -260,36 +260,31 @@ You have \(n\) friends and would like all of them to get along, so you invite th
     \(M(n,k,\ell) = (1 + o(1)) \binom{n}{\ell} \big/ \binom{k}{\ell}\) for fixed \(k \ge \ell\) as \(n \to \infty\).
 \end{theorem}
 
-What if we did the most straightforward thing and just chose sets at random? Choose every \(k\)-set \(S\) independently with probability \(p\), and write \(D \coloneqq \binom{n-\ell}{k-\ell}\) for the number of \(k\)-sets containing a fixed \(\ell\)-set. Let
-\[
-    N \coloneqq \sum_{S \in \binom{[n]}{k}} \mathbbm{1}_{\{S \text{ chosen}\}},
-    \qquad
-    U \coloneqq \sum_{X \in \binom{[n]}{\ell}} \mathbbm{1}_{\{X \text{ not covered}\}}
-\]
-be the numbers of chosen \(k\)-sets and of uncovered \(\ell\)-sets.
+\subsection{Why a Random Cover Is Not Enough}\label{sec:random-cover-fails}
+
+The lower bound in \autoref{thm:rodl} is \autoref{prop:covering-lower}, so what has to be proved is the upper bound: for every \(a > 0\) and all large \(n\), there is a cover by at most \((1 + a) \binom{n}{\ell} \big/ \binom{k}{\ell}\) \(k\)-sets. The most straightforward attempt is the method of alterations: choose a random family of \(k\)-sets, which covers most \(\ell\)-sets, then patch the \(\ell\)-sets it misses.
+\begin{enumerate}[(1)]
+    \item \emph{Random family.} Fix \(p \in (0,1)\) and let \(\mathcal{S}\) contain every \(k\)-set independently with probability \(p\). By \autoref{thm:linearity}, \(\mathbb{E}\abs{\mathcal{S}} = \binom{n}{k} p\).
+    \item \emph{Patching.} Let \(U\) be the number of \(\ell\)-sets contained in no member of \(\mathcal{S}\). Adding, for each such \(\ell\)-set \(X\), one \(k\)-set containing \(X\) turns \(\mathcal{S}\) into a cover with at most \(\abs{\mathcal{S}} + U\) sets. So \(M(n,k,\ell) \le \abs{\mathcal{S}} + U\) for every outcome, and by \autoref{lem:first-moment} and \autoref{thm:linearity},
+    \[
+        M(n,k,\ell) \le \mathbb{E}\bigl[ \abs{\mathcal{S}} + U \bigr] = \mathbb{E}\abs{\mathcal{S}} + \mathbb{E}[U].
+    \]
+    \item \emph{Computing \(\mathbb{E}[U]\).} Let \(D \coloneqq \binom{n-\ell}{k-\ell}\) be the number of \(k\)-sets containing a fixed \(\ell\)-set \(X\). \(X\) is uncovered iff none of these \(D\) sets is chosen, so \(\mathbb{P}(X \text{ uncovered}) = (1-p)^{D}\) and, by \autoref{thm:linearity}, \(\mathbb{E}[U] = \binom{n}{\ell} (1-p)^{D}\).
+    \item \emph{Choosing \(p\).} Write \(p = \frac{t}{D}\) with \(t > 0\) a constant. Counting pairs \(X \subseteq S \subseteq [n]\) with \(\abs{X} = \ell\), \(\abs{S} = k\) in two ways gives \(\binom{n}{k}\binom{k}{\ell} = \binom{n}{\ell}\binom{n-\ell}{k-\ell}\), i.e.\ \(\frac{1}{D}\binom{n}{k} = \binom{n}{\ell} \big/ \binom{k}{\ell}\). With \(1 - x \le e^{-x}\),
+    \begin{equation}\label{eq:random-cover-bound}
+        M(n,k,\ell) \le \binom{n}{k} \frac{t}{D} + \binom{n}{\ell} \Bigl( 1 - \frac{t}{D} \Bigr)^{D}
+        \le t\, \frac{\binom{n}{\ell}}{\binom{k}{\ell}} + e^{-t} \binom{n}{\ell}
+        = \Bigl( t + \tbinom{k}{\ell} e^{-t} \Bigr) \frac{\binom{n}{\ell}}{\binom{k}{\ell}} .
+    \end{equation}
+\end{enumerate}
+
+\emph{Where it fails.} \autoref{thm:rodl} needs the factor \(t + \binom{k}{\ell} e^{-t}\) in \eqref{eq:random-cover-bound} to be at most \(1 + a\), and its two terms pull \(t\) in opposite directions.
 \begin{itemize}
-    \item \emph{Choosing \(p\).} By \autoref{thm:linearity}, \(\mathbb{E}[N] = \binom{n}{k} p\). To match \autoref{prop:covering-lower} we need
-    \[
-        \binom{n}{k} p \approx \frac{\binom{n}{\ell}}{\binom{k}{\ell}}
-        \quad\Longrightarrow\quad
-        p \approx \frac{\binom{n}{\ell}}{\binom{n}{k}\binom{k}{\ell}} = \frac{1}{D},
-    \]
-    using \(\binom{n}{k}\binom{k}{\ell} = \binom{n}{\ell}\binom{n-\ell}{k-\ell}\) (both count pairs \(X \subseteq S \subseteq [n]\) with \(\abs{X} = \ell\), \(\abs{S} = k\)).
-    \item \emph{Uncovered \(\ell\)-sets.} An \(\ell\)-set \(X\) is uncovered iff none of the \(D\) \(k\)-sets containing it is chosen, so with \(p = \frac{1}{D}\)
-    \[
-        \mathbb{P}(X \text{ is not covered}) = (1-p)^{D} \sim e^{-pD} = e^{-1},
-    \]
-    since \((1 - \frac{1}{D})^{D} \to e^{-1}\) as \(D \to \infty\). By \autoref{thm:linearity}, \(\mathbb{E}[U] \sim e^{-1}\binom{n}{\ell}\).
+    \item The term \(t\) is the cost of the random family. Each \(\ell\)-set lies in \(t\) chosen sets on average, so the family uses \(t\) times as many sets as a perfect cover would. Keeping this term \(\le 1 + a\) needs \(t \le 1 + a\).
+    \item The term \(\binom{k}{\ell} e^{-t}\) is the cost of patching. A patching set is added for a single \(\ell\)-set, so it uses only one of its \(\binom{k}{\ell}\) \(\ell\)-subsets, and the \(e^{-t}\binom{n}{\ell}\) patches cost \(\binom{k}{\ell}\) times more than covering those \(\ell\)-sets perfectly. Keeping this term \(\le a\) needs \(t \ge \ln \bigl( \binom{k}{\ell} / a \bigr)\), which is large for small \(a\).
 \end{itemize}
-This is \emph{not good enough}: a constant fraction \(e^{-1}\) of the \(\ell\)-sets is left uncovered. Patching each uncovered \(X\) with one extra \(k\)-set containing it gives a cover of expected size
+The best choice is the minimizer of \(f(t) = t + r e^{-t}\) with \(r = \binom{k}{\ell}\): \(f'(t) = 1 - r e^{-t} = 0\) at \(t = \ln r\), where \(f(\ln r) = 1 + \ln r\). So this argument proves only
 \[
-    \mathbb{E}[N + U] \sim \frac{\binom{n}{\ell}}{\binom{k}{\ell}} + e^{-1}\binom{n}{\ell}
-    = \Bigl( 1 + e^{-1}\tbinom{k}{\ell} \Bigr) \frac{\binom{n}{\ell}}{\binom{k}{\ell}},
+    M(n,k,\ell) \le \Bigl( 1 + \ln \tbinom{k}{\ell} \Bigr) \frac{\binom{n}{\ell}}{\binom{k}{\ell}},
 \]
-off by a constant factor rather than \(1 + o(1)\). Taking \(p = \frac{t}{D}\) for a constant \(t > 0\) does not help: the same computation gives
-\[
-    \mathbb{E}[N + U] \sim \Bigl( t + e^{-t}\tbinom{k}{\ell} \Bigr) \frac{\binom{n}{\ell}}{\binom{k}{\ell}},
-    \qquad
-    t + e^{-t}\tbinom{k}{\ell} \ge t + e^{-t} > 1,
-\]
-the last step by \(e^{-t} > 1 - t\). So the proof of \autoref{thm:rodl} is not straightforward at all.
+a constant factor \(1 + \ln \binom{k}{\ell} > 1\) away from \autoref{thm:rodl} when \(k > \ell\). The loss is in the construction, not in the estimates: since \(D \to \infty\), \(\bigl( 1 - \frac{t}{D} \bigr)^{D} \to e^{-t}\), so \eqref{eq:random-cover-bound} is asymptotically the true value of \(\mathbb{E}\bigl[ \abs{\mathcal{S}} + U \bigr]\). So the proof of \autoref{thm:rodl} is not straightforward at all.

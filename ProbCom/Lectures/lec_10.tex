@@ -1,6 +1,6 @@
 \lecture{10}{6 Nov.}{}
 
-The computation at the end of \autoref{sec:covering} shows where a one-shot random choice loses. With \(p = \frac{t}{D}\), a fixed \(\ell\)-set lies in \(t\) chosen \(k\)-sets on average. If \(t\) is large, many \(\ell\)-sets are covered several times and the extra \(k\)-sets are wasted; if \(t\) is small, a fraction \(e^{-t}\) of the \(\ell\)-sets stays uncovered; no constant \(t\) avoids both losses. R\"odl's way out is to choose only a small random batch of \(k\)-sets at a time, a \emph{nibble}, discard the \(\ell\)-sets it covers, and repeat on what is left. Only the incidences between \(\ell\)-sets and \(k\)-sets matter for this, so we first restate the problem as covering the vertices of a hypergraph.
+We saw in \autoref{sec:random-cover-fails} that a single round of random choice cannot both cover almost every \(\ell\)-set and avoid covering many of them repeatedly. R\"odl's way out is to choose only a small random batch of \(k\)-sets at a time, a \emph{nibble}, discard the \(\ell\)-sets it covers, and repeat on what is left. Only the incidences between \(\ell\)-sets and \(k\)-sets matter for this, so we first restate the problem as covering the vertices of a hypergraph.
 
 \section{Covers in Hypergraphs}\label{sec:hypergraph-covers}
 
@@ -27,84 +27,7 @@ and \(M(n,k,\ell)\) is the minimum size of a cover of \(\mathcal{H}\).
     Given an \(r\)-uniform hypergraph on \(N\) vertices, how many edges do we need to cover all the vertices?
 \end{question}
 
-\emph{Trivial lower bound.} \(m\) edges of size \(r\) contain at most \(mr\) vertices, so a cover needs \(m \ge \frac{N}{r}\). For \(\mathcal{H}\) this is \(\frac{N}{r} = \binom{n}{\ell} \big/ \binom{k}{\ell}\), i.e.\ \autoref{prop:covering-lower}, and \autoref{thm:rodl} says that \(\mathcal{H}\) has a cover only a factor \(1 + o(1)\) above the trivial bound. In general the trivial bound can be off by a constant factor.
-
-\begin{eg}\label{eg:cover-bad}
-    Three \(3\)-uniform hypergraphs (\(r = 3\)) that need many more than \(\frac{N}{3}\) edges.
-    \begin{center}
-        \begin{tikzpicture}[thick, every node/.style={font=\small}, dot/.style={circle, fill, inner sep=1.1pt}]
-            \begin{scope}
-                \draw (0,0) ellipse (0.45 and 1.3);
-                \draw (2,0) ellipse (0.45 and 1.3);
-                \draw (4,0) ellipse (0.45 and 2.5);
-                \foreach \y in {0.9,0.3,-0.3,-0.9} {
-                    \node[dot] at (0,\y) {};
-                    \node[dot] at (2,\y) {};
-                }
-                \foreach \y in {2.1,1.5,0.9,0.3,-0.3,-0.9,-1.5,-2.1} \node[dot] at (4,\y) {};
-                \draw[blue!60!black] plot[smooth] coordinates {(0,0.9) (2,0.9) (4,2.1)};
-                \draw[blue!60!black] plot[smooth] coordinates {(0,0.3) (2,-0.3) (4,0.3)};
-                \draw[blue!60!black] plot[smooth] coordinates {(0,-0.9) (2,0.3) (4,-0.9)};
-                \node at (0,-2.9) {\(A\): \(n\)};
-                \node at (2,-2.9) {\(B\): \(n\)};
-                \node at (4,-2.9) {\(C\): \(2n\)};
-                \node at (2,-3.5) {(1)};
-            \end{scope}
-            \begin{scope}[xshift=6.5cm]
-                \draw (0,0) circle (0.35);
-                \node[dot] (a) at (0,0) {};
-                \draw (2,0) ellipse (0.45 and 2);
-                \draw (4,0) ellipse (0.45 and 2);
-                \foreach \y in {1.5,0.9,0.3,-0.3,-0.9,-1.5} {
-                    \node[dot] at (2,\y) {};
-                    \node[dot] at (4,\y) {};
-                }
-                \draw[blue!60!black] (0,0) -- (2,1.5) -- (4,1.5);
-                \draw[blue!60!black] (0,0) -- (2,0.3) -- (4,0.9);
-                \draw[blue!60!black] (0,0) -- (2,-1.5) -- (4,-0.3);
-                \node at (0,-2.9) {\(A = \{a\}\)};
-                \node at (2,-2.9) {\(B\): \(n\)};
-                \node at (4,-2.9) {\(C\): \(n\)};
-                \node at (2,-3.5) {(2)};
-            \end{scope}
-        \end{tikzpicture}
-    \end{center}
-    \begin{enumerate}[(1)]
-        \item \(V = A \cupdot B \cupdot C\) with \(\abs{A} = \abs{B} = n\) and \(\abs{C} = 2n\), and every edge has one vertex in each part. Here \(N = 4n\) and \(\frac{N}{r} = \frac{4n}{3}\), but each edge contains only one vertex of \(C\), so a cover needs \(\ge 2n\) edges to cover \(C\).
-        \item \(V = \{a\} \cupdot B \cupdot C\) with \(\abs{B} = \abs{C} = n\), and every edge is \(\{a, b, c\}\) with \(b \in B\), \(c \in C\). Here \(N = 2n + 1\) and \(\frac{N}{r} = \frac{2n+1}{3} \approx \frac{2}{3}n\), but again each edge contains one vertex of \(C\), so a cover needs \(\ge n\) edges.
-        \item \(V\) is split into \(\frac{N}{9}\) disjoint \emph{layers} of \(9\) vertices, and no edge meets two layers. A layer consists of two triangles \(T\), \(T'\) (\(3\) vertices each) and three further vertices \(Z\), and its edges are the \(18\) sets \(\{u, v, z\}\) with \(uv\) one of the \(6\) sides of \(T\) or \(T'\) and \(z \in Z\).
-        \begin{center}
-            \begin{tikzpicture}[thick, every node/.style={font=\small}, dot/.style={circle, fill, inner sep=1.2pt}]
-                \coordinate (x1) at (0,0); \coordinate (x2) at (1,0); \coordinate (x3) at (0.5,0.85);
-                \coordinate (y1) at (2.5,0); \coordinate (y2) at (3.5,0); \coordinate (y3) at (3,0.85);
-                \coordinate (z1) at (0.5,-1.4); \coordinate (z2) at (1.75,-1.4); \coordinate (z3) at (3,-1.4);
-                \fill[red, opacity=0.2] (x1) -- (x2) -- (z1) -- cycle;
-                \draw[red] (x1) -- (x2) -- (z1) -- cycle;
-                \fill[orange, opacity=0.2] (x2) -- (x3) -- (z2) -- cycle;
-                \draw[orange] (x2) -- (x3) -- (z2) -- cycle;
-                \fill[blue, opacity=0.2] (y1) -- (y2) -- (z3) -- cycle;
-                \draw[blue] (y1) -- (y2) -- (z3) -- cycle;
-                \fill[green!60!black, opacity=0.2] (y1) -- (y3) -- (z2) -- cycle;
-                \draw[green!60!black] (y1) -- (y3) -- (z2) -- cycle;
-                \draw (x1) -- (x2) -- (x3) -- cycle;
-                \draw (y1) -- (y2) -- (y3) -- cycle;
-                \foreach \p in {x1,x2,x3,y1,y2,y3,z1,z2,z3} \node[dot] at (\p) {};
-                \node at (0.5,1.25) {\(T\)};
-                \node at (3,1.25) {\(T'\)};
-                \node[right] at (3.4,-1.4) {\(Z\)};
-            \end{tikzpicture}
-        \end{center}
-        A vertex of \(T\) lies on \(2\) sides and each side is in \(3\) edges, so it has degree \(2 \cdot 3 = 6\); a vertex of \(Z\) is in one edge per side, so it has degree \(6\). Thus this hypergraph is \(6\)-regular. Every edge meets \(T\) in \(0\) or \(2\) vertices and \(\abs{T} = 3\) is odd, so at least \(2\) edges meet \(T\); likewise for \(T'\), and no edge meets both. So each layer needs \(\ge 4\) edges (the picture shows a cover of a layer by \(4\)), and a cover needs \(\ge 4 \cdot \frac{N}{9} = \frac{4}{3} \cdot \frac{N}{3}\) edges in total.
-    \end{enumerate}
-\end{eg}
-
-In (1) and (2) of \autoref{eg:cover-bad} the degrees are very uneven: in (1), every edge meets \(A\) and \(C\) once each, so
-\[
-    \sum_{x \in A} \deg(x) = \sum_{x \in C} \deg(x) = e(H)
-    \qquad\text{while}\qquad
-    \abs{C} = 2\abs{A},
-\]
-so a vertex of \(C\) has on average half the degree of a vertex of \(A\); and in (2), \(a\) lies in every edge. Example (3) is regular, but the two ends of a side of \(T\) lie together in \(3\) of the \(6\) edges at either of them, so the edges at a vertex keep reusing the same few other vertices. The next definition rules out both problems.
+\emph{Trivial lower bound.} \(m\) edges of size \(r\) contain at most \(mr\) vertices, so a cover needs \(m \ge \frac{N}{r}\). For \(\mathcal{H}\) this is \(\frac{N}{r} = \binom{n}{\ell} \big/ \binom{k}{\ell}\), i.e.\ \autoref{prop:covering-lower}, and \autoref{thm:rodl} says that \(\mathcal{H}\) has a cover only a factor \(1 + o(1)\) above the trivial bound. For a general \(r\)-uniform hypergraph this can fail: the smallest cover can have size \(c \cdot \frac{N}{r}\) for a constant \(c > 1\) that does not tend to \(1\) as \(N \to \infty\), so the trivial bound is wrong by a constant factor rather than by \(1 + o(1)\). In \autoref{eg:cover-bad} below, \(c\) is \(\frac{3}{2}\), \(\frac{3}{2}\) and \(\frac{4}{3}\).
 
 \begin{definition}[Degree, codegree]\label{def:codegree}
     Let \(H\) be a hypergraph and \(x, y \in V(H)\). The \vocab{degree} of \(x\) and the \vocab{codegree} of \(x\) and \(y\) are
@@ -114,6 +37,125 @@ so a vertex of \(C\) has on average half the degree of a vertex of \(A\); and in
         \operatorname{codeg}(x,y) \coloneqq \#\{ e \in E(H) : x, y \in e \}.
     \]
 \end{definition}
+
+\begin{eg}\label{eg:cover-bad}
+    Three \(3\)-uniform hypergraphs (\(r = 3\)) that need many more than \(\frac{N}{3}\) edges. In (1) and (2) the figures show only a minimum cover for small \(n\); each colored path is one edge.
+    \begin{enumerate}[(1)]
+        \item \(V = A \cupdot B \cupdot C\) with \(\abs{A} = \abs{B} = n\), \(\abs{C} = 2n\), and the edges are all triples with one vertex in each part. Here \(\frac{N}{r} = \frac{4n}{3}\), but each edge contains only one vertex of \(C\), so a cover needs \(2n\) edges. \emph{Problem:} uneven degrees, \(\deg(a) = \deg(b) = 2n^{2}\) but \(\deg(c) = n^{2}\), so covering \(C\) covers \(A \cup B\) twice.
+        \begin{center}
+            \begin{tikzpicture}[thick, every node/.style={font=\small}, dot/.style={circle, fill, inner sep=1.2pt}, line join=round]
+                \coordinate (a1) at (0,0.6); \coordinate (a2) at (0,-0.6);
+                \coordinate (b1) at (2,0.6); \coordinate (b2) at (2,-0.6);
+                \coordinate (c1) at (4,1.8); \coordinate (c2) at (4,0.6); \coordinate (c3) at (4,-0.6); \coordinate (c4) at (4,-1.8);
+                \draw (0,0) ellipse (0.4 and 1.1);
+                \draw (2,0) ellipse (0.4 and 1.1);
+                \draw (4,0) ellipse (0.4 and 2.3);
+                \draw[red] (a1) -- (b1) -- (c1);
+                \draw[orange] (a2) -- (b1) -- (c2);
+                \draw[blue] (a1) -- (b2) -- (c3);
+                \draw[green!60!black] (a2) -- (b2) -- (c4);
+                \foreach \p in {a1,a2,b1,b2,c1,c2,c3,c4} \node[dot] at (\p) {};
+                \node at (0,-1.5) {\(A\)};
+                \node at (2,-1.5) {\(B\)};
+                \node at (4,-2.7) {\(C\)};
+                \node at (2,-3.3) {\(n = 2\): a cover by \(2n = 4\) edges};
+            \end{tikzpicture}
+        \end{center}
+        \item \(V = \{a\} \cupdot B \cupdot C\) with \(\abs{B} = \abs{C} = n\), and the edges are all \(\{a, b, c\}\) with \(b \in B\), \(c \in C\). Here \(\frac{N}{r} = \frac{2n+1}{3} \approx \frac{2}{3}n\), but again a cover needs \(n\) edges. \emph{Problem:} uneven degrees, \(\deg(a) = n^{2}\) but every other degree is \(n\), so \(a\) is covered \(n\) times.
+        \begin{center}
+            \begin{tikzpicture}[thick, every node/.style={font=\small}, dot/.style={circle, fill, inner sep=1.2pt}, line join=round]
+                \coordinate (a) at (0,0);
+                \coordinate (b1) at (2,1.2); \coordinate (b2) at (2,0); \coordinate (b3) at (2,-1.2);
+                \coordinate (c1) at (4,1.2); \coordinate (c2) at (4,0); \coordinate (c3) at (4,-1.2);
+                \draw (0,0) circle (0.35);
+                \draw (2,0) ellipse (0.4 and 1.7);
+                \draw (4,0) ellipse (0.4 and 1.7);
+                \draw[red] (a) -- (b1) -- (c1);
+                \draw[orange] (a) -- (b2) -- (c2);
+                \draw[blue] (a) -- (b3) -- (c3);
+                \foreach \p in {a,b1,b2,b3,c1,c2,c3} \node[dot] at (\p) {};
+                \node at (0,-0.7) {\(\{a\}\)};
+                \node at (2,-2.1) {\(B\)};
+                \node at (4,-2.1) {\(C\)};
+                \node at (2,-2.7) {\(n = 3\): a cover by \(n = 3\) edges};
+            \end{tikzpicture}
+        \end{center}
+        \item Let \(N = 9L\). Split the vertex set into \(L\) disjoint \vocab{layers}
+        \[
+            V = V_1 \cupdot \cdots \cupdot V_L,
+            \qquad
+            V_i = T_i \cupdot T'_i \cupdot Z_i,
+            \qquad
+            \abs{T_i} = \abs{T'_i} = \abs{Z_i} = 3,
+        \]
+        and let
+        \[
+            E(H) = \Bigl\{ P \cup \{z\} \;:\; 1 \le i \le L,\ P \in \tbinom{T_i}{2} \cup \tbinom{T'_i}{2},\ z \in Z_i \Bigr\}.
+        \]
+        So every edge lies inside one layer, and each layer contains \((3 + 3) \cdot 3 = 18\) edges. The figure shows one layer \(V_i\) with \(T_i = \{x_1, x_2, x_3\}\), \(T'_i = \{y_1, y_2, y_3\}\), \(Z_i = \{z_1, z_2, z_3\}\); the sides of the triangles are the pairs \(P \in \binom{T_i}{2} \cup \binom{T'_i}{2}\), and each shaded triangle is an edge \(P \cup \{z\}\). Left: the \(3\) edges \(\{x_2, x_3, z\}\), \(z \in Z_i\). Right: a cover of \(V_i\) by the \(4\) edges
+        \[
+            \{x_1, x_2, z_1\}, \quad \{x_1, x_3, z_3\}, \quad \{y_2, y_3, z_2\}, \quad \{y_1, y_2, z_1\}.
+        \]
+        \begin{center}
+            \begin{tikzpicture}[thick, every node/.style={font=\small}, dot/.style={circle, fill, inner sep=1.2pt}, line join=round, e/.style={draw=#1, fill=#1, fill opacity=0.15}]
+                \def\pts{
+                    \coordinate (x1) at (0,0); \coordinate (x2) at (1,0.8); \coordinate (x3) at (1,-0.8);
+                    \coordinate (z1) at (2.5,1.3); \coordinate (z2) at (2.5,0); \coordinate (z3) at (2.5,-1.3);
+                    \coordinate (y1) at (5,0); \coordinate (y2) at (4,0.8); \coordinate (y3) at (4,-0.8);
+                }
+                \def\base{
+                    \draw (x1) -- (x2) -- (x3) -- cycle;
+                    \draw (y1) -- (y2) -- (y3) -- cycle;
+                    \foreach \p in {x1,x2,x3,y1,y2,y3,z1,z2,z3} \node[dot] at (\p) {};
+                    \node[left] at (x1) {\(x_1\)}; \node[above] at (x2) {\(x_2\)}; \node[below] at (x3) {\(x_3\)};
+                    \node[right] at (y1) {\(y_1\)}; \node[above] at (y2) {\(y_2\)}; \node[below] at (y3) {\(y_3\)};
+                    \node[above] at (z1) {\(z_1\)}; \node[below] at (z3) {\(z_3\)};
+                }
+                \begin{scope}
+                    \pts
+                    \filldraw[e=red] (x2) -- (x3) -- (z1) -- cycle;
+                    \filldraw[e=orange] (x2) -- (x3) -- (z2) -- cycle;
+                    \filldraw[e=blue] (x2) -- (x3) -- (z3) -- cycle;
+                    \base
+                    \node[right] at (z2) {\(z_2\)};
+                    \node at (2.5,-2.3) {\(\{x_2, x_3, z\}\), \(z \in Z_i\)};
+                \end{scope}
+                \begin{scope}[xshift=7cm]
+                    \pts
+                    \filldraw[e=red] (x1) -- (x2) -- (z1) -- cycle;
+                    \filldraw[e=orange] (x1) -- (x3) -- (z3) -- cycle;
+                    \filldraw[e=blue] (y2) -- (y3) -- (z2) -- cycle;
+                    \filldraw[e=green!60!black] (y1) -- (y2) -- (z1) -- cycle;
+                    \base
+                    \node[left] at (z2) {\(z_2\)};
+                    \node at (2.5,-2.3) {a cover of \(V_i\) by \(4\) edges};
+                \end{scope}
+            \end{tikzpicture}
+        \end{center}
+        \emph{\(H\) is \(6\)-regular.} For \(x \in T_i\), the pairs \(P \in \binom{T_i}{2}\) containing \(x\) number \(2\), and each extends by any \(z \in Z_i\); for \(z \in Z_i\), every pair \(P\) gives one edge:
+        \[
+            \deg(x) = 2 \cdot \abs{Z_i} = 6,
+            \qquad
+            \deg(z) = \Bigl| \tbinom{T_i}{2} \Bigr| + \Bigl| \tbinom{T'_i}{2} \Bigr| = 6 .
+        \]
+        The same holds for \(x \in T'_i\).
+
+        \emph{A cover needs \(\frac{4}{3} \cdot \frac{N}{3}\) edges.} Let \(F\) be a cover. Every edge \(e\) has \(\abs{e \cap T_i} \in \{0, 2\}\), so
+        \[
+            \sum_{e \in F} \abs{e \cap T_i} \ge \abs{T_i} = 3
+            \text{ and is even}
+            \;\Longrightarrow\;
+            \sum_{e \in F} \abs{e \cap T_i} \ge 4
+            \;\Longrightarrow\;
+            \#\{ e \in F : e \cap T_i \ne \varnothing \} \ge 2 .
+        \]
+        The same holds for \(T'_i\), and no edge meets both \(T_i\) and \(T'_i\), so \(F\) has at least \(4\) edges inside each \(V_i\). The layers are disjoint, so \(\abs{F} \ge 4L = 4 \cdot \frac{N}{9} = \frac{4}{3} \cdot \frac{N}{3}\), and the cover in the figure, repeated in every layer, attains this.
+
+        \emph{Problem:} large codegrees. For distinct \(x, y \in T_i\), \(\operatorname{codeg}(x, y) = \abs{Z_i} = 3 = \frac{1}{2}\deg(x)\). Every edge containing \(x_3\) contains \(x_1\) or \(x_2\), so once \(x_1, x_2\) are covered, covering \(x_3\) covers one of them again.
+    \end{enumerate}
+\end{eg}
+
+Uneven degrees as in (1) and (2) and large codegrees as in (3) are what the next definition rules out.
 
 \begin{notation}
     \(a = (1 \pm \gamma) D\) means \((1 - \gamma) D \le a \le (1 + \gamma) D\).
@@ -137,59 +179,105 @@ so a vertex of \(C\) has on average half the degree of a vertex of \(A\); and in
 \end{observation}
 
 \begin{proof}
-    If \(k = \ell\), every \(\ell\)-set needs its own \(k\)-set, so \(M(n,k,\ell) = \binom{n}{\ell} = \binom{n}{\ell} \big/ \binom{k}{\ell}\). Let \(k > \ell\), and apply \autoref{thm:pippenger} to \(\mathcal{H}\) from \autoref{def:aux-hypergraph}, which has
+    \emph{Goal.} The lower bound \(M(n,k,\ell) \ge \binom{n}{\ell} \big/ \binom{k}{\ell}\) is \autoref{prop:covering-lower}, so it suffices to show: for every \(a > 0\),
+    \begin{equation}\label{eq:rodl-upper}
+        M(n,k,\ell) \le (1 + a) \frac{\binom{n}{\ell}}{\binom{k}{\ell}}
+        \qquad\text{for all large } n .
+    \end{equation}
+    If \(k = \ell\), every \(\ell\)-set needs its own \(k\)-set, so \(M(n,k,\ell) = \binom{n}{\ell} = \binom{n}{\ell} \big/ \binom{k}{\ell}\). From now on \(k > \ell\) are fixed and \(n \to \infty\).
+
+    \emph{Notation.} Let \(\mathcal{H}\) be the auxiliary hypergraph of \autoref{def:aux-hypergraph}. To avoid a clash with the constant \(K\) of \autoref{thm:pippenger}, write \(S\) for a \(k\)-subset of \([n]\) and \(e_S = \binom{S}{\ell}\) for the corresponding edge; distinct \(S\) give distinct edges, since \(S\) is the union of the \(\ell\)-sets in \(e_S\). The vertices of \(\mathcal{H}\) are \(\ell\)-subsets of \([n]\); we denote them by \(X, Y\). Since \(X \in e_S\) iff \(X \subseteq S\), the degree and codegree of \autoref{def:codegree} in \(\mathcal{H}\) are
+    \[
+        \deg(X) = \#\bigl\{ S \in \tbinom{[n]}{k} : X \subseteq S \bigr\},
+        \qquad
+        \operatorname{codeg}(X,Y) = \#\bigl\{ S \in \tbinom{[n]}{k} : X \cup Y \subseteq S \bigr\}.
+    \]
+    By \autoref{def:covering} and \autoref{def:aux-hypergraph}, \(M(n,k,\ell)\) is the minimum size of a cover of \(\mathcal{H}\), and \(\mathcal{H}\) is \(r\)-uniform on \(N\) vertices with
     \[
         N = \binom{n}{\ell},
         \qquad
         r = \binom{k}{\ell},
-        \qquad
-        D \coloneqq \binom{n-\ell}{k-\ell}.
+        \qquad\text{so}\qquad
+        \frac{N}{r} = \frac{\binom{n}{\ell}}{\binom{k}{\ell}} .
     \]
-    \begin{itemize}
-        \item \emph{Degrees.} A \(k\)-set \(K \supseteq X\) is \(X\) together with a \((k-\ell)\)-subset of \([n] \setminus X\), so \(\deg(X) = \binom{n-\ell}{k-\ell} = D\) for every vertex \(X\). Hence (i) holds for every \(\gamma\), (ii) holds with \(K = 2\), and every degree is positive.
-        \item \emph{Codegrees.} Let \(X \ne Y\) and pick \(y \in Y \setminus X\). Every \(k\)-set containing \(X\) and \(Y\) contains the \((\ell+1)\)-set \(X \cup \{y\}\), so, using \(\binom{m-1}{j-1} = \frac{j}{m}\binom{m}{j}\) with \(m = n - \ell\), \(j = k - \ell\),
+    So \eqref{eq:rodl-upper} says exactly that \(\mathcal{H}\) has a cover of size \(\le (1+a)\frac{N}{r}\), which is the conclusion of \autoref{thm:pippenger}. It remains to check its hypotheses with
+    \[
+        D \coloneqq \binom{n-\ell}{k-\ell},
+        \qquad
+        K \coloneqq 2 .
+    \]
+    \begin{enumerate}[(a)]
+        \item \emph{Degrees.} A \(k\)-set \(S \supseteq X\) is \(X\) together with a \((k-\ell)\)-subset of the \(n - \ell\) elements of \([n] \setminus X\), so
         \[
-            \operatorname{codeg}(X,Y) \le \binom{n-\ell-1}{k-\ell-1} = \frac{k-\ell}{n-\ell} \binom{n-\ell}{k-\ell} = \frac{k-\ell}{n-\ell}\, D = o(D).
+            \deg(X) = \binom{n-\ell}{k-\ell} = D \qquad\text{for every vertex } X.
         \]
+        \item \emph{Codegrees.} Let \(X \ne Y\). As \(\abs{X} = \abs{Y}\), there is some \(y \in Y \setminus X\). Every \(S \supseteq X \cup Y\) contains the \((\ell+1)\)-set \(X \cup \{y\}\), and as in (a) the number of \(k\)-sets containing a fixed \((\ell+1)\)-set is \(\binom{n-\ell-1}{k-\ell-1}\). Using \(\binom{m-1}{j-1} = \frac{j}{m}\binom{m}{j}\) with \(m = n - \ell\), \(j = k - \ell\),
+        \[
+            \operatorname{codeg}(X,Y) \le \binom{n-\ell-1}{k-\ell-1} = \frac{k-\ell}{n-\ell} \binom{n-\ell}{k-\ell} = \frac{k-\ell}{n-\ell}\, D .
+        \]
+    \end{enumerate}
+    Now fix \(a > 0\), and let \(\gamma = \gamma(r, 2, a)\) and \(D_0 = D_0(r, 2, a)\) be given by \autoref{thm:pippenger}. Take \(n\) so large that \(\frac{k-\ell}{n-\ell} < \gamma\) and \(n - \ell \ge D_0\); then \(D = \binom{n-\ell}{k-\ell} \ge n - \ell \ge D_0\), as \(1 \le k - \ell < n - \ell\). The hypotheses of \autoref{thm:pippenger} hold:
+    \begin{itemize}
+        \item (i) every vertex, not just all but \(\gamma N\), has \(\deg(X) = D = (1 \pm \gamma) D\), by (a);
+        \item (ii) \(\deg(X) = D < 2D = KD\), by (a);
+        \item (iii) \(\operatorname{codeg}(X,Y) \le \frac{k-\ell}{n-\ell} D < \gamma D\), by (b);
+        \item every degree is \(D > 0\).
     \end{itemize}
-    Fix \(a > 0\) and let \(\gamma = \gamma(r,2,a)\), \(D_0 = D_0(r,2,a)\). For \(n\) large, \(\frac{k-\ell}{n-\ell} < \gamma\), so (iii) holds, and \(D \ge n - \ell \ge D_0\). \autoref{thm:pippenger} gives a cover of \(\mathcal{H}\) of size \(\le (1+a)\frac{N}{r}\), and with \autoref{prop:covering-lower},
+    Hence \(\mathcal{H}\) has a cover of size \(\le (1+a)\frac{N}{r}\), which is \eqref{eq:rodl-upper}. Together with \autoref{prop:covering-lower},
     \[
         \frac{\binom{n}{\ell}}{\binom{k}{\ell}} \le M(n,k,\ell) \le (1 + a) \frac{\binom{n}{\ell}}{\binom{k}{\ell}}
-        \qquad\text{for all large } n .
+        \qquad\text{for all large } n ,
     \]
-    As \(a > 0\) is arbitrary, \(M(n,k,\ell) = (1 + o(1)) \binom{n}{\ell} \big/ \binom{k}{\ell}\).
+    and as \(a > 0\) is arbitrary, \(M(n,k,\ell) = (1 + o(1)) \binom{n}{\ell} \big/ \binom{k}{\ell}\).
 \end{proof}
 
 \section{Taking a Nibble}\label{sec:nibble}
 
-Let \(H\) be well-spread with typical degree \(D\). What if we take \(m\) edges uniformly and independently at random? Pretend every degree is \(D\); then \(\sum_{x} \deg(x) = r\, e(H)\) gives \(e(H) \approx \frac{ND}{r}\). Each random edge contains \(v\) with probability \(\frac{\deg(v)}{e(H)}\), so
+The goal of this section is a plan for proving \autoref{thm:pippenger}: given a well-spread \(r\)-uniform \(H\) on \(N\) vertices with typical degree \(D\), find a cover with at most \((1+a)\frac{N}{r}\) edges. We first look at what \(m\) random edges cover. This shows that random edges waste almost nothing as long as \(m\) is a small fraction of \(\frac{N}{r}\), which suggests covering \(V\) in many small random rounds (\emph{nibbles}) instead of one. The key lemma below says that one such round can be carried out without destroying well-spreadness.
+
+So take \(m\) edges of \(H\) uniformly and independently at random. Pretend every degree is \(D\); then \(\sum_{x} \deg(x) = r\, e(H)\) gives \(e(H) \approx \frac{ND}{r}\). Each random edge contains \(v\) with probability \(\frac{\deg(v)}{e(H)}\), so
 \[
     \mathbb{P}(v \text{ is uncovered}) = \Bigl( 1 - \frac{\deg(v)}{e(H)} \Bigr)^{m} \approx \Bigl( 1 - \frac{D}{ND/r} \Bigr)^{m} = \Bigl( 1 - \frac{r}{N} \Bigr)^{m} \approx e^{-\frac{rm}{N}},
 \]
 where \(\frac{rm}{N} \approx m \cdot \frac{\deg(v)}{e(H)}\) is the expected number of times \(v\) is covered.
 \begin{center}
-    \begin{tikzpicture}[thick, every node/.style={font=\small}, dot/.style={circle, fill, inner sep=1pt}]
-        \draw (0,0) rectangle (4,2.6);
-        \draw[blue!60!black] (0.8,1.4) ellipse (0.35 and 0.9);
-        \draw[blue!60!black, rotate around={30:(1.2,1.7)}] (1.2,1.7) ellipse (0.3 and 0.6);
-        \draw[blue!60!black, rotate around={-20:(1.6,1)}] (1.6,1) ellipse (0.35 and 0.75);
-        \draw[blue!60!black, rotate around={70:(2.2,0.9)}] (2.2,0.9) ellipse (0.35 and 0.7);
-        \draw[blue!60!black] (2.6,1.5) ellipse (0.35 and 0.75);
-        \draw[blue!60!black, rotate around={-30:(3.3,1.4)}] (3.3,1.4) ellipse (0.3 and 0.9);
-        \foreach \p in {(0.7,1.9),(0.9,1),(1.3,2),(1.5,1.2),(1.9,0.6),(2.3,1.1),(2.6,1.9),(2.7,0.5),(3.2,2),(3.5,1)} \node[dot] at \p {};
-        \node at (2,-0.35) {\(m\) large};
-        \begin{scope}[xshift=5cm]
-            \draw (0,0) rectangle (4,2.6);
-            \foreach \p in {(0.4,2.2),(0.5,0.4),(1.2,0.3),(2.4,2.3),(3.6,2.1),(3.5,0.4),(2.3,0.4),(1.7,1.9)} \node[dot] at \p {};
-            \draw[blue!60!black] (0.6,0.9) -- (1.4,0.9) -- (1,1.8) -- cycle;
-            \draw[blue!60!black] (0.9,0.7) -- (1.7,1.2) -- (0.9,1.6) -- cycle;
-            \draw[blue!60!black] (2.6,0.9) -- (3.4,0.9) -- (3,1.7) -- cycle;
-            \foreach \p in {(0.6,0.9),(1.4,0.9),(1,1.8),(0.9,0.7),(1.7,1.2),(0.9,1.6),(2.6,0.9),(3.4,0.9),(3,1.7)} \node[dot] at \p {};
-            \node at (2,-0.35) {\(m\) small};
+    \begin{tikzpicture}[thick, every node/.style={font=\small}, dot/.style={circle, fill, inner sep=1.1pt}]
+        % an edge {#1,#2,#3}: a smooth closed curve around the three points
+        \def\hedge#1#2#3{
+            \coordinate (c) at ($1/3*(#1) + 1/3*(#2) + 1/3*(#3)$);
+            \filldraw[blue!60!black, fill opacity=0.12] plot[smooth cycle, tension=0.55] coordinates {
+                ($(#1)!-0.2cm!(c)$) ($($(#1)!0.5!(#2)$)!-0.3cm!(c)$)
+                ($(#2)!-0.2cm!(c)$) ($($(#2)!0.5!(#3)$)!-0.3cm!(c)$)
+                ($(#3)!-0.2cm!(c)$) ($($(#3)!0.5!(#1)$)!-0.3cm!(c)$)
+            };
+        }
+        \def\pts{
+            \coordinate (p1) at (0.4,2.2); \coordinate (p2) at (1.2,2.2); \coordinate (p3) at (2.0,2.2);
+            \coordinate (p4) at (2.8,2.2); \coordinate (p5) at (3.6,2.2);
+            \coordinate (p6) at (0.8,1.35); \coordinate (p7) at (1.6,1.35); \coordinate (p8) at (2.4,1.35);
+            \coordinate (p9) at (3.2,1.35);
+            \coordinate (p10) at (0.4,0.5); \coordinate (p11) at (1.2,0.5); \coordinate (p12) at (2.0,0.5);
+            \coordinate (p13) at (2.8,0.5); \coordinate (p14) at (3.6,0.5);
+        }
+        \def\drawdots{\foreach \i in {1,...,14} \node[dot] at (p\i) {};}
+        \begin{scope}
+            \pts
+            \draw (-0.15,-0.05) rectangle (4.15,2.85);
+            \hedge{p1}{p2}{p6} \hedge{p2}{p3}{p7} \hedge{p6}{p7}{p11} \hedge{p3}{p4}{p8}
+            \hedge{p7}{p8}{p12} \hedge{p4}{p5}{p9} \hedge{p8}{p9}{p13} \hedge{p9}{p13}{p14}
+            \drawdots
+            \node[align=center] at (2,-0.6) {\(m\) large: few vertices uncovered,\\ many covered more than once};
+        \end{scope}
+        \begin{scope}[xshift=5.4cm]
+            \pts
+            \draw (-0.15,-0.05) rectangle (4.15,2.85);
+            \hedge{p2}{p3}{p7} \hedge{p7}{p8}{p12} \hedge{p9}{p13}{p14}
+            \drawdots
+            \node[align=center] at (2,-0.6) {\(m\) small: little overlap,\\ many vertices uncovered};
         \end{scope}
     \end{tikzpicture}
 \end{center}
-The two pictures are the trade-off from the start of the lecture. If \(\frac{rm}{N}\) is large, almost every vertex is covered but many are covered several times. If \(m = \frac{\varepsilon N}{r}\) for a small \(\varepsilon\), each vertex is covered with probability \(\approx 1 - e^{-\varepsilon} \approx \varepsilon\) and overlaps are rare: the nibble covers about \(\varepsilon N - O(\varepsilon^{2} N)\) of the \(\varepsilon N\) vertices it could cover at best. So we take a nibble, delete the covered vertices and repeat. This only works if what remains is again well-spread, which is what the key lemma provides.
+The two pictures are the trade-off of \autoref{sec:random-cover-fails}. If \(\frac{rm}{N}\) is large, almost every vertex is covered but many are covered several times. If \(m = \frac{\varepsilon N}{r}\) for a small \(\varepsilon\), each vertex is covered with probability \(\approx 1 - e^{-\varepsilon} \approx \varepsilon\) and overlaps are rare: the nibble covers about \(\varepsilon N - O(\varepsilon^{2} N)\) of the \(\varepsilon N\) vertices it could cover at best. So we take a nibble, delete the covered vertices and repeat. This only works if what remains is again well-spread, which is what the key lemma provides.
 
 \begin{lemma}[Key lemma]\label{lem:nibble}
     For every \(r \ge 2\), \(K \ge 1\), \(\varepsilon > 0\) and \(\delta' > 0\), there are \(\delta = \delta(r,K,\varepsilon,\delta') > 0\) and \(D_0 = D_0(r,K,\varepsilon,\delta')\) such that for every \(N\) and every \(D \ge D_0\) the following holds. If \(H\) is a \((\delta, K)\)-well-spread \(r\)-uniform hypergraph on \(N\) vertices with typical degree \(D\), then there is a set \(E'\) of edges with
@@ -200,4 +288,4 @@ The two pictures are the trade-off from the start of the lecture. If \(\frac{rm}
     \end{enumerate}
 \end{lemma}
 
-The numbers in \autoref{lem:nibble} match the heuristic above with \(m = \frac{\varepsilon N}{r}\). (ii) is \(\mathbb{P}(v \text{ uncovered}) \approx e^{-\varepsilon}\). For (iii), an edge \(e \ni x\) with \(x \in V'\) survives in \(H[V']\) iff its other \(r - 1\) vertices are also uncovered, which happens with probability \(\approx (e^{-\varepsilon})^{r-1}\). Thus \(H[V']\) is again nearly regular, with about \(N e^{-\varepsilon}\) vertices and typical degree about \(D e^{-\varepsilon(r-1)}\), so the lemma can be applied to it again.
+The numbers in \autoref{lem:nibble} match the heuristic above with \(m = \frac{\varepsilon N}{r}\). (ii) is \(\mathbb{P}(v \text{ uncovered}) \approx e^{-\varepsilon}\). For (iii), an edge \(e \ni x\) with \(x \in V'\) survives in \(H[V']\) iff its other \(r - 1\) vertices are also uncovered, which happens with probability \(\approx (e^{-\varepsilon})^{r-1}\). Thus \(H[V']\) is again nearly regular, with about \(N e^{-\varepsilon}\) vertices and typical degree about \(D e^{-\varepsilon(r-1)}\). Next time we check that \(H[V']\) is in fact well-spread, iterate \autoref{lem:nibble} to prove \autoref{thm:pippenger}, and then prove the lemma itself.

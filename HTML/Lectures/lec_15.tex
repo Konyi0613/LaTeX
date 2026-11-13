@@ -127,23 +127,32 @@ The opposite idea is to select by the error on a fresh test set
 \]
 
 \begin{remark}
-    This is not \(\Ein\) on another training set: \(\Dtest\) trains nothing.
+    \textbf{Question.} Is this not just selection by \(\Ein\) with \(\Dtest\)
+    in place of \(\mathcal{D}\)? In both cases data pick \(m^*\), so why does
+    one generalize and the other not?
+
+    \textbf{Answer.} A bound does not need the chosen hypothesis to be
+    independent of the data; it needs the \emph{set of candidates} to be fixed
+    before the data that judge them are seen. The VC bound (\autoref{thm:vc})
+    and finite-bin Hoeffding (\autoref{thm:finite-hoeffding}) hold for every
+    candidate at once, so any data-driven pick is covered, at a price set by
+    the size of the candidate set. (Only \autoref{thm:hoeffding-h} needs a
+    single \(h\) fixed in advance.) The two selections differ in what that set
+    is.
     \begin{itemize}
-        \item The index \(m\) runs over the \(M\) \emph{models}, not over
-            hypotheses: each \(\mathcal{H}_m\) may be infinite, but there are
-            only \(M\) of them, e.g.\ the \(1296\) combinations above.
-        \item Every \(g_m = \mathcal{A}_m(\mathcal{D})\) is still learned from
-            \(\mathcal{D}\) alone. \(\Dtest\) only scores the \(M\) finished
-            hypotheses \(g_1, \ldots, g_M\) and picks one.
-        \item Selecting by \(\Ein\) uses \(\mathcal{D}\) twice, to learn each
-            \(g_m\) and then to pick among them, so the whole process searches
-            \(\mathcal{H}_1 \cup \cdots \cup \mathcal{H}_M\) and pays its
-            \(\dvc\).
-        \item On \(\Dtest\) the only choice made is one out of \(M\) fixed
-            hypotheses, which is the setting of finite-bin Hoeffding with
-            \(M\) bins: the price is \(\log M\), whatever the size of each
-            \(\mathcal{H}_m\).
+        \item By \(\Ein\): \(\mathcal{D}\) is used twice, to learn each \(g_m =
+            \mathcal{A}_m(\mathcal{D})\) and to pick among them. Before
+            \(\mathcal{D}\) is seen, the candidates are all of \(\mathcal{H}_1
+            \cup \cdots \cup \mathcal{H}_M\), and the price is its \(\dvc\).
+        \item By \(\Etest\): \(\Dtest\) trains nothing. The \(g_m\) are learned
+            from \(\mathcal{D}\) alone, so before \(\Dtest\) is seen the
+            candidates are just the \(M\) fixed hypotheses \(g_1, \ldots,
+            g_M\), and the price is \(\log M\), however large each
+            \(\mathcal{H}_m\) is.
     \end{itemize}
+    Note that \(m\) counts models, not hypotheses: there are only \(M\) of
+    them, e.g.\ the \(1296\) combinations above, even if each \(\mathcal{H}_m\)
+    is infinite.
 \end{remark}
 
 \begin{itemize}

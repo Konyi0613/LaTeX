@@ -111,7 +111,7 @@
 		\[ \mathbb{P}(X = 0) \le \frac{\mathrm{Var}(X)}{\mathbb{E}[X^2]}. \]
 \end{itemize}
 
-\paragraph{Solution.} Throughout, $\mb E[X^2] < \infty$ (otherwise $\mathrm{Var}(X) = \infty$ and there is nothing to prove), and the denominators are assumed non-zero: $\mb E[X] \neq 0$ in (a) and $\mb E[X^2] > 0$ in (b).
+\paragraph{Solution (to be graded; provided by Chang).} Throughout, $\mb E[X^2] < \infty$ (otherwise $\mathrm{Var}(X) = \infty$ and there is nothing to prove), and the denominators are assumed non-zero: $\mb E[X] \neq 0$ in (a) and $\mb E[X^2] > 0$ in (b).
 
 \begin{proof}[Proof of (a)]
 	Let $\mu = \mb E[X] \neq 0$.
@@ -284,47 +284,84 @@ If $A \neq B$ and $\sigma(A) = \sigma(B)$, then $I = A \setminus B$ and $J = B \
 
 \paragraph{Exercise 4}  Let $x$ be a uniformly random number from $[n]$, and let $X$ be the number of distinct prime numbers between $1$ and $\sqrt{n}$ that divide $x$. Using the fact that, as $m \to \infty$, we have $\sum_{p \; \textrm{prime}, p \le m} \frac{1}{p} = \ln \ln m + O(1)$, show that $\mathrm{Var}(X) = \ln \ln n + O(1)$, and deduce at almost all numbers in $[n]$ have $(1 + o(1)) \ln \ln n$ distinct prime factors.
 
-\paragraph{Solution.} Throughout, $p, q$ denote primes at most $\sqrt n$, and $\pi(\sqrt n) \le \sqrt n$ is their number. Applying the given fact with $m = \sqrt n$ and $\ln \ln \sqrt n = \ln \ln n - \ln 2$,
-\begin{equation}
-	\sum_{p \le \sqrt n} \frac 1p = \ln \ln n + O(1). \tag{4} \label{eq:mertens}
-\end{equation}
-Let $X_p = \mathbf 1_{\{p \mid x\}}$, so $X = \sum_p X_p$. Exactly $\lfloor n/d \rfloor$ elements of $[n]$ are divisible by $d$, and for distinct primes $p \mid x, q \mid x \iff pq \mid x$, so
+\paragraph{Solution (to be graded; provided by Huang).} The probability space is $\Omega = [n]$ with $\mb P(\{x\}) = \frac1n$ for each $x \in [n]$. Throughout, $p, q$ denote primes with $p, q \le \sqrt n$, and $\pi(\sqrt n) \le \sqrt n$ is the number of such primes. For each such $p$ let
 \[
-	\mb P(p \mid x) = \frac{\lfloor n/p \rfloor}{n} \in \left[ \frac 1p - \frac 1n, \frac 1p \right], \qquad \mb P(p \mid x, \, q \mid x) = \frac{\lfloor n/pq \rfloor}{n} \in \left[ \frac{1}{pq} - \frac 1n, \frac{1}{pq} \right].
+	E_p = \{ x \in [n] : p \mid x \}, \qquad X_p = \mathbf 1_{E_p} = \begin{cases} 1, & p \mid x, \\ 0, & \text{otherwise}, \end{cases}
 \]
-In particular $\mb E[X] = \sum_p \mb P(p \mid x) \in \big[ \sum_p \frac1p - \frac{\pi(\sqrt n)}{n}, \sum_p \frac1p \big]$, so $\mb E[X] = \ln \ln n + O(1)$ by \eqref{eq:mertens}.
+so that $X = \sum_{p \le \sqrt n} X_p$.
+
+\emph{The mean.} For any integer $d \ge 1$, the number of multiples of $d$ in $[n]$ is $\lfloor n/d \rfloor \in (\frac nd - 1, \frac nd]$, so
+\begin{equation}
+	\mb P(d \mid x) = \frac{\lfloor n/d \rfloor}{n} = \frac 1d + O\left( \frac 1n \right), \tag{4} \label{eq:div}
+\end{equation}
+where here and below the implied constants are absolute (the error in \eqref{eq:div} lies in $(-\frac1n, 0]$). Hence $\mb E[X_p] = \mb P(E_p) = \frac1p + O(\frac1n)$ and
+\[
+	\mb E[X] = \sum_{p \le \sqrt n} \mb E[X_p] = \sum_{p \le \sqrt n} \left( \frac 1p + O\left( \frac1n \right) \right) = \sum_{p \le \sqrt n} \frac 1p + O\left( \frac{\pi(\sqrt n)}{n} \right).
+\]
+Since $\pi(\sqrt n) \le \sqrt n$, we have $O\big( \frac{\pi(\sqrt n)}{n} \big) = O\big( \frac{1}{\sqrt n} \big) = o(1)$. Also, by the given fact with $m = \sqrt n$,
+\begin{equation}
+	\sum_{p \le \sqrt n} \frac 1p = \ln \ln \sqrt n + O(1) = \ln\left( \tfrac12 \ln n \right) + O(1) = \ln \ln n - \ln 2 + O(1) = \ln \ln n + O(1), \tag{5} \label{eq:mertens}
+\end{equation}
+so $\mb E[X] = \ln \ln n + O(1)$.
 
 \begin{proof}[Proof that $\mathrm{Var}(X) = \ln \ln n + O(1)$]
-	We use $\mathrm{Var}(X) = \sum_p \mathrm{Var}(X_p) + \sum_{p \neq q} \mathrm{Cov}(X_p, X_q)$, the second sum over ordered pairs.
+	We have
+	\[
+		\mathrm{Var}(X) = \sum_{p \le \sqrt n} \mathrm{Var}(X_p) + \sum_{\substack{p, q \le \sqrt n \\ p \neq q}} \mathrm{Cov}(X_p, X_q),
+	\]
+	the second sum running over ordered pairs.
 
-	\emph{Diagonal terms.} $\mathrm{Var}(X_p) = \mb P(p \mid x)\big( 1 - \mb P(p \mid x) \big)$ satisfies
+	\emph{Variances.} Since $X_p^2 = \mathbf 1_{E_p}^2 = \mathbf 1_{E_p} = X_p$,
 	\[
-		\frac 1p \ge \mathrm{Var}(X_p) \ge \left( \frac 1p - \frac 1n \right)\left( 1 - \frac 1p \right) \ge \frac 1p - \frac{1}{p^2} - \frac1n.
+		\mathrm{Var}(X_p) = \mb E[X_p^2] - \mb E[X_p]^2 = \left( \frac 1p + O\left( \frac1n \right) \right) - \left( \frac 1p + O\left( \frac1n \right) \right)^2 = \frac 1p - \frac{1}{p^2} + O\left( \frac 1n \right).
 	\]
-	As $\sum_p \frac{1}{p^2} < \sum_{j \ge 2} \frac{1}{j^2} < 1$ and $\sum_p \frac 1n \le \frac{\sqrt n}{n} \le 1$, \eqref{eq:mertens} gives $\sum_p \mathrm{Var}(X_p) = \ln \ln n + O(1)$.
+	Note that $\sum_{p \le \sqrt n} \frac{1}{p^2} \le \sum_{k=1}^\infty \frac{1}{k^2} = \frac{\pi^2}{6} = O(1)$ and $O\big( \frac{\pi(\sqrt n)}{n} \big) = o(1)$, so by \eqref{eq:mertens}
+	\[
+		\begin{aligned}
+			\sum_{p \le \sqrt n} \mathrm{Var}(X_p) &= \sum_{p \le \sqrt n} \frac 1p - \sum_{p \le \sqrt n} \frac{1}{p^2} + O\left( \frac{\pi(\sqrt n)}{n} \right) \\
+			&= \big( \ln \ln n + O(1) \big) - O(1) + o(1) = \ln \ln n + O(1).
+		\end{aligned}
+	\]
 
-	\emph{Covariances.} For $p \neq q$, using the bounds above (note $\frac 1p - \frac 1n \ge 0$),
+	\emph{Covariances.} For distinct primes $p, q \le \sqrt n$ we have $p \mid x$ and $q \mid x$ if and only if $pq \mid x$, so $X_p X_q = \mathbf 1_{\{pq \mid x\}}$ and, by \eqref{eq:div} with $d = pq$,
 	\[
-		\mathrm{Cov}(X_p, X_q) \le \frac{1}{pq} - \left( \frac1p - \frac1n \right) \left( \frac1q - \frac1n \right) \le \frac1n \left( \frac 1p + \frac 1q \right), \]
-	\[ \mathrm{Cov}(X_p, X_q) \ge \frac{1}{pq} - \frac 1n - \frac{1}{pq} = -\frac1n.
+		\mb E[X_p X_q] = \mb P(pq \mid x) = \frac{\lfloor n/pq \rfloor}{n} = \frac{1}{pq} + O\left( \frac 1n \right).
 	\]
-	There are at most $\pi(\sqrt n)^2 \le n$ ordered pairs, and each prime $p$ occurs in fewer than $2\pi(\sqrt n)$ of them, so by \eqref{eq:mertens}
+	Therefore
 	\[
-		-1 \le \sum_{p \neq q} \mathrm{Cov}(X_p, X_q) \le \frac{2 \pi(\sqrt n)}{n} \sum_p \frac1p \le \frac{2(\ln \ln n + O(1))}{\sqrt n} = o(1).
+		\begin{aligned}
+			\mathrm{Cov}(X_p, X_q) &= \mb E[X_p X_q] - \mb E[X_p] \mb E[X_q] \\
+			&= \left( \frac{1}{pq} + O\left( \frac1n \right) \right) - \left( \frac1p + O\left( \frac1n \right) \right) \left( \frac1q + O\left( \frac1n \right) \right) = O\left( \frac1n \right),
+		\end{aligned}
 	\]
-	Here the choice of the range $p \le \sqrt n$ is what makes the error terms $-\frac1n$ summable. Adding up, $\mathrm{Var}(X) = \ln \ln n + O(1)$.
+	with an absolute implied constant (explicitly, $\card{\mathrm{Cov}(X_p, X_q)} \le \frac3n$, since each error term in \eqref{eq:div} has absolute value less than $\frac1n$ and $\frac1p, \frac1q \le \frac12$). There are at most $\pi(\sqrt n)^2 \le (\sqrt n)^2 = n$ ordered pairs of distinct primes $p, q \le \sqrt n$, hence
+	\[
+		\Big| \sum_{p \neq q} \mathrm{Cov}(X_p, X_q) \Big| \le n \cdot O\left( \frac 1n \right) = O(1).
+	\]
+	Adding up, $\mathrm{Var}(X) = \big( \ln \ln n + O(1) \big) + O(1) = \ln \ln n + O(1)$.
 \end{proof}
 
 \begin{proof}[Deduction]
-	Let $\nu(x)$ be the number of distinct prime factors of $x$. Two distinct primes larger than $\sqrt n$ have product larger than $n \ge x$, so $x$ has at most one prime factor exceeding $\sqrt n$, and $X(x) \le \nu(x) \le X(x) + 1$. Fix a constant $C$ with $\card{\mb E[X] - \ln \ln n} \le C$ and $\mathrm{Var}(X) \le \ln \ln n + C$. By Chebyshev's inequality with $a = (\ln \ln n)^{3/4}$,
+	\emph{$X$ is concentrated.} By Chebyshev's inequality, $\mb P(\card{X - \mb E[X]} \ge t) \le \frac{\mathrm{Var}(X)}{t^2}$ for $t > 0$. Fix a constant $\eps > 0$ and set $t = \eps \ln \ln n$. Then
 	\[
-		\mb P\Big( \card{X - \mb E[X]} \ge (\ln \ln n)^{3/4} \Big) \le \frac{\ln \ln n + C}{(\ln \ln n)^{3/2}} \to 0.
+		\mb P\big( \card{X - \mb E[X]} \ge \eps \ln \ln n \big) \le \frac{\mathrm{Var}(X)}{\eps^2 (\ln \ln n)^2} = \frac{\ln \ln n + O(1)}{\eps^2 (\ln \ln n)^2} = O\left( \frac{1}{\ln \ln n} \right) = o(1)
 	\]
-	Outside this event,
+	as $n \to \infty$. Since $\card{\mb E[X] - \ln \ln n} = O(1) \le \eps \ln \ln n$ for $n$ large, with high probability
 	\[
-		\card{\nu(x) - \ln \ln n} \le \card{X - \mb E[X]} + \card{\mb E[X] - \ln \ln n} + 1 \le (\ln \ln n)^{3/4} + C + 1 = o(\ln \ln n).
+		\card{X - \ln \ln n} \le \card{X - \mb E[X]} + \card{\mb E[X] - \ln \ln n} < 2\eps \ln \ln n,
 	\]
-	Hence all but $o(n)$ numbers $x \in [n]$ have $\nu(x) = (1 + o(1)) \ln \ln n$.
+	i.e.\ $X = (1 \pm 2\eps) \ln \ln n$. As $\eps > 0$ is arbitrary, $X = (1 + o(1)) \ln \ln n$ with high probability.
+
+	\emph{From $X$ to all prime factors.} Let $\omega(x)$ denote the number of distinct prime factors of $x \in [n]$. Every prime factor of $x$ is either $\le \sqrt n$ or $> \sqrt n$.
+	\begin{itemize}
+		\item The number of distinct prime factors $\le \sqrt n$ is exactly $X$.
+		\item If $x$ had two distinct prime factors $q_1 < q_2$ with $q_1, q_2 > \sqrt n$, then $x \ge q_1 q_2 > (\sqrt n)^2 = n$, contradicting $x \in [n]$. Thus $x$ has at most one prime factor greater than $\sqrt n$.
+	\end{itemize}
+	Hence $X \le \omega(x) \le X + 1$, so
+	\[
+		\frac{X}{\ln \ln n} \le \frac{\omega(x)}{\ln \ln n} \le \frac{X}{\ln \ln n} + \frac{1}{\ln \ln n}.
+	\]
+	Since $\frac{X}{\ln \ln n} = 1 + o(1)$ with high probability and $\frac{1}{\ln \ln n} = o(1)$, it follows that $\frac{\omega(x)}{\ln \ln n} = 1 + o(1)$ with probability $1 - o(1)$. That is, almost all numbers in $[n]$ have $(1 + o(1)) \ln \ln n$ distinct prime factors.
 \end{proof}
 
 \paragraph{Exercise 5}  Let $a_1, a_2, \hdots, a_n$ be real numbers with $\sum_{i=1}^n a_i^2 = 1$, and let $( \varepsilon_1, \hdots, \varepsilon_n)$ be a uniformly random vector in $\{-1,1\}^n$.

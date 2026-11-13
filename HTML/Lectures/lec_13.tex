@@ -630,8 +630,16 @@ can never reach.
         cannot model that function.
     \item It differs from stochastic noise in two ways.
         \begin{itemize}
-            \item It depends on \(\mathcal{H}\): a larger set gets closer to
-                \(f\) and leaves less of it.
+            \item It depends on \(\mathcal{H}\). The gray area is \(f -
+                h^*\), and \(h^*\) is the best \emph{in} \(\mathcal{H}\), so
+                changing \(\mathcal{H}\) changes \(h^*\) and hence the gap. If
+                \(\mathcal{H} \subset \mathcal{H}'\), the best \(h'^*\) of
+                \(\mathcal{H}'\) is at least as close to \(f\) as \(h^*\) (which
+                \(\mathcal{H}'\) also contains), so the larger set leaves less
+                deterministic noise; once \(f \in \mathcal{H}'\), none is left.
+                Stochastic noise \(\epsilon\) comes from how the data are
+                generated and stays the same whatever \(\mathcal{H}\) we
+                choose.
             \item It is fixed for a given \(\bm{x}\): the same \(x_n\) always
                 carries the same \(f(x_n) - h^*(x_n)\), whereas \(\epsilon\) is
                 redrawn for each example.
@@ -753,9 +761,14 @@ is noise.
     \item Possible action 1 is to correct its label (\vocab{data cleaning}).
     \item Possible action 2 is to remove the example (\vocab{data pruning}).
 \end{itemize}
-Either action lowers the noise the learner sees. Both depend on the detection,
-though, and the same rules also flag examples that are correct but unusual.
-Removing those leaves a less representative data set.
+Either action lowers the noise the learner sees, but only if the detection is
+right, and none of the rules above can tell a mislabelled example from a
+correctly labelled one that merely looks unusual. A `5' written thin and
+upright really is close to the \(\circ\)'s and really is misclassified by the
+current classifier, so every rule flags it too. Relabelling it as `1' adds
+noise instead of removing it. Pruning it throws away the one kind of example
+that shows what such a `5' looks like, so the remaining data no longer
+represent the real distribution, and \(g\) may fail on exactly those cases.
 
 \begin{moral}
     Possibly helps, but \textbf{effect varies}.
