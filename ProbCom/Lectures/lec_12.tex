@@ -1,0 +1,98 @@
+\lecture{12}{13 Nov.}{}
+
+The lecture began by recalling \autoref{lem:nibble} and \autoref{rmk:nibble-well-spread}, and sketched the proof of (iii) of \autoref{lem:nibble}; the full argument is in \autoref{sec:nibble-lemma-proof}.
+
+\begin{remark}[Sketch of the proof of (iii)]\label{rmk:nibble-iii-sketch}
+    Condition on \(x \in V'\). An edge \(e \ni x\) survives in \(H[V']\) iff the vertices of \(e \setminus \{x\}\) are in \(V'\) too, i.e.\ iff no edge of \(F_{x}(e) = \{ f \in E(H) : f \not\ni x,\ f \cap e \ne \varnothing \}\) is selected. A typical \(x\) has \(\deg(x) \approx D\), and almost all edges through it contain only vertices of degree \(\approx D\) (\autoref{claim:good-vertices}). For these edges \(\abs{F_{x}(e)} \approx (r-1)D\), so
+    \[
+        \mathbb{P}\bigl( e \in H[V'] \bigr) \approx (1 - p)^{(r-1)D} = \Bigl( 1 - \frac{\varepsilon}{D} \Bigr)^{(r-1)D} \approx e^{-\varepsilon(r-1)} .
+    \]
+    Small codegrees make the covariances small: if \(e \cap e' = \{x\}\), then \(\abs{F_{x}(e) \cap F_{x}(e')} \le (r-1)^{2} \delta D\).
+\end{remark}
+
+The nibble was also compared with the \emph{differential equation method}, which was only mentioned.
+
+\chapter{The Lov\'asz Local Lemma}
+
+\section{Rare Events Under Limited Dependence}\label{sec:lll-motivation}
+
+Toss a fair coin \(n\) times. We expect to see \(\frac{n}{2}\) heads; can we see \(0\) heads? If the tosses are independent, then
+\[
+    \mathbb{P}(0 \text{ heads}) = \mathbb{P}(T, T, \ldots, T) = \Bigl( \frac{1}{2} \Bigr)^{n} > 0 .
+\]
+Now suppose the first two coins are quantum-entangled: they always show opposite results, as in \(H, T, T, H, T, \ldots\). The first toss is independent of all tosses but the \(2^{\text{nd}}\), yet \(\mathbb{P}(0 \text{ heads}) = 0\), since one of the first two coins shows heads. So a little dependence can make it impossible to avoid all the bad events \(\{\text{toss } i \text{ is heads}\}\). \autoref{thm:lll-symmetric} below says that \(\mathbb{P}(\text{no bad event}) > 0\) still holds when each bad event \(A_{i}\) is independent of all but at most \(d\) others and \(\mathbb{P}(A_{i}) \le p\) with \(e p (d+1) \le 1\). In the entangled example \(p = \frac{1}{2}\) and \(d = 1\), so \(e p (d+1) = e > 1\) and the lemma does not apply.
+
+\begin{definition}[Mutual independence]\label{def:mutually-independent}
+    An event \(A\) is \vocab{mutually independent} of a family of events \(\{ B_{1}, \ldots, B_{m} \}\) if
+    \[
+        \mathbb{P}\Bigl( A \cap \bigcap_{j \in S} B_{j} \Bigr) = \mathbb{P}(A) \, \mathbb{P}\Bigl( \bigcap_{j \in S} B_{j} \Bigr)
+        \qquad \text{for every } S \subseteq [m] .
+    \]
+\end{definition}
+
+The intersections \(\bigcap_{j \in S} B_{j}\) form a \(\pi\)-system generating \(\sigma(B_{1}, \ldots, B_{m})\), so by the \(\pi\)--\(\lambda\) theorem this is equivalent to \(A\) being independent of every event built from the \(B_{j}\) by complements, intersections and unions. The \(B_{j}\) need not be independent of each other.
+
+\begin{definition}[Dependency digraph]\label{def:dependency-digraph}
+    Let \(A_{1}, A_{2}, \ldots, A_{n}\) be events in a probability space. A directed graph \(\Gamma = ([n], E)\) is a \vocab{dependency digraph} if for every \(i\), the event \(A_{i}\) is mutually independent of \(\{ A_{j} : j \ne i,\ (i,j) \notin E(\Gamma) \}\).
+\end{definition}
+
+\begin{remark}\label{rmk:dependency-digraph}\hfill
+    \begin{enumerate}[(1)]
+        \item \emph{\(\Gamma\) need not be symmetric.} \autoref{def:dependency-digraph} asks for \emph{mutual} independence of \(A_{i}\) from all its non-neighbours together, which is stronger than pairwise independence. For two fair coins, let \(A_{1} = \{\text{coin 1 is heads}\}\), \(A_{2} = \{\text{coin 2 is heads}\}\) and \(A_{3} = \{\text{the coins agree}\}\). These are pairwise independent, but \(\mathbb{P}(A_{3} \mid A_{1} \cap A_{2}) = 1 \ne \frac{1}{2}\), and likewise each \(A_{i}\) depends on the other two together. So every vertex needs an out-edge, and the directed cycle \(1 \to 2 \to 3 \to 1\) is a dependency digraph with \(d = 1\): each \(A_{i}\) only has to be independent of its single non-neighbour. In it \((1,3) \notin E(\Gamma)\) but \((3,1) \in E(\Gamma)\).
+        \item \emph{An edge does not mean dependence.} Adding edges to a dependency digraph keeps it one, since a subfamily of a mutually independent family is still mutually independent; the complete digraph is always a dependency digraph. So \(\Gamma\) only bounds the dependencies from above. For instance, in \autoref{sec:lll-ramsey} two events \(A_{K}, A_{K'}\) with \(\abs{K \cap K'} = 2\) are joined, although they are pairwise independent: with \(m = \binom{k}{2}\), conditioning on the colour of the shared edge gives \(\mathbb{P}(A_{K} \cap A_{K'}) = 2 \cdot \frac{1}{2} \cdot 2^{-(m-1)} \cdot 2^{-(m-1)} = \mathbb{P}(A_{K}) \mathbb{P}(A_{K'})\).
+    \end{enumerate}
+\end{remark}
+
+\begin{theorem}[Lov\'asz Local Lemma, symmetric case; Erd\H{o}s--Lov\'asz, 1975]\label{thm:lll-symmetric}
+    Let \(A_{1}, A_{2}, \ldots, A_{n}\) be events in a probability space. Let \(\Gamma\) be a dependency digraph of maximum out-degree \(d\), and suppose \(\mathbb{P}(A_{i}) \le p\) for all \(i\). If \(e p (d+1) \le 1\), then
+    \[
+        \mathbb{P}\Bigl( \bigcap_{i=1}^{n} A_{i}^{c} \Bigr) > 0 .
+    \]
+\end{theorem}
+
+\section{Ramsey Numbers via the Local Lemma}\label{sec:lll-ramsey}
+
+So far we have
+\[
+    \begin{aligned}
+        R(k) &\ge \frac{1 + o(1)}{e\sqrt{2}} \, k \, 2^{k/2} && \text{(first moment, \autoref{prop:ramsey-union-sharp})}, \\
+        R(k) &\ge \frac{1 + o(1)}{e} \, k \, 2^{k/2} && \text{(alteration, \autoref{cor:ramsey-alteration})}.
+    \end{aligned}
+\]
+
+\begin{theorem}\label{thm:ramsey-lll}
+    \(R(k) \ge (1 - o(1)) \dfrac{\sqrt{2}}{e} \, k \, 2^{k/2}\).
+\end{theorem}
+
+\begin{proof}
+    \emph{Probability space and events.} Take a uniformly random red/blue coloring of \(E(K_{n})\), \(V = V(K_n)\), and for \(K \in \binom{V}{k}\) let
+    \[
+        A_{K} \coloneqq \{ K \text{ spans a monochromatic clique} \},
+        \qquad
+        \mathbb{P}(A_{K}) = 2^{1 - \binom{k}{2}} \eqqcolon p .
+    \]
+    \emph{Dependency digraph.} \(A_{K}\) is determined by the colors of the edges inside \(K\). If \(\abs{K' \cap K} \le 1\), then \(K\) and \(K'\) share no edge, so \(A_{K}\) is mutually independent of \(\{ A_{K'} : \abs{K' \cap K} \le 1 \}\). So the digraph \(\Gamma\) on \(\binom{V}{k}\) with \(K \to K'\) iff \(K' \ne K\) and \(\abs{K \cap K'} \ge 2\) is a dependency digraph. By symmetry every \(K\) has the same out-degree, so its maximum out-degree is
+    \[
+        d = \# \bigl\{ K' \in \tbinom{V}{k} : K' \ne K,\ \abs{K \cap K'} \ge 2 \bigr\} .
+    \]
+    Every \(K'\) with \(\abs{K \cap K'} \ge 2\), including \(K' = K\), arises by choosing a pair inside \(K\) and \(k-2\) further vertices from the other \(n-2\) (possibly in several ways), so
+    \[
+        d + 1 = \# \bigl\{ K' : \abs{K \cap K'} \ge 2 \bigr\} \le \binom{k}{2} \binom{n-2}{k-2} .
+    \]
+    \emph{Applying the local lemma.} By \autoref{thm:lll-symmetric}, if
+    \begin{equation}\label{eq:ramsey-lll-condition}
+        e \, 2^{1 - \binom{k}{2}} \binom{k}{2} \binom{n-2}{k-2} \le 1 ,
+    \end{equation}
+    then with positive probability no \(A_{K}\) occurs, i.e.\ there is a 2-coloring of \(E(K_{n})\) without a monochromatic \(K_{k}\), and so \(R(k) > n\).
+
+    \emph{Choosing \(n\).} Using \(\binom{n-2}{k-2} \le \bigl( \frac{(n-2)e}{k-2} \bigr)^{k-2}\) and \(1 - \binom{k}{2} = 1 - \frac{k(k-1)}{2} = -\frac{(k-2)(k+1)}{2}\),
+    \[
+        2^{1 - \binom{k}{2}} \binom{n-2}{k-2} \le \Bigl( \frac{(n-2)e}{k-2} \Bigr)^{k-2} 2^{-\frac{(k-2)(k+1)}{2}} = x^{k-2},
+        \qquad
+        x \coloneqq \frac{(n-2)e}{(k-2) \, 2^{\frac{k+1}{2}}} .
+    \]
+    So \eqref{eq:ramsey-lll-condition} holds once \(x \le c_{k} \coloneqq \bigl( e\binom{k}{2} \bigr)^{-1/(k-2)}\), and \(c_{k} \to 1\) because \(\frac{\ln(e k^{2})}{k-2} \to 0\). Taking \(n\) as large as \(x \le c_{k}\) allows,
+    \[
+        R(k) > n = (1 - o(1)) \frac{(k-2) \, 2^{\frac{k+1}{2}}}{e} = (1 - o(1)) \frac{\sqrt{2}}{e} \, k \, 2^{k/2} . \qedhere
+    \]
+\end{proof}
