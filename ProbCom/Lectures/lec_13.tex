@@ -1,0 +1,328 @@
+\lecture{13}{17 Nov.}{}
+\section{Property B via the Local Lemma}\label{sec:lll-property-B}
+
+Recall from \autoref{sec:property-B} that \(m(k)\) is the least number of edges of a \(k\)-uniform hypergraph without Property B, and that
+\[
+    c \sqrt{\frac{k}{\ln k}} \, 2^{k} \le m(k) \le C k^{2} 2^{k} .
+\]
+The lower bound comes from the random greedy coloring (Cherkashin--Kozik), improving \(m(k) \ge 2^{k-1}\) of \autoref{prop:m-lower}, and the upper bound from a random hypergraph (\autoref{thm:m-upper-random}). All of these bound the \emph{total} number of edges. The local lemma instead only asks that each edge meets few others, and allows any number of edges.
+
+\begin{proposition}\label{prop:property-B-lll}
+    Let \(H\) be a \(k\)-uniform hypergraph in which every edge intersects at most \(\frac{2^{k-1}}{e} - 1\) other edges. Then \(H\) has Property B.
+\end{proposition}
+
+\begin{proof}
+    Color each vertex of \(H\) red or blue with probability \(\frac{1}{2}\) each, independently. Let \(E(H) = \{e_{1}, \ldots, e_{m}\}\) and \(A_{i} \coloneqq \{ e_{i} \text{ is monochromatic} \}\); as in \autoref{prop:m-lower},
+    \[
+        \mathbb{P}(A_{i}) = 2 \cdot 2^{-k} = 2^{1-k} \eqqcolon p .
+    \]
+    \(A_{i}\) is determined by the colors of the vertices of \(e_{i}\), and the events \(\{ A_{j} : e_{j} \cap e_{i} = \varnothing \}\) are determined by the colors of vertices outside \(e_{i}\), which are independent of those in \(e_{i}\). So \(A_{i}\) is mutually independent of \(\{ A_{j} : e_{j} \cap e_{i} = \varnothing \}\), and the digraph \(\Gamma\) with \(i \to j\) iff \(j \ne i\) and \(e_{i} \cap e_{j} \ne \varnothing\) is a dependency digraph (\autoref{def:dependency-digraph}) of maximum out-degree \(d \le \frac{2^{k-1}}{e} - 1\), by the hypothesis of \autoref{prop:property-B-lll}. Then
+    \[
+        e p (d+1) \le e \cdot 2^{1-k} \cdot \frac{2^{k-1}}{e} = 1 ,
+    \]
+    so by \thmref{thm:lll-symmetric}, \(\mathbb{P}\bigl( \bigcap_{i} A_{i}^{c} \bigr) > 0\). Hence some coloring has no monochromatic edge, i.e.\ \(H\) has Property B.
+\end{proof}
+
+\section{The Off-Diagonal Ramsey Number \texorpdfstring{\(R(3,k)\)}{R(3,k)}}\label{sec:r3k}
+
+\begin{definition}\label{def:r3k}
+    \[
+        R(3,k) \coloneqq \min \{ n : \text{every red/blue coloring of } E(K_{n}) \text{ has a red } K_{3} \text{ or a blue } K_{k} \} .
+    \]
+\end{definition}
+
+We first record the two bounds that the earlier methods give.
+
+\begin{proposition}\label{prop:r3k-upper}
+    \(R(3,k) \le \binom{k+1}{2}\) for every \(k \ge 2\); in particular \(R(3,k) = O(k^{2})\).
+\end{proposition}
+
+\begin{proof}
+    \emph{Base case.} \(R(3,2) \le 3\): in a coloring of \(E(K_{3})\), either some edge is blue, which is a blue \(K_{2}\), or all three edges are red, which is a red \(K_{3}\).
+
+    \emph{Recursion.} We show \(R(3,k) \le R(3,k-1) + k\) for \(k \ge 3\), following the proof of \thmref{thm:erdos-szekeres}. Let \(N \coloneqq R(3,k-1) + k\), color \(E(K_{N})\), fix a vertex \(v\), and let
+    \[
+        \mathrm{Red}(v) \coloneqq \{ u : uv \text{ red} \}, \qquad
+        \mathrm{Blue}(v) \coloneqq \{ u : uv \text{ blue} \},
+    \]
+    so that \(\abs{\mathrm{Red}(v)} + \abs{\mathrm{Blue}(v)} = N - 1 = R(3,k-1) + k - 1\).
+    So \(\abs{\mathrm{Red}(v)} \ge k\) or \(\abs{\mathrm{Blue}(v)} \ge R(3,k-1)\).
+    \begin{itemize}
+        \item If \(\abs{\mathrm{Red}(v)} \ge k\): if some edge \(uw\) with \(u, w \in \mathrm{Red}(v)\) is red, then \(\{u, v, w\}\) is a red \(K_{3}\). Otherwise all edges inside \(\mathrm{Red}(v)\) are blue, and any \(k\) of its vertices span a blue \(K_{k}\).
+        \item If \(\abs{\mathrm{Blue}(v)} \ge R(3,k-1)\): by definition of \(R(3,k-1)\), the coloring inside \(\mathrm{Blue}(v)\) has a red \(K_{3}\), or a blue \(K_{k-1}\) on some \(S \subseteq \mathrm{Blue}(v)\). In the latter case all edges from \(v\) to \(S\) are blue, so \(S \cup \{v\}\) spans a blue \(K_{k}\).
+    \end{itemize}
+    Hence \(R(3,k) \le N\). Iterating from the base case,
+    \[
+        R(3,k) \le R(3,2) + \sum_{j=3}^{k} j \le 3 + \sum_{j=3}^{k} j = \sum_{j=1}^{k} j = \binom{k+1}{2} . \qedhere
+    \]
+\end{proof}
+
+\begin{proposition}\label{prop:r3k-alteration}
+    There is \(c > 0\) such that \(R(3,k) \ge c \bigl( \frac{k}{\ln k} \bigr)^{3/2}\) for all large \(k\).
+\end{proposition}
+
+\begin{proof}
+    \emph{Alteration.} This is the argument of \autoref{thm:ramsey-alteration} with two kinds of bad structures. Color each edge of \(K_{n}\) red with probability \(q\) and blue with probability \(1 - q\), independently. Let \(X\) be the number of red triangles and \(Y\) the number of blue \(K_{k}\)'s. Deleting one vertex from each red triangle and from each blue \(K_{k}\) removes at most \(X + Y\) vertices, and on the remaining \(\ge n - X - Y\) vertices there is no red \(K_{3}\) and no blue \(K_{k}\). Some coloring has \(X + Y \le \mathbb{E}[X + Y]\), so by linearity of expectation (\thmref{thm:linearity})
+    \begin{equation}\label{eq:r3k-alteration}
+        R(3,k) > n - \mathbb{E}[X] - \mathbb{E}[Y],
+        \qquad
+        \mathbb{E}[X] = \binom{n}{3} q^{3} \le \frac{n^{3} q^{3}}{6},
+        \qquad
+        \mathbb{E}[Y] = \binom{n}{k} (1-q)^{\binom{k}{2}} \le n^{k} e^{-q \frac{k(k-1)}{2}} ,
+    \end{equation}
+    using \(\binom{n}{k} \le n^{k}\) and \(1 - q \le e^{-q}\).
+
+    \emph{Choice of parameters.} Given large \(k\), let
+    \[
+        n \coloneqq \Bigl\lfloor \Bigl( \frac{k}{6 \ln k} \Bigr)^{3/2} \Bigr\rfloor,
+        \qquad
+        q \coloneqq n^{-2/3} \le 1 .
+    \]
+    Then \(\mathbb{E}[X] \le \frac{n^{3} n^{-2}}{6} = \frac{n}{6}\). Since \(n^{2/3} \le \frac{k}{6 \ln k}\) and \(\ln n \le \frac{3}{2} \ln k\),
+    \[
+        2 n^{2/3} \ln n \le 2 \cdot \frac{k}{6 \ln k} \cdot \frac{3}{2} \ln k = \frac{k}{2} \le k - 1,
+        \qquad\text{so}\qquad
+        q \, \frac{k(k-1)}{2} = \frac{k (k-1)}{2 n^{2/3}} \ge k \ln n ,
+    \]
+    and \(\mathbb{E}[Y] \le n^{k} e^{-k \ln n} = 1\). By \eqref{eq:r3k-alteration}, for \(n \ge 3\),
+    \[
+        R(3,k) > n - \frac{n}{6} - 1 \ge \frac{n}{2} \ge \frac{1}{2} \Bigl( \Bigl( \frac{k}{6 \ln k} \Bigr)^{3/2} - 1 \Bigr) \ge c \Bigl( \frac{k}{\ln k} \Bigr)^{3/2} . \qedhere
+    \]
+\end{proof}
+
+\subsection{The Symmetric Local Lemma Fails}\label{sec:r3k-symmetric}
+
+Color each edge of \(K_{n}\) red with probability \(q\) and blue with probability \(1-q\), independently. For \(T \in \binom{[n]}{3}\) and \(K \in \binom{[n]}{k}\) let
+\[
+    \begin{aligned}
+        A_{T} &\coloneqq \{ T \text{ spans a red triangle} \}, & \mathbb{P}(A_{T}) &= q^{3}, \\
+        B_{K} &\coloneqq \{ K \text{ spans a blue } K_{k} \}, & \mathbb{P}(B_{K}) &= (1-q)^{\binom{k}{2}} .
+    \end{aligned}
+\]
+Each event is determined by the colors of the edges inside its vertex set. So, as in \autoref{thm:ramsey-lll}, it is mutually independent of all events whose vertex sets share no edge with it, i.e.\ meet it in \(\le 1\) vertex. Hence the digraph \(\Gamma\) with an edge from one event to another iff their vertex sets share \(\ge 2\) vertices is a dependency digraph, and the out-degrees are
+\[
+    \begin{aligned}
+        \deg^{+}(A_{T}) &= \# \{ T' \ne T : \abs{T' \cap T} = 2 \} + \# \{ K : \abs{K \cap T} \ge 2 \} \\
+        &\le \binom{3}{2} (n-3) + \binom{3}{2} \binom{n-2}{k-2}, \\
+        \deg^{+}(B_{K}) &= \# \{ T : \abs{T \cap K} \ge 2 \} + \# \{ K' \ne K : \abs{K' \cap K} \ge 2 \} \\
+        &\le \binom{k}{2} (n-2) + \binom{k}{2} \binom{n-2}{k-2} .
+    \end{aligned}
+\]
+Each term counts, for every pair \(\{u, v\}\) inside the vertex set (\(\binom{3}{2}\) pairs in \(T\), \(\binom{k}{2}\) pairs in \(K\)), the triangles through \(\{u, v\}\), which have \(n-2\) choices of third vertex (\(n-3\) if it must lie outside \(T\)), or the \(k\)-sets through \(\{u, v\}\), which have \(\binom{n-2}{k-2}\) choices of the other \(k-2\) vertices. A set containing several of these pairs is counted several times, hence \(\le\); for \(\{ T' \ne T : \abs{T' \cap T} = 2 \}\) each \(T'\) contains exactly one pair of \(T\), so the count \(\binom{3}{2}(n-3)\) is exact.
+
+\emph{Applying \thmref{thm:lll-symmetric}.} Take
+\[
+    p \coloneqq \max \Bigl\{ q^{3}, (1-q)^{\binom{k}{2}} \Bigr\} \ge \text{every } \mathbb{P}(A_{T}), \mathbb{P}(B_{K}),
+    \qquad
+    d \coloneqq \max \bigl\{ \deg^{+}(A_{T}), \deg^{+}(B_{K}) \bigr\} .
+\]
+If \(e p (d+1) \le 1\), then \thmref{thm:lll-symmetric} gives, with positive probability, no \(A_{T}\) and no \(B_{K}\), i.e.\ a coloring of \(E(K_{n})\) with no red \(K_{3}\) and no blue \(K_{k}\), so \(R(3,k) > n\). The task is to find the largest \(n\) for which some \(q\) satisfies \(e p (d+1) \le 1\).
+
+\emph{Choosing \(q\).} \(d\) does not depend on \(q\), so the best \(q\) minimizes \(p\). Since \(q^{3}\) increases and \((1-q)^{\binom{k}{2}}\) decreases in \(q\), the maximum is smallest where they are equal: \(q^{3} \approx (1-q)^{\binom{k}{2}} \approx e^{-q k^{2}/2}\). Taking logarithms, \(3 \ln \frac{1}{q} \approx \frac{q k^{2}}{2}\) with \(\ln \frac{1}{q} \approx 2 \ln k\), so
+\[
+    q \approx \frac{12 \ln k}{k^{2}}, \qquad p \approx \Bigl( \frac{12 \ln k}{k^{2}} \Bigr)^{3} .
+\]
+
+\emph{Result.} For \(n \ge k + 1\) the largest term in the out-degree bounds is \(\binom{k}{2} \binom{n-2}{k-2}\), so \(d \approx \binom{k}{2} \binom{n-2}{k-2}\), and \(e p (d+1) \le 1\) becomes
+\[
+    e \Bigl( \frac{12 \ln k}{k^{2}} \Bigr)^{3} \binom{k}{2} \binom{n-2}{k-2} \lesssim 1 ,
+    \qquad\text{i.e.}\qquad
+    \binom{n-2}{k-2} \lesssim \frac{k^{4}}{\ln^{3} k} .
+\]
+Writing \(n = k + c\), we have \(\binom{n-2}{k-2} = \binom{k+c-2}{c} \approx \frac{k^{c}}{c!}\), which is \(\lesssim \frac{k^{4}}{\ln^{3} k}\) only for \(c \le 3\). So the symmetric lemma gives at best \(R(3,k) > k + 3\), far weaker than \autoref{prop:r3k-alteration}.
+
+The problem is that the two kinds of events are very different. \(A_{T}\) is fairly likely but has few neighbours of its own kind; \(B_{K}\) is extremely unlikely but has a huge number of neighbours. The symmetric lemma pairs the worst \(p\) (from \(A_{T}\)) with the worst \(d\) (from \(B_{K}\)). The general lemma below gives each event its own weight.
+
+\subsection{The General Local Lemma}\label{sec:lll-general}
+
+\begin{theorem}[Lov\'asz Local Lemma, general case]\label{thm:lll-general}
+    Let \(A_{1}, \ldots, A_{n}\) be events with dependency digraph \(\Gamma\). Suppose there are \(x_{1}, \ldots, x_{n} \in [0,1)\) such that for all \(i\),
+    \begin{equation}\label{eq:lll-general-condition}
+        \mathbb{P}(A_{i}) \le x_{i} \prod_{j : (i,j) \in E(\Gamma)} (1 - x_{j}) .
+    \end{equation}
+    Then
+    \[
+        \mathbb{P}\Bigl( \bigcap_{i=1}^{n} A_{i}^{c} \Bigr) \ge \prod_{i=1}^{n} (1 - x_{i}) > 0 .
+    \]
+\end{theorem}
+
+The symmetric case \thmref{thm:lll-symmetric} is the special case \(x_{i} = \frac{1}{d+1}\) of \thmref{thm:lll-general}; this is derived in \autoref{sec:lll-symmetric-from-general}, and \thmref{thm:lll-general} itself is proved in \autoref{sec:lll-general-proof}.
+
+\subsection{Spencer's Lower Bound}\label{sec:r3k-spencer}
+
+In \autoref{sec:r3k-symmetric}, \(A_{T}\) has \(\le 3n\) out-neighbours \(A_{T'}\) and \(\le \binom{n}{k}\) out-neighbours \(B_{K}\), while \(B_{K}\) has \(\le \binom{k}{2} n\) out-neighbours \(A_{T}\) and \(\le \binom{n}{k}\) out-neighbours \(B_{K'}\). Give all triangle events the weight \(x\) and all clique events the weight \(y\).
+
+\begin{theorem}[Spencer, 1977]\label{thm:r3k-lll}
+    If there are \(x, y \in [0,1)\), \(q \in [0,1]\) and \(n \in \mathbb{N}\) with
+    \begin{align}
+        q^{3} &\le x (1-x)^{3n} (1-y)^{\binom{n}{k}}, \label{eq:r3k-i} \\
+        (1-q)^{\binom{k}{2}} &\le y (1-x)^{\binom{k}{2} n} (1-y)^{\binom{n}{k}}, \label{eq:r3k-ii}
+    \end{align}
+    then \(R(3,k) > n\).
+\end{theorem}
+
+\begin{proof}
+    Take the random coloring, events and dependency digraph \(\Gamma\) of \autoref{sec:r3k-symmetric}, with \(x_{T} = x\) for every \(A_{T}\) and \(x_{K} = y\) for every \(B_{K}\). Every factor \(1 - x_{j}\) lies in \((0,1]\), so a product over fewer factors is larger. By the out-degree bounds above and \eqref{eq:r3k-i},
+    \[
+        x_{T} \prod_{j : (T,j) \in E(\Gamma)} (1 - x_{j}) \ge x (1-x)^{3n} (1-y)^{\binom{n}{k}} \ge q^{3} = \mathbb{P}(A_{T}),
+    \]
+    and by the out-degree bounds above and \eqref{eq:r3k-ii},
+    \[
+        x_{K} \prod_{j : (K,j) \in E(\Gamma)} (1 - x_{j}) \ge y (1-x)^{\binom{k}{2} n} (1-y)^{\binom{n}{k}} \ge (1-q)^{\binom{k}{2}} = \mathbb{P}(B_{K}) .
+    \]
+    So \eqref{eq:lll-general-condition} holds for every event. By \thmref{thm:lll-general}, with positive probability no \(A_{T}\) and no \(B_{K}\) occurs, i.e.\ some coloring of \(E(K_{n})\) has neither a red \(K_{3}\) nor a blue \(K_{k}\). Hence \(R(3,k) > n\).
+\end{proof}
+
+\begin{corollary}\label{cor:r3k-lll}
+    There is \(c > 0\) such that \(R(3,k) \ge c \, \dfrac{k^{2}}{\log^{2} k}\) for all large \(k\).
+\end{corollary}
+
+\begin{proof}
+    \emph{Heuristic choice of parameters.} Here \(n, q, x, y\) are all functions of \(k\), and \(\Theta, \lesssim, \approx\) refer to \(k \to \infty\). Keep \((1-y)^{\binom{n}{k}} \approx e^{-y \binom{n}{k}} = \Theta(1)\) by taking \(y \approx \binom{n}{k}^{-1}\). In \eqref{eq:r3k-ii}, the factor \((1-x)^{\binom{k}{2} n} \approx e^{-x n \binom{k}{2}}\) must not beat the left-hand side \(\approx e^{-q \binom{k}{2}}\), so \(x n \lesssim q\). In the right-hand side \(x (1-x)^{3n} (1-y)^{\binom{n}{k}}\) of \eqref{eq:r3k-i}, the last factor is \(\Theta(1)\) by the choice of \(y\), and \(1 \ge (1-x)^{3n} \approx e^{-3xn} \ge e^{-3q} \ge e^{-3}\), since \(xn \lesssim q\) and \(q \le 1\) is a probability, so this factor is \(\Theta(1)\) too. So the right-hand side is \(\Theta(x)\), and \eqref{eq:r3k-i} becomes \(q^{3} \lesssim x\). Together \(n q^{3} \lesssim q\), i.e.\ \(q \lesssim n^{-1/2}\). Finally, in \eqref{eq:r3k-ii} the factor \((1-y)^{\binom{n}{k}}\) is \(\Theta(1)\), and \((1-x)^{\binom{k}{2} n} \approx e^{-xn \binom{k}{2}}\) with \(xn\) a small constant times \(q\) only changes the constant in the exponent. So, up to constants, \eqref{eq:r3k-ii} reads
+    \[
+        e^{-q k^{2}/2} \approx (1-q)^{\binom{k}{2}} \lesssim y \approx \binom{n}{k}^{-1} .
+    \]
+    Since \(\binom{n}{k} \le n^{k}\), we have \(\binom{n}{k}^{-1} \ge n^{-k}\), so it suffices that
+    \[
+        e^{-q k^{2}/2} \le n^{-k}
+        \iff \frac{q k^{2}}{2} \ge k \ln n
+        \iff q k \ge 2 \ln n .
+    \]
+    With \(q \approx n^{-1/2}\) this means \(k \gtrsim 2 \sqrt{n} \ln n\), so we can take \(k \approx \sqrt{n} \ln n\) up to a constant. Inverting, \(\ln k = \frac{1}{2} \ln n + \ln \ln n + O(1)\), so \(\ln n \approx 2 \ln k\) and
+    \[
+        \sqrt{n} \approx \frac{k}{\ln n} \approx \frac{k}{2 \ln k},
+        \qquad\text{i.e.}\qquad
+        n \approx \frac{k^{2}}{\ln^{2} k} \text{ up to a constant}.
+    \]
+
+    \emph{Verification.} We use \((1-t)^{m} \ge 1 - mt\) (Bernoulli), \(1 - t \le e^{-t}\), and \(1 - t \ge e^{-2t}\) for \(t \in [0, \frac{1}{2}]\). Given large \(k\), let
+    \[
+        n \coloneqq \Bigl\lfloor \Bigl( \frac{k}{24 \ln k} \Bigr)^{2} \Bigr\rfloor,
+        \qquad
+        q \coloneqq \frac{1}{4\sqrt{n}}, \qquad
+        x \coloneqq 2 q^{3} = \frac{1}{32 \, n^{3/2}}, \qquad
+        y \coloneqq \frac{1}{4 \binom{n}{k}} .
+    \]
+    Since \(\sqrt{n} \le \frac{k}{24 \ln k}\) and \(\ln n \le 2 \ln k\), we have \(k \ge 12 \sqrt{n} \ln n\) (and \(k \le n\) for large \(k\)). Bernoulli gives
+    \[
+        (1-y)^{\binom{n}{k}} \ge 1 - y \binom{n}{k} = \frac{3}{4},
+        \qquad
+        (1-x)^{3n} \ge 1 - 3 n x = 1 - \frac{3}{32 \sqrt{n}} \ge \frac{29}{32} .
+    \]
+    \eqref{eq:r3k-i}: the right-hand side is \(\ge 2 q^{3} \cdot \frac{29}{32} \cdot \frac{3}{4} = \frac{87}{64} q^{3} \ge q^{3}\).
+
+    \eqref{eq:r3k-ii}: since \(2 x n = \frac{1}{16 \sqrt{n}} = \frac{q}{4}\),
+    \[
+        \text{RHS} \ge \frac{3}{4} \, y \, e^{-2 x n \binom{k}{2}} = \frac{3}{16 \binom{n}{k}} \, e^{-\frac{q}{4} \binom{k}{2}},
+        \qquad
+        \text{LHS} \le e^{-q \binom{k}{2}} .
+    \]
+    So it suffices that \(e^{-\frac{3q}{4} \binom{k}{2}} \le \frac{3}{16} n^{-k} \le \frac{3}{16 \binom{n}{k}}\), i.e.\
+    \[
+        \frac{3 q}{4} \binom{k}{2} = \frac{3 k (k-1)}{32 \sqrt{n}} \ge k \ln n + \ln \frac{16}{3} .
+    \]
+    Using \(k - 1 \ge 12 \sqrt{n} \ln n - 1\), dividing by \(k\) gives
+    \[
+        \frac{3 (k-1)}{32 \sqrt{n}} \ge \frac{9}{8} \ln n - \frac{3}{32 \sqrt{n}} \ge \ln n + \frac{\ln(16/3)}{k}
+    \]
+    for large \(n\). By \autoref{thm:r3k-lll}, \(R(3,k) > n \ge \bigl( \frac{k}{24 \ln k} \bigr)^{2} - 1 \ge c \frac{k^{2}}{\ln^{2} k}\).
+\end{proof}
+
+Compared with \(R(3,k) = O(k^{2})\) (\autoref{prop:r3k-upper}), this is off only by a factor \(\log^{2} k\), while the symmetric lemma gave nothing and alterations gave \((k/\log k)^{3/2}\) (\autoref{prop:r3k-alteration}).
+
+\section{Proof of the Local Lemma}\label{sec:lll-proof}
+
+\subsection{The Symmetric Case from the General Case}\label{sec:lll-symmetric-from-general}
+
+\begin{proof}[Proof of {\thmref{thm:lll-symmetric}}]
+    If \(d = 0\), then \(\Gamma\) has no edges and each \(A_{i}\) is mutually independent of all the others. Take \(x_{i} = \mathbb{P}(A_{i})\), which lies in \([0,1)\) since \(\mathbb{P}(A_{i}) \le p \le \frac{1}{e}\). Every product in \eqref{eq:lll-general-condition} is empty, so the condition reads \(\mathbb{P}(A_{i}) \le x_{i}\), which holds, and \thmref{thm:lll-general} gives \(\mathbb{P}\bigl( \bigcap_{i} A_{i}^{c} \bigr) \ge \prod_{i} (1 - \mathbb{P}(A_{i})) > 0\). Let \(d \ge 1\) and set \(x_{i} = \frac{1}{d+1} \in (0,1)\) for all \(i\). Each \(i\) has \(\le d\) out-neighbours and each factor \(1 - x_{j}\) lies in \((0,1)\), so
+    \[
+        x_{i} \prod_{j : (i,j) \in E(\Gamma)} (1 - x_{j})
+        \ge \frac{1}{d+1} \Bigl( 1 - \frac{1}{d+1} \Bigr)^{d}
+        = \frac{1}{d+1} \cdot \frac{1}{(1 + \frac{1}{d})^{d}}
+        \ge \frac{1}{e (d+1)}
+        \ge p
+        \ge \mathbb{P}(A_{i}),
+    \]
+    using \((1 + \frac{1}{d})^{d} \le e\) and \(e p (d+1) \le 1\). So \eqref{eq:lll-general-condition} holds, and \thmref{thm:lll-general} gives
+    \[
+        \mathbb{P}\Bigl( \bigcap_{i=1}^{n} A_{i}^{c} \Bigr) \ge \Bigl( 1 - \frac{1}{d+1} \Bigr)^{n} > 0 . \qedhere
+    \]
+\end{proof}
+
+\begin{remark}\label{rmk:shearer}
+    Shearer (1985) showed that the constant \(e\) in \thmref{thm:lll-symmetric} cannot be replaced by a smaller one.
+\end{remark}
+
+\subsection{Proof of the General Case}\label{sec:lll-general-proof}
+
+\begin{proof}[Proof of {\thmref{thm:lll-general}}]
+    By the chain rule, \(\mathbb{P}\bigl( \bigcap_{i} A_{i}^{c} \bigr)\) is a product of the conditional probabilities \(\mathbb{P}\bigl( A_{i}^{c} \bigm| \bigcap_{j < i} A_{j}^{c} \bigr)\), so it suffices to bound these from below. We prove this for every conditioning set, which is what makes the induction work.
+    \begin{claim}\label{claim:lll-conditional}
+        For every \(S \subseteq [n]\), \(\mathbb{P}\bigl( \bigcap_{j \in S} A_{j}^{c} \bigr) > 0\), and for every \(i \notin S\),
+        \[
+            \mathbb{P}\Bigl( A_{i}^{c} \Bigm| \bigcap_{j \in S} A_{j}^{c} \Bigr) \ge 1 - x_{i} .
+        \]
+    \end{claim}
+
+    \emph{\autoref{claim:lll-conditional} implies the theorem.} By the chain rule and \autoref{claim:lll-conditional} with \(S = [i-1]\),
+    \[
+        \mathbb{P}\Bigl( \bigcap_{i=1}^{n} A_{i}^{c} \Bigr)
+        = \prod_{i=1}^{n} \mathbb{P}\Bigl( A_{i}^{c} \Bigm| \bigcap_{j < i} A_{j}^{c} \Bigr)
+        \ge \prod_{i=1}^{n} (1 - x_{i}) .
+    \]
+
+    \emph{Proof of \autoref{claim:lll-conditional}, by induction on \(s = \abs{S}\).} For \(S = \varnothing\), the first part is \(\mathbb{P}(\Omega) = 1\), and by \eqref{eq:lll-general-condition},
+    \[
+        \mathbb{P}(A_{i}^{c}) = 1 - \mathbb{P}(A_{i}) \ge 1 - x_{i} \prod_{j : (i,j) \in E(\Gamma)} (1 - x_{j}) \ge 1 - x_{i} .
+    \]
+    Now let \(s \ge 1\) and assume the claim for all sets of size \(< s\).
+
+    \emph{Positivity.} Write \(S = \{ j_{1}, \ldots, j_{s} \}\). By the chain rule,
+    \[
+        \mathbb{P}\Bigl( \bigcap_{j \in S} A_{j}^{c} \Bigr) = \prod_{t=1}^{s} \mathbb{P}\Bigl( A_{j_{t}}^{c} \Bigm| \bigcap_{u < t} A_{j_{u}}^{c} \Bigr),
+    \]
+    where \(t = 1, \ldots, s\) indexes the factors, and the \(t\)-th factor conditions on the events indexed by
+    \[
+        P_{t} \coloneqq \{ j_{1}, \ldots, j_{t-1} \} \qquad (P_{1} = \varnothing) .
+    \]
+    Since \(\abs{P_{t}} = t - 1 < s\) and \(j_{t} \notin P_{t}\), the induction hypothesis applies to \(P_{t}\) and \(j_{t}\): the conditioning event has positive probability, and the \(t\)-th factor is \(\ge 1 - x_{j_{t}}\). Hence
+    \[
+        \mathbb{P}\Bigl( \bigcap_{j \in S} A_{j}^{c} \Bigr) \ge \prod_{t=1}^{s} (1 - x_{j_{t}}) > 0 .
+    \]
+
+    \emph{The bound.} Fix \(i \notin S\), split \(S\) into the out-neighbours of \(i\) and the rest,
+    \[
+        S_{1} \coloneqq \{ j \in S : (i,j) \in E(\Gamma) \}, \qquad S_{2} \coloneqq S \setminus S_{1},
+    \]
+    and write \(C_{1} \coloneqq \bigcap_{j \in S_{1}} A_{j}^{c}\), \(C_{2} \coloneqq \bigcap_{j \in S_{2}} A_{j}^{c}\). By \autoref{def:dependency-digraph}, \(A_{i}\) is mutually independent of \(\{ A_{j} : j \in S_{2} \}\), hence independent of \(C_{2}\) (\autoref{def:mutually-independent} and the remark after it). If \(S_{1} = \varnothing\), then \(\mathbb{P}(A_{i} \mid C_{2}) = \mathbb{P}(A_{i}) \le x_{i}\) by \eqref{eq:lll-general-condition}. Otherwise, note that \(C_{1} \cap C_{2} = \bigcap_{j \in S} A_{j}^{c}\) since \(S = S_{1} \cup S_{2}\), so the Positivity step above (for this same \(S\)) gives \(\mathbb{P}(C_{1} \cap C_{2}) > 0\), and hence also \(\mathbb{P}(C_{2}) \ge \mathbb{P}(C_{1} \cap C_{2}) > 0\). So we may condition on \(C_{1} \cap C_{2}\) and on \(C_{2}\):
+    \[
+        \mathbb{P}(A_{i} \mid C_{1} \cap C_{2})
+        = \frac{\mathbb{P}(A_{i} \cap C_{1} \cap C_{2})}{\mathbb{P}(C_{1} \cap C_{2})}
+        = \frac{\mathbb{P}(A_{i} \cap C_{1} \mid C_{2})}{\mathbb{P}(C_{1} \mid C_{2})} .
+    \]
+    \emph{Numerator.} By \(A_{i} \cap C_{1} \subseteq A_{i}\), independence of \(A_{i}\) and \(C_{2}\), and \eqref{eq:lll-general-condition},
+    \[
+        \mathbb{P}(A_{i} \cap C_{1} \mid C_{2}) \le \mathbb{P}(A_{i} \mid C_{2}) = \mathbb{P}(A_{i}) \le x_{i} \prod_{j : (i,j) \in E(\Gamma)} (1 - x_{j}) .
+    \]
+    \emph{Denominator.} Write \(S_{1} = \{ \ell_{1}, \ldots, \ell_{r} \}\) with \(r \ge 1\). Applying the chain rule to \(C_{1} = \bigcap_{t=1}^{r} A_{\ell_{t}}^{c}\), with \(C_{2}\) kept in every conditioning,
+    \[
+        \mathbb{P}(C_{1} \mid C_{2})
+        = \prod_{t=1}^{r} \mathbb{P}\Bigl( A_{\ell_{t}}^{c} \Bigm| C_{2} \cap \bigcap_{u < t} A_{\ell_{u}}^{c} \Bigr) .
+    \]
+    The \(t\)-th factor conditions on \(\bigcap_{j \in R_{t}} A_{j}^{c}\), where
+    \[
+        R_{t} \coloneqq S_{2} \cup \{ \ell_{1}, \ldots, \ell_{t-1} \} .
+    \]
+    To use the induction hypothesis on \(R_{t}\) and \(\ell_{t}\), check:
+    \(\ell_{t} \notin R_{t}\), because \(\ell_{t} \in S_{1}\) is not in \(S_{2}\) and differs from \(\ell_{1}, \ldots, \ell_{t-1}\);
+    and \(\abs{R_{t}} < s\), because \(R_{t} \subseteq S \setminus \{ \ell_{t} \}\).
+    So the induction hypothesis gives that each factor is \(\ge 1 - x_{\ell_{t}}\) (and that the conditioning events have positive probability), hence
+    \[
+        \mathbb{P}(C_{1} \mid C_{2})
+        \ge \prod_{t=1}^{r} (1 - x_{\ell_{t}})
+        = \prod_{j \in S_{1}} (1 - x_{j})
+        \ge \prod_{j : (i,j) \in E(\Gamma)} (1 - x_{j}) ,
+    \]
+    where the last step uses \(S_{1} \subseteq \{ j : (i,j) \in E(\Gamma) \}\) and \(1 - x_{j} \in (0,1]\). Dividing, \(\mathbb{P}(A_{i} \mid C_{1} \cap C_{2}) \le x_{i}\), i.e.\ \(\mathbb{P}\bigl( A_{i}^{c} \bigm| \bigcap_{j \in S} A_{j}^{c} \bigr) \ge 1 - x_{i}\). This proves \autoref{claim:lll-conditional} and the theorem.
+\end{proof}
