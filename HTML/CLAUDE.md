@@ -9,6 +9,18 @@ lives in the Preface inside `HTML.tex`; `01_handout` is Chapter 1, and so on.
 Chapter titles come from the course site (Ch.1 *The Learning Problem*, Ch.2
 *Learning to Answer Yes/No*, Ch.3 *Types of Learning*, …).
 
+The book has two `\part`s, set in `HTML.tex`:
+
+- **Part I — Machine Learning Foundations (機器學習基石)**: handouts `01`–`16`
+  → `lec_1`–`lec_16`, `\lec{1}{16}`.
+- **Part II — Machine Learning Techniques (機器學習技法)**: handouts `201`,
+  `202`, … (and later `212u`, …) → `lec_17`, `lec_18`, … in course-site order,
+  `\lec{17}{40}`. Chapter and `\lecture` numbers continue from Part I (`201` is
+  Ch.17 *Linear Support Vector Machine*), so cross-references stay unique.
+  These decks number themselves “Lecture 1, 2, …” and were written for the
+  separate Coursera course; keep their content, but the notes treat Part I as
+  already known and `\autoref` back into it.
+
 ## The cardinal rule
 
 > 在保留簡報內容的前提下把脈絡補清楚。
@@ -107,6 +119,14 @@ Redraw every slide figure in TikZ. Shared styles already in `header.tex`:
   pictures (`\circ` for `+1`, `\times` for `-1`, shaded half-spaces, the weight
   vector)
 - `dcls=<colour>` / `dunl` / `plotbox` — multi-class and unlabelled scatter plots
+- `fatband` / `fatdisk` / `fatedge` / `fatcore` / `svbox` / `dposfaint` /
+  `dnegfaint`, `\svmtoypanel[plain|disk|band]{a}{b}{c}` — large-margin (SVM)
+  pictures; the panel computes its own margin from the deck's toy data
+- `\ksvmpanel[size]{region}{data}{SVs}` with `\ksvmPolyData` / `\ksvmGaussData`
+  and the solved regions `\ksvmPolyA…C`, `\ksvmPolyTen`, `\ksvmGaussA…C` —
+  kernel-SVM decision regions (hard-margin dual solved by SMO, contoured by
+  marching squares). The machine has no numpy: such solvers are written in
+  plain Python.
 
 Wrap anything wide in `\begin{adjustbox}{max width=\textwidth}`. Prefer
 explicit coordinates over `positioning` chains for multi-part diagrams — they

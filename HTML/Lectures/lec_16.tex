@@ -390,17 +390,34 @@ the most innocent preprocessing step:
     \end{minipage}
 \end{center}
 
+``Shift-scale'' is the routine normalisation applied before training: each
+of the \(20\) input coordinates is shifted by a mean and divided by a
+standard deviation,
+\[
+    x_i \;\longmapsto\; \frac{x_i - \mu_i}{\sigma_i},
+\]
+so that every input is centred at \(0\) with unit spread. The formula is the
+same in both runs; what differs is \textbf{which days \(\mu_i\) and
+\(\sigma_i\) are computed from}:
 \begin{itemize}
     \item Snooping: shift-scale all values by \textbf{training \(+\)
         testing}.
     \item No snooping: shift-scale all values by \textbf{training} only.
 \end{itemize}
 
-The only difference between the two runs is which days the mean and the
-spread of the normalisation were computed from. With snooping, the
-statistics of the test period leak into the training inputs, and the
-`profit' over the \(500\) test days peaks near \(30\%\) and ends above
-\(20\%\); done properly, the same model ends slightly below zero.
+In the first run, \(\mu_i\) and \(\sigma_i\) are averages over all \(8\)
+years, so they already contain the level and volatility of the two test
+years. Every training input is then re-expressed relative to numbers that
+``know'' where the exchange rate is heading, and the learned \(g\) picks up
+a trace of the future through the preprocessing alone --- information no
+trader has on the first day of real trading, when only the past exists. In
+the second run the statistics come from the \(6\) training years, and those
+same \(\mu_i, \sigma_i\) are then reused, unchanged, on the test inputs,
+exactly as they would have to be in deployment. The test set has thus
+``affected a step in the learning process'' in the first run only, and the
+gap is large: the snooped `profit' over the \(500\) test days peaks near
+\(30\%\) and ends above \(20\%\), while the honest run of the same model ends
+slightly below zero.
 
 \subsection{Data Snooping by Data Reusing}
 

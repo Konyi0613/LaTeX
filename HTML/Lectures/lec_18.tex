@@ -1,0 +1,867 @@
+\chapter{Dual Support Vector Machine}
+\lecture{18}{4 Nov.}{}
+
+\begin{prev}
+    Linear SVM (\autoref{sec:svm}) is more robust and solvable with quadratic
+    programming: the hard-margin problem is a QP in \((b, \bm{w})\), and
+    feeding it transformed inputs \(\bm{z}_n = \bm{\Phi}(\bm{x}_n)\) gives a
+    large-margin hyperplane with a sophisticated boundary. The catch, left
+    at the end of the chapter, is that this QP has \(\tilde{d} + 1\)
+    variables.
+\end{prev}
+
+This chapter removes that dependence on \(\tilde{d}\), or at least moves it
+out of sight. It rewrites the SVM as an `equivalent' problem whose variables
+are one number per \emph{example} rather than one per \emph{feature}, using
+the Lagrange multipliers that regularization already hinted at. The new
+problem is again a QP; its solution also tells us exactly which examples
+the fattest hyperplane depends on.
+
+\paragraph{Roadmap.}
+\begin{enumerate}
+    \item \textbf{Embedding Numerous Features: Kernel Models}
+        \begin{itemize}
+            \item[] Lecture 1: Linear Support Vector Machine --- linear SVM:
+                more robust and solvable with quadratic programming
+            \item[] \textbf{Lecture 2: Dual Support Vector Machine} ---
+                Motivation of Dual SVM; Lagrange Dual SVM; Solving Dual SVM;
+                Messages behind Dual SVM
+        \end{itemize}
+    \item Combining Predictive Features: Aggregation Models
+    \item Distilling Implicit Features: Extraction Models
+\end{enumerate}
+
+\section{Motivation of Dual SVM}\label{sec:dual-motivation}
+
+\source{slides p.2--6}
+
+\subsection{Non-Linear Support Vector Machine Revisited}
+
+\begin{center}
+    \begin{minipage}[c]{0.4\textwidth}
+        \[
+            \begin{aligned}
+                \min_{b, \bm{w}} \quad & \frac{1}{2} \bm{w}^\top \bm{w}\\
+                \text{s.t.} \quad & y_n (\bm{w}^\top
+                    \underbrace{\bm{z}_n}_{\bm{\Phi}(\bm{x}_n)} + b) \ge 1,\\
+                & \text{for } n = 1, 2, \dots , N
+            \end{aligned}
+        \]
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[c]{0.56\textwidth}
+        \begin{algorithm}[H]
+            \caption{Non-Linear Hard-Margin SVM}\label{alg:nonlinear-hard-svm}
+            \(\mathrm{Q} = \begin{bmatrix} 0 & \bm{0}_{\tilde{d}}^\top \\
+                \bm{0}_{\tilde{d}} & \mathrm{I}_{\tilde{d}} \end{bmatrix}\);
+                \(\bm{p} = \bm{0}_{\tilde{d}+1}\);
+                \(\bm{a}_n^\top = y_n \begin{bmatrix} 1 & \bm{z}_n^\top
+                \end{bmatrix}\); \(c_n = 1\)\;
+            \(\begin{bmatrix} b \\ \bm{w} \end{bmatrix} \gets
+                \mathrm{QP}(\mathrm{Q}, \bm{p}, \mathrm{A}, \bm{c})\)\;
+            \Return \(b \in \mathbb{R}\) \& \(\bm{w} \in
+                \mathbb{R}^{\tilde{d}}\) with \(g_{\mathrm{SVM}}(\bm{x}) =
+                \sign(\bm{w}^\top \bm{\Phi}(\bm{x}) + b)\)\;
+        \end{algorithm}
+    \end{minipage}
+\end{center}
+
+This is \autoref{alg:linear-hard-svm} with \(\bm{x}_n\) replaced by
+\(\bm{z}_n\) everywhere.
+\begin{itemize}
+    \item Demanded: \textbf{not many} (large-margin), but
+        \textbf{sophisticated} boundary (feature transform) --- the new
+        possibility that closed \autoref{sec:why-large-margin}.
+    \item QP with \(\tilde{d} + 1\) variables and \(N\) constraints ---
+        challenging if \(\tilde{d}\) is large, \textbf{or infinite?!} :-)
+\end{itemize}
+The two demands collide here. The more numerous the features, the better
+the boundary, and the bigger the QP; a transform with infinitely many
+features, which will turn out to be useful, cannot even be written down as a
+QP of this form.
+
+\begin{moral}
+    Goal: SVM \textbf{without dependence on \(\tilde{d}\)}.
+\end{moral}
+
+\subsection{Todo: SVM `without' \texorpdfstring{\(\tilde{d}\)}{d~}}
+
+\begin{center}
+    \begin{minipage}[t]{0.45\textwidth}
+        \textbf{Original SVM}\\
+        (convex) QP of
+        \begin{itemize}
+            \item \(\tilde{d} + 1\) variables
+            \item \(N\) constraints
+        \end{itemize}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.45\textwidth}
+        \textbf{`Equivalent' SVM}\\
+        (convex) QP of
+        \begin{itemize}
+            \item \(N\) variables
+            \item \(N + 1\) constraints
+        \end{itemize}
+    \end{minipage}
+\end{center}
+
+\begin{remark}[Warning: Heavy Math!!!!!!]
+    The road to the equivalent SVM runs through optimization theory, so two
+    ground rules:
+    \begin{itemize}
+        \item We introduce some necessary math \emph{without rigor} to help
+            understand SVM deeper.
+        \item We `claim' some results if the details are unnecessary --- like
+            how we `claimed' Hoeffding (\autoref{thm:hoeffding}).
+    \end{itemize}
+\end{remark}
+
+\begin{moral}
+    `Equivalent' SVM: based on some \textbf{dual problem} of Original SVM.
+\end{moral}
+
+\subsection{Key Tool: Lagrange Multipliers}
+
+The tool comes from regularization, where the same move was already made
+once, in \autoref{rem:lambda-c}.
+
+\begin{center}
+    \begin{tabular}{@{}c@{\quad}c@{\quad}c@{}}
+        Regularization by & & Regularization by\\
+        constrained-minimizing \(\Ein\) & \(\iff\) & minimizing
+            \(\Eaug\)\\[4pt]
+        \(\displaystyle \min_{\bm{w}} \Ein(\bm{w}) \text{ s.t. }
+            \bm{w}^\top \bm{w} \le C\)
+        & &
+        \(\displaystyle \min_{\bm{w}} \Eaug(\bm{w}) = \Ein(\bm{w}) +
+            \frac{\lambda}{N} \bm{w}^\top \bm{w}\)
+    \end{tabular}
+\end{center}
+
+\begin{itemize}
+    \item \(C\) is equivalent to some \(\lambda \ge 0\) by checking the
+        \textbf{optimality condition}
+        \[
+            \nabla \Ein(\bm{w}) + \frac{2\lambda}{N} \bm{w} = \bm{0}.
+        \]
+    \item Regularization: view \(\lambda\) as a \textbf{given parameter}
+        instead of \(C\), and solve `easily'.
+    \item Dual SVM: view the \(\lambda\)'s as unknown given the constraints,
+        and \textbf{solve them as variables instead}.
+\end{itemize}
+
+In regularization the multiplier \(\lambda\) is the price that turns one
+constraint into a penalty, and we never asked what its right value is for a
+given \(C\) --- we just picked \(\lambda\). The SVM has its constraints
+fixed, so the right multipliers are unknown, and finding them becomes the
+problem itself.
+
+\begin{moral}
+    How many \(\lambda\)'s as variables? \(N\) --- one per constraint.
+\end{moral}
+
+\subsection{Starting Point: Constrained to `Unconstrained'}
+
+\begin{center}
+    \begin{minipage}[c]{0.38\textwidth}
+        \[
+            \begin{aligned}
+                \min_{b, \bm{w}} \quad & \frac{1}{2} \bm{w}^\top \bm{w}\\
+                \text{s.t.} \quad & y_n (\bm{w}^\top \bm{z}_n + b) \ge 1,\\
+                & \text{for } n = 1, 2, \dots , N
+            \end{aligned}
+        \]
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[c]{0.58\textwidth}
+        \begin{definition}[Lagrange function]
+            With \vocab{Lagrange multipliers} \(\cancel{\lambda_n}\)
+            \(\alpha_n\),
+            \[
+                \mathcal{L}(b, \bm{w}, \bm{\alpha}) =
+                \underbrace{\frac{1}{2} \bm{w}^\top \bm{w}}_{\text{objective}}
+                + \sum_{n=1}^N \alpha_n \underbrace{\left( 1 - y_n
+                (\bm{w}^\top \bm{z}_n + b) \right)}_{\text{constraint}}.
+            \]
+        \end{definition}
+    \end{minipage}
+\end{center}
+
+The SVM literature calls the multipliers \(\alpha_n\) rather than
+\(\lambda_n\). Each constraint is rewritten as ``something \(\le 0\)'',
+namely \(1 - y_n(\bm{w}^\top \bm{z}_n + b) \le 0\), and added to the objective
+with its own multiplier.
+
+\begin{lemma}[Claim]\label{lem:svm-minmax}
+    \[
+        \text{SVM} \equiv \min_{b, \bm{w}} \left( \max_{\text{all } \alpha_n
+        \ge 0} \mathcal{L}(b, \bm{w}, \bm{\alpha}) \right)
+        = \min_{b, \bm{w}} \left( \infty \text{ if violate};\
+        \frac{1}{2} \bm{w}^\top \bm{w} \text{ if feasible} \right).
+    \]
+\end{lemma}
+
+\begin{proof}
+    Write \(\square = \frac{1}{2} \bm{w}^\top \bm{w}\) and fix \((b,
+    \bm{w})\).
+    \begin{itemize}
+        \item Any `violating' \((b, \bm{w})\): some constraint term \(1 - y_n
+            (\bm{w}^\top \bm{z}_n + b)\) is positive, and
+            \[
+                \max_{\text{all } \alpha_n \ge 0} \left( \square + \sum_n
+                \alpha_n (\text{some positive}) \right) \to \infty
+            \]
+            by sending that \(\alpha_n\) to infinity.
+        \item Any `feasible' \((b, \bm{w})\): all constraint terms are
+            non-positive, and
+            \[
+                \max_{\text{all } \alpha_n \ge 0} \left( \square + \sum_n
+                \alpha_n (\text{all non-positive}) \right) = \square,
+            \]
+            attained by setting every \(\alpha_n = 0\).
+    \end{itemize}
+    The outer \(\min\) never picks an \(\infty\), so it ranges over the
+    feasible \((b, \bm{w})\) only, and there minimizes \(\frac{1}{2}
+    \bm{w}^\top \bm{w}\) --- which is the SVM.
+\end{proof}
+
+\begin{moral}
+    Constraints now \textbf{hidden in} \(\max\).
+\end{moral}
+
+\begin{exercise}[Fun Time]
+    Consider two transformed examples \((\bm{z}_1, +1)\) and \((\bm{z}_2,
+    -1)\) with \(\bm{z}_1 = \bm{z}\) and \(\bm{z}_2 = -\bm{z}\). What is the
+    Lagrange function \(\mathcal{L}(b, \bm{w}, \bm{\alpha})\) of hard-margin
+    SVM?
+    \begin{enumerate}[(1)]
+        \item \(\frac{1}{2} \bm{w}^\top \bm{w} + \alpha_1 (1 + \bm{w}^\top
+            \bm{z} + b) + \alpha_2 (1 + \bm{w}^\top \bm{z} + b)\);
+        \item \(\frac{1}{2} \bm{w}^\top \bm{w} + \alpha_1 (1 - \bm{w}^\top
+            \bm{z} - b) + \alpha_2 (1 - \bm{w}^\top \bm{z} + b)\);
+        \item \(\frac{1}{2} \bm{w}^\top \bm{w} + \alpha_1 (1 + \bm{w}^\top
+            \bm{z} + b) + \alpha_2 (1 + \bm{w}^\top \bm{z} - b)\);
+        \item \(\frac{1}{2} \bm{w}^\top \bm{w} + \alpha_1 (1 - \bm{w}^\top
+            \bm{z} - b) + \alpha_2 (1 - \bm{w}^\top \bm{z} - b)\).
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (2). By definition,
+    \[
+        \mathcal{L}(b, \bm{w}, \bm{\alpha}) = \frac{1}{2} \bm{w}^\top \bm{w}
+        + \alpha_1 (1 - y_1 (\bm{w}^\top \bm{z}_1 + b)) + \alpha_2 (1 - y_2
+        (\bm{w}^\top \bm{z}_2 + b))
+    \]
+    with \((\bm{z}_1, y_1) = (\bm{z}, +1)\) and \((\bm{z}_2, y_2) =
+    (-\bm{z}, -1)\); the second term is \(1 + (-\bm{w}^\top \bm{z} + b) = 1
+    - \bm{w}^\top \bm{z} + b\).
+\end{proof}
+
+\section{Lagrange Dual SVM}\label{sec:lagrange-dual}
+
+\source{slides p.7--12}
+
+\autoref{lem:svm-minmax} is still the original problem, only rewritten:
+the \(\min\) is over \(\tilde{d} + 1\) variables. The step that removes them
+is to swap the order of \(\min\) and \(\max\).
+
+\subsection{Lagrange Dual Problem}
+
+For any fixed \(\bm{\alpha}'\) with all \(\alpha'_n \ge 0\),
+\[
+    \min_{b, \bm{w}} \left( \max_{\text{all } \alpha_n \ge 0}
+    \mathcal{L}(b, \bm{w}, \bm{\alpha}) \right) \ge \min_{b, \bm{w}}
+    \mathcal{L}(b, \bm{w}, \bm{\alpha}'),
+\]
+because \(\max \ge\) any: for each \((b, \bm{w})\) the left integrand is at
+least \(\mathcal{L}(b, \bm{w}, \bm{\alpha}')\), and taking \(\min\) on both
+sides keeps the inequality.
+
+For the best \(\bm{\alpha}' \ge \bm{0}\) on the right-hand side,
+\[
+    \min_{b, \bm{w}} \left( \max_{\text{all } \alpha_n \ge 0}
+    \mathcal{L}(b, \bm{w}, \bm{\alpha}) \right) \ge
+    \underbrace{\max_{\text{all } \alpha'_n \ge 0} \left( \min_{b, \bm{w}}
+    \mathcal{L}(b, \bm{w}, \bm{\alpha}') \right)}_{\text{Lagrange dual
+    problem}},
+\]
+because the best is one of any.
+
+\begin{definition}[Lagrange dual problem]
+    The \vocab{Lagrange dual problem} is the `outer' maximization over
+    \(\bm{\alpha}\) of a lower bound on the original problem: each
+    \(\bm{\alpha} \ge \bm{0}\) gives the lower bound \(\min_{b, \bm{w}}
+    \mathcal{L}(b, \bm{w}, \bm{\alpha})\), and the dual looks for the
+    tightest one.
+\end{definition}
+
+The swap is what makes the problem tractable: once \(\bm{\alpha}\) is
+fixed, the inner \(\min\) over \((b, \bm{w})\) has \emph{no constraints}
+left, so it can be solved by setting derivatives to zero.
+
+\subsection{Strong Duality of Quadratic Programming}
+
+\[
+    \underbrace{\min_{b, \bm{w}} \left( \max_{\text{all } \alpha_n \ge 0}
+    \mathcal{L}(b, \bm{w}, \bm{\alpha}) \right)}_{\text{equiv.\ to original
+    (primal) SVM}}
+    \ \ge \
+    \underbrace{\max_{\text{all } \alpha_n \ge 0} \left( \min_{b, \bm{w}}
+    \mathcal{L}(b, \bm{w}, \bm{\alpha}) \right)}_{\text{Lagrange dual}}
+\]
+
+\begin{fact}[Strong duality of QP]
+    \begin{itemize}
+        \item `\(\ge\)': \vocab{weak duality}, always true (shown above).
+        \item `\(=\)': \vocab{strong duality}, true for QP if
+            \begin{itemize}
+                \item the primal is convex,
+                \item the primal is feasible (true if \(\bm{\Phi}\)-separable),
+                \item the constraints are linear
+            \end{itemize}
+            --- called the \vocab{constraint qualification}.
+    \end{itemize}
+\end{fact}
+
+This is one of the results the warning promised to `claim'. The SVM meets
+all three conditions: \(\frac{1}{2} \bm{w}^\top \bm{w}\) is convex, the
+constraints are linear in \((b, \bm{w})\), and a hard-margin SVM is only
+used on data that some hyperplane separates in \(\mathcal{Z}\).
+
+\begin{moral}
+    There \textbf{exists a primal-dual optimal} solution \((b, \bm{w},
+    \bm{\alpha})\) for both sides.
+\end{moral}
+
+So we may solve the dual instead of the primal, and the same triple
+\((b, \bm{w}, \bm{\alpha})\) answers both.
+
+\subsection{Solving Lagrange Dual: Simplifications (1/2)}
+
+\[
+    \max_{\text{all } \alpha_n \ge 0} \left( \underbrace{\min_{b, \bm{w}}
+    \frac{1}{2} \bm{w}^\top \bm{w} + \sum_{n=1}^N \alpha_n \left( 1 - y_n
+    (\bm{w}^\top \bm{z}_n + b) \right)}_{\mathcal{L}(b, \bm{w},
+    \bm{\alpha})} \right)
+\]
+
+\begin{itemize}
+    \item The inner problem is `unconstrained'; at the optimum
+        \[
+            \frac{\partial \mathcal{L}(b, \bm{w}, \bm{\alpha})}{\partial b} =
+            0 = -\sum_{n=1}^N \alpha_n y_n.
+        \]
+    \item There is no loss of optimality if we solve with the constraint
+        \(\sum_{n=1}^N \alpha_n y_n = 0\).
+\end{itemize}
+
+The second bullet deserves its reason. \(\mathcal{L}\) is linear in \(b\)
+with slope \(-\sum_n \alpha_n y_n\). If that slope is non-zero, the inner
+\(\min\) over \(b\) is \(-\infty\), and such an \(\bm{\alpha}\) can never be
+the outer \(\max\); so the outer \(\max\) may as well be restricted to the
+\(\bm{\alpha}\) with zero slope.
+
+But wait, \(b\) \textbf{can be removed}: under that constraint the only term
+containing \(b\) is \(-\sum_n \alpha_n y_n \cdot b = 0\).
+\[
+    \max_{\text{all } \alpha_n \ge 0, \sum y_n \alpha_n = 0} \left(
+    \min_{b, \bm{w}} \frac{1}{2} \bm{w}^\top \bm{w} + \sum_{n=1}^N \alpha_n
+    \left( 1 - y_n (\bm{w}^\top \bm{z}_n) \right) - \cancel{\sum_{n=1}^N
+    \alpha_n y_n \cdot b} \right)
+\]
+
+\subsection{Solving Lagrange Dual: Simplifications (2/2)}
+
+\[
+    \max_{\text{all } \alpha_n \ge 0, \sum y_n \alpha_n = 0} \left(
+    \min_{\textcolor{gray}{b}, \bm{w}} \frac{1}{2} \bm{w}^\top \bm{w} +
+    \sum_{n=1}^N \alpha_n \left( 1 - y_n (\bm{w}^\top \bm{z}_n) \right)
+    \right)
+\]
+
+\begin{itemize}
+    \item The inner problem is `unconstrained'; at the optimum
+        \[
+            \frac{\partial \mathcal{L}(b, \bm{w}, \bm{\alpha})}{\partial w_i}
+            = 0 = w_i - \sum_{n=1}^N \alpha_n y_n z_{n,i}.
+        \]
+    \item There is no loss of optimality if we solve with the constraint
+        \(\bm{w} = \sum_{n=1}^N \alpha_n y_n \bm{z}_n\).
+\end{itemize}
+
+Here the inner objective is a convex quadratic in \(\bm{w}\), so the
+stationary point is its minimum, and putting it in as a constraint just
+records where the inner \(\min\) is attained.
+
+But wait! Under that constraint, \(\sum_n \alpha_n y_n \bm{w}^\top \bm{z}_n
+= \bm{w}^\top \sum_n \alpha_n y_n \bm{z}_n = \bm{w}^\top \bm{w}\), so
+\[
+    \max_{\text{all } \alpha_n \ge 0, \sum y_n \alpha_n = 0, \bm{w} = \sum
+    \alpha_n y_n \bm{z}_n} \left( \textcolor{gray}{\min_{b, \bm{w}}}\
+    \frac{1}{2} \bm{w}^\top \bm{w} + \sum_{n=1}^N \alpha_n - \bm{w}^\top
+    \bm{w} \right)
+\]
+\[
+    \iff \max_{\text{all } \alpha_n \ge 0, \sum y_n \alpha_n = 0, \bm{w} =
+    \sum \alpha_n y_n \bm{z}_n} -\frac{1}{2} \norm{\sum_{n=1}^N \alpha_n y_n
+    \bm{z}_n}^2 + \sum_{n=1}^N \alpha_n.
+\]
+The \(\min\) is greyed out because nothing is left to minimize: \(b\) has
+dropped out and \(\bm{w}\) is pinned down by \(\bm{\alpha}\). What remains is
+a problem in \(\bm{\alpha}\) alone.
+
+\subsection{KKT Optimality Conditions}
+
+\[
+    \max_{\text{all } \alpha_n \ge 0, \sum y_n \alpha_n = 0, \bm{w} = \sum
+    \alpha_n y_n \bm{z}_n} -\frac{1}{2} \norm{\sum_{n=1}^N \alpha_n y_n
+    \bm{z}_n}^2 + \sum_{n=1}^N \alpha_n
+\]
+
+\begin{fact}[KKT conditions]\label{fact:kkt}
+    If \((b, \bm{w}, \bm{\alpha})\) is primal-dual optimal, then
+    \begin{itemize}
+        \item primal feasible: \(y_n (\bm{w}^\top \bm{z}_n + b) \ge 1\);
+        \item dual feasible: \(\alpha_n \ge 0\);
+        \item dual-inner optimal: \(\sum y_n \alpha_n = 0\); \(\bm{w} =
+            \sum \alpha_n y_n \bm{z}_n\);
+        \item primal-inner optimal (at optimal all `Lagrange terms'
+            disappear):
+            \[
+                \alpha_n \left( 1 - y_n (\bm{w}^\top \bm{z}_n + b) \right) =
+                0.
+            \]
+    \end{itemize}
+    These are called the \vocab{Karush-Kuhn-Tucker (KKT) conditions},
+    necessary for optimality [\& sufficient here].
+\end{fact}
+
+The first three restate constraints we have already met; the last is the
+new one. At the optimum the primal and dual values coincide, so
+\(\frac{1}{2} \bm{w}^\top \bm{w} = \mathcal{L}(b, \bm{w}, \bm{\alpha})\), and
+the sum of the Lagrange terms \(\alpha_n(1 - y_n(\bm{w}^\top \bm{z}_n + b))\)
+must vanish. Each term is a non-negative \(\alpha_n\) times a non-positive
+number, so each one must vanish on its own. This is the same reasoning as in
+\autoref{lem:svm-minmax}: for feasible \((b, \bm{w})\), the inner \(\max\)
+over \(\bm{\alpha}\) is reached only by multipliers that kill every term.
+
+\begin{moral}
+    We will use KKT to `solve' \((b, \bm{w})\) from the optimal
+    \(\bm{\alpha}\).
+\end{moral}
+
+\begin{exercise}[Fun Time]
+    For a single variable \(w\), consider minimizing \(\frac{1}{2} w^2\)
+    subject to two linear constraints \(w \ge 1\) and \(w \le 3\). We know
+    that the Lagrange function \(\mathcal{L}(w, \bm{\alpha}) = \frac{1}{2}
+    w^2 + \alpha_1 (1 - w) + \alpha_2 (w - 3)\). Which of the following
+    equations that contain \(\bm{\alpha}\) are among the KKT conditions of
+    the optimization problem?
+    \begin{enumerate}[(1)]
+        \item \(\alpha_1 \ge 0\) and \(\alpha_2 \ge 0\);
+        \item \(w = \alpha_1 - \alpha_2\);
+        \item \(\alpha_1 (1 - w) = 0\) and \(\alpha_2 (w - 3) = 0\);
+        \item all of the above.
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (4). (1) contains the dual-feasible constraints; (2) contains the
+    dual-inner-optimal constraint, from \(\partial \mathcal{L} / \partial w
+    = w - \alpha_1 + \alpha_2 = 0\); (3) contains the primal-inner-optimal
+    constraints. (The solution is \(w = 1\), \(\alpha_1 = 1\), \(\alpha_2 =
+    0\): the active constraint \(w \ge 1\) gets a positive multiplier, the
+    inactive one gets zero.)
+\end{proof}
+
+\section{Solving Dual SVM}\label{sec:solving-dual}
+
+\source{slides p.13--17}
+
+\subsection{Dual Formulation of Support Vector Machine}
+
+\[
+    \max_{\text{all } \alpha_n \ge 0, \sum y_n \alpha_n = 0, \bm{w} = \sum
+    \alpha_n y_n \bm{z}_n} -\frac{1}{2} \norm{\sum_{n=1}^N \alpha_n y_n
+    \bm{z}_n}^2 + \sum_{n=1}^N \alpha_n
+\]
+
+Flip the sign to turn \(\max\) into \(\min\), expand the squared norm as a
+double sum, and drop \(\bm{w}\) from the constraints, since it no longer
+appears in the objective and is recovered afterwards.
+
+\begin{definition}[Standard hard-margin SVM dual]
+    \[
+        \begin{aligned}
+            \min_{\bm{\alpha}} \quad & \frac{1}{2} \sum_{n=1}^N \sum_{m=1}^N
+                \alpha_n \alpha_m y_n y_m \bm{z}_n^\top \bm{z}_m -
+                \sum_{n=1}^N \alpha_n\\
+            \text{subject to} \quad & \sum_{n=1}^N y_n \alpha_n = 0;\\
+            & \alpha_n \ge 0, \text{ for } n = 1, 2, \dots , N.
+        \end{aligned}
+    \]
+\end{definition}
+
+\begin{moral}
+    A (convex) QP of \(N\) variables \& \(N + 1\) constraints, as promised.
+\end{moral}
+
+How to solve it? Yeah, we know QP! :-)
+
+\subsection{Dual SVM with QP Solver}
+
+\begin{center}
+    \begin{tabular}{@{}c@{\qquad}c@{}}
+        optimal \(\bm{\alpha} = \ ?\) & optimal \(\bm{\alpha} \gets
+            \mathrm{QP}(\mathrm{Q}, \bm{p}, \mathrm{A}, \bm{c})\)\\[6pt]
+        \(\begin{aligned}
+            \min_{\bm{\alpha}} \quad & \tfrac{1}{2} \textstyle\sum_{n=1}^N
+                \sum_{m=1}^N \alpha_n \alpha_m y_n y_m \bm{z}_n^\top
+                \bm{z}_m\\
+            & \quad - \textstyle\sum_{n=1}^N \alpha_n\\
+            \text{subject to} \quad & \textstyle\sum_{n=1}^N y_n \alpha_n =
+                0;\\
+            & \alpha_n \ge 0,\\
+            & \text{for } n = 1, 2, \dots , N
+        \end{aligned}\)
+        &
+        \(\begin{aligned}
+            \min_{\bm{\alpha}} \quad & \tfrac{1}{2} \bm{\alpha}^\top
+                \mathrm{Q} \bm{\alpha} + \bm{p}^\top \bm{\alpha}\\
+            \text{subject to} \quad & \bm{a}_i^\top \bm{\alpha} \ge c_i,\\
+            & \text{for } i = 1, 2, \dots
+        \end{aligned}\)
+    \end{tabular}
+\end{center}
+
+\begin{itemize}
+    \item \(q_{n,m} = y_n y_m \bm{z}_n^\top \bm{z}_m\);
+    \item \(\bm{p} = -\bm{1}_N\);
+    \item \(\bm{a}_{\ge} = \bm{y}\), \(\bm{a}_{\le} = -\bm{y}\);
+        \(\bm{a}_n^\top = n\)-th unit direction;
+    \item \(c_{\ge} = 0\), \(c_{\le} = 0\); \(c_n = 0\).
+\end{itemize}
+
+The generic solver only takes `\(\ge\)' constraints, so the one equality
+\(\bm{y}^\top \bm{\alpha} = 0\) is written as the pair \(\bm{y}^\top
+\bm{\alpha} \ge 0\) and \(-\bm{y}^\top \bm{\alpha} \ge 0\), and each bound
+\(\alpha_n \ge 0\) as \(\bm{e}_n^\top \bm{\alpha} \ge 0\) --- \(N + 2\) rows
+in all, which is the \(N + 1\) constraints with the equality counted twice.
+
+\begin{note}
+    Many solvers treat \textbf{equality} (\(\bm{a}_{\ge}\),
+    \(\bm{a}_{\le}\)) \& \textbf{bound} (\(\bm{a}_n\)) constraints specially
+    for \textbf{numerical stability}.
+\end{note}
+
+\subsection{Dual SVM with Special QP Solver}
+
+\[
+    \text{optimal } \bm{\alpha} \gets \mathrm{QP}(\mathrm{Q}_{\mathrm{D}},
+    \bm{p}, \mathrm{A}, \bm{c}): \qquad
+    \begin{aligned}
+        \min_{\bm{\alpha}} \quad & \frac{1}{2} \bm{\alpha}^\top
+            \mathrm{Q}_{\mathrm{D}} \bm{\alpha} + \bm{p}^\top \bm{\alpha}\\
+        \text{subject to} \quad & \text{special equality and bound
+            constraints}
+    \end{aligned}
+\]
+
+\begin{itemize}
+    \item \(q_{n,m} = y_n y_m \bm{z}_n^\top \bm{z}_m\), often
+        \textbf{non-zero}.
+    \item If \(N = 30{,}000\), the dense \(\mathrm{Q}_{\mathrm{D}}\) (\(N\)
+        by \(N\) symmetric) takes \(> 3\)G RAM: that is \(9 \times 10^8\)
+        entries, \(3.6\)\,GB even at four bytes each.
+    \item We need a special solver for
+        \begin{itemize}
+            \item not storing the whole \(\mathrm{Q}_{\mathrm{D}}\),
+            \item utilizing the special constraints properly,
+        \end{itemize}
+        to scale up to large \(N\).
+\end{itemize}
+
+The subscript D marks the dual's matrix, to tell it from the \(\mathrm{Q}\)
+of the primal. Its size is the new bottleneck: the dual traded
+\(\tilde{d}\) for \(N\), and \(N^2\) entries is a lot when \(N\) is large.
+
+\begin{moral}
+    Usually better to use a \textbf{special solver} in practice.
+\end{moral}
+
+\subsection{Optimal \texorpdfstring{\((b, \bm{w})\)}{(b, w)}}
+
+The KKT conditions of \autoref{fact:kkt}, once more: if \((b, \bm{w},
+\bm{\alpha})\) is primal-dual optimal,
+\begin{itemize}
+    \item primal feasible: \(y_n (\bm{w}^\top \bm{z}_n + b) \ge 1\);
+    \item dual feasible: \(\alpha_n \ge 0\);
+    \item dual-inner optimal: \(\sum y_n \alpha_n = 0\); \(\bm{w} = \sum
+        \alpha_n y_n \bm{z}_n\);
+    \item primal-inner optimal (at optimal all `Lagrange terms' disappear):
+        \[
+            \alpha_n \left( 1 - y_n (\bm{w}^\top \bm{z}_n + b) \right) = 0
+            \quad (\text{\vocab{complementary slackness}}).
+        \]
+\end{itemize}
+
+\begin{itemize}
+    \item Optimal \(\bm{\alpha} \implies\) optimal \(\bm{w}\)? Easy, above!
+        \(\bm{w} = \sum \alpha_n y_n \bm{z}_n\).
+    \item Optimal \(\bm{\alpha} \implies\) optimal \(b\)? A range from
+        primal feasibility, and an equality from complementary slackness:
+        if one \(\alpha_n > 0\), then \(b = y_n - \bm{w}^\top \bm{z}_n\).
+\end{itemize}
+
+The equality comes in one line. \(\alpha_n > 0\) forces \(1 - y_n
+(\bm{w}^\top \bm{z}_n + b) = 0\); multiplying \(y_n (\bm{w}^\top \bm{z}_n +
+b) = 1\) by \(y_n\), with \(y_n^2 = 1\), gives \(\bm{w}^\top \bm{z}_n + b =
+y_n\). Some \(\alpha_n\) is always positive when both classes are present:
+if all were zero, \(\bm{w} = \bm{0}\), and \(y_n b \ge 1\) cannot hold for
+labels of both signs.
+
+\begin{moral}
+    Comp.\ slackness: \(\alpha_n > 0 \implies\) on fat boundary (SV!).
+\end{moral}
+
+\begin{exercise}[Fun Time]
+    Consider two transformed examples \((\bm{z}_1, +1)\) and \((\bm{z}_2,
+    -1)\) with \(\bm{z}_1 = \bm{z}\) and \(\bm{z}_2 = -\bm{z}\). After solving
+    the dual problem of hard-margin SVM, assume that the optimal
+    \(\alpha_1\) and \(\alpha_2\) are both strictly positive. What is the
+    optimal \(b\)?
+    \begin{enumerate}[(1)]
+        \item \(-1\);
+        \item \(0\);
+        \item \(1\);
+        \item not certain with the descriptions above.
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (2). With the descriptions, at the optimal \((b, \bm{w})\),
+    \[
+        b = +1 - \bm{w}^\top \bm{z} = -1 + \bm{w}^\top \bm{z},
+    \]
+    the first from \((\bm{z}_1, +1)\) and the second from \((-\bm{z},
+    -1)\). That is, \(\bm{w}^\top \bm{z} = 1\) and \(b = 0\).
+\end{proof}
+
+\section{Messages behind Dual SVM}\label{sec:dual-messages}
+
+\source{slides p.18--22}
+
+\subsection{Support Vectors Revisited}
+
+\begin{center}
+    \begin{minipage}[c]{0.56\textwidth}
+        \begin{itemize}
+            \item On boundary: `locates' fattest hyperplane; others:
+                \textbf{not needed}.
+            \item Examples with \(\alpha_n > 0\): on boundary.
+            \item Call \(\alpha_n > 0\) examples \((\bm{z}_n, y_n)\)
+                \textbf{support vectors} \cancel{(candidates)}.
+            \item SV (positive \(\alpha_n\)) \(\subseteq\) SV candidates (on
+                boundary).
+        \end{itemize}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[c]{0.4\textwidth}
+        \centering
+        \svmtoysolution
+    \end{minipage}
+\end{center}
+
+\autoref{sec:svm} called the boundary examples support vector
+\emph{candidates} and postponed the definition. Complementary slackness
+settles it.
+
+\begin{definition}[Support vector]
+    An example \((\bm{z}_n, y_n)\) with \(\alpha_n > 0\) in the dual optimal
+    solution is a \vocab{support vector} (SV).
+\end{definition}
+
+Every SV is on the boundary, but a boundary example may still have
+\(\alpha_n = 0\) --- complementary slackness only rules out \(\alpha_n > 0\)
+off the boundary. For the toy data of the picture (\(\bm{z}_n = \bm{x}_n\)),
+the dual can be solved by hand from \(\bm{w} = (1, -1)\) and the KKT
+conditions: \((3, 0)\) is off the boundary, so \(\alpha_4 = 0\), and
+\[
+    \bm{w} = -\alpha_2 (2, 2) + \alpha_3 (2, 0) = (1, -1),
+    \qquad -\alpha_1 - \alpha_2 + \alpha_3 = 0
+\]
+give \(\alpha_2 = \frac{1}{2}\), \(\alpha_3 = 1\), \(\alpha_1 = \frac{1}{2}\).
+Here all three candidates are SVs. (This computation is mine; the deck
+shows only the picture.)
+
+\begin{itemize}
+    \item Only SVs are needed to compute \(\bm{w}\):
+        \[
+            \bm{w} = \sum_{n=1}^N \alpha_n y_n \bm{z}_n = \sum_{\text{SV}}
+            \alpha_n y_n \bm{z}_n.
+        \]
+    \item Only SVs are needed to compute \(b\): \(b = y_n - \bm{w}^\top
+        \bm{z}_n\) with any SV \((\bm{z}_n, y_n)\). In the toy example,
+        \((2, 0)\) gives \(b = 1 - 2 = -1\).
+\end{itemize}
+
+\begin{moral}
+    SVM: learn \textbf{fattest hyperplane} by identifying \textbf{support
+    vectors} with the \textbf{dual} optimal solution.
+\end{moral}
+
+\subsection{Representation of Fattest Hyperplane}
+
+\begin{center}
+    \begin{tabular}{@{}c@{\qquad\qquad}c@{}}
+        \textbf{SVM} & \textbf{PLA}\\[4pt]
+        \(\displaystyle \bm{w}_{\mathrm{SVM}} = \sum_{n=1}^N \alpha_n (y_n
+            \bm{z}_n)\)
+        &
+        \(\displaystyle \bm{w}_{\mathrm{PLA}} = \sum_{n=1}^N \beta_n (y_n
+            \bm{z}_n)\)\\[12pt]
+        \(\alpha_n\) from \textbf{dual solution} & \(\beta_n\) by
+            \textbf{\# mistake corrections}
+    \end{tabular}
+\end{center}
+
+PLA (\autoref{alg:pla}) starts from \(\bm{0}\) and only ever adds \(y_n
+\bm{z}_n\) for a mistaken example, so its final weight is that sum with
+\(\beta_n\) counting how often example \(n\) was corrected.
+
+\begin{moral}
+    \(\bm{w}\) = linear combination of \(y_n \bm{z}_n\).
+\end{moral}
+
+\begin{itemize}
+    \item Also true for GD/SGD-based LogReg/LinReg when \(\bm{w}_0 =
+        \bm{0}\): every gradient (\autoref{eq:lr-grad} for logistic
+        regression) is itself a combination of the \(\bm{z}_n\), so every
+        step adds one.
+    \item Call \(\bm{w}\) `\textbf{represented}' by data.
+\end{itemize}
+
+\begin{moral}
+    SVM: represent \(\bm{w}\) by \textbf{SVs only}.
+\end{moral}
+
+\subsection{Summary: Two Forms of Hard-Margin SVM}
+
+\begin{center}
+    \begin{minipage}[t]{0.47\textwidth}
+        \textbf{Primal Hard-Margin SVM}
+        \[
+            \begin{aligned}
+                \min_{b, \bm{w}} \quad & \frac{1}{2} \bm{w}^\top \bm{w}\\
+                \text{sub.\ to} \quad & y_n (\bm{w}^\top \bm{z}_n + b) \ge
+                    1,\\
+                & \text{for } n = 1, 2, \dots , N
+            \end{aligned}
+        \]
+        \begin{itemize}
+            \item \(\tilde{d} + 1\) variables, \(N\) constraints ---
+                suitable when \(\tilde{d} + 1\) small
+            \item physical meaning: locate \textbf{specially-scaled}
+                \((b, \bm{w})\)
+        \end{itemize}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.47\textwidth}
+        \textbf{Dual Hard-Margin SVM}
+        \[
+            \begin{aligned}
+                \min_{\bm{\alpha}} \quad & \frac{1}{2} \bm{\alpha}^\top
+                    \mathrm{Q}_{\mathrm{D}} \bm{\alpha} - \bm{1}^\top
+                    \bm{\alpha}\\
+                \text{s.t.} \quad & \bm{y}^\top \bm{\alpha} = 0;\\
+                & \alpha_n \ge 0 \text{ for } n = 1, \dots , N
+            \end{aligned}
+        \]
+        \begin{itemize}
+            \item \(N\) variables, \(N + 1\) simple constraints ---
+                suitable when \(N\) small
+            \item physical meaning: locate \textbf{SVs} \((\bm{z}_n, y_n)\)
+                \& their \(\alpha_n\)
+        \end{itemize}
+    \end{minipage}
+\end{center}
+
+\begin{moral}
+    Both eventually result in the optimal \((b, \bm{w})\) for the fattest
+    hyperplane,
+    \[
+        g_{\mathrm{SVM}}(\bm{x}) = \sign(\bm{w}^\top \bm{\Phi}(\bm{x}) +
+        b).
+    \]
+\end{moral}
+
+\subsection{Are We Done Yet?}
+
+Goal: SVM without dependence on \(\tilde{d}\).
+\[
+    \begin{aligned}
+        \min_{\bm{\alpha}} \quad & \frac{1}{2} \bm{\alpha}^\top
+            \mathrm{Q}_{\mathrm{D}} \bm{\alpha} - \bm{1}^\top \bm{\alpha}\\
+        \text{subject to} \quad & \bm{y}^\top \bm{\alpha} = 0;\\
+        & \alpha_n \ge 0, \text{ for } n = 1, 2, \dots , N
+    \end{aligned}
+\]
+\begin{itemize}
+    \item \(N\) variables, \(N + 1\) constraints: no dependence on
+        \(\tilde{d}\)?
+    \item \(q_{n,m} = y_n y_m \bm{z}_n^\top \bm{z}_m\): an inner product in
+        \(\mathbb{R}^{\tilde{d}}\) --- \(O(\tilde{d})\) via na\"ive
+        computation!
+\end{itemize}
+
+The dependence has not gone away; it has moved into the entries of
+\(\mathrm{Q}_{\mathrm{D}}\), each of which still transforms two inputs into
+\(\mathbb{R}^{\tilde{d}}\) and multiplies them coordinate by coordinate.
+The same holds at prediction time, where \(\bm{w}^\top \bm{\Phi}(\bm{x}) =
+\sum_{\text{SV}} \alpha_n y_n \bm{z}_n^\top \bm{\Phi}(\bm{x})\) is again a
+sum of inner products in \(\mathcal{Z}\).
+
+\begin{moral}
+    No dependence only if \textbf{avoiding na\"ive computation} (next
+    lecture :-)).
+\end{moral}
+
+\begin{exercise}[Fun Time]
+    Consider applying dual hard-margin SVM on \(N = 5566\) examples and
+    getting \(1126\) SVs. Which of the following can be the number of
+    examples that are on the fat boundary --- that is, SV candidates?
+    \begin{enumerate}[(1)]
+        \item \(0\);
+        \item \(1024\);
+        \item \(1234\);
+        \item \(9999\).
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (3). Because SVs are always on the fat boundary,
+    \[
+        \#\text{SVs} \le \#\text{SV candidates} \le N,
+    \]
+    i.e.\ the answer must lie between \(1126\) and \(5566\).
+\end{proof}
+
+\hrulebar
+
+\subsection*{Summary}
+
+\begin{description}
+    \item[Motivation of Dual SVM] want to remove dependence on
+        \(\tilde{d}\).
+    \item[Lagrange Dual SVM] KKT conditions link primal/dual.
+    \item[Solving Dual SVM] another QP, better solved with a special
+        solver.
+    \item[Messages behind Dual SVM] SVs represent the fattest hyperplane.
+\end{description}
+
+Every place where \(\tilde{d}\) still enters the dual is an inner product
+\(\bm{z}_n^\top \bm{z}_m\) of two transformed inputs. Next: computing the
+inner product in \(\mathbb{R}^{\tilde{d}}\) efficiently, without forming the
+transformed vectors at all.
