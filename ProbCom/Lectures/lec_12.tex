@@ -30,7 +30,16 @@ Now suppose the first two coins are quantum-entangled: they always show opposite
     \]
 \end{definition}
 
-The intersections \(\bigcap_{j \in S} B_{j}\) form a \(\pi\)-system generating \(\sigma(B_{1}, \ldots, B_{m})\), so by the \(\pi\)--\(\lambda\) theorem this is equivalent to \(A\) being independent of every event built from the \(B_{j}\) by complements, intersections and unions. The \(B_{j}\) need not be independent of each other.
+\begin{remark}\label{rmk:mutual-indep-complements}
+    If \(A\) is mutually independent of \(\{ B_{1}, \ldots, B_{m} \}\), then it is also mutually independent of the family obtained by replacing any of the \(B_{j}\) by \(B_{j}^{c}\). It suffices to replace one, say \(B_{1}\), and repeat. For \(S \subseteq \{2, \ldots, m\}\) let \(D \coloneqq \bigcap_{j \in S} B_{j}\); since \(B_{1}^{c} \cap D = D \setminus (B_{1} \cap D)\),
+    \[
+        \mathbb{P}(A \cap B_{1}^{c} \cap D)
+        = \mathbb{P}(A \cap D) - \mathbb{P}(A \cap B_{1} \cap D)
+        = \mathbb{P}(A) \mathbb{P}(D) - \mathbb{P}(A) \mathbb{P}(B_{1} \cap D)
+        = \mathbb{P}(A) \mathbb{P}(B_{1}^{c} \cap D) ,
+    \]
+    and intersections not involving \(B_{1}^{c}\) are unchanged. In particular \(A\) is independent of \(\bigcap_{j \in S} B_{j}^{c}\) for every \(S \subseteq [m]\). The \(B_{j}\) need not be independent of each other.
+\end{remark}
 
 \begin{definition}[Dependency digraph]\label{def:dependency-digraph}
     Let \(A_{1}, A_{2}, \ldots, A_{n}\) be events in a probability space. A directed graph \(\Gamma = ([n], E)\) is a \vocab{dependency digraph} if for every \(i\), the event \(A_{i}\) is mutually independent of \(\{ A_{j} : j \ne i,\ (i,j) \notin E(\Gamma) \}\).
@@ -38,8 +47,47 @@ The intersections \(\bigcap_{j \in S} B_{j}\) form a \(\pi\)-system generating \
 
 \begin{remark}\label{rmk:dependency-digraph}\hfill
     \begin{enumerate}[(1)]
-        \item \emph{\(\Gamma\) need not be symmetric.} \autoref{def:dependency-digraph} asks for \emph{mutual} independence of \(A_{i}\) from all its non-neighbours together, which is stronger than pairwise independence. For two fair coins, let \(A_{1} = \{\text{coin 1 is heads}\}\), \(A_{2} = \{\text{coin 2 is heads}\}\) and \(A_{3} = \{\text{the coins agree}\}\). These are pairwise independent, but \(\mathbb{P}(A_{3} \mid A_{1} \cap A_{2}) = 1 \ne \frac{1}{2}\), and likewise each \(A_{i}\) depends on the other two together. So every vertex needs an out-edge, and the directed cycle \(1 \to 2 \to 3 \to 1\) is a dependency digraph with \(d = 1\): each \(A_{i}\) only has to be independent of its single non-neighbour. In it \((1,3) \notin E(\Gamma)\) but \((3,1) \in E(\Gamma)\).
-        \item \emph{An edge does not mean dependence.} Adding edges to a dependency digraph keeps it one, since a subfamily of a mutually independent family is still mutually independent; the complete digraph is always a dependency digraph. So \(\Gamma\) only bounds the dependencies from above. For instance, in \autoref{sec:lll-ramsey} two events \(A_{K}, A_{K'}\) with \(\abs{K \cap K'} = 2\) are joined, although they are pairwise independent: with \(m = \binom{k}{2}\), conditioning on the colour of the shared edge gives \(\mathbb{P}(A_{K} \cap A_{K'}) = 2 \cdot \frac{1}{2} \cdot 2^{-(m-1)} \cdot 2^{-(m-1)} = \mathbb{P}(A_{K}) \mathbb{P}(A_{K'})\).
+        \item \emph{\(\Gamma\) need not be symmetric}, i.e.\ \((i,j) \in E(\Gamma)\) need not imply \((j,i) \in E(\Gamma)\). For two fair coins, let \(A_{1} = \{\text{coin 1 is heads}\}\), \(A_{2} = \{\text{coin 2 is heads}\}\), \(A_{3} = \{\text{the coins agree}\}\). They are pairwise independent, but any two determine the third. The directed cycle below is a dependency digraph, since each \(A_{i}\) only has to be independent of its one non-neighbour; it has \((3,1) \in E(\Gamma)\) but \((1,3) \notin E(\Gamma)\).
+        \begin{center}
+            \begin{tikzpicture}[thick, >={Stealth[length=2.6mm]}, ev/.style={circle, draw, minimum size=8mm, inner sep=0pt}]
+                \node[ev] (a1) at (90:1.3) {\(A_{1}\)};
+                \node[ev] (a2) at (210:1.3) {\(A_{2}\)};
+                \node[ev] (a3) at (330:1.3) {\(A_{3}\)};
+                \draw[->] (a1) to[bend right=15] (a2);
+                \draw[->] (a2) to[bend right=15] (a3);
+                \draw[->] (a3) to[bend right=15] (a1);
+                \node[anchor=west, align=left, font=\small] at (2.4,0.1) {%
+                    \begin{tabular}{@{}lll@{}}
+                        event & out-neighbour & non-neighbour \\ \hline
+                        \(A_{1}\) & \(A_{2}\) & \(A_{3}\) \\
+                        \(A_{2}\) & \(A_{3}\) & \(A_{1}\) \\
+                        \(A_{3}\) & \(A_{1}\) & \(A_{2}\)
+                    \end{tabular}};
+            \end{tikzpicture}
+        \end{center}
+        \item \emph{An edge does not mean dependence}: \((i,j) \in E(\Gamma)\) allows \(A_{i}\) to depend on \(A_{j}\) but does not require it. In \autoref{sec:lll-ramsey}, \(A_{K}\) and \(A_{K'}\) with \(\abs{K \cap K'} = 2\) are joined, yet independent: with \(m = \binom{k}{2}\), conditioning on the colour of the shared edge,
+        \[
+            \mathbb{P}(A_{K} \cap A_{K'}) = 2 \cdot \tfrac{1}{2} \cdot 2^{-(m-1)} \cdot 2^{-(m-1)} = 2^{1-m} \cdot 2^{1-m} = \mathbb{P}(A_{K}) \, \mathbb{P}(A_{K'}) .
+        \]
+        \begin{center}
+            \begin{tikzpicture}[thick, >={Stealth[length=2.6mm]}, dot/.style={circle, fill, inner sep=1.3pt}]
+                \draw[blue!70!black] (0,0) ellipse (1.6 and 1);
+                \draw[red!70!black] (2,0) ellipse (1.6 and 1);
+                \node[blue!70!black] at (-0.9,0) {\(K\)};
+                \node[red!70!black] at (2.9,0) {\(K'\)};
+                \node[dot, label=right:\(u\)] (u) at (0.9,0.32) {};
+                \node[dot, label=right:\(v\)] (v) at (0.9,-0.32) {};
+                \draw[very thick, violet] (u) -- (v);
+                \node[font=\small] at (1,-1.45) {shared edge \(uv\)};
+                \begin{scope}[xshift=6.3cm]
+                    \node[circle, draw, minimum size=9mm, inner sep=0pt] (ak) at (0,0) {\(A_{K}\)};
+                    \node[circle, draw, minimum size=9mm, inner sep=0pt] (akk) at (2.4,0) {\(A_{K'}\)};
+                    \draw[->] (ak) to[bend left=20] (akk);
+                    \draw[->] (akk) to[bend left=20] (ak);
+                    \node[font=\small] at (1.2,-1.45) {joined in \(\Gamma\), yet independent};
+                \end{scope}
+            \end{tikzpicture}
+        \end{center}
     \end{enumerate}
 \end{remark}
 
