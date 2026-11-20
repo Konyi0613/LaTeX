@@ -31,10 +31,14 @@
 
 \source{Slides p.~275}
 
+\suppstart
 \autoref{sec:self-financing} showed that the tree is a hedging recipe.
 This lecture turns it into a \emph{formula} and then into \emph{algorithms}, takes its limit to reach the Black--Scholes formula, and finally asks how sensitive the answer is to each of its inputs.
+\suppend
 
+\suppstart
 The weights in \eqref{eq:bopm-call-n} are binomial probabilities, so name them.
+\suppend
 
 \begin{definition}
 	Denote the \vocab{binomial distribution} with parameters $n$ and $p$ by
@@ -45,23 +49,31 @@ The weights in \eqref{eq:bopm-call-n} are binomial probabilities, so name them.
 \end{definition}
 
 If you flip a coin $n$ times with $p$ being the probability of getting heads, then $b(j;n,p)$ is the probability of getting $j$ heads.
+\suppstart
 In the tree, a ``head'' is an up move and $p$ is the risk-neutral probability \eqref{eq:risk-neutral-p}.
+\suppend
 
 \source{Slides pp.~276--277}
 
 The stock prices at time $n$ are $Su^{n},Su^{n-1}d,\ldots,Sd^{n}$, increasing in the number $j$ of up moves.
+\suppstart
 So the call finishes in the money exactly when $j$ is large enough.
+\suppend
 
 \begin{definition}
 	Let $a$ be the minimum number of upward price moves for the call to finish in the money, i.e., the smallest nonnegative integer $j$ such that $Su^{j}d^{n-j}\ge X$.
+	\suppstart
 	Taking logarithms, $j\ln(u/d)\ge\ln\bigl(X/(Sd^{n})\bigr)$, so
+	\suppend
 	\begin{equation}
 		a \;=\; \max\left(0,\ \left\lceil\frac{\ln\bigl(X/(Sd^{n})\bigr)}{\ln(u/d)}\right\rceil\right) .
 		\label{eq:bopm-a}
 	\end{equation}
 \end{definition}
 
+\suppstart
 Every term of \eqref{eq:bopm-call-n} with $j<a$ is zero, and for $j\ge a$ the $\max$ can be dropped.
+\suppend
 Hence
 \begin{align}
 	C & \;=\; \frac{\sum_{j=a}^{n}\binom{n}{j}p^{j}(1-p)^{n-j}\bigl(Su^{j}d^{n-j}-X\bigr)}{R^{n}}
@@ -73,6 +85,7 @@ Hence
 	\label{eq:bopm-formula}
 \end{align}
 
+\suppstart
 \begin{note}
 	第二行只是把 $S$ 提出來，並把 $R^{n}$ 平均分給每一期：
 	\[
@@ -94,6 +107,7 @@ Hence
 \begin{remark}
 	\vocab{二項式選擇權定價公式}（binomial option pricing formula）：\eqref{eq:bopm-formula} 把 \eqref{eq:bopm-call-n} 中為零的項（$j<a$，到期價外）丟掉後，拆成兩個「至少 $a$ 次上漲」的二項尾端機率。第二項用的是風險中立機率 $p$，第一項用的是另一個機率 $pu/R$。
 \end{remark}
+\suppend
 
 %─────§ Numerical examples────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Numerical Examples}
@@ -113,7 +127,9 @@ Hence
 	\[
 		\frac{390\times0.343+30\times0.441+0\times0.189+0\times0.027}{(1.2)^{3}} \;=\; 85.069 .
 	\]
+	\suppstart
 	Here $a=2$, and only the top two terminal states contribute.
+	\suppend
 \end{eg}
 
 \begin{figure}[H]
@@ -171,8 +187,11 @@ Hence
 \source{Slides pp.~280--285}
 
 Suppose the option is selling for \$90 instead of \$85.069.
+\suppstart
 We now run \autoref{prop:self-financing} with real numbers.
+\suppend
 
+\suppstart
 \begin{remark}
 	\textbf{整個例子在做什麼。}我們賣出一個 call（short call），同時建立並維持它的 replicating portfolio：$h$ 股股票 $+$ $B$ 元債券。這裡 $B<0$，代表借錢，所以文中的 debt 就是 $-B$。每一期只用到三條規則：
 	\begin{enumerate}[(a),nosep]
@@ -182,6 +201,7 @@ We now run \autoref{prop:self-financing} with real numbers.
 	\end{enumerate}
 	驗算方式：每個節點上 portfolio 的價值 $hS-\text{debt}=hS+B$ 都應等於該節點的 call 價值 $C$（\eqref{eq:bopm-price}）。
 \end{remark}
+\suppend
 
 \paragraph{Time 0.}
 Sell the call for \$90.
@@ -192,6 +212,7 @@ The fund that remains,
 \]
 is the arbitrage profit, as we will see.
 
+\suppstart
 \begin{remark}
 	\textbf{Time 0 的數字}（節點 $S=160$）。下一期的股價是 $Su=240$、$Sd=80$，call 價值是 $C_{u}=141.458$、$C_{d}=10.208$，所以由 (a)
 	\[
@@ -200,6 +221,7 @@ is the arbitrage profit, as we will see.
 	買這些股票要 $0.82031\times160=131.25$ 元，但 portfolio 只值 $C=85.069$，差額 $131.25-85.069=46.1806$ 就是借款，即 $B=C-hS=-46.1806$。
 	用 \eqref{eq:bopm-hb} 直接算也一樣：$B=\dfrac{uC_{d}-dC_{u}}{(u-d)R}=\dfrac{1.5\times10.208-0.5\times141.458}{1\times1.2}=-46.18$。
 \end{remark}
+\suppend
 
 \paragraph{Time 1.}
 Suppose the stock price moves to \$240.
@@ -211,6 +233,7 @@ Debt now totals
 The portfolio has a value of $0.90625\times240-76.04232=141.45768$, which matches the corresponding call value $141.458$ in \autoref{fig:bopm-example}.
 The trading strategy is self-financing: the new shares were paid for by new debt, and nothing else changed hands.
 
+\suppstart
 \begin{remark}
 	\textbf{Time 1 的數字}（節點 $S=240$）。
 	\begin{itemize}[nosep]
@@ -221,6 +244,7 @@ The trading strategy is self-financing: the new shares were paid for by new debt
 	\end{itemize}
 	其實在 rebalance 之前，舊組合就已經值 $0.82031\times240-55.4167\approx141.458$：舊組合的價值剛好等於新組合的成本，所以不用補錢。
 \end{remark}
+\suppend
 
 \paragraph{Time 2.}
 Suppose the stock price plunges to \$120.
@@ -230,6 +254,7 @@ Use it to reduce the debt to
 	76.04232\times1.2-78.75 \;=\; 12.5 \text{ dollars}.
 \]
 
+\suppstart
 \begin{remark}
 	\textbf{Time 2 的數字}（節點 $S=120$，從 $240$ 下跌而來）。
 	\begin{itemize}[nosep]
@@ -239,6 +264,7 @@ Use it to reduce the debt to
 		\item \textbf{驗算：}$0.25\times120-12.5=17.5$，等於該節點的 call 價值。
 	\end{itemize}
 \end{remark}
+\suppend
 
 \paragraph{Time 3, rising price.}
 The stock price moves to \$180 and the call we wrote finishes in the money.
@@ -249,6 +275,7 @@ Financing this loss with borrowing brings the total debt to $12.5\times1.2+30=45
 The stock price moves to \$60 and the call expires worthless.
 Selling the $0.25$ shares brings in $0.25\times60=15$ dollars, which repays exactly the debt of $12.5\times1.2=15$ dollars.
 
+\suppstart
 \begin{remark}
 	\textbf{Time 3 的數字。}到期不再 rebalance，只要結清。由 (b)，debt 變成 $12.5\times1.2=15$，手上還有 $0.25$ 股。
 	\begin{itemize}[nosep]
@@ -268,6 +295,7 @@ Selling the $0.25$ shares brings in $0.25\times60=15$ dollars, which repays exac
 	由 \eqref{eq:bopm-replicate}，每個節點上 portfolio 的價值都等於 \autoref{fig:bopm-example} 中的 call 價值；所以不論股價走哪條路徑，到期時的債務都剛好由「股票價值減去 call 的 payoff」償還。
 	唯一的誤差來自 delta 在小數第五位的四捨五入，所以 time~1 才會出現 $141.45768$ 對 $141.45833$ 的差異。
 \end{note}
+\suppend
 
 \subsection{Applications besides Arbitrage}
 
@@ -281,6 +309,7 @@ The same numbers serve two other purposes.\footnote{Thanks to a lively class dis
 No prediction is involved!
 Without the hedge, the writer may end up forking out \$390 in the worst case (the top terminal node of \autoref{fig:bopm-example}).\footnote{Thanks to a lively class discussion on March 16, 2016.}
 
+\suppstart
 \begin{remark}
 	\vocab{複製}（replicate）與\vocab{避險}（hedge）是同一件事的兩面：買進複製組合 $=$ 合成一個買權；賣出買權再買進複製組合 $=$ 把賣出的買權完全對沖掉。兩者都只依照每個節點的 delta 調整部位，不需要預測股價。
 \end{remark}
@@ -290,6 +319,7 @@ Without the hedge, the writer may end up forking out \$390 in the worst case (th
 	以 \autoref{sec:bopm-arbitrage-walk} 為例：部位是 short call $+$ replicating portfolio，由 \eqref{eq:bopm-price}，每個節點上 portfolio 的價值都等於 call 的價值，所以淨值恆為 $0$；一開始拿到的 $4.931$ 不論股價怎麼走都留得住，存到到期就是確定的 $4.931\times1.2^{3}$。
 	另外，hedge 不是建好就放著不管：每個節點的 delta $h$ 都不同（$0.82031\to0.90625\to0.25$），每期都得 rebalance 才能維持；連續時間下則要隨時調整（\autoref{sec:delta}）。
 \end{note}
+\suppend
 
 %─────§ Algorithms──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Binomial Tree Algorithms for European Options}
@@ -301,6 +331,7 @@ The BOPM implies the \vocab{binomial tree algorithm} that applies backward induc
 There are $\sum_{j=0}^{n}(j+1)\sim n^{2}/2$ nodes and each costs $O(1)$ work, so the total running time is $O(n^{2})$.
 Storing every node needs $O(n^{2})$ memory, but backward induction only ever looks one column ahead, so a single array of length $n+1$ suffices --- provided its entries are updated in the right order.
 
+\suppstart
 \begin{algorithm}[H]
 	\caption{Binomial tree algorithm for European calls, $O(n)$ space}
 	\label{alg:bopm-european}
@@ -323,6 +354,7 @@ Storing every node needs $O(n^{2})$ memory, but backward induction only ever loo
 	新的 $C[\,i\,]$ 要讀舊的 $C[\,i\,]$ 和 $C[\,i+1\,]$；往上跑時，讀 $C[\,i+1\,]$ 的那一刻它還沒被覆寫。
 	若 $i$ 遞減，就會讀到已經屬於時間 $j$ 的新值 --- 這就是投影片提醒的「proper updating」。
 \end{note}
+\suppend
 
 \begin{figure}[H]
 	\centering
@@ -360,6 +392,7 @@ To price European puts, simply replace the payoff by $\max\bigl(0,\,X-Su^{n-i}d^
 \source{Slides p.~289}
 
 If $C[\,j+1\,][\,i\,]$ and $C[\,j+1\,][\,i+1\,]$ are both zero, so is $C[\,j\,][\,i\,]$.
+\suppstart
 A node with $i$ down moves at time $j$ can still collect at most $n-i$ up moves in total, so it is worthless whenever $n-i<a$.
 Letting the inner loop run only up to $\min(n-a,\,j)$ skips the whole triangle of zeros below the strike (\autoref{fig:bopm-zeros}), and the algorithm runs in $O\bigl(n(n-a)\bigr)$ time with an array of size $n-a+1$.
 
@@ -372,6 +405,7 @@ Letting the inner loop run only up to $\min(n-a,\,j)$ skips the whole triangle o
 	\end{enumerate}
 	例如 \autoref{eg:bopm-three-period} 中 $n=3$、$a=2$，所以 $n-a=1$：只有 $i=0,1$ 的節點需要計算，而 $i=2,3$ 的節點（股價 $40$、$60$、$20$）在 \autoref{fig:bopm-example} 中確實都是 $0$。
 \end{remark}
+\suppend
 
 \begin{figure}[H]
 	\centering
@@ -439,7 +473,9 @@ Note that
 \[
 	b(j;n,p) \;=\; \frac{p\,(n-j+1)}{(1-p)\,j}\;b(j-1;n,p) ,
 \]
+\suppstart
 which follows from $\binom{n}{j}=\binom{n}{j-1}\frac{n-j+1}{j}$.
+\suppend
 So the following program computes $b(j;n,p)$ in $b[\,j\,]$:
 
 \begin{algorithm}[H]
@@ -460,9 +496,11 @@ With the $b(j;n,p)$ available, the risk-neutral valuation formula \eqref{eq:bopm
 \]
 But we only need a single variable to store the $b(j;n,p)$'s as they are being sequentially computed: each one is used once, in the $j$th term of the sum, and then only to produce the next.
 
+\suppstart
 \begin{note}
 	當 $n$ 很大時，$b(j;n,p)$ 和 $Su^{j}d^{n-j}$ 的值會非常極端（遠在 $n=10^{4}$ 之前 $b(a;n,p)$ 就已經 underflow），所以實作上應該改存它們的對數。\footnote{課本 Programming Assignment 9.2.14。}
 \end{note}
+\suppend
 
 This linear-time algorithm computes the discounted expected value of $\max(S_{n}-X,0)$.
 This forward-induction approach cannot be applied to American options because of early exercise.
@@ -472,6 +510,7 @@ So binomial tree algorithms for American options usually run in $O(n^{2})$ time.
 
 \source{Slides p.~293}
 
+\suppstart
 \textbf{動機。}\autoref{sec:backward-induction} 的遞迴式最直接的寫法就是 recursion：在 $Su$ 和 $Sd$ 各用剩下的 $n-1$ 期定價，再合起來。
 
 \begin{algorithm}[H]
@@ -493,6 +532,7 @@ So binomial tree algorithms for American options usually run in $O(n^{2})$ time.
 
 \textbf{那為什麼還要講 bushy tree。}存表的前提是 option 的價值只取決於「現在的股價」。
 若 payoff 取決於整條 path（例如平均股價，見 \autoref{sec:path-dependent}），$Sud$ 和 $Sdu$ 股價相同但平均不同，就不能共用同一格，這時真的得面對 $2^{n}$ 條 path。
+\suppend
 
 \begin{figure}[H]
 	\centering
@@ -517,10 +557,12 @@ So binomial tree algorithms for American options usually run in $O(n^{2})$ time.
 	\label{fig:bushy}
 \end{figure}
 
+\suppstart
 \begin{moral}
 	同一個公式有三種演算法：brute-force recursion 是 $O(2^{n})$，在 recombining tree 上做 backward induction 是 $O(n^{2})$，直接對 terminal distribution 求和（\autoref{alg:bopm-optimal}）是 $O(n)$。
 	第一種什麼都沒利用，第二種利用了 $ud=du$，第三種利用了 European payoff 只取決於到期時的 state --- 這也正是它不能用在 American options 的原因。
 \end{moral}
+\suppend
 
 %─────§ Toward Black–Scholes─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Toward the Black--Scholes Formula}
@@ -537,6 +579,7 @@ As $n$ increases, however, the stock price ranges over ever larger numbers of po
 What is needed is to calibrate the BOPM's parameters $u$, $d$ and $R$ so that it converges to the continuous-time model.
 We now skim through the proof.
 
+\suppstart
 \begin{remark}[路線圖]
 	目標是從 binomial tree 推出 Black--Scholes 公式，只有四步：
 	\begin{enumerate}[(1),nosep]
@@ -547,6 +590,7 @@ We now skim through the proof.
 	\end{enumerate}
 	簡報只給每一步的結論。標成「補充」的 proof 和 remark 是筆記另外補的細節，第一次讀可以跳過。每一小節開頭的 $\triangleright$ 標示它屬於第幾步。
 \end{remark}
+\suppend
 
 \begin{notation}
 	\begin{itemize}[nosep]
@@ -562,10 +606,13 @@ We now skim through the proof.
 
 \source{Slides pp.~296--300}
 
+\suppstart
 \bsstep{1}{讓 tree 的 log return 平均、變異數對上真實股價}
+\suppend
 
 Under the binomial model, $\ln u$ and $\ln d$ are the stock's two possible continuously compounded rates of return per period.
 
+\suppstart
 \begin{remark}
 	由 \eqref{eq:continuous}，continuously compounded rate of return $x$ 的意思是 $S_{\text{end}}=S\,e^{x}$，也就是 $x=\ln(S_{\text{end}}/S)$。
 	一期內股價只會變成 $Su$ 或 $Sd$，所以這一期的報酬率只有兩種可能：$\ln(Su/S)=\ln u$ 或 $\ln(Sd/S)=\ln d$（例如 $u=1.1$ 時是 $\ln1.1\approx9.53\%$，而不是 simple return 的 $10\%$）。
@@ -577,6 +624,7 @@ After $j$ up moves out of $n$,
 	\label{eq:bopm-log-return}
 \end{equation}
 where $j\sim\mathrm{Bin}(n,q)$, with $q$ the \emph{true} up probability of \autoref{sec:bopm}, so $E[\,j\,]=nq$ and $\Var[\,j\,]=nq(1-q)$.
+\suppend
 
 \begin{definition}
 	Let
@@ -594,8 +642,11 @@ From \eqref{eq:bopm-log-return} it is not hard to show that
 	\qquad
 	\hat{\sigma}^{2} \;=\; q(1-q)\ln^{2}(u/d) .
 \]
+\suppstart
 Indeed, each period contributes an independent Bernoulli variable equal to $\ln u$ or $\ln d$.
+\suppend
 
+\suppstart
 \begin{remark}
 	\textbf{$\hat{\mu}$ 和 $\hat{\sigma}^{2}$ 怎麼算。}
 	\begin{enumerate}[(1),nosep]
@@ -615,6 +666,7 @@ Indeed, each period contributes an independent Bernoulli variable equal to $\ln 
 		代 $a=\ln u$、$b=\ln d$ 得 $E[y_{k}]=q\ln(u/d)+\ln d=\hat{\mu}$、$\Var[y_{k}]=q(1-q)\ln^{2}(u/d)=\hat{\sigma}^{2}$。所以 $\hat{\mu}$、$\hat{\sigma}^{2}$ 就是\emph{一期}的平均和變異數，這也是定義裡除以 $n$ 的原因。
 	\end{enumerate}
 \end{remark}
+\suppend
 
 Assume the stock's true continuously compounded rate of return over $\tau$ years satisfies
 \[
@@ -624,6 +676,7 @@ Assume the stock's true continuously compounded rate of return over $\tau$ years
 \]
 Call $\sigma$ the stock's (annualized) \vocab{volatility}.
 
+\suppstart
 \begin{remark}
 	\vocab{波動率}（volatility）$\sigma$。這裡先不管 tree，假設真實股價的 $\tau$ 年 log return $\ln(S_{\tau}/S)$ 平均是 $\mu\tau$、變異數是 $\sigma^{2}\tau$。
 	\begin{enumerate}[(1),nosep]
@@ -638,6 +691,7 @@ Call $\sigma$ the stock's (annualized) \vocab{volatility}.
 	\end{enumerate}
 	下面 \eqref{eq:calib-mean}--\eqref{eq:calib-var} 就是要求 BOPM 的 $n$ 期 log return 的平均 $n\hat{\mu}$ 和變異數 $n\hat{\sigma}^{2}$ 對上這裡的 $\mu\tau$ 和 $\sigma^{2}\tau$。
 \end{remark}
+\suppend
 
 The BOPM converges to that distribution only if
 \begin{align}
@@ -651,6 +705,7 @@ Impose
 \]
 It makes nodes at the same horizontal level of the tree have identical prices (\autoref{fig:bopm-zeros}); other choices are possible.\footnote{Exact solutions for $u,d,q$ are feasible if \eqref{eq:calib-mean}--\eqref{eq:calib-var} are replaced by equations: 3 equations for 3 variables (Chance, 2008). Exercise 9.3.1 of the textbook instead imposes $q=1/2$.}
 
+\suppstart
 \begin{remark}
 	\begin{enumerate}[(1),nosep]
 		\item \textbf{\eqref{eq:calib-mean}--\eqref{eq:calib-var} 在說什麼。}由 $\hat{\mu},\hat{\sigma}^{2}$ 的定義，tree 的 $n$ 期 log return $\ln(S_{\tau}/S)$ 平均是 $n\hat{\mu}$、變異數是 $n\hat{\sigma}^{2}$。要讓 tree 逼近真實股價，至少這兩個數要對上真實的 $\mu\tau$ 和 $\sigma^{2}\tau$。只要求 $n\to\infty$ 時對上（$\to$）而不要求相等，因為 tree 本來就只是近似。
@@ -658,6 +713,7 @@ It makes nodes at the same horizontal level of the tree have identical prices (\
 		\item \textbf{為什麼選 $ud=1$。}$ud=1$ 等價於 $\ln d=-\ln u$，也就是在 log 座標下上漲和下跌走一樣長。於是 $Sud=S$：漲一次再跌一次會回到原價，股價只由「上漲次數 $-$ 下跌次數」決定，畫在圖上同一高度的 node 股價相同。
 	\end{enumerate}
 \end{remark}
+\suppend
 
 \begin{proposition}
 	\label{prop:crr}
@@ -678,6 +734,7 @@ It makes nodes at the same horizontal level of the tree have identical prices (\
 	\]
 \end{proposition}
 
+\suppstart
 \begin{proof}
 	Now $\ln(u/d)=2\sigma\sqrt{\Delta t}$ and $\ln d=-\sigma\sqrt{\Delta t}$, so
 	\[
@@ -708,9 +765,11 @@ It makes nodes at the same horizontal level of the tree have identical prices (\
 	\end{enumerate}
 	\textbf{證明裡的恆等式。}$q(1-q)=\frac14-\bigl(q-\frac12\bigr)^{2}=\frac14-\frac14(2q-1)^{2}$（把右邊展開即可驗證）。代入 $2q-1=\frac{\mu}{\sigma}\sqrt{\Delta t}$ 後，變異數比 $\sigma^{2}\tau$ 多乘了 $1-(\mu/\sigma)^{2}\Delta t$；$\Delta t\to0$ 時這個因子 $\to1$，所以是 $\to$ 而不是 $=$。
 \end{remark}
+\suppend
 
 With this choice, even if $\sigma$ is not calibrated correctly, the mean is still matched exactly.
 Note also that $u$ and $d$ are related to volatility exclusively: both are independent of $r$ and $\mu$.
+\suppstart
 All the information about the drift sits in the probability; that is the same division of labour as in \autoref{sec:bopm-risk}, where only $u$ and $d$ entered the price.
 
 \begin{remark}
@@ -719,17 +778,21 @@ All the information about the drift sits in the probability; that is the same di
 		\item \textbf{分工。}$u,d$ 只含 $\sigma$，決定每一步走多遠；$\mu$ 只出現在 $q$，決定往上走的機率比 $\frac12$ 大多少。
 	\end{enumerate}
 \end{remark}
+\suppend
 
 \subsection{The CRR Model}
 
 \source{Slides pp.~301--302}
 
+\suppstart
 \bsstep{1}{（續）CRR 就是第 1 步解出來的 $u,d,q$}
+\suppend
 
 The choices \eqref{eq:crr} result in the \vocab{CRR binomial model}.\footnote{Cox, Ross, \& Rubinstein (1979).}
 Black (1992): ``This method is probably used more than the original formula in practical situations.''
 OptionMetrics's (2015) IvyDB, for instance, uses the CRR model.
 
+\suppstart
 \begin{remark}
 	\vocab{CRR 二項式模型}（Cox--Ross--Rubinstein binomial model）：就是 \eqref{eq:crr} 的選法。取 log 後
 	\[
@@ -739,6 +802,7 @@ OptionMetrics's (2015) IvyDB, for instance, uses the CRR model.
 	\]
 	所以每一期 $\ln S$ 固定往上或往下走 $\sigma\sqrt{\Delta t}$，在 $(t,\ln S)$ 平面上是等距的格子（\autoref{fig:crr-lattice}）。
 \end{remark}
+\suppend
 
 The CRR model is best seen in logarithmic terms:
 \[
@@ -748,7 +812,9 @@ The CRR model is best seen in logarithmic terms:
 		\ln S-\sigma\sqrt{\Delta t}, & \text{down move}.
 	\end{cases}
 \]
+\suppstart
 In the $(t,\ln S)$ plane the tree is a regular lattice (\autoref{fig:crr-lattice}).
+\suppend
 
 \begin{figure}[H]
 	\centering
@@ -784,17 +850,22 @@ In the $(t,\ln S)$ plane the tree is a regular lattice (\autoref{fig:crr-lattice
 
 \source{Slides p.~303}
 
+\suppstart
 \bsstep{1}{（附帶條件）CRR 的 risk-neutral $p$ 要落在 $[0,1]$}
+\suppend
 
 The no-arbitrage inequalities $d<R<u$ may not hold under \eqref{eq:crr} or \eqref{eq:risk-neutral-p}.
 If this happens, the risk-neutral probabilities lie outside $[0,1]$.\footnote{Many papers and programs forget to check this condition!}
+\suppstart
 With $r\ge0$ the inequality $d<R$ is automatic, and $R<u$ means $e^{\sigma\sqrt{\Delta t}}>e^{r\Delta t}$, i.e., $\sigma>r\sqrt{\tau/n}$, i.e.,
+\suppend
 \begin{equation}
 	n \;>\; \frac{r^{2}}{\sigma^{2}}\,\tau .
 	\label{eq:crr-n-bound}
 \end{equation}
 So the problem goes away if $n$ is large enough.
 
+\suppstart
 \begin{remark}
 	\textbf{\eqref{eq:crr-n-bound} 的推導。}
 	\begin{enumerate}[(1),nosep]
@@ -813,18 +884,22 @@ Other solutions can be found in the textbook\footnote{See Exercise 9.3.1 of the 
 	With $r=10\%$, $\sigma=5\%$ and $\tau=1$, \eqref{eq:crr-n-bound} requires $n>4$: a two-period CRR tree for a low-volatility stock has $p>1$.
 	For typical equity volatilities the bound is far below $1$ and never binds.
 \end{eg}
+\suppend
 
 \subsection{The Limiting Distribution}
 \label{sec:bs-step2}
 
 \source{Slides pp.~304--305}
 
+\suppstart
 \bsstep{2}{$n\to\infty$，由 CLT 得到 lognormal}
+\suppend
 
 By \eqref{eq:bopm-log-return}, $\ln(S_{\tau}/S)$ is a sum of $n$ independent Bernoulli variables.
 The central limit theorem (\autoref{thm:clt}) therefore says $\ln(S_{\tau}/S)$ converges to $N(\mu\tau,\sigma^{2}\tau)$.\footnote{As our probabilities depend on $n$, this argument is only heuristic; the rigorous version uses the Lyapunov condition, $\bigl[(1-q)^{2}+q^{2}\bigr]/\bigl[nq(1-q)\bigr]\to0$, which holds here. See Uspensky (1937).}
 So $\ln S_{\tau}$ approaches $N(\mu\tau+\ln S,\,\sigma^{2}\tau)$.
 
+\suppstart
 \begin{remark}
 	\begin{enumerate}[(1),nosep]
 		\item \textbf{CLT 怎麼用。}$\ln(S_{\tau}/S)=\sum_{k=1}^{n}y_{k}$，$y_{k}$ i.i.d.，每個只取 $\ln u$ 或 $\ln d$。\autoref{thm:clt} 說很多 i.i.d.\ 變數的和近似 normal，而 normal 由平均和變異數決定：和的平均是 $n\hat{\mu}$、變異數是 $n\hat{\sigma}^{2}$，由 \autoref{prop:crr} 它們 $\to\mu\tau$ 和 $\sigma^{2}\tau$。所以 $\ln(S_{\tau}/S)\to N(\mu\tau,\sigma^{2}\tau)$。
@@ -832,12 +907,19 @@ So $\ln S_{\tau}$ approaches $N(\mu\tau+\ln S,\,\sigma^{2}\tau)$.
 		\item \textbf{lognormal。}由 \autoref{sec:lognormal} 的定義，$\ln Y$ 是 normal 的 $Y$ 叫 lognormal，所以 $S_{\tau}$ 在極限下是 lognormal。
 	\end{enumerate}
 \end{remark}
+\suppend
 
 \begin{moral}
 	$S_{\tau}$ has a lognormal distribution in the limit.
-	This is the distribution \autoref{sec:lognormal} prepared for; the binomial tree has now \emph{derived} it, rather than assumed it.
 \end{moral}
 
+\suppstart
+\begin{moral}
+	This is the distribution \autoref{sec:lognormal} prepared for; the binomial tree has now \emph{derived} it, rather than assumed it.
+\end{moral}
+\suppend
+
+\suppstart
 \bsstep{3}{換成 risk-neutral 機率}
 
 Which $\mu$?
@@ -853,12 +935,14 @@ For pricing we need the tree under the risk-neutral probability, not under $q$.
 	\end{enumerate}
 	真實的期望報酬 $\mu$ 在 (3) 中被換掉了，這就是 Black--Scholes 公式裡沒有 $\mu$ 的原因。
 \end{remark}
+\suppend
 
 \begin{lemma}
 	\label{lem:rn-lognormal}
 	In a risk-neutral economy, the continuously compounded rate of return satisfies $\ln(S_{\tau}/S)\to N\bigl((r-\sigma^{2}/2)\,\tau,\ \sigma^{2}\tau\bigr)$ in distribution.
 \end{lemma}
 
+\suppstart
 \begin{proof}[Proof（補充；簡報只說「令 $q=p$、$n\to\infty$，則 $\mu=r-\sigma^{2}/2$」）]
 	想法：同一棵 CRR tree，把 $q$ 換成 $p=\frac{e^{r\Delta t}-d}{u-d}$，證明 $p$ 和 \eqref{eq:crr} 的 $q$ 形狀相同，只是 $\mu$ 換成 $r-\sigma^{2}/2$。
 	用 $e^{y}=1+y+\frac{y^{2}}{2}+O(y^{3})$，$y$ 分別代 $r\Delta t$ 和 $\pm\sigma\sqrt{\Delta t}$：
@@ -888,12 +972,15 @@ For pricing we need the tree under the risk-neutral probability, not under $q$.
 	\end{enumerate}
 	也就是說，log return 的平均要比 $r\tau$ 少 $\sigma^{2}\tau/2$，取 $\exp$ 再平均之後才會剛好是 $e^{r\tau}$。這和 Jensen's inequality（\autoref{thm:jensen}）一致：$\ln$ 是 concave，所以 $E[\ln Y]\le\ln E[Y]$。
 \end{remark}
+\suppend
 
 \subsection{Two Meanings of ``Rate of Return''}
 
 \source{Slides pp.~306--307}
 
+\suppstart
 \bsstep{3}{（續）第 3 步的平均 $r-\sigma^{2}/2$ 怎麼解讀}
+\suppend
 
 The expected stock price at expiration in a risk-neutral economy is $Se^{r\tau}$, by \autoref{lem:rn-lognormal} and \eqref{eq:lognormal-moments}:
 \[
@@ -910,6 +997,7 @@ If it means instead
 \]
 the (weighted) geometric average rate of return, annualized, then \autoref{lem:rn-lognormal} gives $r-\sigma^{2}/2$.
 
+\suppstart
 \begin{remark}
 	兩個「rate of return」只差在 $\ln$ 和 $E$ 的順序：
 	\begin{enumerate}[(1),nosep]
@@ -923,13 +1011,16 @@ the (weighted) geometric average rate of return, annualized, then \autoref{lem:r
 	第一個講的是各情境下 \emph{wealth} 的平均，第二個講的是單一情境中典型（median）的 \emph{growth}。
 	Jensen's inequality（\autoref{thm:jensen}）讓第二個小於第一個，對 lognormal 而言剛好差 $\sigma^{2}/2$。
 \end{note}
+\suppend
 
 \subsection{The Black--Scholes Formula}
 \label{sec:black-scholes}
 
 \source{Slides p.~308}
 
+\suppstart
 \bsstep{4}{代入定價公式，得到 Black--Scholes 公式}
+\suppend
 
 \begin{theorem}[The Black--Scholes Formula, 1973]
 	\label{thm:black-scholes}
@@ -946,6 +1037,7 @@ the (weighted) geometric average rate of return, annualized, then \autoref{lem:r
 
 On a United flight from San Francisco to Tokyo on March 7, 2010, a real-estate manager mentioned this formula to the lecturer!
 
+\suppstart
 \begin{proof}[Proof（補充；簡報沒有證明）]
 	\begin{enumerate}[(1),nosep]
 		\item \textbf{定價公式。}由 \eqref{eq:rn-pricing}，European option 的價值 $=$ 折現因子 $\times$ risk-neutral 下 payoff 的期望。$n$ 期的折現因子是 $e^{-\hat{r}n}=e^{-r\tau}$，所以 $C=e^{-r\tau}E^{\pi}\bigl[\max(S_{\tau}-X,0)\bigr]$。
@@ -980,15 +1072,19 @@ On a United flight from San Francisco to Tokyo on March 7, 2010, a real-estate m
 \begin{remark}
 	\vocab{Black--Scholes 公式}：$C=SN(x)-Xe^{-r\tau}N(x-\sigma\sqrt{\tau})$。只需要五個輸入 $S,X,\sigma,\tau,r$；股票的期望報酬 $\mu$ 不出現，正如 \autoref{sec:bopm-risk} 中 $q$ 不出現一樣。
 \end{remark}
+\suppend
 
 \subsection{Interpreting \texorpdfstring{$N(x)$}{N(x)} and \texorpdfstring{$N(x-\sigma\sqrt{\tau})$}{N(x - sigma sqrt tau)}}
 \label{sec:bs-interpret}
 
 \source{Slides p.~309}
 
+\suppstart
 \bsstep{4}{（續）公式裡兩個 $N(\cdot)$ 的意思}
+\suppend
 
 Compare \eqref{eq:bs-call} with \eqref{eq:bopm-formula} for the meaning of $x$.
+\suppstart
 \begin{itemize}[itemsep=0.3em]
 	\item $N(x-\sigma\sqrt{\tau})$ is the limit of $\sum_{j\ge a}b(j;n,p)$: the risk-neutral probability that the call finishes in the money, $\mathrm{Prob}^{\pi}[\,S_{\tau}>X\,]$ (cf.\ \autoref{prop:lognormal-tail}).
 	\item $N(x)$ is the limit of $\sum_{j\ge a}b(j;n,pu/R)$: the probability of the same event under the tilted measure $pu/R$, which weights each path by how much the stock grew along it.\footnote{See Exercise 13.2.12 of the textbook for an interpretation of the probability associated with $N(x)$ and $N(-x)$.}
@@ -1018,6 +1114,7 @@ Compare \eqref{eq:bs-call} with \eqref{eq:bopm-formula} for the meaning of $x$.
 	\]
 	$\sigma\sqrt{\tau}$ 不含 $X$，所以 $\frac{\partial(x-\sigma\sqrt{\tau})}{\partial X}=\frac{\partial x}{\partial X}$；再由 \eqref{eq:bs-identity}，$SN'(x)=Xe^{-r\tau}N'(x-\sigma\sqrt{\tau})$，第一項和第三項抵銷，剩下 $\frac{\partial C}{\partial X}=-e^{-r\tau}N(x-\sigma\sqrt{\tau})$。
 \end{remark}
+\suppend
 
 %─────§ BOPM and BS──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{BOPM and Black--Scholes Model}
@@ -1037,6 +1134,7 @@ The connections are
 \]
 which is the CRR model \eqref{eq:crr} again.
 
+\suppstart
 \begin{remark}
 	\textbf{對應關係。}每期長度 $\Delta t=\tau/n$ 年，代入 \eqref{eq:crr} 的 $u=e^{\sigma\sqrt{\Delta t}}$、$d=e^{-\sigma\sqrt{\Delta t}}$；每期的連續複利利率是年利率乘上一期的年數，$\hat{r}=r\Delta t=r\tau/n$。
 \end{remark}
@@ -1045,6 +1143,7 @@ which is the CRR model \eqref{eq:crr} again.
 	Consider a 3-month option when the interest rate is 8\% per annum and the volatility is 30\% per annum, so $\tau=0.25$, $r=0.08$ and $\sigma=0.3$.
 	A binomial tree with $n=5$ should use $u=e^{0.3\sqrt{0.25/5}}=1.0694$, $d=e^{-0.3\sqrt{0.25/5}}=0.9351$ and $\hat{r}=0.004$.\footnote{Example 9.3.5 of the textbook.}
 \end{eg}
+\suppend
 
 \source{Slides pp.~311--312}
 
@@ -1082,6 +1181,7 @@ which is the CRR model \eqref{eq:crr} again.
 The binomial tree algorithms converge reasonably fast: the error is $O(1/n)$.\footnote{F.~Diener \& M.~Diener (2004); L.~Chang \& Palmer (2007).}
 Oscillations are inherent, however, and they can be dealt with by judicious choices of $u$ and $d$.\footnote{See Exercise 9.3.8 of the textbook, which shifts the lattice by $(1/n)\ln(X/S)$ so that the strike always falls on a node.}
 
+\suppstart
 \begin{remark}
 	\textbf{圖在畫什麼。}固定 $S=100$、$r=8\%$、$\sigma=0.2$、$\tau=1$，對每個 $n$ 用上面的 $u,d,\hat{r}$ 建 $n$ 期 CRR tree，由 \eqref{eq:bopm-call-n} 算出
 	\[
@@ -1095,6 +1195,7 @@ Oscillations are inherent, however, and they can be dealt with by judicious choi
 
 	\textbf{怎麼修。}選 $u,d$ 讓 $\ln X$ 永遠落在格點上（課本 Exercise 9.3.8：把 lattice 平移 $\frac1n\ln(X/S)$），相對位置就固定，振盪消失。同樣的 kink 問題也出現在 \autoref{sec:numerical-gamma-fails}；barrier option 更嚴重（\autoref{fig:barrier-convergence}）。
 \end{remark}
+\suppend
 
 %─────§ Implied volatility──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Implied Volatility}
@@ -1106,6 +1207,7 @@ Of the five inputs, volatility is the sole parameter not directly observable.
 The Black--Scholes formula can be used to compute the market's opinion of it: solve for $\sigma$ given the option price, $S$, $X$, $\tau$ and $r$, with the numerical methods of \autoref{sec:numerical-irr}.
 The result is the \vocab{implied volatility}.
 
+\suppstart
 \begin{remark}
 	\vocab{隱含波動率}（implied volatility）：把市場上的選擇權價格代回 Black--Scholes 公式反解出來的 $\sigma$，可以看成市場對未來波動的「共識」。跟它相對的是\vocab{歷史波動率}（historical volatility），由過去股價的對數報酬估計。
 \end{remark}
@@ -1118,6 +1220,7 @@ The result is the \vocab{implied volatility}.
 		\item \emph{為什麼 $\tau$ 很小時很難？} $\tau\to0$ 時 vega $\to0$，價格幾乎不隨 $\sigma$ 變動，價格的一點誤差就會讓解出的 $\sigma$ 差很多。
 	\end{itemize}
 \end{note}
+\suppend
 
 Implied volatility is
 \begin{quote}
@@ -1144,6 +1247,7 @@ For stock options, low-strike options tend to have higher implied volatilities (
 	\item Another is that volatility rises when the stock falls,\footnote{This is called the \vocab{leverage effect} (Black, 1992).} making in-the-money calls more likely to become in the money again.
 \end{itemize}
 
+\suppstart
 \begin{remark}
 	\vocab{波動率微笑}（volatility smile）：同一標的、同一到期日、不同 strike 反解出的 implied vol 對 $X$ 作圖。Black--Scholes 若正確應為水平線；外匯常見 smile，股票常見 \vocab{skew}（低 strike 的 implied vol 較高），即低 strike 的 option 比單一 $\sigma$ 的 Black--Scholes 價格貴。根本原因是真實 log return 的左尾比 normal 厚（\autoref{fig:sp500-density}），簡報給兩個來源：
 	\begin{itemize}[nosep]
@@ -1181,11 +1285,13 @@ For stock options, low-strike options tend to have higher implied volatilities (
 		maturities.}
 	\label{fig:smile}
 \end{figure}
+\suppend
 
 To address this issue, volatilities are often combined to produce a composite implied volatility.
 This practice is not sound theoretically.
 The existence of different implied volatilities for options on the same underlying asset shows the Black--Scholes model is not literally true.
 
+\suppstart
 \begin{remark}
 	\vocab{composite implied volatility}：把各 strike 的 implied vol 加權平均成一個數（常用 vega 加權，讓 at the money 的權重大），當成這支股票的 $\sigma$。理論上站不住：smile 本身就說明 Black--Scholes 不對，平均後代回公式也無法同時重現所有 option 的市場價格。比較好的做法是保留整個 implied vol 曲面，依 strike、到期日各取各的值。
 \end{remark}
@@ -1194,6 +1300,7 @@ The existence of different implied volatilities for options on the same underlyi
 	A single stock has a single volatility in the Black--Scholes model, so the smile is a measurement of the model's error, not of the stock.
 	By \autoref{thm:breeden-litzenberger}, a non-flat smile is the market telling us its risk-neutral density of $S_{\tau}$ is \emph{not} lognormal --- typically with fatter tails, exactly as \autoref{fig:sp500-density} showed for realized returns.
 \end{moral}
+\suppend
 
 %─────§ American puts──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Binomial Tree Algorithms for American Puts}
@@ -1205,6 +1312,7 @@ Early exercise has to be considered.
 The binomial tree algorithm starts with the terminal payoffs $\max\bigl(0,\,X-Su^{j}d^{n-j}\bigr)$ and applies backward induction.
 At each intermediate node, compare the payoff if exercised and the continuation value, and keep the larger one.
 
+\suppstart
 \begin{remark}
 	\autoref{alg:american-put}（下面）和 \autoref{alg:bopm-european} 只差內層那一行。時間 $j$、跌了 $i$ 次的 node 股價是 $Su^{j-i}d^{i}$：
 	\begin{itemize}[nosep]
@@ -1251,6 +1359,7 @@ At each intermediate node, compare the payoff if exercised and the continuation 
 	\end{itemize}
 \end{remark}
 \end{eg}
+\suppend
 
 \subsection{Bermudan Options}
 
@@ -1260,9 +1369,11 @@ Some American options can be exercised only at discrete time points instead of c
 They are called \vocab{Bermudan options}.
 Their pricing algorithm is identical to that for American options, but early exercise is considered for only those nodes when early exercise is permitted.
 
+\suppstart
 \begin{remark}
 	\vocab{百慕達式選擇權}（Bermudan option）：只能在事先約定的幾個日期提前履約，介於歐式（只能到期履約）與美式（隨時可履約）之間——就像百慕達在地理上介於歐洲與美國之間。演算法上只在允許履約的那幾欄取 $\max$。
 \end{remark}
+\suppend
 
 %─────§ Time-dependent parameters───────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Time-Dependent Parameters}
@@ -1282,7 +1393,9 @@ The annualized volatility to be used in the Black--Scholes formula should now be
 \[
 	\sqrt{\frac{\int_{0}^{\tau}\sigma^{2}(t)\,dt}{\tau}} ,
 \]
+\suppstart
 the root-mean-square of $\sigma(t)$ --- \emph{not} its average.
+\suppend
 
 For the binomial model, $u$ and $d$ now depend on time:
 \[
@@ -1291,6 +1404,7 @@ For the binomial model, $u$ and $d$ now depend on time:
 	d \;=\; e^{-\sigma(t)\sqrt{\tau/n}} .
 \]
 But then the tree no longer combines: an up move at time $t_{1}$ followed by a down move at $t_{2}$ multiplies the price by $e^{(\sigma(t_{1})-\sigma(t_{2}))\sqrt{\Delta t}}$, and the reverse order by its reciprocal.\footnote{Amin (1991); C.~I.~Chen (\texttt{R98922127}) (2011).}
+\suppstart
 One way out is to let the period lengths vary so that $\sigma(t_{i})\sqrt{\Delta t_{i}}$ stays constant; then every period moves $\ln S$ by the same $\pm$ step and the lattice is regular again.
 
 \begin{remark}
@@ -1301,6 +1415,7 @@ One way out is to let the period lengths vary so that $\sigma(t_{i})\sqrt{\Delta
 		\item \textbf{修正。}讓每期長度 $\Delta t_{i}$ 不同，使 $\sigma(t_{i})\sqrt{\Delta t_{i}}$ 都等於同一個常數 $c$；每步都是 $\ln S\pm c$，(3) 的兩個乘數就相等了。
 	\end{enumerate}
 \end{remark}
+\suppend
 
 The CBOE S\&P 500 Volatility Index (\vocab{VIX}) tracks the 30-day implied volatility of S\&P 500 index options; its history over 1990--2016 (plotted on the slides) shows how far from constant volatility actually is, with spikes above 80 during the 2008 crisis.
 
@@ -1316,6 +1431,7 @@ In other words,
 \]
 where $r_{i}$ is the continuously compounded short rate measured in periods for period $i$, i.e., the one-period forward rate.
 
+\suppstart
 \begin{remark}
 	\textbf{為什麼是平均。}第 $i$ 期的折現因子是 $e^{-r_{i}}$，整段的折現因子是 $\prod_{i}e^{-r_{i}}=e^{-\sum_{i}r_{i}}$。Black--Scholes 用的是 $e^{-r\tau}$，令兩者相等得 $r\tau=\sum_{i}r_{i}$。$r_{i}$ 以「期」為單位，$\sum_{i}r_{i}$ 是整段的總利息，除以年數 $\tau$ 才是年利率。
 \end{remark}
@@ -1328,6 +1444,7 @@ This is \eqref{eq:cc-avg} again: the zero-coupon bond maturing at expiration is 
 	short rate 只透過 $R_{i}=e^{r_{i}}$ 進入 $p_{i}=(R_{i}-d)/(u-d)$；由 $u$ 和 $d$ 建出的價格 lattice 完全不受影響。
 	backward induction 只要在第 $i$ 期改用 $p_{i}$ 和 $R_{i}$ 即可 --- 前提是每一期都滿足 $d<R_{i}<u$。
 \end{note}
+\suppend
 
 \subsection{Trading Days and Calendar Days}
 
@@ -1337,12 +1454,15 @@ Interest accrues based on the calendar day, but $\sigma$ is usually calculated b
 How to harmonize these two different times in the Black--Scholes formula and binomial tree algorithms?\footnote{Recall \autoref{sec:day-count} about dating issues.}
 
 Think of $\sigma$ as measuring the annualized volatility of stock price one year from now, and suppose a year has $m$ (say 253) trading days.
+\suppstart
 Variance accumulates only on trading days, so the variance up to expiration is $\sigma^{2}\times(\text{trading days to expiration})/m$.
+\suppend
 Writing this in calendar time, as $\sigma_{\mathrm{eff}}^{2}\times(\text{calendar days to expiration})/365$, we can replace $\sigma$ in the Black--Scholes formula with\footnote{D.~French (1984).}
 \[
 	\sigma_{\mathrm{eff}} \;=\; \sigma\sqrt{\frac{365}{m}\times\frac{\text{number of trading days to expiration}}{\text{number of calendar days to expiration}}} .
 \]
 
+\suppstart
 \begin{remark}
 	\textbf{為什麼要 $\sigma_{\mathrm{eff}}$。}Black--Scholes 只有一個 $\tau$，卻用在兩處：折現 $e^{-r\tau}$ 和變異數 $\sigma^{2}\tau$。利息每個日曆日都算，波動卻只發生在交易日。$\tau$ 取日曆時間 $T_{\mathrm{cal}}/365$ 折現才對，但這樣 $\sigma^{2}\tau$ 會把休市日也算進變異數。所以 $\tau$ 不動、改 $\sigma$：找 $\sigma_{\mathrm{eff}}$ 使公式裡的變異數等於真正的變異數，
 	\[
@@ -1350,15 +1470,18 @@ Writing this in calendar time, as $\sigma_{\mathrm{eff}}^{2}\times(\text{calenda
 	\]
 	右邊是每個交易日 $\sigma^{2}/m$、共 $T_{\mathrm{tr}}$ 天（$T_{\mathrm{tr}},T_{\mathrm{cal}}$ 為到期前的交易日數、日曆日數），解出來就是上式。
 \end{remark}
+\suppend
 
 This works only for European options.
 How about binomial tree algorithms?\footnote{Contributed by Mr.~Lu, Zheng-Liang (\texttt{D00922011}) in 2015.}
+\suppstart
 One natural answer: let each period be one trading day, with the stock moving $\pm\sigma/\sqrt{m}$ in logarithm, but discount each period over its calendar length --- three days of interest for the period spanning a weekend.
 Since only $p$ and $R$ change from period to period, the tree still combines, by the previous subsection.
 
 \begin{remark}
 	\textbf{tree 的做法。}tree 可以把兩種時間分開處理，不需要 $\sigma_{\mathrm{eff}}$。每一期是一個交易日：波動用交易時間 $\Delta t=1/m$，所以 $u=e^{\sigma/\sqrt{m}}$、$d=1/u$ 每期相同；利息用那一期的日曆天數，例如週五到週一那期 $R=e^{3r/365}$，其他期 $R=e^{r/365}$。$p=(R-d)/(u-d)$ 因此隨期數改變，但 $u,d$ 不變，tree 照樣 recombine（上一小節的 time-dependent short rate）。這樣也能處理 American option，而 $\sigma_{\mathrm{eff}}$ 只能用在 European 的 Black--Scholes 公式。
 \end{remark}
+\suppend
 
 %─────§ Dividends──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Options on a Stock That Pays Dividends}
@@ -1383,10 +1506,12 @@ Follow the stock price one more period: the number of possible stock prices is n
 \]
 The binomial tree no longer combines, because $(Su-D)\,d\ne(Sd-D)\,u$ --- the timing of the dividend now matters.
 
+\suppstart
 \begin{remark}
 	展開得 $(Su-D)\,d=Sud-Dd$、$(Sd-D)\,u=Sud-Du$，兩者差 $D(u-d)\ne0$。股利是固定金額：先扣再乘，$D$ 會被之後的 $u$ 或 $d$ 放大或縮小，扣的時間點不同結果就不同。
 \end{remark}
 With $m$ ex-dividend dates the number of terminal nodes is at least $2^{m}$.
+\suppend
 
 \begin{figure}[H]
 	\centering
@@ -1458,6 +1583,7 @@ Note that, as $d<R<u$,
 So the ad hoc approximation has a smaller dynamic range.
 This explains why in practice the volatility is usually increased when using it.
 
+\suppstart
 \begin{remark}
 	\textbf{這一小節在講什麼。}上一小節的問題是：固定金額的股利 $D$ 讓 tree 不再 recombine。這裡用近似繞過它：
 	\begin{enumerate}[(1),nosep]
@@ -1466,15 +1592,18 @@ This explains why in practice the volatility is usually increased when using it.
 		\item \textbf{代價。}和真實的 tree 比，到期股價的範圍比較窄（上面的不等式：最高價較低、最低價較高），因為整段隨機成長只作用在較小的 $S-D/R$ 上。所以實務上會把 $\sigma$ 調大一點補回來。
 	\end{enumerate}
 \end{remark}
+\suppend
 
 \paragraph{A general approach.}
 A new tree structure handles known dividends with no approximation assumptions, together with a mathematical proof that the tree can always be constructed.\footnote{T.~Dai (\texttt{B82506025}, \texttt{R86526008}, \texttt{D8852600}) \& Lyuu (2004). Also Arealy \& Rodrigues (2013).}
 Its actual performance is quadratic except in pathological cases.
 Other approaches include adjusting $\sigma$ and approximating the known dividend with a dividend yield.\footnote{Geske \& Shastri (1985). It works well for American options but not European ones (T.~Dai, 2009).}
 
+\suppstart
 \begin{remark}
 	\textbf{一般做法。}Dai \& Lyuu 設計了一種新的 tree 結構，直接處理固定金額的股利，不做 \autoref{sec:adhoc-dividend} 那種近似，並證明這種 tree 一定建得出來（分支機率都落在 $[0,1]$）。除了極端的參數外，running time 是 $O(n^{2})$，而不是不 recombine 時的至少 $2^{m}$。其他做法包括調整 $\sigma$，以及把固定股利 $D$ 換成等價的 dividend yield（按比例發放，tree 就會 recombine）；後者對 American option 效果好，對 European option 則不然。細節在簡報 pp.~792 以後。
 \end{remark}
+\suppend
 
 \subsection{Continuous Dividend Yields}
 \label{sec:continuous-yield}
@@ -1485,7 +1614,9 @@ In the \vocab{continuous-payout model}, dividends are paid continuously.
 This approximates a broad-based stock market portfolio, in which some company pays a dividend nearly every day.
 The payment of a continuous dividend yield at rate $q$ reduces the growth rate of the stock price by $q$: a stock that grows from $S$ to $S_{\tau}$ with a continuous dividend yield of $q$ would have grown from $S$ to $S_{\tau}e^{q\tau}$ without the dividends.
 
+\suppstart
 \zh{continuous-payout model 假設股利連續發放，很接近大盤指數（幾乎每天都有公司配息）。以比率 $q$ 連續配息會讓股價成長率少 $q$：有配息時股價從 $S$ 漲到 $S_{\tau}$，不配息的話會漲到 $S_{\tau}e^{q\tau}$。}
+\suppend
 
 So a European option has the same value as one on a stock with price $Se^{-q\tau}$ that pays no dividends --- in pricing European options, only the distribution of $S_{\tau}$ matters.
 The Black--Scholes formulas thus hold with $S$ replaced by $Se^{-q\tau}$:\footnote{Merton (1973).}
@@ -1499,6 +1630,7 @@ where now
 	\label{eq:bs-x-q}
 \end{equation}
 Formulas \eqref{eq:bs-call-q} and \eqref{eq:bs-put-q} remain valid as long as the dividend yield is predictable, with $q$ the average annualized yield over the option's life.
+\suppstart
 A foreign currency is the prime example, with $q$ the foreign interest rate (\autoref{sec:forex}).
 
 \zh{所以 European option 的價值等於標的是「價格 $Se^{-q\tau}$、不配息的股票」時的價值，因為 European option 只看 $S_{\tau}$ 的分布；於是 Black--Scholes 公式把 $S$ 換成 $Se^{-q\tau}$ 即可，得到 \eqref{eq:bs-call-q}--\eqref{eq:bs-x-q}。只要殖利率可預測就適用，$q$ 取存續期間的平均年化殖利率；最典型的例子是外幣，$q$ 是外國利率。}
@@ -1511,6 +1643,7 @@ A foreign currency is the prime example, with $q$ the foreign interest rate (\au
 		\item \textbf{$x$ 的變化。}\eqref{eq:bs-x} 裡的 $\ln(S/X)$ 變成 $\ln(Se^{-q\tau}/X)=\ln(S/X)-q\tau$，併入後面就是 \eqref{eq:bs-x-q} 的 $(r-q+\sigma^{2}/2)\tau$。
 	\end{enumerate}
 \end{remark}
+\suppend
 
 \source{Slides pp.~340--341}
 
@@ -1523,6 +1656,7 @@ To run binomial tree algorithms there are two equivalent-in-spirit options, both
 		      \label{eq:rn-p-yield}
 	      \end{equation}
 \end{enumerate}
+\suppstart
 Either way $E^{\pi}\bigl[\,S_{t+\Delta t}\,\bigr]=Se^{(r-q)\Delta t}$: in (1), $p\,ue^{-q\Delta t}+(1-p)\,de^{-q\Delta t}=Re^{-q\Delta t}$ by \eqref{eq:rn-stock}; in (2) it is the definition of $p$.
 
 \zh{tree 上有兩種做法，根據都是 risk-neutral 下股價期望成長率為 $r-q$：(1) $u,d$ 換成 $ue^{-q\Delta t}$、$de^{-q\Delta t}$，其他不變，但 $p$ 仍用原本的 $u,d$ 算；(2) $u,d$ 不變，$p$ 改用 \eqref{eq:rn-p-yield}。兩者都讓 $E^{\pi}[S_{t+\Delta t}]=Se^{(r-q)\Delta t}$。}
@@ -1537,6 +1671,7 @@ Either way $E^{\pi}\bigl[\,S_{t+\Delta t}\,\bigr]=Se^{(r-q)\Delta t}$: in (1), $
 	total return 是 $u$ 或 $d$；ex-dividend 價格則是 $ue^{-q\Delta t}$ 或 $de^{-q\Delta t}$。
 	若用縮小後的乘數算 $p$，就等於讓 ex-dividend 價格本身賺到 $R$，也就是投資人除了 riskless rate 之外還\emph{白拿}了 dividend。
 \end{note}
+\suppend
 
 %─────§ TAIEX───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Distribution of Logarithmic Returns of TAIEX}
@@ -1544,10 +1679,12 @@ Either way $E^{\pi}\bigl[\,S_{t+\Delta t}\,\bigr]=Se^{(r-q)\Delta t}$: in (1), $
 \source{Slide p.~342}
 
 The slide plots the histogram of the daily log returns (in \%) of TAIEX from January 3, 2003 to July 13, 2018 against a fitted normal density.
+\suppstart
 The histogram has a higher central peak and heavier tails than the normal, the same picture as \autoref{fig:sp500-density} for the S\&P 500.
 So the lognormal limit of \autoref{lem:rn-lognormal} is an idealization, and the smile of \autoref{sec:implied-vol} is one of its symptoms.
 
 \zh{簡報畫了 TAIEX 從 2003/1/3 到 2018/7/13 每日 log return（\%）的 histogram，並與配適的 normal density 比較：中間的峰比 normal 高、兩邊的尾巴比 normal 厚，和 S\&P 500 一樣。所以 \autoref{lem:rn-lognormal} 的 lognormal 只是理想化，smile 就是它不完全成立的徵兆。}
+\suppend
 
 %─────§ Exercise boundaries──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Exercise Boundaries of American Options}
@@ -1561,6 +1698,7 @@ In the continuous-time model, an American put should be exercised as soon as the
 	\item The exercise boundary is a nonincreasing function of $t$ for American calls.
 	\item The exercise boundary may be approximated by multipiece exponential functions.\footnote{Ju (1998).}
 \end{itemize}
+\suppstart
 \autoref{sec:american-vs-barrier} asks whether this makes American options barrier options.
 
 \zh{連續時間模型中，American put 應在股價一跌到臨界價格 $S^{*}(t)$ 就履約，$S^{*}(t)$ 叫 exercise boundary。put 的 boundary 隨 $t$ 遞增（\autoref{fig:exercise-boundary}），call 的隨 $t$ 遞減；boundary 可用分段指數函數近似。之後 \autoref{sec:american-vs-barrier} 會問：這樣 American option 算不算 barrier option？}
@@ -1588,6 +1726,7 @@ In the continuous-time model, an American put should be exercised as soon as the
 		P(S',t)\le P(S,t)+(S-S'),\qquad\text{即}\qquad g(S')\le g(S).
 	\]
 \end{note}
+\suppend
 
 \begin{figure}[H]
 	\centering
@@ -1618,6 +1757,7 @@ In the continuous-time model, an American put should be exercised as soon as the
 	\label{fig:exercise-boundary}
 \end{figure}
 
+\suppstart
 \zh{圖：$X=100$、$r=8\%$、$\sigma=30\%$、一年到期的 American put，用 600 期的 \autoref{alg:american-put} 加上對 $S$ 二分搜尋求出 boundary。曲線下方立刻履約最好；到期時 boundary 升到 $X$。}
 
 \begin{intuition}
@@ -1640,6 +1780,7 @@ In the continuous-time model, an American put should be exercised as soon as the
 	\end{itemize}
 	call（有股利時）是鏡像：現在履約賺到之後的股利，代價是提早付 $X$（損失利息）並放棄一個 put（股價跌破 $X$ 時的保護）。$\tau$ 長時要 $S$ 遠高於 $X$ 才履約，到期時降到 $X$，所以遞減。
 \end{remark}
+\suppend
 
 %─────Chapter: Sensitivity Analysis──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \chapter{Sensitivity Analysis of Options}
@@ -1656,6 +1797,7 @@ In the continuous-time model, an American put should be exercised as soon as the
 
 \bigskip
 
+\suppstart
 \noindent Chapter~\ref{ch:pricing-models} produced a number.
 This chapter asks how that number moves when each input moves --- which is what a trader holding the option actually needs to know, since it is the movements that have to be hedged.
 
@@ -1664,6 +1806,7 @@ This chapter asks how that number moves when each input moves --- which is what 
 \begin{remark}[讀法]
 	簡報只給每個 Greek 的公式和圖。這些公式都是對 \eqref{eq:bs-call} 做偏微分，而且全部用同一個技巧（\autoref{lem:bs-identity} 和 \autoref{rem:greek-recipe}）。標成「補充」的 lemma、proof、remark 是筆記補的推導，第一次讀可以只記公式和直觀。
 \end{remark}
+\suppend
 
 %─────§ Greeks───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Sensitivity Measures (``The Greeks'')}
@@ -1674,11 +1817,13 @@ This chapter asks how that number moves when each input moves --- which is what 
 How the value of a security changes relative to changes in a given parameter is key to hedging.
 Duration (\autoref{sec:md-volatility}), for instance, is the bond's sensitivity to its yield.
 
+\suppstart
 \zh{證券價值對參數變動的反應是避險的關鍵；例如 duration 就是債券對 yield 的敏感度。}
 
 \begin{remark}
 	\vocab{希臘字母}（the Greeks）：選擇權價格對各個參數的偏導數——對股價是 Delta $\Delta$、對時間是 Theta $\Theta$、對股價的二階導數是 Gamma $\Gamma$、對波動率是 Vega $\Lambda$、對利率是 Rho $\rho$。它們之於選擇權，就像存續期間與凸性之於債券。
 \end{remark}
+\suppend
 
 \begin{notation}
 	Throughout, $x$ is defined by \eqref{eq:bs-x},
@@ -1692,6 +1837,7 @@ Duration (\autoref{sec:md-volatility}), for instance, is the bond's sensitivity 
 	is the density function of the standard normal distribution.
 \end{notation}
 
+\suppstart
 \begin{remark}
 	\textbf{$x$ 的意義。}本章的 $x$ 都是 \eqref{eq:bs-x}；$N(z)=\mathrm{Prob}[Z\le z]$ 是 standard normal 的 CDF（\eqref{eq:normal-cdf}），$N'$ 是它的導數，也就是 density。$x$ 本身不好解讀，看 $x-\sigma\sqrt{\tau}$ 比較清楚：由 \autoref{lem:rn-lognormal}，risk-neutral 下 $\ln S_{\tau}\sim N\bigl(\ln S+(r-\sigma^{2}/2)\tau,\ \sigma^{2}\tau\bigr)$，所以
 	\[
@@ -1735,6 +1881,7 @@ Every closed-form Greek below follows from one identity, which is worth isolatin
 	\end{enumerate}
 	所以 $\frac{\partial C}{\partial\theta}=\text{(1)}+SN'(x)\,\frac{\partial(\sigma\sqrt{\tau})}{\partial\theta}$，完全不用算 $\frac{\partial x}{\partial\theta}$。
 \end{remark}
+\suppend
 
 %─────§ Delta───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Delta}
@@ -1749,13 +1896,17 @@ Every closed-form Greek below follows from one identity, which is worth isolatin
 	where $f$ is the price of the derivative and $S$ is the price of the underlying asset.
 \end{definition}
 
+\suppstart
 \zh{Delta 是 derivative 價格 $f$ 對標的價格 $S$ 的偏導數。}
+\suppend
 
 The delta of a portfolio of derivatives on the same underlying asset is the sum of their individual deltas, by elementary calculus.
 The delta used in the BOPM, \eqref{eq:bopm-hb}, is the discrete analog.
 The delta of a long stock is $1$.
 
+\suppstart
 \zh{同一標的上的 derivatives 組成的 portfolio，delta 是各自 delta 的和（微分是線性的）。BOPM 的 $h$ \eqref{eq:bopm-hb} 是 delta 的離散版本。一股股票的 delta 是 $1$。}
+\suppend
 
 \source{Slides pp.~349--350}
 
@@ -1772,12 +1923,14 @@ The delta of a long stock is $1$.
 	\end{equation}
 \end{proposition}
 
+\suppstart
 \zh{不配息股票的 European call 的 delta 是 $N(x)>0$，put 的是 $N(x)-1=-N(-x)<0$。}
 
 \begin{proof}[Proof（補充；簡報只給公式）]
 	用 \autoref{rem:greek-recipe}，$\theta=S$：(1) 顯式部分只有 $SN(x)$ 前面的 $S$，微分得 $N(x)$；(2) $\sigma\sqrt{\tau}$ 不含 $S$，那一項是 $0$。所以 $\partial C/\partial S=N(x)$。
 	put：$P=C-S+Xe^{-r\tau}$ 對 $S$ 微分得 $N(x)-1=-N(-x)$。
 \end{proof}
+\suppend
 
 So the deltas of a call and an otherwise identical put cancel each other when $N(x)=1/2$, i.e., when $x=0$, i.e., when
 \begin{equation}
@@ -1786,11 +1939,13 @@ So the deltas of a call and an otherwise identical put cancel each other when $N
 \end{equation}
 The straddle (\autoref{sec:combinations}) $C+P$ then has zero delta!
 
+\suppstart
 \zh{call 和同條件 put 的 delta 在 $N(x)=\frac12$，即 $x=0$、$X=Se^{(r+\sigma^{2}/2)\tau}$ 時互相抵銷，此時 straddle $C+P$ 的 delta 為 $0$。}
 
 \begin{remark}
 	\textbf{\eqref{eq:straddle-zero-delta} 的推導。}straddle 的 delta 是 $N(x)+\bigl(N(x)-1\bigr)=2N(x)-1$，為 $0$ 時 $N(x)=\frac12$。$N$ 是 standard normal 的 CDF，$N(0)=\frac12$ 且嚴格遞增，所以 $x=0$。由 \eqref{eq:bs-x}，$x=0\iff\ln(S/X)=-(r+\sigma^{2}/2)\tau\iff X=Se^{(r+\sigma^{2}/2)\tau}$。
 \end{remark}
+\suppend
 
 \begin{figure}[H]
 	\centering
@@ -1824,6 +1979,7 @@ The straddle (\autoref{sec:combinations}) $C+P$ then has zero delta!
 	\label{fig:delta}
 \end{figure}
 
+\suppstart
 \zh{圖：$X=50$、$\sigma=30\%$、$r=8\%$ 的 call 和 put delta。左兩張：$\tau=201$ 天，對股價作圖；右兩張：對剩餘天數 $\tau$ 作圖，$S=60$（點線）、$50$（實線，at the money）、$40$（虛線）。$S=60$ 對 call 是 in the money、對 put 是 out of the money，$S=40$ 相反。由 \eqref{eq:delta-put}，每一條 put 曲線都是它上方的 call 曲線往下移 $1$——左右兩張都成立，因為 $\partial P/\partial S=\partial C/\partial S-1$ 對每一組 $(S,\tau)$ 都成立。}
 
 
@@ -1834,6 +1990,7 @@ The straddle (\autoref{sec:combinations}) $C+P$ then has zero delta!
 \end{intuition}
 
 \zh{$N(x)$ 是 \autoref{sec:bopm-one-period} 的 hedge ratio 取極限，也可讀成「履約的機率」。深度價內的 call 就像股票減債券，$\Delta\to1$；深度價外幾乎沒價值，$\Delta\to0$。接近到期時沒時間翻盤，所以右圖三條線分別趨向 $1$、$\frac12$、$0$。}
+\suppend
 
 \subsection{Dividends, Straddles and Strangles}
 
@@ -1846,10 +2003,13 @@ Then
 	\qquad
 	\frac{\partial P}{\partial S} \;=\; -e^{-q\tau}N(-x) \;<\; 0 ,
 \]
+\suppstart
 since \eqref{eq:bs-call-q} is \eqref{eq:bs-call} evaluated at $Se^{-q\tau}$.
 
 \zh{有連續股利 $q$ 時（$x$ 用 \eqref{eq:bs-x-q}），call 和 put 的 delta 都多乘 $e^{-q\tau}$，因為 \eqref{eq:bs-call-q} 就是把 \eqref{eq:bs-call} 的 $S$ 換成 $Se^{-q\tau}$。}
+\suppend
 
+\suppstart
 \begin{remark}[補充]
 	記 $C_{0}(S')$ 為不發股利的 \eqref{eq:bs-call}。\eqref{eq:bs-call-q} 就是 $C_{0}(Se^{-q\tau})$（\eqref{eq:bs-x-q} 的 $x$ 也正是 \eqref{eq:bs-x} 代 $S'=Se^{-q\tau}$）。chain rule：
 	\[
@@ -1857,6 +2017,7 @@ since \eqref{eq:bs-call-q} is \eqref{eq:bs-call} evaluated at $Se^{-q\tau}$.
 	\]
 	put 同理。
 \end{remark}
+\suppend
 
 Now consider an $X_{1}$-strike call and an $X_{2}$-strike put, $X_{1}\ge X_{2}$, otherwise identical.
 Let
@@ -1872,6 +2033,7 @@ Their deltas $e^{-q\tau}N(x_{1})$ and $-e^{-q\tau}N(-x_{2})$ sum to zero when $x
 The strangle (\autoref{sec:combinations}) $C+P$ then has zero delta!
 Demanding $X_{1}=X_{2}=X$ gives back a straddle, and \eqref{eq:strangle-zero-delta} becomes $X=Se^{(r-q+\sigma^{2}/2)\tau}$, generalizing \eqref{eq:straddle-zero-delta}.
 
+\suppstart
 \zh{strike $X_{1}$ 的 call 和 strike $X_{2}$ 的 put（$X_{1}\ge X_{2}$），各自用 \eqref{eq:xi} 定義 $x_{i}$。兩者 delta 相加為 $0$ 的條件是 $x_{1}=-x_{2}$，整理得 \eqref{eq:strangle-zero-delta}，此時 strangle $C+P$ 的 delta 為 $0$。$X_{1}=X_{2}=X$ 就是 straddle，條件變成 $X=Se^{(r-q+\sigma^{2}/2)\tau}$，推廣了 \eqref{eq:straddle-zero-delta}。}
 
 \begin{remark}[補充]
@@ -1883,6 +2045,7 @@ Demanding $X_{1}=X_{2}=X$ gives back a straddle, and \eqref{eq:strangle-zero-del
 		\item $X_{1}=X_{2}=X$ 時：$(S/X)^{2}=e^{-(2r-2q+\sigma^{2})\tau}$，開根號得 $X=Se^{(r-q+\sigma^{2}/2)\tau}$。
 	\end{enumerate}
 \end{remark}
+\suppend
 
 \subsection{Delta Neutrality}
 
@@ -1896,6 +2059,7 @@ A delta-neutral portfolio is immune to small price changes in the underlying ass
 	\item In general, hedge a position in a security with delta $\Delta_{1}$ by shorting $\Delta_{1}/\Delta_{2}$ units of a security with delta $\Delta_{2}$.
 \end{itemize}
 
+\suppstart
 \zh{總 delta 為 $0$ 的部位叫 delta-neutral，對標的價格的小變動免疫，所以可用來避險：call 加上 $-\Delta$ 股股票就是 delta-neutral；long call 就 short $\Delta$ 股，short call 就 long $\Delta$ 股；一般而言，持有 delta 為 $\Delta_{1}$ 的證券，就 short $\Delta_{1}/\Delta_{2}$ 單位 delta 為 $\Delta_{2}$ 的證券。}
 
 \begin{remark}
@@ -1910,6 +2074,7 @@ A delta-neutral portfolio is immune to small price changes in the underlying ass
 	關鍵在「small」：delta neutrality 是一階的敘述，只在瞬間成立。
 	$S$ 變動時 delta 也會跟著變 --- 變化率就是 gamma（\autoref{sec:gamma}）--- 所以 hedge 必須 rebalance，這就是 \autoref{sec:bopm-arbitrage-walk} 的連續時間版本。
 \end{note}
+\suppend
 
 %─────§ Theta───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Theta (Time Decay)}
@@ -1924,6 +2089,7 @@ A delta-neutral portfolio is immune to small price changes in the underlying ass
 	\]
 \end{definition}
 
+\suppstart
 The minus sign is because $\tau$ is time \emph{to expiration}: as calendar time $t$ passes, $\tau$ shrinks.
 
 \zh{Theta 是證券價值隨時間的變化率。有負號是因為 $\tau$ 是距到期的時間：日曆時間 $t$ 往前走，$\tau$ 就變小。}
@@ -1931,6 +2097,7 @@ The minus sign is because $\tau$ is time \emph{to expiration}: as calendar time 
 \begin{remark}
 	Theta 是偏導數：\emph{股價 $S$}（以及 $\sigma,r$）\emph{固定不變}時，價值隨時間的變化率。它不是「價值平均會怎麼變」：$S$ 本身也會動，而 backward induction 的定義 $C=\frac{pC_{u}+(1-p)C_{d}}{R}$ 說的是 $E^{\pi}[C_{\text{下一期}}]=R\,C$，平均以 riskless rate 成長。所以下面 call 的 $\Theta<0$ 並不表示該提前履約（\autoref{thm:merton-no-early}）。
 \end{remark}
+\suppend
 
 \begin{proposition}
 	For a European call on a non-dividend-paying stock,
@@ -1943,6 +2110,7 @@ The minus sign is because $\tau$ is time \emph{to expiration}: as calendar time 
 	\]
 \end{proposition}
 
+\suppstart
 \zh{不配息股票的 European call 的 theta 恆負；put 的多了正項 $rXe^{-r\tau}N(-x+\sigma\sqrt{\tau})$，可正可負。}
 
 \begin{proof}[Proof（補充；簡報只給公式）]
@@ -1954,11 +2122,14 @@ The minus sign is because $\tau$ is time \emph{to expiration}: as calendar time 
 	所以 $\frac{\partial C}{\partial\tau}=\frac{SN'(x)\sigma}{2\sqrt{\tau}}+rXe^{-r\tau}N(x-\sigma\sqrt{\tau})>0$，$\Theta=-\frac{\partial C}{\partial\tau}<0$。
 	put：parity 給 $\frac{\partial P}{\partial\tau}=\frac{\partial C}{\partial\tau}-rXe^{-r\tau}$，再用 $N(x-\sigma\sqrt{\tau})-1=-N(-x+\sigma\sqrt{\tau})$。$S\to0$ 時 $N'(x)\to0$、$N(-x+\sigma\sqrt{\tau})\to1$，所以 $\Theta_{\text{put}}\to rXe^{-r\tau}>0$。
 \end{proof}
+\suppend
 
 The call loses value with the passage of time.
 The put's theta can be negative or positive: deep in the money the second term wins, which is the European put worth less than its intrinsic value in \autoref{fig:option-value} --- waiting only delays receipt of $X$.
 
+\suppstart
 \zh{call 的價值隨時間流失。put 的 theta 可正可負：深度價內時第二項較大、theta 為正，對應 \autoref{fig:option-value} 中 European put 低於 intrinsic value 的情況——再等只會延後拿到 $X$。}
+\suppend
 
 \source{Slides pp.~356--357}
 
@@ -1997,7 +2168,9 @@ The put's theta can be negative or positive: deep in the money the second term w
 	\label{fig:theta}
 \end{figure}
 
+\suppstart
 \zh{圖：$X=50$、$\sigma=30\%$、$r=8\%$ 的年化 theta。左兩張：$\tau=201$ 天，call 和 put 對股價作圖；右兩張：對剩餘天數 $\tau$ 作圖，$S=60$（點線）、$50$（實線，at the money）、$40$（虛線）。call 的 theta 恆負、在價平附近最負；put 的在深度價內（$S=40$）變正，趨近 $rXe^{-r\tau}$。價平的 theta 在 $\tau\to0$ 時急遽變負：快到期時價平 option 的時間價值流失得最快。}
+\suppend
 
 Suppose the stock pays a continuous dividend yield of $q$, with $x$ as in \eqref{eq:bs-x-q}.
 Then each formula gains an extra term:
@@ -2005,6 +2178,7 @@ Then each formula gains an extra term:
 	\Theta_{\text{call}} & \;=\; -\frac{SN'(x)\,\sigma\,e^{-q\tau}}{2\sqrt{\tau}}-rXe^{-r\tau}N\bigl(x-\sigma\sqrt{\tau}\bigr)+qSe^{-q\tau}N(x) , \\
 	\Theta_{\text{put}}  & \;=\; -\frac{SN'(x)\,\sigma\,e^{-q\tau}}{2\sqrt{\tau}}+rXe^{-r\tau}N\bigl(-x+\sigma\sqrt{\tau}\bigr)-qSe^{-q\tau}N(-x) .
 \end{align*}
+\suppstart
 The extra term is the derivative of $Se^{-q\tau}$ with respect to $-\tau$: a dividend-paying call gains from the passage of time insofar as fewer dividends remain to be paid out.\footnote{The slides write the first term without $e^{-q\tau}$; with $x$ from \eqref{eq:bs-x-q} the identity \eqref{eq:bs-identity} becomes $Se^{-q\tau}N'(x)=Xe^{-r\tau}N'(x-\sigma\sqrt{\tau})$, and the factor $e^{-q\tau}$ belongs there. Cf.\ the vega with dividends in \autoref{sec:vega}.}
 
 \zh{有連續股利 $q$ 時兩個公式各多一項，即 $Se^{-q\tau}$ 對 $-\tau$ 的導數：時間過去，剩下要發的股利變少，對 call 有利。}
@@ -2016,6 +2190,7 @@ The extra term is the derivative of $Se^{-q\tau}$ with respect to $-\tau$: a div
 	\]
 	乘上 $N(x)$；$\Theta=-\frac{\partial C}{\partial\tau}$ 就多出 $+qSe^{-q\tau}N(x)$。第一項的 $e^{-q\tau}$ 則是因為 identity 中的 $S$ 換成了 $Se^{-q\tau}$（見 footnote）。
 \end{remark}
+\suppend
 
 %─────§ Gamma───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Gamma}
@@ -2034,7 +2209,9 @@ It measures how sensitive delta is to changes in the price of the underlying ass
 In practice, a portfolio with a high gamma needs be rebalanced more often to maintain delta neutrality.
 Roughly, delta $\sim$ duration and gamma $\sim$ convexity (\autoref{sec:convexity}).
 
+\suppstart
 \zh{Gamma 是 delta 對標的價格的變化率（$f$ 對 $S$ 的二階導數），衡量 delta 對股價有多敏感。gamma 高的 portfolio 要更頻繁 rebalance 才能維持 delta neutral。大致上 delta 對應 duration、gamma 對應 convexity。}
+\suppend
 
 \begin{proposition}
 	The gamma of a European call or put on a non-dividend-paying stock is
@@ -2043,6 +2220,7 @@ Roughly, delta $\sim$ duration and gamma $\sim$ convexity (\autoref{sec:convexit
 	\]
 \end{proposition}
 
+\suppstart
 \zh{不配息股票的 European call 和 put 有相同的 gamma $N'(x)/(S\sigma\sqrt{\tau})>0$。}
 
 \begin{proof}[Proof（補充；簡報只給公式）]
@@ -2052,6 +2230,7 @@ Roughly, delta $\sim$ duration and gamma $\sim$ convexity (\autoref{sec:convexit
 \begin{remark}
 	Gamma 恆正，表示歐式選擇權的價值是 $S$ 的凸函數（與 \autoref{fig:option-value} 一致）。持有 gamma 為正的部位並做 delta 避險，股價大漲大跌都會賺一點（凸性），代價則是 theta 每天流失的時間價值。
 \end{remark}
+\suppend
 
 \source{Slides pp.~359--360}
 
@@ -2082,15 +2261,20 @@ Roughly, delta $\sim$ duration and gamma $\sim$ convexity (\autoref{sec:convexit
 	\label{fig:gamma}
 \end{figure}
 
+\suppstart
 \zh{圖：$X=50$、$\sigma=30\%$、$r=8\%$ 的 gamma；右圖 $S=60,50,40$ 對剩餘天數作圖。價平的 gamma 在 $\tau\to0$ 時像 $1/\sqrt{\tau}$ 一樣變大，其他的趨近 $0$。}
+\suppend
 
 Gamma is maximized when the option is nearly at the money, namely at
 \[
 	S \;=\; Xe^{-(r+3\sigma^{2}/2)\,\tau} .
 \]
+\suppstart
 Indeed $\partial\ln\Gamma/\partial S=-x/(S\sigma\sqrt{\tau})-1/S$, which vanishes at $x=-\sigma\sqrt{\tau}$; substituting into \eqref{eq:bs-x} gives the formula.
+\suppend
 As the at-the-money option approaches expiration, its gamma tends to rise, like $1/\sqrt{\tau}$; the gammas of other options, however, tend to zero, because $N'(x)\to0$ faster as $\abs{x}\to\infty$.
 
+\suppstart
 \zh{Gamma 在接近價平、$S=Xe^{-(r+3\sigma^{2}/2)\tau}$ 時最大（令 $\partial\ln\Gamma/\partial S=0$ 得 $x=-\sigma\sqrt{\tau}$）。價平 option 接近到期時 gamma 變大，其他的趨近 $0$，因為 $\abs{x}\to\infty$ 時 $N'(x)$ 衰減得更快。}
 
 \begin{remark}[補充]
@@ -2111,6 +2295,7 @@ As the at-the-money option approaches expiration, its gamma tends to rise, like 
 \end{intuition}
 
 \zh{接近到期時，價平 option 的 delta 會在 strike 兩側從 $0$ 跳到 $1$（\autoref{fig:delta} 右圖）；跳躍就是斜率無限大，所以 delta 的斜率 gamma 在那裡爆掉。這是避險者的惡夢：快到期的價平 option 要不停 rebalance。}
+\suppend
 
 %─────§ Vega────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Vega}
@@ -2130,7 +2315,9 @@ Alexander (2001): ``This is a term that was invented by Americans, and intended 
 
 Volatility often changes over time (\autoref{sec:time-dependent}), and a security with a high vega is very sensitive to changes in, or estimation error of, the volatility.
 
+\suppstart
 \zh{Vega 是證券價值對標的波動率的變化率（vega 不是希臘字母，是美國人發明、聽起來像希臘字母的詞）。波動率常隨時間改變，vega 高的證券對波動率的變動或估計誤差非常敏感。}
+\suppend
 
 \begin{proposition}
 	The vega of a European call or put on a non-dividend-paying stock is
@@ -2139,15 +2326,19 @@ Volatility often changes over time (\autoref{sec:time-dependent}), and a securit
 	\]
 \end{proposition}
 
+\suppstart
 \zh{不配息股票的 European call 和 put 有相同的 vega $S\sqrt{\tau}N'(x)>0$。}
 
 \begin{proof}[Proof（補充；簡報只給公式）]
 	用 \autoref{rem:greek-recipe}，$\theta=\sigma$：(1) $S$ 和 $Xe^{-r\tau}$ 都不含 $\sigma$，顯式部分是 $0$；(2) $\frac{\partial(\sigma\sqrt{\tau})}{\partial\sigma}=\sqrt{\tau}$，乘上 $SN'(x)$。所以 $\Lambda=S\sqrt{\tau}N'(x)$。put：$P=C-S+Xe^{-r\tau}$ 中只有 $C$ 含 $\sigma$。
 \end{proof}
+\suppend
 
 So higher volatility raises the option value, which incidentally guarantees the uniqueness of the implied volatility in \autoref{sec:implied-vol}.
 
+\suppstart
 \zh{所以波動率越高 option 越值錢；這也保證 \autoref{sec:implied-vol} 的 implied volatility 唯一。}
+\suppend
 
 \source{Slides pp.~362--364}
 
@@ -2177,20 +2368,25 @@ So higher volatility raises the option value, which incidentally guarantees the 
 	\label{fig:vega}
 \end{figure}
 
+\suppstart
 \zh{圖：$X=50$、$\sigma=30\%$、$r=8\%$ 的 vega；右圖 $S=60,50,40$ 對剩餘天數作圖，每條都在 $\tau\to0$ 時趨近 $0$。}
+\suppend
 
 Note that\footnote{Reiss \& Wystup (2001).}
 \begin{equation}
 	\Lambda \;=\; \tau\sigma S^{2}\,\Gamma ,
 	\label{eq:vega-gamma}
 \end{equation}
+\suppstart
 as the two formulas show at a glance: $\tau\sigma S^{2}\cdot\frac{N'(x)}{S\sigma\sqrt{\tau}}=S\sqrt{\tau}\,N'(x)$.
+\suppend
 If the stock pays a continuous dividend yield of $q$, then
 \[
 	\Lambda \;=\; Se^{-q\tau}\sqrt{\tau}\,N'(x) ,
 \]
 where $x$ is defined in \eqref{eq:bs-x-q}.
 
+\suppstart
 \zh{注意 $\Lambda=\tau\sigma S^{2}\Gamma$，比較兩個公式即可看出。有連續股利 $q$ 時，vega 變成 $Se^{-q\tau}\sqrt{\tau}N'(x)$。}
 
 Vega is maximized when $x=0$, i.e., when $S=Xe^{-(r-q+\sigma^{2}/2)\,\tau}$, and declines very fast as $S$ moves away from that peak.
@@ -2206,16 +2402,19 @@ Vega is maximized when $x=0$, i.e., when $S=Xe^{-(r-q+\sigma^{2}/2)\,\tau}$, and
 	\]
 	在 $x=\sigma\sqrt{\tau}$ 時為零。代入 \eqref{eq:bs-x-q}：$\ln(S/X)+(r-q+\sigma^{2}/2)\tau=\sigma^{2}\tau$，即 $S=Xe^{-(r-q-\sigma^{2}/2)\tau}$ --- 這正是 \autoref{fig:vega} 左圖的峰值位置。
 \end{note}
+\suppend
 
 Now consider a portfolio consisting of an $X_{1}$-strike call $C$ and a \emph{short} $X_{2}$-strike put $P$, $X_{1}\ge X_{2}$.
 Their vegas are $Se^{-q\tau}\sqrt{\tau}N'(x_{i})$ with $x_{i}$ as in \eqref{eq:xi}, and they cancel out when $x_{1}=-x_{2}$, since $N'$ is even.
 This leads to \eqref{eq:strangle-zero-delta} --- the same condition that gave zero delta for the strangle $C+P$.
 
+\suppstart
 \zh{long strike $X_{1}$ 的 call、short strike $X_{2}$ 的 put（$X_{1}\ge X_{2}$）：因為 $N'$ 是偶函數，兩者 vega 在 $x_{1}=-x_{2}$ 時抵銷，得到的正是 \eqref{eq:strangle-zero-delta}，和 strangle delta 為 $0$ 的條件相同。}
 
 \begin{remark}[補充]
 	long call 的 vega 是 $\Lambda(x_{1})$，short put 的是 $-\Lambda(x_{2})$，總和 $Se^{-q\tau}\sqrt{\tau}\bigl(N'(x_{1})-N'(x_{2})\bigr)=0\iff N'(x_{1})=N'(x_{2})$。$N'$ 是偶函數，所以 $x_{1}=\pm x_{2}$；取 $x_{1}=-x_{2}$，就和 \eqref{eq:strangle-zero-delta} 推導的第一步相同。
 \end{remark}
+\suppend
 
 \source{Slides p.~365}
 
@@ -2224,10 +2423,13 @@ The Black--Scholes formula also implies
 \[
 	C\to S , \qquad P\to Xe^{-r\tau} , \qquad\text{as }\sigma\to\infty ,
 \]
+\suppstart
 since $x\to\infty$ and $x-\sigma\sqrt{\tau}\to-\infty$.
 These are the \emph{upper} ends of the ranges allowed by no-arbitrage --- recall $C\ge\max(S-Xe^{-r\tau},0)$ (the proof of \autoref{thm:merton-no-early}) and $P\ge\max(Xe^{-r\tau}-S,0)$ (\autoref{lem:put-bound}), the lower ends, which are the limits as $\sigma\to0$.
+\suppend
 These boundary conditions are handy for some numerical methods.
 
+\suppstart
 \zh{$\tau\to0$ 時 $\Lambda\to0$，這回答了 \autoref{sec:implied-vol} 的問題。由 Black--Scholes 公式，$\sigma\to\infty$ 時 $C\to S$、$P\to Xe^{-r\tau}$，是 no-arbitrage 允許範圍的上界；下界 $\max(S-Xe^{-r\tau},0)$、$\max(Xe^{-r\tau}-S,0)$ 則是 $\sigma\to0$ 的極限。這些邊界條件對某些數值方法很有用。}
 
 \begin{remark}[補充]
@@ -2236,6 +2438,7 @@ These boundary conditions are handy for some numerical methods.
 		\item \textbf{$\sigma\to\infty$。}$x=\frac{\ln(S/X)+r\tau}{\sigma\sqrt{\tau}}+\frac{\sigma\sqrt{\tau}}{2}\to\infty$，$x-\sigma\sqrt{\tau}=\frac{\ln(S/X)+r\tau}{\sigma\sqrt{\tau}}-\frac{\sigma\sqrt{\tau}}{2}\to-\infty$。代入 \eqref{eq:bs-call}：$C\to S\cdot1-Xe^{-r\tau}\cdot0=S$；代入 \eqref{eq:bs-put}：$P\to Xe^{-r\tau}\cdot1-S\cdot0=Xe^{-r\tau}$。
 	\end{enumerate}
 \end{remark}
+\suppend
 
 %─────§ Rho─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Rho}
@@ -2259,6 +2462,7 @@ These boundary conditions are handy for some numerical methods.
 	\]
 \end{proposition}
 
+\suppstart
 \begin{proof}[Proof（補充；簡報只給公式）]
 	用 \autoref{rem:greek-recipe}，$\theta=r$：(1) 顯式部分 $\frac{\partial}{\partial r}\bigl(-Xe^{-r\tau}\bigr)=X\tau e^{-r\tau}$，乘上 $N(x-\sigma\sqrt{\tau})$；(2) $\sigma\sqrt{\tau}$ 不含 $r$，是 $0$。
 	put：$\frac{\partial}{\partial r}(Xe^{-r\tau})=-X\tau e^{-r\tau}$，所以 $\frac{\partial P}{\partial r}=X\tau e^{-r\tau}\bigl(N(x-\sigma\sqrt{\tau})-1\bigr)=-X\tau e^{-r\tau}N(-x+\sigma\sqrt{\tau})$。
@@ -2277,6 +2481,7 @@ A call holder will pay $X$ later, a put holder will receive it later; raising $r
 	\]
 	股價風險全部在 $M$ 裡，$r$ 只出現在 $Xe^{-r\tau}$。$r$ 上升使 $Xe^{-r\tau}$ 變小：在\emph{每一個}情境 $Z$ 下，call 的被期望值變大、put 的變小，所以 $\rho_{\text{call}}>0$、$\rho_{\text{put}}<0$。直觀上，call 持有者到期才付 $X$、put 持有者到期才收 $X$；$r$ 越高，晚付越划算、晚收越吃虧。
 \end{remark}
+\suppend
 
 \begin{figure}[H]
 	\centering
@@ -2302,7 +2507,9 @@ A call holder will pay $X$ later, a put holder will receive it later; raising $r
 	\label{fig:rho}
 \end{figure}
 
+\suppstart
 \zh{圖：$X=50$、$\sigma=30\%$、$r=8\%$、$\tau=201$ 天的 rho。深度價內 call 的 rho 趨近 $X\tau e^{-r\tau}\approx26$，就是它等於 short 的那張債券 $Xe^{-r\tau}$ 的利率敏感度。}
+\suppend
 
 %─────§ Numerical Greeks────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 \section{Numerical Greeks}
@@ -2318,7 +2525,9 @@ A standard method computes the finite difference
 \]
 which roughly doubles the computation time of evaluating the derivative itself (two extra pricings).
 
+\suppstart
 \zh{只有最簡單的 option 有 closed form，例如 American put 的 Greeks 就得數值計算。以 delta 為例，標準做法是上式的中央差分，要多定價兩次，計算時間約為兩倍。}
+\suppend
 
 \subsection{An Alternative Numerical Delta}
 
@@ -2332,14 +2541,17 @@ Delta is approximated by
 	\label{eq:num-delta}
 \end{equation}
 at essentially zero extra cost --- stop \autoref{alg:american-put} one step early and return $\bigl(P[0]-P[1]\bigr)/(Su-Sd)$.
+\suppstart
 This is just \eqref{eq:bopm-hb}.
 
 \zh{改用 tree 的中間結果：演算法算到第一期末時，已有股價 $Su$、$Sd$ 處的價值 $f_{u}$、$f_{d}$，用 \eqref{eq:num-delta} 近似 delta，幾乎不用額外成本（\autoref{alg:american-put} 提早一步停下即可）。這就是 \eqref{eq:bopm-hb} 的 $h$。}
+\suppend
 
 \subsection{Extended Binomial Tree}
 
 \source{Slide p.~370}
 
+\suppstart
 Strictly speaking, \eqref{eq:num-delta} is the delta at time $\Delta t$, not now.
 An improved method starts the tree two periods \emph{before} now (\autoref{fig:extended-tree}), so that the present time is the third column, with nodes $Su/d$, $S$, $Sd/u$.
 Delta is then
@@ -2366,6 +2578,7 @@ both at the present time.
 	\end{enumerate}
 	\eqref{eq:num-gamma}（下一小節）是同樣的公式，只是用第二期的 $Suu,Sud,Sdd$，中點距離是 $(Suu-Sdd)/2$。
 \end{remark}
+\suppend
 
 \begin{figure}[H]
 	\centering
@@ -2409,13 +2622,17 @@ both at the present time.
 	\label{fig:extended-tree}
 \end{figure}
 
+\suppstart
 \zh{圖：原本的 tree（粗線）往前延伸兩期。$ud=1$ 時 $S/(ud)=S$，現在那一欄是 $Su^{2}$、$S$、$Sd^{2}$。}
+\suppend
 
 \subsection{Numerical Gamma}
 
 \source{Slide p.~371}
 
+\suppstart
 On the ordinary tree, gamma is read off the second period.
+\suppend
 At the stock price $(Suu+Sud)/2$, delta is approximately $(f_{uu}-f_{ud})/(Suu-Sud)$; at $(Sud+Sdd)/2$, it is approximately $(f_{ud}-f_{dd})/(Sud-Sdd)$.
 Gamma is the rate of change in deltas between these two prices:
 \begin{equation}
@@ -2423,6 +2640,7 @@ Gamma is the rate of change in deltas between these two prices:
 	\label{eq:num-gamma}
 \end{equation}
 
+\suppstart
 \begin{remark}
 	\textbf{為什麼這樣寫就是二次微分。}gamma 是 $\frac{\partial^{2}f}{\partial S^{2}}=\frac{\partial}{\partial S}\bigl(\frac{\partial f}{\partial S}\bigr)$，也就是「delta 的變化率」。tree 上沒有 $f$ 的公式，只有第二期三個 node 的值 $f_{uu},f_{ud},f_{dd}$（股價 $Suu>Sud>Sdd$），所以分兩步做差分：
 	\begin{enumerate}[(1),nosep]
@@ -2440,13 +2658,16 @@ Gamma is the rate of change in deltas between these two prices:
 	\end{enumerate}
 	\textbf{和熟悉的公式一樣。}若三點等距、間距 $h$（$Suu-Sud=Sud-Sdd=h$），分子是 $\frac{f_{uu}-2f_{ud}+f_{dd}}{h}$、分母是 $h$，得到 $\frac{f_{uu}-2f_{ud}+f_{dd}}{h^{2}}$，正是 \autoref{sec:numerical-gamma-fails} 的二次差分。tree 上三點不等距（間隔是乘上 $u/d$），所以要用上面的一般形式。注意它估的是第二期、股價 $Sud$（$ud=1$ 時就是 $S$）附近的 gamma，不是現在的；要現在的就用 \autoref{fig:extended-tree} 的 extended tree。
 \end{remark}
+\suppend
 
 \subsection{Alternative Numerical Delta and Gamma}
 
 \source{Slide p.~372}
 
 Let $\epsilon\triangleq\ln u$ and think in terms of $\ln S$, where the CRR lattice is evenly spaced.
+\suppstart
 Since $\partial f/\partial S=\frac1S\,\partial f/\partial\ln S$ and $\partial^{2}f/\partial S^{2}=\frac{1}{S^{2}}\bigl(\partial^{2}f/\partial(\ln S)^{2}-\partial f/\partial\ln S\bigr)$,
+\suppend
 \[
 	\left(\frac{f_{u}-f_{d}}{2\epsilon}\right)\frac{1}{S}
 \]
@@ -2456,6 +2677,7 @@ approximates the numerical delta, and
 \]
 approximates the numerical gamma.\footnote{See p.~692 of the slides, where the grid has spacing $\epsilon$ in $\ln S$. On the binomial tree, $f_{uu},f_{ud},f_{dd}$ are $2\epsilon$ apart, so $\epsilon$ in the gamma formula should then read $2\epsilon$.}
 
+\suppstart
 \zh{令 $\epsilon=\ln u$，改在 $\ln S$ 座標下看，CRR lattice 在這裡是等距的。用 $\partial f/\partial S$、$\partial^{2}f/\partial S^{2}$ 和 $\ln S$ 導數的關係，就得到上面兩個近似式（在 tree 上，gamma 式中的 $\epsilon$ 要換成 $2\epsilon$）。}
 
 \begin{remark}[補充]
@@ -2466,6 +2688,7 @@ approximates the numerical gamma.\footnote{See p.~692 of the slides, where the g
 	\end{enumerate}
 	\textbf{差分。}在 $y$ 座標下 grid 是等距的，所以用一般的中央差分：$f_{y}\approx\frac{f(y+h)-f(y-h)}{2h}$、$f_{yy}\approx\frac{f(y+h)-2f(y)+f(y-h)}{h^{2}}$，$h$ 是 grid 間距。delta 用 $Su,Sd$（$y\pm\epsilon$，$h=\epsilon$）；gamma 的公式是寫給間距 $\epsilon$ 的 grid，在 tree 上 $Suu,Sud,Sdd$ 間距 $2\epsilon$，所以要把 $\epsilon$ 換成 $2\epsilon$（見 footnote）。
 \end{remark}
+\suppend
 
 \subsection{Finite Difference Fails for Numerical Gamma}
 \label{sec:numerical-gamma-fails}
@@ -2477,6 +2700,7 @@ Numerical differentiation gives
 	\frac{f(S+\Delta S)-2f(S)+f(S-\Delta S)}{(\Delta S)^{2}} .
 \]
 It does not work, and in general calculating gamma is a hard problem numerically --- recall the floating-point disaster of \autoref{fig:fp-error}.
+\suppstart
 But here the failure is structural, not only floating-point.
 
 \begin{remark}
@@ -2525,8 +2749,10 @@ But here the failure is structural, not only floating-point.
 		\item \textbf{結果。}算出來不是 $0$ 就是很大，和真正的 gamma 無關；把 $\Delta S$ 調小只會更糟。
 	\end{enumerate}
 \end{remark}
+\suppend
 
 But why did the binomial tree version \eqref{eq:num-gamma} work?
+\suppstart
 Because its step is not a free parameter: the nodes $Suu$, $Sud$, $Sdd$ are spaced by the factor $u/d$, which is exactly the spacing of the kinks.
 Each of its two difference quotients spans one full linear piece of the tree's own value function, so the second difference sees every kink with the same weight instead of catching one by accident.\footnote{Exercise 10.2.1 of the textbook.}
 
@@ -2538,6 +2764,7 @@ Each of its two difference quotients spans one full linear piece of the tree's o
 \end{moral}
 
 \zh{要在數值方法自己的 grid 上做微分。步長比方法的解析度還細的差分，量到的是方法的人工痕跡，而不是導數。}
+\suppend
 
 \subsection{Other Numerical Greeks}
 
@@ -2547,13 +2774,17 @@ The theta can be computed on the tree as
 \[
 	\frac{f_{ud}-f}{2(\tau/n)} ,
 \]
+\suppstart
 since $Sud=S$: the same stock price two periods later.
 
 \begin{remark}
 	theta 是「股價不變時，價值隨時間的變化率」。$f$ 是現在、股價 $S$ 的價值；$f_{ud}$ 是兩期後、股價 $Sud=S$ 的價值。兩者股價相同、時間差 $2\Delta t=2\tau/n$，所以相減再除以時間差就是 $\partial f/\partial t$ 的差分近似。
 \end{remark}
+\suppend
 In fact, the theta of a European option can be derived from delta and gamma, by an equation we shall meet later in the course.
 The vega of a European option can be derived from gamma, by \eqref{eq:vega-gamma}.
 For rho, there seems no alternative but to run the binomial tree algorithm twice.
 
+\suppstart
 \zh{theta 可在 tree 上用 $\frac{f_{ud}-f}{2(\tau/n)}$ 算，因為 $Sud=S$ 是兩期後的同一個股價。其實 European option 的 theta 可由 delta 和 gamma 推出（之後的課會看到那條方程式），vega 可由 gamma 用 \eqref{eq:vega-gamma} 推出；rho 似乎只能把 tree 跑兩次。}
+\suppend
