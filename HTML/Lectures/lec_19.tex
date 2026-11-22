@@ -10,12 +10,14 @@
 \end{prev}
 
 This chapter removes the last trace of \(\tilde{d}\) by never forming
-\(\bm{z}_n\) at all: for the right transforms, the inner product
+\(\bm{z}_n\) at all. For the right transforms, the inner product
 \(\bm{\Phi}(\bm{x})^\top \bm{\Phi}(\bm{x}')\) can be computed directly from
 \(\bm{x}\) and \(\bm{x}'\), much faster than transforming first. That
-shortcut, the kernel, makes polynomial transforms of any degree cheap and
-even admits a transform of infinite dimension. The chapter ends by comparing
-the kernels and asking which functions can be kernels at all.
+shortcut is called a \emph{kernel}. It makes polynomial transforms of any
+degree cheap, and it even admits a transform of infinite dimension, the
+Gaussian kernel. Each kernel brings its own strengths and dangers, so the
+chapter ends by comparing them and by asking which functions can serve as
+kernels at all.
 
 \paragraph{Roadmap.}
 \begin{enumerate}
@@ -38,21 +40,29 @@ the kernels and asking which functions can be kernels at all.
 
 \subsection{Dual SVM Revisited}
 
-Goal: SVM without dependence on \(\tilde{d}\). Half-way done:
+The goal set in \autoref{sec:dual-motivation} was an SVM without dependence
+on \(\tilde{d}\). The dual of \autoref{sec:solving-dual} gets half-way
+there:
 \[
     \begin{aligned}
         \min_{\bm{\alpha}} \quad & \frac{1}{2} \bm{\alpha}^\top
             \mathrm{Q}_{\mathrm{D}} \bm{\alpha} - \bm{1}^\top \bm{\alpha}\\
         \text{subject to} \quad & \bm{y}^\top \bm{\alpha} = 0;\\
-        & \alpha_n \ge 0, \text{ for } n = 1, 2, \dots , N
+        & \alpha_n \ge 0, \text{ for } n = 1, 2, \dots , N.
     \end{aligned}
 \]
+Its size is counted by \(N\) alone, but its data enter in a way that still
+involves \(\tilde{d}\):
 \begin{itemize}
-    \item \(q_{n,m} = y_n y_m \bm{z}_n^\top \bm{z}_m\): an inner product in
-        \(\mathbb{R}^{\tilde{d}}\);
-    \item need: \(\bm{z}_n^\top \bm{z}_m = \bm{\Phi}(\bm{x}_n)^\top
-        \bm{\Phi}(\bm{x}_m)\) calculated \textbf{faster} than
-        \(O(\tilde{d})\).
+    \item Each coefficient \(q_{n,m} = y_n y_m \bm{z}_n^\top \bm{z}_m\) of
+        \(\mathrm{Q}_{\mathrm{D}}\) is an inner product in
+        \(\mathbb{R}^{\tilde{d}}\), which costs \(O(\tilde{d})\) if we first
+        compute \(\bm{z}_n\) and \(\bm{z}_m\) and then multiply them
+        coordinate by coordinate.
+    \item To be rid of \(\tilde{d}\), we therefore need a way to obtain
+        \(\bm{z}_n^\top \bm{z}_m = \bm{\Phi}(\bm{x}_n)^\top
+        \bm{\Phi}(\bm{x}_m)\) \textbf{faster} than \(O(\tilde{d})\), without
+        going through the transformed vectors.
 \end{itemize}
 
 \begin{question}
@@ -61,13 +71,15 @@ Goal: SVM without dependence on \(\tilde{d}\). Half-way done:
 
 \subsection{Fast Inner Product for \texorpdfstring{\(\bm{\Phi}_2\)}{Phi2}}
 
-Take the 2nd order polynomial transform
+The answer is yes for the transforms we actually use, and the 2nd order
+polynomial transform shows why. Write it as
 \[
     \bm{\Phi}_2(\bm{x}) = (1, x_1, x_2, \dots , x_d, x_1^2, x_1 x_2, \dots ,
-    x_1 x_d, x_2 x_1, x_2^2, \dots , x_2 x_d, \dots , x_d^2)
+    x_1 x_d, x_2 x_1, x_2^2, \dots , x_2 x_d, \dots , x_d^2),
 \]
---- which includes both \(x_1 x_2\) \& \(x_2 x_1\) for `simplicity' :-).
-Its inner product splits by degree:
+which lists every ordered pair, and so includes both \(x_1 x_2\) and
+\(x_2 x_1\) --- for `simplicity' :-). Grouping the coordinates by degree,
+its inner product is
 \[
     \begin{aligned}
         \bm{\Phi}_2(\bm{x})^\top \bm{\Phi}_2(\bm{x}') &= 1 + \sum_{i=1}^d x_i
@@ -78,11 +90,16 @@ Its inner product splits by degree:
             \bm{x}').
     \end{aligned}
 \]
-The duplicated cross terms are what make the double sum factor: with every
-ordered pair \((i, j)\) present, \(\sum_{i,j} (x_i x'_i)(x_j x'_j)\) is a
-product of two copies of the same sum. Transforming first costs \(O(d^2)\)
-for the \(1 + d + d^2\) coordinates; the last line needs one inner product
-in \(\mathbb{R}^d\), \(O(d)\).
+The first line pairs the constant with the constant, each \(x_i\) with
+\(x'_i\), and each \(x_i x_j\) with \(x'_i x'_j\). In the second line the
+factor \(x_i x'_i\), which does not depend on \(j\), comes out of the inner
+sum, and this is where the duplicated cross terms pay off: because every
+ordered pair \((i, j)\) is present, the double sum is a product of two copies
+of the same sum. Each copy is \(\bm{x}^\top \bm{x}'\).
+
+Transforming first means building \(1 + d + d^2\) coordinates for each of
+\(\bm{x}\) and \(\bm{x}'\), at cost \(O(d^2)\). The last line needs only one
+inner product in \(\mathbb{R}^d\), followed by a few scalar operations.
 
 \begin{moral}
     For \(\bm{\Phi}_2\), transform \(+\) inner product can be carefully done
@@ -90,6 +107,10 @@ in \(\mathbb{R}^d\), \(O(d)\).
 \end{moral}
 
 \subsection{Kernel: Transform + Inner Product}
+
+The combined operation `transform, then take the inner product' deserves a
+name of its own, since it is the only thing the dual SVM ever does with
+\(\bm{\Phi}\).
 
 \begin{definition}[Kernel function]
     A transform \(\bm{\Phi}\) comes with its \vocab{kernel function}
@@ -101,28 +122,34 @@ in \(\mathbb{R}^d\), \(O(d)\).
     (\bm{x}^\top \bm{x}') + (\bm{x}^\top \bm{x}')^2\).
 \end{definition}
 
-The dual SVM touches \(\bm{z}\) in three places, and each of them is an
-inner product of two transformed vectors.
+The transformed vectors \(\bm{z}\) appear in three places of the dual SVM:
+in the QP itself, in the bias recovered by the KKT conditions
+(\autoref{sec:solving-dual}), and in the final hypothesis. In each place they
+can be replaced by kernel evaluations.
 \begin{itemize}
-    \item Quadratic coefficient: \(q_{n,m} = y_n y_m \bm{z}_n^\top \bm{z}_m
-        = y_n y_m K(\bm{x}_n, \bm{x}_m)\).
-    \item Optimal bias \(b\)? From an SV \((\bm{x}_s, y_s)\),
+    \item The quadratic coefficients of the QP are \(q_{n,m} = y_n y_m
+        \bm{z}_n^\top \bm{z}_m = y_n y_m K(\bm{x}_n, \bm{x}_m)\), so
+        \(\mathrm{Q}_{\mathrm{D}}\) is built from \(N^2\) kernel values.
+    \item The optimal bias comes from any SV \((\bm{x}_s, y_s)\). Substituting
+        the representation \(\bm{w} = \sum_n \alpha_n y_n \bm{z}_n\) of
+        \autoref{sec:dual-messages} into \(b = y_s - \bm{w}^\top \bm{z}_s\)
+        gives
         \[
             b = y_s - \bm{w}^\top \bm{z}_s = y_s - \left( \sum_{n=1}^N
             \alpha_n y_n \bm{z}_n \right)^\top \bm{z}_s = y_s - \sum_{n=1}^N
             \alpha_n y_n K(\bm{x}_n, \bm{x}_s).
         \]
-    \item Optimal hypothesis \(g_{\mathrm{SVM}}\): for a test input
-        \(\bm{x}\),
+    \item The optimal hypothesis \(g_{\mathrm{SVM}}\) is evaluated the same
+        way at a test input \(\bm{x}\):
         \[
             g_{\mathrm{SVM}}(\bm{x}) = \sign \left( \bm{w}^\top
             \bm{\Phi}(\bm{x}) + b \right) = \sign \left( \sum_{n=1}^N
             \alpha_n y_n K(\bm{x}_n, \bm{x}) + b \right).
         \]
 \end{itemize}
-The second and third bullets expand \(\bm{w}\) by its representation
-\(\bm{w} = \sum_n \alpha_n y_n \bm{z}_n\) from \autoref{sec:dual-messages},
-so \(\bm{w}\) itself never has to be stored.
+In the last two items \(\bm{w}\) is never formed: it lives in
+\(\mathbb{R}^{\tilde{d}}\), and the representation lets every product with
+it be written as a combination of kernel values.
 
 \begin{moral}
     \textbf{Kernel trick}: plug in an efficient kernel function to avoid
@@ -130,6 +157,9 @@ so \(\bm{w}\) itself never has to be stored.
 \end{moral}
 
 \subsection{Kernel SVM with QP}
+
+Putting the three replacements together gives an algorithm that takes the
+kernel, not the transform, as its input.
 
 \begin{algorithm}[H]
     \caption{Kernel Hard-Margin SVM}\label{alg:kernel-hard-svm}
@@ -145,16 +175,24 @@ so \(\bm{w}\) itself never has to be stored.
         \alpha_n y_n K(\bm{x}_n, \bm{x}) + b \right)\)\;
 \end{algorithm}
 
+The sums in lines 3 and 4 run over the SVs only, because every other example
+has \(\alpha_n = 0\). The cost of each line is then:
 \begin{itemize}
-    \item Line 1: time complexity \(O(N^2) \cdot\) (kernel evaluation).
-    \item Line 2: QP with \(N\) variables and \(N + 1\) constraints.
-    \item Lines 3 \& 4: time complexity \(O(\#\text{SV}) \cdot\) (kernel
-        evaluation).
+    \item Line 1 fills the \(N \times N\) matrix
+        \(\mathrm{Q}_{\mathrm{D}}\), one kernel evaluation per entry, so its
+        time complexity is \(O(N^2) \cdot (\text{kernel evaluation})\).
+    \item Line 2 is a QP with \(N\) variables and \(N + 1\) constraints, the
+        same as in \autoref{sec:solving-dual}.
+    \item Lines 3 and 4 each take one kernel evaluation per SV, so their time
+        complexity is \(O(\#\text{SV}) \cdot (\text{kernel evaluation})\);
+        line 4 pays it again for every new \(\bm{x}\).
 \end{itemize}
-
-\(\tilde{d}\) appears nowhere: it is hidden inside the cost of one kernel
-evaluation, which for \(\bm{\Phi}_2\) is \(O(d)\). The returned model is the
-list of SVs with their \(\alpha_n\), not a weight vector.
+The dimension \(\tilde{d}\) no longer appears anywhere: it is hidden inside
+the cost of one kernel evaluation, which for \(\bm{\Phi}_2\) is \(O(d)\).
+What the algorithm returns is also different from before. Instead of a
+weight vector, the model is the list of SVs with their \(\alpha_n\), and
+predicting with it means comparing the new input with each SV through
+\(K\).
 
 \begin{moral}
     \textbf{Kernel SVM}: use a computational shortcut to avoid
@@ -183,10 +221,16 @@ list of SVs with their \(\alpha_n\), not a weight vector.
 
 \source{slides p.7--11}
 
+The kernel trick is only as useful as the kernels we can compute quickly.
+\(K_{\bm{\Phi}_2}\) is the first example; this section turns it into a
+family that covers polynomial transforms of every degree.
+
 \subsection{General Poly-2 Kernel}
 
-Rescaling the coordinates of \(\bm{\Phi}_2\) changes its inner product, and
-some rescalings give a tidier kernel:
+The quadratic transform is not unique. Multiplying its coordinates by
+positive constants does not change which curves a linear classifier in
+\(\mathcal{Z}\) can draw, but it does change the inner product, and some
+choices of constants give a tidier kernel:
 \[
     \begin{aligned}
         \bm{\Phi}_2(\bm{x}) &= (1, x_1, \dots , x_d, x_1^2, \dots , x_d^2)
@@ -201,8 +245,11 @@ some rescalings give a tidier kernel:
             (\bm{x}^\top \bm{x}')^2
     \end{aligned}
 \]
-(the `\(\dots\)' after \(x_1^2\) still run through all the products \(x_i
-x_j\)). The last line is a perfect square.
+Here the `\(\dots\)' after \(x_1^2\) still run through all the products
+\(x_i x_j\). A factor \(c\) on a coordinate becomes \(c^2\) in the inner
+product, so scaling the linear coordinates by \(\sqrt{2}\) doubles the
+middle term, and scaling them by \(\sqrt{2\gamma}\) and the quadratic ones by
+\(\gamma\) gives the third line. That last expression is a perfect square.
 
 \begin{moral}
     \[
@@ -211,23 +258,39 @@ x_j\)). The last line is a perfect square.
     \]
 \end{moral}
 
+The rescaled transforms are interchangeable in one respect and not in
+another:
 \begin{itemize}
-    \item \(K_2\): somewhat `easier' to calculate than \(K_{\bm{\Phi}_2}\)
-        --- one inner product, one addition, one square.
-    \item \(\bm{\Phi}_2\) and the rescaled \(\bm{\Phi}_2\): equivalent
-        \textbf{power}, different \textbf{inner product} \(\implies\)
-        different \textbf{geometry}.
+    \item \(K_2\) is somewhat `easier' to calculate than \(K_{\bm{\Phi}_2}\):
+        it takes one inner product, one multiplication by \(\gamma\), one
+        addition and one square.
+    \item The original \(\bm{\Phi}_2\) and the rescaled one have equivalent
+        \textbf{power}, since they span the same quadratic curves in
+        \(\mathcal{X}\); but they have a different \textbf{inner product},
+        and hence a different \textbf{geometry} in \(\mathcal{Z}\).
 \end{itemize}
-Every rescaled transform spans the same quadratic curves, so the hypothesis
-sets coincide. But the SVM picks the hyperplane with the largest margin, and
-the margin is measured with the inner product of \(\mathcal{Z}\); stretching
-some coordinates of \(\mathcal{Z}\) changes which hyperplane is fattest.
+The geometry matters because the SVM does not just pick some separating
+hyperplane. It picks the one with the largest margin, and the margin is a
+distance measured with the inner product of \(\mathcal{Z}\). Stretching some
+coordinates of \(\mathcal{Z}\) changes the distances, and with them which
+hyperplane is fattest, so the same data can lead to a different boundary.
 
 \begin{moral}
-    \(K_2\) is commonly used.
+    \(K_2\) commonly used.
 \end{moral}
 
 \subsection{Poly-2 Kernels in Action}
+
+The effect of the geometry is visible on data. Each picture below is a
+hard-margin SVM trained on the same 40 examples, with the region classified
+\(+1\) shaded blue and the support vectors boxed; only the poly-2 kernel
+changes. Expanding \((1 + \gamma \bm{x}^\top \bm{x}')^2 = 1 + 2\gamma
+\bm{x}^\top \bm{x}' + \gamma^2 (\bm{x}^\top \bm{x}')^2\) shows what
+\(\gamma\) does. With \(\gamma = 0.001\) the linear term outweighs the
+quadratic one, so \(\mathcal{Z}\) is stretched along the linear coordinates
+and the boundary is a gentle curve. With \(\gamma = 1000\) the quadratic term
+dominates, and the boundary approaches a conic centred at the origin, whose
+two branches can both enter the picture.
 
 \begin{center}
     \begin{tabular}{@{}c@{\hspace{1.2em}}c@{\hspace{1.2em}}c@{}}
@@ -240,29 +303,28 @@ some coordinates of \(\mathcal{Z}\) changes which hyperplane is fattest.
     \end{tabular}
 \end{center}
 
-Each picture is a hard-margin SVM solved on the same data, with the
-support vectors boxed. The pictures are mine: I measured the 40 examples off
-the deck's figure and solved the dual with each kernel. The deck does not
-say where its origin is, so the boundaries and SV sets differ in detail from
-the deck's. I put the origin at the centre of the hyperbola in the deck's
-third picture and doubled the scale.
 \begin{itemize}
-    \item \(g_{\mathrm{SVM}}\) \textbf{different}, \fbox{SVs}
-        \textbf{different} --- `hard' to say which is better before learning.
-        The three runs have \(4\), \(3\) and \(4\) SVs, and only the third
-        grows a second branch at the bottom.
-    \item Change of \textbf{kernel} \(\iff\) change of \textbf{margin
-        definition}. The three margins, \(1/\norm{\bm{w}}\) in each kernel's
-        own \(\mathcal{Z}\), come out as about \(0.0002\), \(0.15\) and
-        \(120\): they are not even on a common scale.
+    \item The resulting \(g_{\mathrm{SVM}}\) are \textbf{different}, and so
+        are the \fbox{SVs}; since all three separate the data, it is `hard' to
+        say which one is better before learning.
+    \item A change of \textbf{kernel} is a change of \textbf{margin
+        definition}: each SVM maximizes \(1 / \norm{\bm{w}}\) in its own
+        \(\mathcal{Z}\), and these margins are not even on a common scale.
 \end{itemize}
 
 \begin{moral}
     Need to select \(K\), just like selecting \(\bm{\Phi}\).
 \end{moral}
 
+Selecting \(K\) is model selection in the sense of
+\autoref{sec:model-selection}, and validation (\autoref{sec:validation}) is
+the tool for it.
+
 \subsection{General Polynomial Kernel}
 
+Nothing in the poly-2 construction is special to degree \(2\). Adding a
+constant \(\zeta\) and raising to the \(Q\)-th power gives a kernel for each
+degree:
 \[
     \begin{aligned}
         K_2(\bm{x}, \bm{x}') &= (\zeta + \gamma \bm{x}^\top \bm{x}')^2
@@ -278,32 +340,34 @@ third picture and doubled the scale.
 \begin{center}
     \begin{minipage}[c]{0.58\textwidth}
         \begin{itemize}
-            \item embeds \(\bm{\Phi}_Q\) specially with parameters \((\gamma,
-                \zeta)\);
-            \item allows computing large-margin \textbf{polynomial}
-                classification \textbf{without dependence on
-                \(\tilde{d}\)}.
+            \item \(K_Q\) embeds the \(Q\)-th order transform \(\bm{\Phi}_Q\)
+                specially, with its coordinates scaled according to the
+                parameters \((\gamma, \zeta)\).
+            \item It allows computing large-margin \textbf{polynomial}
+                classification \textbf{without dependence on \(\tilde{d}\)}:
+                one inner product in \(\mathbb{R}^d\) and one power, whatever
+                \(Q\) is.
         \end{itemize}
     \end{minipage}%
     \hfill
     \begin{minipage}[c]{0.38\textwidth}
         \centering
         \ksvmpanel[3.4]{\ksvmPolyTen}{\ksvmGaussData}{\ksvmPolyTenSV}\\[2pt]
-        {\small 10-th order polynomial with margin 0.1}
+        {\small 10-th order polynomial}
     \end{minipage}
 \end{center}
 
-Expanding \((\zeta + \gamma \bm{x}^\top \bm{x}')^Q\) by the binomial
-theorem gives every monomial up to degree \(Q\), each with its own positive
-weight. So \(K_Q\) is the inner product of a rescaled \(\bm{\Phi}_Q\), whose
-\(\tilde{d} = O(d^Q)\) never has to be paid. In two dimensions a 10th-order
-transform has 66 coordinates, and the kernel still costs one inner product
-in \(\mathbb{R}^2\) and one power.
-
-The picture on the right is my own run of \((1 + \bm{x}^\top \bm{x}')^{10}\)
-on the data of the Gaussian pictures below, in a frame of my choosing. Its
-margin comes out as about \(0.30\) rather than the deck's \(0.1\), which is
-another reminder that the margin depends on the frame and the kernel.
+The first item follows from the binomial theorem. Expanding \((\zeta +
+\gamma \bm{x}^\top \bm{x}')^Q\) and then each power of \(\bm{x}^\top \bm{x}'
+= \sum_i x_i x'_i\) produces every monomial of degree at most \(Q\) in
+\(\bm{x}\), times the same monomial in \(\bm{x}'\), with a non-negative
+weight. So \(K_Q\) is the inner product of a scaled \(\bm{\Phi}_Q\), and by
+\autoref{lem:monomials} that transform has \(\binom{Q+d}{d}\) coordinates.
+For the 10th order in two dimensions, as in the picture, that is already
+\(\binom{12}{2} = 66\) coordinates, while the kernel still costs two
+multiplications, one addition and one power. In the deck's version of this
+picture the margin is \(0.1\); like every margin above, the number belongs to
+this kernel's \(\mathcal{Z}\).
 
 \begin{moral}
     SVM \(+\) Polynomial Kernel: \textbf{Polynomial SVM}.
@@ -311,6 +375,8 @@ another reminder that the margin depends on the frame and the kernel.
 
 \subsection{Special Case: Linear Kernel}
 
+At the other end of the family sits the smallest member: \(Q = 1\), \(\zeta
+= 0\), \(\gamma = 1\).
 \[
     \begin{aligned}
         K_1(\bm{x}, \bm{x}') &= (0 + 1 \cdot \bm{x}^\top \bm{x}')^1\\
@@ -323,10 +389,11 @@ another reminder that the margin depends on the frame and the kernel.
 \begin{center}
     \begin{minipage}[c]{0.62\textwidth}
         \begin{itemize}
-            \item \(K_1\): just the \textbf{usual inner product}, called the
-                \vocab{linear kernel}.
-            \item `Even easier': can be solved (often in primal form)
-                \textbf{efficiently}.
+            \item \(K_1\) is just the \textbf{usual inner product} of
+                \(\mathcal{X}\), and it is called the \vocab{linear kernel}.
+            \item It is `even easier' than the others: since no transform is
+                involved, the problem can be solved \textbf{efficiently},
+                often in its primal form.
         \end{itemize}
     \end{minipage}%
     \hfill
@@ -336,14 +403,18 @@ another reminder that the margin depends on the frame and the kernel.
     \end{minipage}
 \end{center}
 
-With \(\bm{\Phi} = \) identity, \(\tilde{d} = d\) and the kernel SVM is the
-linear SVM of \autoref{sec:svm} --- the picture is its toy example again.
-When \(d\) is small the primal QP with \(d + 1\) variables is the cheaper of
-the two forms.
+With \(K_1\) the transform is the identity, \(\tilde{d} = d\), and the kernel
+SVM is the linear SVM of \autoref{sec:svm}; the picture is its toy example
+once more. The primal QP then has only \(d + 1\) variables, so when \(d\) is
+small there is no reason to go through the dual at all.
 
 \begin{moral}
     Linear first, remember? :-)
 \end{moral}
+
+This is the `linear model first' advice of \autoref{sec:structured-H},
+restated for kernels: try the linear kernel before any of the more powerful
+ones.
 
 \begin{exercise}[Fun Time]
     Consider the general 2-nd polynomial kernel \(K_2(\bm{x}, \bm{x}') =
@@ -373,11 +444,17 @@ the two forms.
 
 \source{slides p.12--16}
 
+The cost of a polynomial kernel does not grow with \(Q\), even though
+\(\tilde{d}\) does. That raises the question of how far the transform can be
+pushed, and the answer is: all the way to infinitely many dimensions.
+
 \subsection{Kernel of Infinite Dimensional Transform}
 
-A polynomial kernel is cheap however large \(Q\) is. Pushing further: an
-infinite dimensional \(\bm{\Phi}(\bm{x})\)? Yes, if \(K(\bm{x}, \bm{x}')\)
-is efficiently computable! Take \(\bm{x} = (x)\), one dimension:
+Can \(\bm{\Phi}(\bm{x})\) be infinite dimensional? Yes, as long as
+\(K(\bm{x}, \bm{x}')\) is efficiently computable! The kernel SVM never
+stores \(\bm{z}\), so all it needs is a function \(K\) that we can evaluate
+and that equals \(\bm{\Phi}(\bm{x})^\top \bm{\Phi}(\bm{x}')\) for
+\emph{some} \(\bm{\Phi}\). Take \(\bm{x} = (x)\), one dimension, and
 \[
     \begin{aligned}
         K(x, x') &= \exp(-(x - x')^2)\\
@@ -395,9 +472,14 @@ with the infinite dimensional
     \bm{\Phi}(x) = \exp(-x^2) \cdot \left( 1, \sqrt{\frac{2}{1!}} x,
     \sqrt{\frac{2^2}{2!}} x^2, \dots \right).
 \]
-The middle step splits \((x - x')^2 = x^2 - 2xx' + x'^2\); the Taylor series
-of \(\exp(2xx')\) is a polynomial kernel of every degree at once, and the
-two outer factors attach \(\exp(-x^2)\) to each side.
+The second line expands \((x - x')^2 = x^2 - 2xx' + x'^2\) and splits the
+exponential into three factors. The only factor that couples \(x\) and
+\(x'\) is \(\exp(2xx')\), and its Taylor series is a sum of terms
+\((2xx')^i / i!\), one for every degree \(i\) --- a polynomial kernel of all
+degrees at once. The fourth line splits each term symmetrically between
+\(x\) and \(x'\), so that the \(i\)-th coordinate of \(\bm{\Phi}\) is
+\(\exp(-x^2) \sqrt{2^i / i!}\, x^i\); the sum over \(i\) is then the inner
+product of two infinite vectors.
 
 \begin{definition}[Gaussian kernel]
     More generally, the \vocab{Gaussian kernel} is
@@ -407,10 +489,16 @@ two outer factors attach \(\exp(-x^2)\) to each side.
     \]
 \end{definition}
 
+The same expansion, applied with \(\norm{\bm{x} - \bm{x}'}^2 = \norm{\bm{x}}^2
+- 2 \bm{x}^\top \bm{x}' + \norm{\bm{x}'}^2\), shows that the Gaussian kernel
+is again an inner product in an infinite-dimensional \(\mathcal{Z}\), and it
+costs only one squared distance in \(\mathbb{R}^d\) and one exponential.
+
 \subsection{Hypothesis of Gaussian SVM}
 
-With the Gaussian kernel \(K(\bm{x}, \bm{x}') = \exp \left( -\gamma
-\norm{\bm{x} - \bm{x}'}^2 \right)\),
+Plugging the Gaussian kernel \(K(\bm{x}, \bm{x}') = \exp \left( -\gamma
+\norm{\bm{x} - \bm{x}'}^2 \right)\) into the hypothesis of
+\autoref{alg:kernel-hard-svm} shows what a Gaussian SVM computes:
 \[
     \begin{aligned}
         g_{\mathrm{SVM}}(\bm{x}) &= \sign \left( \sum_{\text{SV}} \alpha_n
@@ -420,14 +508,15 @@ With the Gaussian kernel \(K(\bm{x}, \bm{x}') = \exp \left( -\gamma
     \end{aligned}
 \]
 \begin{itemize}
-    \item A linear combination of Gaussians \textbf{centered at the SVs}
-        \(\bm{x}_n\).
-    \item Also called the \vocab{Radial Basis Function (RBF)} kernel.
+    \item The score inside the \(\sign\) is a linear combination of Gaussians
+        \textbf{centered at the SVs} \(\bm{x}_n\). Each SV contributes a bump
+        of height \(\alpha_n\), pointing up for \(y_n = +1\) and down for
+        \(y_n = -1\), whose width is set by \(\gamma\).
+    \item The Gaussian kernel is also called the \vocab{Radial Basis Function
+        (RBF)} kernel: each bump depends on \(\bm{x}\) only through the
+        distance \(\norm{\bm{x} - \bm{x}_n}\), i.e.\ it is radial, and the
+        bumps are the basis functions being combined.
 \end{itemize}
-Each SV contributes a bump of height \(\alpha_n\), pointing up for \(y_n =
-+1\) and down for \(y_n = -1\), with width set by \(\gamma\). The bump
-depends on \(\bm{x}\) only through its distance to \(\bm{x}_n\), which is
-why the kernel is called radial.
 
 \begin{moral}
     \textbf{Gaussian SVM}: find \(\alpha_n\) to combine Gaussians centered at
@@ -435,6 +524,12 @@ why the kernel is called radial.
 \end{moral}
 
 \subsection{Support Vector Mechanism}
+
+\autoref{sec:why-large-margin} closed with a promise: large-margin
+hyperplanes combined with a numerous feature transform would give
+hypotheses that are \textbf{not many} yet have a \textbf{sophisticated}
+boundary. The kernel trick is what makes the transform affordable, so the
+promise can now be kept.
 
 \begin{center}
     \solidrules
@@ -449,24 +544,30 @@ why the kernel is called radial.
     \end{tabular}
 \end{center}
 
+Two substitutions make it work, one for each object that would otherwise
+live in \(\mathcal{Z}\):
 \begin{itemize}
-    \item transformed vector \(\bm{z} = \bm{\Phi}(\bm{x}) \implies\)
-        efficient kernel \(K(\bm{x}, \bm{x}')\);
-    \item store optimal \(\bm{w} \implies\) store a few SVs and
-        \(\alpha_n\).
+    \item instead of the transformed vector \(\bm{z} = \bm{\Phi}(\bm{x})\),
+        we compute the efficient kernel \(K(\bm{x}, \bm{x}')\);
+    \item instead of storing the optimal \(\bm{w}\), we store a few SVs and
+        their \(\alpha_n\).
 \end{itemize}
-
-This is the table that closed \autoref{sec:why-large-margin}, now with the
-`numerous feature transform' made affordable. Neither the transform nor the
-weight vector is ever stored, which is what makes an infinite-dimensional
-\(\mathcal{Z}\) possible at all.
+Since neither the transform nor the weight vector is ever written down,
+nothing prevents \(\mathcal{Z}\) from being infinite dimensional.
 
 \begin{moral}
     New possibility by Gaussian SVM: \textbf{infinite-dimensional linear
     classification}, with generalization `guarded by' large-margin :-)
 \end{moral}
 
+The smiley hides a caveat, which the pictures of the next subsection make
+plain.
+
 \subsection{Gaussian SVM in Action}
+
+The three pictures train a Gaussian SVM on the same 40 examples with
+increasing \(\gamma\); as before, blue is the region classified \(+1\) and
+the SVs are boxed.
 
 \begin{center}
     \begin{tabular}{@{}c@{\hspace{1.2em}}c@{\hspace{1.2em}}c@{}}
@@ -479,20 +580,23 @@ weight vector is ever stored, which is what makes an infinite-dimensional
     \end{tabular}
 \end{center}
 
-These are again my runs, on 40 examples measured off the deck's figure and
-placed in \([-1, 1]^2\). As \(\gamma\) grows, each Gaussian narrows and the
-boundary bends around individual examples. At \(\gamma = 100\) it has broken
-into islands around the crosses, and all \(40\) examples are SVs (\(9\) and
-\(25\) for the other two).
+As \(\gamma\) grows, each Gaussian bump narrows and reaches fewer
+neighbours, so the boundary has to be assembled from more and more local
+pieces. At \(\gamma = 1\) it is a smooth curve; at \(\gamma = 100\) it has
+broken into small islands around individual examples, and almost every
+example has become an SV.
 \begin{itemize}
-    \item Large \(\gamma \implies\) sharp Gaussians \(\implies\)
+    \item Large \(\gamma\) means sharp Gaussians, and sharp Gaussians let the
+        boundary bend around single examples --- that looks like
         `overfit'?
     \item \textbf{Warning: SVM can still overfit :-(}
 \end{itemize}
-The large-margin guard of \autoref{sec:why-large-margin} restricts the
-dichotomies for a fixed \(\mathcal{Z}\), but \(\gamma\) changes
-\(\mathcal{Z}\). The right-hand picture separates the data perfectly and
-still looks like memorization.
+The large-margin guard of \autoref{sec:why-large-margin} limits the
+dichotomies for a \emph{fixed} \(\mathcal{Z}\). Changing \(\gamma\) changes
+\(\mathcal{Z}\), and an infinite-dimensional \(\mathcal{Z}\) with very sharp
+bumps can separate almost anything. The right-hand picture classifies every
+training example correctly and still looks like memorization rather than
+learning.
 
 \begin{moral}
     Gaussian SVM: need \textbf{careful selection of \(\gamma\)}.
@@ -525,6 +629,10 @@ still looks like memorization.
 
 \source{slides p.17--21}
 
+We now have three kernels, ordered by power: linear, polynomial and
+Gaussian. More power is not free, and each kernel trades it against speed,
+numerical safety, interpretability and the number of parameters to choose.
+
 \subsection{Linear Kernel: Cons and Pros}
 
 \begin{center}
@@ -543,7 +651,9 @@ still looks like memorization.
     \begin{minipage}[t]{0.47\textwidth}
         \raggedright\textbf{Cons}
         \begin{itemize}
-            \item restricted --- \textbf{not always separable?!}
+            \item It is restricted: the data are \textbf{not always
+                separable?!} by a hyperplane in \(\mathcal{X}\), as in the
+                circle data below.
         \end{itemize}
         \centering
         \begin{tikzpicture}[scale=1.1]
@@ -555,19 +665,21 @@ still looks like memorization.
     \begin{minipage}[t]{0.47\textwidth}
         \raggedright\textbf{Pros}
         \begin{itemize}
-            \item safe --- \textbf{linear first, remember? :-)}
-            \item fast --- with a \textbf{special QP solver} in primal
-            \item very explainable --- \textbf{\(\bm{w}\) and SVs} say
-                something
+            \item It is safe: \textbf{linear first, remember? :-)}
+            \item It is fast: with a \textbf{special QP solver}, the primal
+                can be solved directly.
+            \item It is very explainable: \textbf{\(\bm{w}\) and the SVs} say
+                something about the problem.
         \end{itemize}
     \end{minipage}
 \end{center}
 
-The `not separable' example is the circle data set of
-\autoref{sec:nonlin-transform}: no line splits the circles inside from the
-crosses outside, and a hard-margin linear SVM has no solution there.
-Explainable means that each \(w_i\) weighs one original feature, as in the
-credit example of \autoref{sec:perceptron-set}.
+The non-separable example is the circle data set of \autoref{sec:quad-hyp}:
+no line splits the circles inside from the crosses outside, so a
+hard-margin SVM with the linear kernel has no solution there. Explainable
+means that each \(w_i\) weighs one original feature, as in the credit example
+of \autoref{sec:perceptron-set}, and that the SVs are actual examples one can
+inspect.
 
 \begin{moral}
     Linear kernel: an important \textbf{basic} tool.
@@ -591,37 +703,41 @@ credit example of \autoref{sec:perceptron-set}.
     \begin{minipage}[t]{0.47\textwidth}
         \raggedright\textbf{Cons}
         \begin{itemize}
-            \item \textbf{numerical difficulty} for large \(Q\):
+            \item It has \textbf{numerical difficulty} for large \(Q\),
+                because a \(Q\)-th power drives any base away from \(1\):
                 \begin{itemize}
-                    \item \(\abs{\zeta + \gamma \bm{x}^\top \bm{x}'} < 1\):
-                        \(K \to 0\);
-                    \item \(\abs{\zeta + \gamma \bm{x}^\top \bm{x}'} > 1\):
-                        \(K \to\) big;
+                    \item if \(\abs{\zeta + \gamma \bm{x}^\top \bm{x}'} <
+                        1\), then \(K \to 0\);
+                    \item if \(\abs{\zeta + \gamma \bm{x}^\top \bm{x}'} >
+                        1\), then \(K \to\) big.
                 \end{itemize}
-            \item three parameters \((\gamma, \zeta, Q)\) --- \textbf{more
-                difficult to select}.
+            \item It has three parameters \((\gamma, \zeta, Q)\), which are
+                \textbf{more difficult to select}.
         \end{itemize}
     \end{minipage}%
     \hfill
     \begin{minipage}[t]{0.47\textwidth}
         \raggedright\textbf{Pros}
         \begin{itemize}
-            \item \textbf{less restricted} than linear;
-            \item strong physical control --- `knows' \textbf{degree \(Q\)}.
+            \item It is \textbf{less restricted} than linear.
+            \item It gives strong physical control: the user `knows' the
+                \textbf{degree \(Q\)} of the boundary.
         \end{itemize}
     \end{minipage}
 \end{center}
 
-The numerical problem is the \(Q\)-th power: entries of
-\(\mathrm{Q}_{\mathrm{D}}\) spread over many orders of magnitude, and the QP
-solver loses precision. The \((1 + 1000 \bm{x}^\top \bm{x}')^2\) run above
-already shows it: its margin of about \(120\) against \(0.0002\) for
-\(\gamma = 0.001\) reflects kernel values of wildly different sizes.
+With large \(Q\), the entries of \(\mathrm{Q}_{\mathrm{D}}\) spread over many
+orders of magnitude, some vanishing and some exploding, and the QP solver
+loses precision on such a matrix.
 
 \begin{moral}
     Polynomial kernel: perhaps \textbf{small-\(Q\) only} --- sometimes
     efficiently done by \textbf{linear on \(\bm{\Phi}_Q(\bm{x})\)}.
 \end{moral}
+
+For small \(Q\), \(\bm{\Phi}_Q(\bm{x})\) has few enough coordinates to be
+computed explicitly, and the fast primal solver of the linear kernel can
+then be run on the transformed data instead of the dual.
 
 \subsection{Gaussian Kernel: Cons and Pros}
 
@@ -641,9 +757,13 @@ already shows it: its margin of about \(120\) against \(0.0002\) for
     \begin{minipage}[t]{0.47\textwidth}
         \raggedright\textbf{Cons}
         \begin{itemize}
-            \item \textbf{mysterious} --- no \(\bm{w}\);
-            \item \textbf{slower} than linear;
-            \item \textbf{too powerful?!}
+            \item It is \textbf{mysterious}: there is no \(\bm{w}\) to
+                inspect, because \(\bm{w}\) lives in an infinite-dimensional
+                \(\mathcal{Z}\).
+            \item It is \textbf{slower} than linear, since training and
+                prediction must go through the dual and the SVs.
+            \item It may be \textbf{too powerful?!}, as the \(\gamma = 100\)
+                picture below shows.
         \end{itemize}
         \centering
         \ksvmpanel[2.4]{\ksvmGaussC}{\ksvmGaussData}{\ksvmGaussCSV}
@@ -652,17 +772,14 @@ already shows it: its margin of about \(120\) against \(0.0002\) for
     \begin{minipage}[t]{0.47\textwidth}
         \raggedright\textbf{Pros}
         \begin{itemize}
-            \item \textbf{more powerful} than linear/poly.;
-            \item bounded --- \textbf{less numerical difficulty} than poly.;
-            \item one parameter only --- \textbf{easier to select} than poly.
+            \item It is \textbf{more powerful} than linear/poly.
+            \item It is bounded, \(0 < K \le 1\), so it has \textbf{less
+                numerical difficulty} than poly.
+            \item It has one parameter only, \(\gamma\), so it is
+                \textbf{easier to select} than poly.
         \end{itemize}
     \end{minipage}
 \end{center}
-
-`No \(\bm{w}\)' because \(\bm{w}\) lives in an infinite-dimensional
-\(\mathcal{Z}\) and can only be held as its SV representation. `Bounded'
-because \(0 < K \le 1\) for every pair. `Too powerful' is the
-\(\gamma = 100\) picture again.
 
 \begin{moral}
     Gaussian kernel: \textbf{one of the most popular} but shall be
@@ -671,15 +788,22 @@ because \(0 < K \le 1\) for every pair. `Too powerful' is the
 
 \subsection{Other Valid Kernels}
 
+Every kernel so far was derived from a transform, by computing
+\(\bm{\Phi}(\bm{x})^\top \bm{\Phi}(\bm{x}')\) in closed form. One could
+instead start from the kernel, writing down any function that measures how
+similar two inputs are, and hope that some \(\bm{\Phi}\) lies behind it.
 \begin{itemize}
-    \item A kernel represents a \textbf{special} similarity:
-        \(\bm{\Phi}(\bm{x})^\top \bm{\Phi}(\bm{x}')\).
-    \item Any similarity \(\implies\) valid kernel? \textbf{Not really.}
-    \item Necessary \& sufficient conditions for a valid kernel:
-        \vocab{Mercer's condition}
+    \item A kernel represents a \textbf{special} similarity between two
+        inputs, namely the inner product \(\bm{\Phi}(\bm{x})^\top
+        \bm{\Phi}(\bm{x}')\) of their transforms.
+    \item Is any similarity a valid kernel? \textbf{Not really}: an inner
+        product has structure that an arbitrary similarity need not have.
+    \item The necessary \& sufficient conditions for a valid kernel are
+        \vocab{Mercer's condition}:
         \begin{itemize}
-            \item symmetric;
-            \item let \(k_{ij} = K(\bm{x}_i, \bm{x}_j)\); the matrix
+            \item \(K\) must be symmetric, \(K(\bm{x}, \bm{x}') =
+                K(\bm{x}', \bm{x})\);
+            \item with \(k_{ij} = K(\bm{x}_i, \bm{x}_j)\), the matrix
                 \(\mathrm{K}\)
                 \[
                     \begin{aligned}
@@ -705,17 +829,18 @@ because \(0 < K \le 1\) for every pair. `Too powerful' is the
                         &= \mathrm{Z} \mathrm{Z}^\top
                     \end{aligned}
                 \]
-                must \textbf{always} be \textbf{positive semi-definite}.
+                must \textbf{always} be \textbf{positive semi-definite}, for
+                every choice of inputs \(\bm{x}_1, \dots , \bm{x}_N\).
         \end{itemize}
 \end{itemize}
 
-Necessity is one line: for any \(\bm{v} \in \mathbb{R}^N\), \(\bm{v}^\top
-\mathrm{Z} \mathrm{Z}^\top \bm{v} = \norm{\mathrm{Z}^\top \bm{v}}^2 \ge 0\).
-Here \(\mathrm{Z}\) has the \(\bm{z}_n^\top\) as rows, as in the foundations.
-Sufficiency --- that a symmetric \(K\) whose matrices are always PSD
-\emph{is} an inner product in some \(\mathcal{Z}\) --- is Mercer's theorem,
-which we claim. The condition must hold for every choice of inputs
-\(\bm{x}_1, \dots , \bm{x}_N\), not just the training set.
+Here \(\mathrm{Z}\) has the \(\bm{z}_n^\top\) as its rows, as in the
+foundations. The factorization \(\mathrm{K} = \mathrm{Z} \mathrm{Z}^\top\)
+shows why the condition is necessary: for any \(\bm{v} \in \mathbb{R}^N\),
+\(\bm{v}^\top \mathrm{Z} \mathrm{Z}^\top \bm{v} = \norm{\mathrm{Z}^\top
+\bm{v}}^2 \ge 0\). Sufficiency, that a symmetric \(K\) whose matrices are
+always PSD \emph{is} an inner product in some \(\mathcal{Z}\), is Mercer's
+theorem, which we claim.
 
 \begin{moral}
     Define your own kernel: possible, \textbf{but hard}.
@@ -761,8 +886,8 @@ which we claim. The condition must hold for every choice of inputs
 \end{description}
 
 The kernel removed every trace of \(\tilde{d}\), and with it the last brake
-on the transform: the Gaussian SVM at \(\gamma = 100\) separates anything
-and overfits. The hard margin demands that every example be classified
-correctly, which is exactly what a noisy data set should not get. Next:
-avoiding overfitting in the Gaussian (and other kernels) by letting the
-margin be violated.
+on the transform: the Gaussian SVM at \(\gamma = 100\) separates the data
+perfectly and overfits. Part of the blame lies with the hard margin itself,
+which insists that every example be classified correctly --- exactly what a
+noisy data set should not get. Next: avoiding overfitting in the Gaussian
+(and other kernels) by allowing the margin to be violated.

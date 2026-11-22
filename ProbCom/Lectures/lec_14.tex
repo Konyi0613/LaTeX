@@ -1,0 +1,199 @@
+\lecture{14}{20 Nov.}{}
+
+\begin{remark}\label{rmk:r3k-current}
+    \autoref{cor:r3k-lll} is not sharp. Kim (1995) proved \(R(3,k) \ge c \, \frac{k^{2}}{\log k}\) by a nibble-type argument (\autoref{lem:nibble}). The \vocab{triangle-free process}, which adds uniformly random edges of \(K_{n}\) one at a time and skips every edge that would close a triangle, gives
+    \[
+        R(3,k) \ge \Bigl( \frac{1}{4} - o(1) \Bigr) \frac{k^{2}}{\ln k}
+    \]
+    (Bohman--Keevash; Fiz Pontiveros--Griffiths--Morris). The best bounds known now are
+    \[
+        \Bigl( \frac{1}{2} + o(1) \Bigr) \frac{k^{2}}{\ln k} \le R(3,k) \le \bigl( 1 + o(1) \bigr) \frac{k^{2}}{\ln k},
+    \]
+    the upper bound due to Shearer (1983). So \(R(3,k) = \Theta\bigl( \frac{k^{2}}{\log k} \bigr)\), and \autoref{cor:r3k-lll} loses only a factor \(\log k\).
+\end{remark}
+
+\section{The Algorithmic Local Lemma}\label{sec:algorithmic-lll}
+
+\subsection{Finding the Coloring}\label{sec:alll-problem}
+
+\autoref{prop:property-B-lll} shows that a \(k\)-uniform hypergraph \(H\) with edges \(F_{1}, \ldots, F_{m}\), each meeting few others, has a \(2\)-coloring without monochromatic edges, but it does not say how to find one. With \(A_{i} \coloneqq \{ F_{i} \text{ is monochromatic} \}\) as in its proof, \eqref{eq:lll-general-condition} forces \(x_{i} \ge \mathbb{P}(A_{i}) = 2^{1-k}\), so the probability guaranteed by \thmref{thm:lll-general} is
+\[
+    \prod_{i=1}^{m} (1 - x_{i}) \le \bigl( 1 - 2^{1-k} \bigr)^{m} \le e^{-m 2^{1-k}} .
+\]
+A uniformly random coloring is good with probability \(p\), and the number of independent trials until the first good one is \(\mathrm{Geom}(p)\), with mean \(\frac{1}{p}\). Knowing only \(p \ge \prod_{i} (1 - x_{i})\), we can promise no better than about \(e^{m 2^{1-k}}\) trials, which is exponential in \(m\).
+
+\begin{theorem}[Beck, 1991]\label{thm:beck}
+    There is \(c > 0\) such that if every edge of a \(k\)-uniform hypergraph \(H\) intersects at most \(2^{ck}\) edges, then a \(2\)-coloring of \(H\) without monochromatic edges can be found in polynomial time.
+\end{theorem}
+
+We do not prove \autoref{thm:beck}, since the following theorem improves it.
+
+\begin{theorem}[Moser--Tardos]\label{thm:moser-tardos}
+    Let \(H\) be a \(k\)-uniform hypergraph with \(m\) edges in which every edge intersects at most \(2^{k-4}\) edges (itself included). Then there is a randomized algorithm that finds a \(2\)-coloring of \(H\) without monochromatic edges in expected time \(O(m \log m)\).
+\end{theorem}
+
+Up to the constant in the exponent, this is the condition of \autoref{prop:property-B-lll}, which needs \(\le \frac{2^{k-1}}{e} - 1\) other edges. The algorithm colors the vertices at random, and while some edge is monochromatic it recolors the vertices of that edge at random. Recoloring an edge can create new monochromatic edges, but only among the edges meeting it, and these are repaired first.
+
+\subsection{The Algorithm}\label{sec:alll-algorithm}
+
+Throughout, the two colors are \(0\) and \(1\), and for an edge \(F\) let
+\[
+    N(F) \coloneqq \{ G \in E(H) : G \cap F \ne \varnothing \} \ni F,
+    \qquad \abs{N(F)} \le 2^{k-4}
+\]
+by the hypothesis of \autoref{thm:moser-tardos}. For a monochromatic edge \(F\), \(\operatorname{col}(F) \in \{0, 1\}\) is its color. For \(G \in N(F)\), \(\operatorname{relindex}(G, F) \in \{0, \ldots, 2^{k-4} - 1\}\) is the position of \(G\) when \(N(F)\) is listed in increasing order of index, written with \(k - 4\) bits, and \(\operatorname{index}(i)\) is \(i - 1\) written with \(\lceil \log_{2} m \rceil\) bits. The string \(\mathrm{Log}\) is a global variable and \(+\) is concatenation. \(\mathrm{Log}\) does not influence the run; it is recorded only for the analysis.
+
+\begin{algorithm}[H]
+    \SetFuncSty{textsc}
+    \SetKwFunction{Repainter}{LLL-Repainter}
+    \caption{\textsc{LLL-Painter}\((H)\)}\label{alg:lll-painter}
+    \KwIn{a \(k\)-uniform hypergraph \(H\) with edges \(F_{1}, \ldots, F_{m}\)}
+    \KwOut{a \(2\)-coloring \(c\) of \(V(H)\) without monochromatic edges}
+    \(c \gets\) a uniformly random coloring \(V(H) \to \{0, 1\}\)\;
+    \(\mathrm{Log} \gets\) the empty string\;
+    \While{some edge is monochromatic in \(c\)}{
+        \(i \gets\) the smallest index such that \(F_{i}\) is monochromatic\;
+        \(\mathrm{Log} \gets \mathrm{Log} + \texttt{1} + \operatorname{index}(i) + \operatorname{col}(F_{i})\) \tcp*{\(\lceil \log_{2} m \rceil + 2\) bits}
+        \(c \gets\) \Repainter{\(H, F_{i}, c\)}\;
+    }
+    \Return{\(c\)}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \SetFuncSty{textsc}
+    \SetKwFunction{Repainter}{LLL-Repainter}
+    \caption{\textsc{LLL-Repainter}\((H, F, c)\)}\label{alg:lll-repainter}
+    \KwIn{a \(k\)-uniform hypergraph \(H\), an edge \(F\) monochromatic in \(c\), a coloring \(c\)}
+    recolor every vertex of \(F\) uniformly at random, independently of everything before\;
+    \While{some \(G \in N(F)\) is monochromatic in \(c\)}{
+        \(G \gets\) the one with the smallest index\;
+        \(\mathrm{Log} \gets \mathrm{Log} + \texttt{1} + \operatorname{relindex}(G, F) + \operatorname{col}(G)\) \tcp*{\(k - 2\) bits}
+        \(c \gets\) \Repainter{\(H, G, c\)}\;
+    }
+    \(\mathrm{Log} \gets \mathrm{Log} + \texttt{0}\) \tcp*{\(1\) bit}
+    \Return{\(c\)}
+\end{algorithm}
+
+A call of \textsc{LLL-Repainter} made by \textsc{LLL-Painter} is a \vocab{top-level call}. The calls form the \vocab{coloring tree} of \autoref{fig:coloring-tree}: its root is \textsc{LLL-Painter}, and the children of a call are the calls it makes, in order.
+
+\begin{lemma}\label{lem:repainter-returns}
+    Suppose \textsc{LLL-Repainter}\((H, F, c)\) returns the coloring \(c'\). Then
+    \begin{enumerate}[(i)]
+        \item no edge of \(N(F)\) is monochromatic in \(c'\);
+        \item every edge \(G\) monochromatic in \(c'\) is monochromatic in \(c\), and \(c' = c\) on \(G\).
+    \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+    (i) is the exit condition of the while loop of \autoref{alg:lll-repainter}. For (ii), the call returned, so the calls below it form a finite tree, and we induct on its number of calls. Let \(c_{0}\) be the coloring after \(F\) is recolored, let \(G_{1}, \ldots, G_{r}\) be the edges of the children, and \(c_{s}\) the coloring returned by the \(s\)-th child, so \(c_{r} = c'\). Let \(G\) be monochromatic in \(c'\). By the induction hypothesis applied to the children \(s = r, r-1, \ldots, 1\), \(G\) is monochromatic in \(c_{0}\) and \(c_{0} = c'\) on \(G\). By (i), \(G \notin N(F)\), i.e.\ \(G \cap F = \varnothing\), and \(c_{0}\) differs from \(c\) only on \(F\). So \(c = c_{0} = c'\) on \(G\).
+\end{proof}
+
+\begin{corollary}\label{cor:top-level-once}
+    Every edge \(F_{i}\) is the edge of at most one top-level call. Likewise, the children of a call on \(F\) are calls on distinct edges of \(N(F)\), so every call has at most \(2^{k-4}\) children.
+\end{corollary}
+
+\begin{proof}
+    Let \(a < b\) be two top-level calls, on \(F_{i}\) and \(F_{j}\), where \(a\) returned. When \(a\) returns, \(F_{i}\) is not monochromatic by (i) of \autoref{lem:repainter-returns}, as \(F_{i} \in N(F_{i})\). Every top-level call between \(a\) and \(b\) returned, so by (ii) of \autoref{lem:repainter-returns} \(F_{i}\) is still not monochromatic when \(b\) starts, while \(F_{j}\) is. Hence \(F_{i} \ne F_{j}\). The same argument applies to two children of one call on \(F\), which are calls on edges of \(N(F)\), and \(\abs{N(F)} \le 2^{k-4}\).
+\end{proof}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+            every node/.style={font=\small},
+            level1/.style={inner sep=1pt},
+            sub/.style={inner sep=1pt, font=\footnotesize},
+        ]
+        \node (r) at (0, 0) {\textsc{LLL-Painter}};
+
+        \node[level1] (a1) at (-4.5, -1.5) {\(F_{i_{1}}\)};
+        \node[level1] (a2) at (-2.6, -1.5) {\(F_{i_{2}}\)};
+        \node[level1] (a3) at (-0.9, -1.5) {\(F_{i_{3}}\)};
+        \node at (1.1, -1.5) {\(\cdots\)};
+        \node[level1] (as) at (3.0, -1.5) {\(F_{i_{s}}\)};
+        \foreach \v in {a1, a2, a3, as} \draw (r) -- (\v);
+
+        % children of F_{i_1}: edges of N(F_{i_1})
+        \node[sub] (b1) at (-6.0, -3.0) {\(G_{1}\)};
+        \node[sub] (b2) at (-4.5, -3.0) {\(G_{2}\)};
+        \node[sub] (b3) at (-3.0, -3.0) {\(G_{3}\)};
+        \foreach \v in {b1, b2, b3} \draw (a1) -- (\v);
+        \draw (b1) -- (-6.4, -4.2);
+        \draw (b1) -- (-5.6, -4.2);
+        \draw (b3) -- (-3.0, -4.2);
+        \draw[dotted] (-6.4, -4.3) -- (-6.4, -4.9);
+        \draw[dotted] (-5.6, -4.3) -- (-5.6, -4.9);
+        \draw[dotted] (-3.0, -4.3) -- (-3.0, -4.9);
+
+        % children of F_{i_3}
+        \node[sub] (c1) at (-1.4, -3.0) {\(G'_{1}\)};
+        \node[sub] (c2) at (-0.4, -3.0) {\(G'_{2}\)};
+        \foreach \v in {c1, c2} \draw (a3) -- (\v);
+        \draw (c2) -- (-0.4, -4.2);
+        \draw[dotted] (-0.4, -4.3) -- (-0.4, -4.9);
+
+        % children of F_{i_s}
+        \node[sub] (d1) at (2.5, -3.0) {\(G''_{1}\)};
+        \node[sub] (d2) at (3.5, -3.0) {\(G''_{2}\)};
+        \foreach \v in {d1, d2} \draw (as) -- (\v);
+
+        \node[align=left, anchor=west] at (4.0, -1.5) {top-level calls:\\ distinct edges, \(s \le m\)};
+        \node[align=left, anchor=west] at (4.0, -3.2) {children of a call on \(F\):\\ distinct edges of \(N(F)\),\\ at most \(2^{k-4}\)};
+        \node[font=\footnotesize] at (-4.5, -3.65) {\(G_{j} \in N(F_{i_{1}})\)};
+    \end{tikzpicture}
+    \caption{The coloring tree. By \autoref{cor:top-level-once}, the root has at most \(m\) children and every other vertex has at most \(2^{k-4}\).}
+    \label{fig:coloring-tree}
+\end{figure}
+
+\subsection{Analysis}\label{sec:alll-analysis}
+
+Let \(T \in \{0, 1, 2, \ldots\} \cup \{\infty\}\) be the total number of calls of \textsc{LLL-Repainter}. For \(t \le T\), let \(\mathrm{Log}_{t}\) be \(\mathrm{Log}\) right after the record of the \(t\)-th call is appended.
+
+\begin{lemma}\label{lem:log-length}
+    For \(t \le T\), \(\mathrm{Log}_{t}\) has length at most
+    \[
+        \ell(t) \coloneqq m \bigl( \lceil \log_{2} m \rceil + 2 \bigr) + t (k - 1),
+    \]
+    and \(\mathrm{Log}_{t}\) determines the edges \(E_{1}, \ldots, E_{t}\) of the first \(t\) calls and the color \(\gamma_{s}\) recorded for each \(E_{s}\).
+\end{lemma}
+
+\begin{proof}
+    \emph{Length.} \(\mathrm{Log}_{t}\) consists of the records of \(t\) calls and of at most \(t - 1\) bits \(\texttt{0}\), one for each call that has returned. By \autoref{cor:top-level-once}, at most \(m\) of these calls are top-level, with records of \(\lceil \log_{2} m \rceil + 2\) bits each; the others have records of \(1 + (k - 4) + 1 = k - 2\) bits. So the length is at most \(m (\lceil \log_{2} m \rceil + 2) + t(k-2) + t - 1 < \ell(t)\).
+
+    \emph{Decoding.} Read \(\mathrm{Log}_{t}\) from left to right, keeping the stack of calls that have started and not yet returned. If the stack is empty, the next \(\lceil \log_{2} m \rceil + 2\) bits are \(\texttt{1}\), \(\operatorname{index}(i)\) and a color, so the next call is on \(F_{i}\). If the call on top of the stack is on \(F\), the next bit is either \(\texttt{0}\), and that call returns, or \(\texttt{1}\), followed by \(\operatorname{relindex}(G, F)\) and a color, and the next call is on \(G\), which \(F\) and \(\operatorname{relindex}(G, F)\) determine.
+\end{proof}
+
+\begin{lemma}\label{lem:log-probability}
+    For every \(t \ge 1\) and every binary string \(L\),
+    \[
+        \mathbb{P}(T \ge t, \ \mathrm{Log}_{t} = L) \le 2^{-tk} .
+    \]
+\end{lemma}
+
+\begin{proof}
+    Generate the randomness in advance: for each vertex \(v\) take independent fair bits \(X_{v, 0}, X_{v, 1}, \ldots\), give \(v\) the initial color \(X_{v, 0}\), and the color \(X_{v, r}\) the \(r\)-th time \(v\) is recolored. Each recoloring then uses fresh independent fair bits, so the run has the same distribution as \autoref{alg:lll-painter}.
+
+    By \autoref{lem:log-length}, \(L\) determines \(E_{1}, \ldots, E_{t}\) and colors \(\gamma_{1}, \ldots, \gamma_{t}\), so for \(v \in E_{s}\) it also determines \(r_{s}(v) \coloneqq \#\{ s' < s : v \in E_{s'} \}\), the number of recolorings of \(v\) before the \(s\)-th call. When the \(s\)-th call starts, \(E_{s}\) is monochromatic of color \(\gamma_{s}\) and \(v\) has color \(X_{v, r_{s}(v)}\), so
+    \[
+        \{ T \ge t, \ \mathrm{Log}_{t} = L \} \subseteq \bigcap_{s=1}^{t} \bigcap_{v \in E_{s}} \bigl\{ X_{v, r_{s}(v)} = \gamma_{s} \bigr\} .
+    \]
+    For fixed \(v\), \(r_{s}(v)\) strictly increases along the \(s\) with \(v \in E_{s}\), so the \(tk\) bits \(X_{v, r_{s}(v)}\) are distinct and the right-hand side has probability \(2^{-tk}\).
+\end{proof}
+
+\begin{proof}[Proof of {\autoref{thm:moser-tardos}}]
+    When \autoref{alg:lll-painter} stops, no edge is monochromatic. There are fewer than \(2^{\ell(t) + 1}\) binary strings of length \(\le \ell(t)\), so by \autoref{lem:log-length} and \autoref{lem:log-probability},
+    \[
+        \mathbb{P}(T \ge t) = \sum_{\abs{L} \le \ell(t)} \mathbb{P}(T \ge t, \ \mathrm{Log}_{t} = L) < 2^{\ell(t) + 1} \, 2^{-tk} = 2^{M - t},
+        \qquad M \coloneqq m \bigl( \lceil \log_{2} m \rceil + 2 \bigr) + 1 .
+    \]
+    A run that does not stop makes infinitely many calls, so \(\mathbb{P}(\text{the algorithm does not stop}) \le \mathbb{P}(T \ge t) \to 0\) as \(t \to \infty\). Moreover
+    \[
+        \mathbb{E}[T] = \sum_{t=1}^{\infty} \mathbb{P}(T \ge t)
+        \le \underbrace{\sum_{t \le M} 1}_{= M} + \underbrace{\sum_{t > M} 2^{M - t}}_{= 1}
+        = m \bigl( \lceil \log_{2} m \rceil + 2 \bigr) + 2 .
+    \]
+    For fixed \(k\), a call costs \(O(1)\) time apart from its children, since it recolors \(k\) vertices and each pass of its loop checks the \(\le 2^{k-4}\) edges of \(N(F)\). By (ii) of \autoref{lem:repainter-returns}, the monochromatic edges after a top-level call on \(F_{i}\) are among those before it except \(F_{i}\), so all have index \(> i\), and \textsc{LLL-Painter} finds them in one pass over \(F_{1}, \ldots, F_{m}\). The expected time is \(O(\mathbb{E}[T] + m) = O(m \log m)\).
+\end{proof}
+
+\begin{intuition}
+    Every call consumes \(k\) fresh random bits but adds only \(k - 1\) bits to \(\mathrm{Log}\) (\autoref{lem:log-length}). A long run would therefore describe \(tk\) random bits by a string of about \(t(k-1)\) bits, and random bits cannot be compressed like this except with probability \(2^{-t}\) (\autoref{lem:log-probability}).
+\end{intuition}

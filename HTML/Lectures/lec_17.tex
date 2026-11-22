@@ -460,7 +460,7 @@ point of the hyperplane, so the choice of foot point never mattered.
 On a separating hyperplane the sign of \(\bm{w}^\top \bm{x}_n + b\) is
 \(y_n\), so multiplying by \(y_n\) is the same as taking the absolute value,
 and the awkward \(\abs{\cdot}\) disappears:
-\[
+\begin{equation}\label{eq:lm-margin}
     \begin{aligned}
         \max_{b, \bm{w}} \quad & \operatorname{margin}(b, \bm{w})\\
         \text{subject to} \quad & \text{every } y_n (\bm{w}^\top \bm{x}_n +
@@ -468,7 +468,7 @@ and the awkward \(\abs{\cdot}\) disappears:
         & \operatorname{margin}(b, \bm{w}) = \min_{n=1,\dots,N}
             \frac{1}{\norm{\bm{w}}} y_n (\bm{w}^\top \bm{x}_n + b).
     \end{aligned}
-\]
+\end{equation}
 
 \subsection{Margin of Special Separating Hyperplane}
 
@@ -487,14 +487,67 @@ Every hyperplane is described by a whole ray of parameter vectors \(c \cdot
 (b, \bm{w})\), \(c > 0\), all with the same margin. Picking the one
 representative on each ray whose closest example scores exactly \(1\)
 loses no hyperplane, and it makes the \(\min\) inside the margin a constant.
-\[
+\begin{equation}\label{eq:lm-scaled}
     \begin{aligned}
         \max_{b, \bm{w}} \quad & \frac{1}{\norm{\bm{w}}}\\
         \text{subject to} \quad & \text{every } y_n (\bm{w}^\top \bm{x}_n +
             b) > 0,\\
         & \min_{n=1,\dots,N} y_n (\bm{w}^\top \bm{x}_n + b) = 1.
     \end{aligned}
-\]
+\end{equation}
+
+\begin{lemma}\label{lem:special-scaling}
+    \eqref{eq:lm-margin} and \eqref{eq:lm-scaled} have the same solutions
+    up to positive scaling:
+    \begin{enumerate}[(i)]
+        \item every solution of \eqref{eq:lm-scaled} solves
+            \eqref{eq:lm-margin};
+        \item if \((b_1, \bm{w}_1)\) solves \eqref{eq:lm-margin} and \(s_1 =
+            \min_n y_n (\bm{w}_1^\top \bm{x}_n + b_1)\), then \(\frac{1}{s_1}
+            (b_1, \bm{w}_1)\) solves \eqref{eq:lm-scaled}.
+    \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+    Let \(F_1\) and \(F_2\) be the feasible sets of \eqref{eq:lm-margin} and
+    \eqref{eq:lm-scaled}. Two facts do all the work.
+    \begin{itemize}
+        \item \(\operatorname{margin}(cb, c\bm{w}) = \operatorname{margin}(b,
+            \bm{w})\) for every \(c > 0\), since \(c\) cancels between
+            \(y_n (\bm{w}^\top \bm{x}_n + b)\) and \(\norm{\bm{w}}\).
+        \item \(F_2 \subseteq F_1\), and on \(F_2\) the inner \(\min\)
+            equals \(1\), so \(\operatorname{margin}(b, \bm{w}) =
+            \frac{1}{\norm{\bm{w}}}\) there.
+    \end{itemize}
+    Moreover, every \((b, \bm{w}) \in F_1\) has \(s = \min_n y_n
+    (\bm{w}^\top \bm{x}_n + b) > 0\), and \(\frac{1}{s} (b, \bm{w}) \in
+    F_2\).
+
+    (i) Let \((b_2, \bm{w}_2)\) solve \eqref{eq:lm-scaled} and take any
+    \((b, \bm{w}) \in F_1\). With \(s\) as above,
+    \[
+        \operatorname{margin}(b, \bm{w}) =
+        \operatorname{margin}\left( \tfrac{1}{s} (b, \bm{w}) \right) =
+        \frac{1}{\norm{\bm{w} / s}} \le \frac{1}{\norm{\bm{w}_2}} =
+        \operatorname{margin}(b_2, \bm{w}_2),
+    \]
+    the inequality because \(\frac{1}{s} (b, \bm{w}) \in F_2\) and \((b_2,
+    \bm{w}_2)\) is optimal there. So \((b_2, \bm{w}_2) \in F_1\) is at least
+    as good as every point of \(F_1\).
+
+    (ii) \(\frac{1}{s_1} (b_1, \bm{w}_1) \in F_2\), and for any \((b, \bm{w})
+    \in F_2 \subseteq F_1\),
+    \[
+        \frac{1}{\norm{\bm{w}}} = \operatorname{margin}(b, \bm{w}) \le
+        \operatorname{margin}(b_1, \bm{w}_1) =
+        \operatorname{margin}\left( \tfrac{1}{s_1} (b_1, \bm{w}_1) \right) =
+        \frac{1}{\norm{\bm{w}_1 / s_1}},
+    \]
+    the inequality because \((b_1, \bm{w}_1)\) is optimal in \(F_1\). So
+    \(\frac{1}{s_1} (b_1, \bm{w}_1)\) is at least as good as every point of
+    \(F_2\).
+\end{proof}
+
 The first constraint is now implied by the second, so it can go.
 
 \subsection{Standard Large-Margin Hyperplane Problem}
