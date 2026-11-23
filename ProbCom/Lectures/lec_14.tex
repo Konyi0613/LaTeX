@@ -1,26 +1,33 @@
 \lecture{14}{20 Nov.}{}
 
-\begin{remark}\label{rmk:r3k-current}
-    \autoref{cor:r3k-lll} is not sharp. Kim (1995) proved \(R(3,k) \ge c \, \frac{k^{2}}{\log k}\) by a nibble-type argument (\autoref{lem:nibble}). The \vocab{triangle-free process}, which adds uniformly random edges of \(K_{n}\) one at a time and skips every edge that would close a triangle, gives
-    \[
-        R(3,k) \ge \Bigl( \frac{1}{4} - o(1) \Bigr) \frac{k^{2}}{\ln k}
-    \]
-    (Bohman--Keevash; Fiz Pontiveros--Griffiths--Morris). The best bounds known now are
-    \[
-        \Bigl( \frac{1}{2} + o(1) \Bigr) \frac{k^{2}}{\ln k} \le R(3,k) \le \bigl( 1 + o(1) \bigr) \frac{k^{2}}{\ln k},
-    \]
-    the upper bound due to Shearer (1983). So \(R(3,k) = \Theta\bigl( \frac{k^{2}}{\log k} \bigr)\), and \autoref{cor:r3k-lll} loses only a factor \(\log k\).
-\end{remark}
-
 \section{The Algorithmic Local Lemma}\label{sec:algorithmic-lll}
 
 \subsection{Finding the Coloring}\label{sec:alll-problem}
 
-\autoref{prop:property-B-lll} shows that a \(k\)-uniform hypergraph \(H\) with edges \(F_{1}, \ldots, F_{m}\), each meeting few others, has a \(2\)-coloring without monochromatic edges, but it does not say how to find one. With \(A_{i} \coloneqq \{ F_{i} \text{ is monochromatic} \}\) as in its proof, \eqref{eq:lll-general-condition} forces \(x_{i} \ge \mathbb{P}(A_{i}) = 2^{1-k}\), so the probability guaranteed by \thmref{thm:lll-general} is
+Let \(H\) be a \(k\)-uniform hypergraph with edges \(F_{1}, \ldots, F_{m}\), each meeting few others. \autoref{prop:property-B-lll} shows that \(H\) has a \(2\)-coloring without monochromatic edges (call such a coloring \vocab{good}), but the proof only shows that a random coloring is good with \emph{positive} probability. It does not tell us how to \emph{find} a good coloring. The question of this section is whether a good coloring can be found quickly, i.e.\ in time polynomial in \(m\).
+
+\emph{The naive algorithm.} The obvious idea is to turn the proof into an algorithm: pick a uniformly random coloring, check whether it is good, and if not, discard it and try again with a fresh random coloring. Write
 \[
-    \prod_{i=1}^{m} (1 - x_{i}) \le \bigl( 1 - 2^{1-k} \bigr)^{m} \le e^{-m 2^{1-k}} .
+    p_{\mathrm{good}} \coloneqq \mathbb{P}(\text{a uniformly random coloring is good}) = \mathbb{P}\Bigl( \bigcap_{i=1}^{m} A_{i}^{c} \Bigr) > 0 ,
 \]
-A uniformly random coloring is good with probability \(p\), and the number of independent trials until the first good one is \(\mathrm{Geom}(p)\), with mean \(\frac{1}{p}\). Knowing only \(p \ge \prod_{i} (1 - x_{i})\), we can promise no better than about \(e^{m 2^{1-k}}\) trials, which is exponential in \(m\).
+where \(A_{i} \coloneqq \{ F_{i} \text{ is monochromatic} \}\) as in the proof of \autoref{prop:property-B-lll} (there \(p = \mathbb{P}(A_{i}) = 2^{1-k}\) is the probability of a single bad event, which is different). The trials are independent, each succeeding with probability \(p_{\mathrm{good}}\), so the number of trials until the first good coloring is \(\mathrm{Geom}(p_{\mathrm{good}})\), with mean \(\frac{1}{p_{\mathrm{good}}}\). So this algorithm is fast exactly when \(p_{\mathrm{good}}\) is not too small.
+
+\emph{Why the local lemma gives a tiny \(p_{\mathrm{good}}\).} The condition \eqref{eq:lll-general-condition} says \(\mathbb{P}(A_{i}) \le x_{i} \prod_{j} (1 - x_{j}) \le x_{i}\), so any admissible choice has \(x_{i} \ge \mathbb{P}(A_{i}) = 2^{1-k}\). Hence the lower bound on \(p_{\mathrm{good}}\) that \thmref{thm:lll-general} gives is at most
+\[
+    \prod_{i=1}^{m} (1 - x_{i}) \le \bigl( 1 - 2^{1-k} \bigr)^{m} \le e^{-m 2^{1-k}} ,
+\]
+which is exponentially small in \(m\) (for fixed \(k\)). So from the local lemma alone we can only promise about \(e^{m 2^{1-k}}\) trials, exponential in \(m\). This is not just a weakness of the bound. Suppose \(F_{1}, \ldots, F_{m}\) are pairwise disjoint (so each edge meets no other edge, and the hypothesis of \autoref{prop:property-B-lll} certainly holds). Then:
+\begin{itemize}
+    \item \emph{One edge.} \(F_{i}\) is monochromatic iff its \(k\) vertices are all \(0\) or all \(1\), so \(\mathbb{P}(A_{i}) = 2 \cdot 2^{-k} = 2^{1-k}\) and \(\mathbb{P}(A_{i}^{c}) = 1 - 2^{1-k}\).
+    \item \emph{Independence.} \(A_{i}\) is determined by the colors of the vertices of \(F_{i}\). Since the sets \(F_{1}, \ldots, F_{m}\) are pairwise disjoint and the vertices are colored independently, \(A_{1}, \ldots, A_{m}\) are determined by disjoint groups of independent colors, so they are mutually independent, and hence so are \(A_{1}^{c}, \ldots, A_{m}^{c}\) (\autoref{rmk:mutual-indep-complements}).
+    \item \emph{Multiplying.} Therefore
+    \[
+        p_{\mathrm{good}} = \mathbb{P}\Bigl( \bigcap_{i=1}^{m} A_{i}^{c} \Bigr) = \prod_{i=1}^{m} \mathbb{P}(A_{i}^{c}) = \bigl( 1 - 2^{1-k} \bigr)^{m} .
+    \]
+\end{itemize}
+So here \(p_{\mathrm{good}}\) equals the bound above exactly, and the naive algorithm needs \(\frac{1}{p_{\mathrm{good}}} = (1 - 2^{1-k})^{-m} \ge e^{m 2^{1-k}}\) trials on average, which is exponential in \(m\).
+
+\emph{The fix.} In the disjoint example the naive algorithm is wasteful: when only \(F_{3}\) is monochromatic, it throws away the whole coloring, although recoloring the \(k\) vertices of \(F_{3}\) alone would do. The algorithms below keep the coloring and repair it locally, recoloring only the vertices of a monochromatic edge. This turns out to be fast whenever each edge meets few others.
 
 \begin{theorem}[Beck, 1991]\label{thm:beck}
     There is \(c > 0\) such that if every edge of a \(k\)-uniform hypergraph \(H\) intersects at most \(2^{ck}\) edges, then a \(2\)-coloring of \(H\) without monochromatic edges can be found in polynomial time.

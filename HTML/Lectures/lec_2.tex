@@ -1059,22 +1059,24 @@ give it a pocket: keep the best line seen so far, and keep wandering.
     \KwIn{training examples \(\mathcal{D}\), an iteration budget}
     \KwOut{\(\hat{\bm{w}}\), called \(\bm{w}_{\mathrm{POCKET}}\) and returned as
         \(g\)}
-    initialize the pocket weights \(\hat{\bm{w}}\)\;
-    \For{\(t = 0, 1, \dots\) until enough iterations}{
+    \pocketadd{initialize the pocket weights \(\hat{\bm{w}}\)}\;
+    \For{\(t = 0, 1, \dots\) \pocketadd{until enough iterations}}{
         find a (random) mistake of \(\bm{w}_t\), called
         \((\bm{x}_{n(t)}, y_{n(t)})\)\;
         (try to) correct the mistake by
         \(\bm{w}_{t+1} \gets \bm{w}_t + y_{n(t)} \bm{x}_{n(t)}\)\;
-        \lIf{\(\bm{w}_{t+1}\) makes fewer mistakes on \(\mathcal{D}\) than
-            \(\hat{\bm{w}}\)}{\(\hat{\bm{w}} \gets \bm{w}_{t+1}\)}
+        {\pocketadd{\lIf{\(\bm{w}_{t+1}\) makes fewer mistakes on
+            \(\mathcal{D}\) than \(\hat{\bm{w}}\)}{\(\hat{\bm{w}} \gets
+            \bm{w}_{t+1}\)}}}
     }
-    \Return \(\hat{\bm{w}}\) as \(g\)\;
+    \pocketadd{\Return \(\hat{\bm{w}}\) as \(g\)}\;
 \end{algorithm}
 
-Note what changed and what did not. The update rule is untouched --- the black
-lines of PLA are still there --- and the only additions are the pocket and the
-iteration budget, which is now needed because there is no ``no more mistakes''
-to stop on.
+Note what changed and what did not. As on the slide, the lines PLA already
+had are in black and the additions are in \pocketadd{orange}. The update rule
+is untouched --- the black lines of PLA are still there --- and the only
+additions are the pocket and the iteration budget, which is now needed because
+there is no ``no more mistakes'' to stop on.
 
 \begin{moral}
     A simple modification of PLA to find (somewhat) `best' weights.

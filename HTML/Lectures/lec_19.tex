@@ -230,44 +230,54 @@ family that covers polynomial transforms of every degree.
 The quadratic transform is not unique. Multiplying its coordinates by
 positive constants does not change which curves a linear classifier in
 \(\mathcal{Z}\) can draw, but it does change the inner product, and some
-choices of constants give a tidier kernel:
+choices of constants give a tidier kernel. The slide writes all three
+transforms below with the same symbol \(\bm{\Phi}_2\) and tells them apart
+only by colour: the \origphi{blue} \(\origphi{\bm{\Phi}_2}\) of the first
+line is the original transform of \autoref{sec:kernel-trick}, with kernel
+\(K_{\origphi{\bm{\Phi}_2}}\); the \scalphi{red} \(\scalphi{\bm{\Phi}_2}\) of
+the other two lines is a rescaled transform, with kernel \(\scalphi{K_2}\),
+and the scaling constants it introduces are red as well.
 \[
     \begin{aligned}
-        \bm{\Phi}_2(\bm{x}) &= (1, x_1, \dots , x_d, x_1^2, \dots , x_d^2)
-            &&\iff K_{\bm{\Phi}_2}(\bm{x}, \bm{x}') = 1 + \bm{x}^\top \bm{x}'
-            + (\bm{x}^\top \bm{x}')^2\\
-        \bm{\Phi}_2(\bm{x}) &= (1, \sqrt{2} x_1, \dots , \sqrt{2} x_d, x_1^2,
-            \dots , x_d^2) &&\iff K_2(\bm{x}, \bm{x}') = 1 + 2 \bm{x}^\top
+        \origphi{\bm{\Phi}_2}(\bm{x}) &= (1, x_1, \dots , x_d, x_1^2, \dots ,
+            x_d^2) &&\iff K_{\origphi{\bm{\Phi}_2}}(\bm{x}, \bm{x}') = 1 +
+            \bm{x}^\top \bm{x}' + (\bm{x}^\top \bm{x}')^2\\
+        \scalphi{\bm{\Phi}_2}(\bm{x}) &= (1, \scalphi{\sqrt{2}} x_1, \dots ,
+            \scalphi{\sqrt{2}} x_d, x_1^2, \dots , x_d^2) &&\iff
+            \scalphi{K_2}(\bm{x}, \bm{x}') = 1 + \scalphi{2} \bm{x}^\top
             \bm{x}' + (\bm{x}^\top \bm{x}')^2\\
-        \bm{\Phi}_2(\bm{x}) &= (1, \sqrt{2\gamma} x_1, \dots , \sqrt{2\gamma}
-            x_d, \gamma x_1^2, \dots , \gamma x_d^2) &&\iff K_2(\bm{x},
-            \bm{x}') = 1 + 2\gamma \bm{x}^\top \bm{x}' + \gamma^2
-            (\bm{x}^\top \bm{x}')^2
+        \scalphi{\bm{\Phi}_2}(\bm{x}) &= (1, \scalphi{\sqrt{2\gamma}} x_1,
+            \dots , \scalphi{\sqrt{2\gamma}} x_d, \scalphi{\gamma} x_1^2,
+            \dots , \scalphi{\gamma} x_d^2) &&\iff \scalphi{K_2}(\bm{x},
+            \bm{x}') = 1 + \scalphi{2\gamma} \bm{x}^\top \bm{x}' +
+            \scalphi{\gamma^2} (\bm{x}^\top \bm{x}')^2
     \end{aligned}
 \]
 Here the `\(\dots\)' after \(x_1^2\) still run through all the products
 \(x_i x_j\). A factor \(c\) on a coordinate becomes \(c^2\) in the inner
-product, so scaling the linear coordinates by \(\sqrt{2}\) doubles the
-middle term, and scaling them by \(\sqrt{2\gamma}\) and the quadratic ones by
-\(\gamma\) gives the third line. That last expression is a perfect square.
+product, so scaling the linear coordinates by \(\scalphi{\sqrt{2}}\) doubles
+the middle term, and scaling them by \(\scalphi{\sqrt{2\gamma}}\) and the
+quadratic ones by \(\scalphi{\gamma}\) gives the third line. That last
+expression is a perfect square.
 
 \begin{moral}
     \[
-        K_2(\bm{x}, \bm{x}') = (1 + \gamma \bm{x}^\top \bm{x}')^2 \quad
-        \text{with } \gamma > 0
+        \scalphi{K_2}(\bm{x}, \bm{x}') = (1 + \gamma \bm{x}^\top \bm{x}')^2
+        \quad \text{with } \gamma > 0
     \]
 \end{moral}
 
-The rescaled transforms are interchangeable in one respect and not in
-another:
+The rescaled transforms are interchangeable with the original in one respect
+and not in another:
 \begin{itemize}
-    \item \(K_2\) is somewhat `easier' to calculate than \(K_{\bm{\Phi}_2}\):
-        it takes one inner product, one multiplication by \(\gamma\), one
-        addition and one square.
-    \item The original \(\bm{\Phi}_2\) and the rescaled one have equivalent
-        \textbf{power}, since they span the same quadratic curves in
-        \(\mathcal{X}\); but they have a different \textbf{inner product},
-        and hence a different \textbf{geometry} in \(\mathcal{Z}\).
+    \item \(\scalphi{K_2}\) is somewhat `easier' to calculate than
+        \(K_{\origphi{\bm{\Phi}_2}}\): it takes one inner product, one
+        multiplication by \(\gamma\), one addition and one square.
+    \item The original (blue) \(\origphi{\bm{\Phi}_2}\) and the rescaled
+        (red) \(\scalphi{\bm{\Phi}_2}\) have equivalent \textbf{power}, since
+        they span the same quadratic curves in \(\mathcal{X}\); but they have
+        a different \textbf{inner product}, and hence a different
+        \textbf{geometry} in \(\mathcal{Z}\).
 \end{itemize}
 The geometry matters because the SVM does not just pick some separating
 hyperplane. It picks the one with the largest margin, and the margin is a
@@ -276,7 +286,7 @@ coordinates of \(\mathcal{Z}\) changes the distances, and with them which
 hyperplane is fattest, so the same data can lead to a different boundary.
 
 \begin{moral}
-    \(K_2\) commonly used.
+    \(\scalphi{K_2}\) commonly used.
 \end{moral}
 
 \subsection{Poly-2 Kernels in Action}
@@ -560,8 +570,19 @@ nothing prevents \(\mathcal{Z}\) from being infinite dimensional.
     classification}, with generalization `guarded by' large-margin :-)
 \end{moral}
 
-The smiley hides a caveat, which the pictures of the next subsection make
-plain.
+\begin{remark}
+    The `not many' comes from \(\mathcal{A}_\rho\) of
+    \autoref{sec:why-large-margin}, which returns \(0\) unless the margin
+    reaches \(\rho\). The SVM has no such threshold, so the bound applies
+    only heuristically, with the attained margin as \(\rho\). For the
+    Gaussian kernel, \(d = \infty\) and \(R = 1\) (since
+    \(\norm{\bm{\Phi}(\bm{x})}^2 = K(\bm{x}, \bm{x}) = 1\)), leaving
+    \(\dvc \le 1/\rho^2 + 1\): everything rests on a margin the SVM does not
+    promise to be large.
+\end{remark}
+
+The smiley hides exactly this caveat, which the pictures of the next
+subsection make plain.
 
 \subsection{Gaussian SVM in Action}
 
@@ -735,9 +756,13 @@ loses precision on such a matrix.
     efficiently done by \textbf{linear on \(\bm{\Phi}_Q(\bm{x})\)}.
 \end{moral}
 
-For small \(Q\), \(\bm{\Phi}_Q(\bm{x})\) has few enough coordinates to be
-computed explicitly, and the fast primal solver of the linear kernel can
-then be run on the transformed data instead of the dual.
+That is, skip the kernel: compute \(\bm{\Phi}_Q(\bm{x})\) explicitly and
+solve the linear SVM in the primal on the transformed data. The dual costs
+grow with \(N\) (\(\mathrm{Q}_{\mathrm{D}}\) is \(N \times N\)), the primal
+with \(\tilde{d} = \binom{Q+d}{d} - 1\). For small \(Q\) and \(d\),
+\(\tilde{d}\) is small (\(65\) for \(Q = 2\), \(d = 10\)) and the primal wins
+when \(N\) is large; `sometimes' because \(\tilde{d}\) explodes as \(Q\) or
+\(d\) grows, and then the kernel wins again.
 
 \subsection{Gaussian Kernel: Cons and Pros}
 
