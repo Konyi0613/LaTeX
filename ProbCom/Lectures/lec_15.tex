@@ -1,0 +1,529 @@
+\chapter{Concentration Inequalities}
+
+\lecture{15}{24 Nov.}{}
+
+Since \autoref{sec:markov-chebyshev} we have shown that a random variable is close to its mean using only its first two moments. \thmref{thm:chebyshev} makes the probability of a large deviation small, but only polynomially small. That is enough to show that \emph{one} random variable is concentrated. It is not enough when, as in many union-bound arguments, we need \emph{exponentially many} random variables to be concentrated simultaneously. This chapter gives bounds whose failure probability is exponentially small. The reference is Appendix~A of Alon--Spencer; a good survey is McDiarmid's \emph{Concentration}.
+
+\begin{moral}
+    For a sum of \(m\) independent bounded random variables, Chebyshev gives a deviation probability of order \(\frac{m}{a^{2}}\). Chernoff's bound improves it to \(e^{-a^{2}/(2m)}\), small enough to survive a union bound over exponentially many events.
+\end{moral}
+
+\section{Motivation: A Union Bound over Exponentially Many Sets}\label{sec:chernoff-motivation}
+
+\begin{question}\label{q:dense-half}
+    In \(G(n, \frac{1}{2})\), how likely is it that some set of \(\frac{n}{2}\) vertices spans at least \(\frac{2}{3} \binom{n/2}{2}\) edges?
+\end{question}
+
+A set of \(\frac{n}{2}\) vertices spans \(\frac{1}{2} \binom{n/2}{2}\) edges on average, so \autoref{q:dense-half} asks whether \emph{some} half of the vertices is much denser than expected. Assume \(n\) is even.
+
+\emph{One set.} Let \(G \sim G(n, \frac{1}{2})\) with \(V(G) = [n]\), and fix \(S \in \binom{[n]}{n/2}\). The \(\binom{n/2}{2}\) pairs inside \(S\) are edges independently with probability \(\frac{1}{2}\), so \(G[S] \sim G(\frac{n}{2}, \frac{1}{2})\) and
+\[
+    e(G[S]) \sim \operatorname{Bin}\Bigl( N, \frac{1}{2} \Bigr), \qquad N \coloneqq \binom{n/2}{2} = \frac{n(n-2)}{8} = \Theta(n^{2}) .
+\]
+
+\emph{All sets.} From now on \(S\) ranges over \(\binom{[n]}{n/2}\). By the union bound over these \(\binom{n}{n/2}\) choices of \(S\), each of which has \(e(G[S]) \ge \frac{2}{3} N\) with the same probability,
+\begin{align}
+    \mathbb{P}\Bigl( \exists S : e(G[S]) \ge \tfrac{2}{3} N \Bigr)
+    &\le \sum_{S} \mathbb{P}\Bigl( e(G[S]) \ge \tfrac{2}{3} N \Bigr)
+    = \binom{n}{n/2} \, \mathbb{P}\Bigl( \operatorname{Bin}\bigl( N, \tfrac{1}{2} \bigr) \ge \tfrac{2}{3} N \Bigr) \label{eq:dense-half-union} \\
+    &= \binom{n}{n/2} \sum_{k \ge \frac{2}{3} N} \mathbb{P}\Bigl( \operatorname{Bin}\bigl( N, \tfrac{1}{2} \bigr) = k \Bigr) \notag \\
+    &= \binom{n}{n/2} \sum_{k \ge \frac{2}{3} N} \binom{N}{k} \Bigl( \frac{1}{2} \Bigr)^{k} \Bigl( \frac{1}{2} \Bigr)^{N-k} \notag \\
+    &= \binom{n}{n/2} \Bigl( \frac{1}{2} \Bigr)^{N} \sum_{k \ge \frac{2}{3} N} \binom{N}{k} . \notag
+\end{align}
+The last sum is exact but hard to use, so we want an upper bound on the single tail probability
+\[
+    p_{n} \coloneqq \mathbb{P}\Bigl( X \ge \tfrac{2}{3} N \Bigr), \qquad \text{where } X \sim \operatorname{Bin}\bigl( N, \tfrac{1}{2} \bigr) ,
+\]
+so that \eqref{eq:dense-half-union} reads \(\mathbb{P}(\exists S : \cdots) \le \binom{n}{n/2} \, p_{n}\). Here \(\mathbb{E}[X] = \frac{N}{2}\) and \(\Var(X) = N \cdot \frac{1}{2} \cdot \frac{1}{2} = \frac{N}{4}\).
+
+\emph{How small must \(p_{n}\) be?} The \(n+1\) binomial coefficients \(\binom{n}{k}\) sum to \(2^{n}\), and \(\binom{n}{n/2}\) is the largest of them, so
+\begin{equation}\label{eq:central-binomial}
+    \frac{2^{n}}{n+1} \le \binom{n}{n/2} \le 2^{n} .
+\end{equation}
+By the upper bound, \(\binom{n}{n/2} p_{n} \to 0\) as soon as \(p_{n} = o(2^{-n})\). By the lower bound, if \(p_{n} \ge \frac{n+1}{2^{n}}\), then the right-hand side of \eqref{eq:dense-half-union} is at least \(1\), and the union bound says nothing at all. So a useful bound on \(p_{n}\) must be \emph{exponentially} small in \(n\). We try the tools we have.
+
+\emph{Markov.} \thmref{thm:markov} applies as \(X \ge 0\), and gives
+\[
+    p_{n} \le \frac{\mathbb{E}[X]}{\frac{2}{3} N} = \frac{\frac{1}{2} N}{\frac{2}{3} N} = \frac{3}{4} .
+\]
+This does not even tend to \(0\). Plugged into \eqref{eq:dense-half-union}, it bounds \(\mathbb{P}\bigl( \exists S : e(G[S]) \ge \tfrac{2}{3} N \bigr)\) by
+\[
+    \frac{3}{4} \binom{n}{n/2} \overset{\eqref{eq:central-binomial}}{\ge} \frac{3}{4} \cdot \frac{2^{n}}{n+1} \longrightarrow \infty ,
+\]
+a bound larger than \(1\): useless.
+
+\emph{Chebyshev.} The event \(X \ge \frac{2}{3} N\) means \(X - \frac{N}{2} \ge \frac{N}{6}\), so by \thmref{thm:chebyshev}
+\[
+    p_{n}
+    \le \mathbb{P}\Bigl( \abs{X - \tfrac{N}{2}} \ge \tfrac{N}{6} \Bigr)
+    \le \frac{\Var(X)}{(N/6)^{2}} = \frac{N/4}{N^{2}/36} = \frac{9}{N} = \frac{72}{n(n-2)} .
+\]
+This does tend to \(0\), so one fixed \(S\) is unlikely to be this dense. But plugged into \eqref{eq:dense-half-union}, it bounds \(\mathbb{P}\bigl( \exists S : e(G[S]) \ge \tfrac{2}{3} N \bigr)\) by
+\[
+    \binom{n}{n/2} \frac{72}{n(n-2)} \overset{\eqref{eq:central-binomial}}{\ge} \frac{2^{n}}{n+1} \cdot \frac{72}{n(n-2)} \longrightarrow \infty ,
+\]
+again larger than \(1\): useless. The problem is structural: Chebyshev's bound decays only polynomially, while the number of sets grows exponentially. Moreover, Chebyshev uses nothing about \(X\) but its variance, and it is sharp: some random variable with the same mean \(\frac{N}{2}\) and variance \(\frac{N}{4}\) has \(\mathbb{P}\bigl( \abs{X - \frac{N}{2}} \ge \frac{N}{6} \bigr) = \frac{9}{N}\) exactly. So no argument using only the variance can do better. To do better we must use more of the structure of \(X\), namely that it is a sum of \emph{independent} indicators.
+
+\emph{What the truth should be.} \(X\) is a sum of \(N\) independent \(\operatorname{Ber}(\frac{1}{2})\) indicators, and for such sums the central limit theorem describes the distribution.
+
+\begin{theorem}[Central limit theorem]\label{thm:clt}
+    Let \(Y_{1}, Y_{2}, \ldots\) be i.i.d.\ with mean \(\mu\) and variance \(\sigma^{2} \in (0, \infty)\), and \(S_{N} \coloneqq Y_{1} + \cdots + Y_{N}\). Then for every \emph{fixed} \(t \in \mathbb{R}\),
+    \[
+        \lim_{N \to \infty} \mathbb{P}\Bigl( \frac{S_{N} - N\mu}{\sigma \sqrt{N}} \ge t \Bigr) = \mathbb{P}(Z \ge t), \qquad Z \sim \mathcal{N}(0, 1) .
+    \]
+\end{theorem}
+
+Here \(\mu = \sigma = \frac{1}{2}\), so \(X\) is roughly normal with mean \(\frac{N}{2}\) and standard deviation \(\frac{\sqrt{N}}{2} = \Theta(n)\) (\autoref{fig:clt-tail}), and our deviation \(\frac{N}{6}\) is \(t = \frac{\sqrt{N}}{3}\) standard deviations. Since \(\mathbb{P}(Z \ge t) \approx e^{-t^{2}/2}\), we expect
+\[
+    p_{n} \approx e^{-N/18} = e^{-\Theta(n^{2})} ,
+\]
+and then \eqref{eq:dense-half-union} would give \(2^{n} e^{-\Theta(n^{2})} \to 0\).
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[every node/.style={font=\small}]
+        \draw[-Stealth] (-3.2, 0) -- (7.4, 0);
+        \draw[thick, domain=-3:6.8, samples=120] plot (\x, {2.2*exp(-(\x)^2/1.6)});
+        \draw[dashed] (0, 0) -- (0, 2.2);
+        \draw (5.5, 0.1) -- (5.5, -0.1);
+        \node[below] at (0, -0.05) {\(\frac{1}{2} N\)};
+        \node[below] at (5.5, -0.05) {\(\frac{2}{3} N\)};
+        \draw[Stealth-Stealth] (-0.9, 1.25) -- node[above] {\(\Theta(n)\)} (0.9, 1.25);
+        \draw[Stealth-Stealth, red] (0, 0.45) -- node[above] {\(\frac{N}{6} = \Theta(n^{2})\)} (5.5, 0.45);
+    \end{tikzpicture}
+    \caption{\(X \sim \operatorname{Bin}(N, \frac{1}{2})\) has standard deviation \(\Theta(n)\), but \autoref{q:dense-half} asks for a deviation of \(\Theta(n^{2})\), i.e.\ \(\Theta(n)\) standard deviations. Chebyshev only sees the variance and gives \(\Theta(n^{-2})\); the normal tail suggests \(e^{-\Theta(n^{2})}\).}
+    \label{fig:clt-tail}
+\end{figure}
+
+This is only a heuristic. \thmref{thm:clt} is a limit statement: for each \emph{fixed} \(t\), the difference
+\[
+    \mathbb{P}\Bigl( \frac{X - N/2}{\sqrt{N}/2} \ge t \Bigr) - \mathbb{P}(Z \ge t)
+\]
+tends to \(0\) as \(N \to \infty\). Here \(t = \frac{\sqrt{N}}{3}\) changes with \(N\), so the theorem does not apply directly. What we need is a bound that holds for every \(N\) and every deviation, with no error term. Chernoff bounds give this for
+\begin{itemize}
+    \item sums of \emph{independent} random variables, such as \(X = \sum_{e} \mathbbm{1}[e \in E(G)]\) above;
+    \item the probability of being \emph{much larger than expected}, a \vocab{large deviation}, where they are exponentially small.
+\end{itemize}
+
+\section{Chernoff Bounds}\label{sec:chernoff}
+
+\subsection{Sums of Random Signs}\label{sec:chernoff-signs}
+
+We start with the simplest sum. Let \(X_{1}, \ldots, X_{m}\) be i.i.d.\ with
+\[
+    X_{i} = \begin{cases}
+        -1 & \text{with probability } \frac{1}{2}, \\
+        \phantom{-}1 & \text{with probability } \frac{1}{2},
+    \end{cases}
+    \qquad
+    S \coloneqq \sum_{i=1}^{m} X_{i}, \qquad \mathbb{E}[S] = 0 .
+\]
+If \(B\) is the number of \(i\) with \(X_{i} = 1\), then \(B \sim \operatorname{Bin}(m, \frac{1}{2})\) and \(S = B - (m - B)\), i.e.
+\begin{equation}\label{eq:signs-binomial}
+    S = 2 \Bigl( B - \frac{m}{2} \Bigr), \qquad B \sim \operatorname{Bin}\Bigl( m, \frac{1}{2} \Bigr) .
+\end{equation}
+So bounds on \(S\) are bounds on a binomial. Note \(\Var(S) = m\), so \(S\) has standard deviation \(\sqrt{m}\).
+
+\begin{theorem}[Chernoff bound, special case]\label{thm:chernoff-signs}
+    For every \(a > 0\),
+    \[
+        \mathbb{P}(S \ge a) \le e^{-\frac{a^{2}}{2m}} .
+    \]
+\end{theorem}
+
+\begin{proof}
+    Let \(\lambda > 0\), to be chosen later, and \(Y \coloneqq e^{\lambda S}\). Since \(x \mapsto e^{\lambda x}\) is increasing, \(S \ge a\) iff \(Y \ge e^{\lambda a}\), and \(Y > 0\), so by \thmref{thm:markov}
+    \[
+        \mathbb{P}(S \ge a) = \mathbb{P}\bigl( Y \ge e^{\lambda a} \bigr) \le \frac{\mathbb{E}[Y]}{e^{\lambda a}} = \frac{\mathbb{E}[e^{\lambda S}]}{e^{\lambda a}} .
+    \]
+    The variables \(e^{\lambda X_{1}}, \ldots, e^{\lambda X_{m}}\) are independent, as functions of independent variables, so the expectation of their product is the product of their expectations:
+    \[
+        \mathbb{E}[e^{\lambda S}]
+        = \mathbb{E}\Bigl[ e^{\lambda \sum_{i=1}^{m} X_{i}} \Bigr]
+        = \mathbb{E}\Bigl[ \prod_{i=1}^{m} e^{\lambda X_{i}} \Bigr]
+        = \prod_{i=1}^{m} \mathbb{E}\bigl[ e^{\lambda X_{i}} \bigr]
+        = \Bigl( \frac{e^{\lambda} + e^{-\lambda}}{2} \Bigr)^{m}
+        = \cosh(\lambda)^{m} .
+    \]
+    To continue we need a simpler upper bound on \(\cosh\).
+
+    \begin{claim}\label{claim:cosh}
+        \(\cosh(\lambda) \le e^{\lambda^{2}/2}\) for every real \(\lambda\).
+    \end{claim}
+
+    \begin{proof}[Proof of \autoref{claim:cosh}]
+        Compare the Taylor expansions term by term. In \(e^{\lambda} + e^{-\lambda}\) the odd powers cancel, so
+        \[
+            \cosh(\lambda) = \frac{e^{\lambda} + e^{-\lambda}}{2} = \sum_{n=0}^{\infty} \frac{\lambda^{2n}}{(2n)!} ,
+            \qquad
+            e^{\lambda^{2}/2} = \sum_{n=0}^{\infty} \frac{(\lambda^{2}/2)^{n}}{n!} = \sum_{n=0}^{\infty} \frac{\lambda^{2n}}{2^{n} n!} .
+        \]
+        All terms are non-negative, and \((2n)! = \prod_{j=1}^{n} (2j)(2j-1) \ge \prod_{j=1}^{n} 2j = 2^{n} n!\), so each term of the first series is at most the corresponding term of the second.
+    \end{proof}
+
+    Therefore
+    \[
+        \mathbb{P}(S \ge a) \le \frac{\cosh(\lambda)^{m}}{e^{\lambda a}} \le \frac{e^{\lambda^{2} m/2}}{e^{\lambda a}} = e^{\frac{\lambda^{2} m}{2} - \lambda a} .
+    \]
+    The exponent \(\frac{\lambda^{2} m}{2} - \lambda a\) is a quadratic in \(\lambda\), minimized at \(\lambda = \frac{a}{m} > 0\), where it equals \(\frac{a^{2}}{2m} - \frac{a^{2}}{m} = -\frac{a^{2}}{2m}\). This gives \(\mathbb{P}(S \ge a) \le e^{-\frac{a^{2}}{2m}}\).
+\end{proof}
+
+\begin{remark}[The scale \(\sqrt{m}\)]\label{rmk:chernoff-vs-normal}
+    Recall that \(S\) has standard deviation \(\sqrt{m}\), so deviations should be measured in units of \(\sqrt{m}\). With \(a = t\sqrt{m}\), \autoref{thm:chernoff-signs} reads
+    \[
+        \mathbb{P}\bigl( S \ge t\sqrt{m} \bigr) \le e^{-t^{2}/2} ,
+    \]
+    the normal tail, valid for every \(m\) and \(t\). Chebyshev (\thmref{thm:chebyshev}) only gives
+    \[
+        \mathbb{P}\bigl( \abs{S} \ge t\sqrt{m} \bigr) \le \frac{\Var(S)}{(t\sqrt{m})^{2}} = \frac{m}{t^{2} m} = \frac{1}{t^{2}} .
+    \]
+\end{remark}
+
+\begin{corollary}\label{cor:chernoff-signs-two-sided}
+    For every \(a > 0\), \(\mathbb{P}(\abs{S} \ge a) \le 2 e^{-\frac{a^{2}}{2m}}\).
+\end{corollary}
+
+\begin{proof}
+    The variables \(-X_{1}, \ldots, -X_{m}\) are again i.i.d.\ uniform on \(\{-1, 1\}\), so \(-S\) has the same distribution as \(S\), and \(\mathbb{P}(S \le -a) = \mathbb{P}(-S \ge a) \le e^{-\frac{a^{2}}{2m}}\) by \autoref{thm:chernoff-signs}. Add the bound for \(\mathbb{P}(S \ge a)\).
+\end{proof}
+
+\begin{corollary}\label{cor:chernoff-binomial}
+    Let \(B \sim \operatorname{Bin}(m, \frac{1}{2})\). For every \(a > 0\),
+    \[
+        \mathbb{P}\Bigl( B - \frac{m}{2} \ge a \Bigr) \le e^{-\frac{2a^{2}}{m}},
+        \qquad
+        \mathbb{P}\Bigl( \abs{B - \frac{m}{2}} \ge a \Bigr) \le 2 e^{-\frac{2a^{2}}{m}} .
+    \]
+\end{corollary}
+
+\begin{proof}
+    By \eqref{eq:signs-binomial}, \(B - \frac{m}{2} = \frac{S}{2}\), so \(\{ B - \frac{m}{2} \ge a \} = \{ S \ge 2a \}\) and \(\{ \abs{B - \frac{m}{2}} \ge a \} = \{ \abs{S} \ge 2a \}\). Apply \autoref{thm:chernoff-signs} and \autoref{cor:chernoff-signs-two-sided} with \(2a\) in place of \(a\): \(\frac{(2a)^{2}}{2m} = \frac{2a^{2}}{m}\).
+\end{proof}
+
+\begin{eg}[Answer to \autoref{q:dense-half}]\label{eg:dense-half}
+    Let \(X \sim \operatorname{Bin}(N, \frac{1}{2})\) with \(N = \binom{n/2}{2}\) as in \autoref{sec:chernoff-motivation}. By \autoref{cor:chernoff-binomial} with \(m = N\) and \(a = \frac{N}{6}\),
+    \[
+        \mathbb{P}\Bigl( X \ge \tfrac{2}{3} N \Bigr) = \mathbb{P}\Bigl( X - \tfrac{N}{2} \ge \tfrac{N}{6} \Bigr) \le e^{-\frac{2 (N/6)^{2}}{N}} = e^{-\frac{N}{18}} ,
+    \]
+    exactly the heuristic value from the central limit theorem. Plugging this into \eqref{eq:dense-half-union},
+    \[
+        \mathbb{P}\Bigl( \exists S \in \tbinom{[n]}{n/2} : e(G[S]) \ge \tfrac{2}{3} \tbinom{n/2}{2} \Bigr)
+        \le 2^{n} e^{-\frac{n(n-2)}{144}} \longrightarrow 0 .
+    \]
+    So with high probability no half of the vertices of \(G(n, \frac{1}{2})\) spans \(\frac{2}{3}\) of its pairs.
+\end{eg}
+
+\subsection{Bounded Independent Summands}\label{sec:chernoff-general}
+
+The proof of \autoref{thm:chernoff-signs} used the distribution of \(X_{i}\) only once, to compute \(\mathbb{E}[e^{\lambda X_{i}}] = \cosh(\lambda)\). The same bound holds for any independent summands with mean \(0\) and values in \([-1, 1]\); they need not be identically distributed.
+
+\begin{theorem}[Chernoff bound, general]\label{thm:chernoff-general}
+    Let \(X_{1}, \ldots, X_{m}\) be independent random variables with
+    \begin{itemize}
+        \item \(\mathbb{E}[X_{i}] = 0\), and
+        \item \(\abs{X_{i}} \le 1\)
+    \end{itemize}
+    for every \(i\). Then \(S \coloneqq \sum_{i=1}^{m} X_{i}\) satisfies, for every \(a > 0\),
+    \[
+        \mathbb{P}(S \ge a) \le e^{-\frac{a^{2}}{2m}} .
+    \]
+\end{theorem}
+
+\begin{proof}
+    Again let \(\lambda > 0\), to be chosen later. As in the proof of \autoref{thm:chernoff-signs}, Markov's inequality for \(e^{\lambda S}\) and independence give
+    \[
+        \mathbb{P}(S \ge a) = \mathbb{P}\bigl( e^{\lambda S} \ge e^{\lambda a} \bigr) \le \frac{\mathbb{E}[e^{\lambda S}]}{e^{\lambda a}},
+        \qquad
+        \mathbb{E}[e^{\lambda S}] = \mathbb{E}\Bigl[ \prod_{i=1}^{m} e^{\lambda X_{i}} \Bigr] = \prod_{i=1}^{m} \mathbb{E}\bigl[ e^{\lambda X_{i}} \bigr] .
+    \]
+    Now \(\mathbb{E}[e^{\lambda X_{i}}]\) depends on the unknown distribution of \(X_{i}\), so we bound it. Let \(h\) be the chord of \(x \mapsto e^{\lambda x}\) between \((-1, e^{-\lambda})\) and \((1, e^{\lambda})\) (\autoref{fig:chord}):
+    \[
+        h(x) \coloneqq \frac{e^{\lambda} + e^{-\lambda}}{2} + \frac{e^{\lambda} - e^{-\lambda}}{2} \, x ,
+        \qquad h(-1) = e^{-\lambda}, \quad h(1) = e^{\lambda} .
+    \]
+    Since \(x \mapsto e^{\lambda x}\) is convex, it lies below its chord on \([-1, 1]\), i.e.\ \(e^{\lambda x} \le h(x)\) for all \(x \in [-1, 1]\). As \(X_{i} \in [-1, 1]\), this gives \(e^{\lambda X_{i}} \le h(X_{i})\), so taking expectations, \(\mathbb{E}[e^{\lambda X_{i}}] \le \mathbb{E}[h(X_{i})]\).
+
+    To compute \(\mathbb{E}[h(X_{i})]\), write \(h(x) = \alpha + \beta x\) with the constants \(\alpha \coloneqq \frac{e^{\lambda} + e^{-\lambda}}{2} = \cosh(\lambda)\) and \(\beta \coloneqq \frac{e^{\lambda} - e^{-\lambda}}{2}\). Then \(h(X_{i}) = \alpha + \beta X_{i}\), and by linearity of expectation and \(\mathbb{E}[X_{i}] = 0\),
+    \[
+        \mathbb{E}[h(X_{i})] = \mathbb{E}[\alpha + \beta X_{i}] = \alpha + \beta \, \mathbb{E}[X_{i}] = \alpha = \cosh(\lambda) .
+    \]
+    Hence
+    \[
+        \mathbb{E}\bigl[ e^{\lambda X_{i}} \bigr] \le \cosh(\lambda) \qquad \text{for every } i .
+    \]
+    So \(\mathbb{E}[e^{\lambda S}] \le \cosh(\lambda)^{m} \le e^{m\lambda^{2}/2}\) by \autoref{claim:cosh}, and, as before, taking \(\lambda = \frac{a}{m}\) gives \(\mathbb{P}(S \ge a) \le e^{-\frac{a^{2}}{2m}}\).
+\end{proof}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[every node/.style={font=\small}, scale=1.1]
+        \draw[-Stealth] (-2.4, 0) -- (2.4, 0) node[right] {\(x\)};
+        \draw[-Stealth] (0, -0.3) -- (0, 3.4);
+        \draw[thick, domain=-2.2:1.75, samples=80] plot (\x, {0.4*exp(1.2*\x)}) node[right] {\(e^{\lambda x}\)};
+        \draw[red, thick] (-1.2, {0.4*cosh(1.2) - 0.4*sinh(1.2)*1.2}) -- (1.5, {0.4*cosh(1.2) + 0.4*sinh(1.2)*1.5}) node[right] {\(h(x)\)};
+        \fill ({-1}, {0.4*exp(-1.2)}) circle (1.5pt);
+        \fill (1, {0.4*exp(1.2)}) circle (1.5pt);
+        \draw[dashed] (-1, 0) -- (-1, {0.4*exp(-1.2)});
+        \draw[dashed] (1, 0) -- (1, {0.4*exp(1.2)});
+        \node[below] at (-1, 0) {\(-1\)};
+        \node[below] at (1, 0) {\(1\)};
+        \fill[red] (0, {0.4*cosh(1.2)}) circle (1.5pt) node[left, red] {\(\cosh \lambda\)};
+    \end{tikzpicture}
+    \caption{The chord \(h\) lies above \(e^{\lambda x}\) on \([-1, 1]\), so \(\mathbb{E}[e^{\lambda X_{i}}] \le \mathbb{E}[h(X_{i})] = h(0) = \cosh \lambda\) whenever \(X_{i} \in [-1, 1]\) has mean \(0\).}
+    \label{fig:chord}
+\end{figure}
+
+\begin{remark}[The bound \(\abs{X_{i}} \le 1\)]\label{rmk:chernoff-general}
+    The hypothesis \(\abs{X_{i}} \le 1\) is used only in the chord step: \(e^{\lambda x} \le h(x)\) holds for \(x \in [-1, 1]\), but outside this interval \(e^{\lambda x}\) lies above the chord.
+    \begin{itemize}
+        \item \emph{The constant \(1\) is a normalization.} If \(\abs{X_{i}} \le c\) instead, then the \(\frac{X_{i}}{c}\) satisfy the hypotheses of \autoref{thm:chernoff-general}, so
+        \[
+            \mathbb{P}(S \ge a) = \mathbb{P}\Bigl( \sum_{i=1}^{m} \frac{X_{i}}{c} \ge \frac{a}{c} \Bigr) \le e^{-\frac{(a/c)^{2}}{2m}} = e^{-\frac{a^{2}}{2mc^{2}}} .
+        \]
+        \item \emph{Some bound is necessary.} Let \(m = 1\) and \(X_{1} = \pm a\) with probability \(\frac{1}{2}\) each. Then \(\mathbb{P}(S \ge a) = \frac{1}{2}\) for every \(a > 0\), so without a bound on the \(X_{i}\) no estimate decaying in \(a\) can hold.
+    \end{itemize}
+\end{remark}
+
+\chapter{Martingales}
+
+Chernoff bounds need a \emph{sum of independent} random variables. Many quantities of interest are not of this form: the chromatic number \(\chi(G)\) of a random graph, its independence number \(\alpha(G)\), or its matching number \(\alpha'(G)\) (the size of a largest matching) depend on all the edges at once, in a complicated way. Martingales replace the independent summands by the increments of a process that reveals \(G\) bit by bit. Azuma's inequality (\thmref{thm:azuma}) then gives the same exponential bound as Chernoff, assuming only that each increment is bounded.
+
+\section{Martingales and Doob Martingales}\label{sec:martingales}
+
+All probability spaces here are finite, so conditional expectations are elementary.
+
+\begin{notation}[Conditional expectation]\label{nota:conditional-expectation}
+    Let \(Z\) and \(Y = (Y_{1}, \ldots, Y_{k})\) be random variables. Define a function \(\varphi\) on the values \(y\) of \(Y\) with \(\mathbb{P}(Y = y) > 0\) by
+    \[
+        \varphi(y) \coloneqq \mathbb{E}[Z \mid Y = y] \coloneqq \sum_{z} z \, \mathbb{P}(Z = z \mid Y = y) ,
+    \]
+    the average of \(Z\) over the event \(\{ Y = y \}\). The conditional expectation of \(Z\) given \(Y\) is the random variable
+    \[
+        \mathbb{E}[Z \mid Y] = \mathbb{E}[Z \mid Y_{1}, \ldots, Y_{k}] \coloneqq \varphi(Y) .
+    \]
+    So \(\mathbb{E}[Z \mid Y]\) is a function of \(Y\): on the event \(\{ Y = y \}\) it equals \(\varphi(y) = \mathbb{E}[Z \mid Y = y]\).
+\end{notation}
+
+\begin{fact}[Tower property]\label{fact:tower}
+    If \(W = g(Y)\) is a function of \(Y\), then
+    \[
+        \mathbb{E}\bigl[ \mathbb{E}[Z \mid Y] \bigm| W \bigr] = \mathbb{E}[Z \mid W] .
+    \]
+    This is the law of total probability. For \(W\) constant it says \(\mathbb{E}\bigl[ \mathbb{E}[Z \mid Y] \bigr] = \mathbb{E}[Z]\).
+\end{fact}
+
+\begin{proof}
+    Both sides are functions of \(W\), so fix \(w\) with \(\mathbb{P}(W = w) > 0\) and compare their values on \(\{ W = w \}\). Since \(W = g(Y)\),
+    \[
+        \{ W = w \} = \bigsqcup_{y : g(y) = w} \{ Y = y \} .
+    \]
+
+    \emph{Step 1: expand.} On \(\{ Y = y \}\) the random variable \(\mathbb{E}[Z \mid Y]\) takes the value \(\mathbb{E}[Z \mid Y = y]\), and given \(W = w\) only the \(y\) with \(g(y) = w\) occur. So
+    \begin{align*}
+        \mathbb{E}\bigl[ \mathbb{E}[Z \mid Y] \bigm| W = w \bigr]
+        &= \sum_{y : g(y) = w} \mathbb{E}[Z \mid Y = y] \, \mathbb{P}(Y = y \mid W = w) \\
+        &= \sum_{y : g(y) = w} \sum_{z} z \, \mathbb{P}(Z = z \mid Y = y) \, \mathbb{P}(Y = y \mid W = w) .
+    \end{align*}
+
+    \emph{Step 2: combine the probabilities.} For \(g(y) = w\) we have \(\{ Y = y \} \subseteq \{ W = w \}\), so
+    \[
+        \mathbb{P}(Y = y, W = w) = \mathbb{P}(Y = y),
+        \qquad
+        \mathbb{P}(Z = z, Y = y) = \mathbb{P}(Z = z, Y = y, W = w) .
+    \]
+    Hence
+    \begin{align*}
+        \mathbb{P}(Z = z \mid Y = y) \, \mathbb{P}(Y = y \mid W = w)
+        &= \frac{\mathbb{P}(Z = z, Y = y)}{\mathbb{P}(Y = y)} \cdot \frac{\mathbb{P}(Y = y, W = w)}{\mathbb{P}(W = w)} \\
+        &= \frac{\mathbb{P}(Z = z, Y = y)}{\mathbb{P}(Y = y)} \cdot \frac{\mathbb{P}(Y = y)}{\mathbb{P}(W = w)} \\
+        &= \frac{\mathbb{P}(Z = z, Y = y, W = w)}{\mathbb{P}(W = w)} \\
+        &= \mathbb{P}(Z = z, Y = y \mid W = w) .
+    \end{align*}
+
+    \emph{Step 3: sum over \(y\).} Substitute Step 2 into Step 1 and exchange the two finite sums. The events \(\{ Z = z, Y = y \}\) with \(g(y) = w\) partition \(\{ Z = z, W = w \}\), so
+    \begin{align*}
+        \mathbb{E}\bigl[ \mathbb{E}[Z \mid Y] \bigm| W = w \bigr]
+        &= \sum_{z} z \sum_{y : g(y) = w} \mathbb{P}(Z = z, Y = y \mid W = w) \\
+        &= \sum_{z} z \, \mathbb{P}(Z = z \mid W = w) \\
+        &= \mathbb{E}[Z \mid W = w] . \qedhere
+    \end{align*}
+\end{proof}
+
+\begin{definition}[Martingale]\label{def:martingale}
+    A sequence of random variables \(X_{0}, X_{1}, \ldots, X_{m}\) is a \vocab{martingale} if
+    \[
+        \mathbb{E}[X_{i} \mid X_{i-1}, X_{i-2}, \ldots, X_{0}] = X_{i-1}
+        \qquad \text{for every } 1 \le i \le m .
+    \]
+\end{definition}
+
+Think of \(X_{i}\) as a gambler's fortune after \(i\) rounds of a fair game: whatever happened so far, the expected fortune after the next round is the current one.
+
+\emph{Increments.} Write \(D_{i} \coloneqq X_{i} - X_{i-1}\) for the \vocab{increments}, so that \(X_{m} = X_{0} + D_{1} + \cdots + D_{m}\), a sum as in \autoref{thm:chernoff-general}. The martingale condition says exactly that each increment has mean \(0\) given the past: since \(X_{i-1}\) is one of the variables conditioned on, \(\mathbb{E}[X_{i-1} \mid X_{i-1}, \ldots, X_{0}] = X_{i-1}\), so
+\[
+    \mathbb{E}[D_{i} \mid X_{i-1}, \ldots, X_{0}] = \mathbb{E}[X_{i} \mid X_{i-1}, \ldots, X_{0}] - X_{i-1} = 0 .
+\]
+
+\begin{eg}[Sums of independent variables]\label{eg:sum-martingale}
+    Let \(Y_{1}, \ldots, Y_{m}\) be independent with \(\mathbb{E}[Y_{i}] = 0\), and \(X_{i} \coloneqq Y_{1} + \cdots + Y_{i}\), so \(X_{0} = 0\). Then \(X_{0}, \ldots, X_{i-1}\) are functions of \(Y_{1}, \ldots, Y_{i-1}\), which are independent of \(Y_{i}\), so
+    \[
+        \mathbb{E}[X_{i} \mid X_{i-1}, \ldots, X_{0}] = X_{i-1} + \mathbb{E}[Y_{i} \mid X_{i-1}, \ldots, X_{0}] = X_{i-1} + \mathbb{E}[Y_{i}] = X_{i-1} .
+    \]
+    So the partial sums of \autoref{thm:chernoff-general} form a martingale, with increments \(X_{i} - X_{i-1} = Y_{i}\).
+\end{eg}
+
+\subsection{The Doob Martingale}\label{sec:doob}
+
+\emph{Setting.} We have a random graph \(G\) and are interested in a graph parameter, so that
+\[
+    X \coloneqq f(G)
+\]
+is a random variable; e.g.\ \(f(G) = \alpha(G)\), \(\chi(G)\) or \(\alpha'(G)\). We want to show that \(X\) is concentrated around \(\mathbb{E}[X]\), usually without knowing \(\mathbb{E}[X]\). The idea is to reveal \(G\) piece by piece and track our best guess for \(f(G)\) given what has been revealed so far. Before anything is revealed the guess is \(\mathbb{E}[f(G)]\); after everything is revealed it is \(f(G)\) itself. In between, the guesses form a martingale.
+
+\begin{proposition}[Doob martingale]\label{prop:doob}
+    Let \(Z\) be a random variable and \(\eta_{1}, \ldots, \eta_{m}\) random variables (the pieces of information, revealed in this order), and set
+    \[
+        X_{i} \coloneqq \mathbb{E}[Z \mid \eta_{1}, \ldots, \eta_{i}], \qquad 0 \le i \le m .
+    \]
+    Then \(X_{0}, X_{1}, \ldots, X_{m}\) is a martingale, with \(X_{0} = \mathbb{E}[Z]\). If \(Z\) is determined by \(\eta_{1}, \ldots, \eta_{m}\), then \(X_{m} = Z\).
+\end{proposition}
+
+\begin{proof}
+    Write \(\eta_{\le i} \coloneqq (\eta_{1}, \ldots, \eta_{i})\). Since \(\eta_{\le i-1}\) is a function of \(\eta_{\le i}\), \autoref{fact:tower} gives
+    \[
+        \mathbb{E}[X_{i} \mid \eta_{\le i-1}] = \mathbb{E}\bigl[ \mathbb{E}[Z \mid \eta_{\le i}] \bigm| \eta_{\le i-1} \bigr] = \mathbb{E}[Z \mid \eta_{\le i-1}] = X_{i-1} .
+    \]
+    That is, averaging over the next piece \(\eta_{i}\) of information returns the previous guess; this is the law of total probability. Each \(X_{j}\) with \(j \le i-1\) is a function of \(\eta_{\le j}\), hence of \(\eta_{\le i-1}\), so \(X_{0}, \ldots, X_{i-1}\) is a function of \(\eta_{\le i-1}\), and \autoref{fact:tower} again gives
+    \[
+        \mathbb{E}[X_{i} \mid X_{i-1}, \ldots, X_{0}]
+        = \mathbb{E}\bigl[ \mathbb{E}[X_{i} \mid \eta_{\le i-1}] \bigm| X_{i-1}, \ldots, X_{0} \bigr]
+        = \mathbb{E}[X_{i-1} \mid X_{i-1}, \ldots, X_{0}]
+        = X_{i-1} .
+    \]
+    For \(i = 0\) nothing is conditioned on, so \(X_{0} = \mathbb{E}[Z]\). If \(Z\) is a function of \(\eta_{\le m}\), then conditioning on \(\eta_{\le m}\) fixes \(Z\), so \(X_{m} = Z\).
+\end{proof}
+
+The proof did not use any independence among the \(\eta_{i}\). The two standard ways to reveal a random graph on \([n]\) give the following two martingales.
+
+\subsection{Edge Exposure}\label{sec:edge-exposure}
+
+Order the \(N \coloneqq \binom{n}{2}\) pairs of vertices as \(e_{1}, \ldots, e_{N}\), and reveal the graph one pair at a time: \(\eta_{i} \coloneqq \mathbbm{1}[e_{i} \in E(G)]\). The \vocab{edge-exposure martingale} is
+\[
+    X_{i} \coloneqq \mathbb{E}\bigl[ f(G) \bigm| \text{whether } e_{1}, \ldots, e_{i} \text{ are edges} \bigr], \qquad 0 \le i \le N .
+\]
+By \autoref{prop:doob} it is a martingale, and
+\[
+    X_{0} = \mathbb{E}[f(G)], \qquad \ldots, \qquad X_{\binom{n}{2}} = f(G) ,
+\]
+since \(G\) is determined once all pairs are revealed.
+
+\begin{eg}[\(\chi\) of \(G(3, \frac{1}{2})\)]\label{eg:edge-exposure-chi}
+    Let \(G \sim G(3, \frac{1}{2})\) and \(X = \chi(G)\), with the pairs revealed in the order \(e_{1} = \{1, 2\}\), \(e_{2} = \{1, 3\}\), \(e_{3} = \{2, 3\}\). The \(8\) graphs are equally likely, and \(\chi(G) = 1\) for the empty graph, \(3\) for the triangle, and \(2\) for the other six. \(X_{i}\) is the average of \(\chi\) over the graphs consistent with what has been revealed (\autoref{fig:edge-exposure-chi}):
+    \begin{itemize}
+        \item \(X_{0} = \frac{1 + 6 \cdot 2 + 3}{8} = 2\);
+        \item \(X_{1} = \frac{1 + 2 + 2 + 2}{4} = 1.75\) if \(e_{1} \notin E(G)\), and \(X_{1} = \frac{2 + 2 + 2 + 3}{4} = 2.25\) if \(e_{1} \in E(G)\);
+        \item \(X_{2} = 1.5, \ 2, \ 2, \ 2.5\) according as \(e_{1}, e_{2}\) are both absent, only \(e_{2}\) present, only \(e_{1}\) present, both present;
+        \item \(X_{3} = \chi(G)\).
+    \end{itemize}
+    Each value is the average of its two children, as \autoref{prop:doob} says: e.g.\ \(\frac{1.75 + 2.25}{2} = 2\) and \(\frac{1.5 + 2}{2} = 1.75\). In this example every increment satisfies \(\abs{X_{i} - X_{i-1}} \le \frac{1}{2}\).
+\end{eg}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+            every node/.style={font=\small},
+            val/.style={fill=white, inner sep=1.5pt},
+            vtx/.style={circle, fill, inner sep=0.9pt},
+        ]
+        % level labels
+        \node[anchor=east] at (-1.2, 0) {\(X_{0}\)};
+        \node[anchor=east] at (-1.2, -1.3) {\(X_{1}\)};
+        \node[anchor=east] at (-1.2, -2.6) {\(X_{2}\)};
+        \node[anchor=east] at (-1.2, -4.0) {\(G\)};
+        \node[anchor=east] at (-1.2, -5.0) {\(X_{3} = \chi(G)\)};
+
+        % tree
+        \node[val] (r) at (5.6, 0) {\(2\)};
+        \node[val] (a0) at (2.4, -1.3) {\(1.75\)};
+        \node[val] (a1) at (8.8, -1.3) {\(2.25\)};
+        \node[val] (b00) at (0.8, -2.6) {\(1.5\)};
+        \node[val] (b01) at (4.0, -2.6) {\(2\)};
+        \node[val] (b10) at (7.2, -2.6) {\(2\)};
+        \node[val] (b11) at (10.4, -2.6) {\(2.5\)};
+        \draw (r) -- node[above left, font=\footnotesize] {\(e_{1} \notin\)} (a0);
+        \draw (r) -- node[above right, font=\footnotesize] {\(e_{1} \in\)} (a1);
+        \draw (a0) -- (b00);
+        \draw (a0) -- (b01);
+        \draw (a1) -- (b10);
+        \draw (a1) -- (b11);
+
+        % leaves: bits for e1 = 12, e2 = 13, e3 = 23
+        \foreach \a/\b/\c/\val [count=\j from 0] in {0/0/0/1, 0/0/1/2, 0/1/0/2, 0/1/1/2, 1/0/0/2, 1/0/1/2, 1/1/0/2, 1/1/1/3} {
+            \pgfmathsetmacro{\x}{1.6*\j}
+            \begin{scope}[shift={(\x, -4.0)}]
+                \coordinate (v1) at (0, 0.3);
+                \coordinate (v2) at (-0.32, -0.25);
+                \coordinate (v3) at (0.32, -0.25);
+                \ifnum\a=1 \draw[thick] (v1) -- (v2); \else \draw[gray!50, densely dotted] (v1) -- (v2); \fi
+                \ifnum\b=1 \draw[thick] (v1) -- (v3); \else \draw[gray!50, densely dotted] (v1) -- (v3); \fi
+                \ifnum\c=1 \draw[thick] (v2) -- (v3); \else \draw[gray!50, densely dotted] (v2) -- (v3); \fi
+                \foreach \v in {v1, v2, v3} \node[vtx] at (\v) {};
+                \node at (0, -1.0) {\(\val\)};
+            \end{scope}
+        }
+        \foreach \p/\j in {b00/0, b00/1, b01/2, b01/3, b10/4, b10/5, b11/6, b11/7} {
+            \draw (\p) -- ({1.6*\j}, -3.55);
+        }
+    \end{tikzpicture}
+    \caption{The edge-exposure martingale for \(\chi(G)\), \(G \sim G(3, \frac{1}{2})\). Vertex \(1\) is on top, \(2\) bottom left, \(3\) bottom right; \(e_{1} = \{1,2\}\), \(e_{2} = \{1,3\}\), \(e_{3} = \{2,3\}\). At each branching the left child is ``\(e_{i}\) absent'' and the right child ``\(e_{i}\) present''; present edges are solid, absent ones dotted. Each node is the average of its children.}
+    \label{fig:edge-exposure-chi}
+\end{figure}
+
+\subsection{Vertex Exposure}\label{sec:vertex-exposure}
+
+Alternatively, reveal the graph one vertex at a time. At step \(i\) we reveal which of the pairs \(\{j, i\}\) with \(j < i\) are edges, i.e.\ \(\eta_{i} \coloneqq \bigl( \mathbbm{1}[\{j, i\} \in E(G)] \bigr)_{j < i}\). After \(i\) steps we know exactly \(G[[i]]\), the subgraph induced by the first \(i\) vertices, i.e.\ the edges present between the first \(i\) vertices. The \vocab{vertex-exposure martingale} is
+\[
+    X_{i} \coloneqq \mathbb{E}\bigl[ f(G) \bigm| G[[i]] \bigr], \qquad 0 \le i \le n ,
+\]
+again a martingale by \autoref{prop:doob}, with
+\[
+    X_{0} = \mathbb{E}[f(G)], \qquad X_{n} = f(G) .
+\]
+(Also \(X_{1} = X_{0}\), since \(G[[1]]\) has no pairs.)
+
+\emph{Relation to edge exposure.} Order the pairs by their larger endpoint:
+\[
+    \underbrace{\{1,2\}}_{\text{inside } [2]}, \
+    \underbrace{\{1,3\}, \{2,3\}}_{\text{new pairs at } 3}, \
+    \underbrace{\{1,4\}, \{2,4\}, \{3,4\}}_{\text{new pairs at } 4}, \
+    \ldots
+\]
+Then the first \(\binom{i}{2}\) pairs are exactly the pairs inside \([i]\), so revealing them is the same as revealing \(G[[i]]\). Hence, writing \(X^{\mathrm{V}}_{i}\) and \(X^{\mathrm{E}}_{j}\) for the vertex- and edge-exposure martingales,
+\[
+    X^{\mathrm{V}}_{i} = X^{\mathrm{E}}_{\binom{i}{2}} \qquad (0 \le i \le n) ,
+\]
+i.e.\ vertex exposure is edge exposure looked at only after steps \(\binom{2}{2}, \binom{3}{2}, \ldots, \binom{n}{2}\). Each vertex step reveals a whole batch of pairs at once.
+
+\emph{Why use it.} The vertex-exposure martingale is much shorter: \(n\) steps instead of \(\binom{n}{2}\). This matters for Azuma's inequality (\thmref{thm:azuma}) below, which applies to a martingale of length \(m\) starting at \(0\) with increments bounded by \(1\). Since \(X_{0} = \mathbb{E}[f(G)]\) is a constant, \(X_{i} - X_{0}\) is such a martingale (if the increments are bounded by \(1\)), and its last value is \(f(G) - \mathbb{E}[f(G)]\). So Azuma gives, for every \(\lambda > 0\),
+\[
+    \mathbb{P}\Bigl( f(G) > \mathbb{E}[f(G)] + \lambda\sqrt{m} \Bigr) < e^{-\lambda^{2}/2} ,
+\]
+i.e.\ \(f(G)\) exceeds its mean by more than \(\lambda\sqrt{m}\) only with probability \(< e^{-\lambda^{2}/2}\). Plugging in the two lengths:
+\begin{itemize}
+    \item edge exposure, \(m = \binom{n}{2} \le \frac{n^{2}}{2}\): \quad \(\mathbb{P}\bigl( f(G) > \mathbb{E}[f(G)] + \lambda \frac{n}{\sqrt{2}} \bigr) < e^{-\lambda^{2}/2}\);
+    \item vertex exposure, \(m = n\): \quad \(\mathbb{P}\bigl( f(G) > \mathbb{E}[f(G)] + \lambda \sqrt{n} \bigr) < e^{-\lambda^{2}/2}\).
+\end{itemize}
+The second controls deviations of order \(\sqrt{n}\) rather than \(n\), a much stronger statement. The price is that a vertex step reveals many pairs at once, so bounding its increment by \(1\) is a stronger requirement on \(f\).
+
+\section{Azuma's Inequality}\label{sec:azuma}
+
+\begin{theorem}[Azuma's inequality]\label{thm:azuma}
+    Let \(0 = X_{0}, X_{1}, \ldots, X_{m}\) be a martingale with
+    \[
+        \abs{X_{i} - X_{i-1}} \le 1 \qquad \text{for every } 1 \le i \le m .
+    \]
+    Then for every \(\lambda > 0\),
+    \[
+        \mathbb{P}\bigl( X_{m} > \lambda \sqrt{m} \bigr) < e^{-\frac{\lambda^{2}}{2}} .
+    \]
+\end{theorem}
