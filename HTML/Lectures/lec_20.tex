@@ -1,0 +1,1240 @@
+\chapter{Soft-Margin Support Vector Machine}
+\lecture{20}{11 Nov.}{}
+
+\begin{prev}
+    Kernel as a shortcut to (transform \(+\) inner product) removes the
+    dependence on \(\tilde{d}\) (\autoref{sec:kernel-trick}): it allows a
+    spectrum of models, from simple (linear) ones to infinite dimensional
+    (Gaussian) ones, all with margin control.
+\end{prev}
+
+The kernel trick let us use very powerful transforms, all the way up to the
+infinite-dimensional Gaussian one. At the end of the last chapter we saw the
+price: with \(\gamma = 100\) the Gaussian SVM classified every training
+example correctly, and the boundary clearly overfitted
+(\autoref{sec:gaussian-kernel}).
+
+This chapter looks at one cause of that overfitting and removes it. The
+hard-margin SVM insists that \emph{every} example lie on its correct side of
+the fat boundary. When some labels are noise, the only way to meet this
+demand is to bend the boundary around the noisy examples. The
+\emph{soft-margin} SVM drops the demand. It allows an example to violate the
+margin, and charges a penalty for each violation. A parameter \(C\) sets how
+large that penalty is.
+
+The chapter follows the four parts of the deck:
+\begin{enumerate}
+    \item write down the soft-margin problem (the primal);
+    \item derive its dual, which again needs only kernels;
+    \item read off what the dual solution tells us: how to compute \(b\),
+        and what each \(\alpha_n\) says about its example;
+    \item choose the two parameters \((C, \gamma)\) of the Gaussian
+        soft-margin SVM.
+\end{enumerate}
+
+\paragraph{Roadmap.}
+\begin{enumerate}
+    \item \textbf{Embedding Numerous Features: Kernel Models}
+        \begin{itemize}
+            \item[] Lecture 3: Kernel Support Vector Machine ---
+                \hlo{\textbf{kernel}} as a shortcut to (transform \(+\) inner
+                product) to \hlo{\textbf{remove dependence on
+                \(\tilde{d}\)}}: allowing a spectrum of simple
+                (\hlo{\textbf{linear}}) models to infinite dimensional
+                (\hlo{\textbf{Gaussian}}) ones with margin control
+            \item[] \textbf{Lecture 4: Soft-Margin Support Vector Machine}
+                --- Motivation and Primal Problem; Dual Problem; Messages
+                behind Soft-Margin SVM; Model Selection
+        \end{itemize}
+    \item Combining Predictive Features: Aggregation Models
+    \item Distilling Implicit Features: Extraction Models
+\end{enumerate}
+
+\section{Motivation and Primal Problem}\label{sec:soft-primal}
+
+\source{slides p.2--6}
+
+\subsection{Cons of Hard-Margin SVM}
+
+\begin{recall}
+    \hlo{\textbf{SVM can still overfit :-(}}
+\end{recall}
+
+We first met these two pictures in \autoref{sec:transform-price}. Both
+classify the same twenty examples. On the left the boundary is a line
+(\(\bm{\Phi}_1\)); on the right it is a fourth-order curve
+(\(\bm{\Phi}_4\)).
+
+\begin{center}
+    \begin{tabular}{@{}c@{\hspace{1.2em}}c@{\hspace{1.2em}}c@{}}
+        \ksvmpanel[3.0]{\softPhiOne}{\softPhiData}{} &
+        \begin{minipage}[c]{0.3\textwidth}
+            \begin{itemize}
+                \item part of reasons: \(\bm{\Phi}\)
+                \item other part: \hlp{\textbf{separable}}
+            \end{itemize}
+        \end{minipage} &
+        \ksvmpanel[3.0]{\softPhiFour}{\softPhiData}{}\\[4pt]
+        \(\bm{\Phi}_1\) & & \(\bm{\Phi}_4\)
+    \end{tabular}
+\end{center}
+
+The line gets two examples wrong: the circle in the bottom-left corner and
+the cross near the top, just left of the centre. Both look like noise. The
+curve gets all twenty right, but only by drawing three separate blue regions
+to catch every circle. Most of us would trust the line more. The curve has
+overfitted.
+
+The slide names two causes.
+\begin{itemize}
+    \item \textbf{The transform \(\bm{\Phi}\).} A powerful transform can draw
+        very complicated boundaries. The Gaussian kernel of the last chapter
+        is even more powerful than \(\bm{\Phi}_4\).
+    \item \textbf{Insisting on separable data.} The hard-margin SVM only
+        accepts a boundary that puts every example on its correct side. If
+        some labels are noise, it has no choice but to bend around those
+        examples as well.
+\end{itemize}
+This chapter deals with the second cause.
+
+\begin{moral}
+    If always insisting on \hlp{\textbf{separable}} (\(\Longrightarrow\)
+    \hlp{\textbf{shatter}}), have power to \hlo{\textbf{overfit to noise}}.
+\end{moral}
+
+Why does `separable' lead to `shatter'? Noise can give the examples any
+labels at all. A model that must separate the data whatever the labels are
+must be able to produce every possible labelling, and that is exactly what
+shattering means. A model with that much power fits noise as easily as it
+fits the real pattern, which is overfitting (\autoref{sec:what-overfit}).
+
+\subsection{Give Up on Some Examples}
+
+So we want the SVM to \hlp{\textbf{give up}} on some noisy examples: it
+should be allowed to get a few of them wrong when fitting them would cost
+too much. We have seen this idea before, in the pocket algorithm
+(\autoref{alg:pocket}). Compare the two problems:
+
+\begin{center}
+    \begin{tabular}{@{}c@{\qquad}c@{}}
+        \textbf{pocket} & \textbf{hard-margin SVM}\\[4pt]
+        \(\displaystyle \min_{b, \bm{w}} \sum_{n=1}^N \hlb{\llbracket y_n
+            \neq \sign(\bm{w}^\top \bm{z}_n + b) \rrbracket}\)
+        &
+        \(\begin{aligned}
+            \min_{b, \bm{w}} \quad & \green{\tfrac{1}{2} \bm{w}^\top
+                \bm{w}}\\
+            \text{s.t.} \quad & y_n (\bm{w}^\top \bm{z}_n + b) \ge 1
+                \text{ for all } n
+        \end{aligned}\)
+    \end{tabular}
+\end{center}
+
+The pocket algorithm minimizes the number of mistakes. It accepts some
+errors, but it does not care about the margin. The hard-margin SVM maximizes
+the margin, but it accepts no errors at all. We want something in between,
+so we combine the two:
+\[
+    \begin{aligned}
+        \text{combination:} \quad \min_{b, \bm{w}} \quad & \green{\frac{1}{2}
+            \bm{w}^\top \bm{w}} + \hlr{C} \cdot \sum_{n=1}^N
+            \hlb{\llbracket y_n \neq \sign(\bm{w}^\top \bm{z}_n + b)
+            \rrbracket}\\
+        \text{s.t.} \quad & y_n (\bm{w}^\top \bm{z}_n + b) \ge 1 \text{ for
+            \hlb{\textbf{correct}} } n\\
+        & y_n (\bm{w}^\top \bm{z}_n + b) \ge -\infty \text{ for
+            \hlb{\textbf{incorrect}} } n
+    \end{aligned}
+\]
+Read it term by term.
+\begin{itemize}
+    \item The objective has two parts. The green part comes from the
+        hard-margin SVM: a smaller \(\bm{w}^\top \bm{w}\) means a larger
+        margin. The blue part comes from the pocket: it counts the mistakes,
+        and each mistake costs \(C\).
+    \item For an example that the hyperplane classifies correctly, we keep
+        the usual margin constraint.
+    \item For an example that it gets wrong, the constraint becomes \(\ge
+        -\infty\), which is always true. In effect that example has no
+        constraint any more. This is what `giving up' on it means. We do pay
+        for it, though: it adds \(C\) to the objective.
+\end{itemize}
+The parameter \(C\) therefore sets the balance between the two goals. With a
+large \(C\), mistakes are expensive and the problem behaves like the
+hard-margin SVM. With a small \(C\), a large margin matters more, and more
+mistakes are tolerated.
+
+\begin{moral}
+    \(\hlr{C}\): trade-off of \green{large margin} \& \hlb{noise
+    tolerance}.
+\end{moral}
+
+\subsection{Soft-Margin SVM (1/2)}
+
+The two kinds of constraint can be written as a single line. When example
+\(n\) is classified correctly, the indicator is \(0\) and the right-hand side
+is \(1\). When it is wrong, the indicator is \(1\) and the right-hand side
+is \(1 - \infty = -\infty\):
+\[
+    \begin{aligned}
+        \min_{b, \bm{w}} \quad & \green{\frac{1}{2} \bm{w}^\top \bm{w}} +
+            \hlr{C} \cdot \sum_{n=1}^N \hlb{\llbracket y_n \neq
+            \sign(\bm{w}^\top \bm{z}_n + b) \rrbracket}\\
+        \text{s.t.} \quad & y_n (\bm{w}^\top \bm{z}_n + b) \ge 1 - \infty
+            \cdot \hlb{\llbracket y_n \neq \sign(\bm{w}^\top \bm{z}_n + b)
+            \rrbracket}
+    \end{aligned}
+\]
+This says exactly what we want, but it has two problems.
+\begin{itemize}
+    \item \(\hlb{\llbracket \cdot \rrbracket}\) is non-linear, so the
+        problem is \hlo{\textbf{not QP anymore :-(}} --- what about the dual?
+        the kernel?
+    \item It \textbf{cannot distinguish small error} (slightly away from the
+        fat boundary) \textbf{or large error} (a\ldots w\ldots a\ldots
+        y\ldots\ from the fat boundary).
+\end{itemize}
+
+The first problem is serious. A QP needs a quadratic objective and linear
+constraints. The indicator jumps between \(0\) and \(1\), so it is neither,
+and a QP solver cannot handle it. The dual and the kernel trick of the last
+two chapters were both built on top of a QP, so we would lose them too.
+
+The second problem is about fairness. The indicator only asks `right or
+wrong?'. An example that is barely on the wrong side costs the same \(C\) as
+one that lies deep inside the other class.
+
+One change fixes both problems: instead of asking \emph{whether} an example
+is wrong, measure \emph{how far} it falls short of the margin.
+\begin{itemize}
+    \item Record the `\vocab{margin violation}' of example \(n\) by a new
+        variable \(\hlp{\xi_n}\): require \(y_n (\bm{w}^\top \bm{z}_n + b)
+        \ge 1 - \hlp{\xi_n}\) with \(\hlp{\xi_n} \ge 0\). These are
+        \hlo{\textbf{linear constraints}}.
+    \item Penalize with \hlp{\textbf{margin violation}} instead of
+        \hlb{\textbf{error count}}. The penalty \(\hlr{C} \cdot \sum_n
+        \hlp{\xi_n}\) is linear, so we still have a \hlo{\textbf{quadratic
+        objective}}.
+\end{itemize}
+
+\begin{definition}[Soft-margin SVM]
+    The \vocab{soft-margin SVM} solves
+    \[
+        \begin{aligned}
+            \min_{b, \bm{w}, \hlp{\bm{\xi}}} \quad & \green{\frac{1}{2}
+                \bm{w}^\top \bm{w}} + \hlr{C} \cdot \sum_{n=1}^N \hlp{\xi_n}\\
+            \text{s.t.} \quad & y_n (\bm{w}^\top \bm{z}_n + b) \ge 1 -
+                \hlp{\xi_n} \text{ and } \hlp{\xi_n} \ge 0 \text{ for all }
+                n.
+        \end{aligned}
+    \]
+\end{definition}
+
+Think of \(\xi_n\) as the amount by which example \(n\) is allowed to fall
+short of the margin.
+\begin{itemize}
+    \item If the example already satisfies \(y_n (\bm{w}^\top \bm{z}_n + b)
+        \ge 1\), we can take \(\xi_n = 0\), and it costs nothing.
+    \item If it does not, \(\xi_n\) has to be at least \(1 - y_n
+        (\bm{w}^\top \bm{z}_n + b)\). The further the example is from where
+        it should be, the larger \(\xi_n\), and the larger the penalty \(C
+        \xi_n\).
+\end{itemize}
+Since we minimize, the optimal \(\xi_n\) is always the smallest value
+allowed: \(\xi_n = \max\bigl(0, 1 - y_n (\bm{w}^\top \bm{z}_n +
+b)\bigr)\). Small violations are now cheap and large ones are expensive.
+
+\subsection{Soft-Margin SVM (2/2)}\label{sec:soft-geometry}
+
+\begin{center}
+    \begin{minipage}[c]{0.56\textwidth}
+        \begin{itemize}
+            \item record `\hlp{\textbf{margin violation}}' by
+                \(\hlp{\xi_n}\)
+            \item penalize with \hlp{\textbf{margin violation}}
+        \end{itemize}
+        \[
+            \begin{aligned}
+                \min_{b, \bm{w}, \hlp{\bm{\xi}}} \quad & \green{\frac{1}{2}
+                    \bm{w}^\top \bm{w}} + \hlr{C} \cdot \sum_{n=1}^N
+                    \hlp{\xi_n}\\
+                \text{s.t.} \quad & y_n (\bm{w}^\top \bm{z}_n + b) \ge 1 -
+                    \hlp{\xi_n}\\
+                & \text{and } \hlp{\xi_n} \ge 0 \text{ for all } n
+            \end{aligned}
+        \]
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[c]{0.4\textwidth}
+        \centering
+        \begin{tikzpicture}[scale=4]
+            \begin{scope}
+                \clip (0,0) rectangle (1,1);
+                % centre line through (0.08,0) with direction (0.81,1);
+                % the fat band has half-width 0.144 around it
+                \fill[fatband] (-0.267,-0.2) -- (0.867,1.2)
+                    -- (1.237,1.2) -- (0.103,-0.2) -- cycle;
+                \draw[sepline] (0.08,0) -- (0.89,1);
+            \end{scope}
+            \draw[plotbox] (0,0) rectangle (1,1);
+            \foreach \p in {(0.141,0.908), (0.408,0.919), (0.528,0.877),
+                (0.373,0.754), (0.106,0.585), (0.123,0.349)}
+                {\node[dneg] at \p {\(\times\)};}
+            \foreach \p in {(0.887,0.585), (0.496,0.440), (0.496,0.254),
+                (0.641,0.113), (0.873,0.127)}{\node[dpos] at \p {};}
+            \draw[-{Stealth[length=1.3mm]}, violet!80!black, thick]
+                (0.505,0.433) -- (0.571,0.379);
+            \node[font=\scriptsize\bfseries, text=violet!80!black, anchor=west]
+                at (0.585,0.395) {violation};
+        \end{tikzpicture}
+    \end{minipage}
+\end{center}
+
+In the picture the grey strip is the fat boundary, and the circle inside it
+has a violation \(\xi_n > 0\). Before explaining the strip, we check what
+the \(1\) in the constraint means now.
+
+\paragraph{The \(1\) is still a choice of scale.} In
+\autoref{sec:standard-lm}, \((b, \bm{w})\) and \(c \cdot (b, \bm{w})\) with
+\(c > 0\) give the same hyperplane, so we were free to fix the scale by
+\(\min_n y_n (\bm{w}^\top \bm{x}_n + b) = 1\) (\autoref{lem:special-scaling}).
+The soft-margin constraint keeps this \(1\), but it can no longer mean
+\(\min_n y_n (\bm{w}^\top \bm{z}_n + b) = 1\): an example with \(\xi_n > 0\)
+has \(y_n (\bm{w}^\top \bm{z}_n + b) < 1\). Instead, the \(1\) fixes where
+the two edges of the strip are: at \(\bm{w}^\top \bm{z} + b = \pm 1\).
+
+Does this rule out any candidate? No. Take any hyperplane and any strip of
+half-width \(h\) around it. Write the hyperplane as \(\bm{w}^\top \bm{z} + b
+= 0\) and scale \((b, \bm{w})\) so that \(\norm{\bm{w}} = 1/h\). Then the
+edges \(\bm{w}^\top \bm{z} + b = \pm 1\) are exactly at distance \(h\). So
+every pair (hyperplane, strip width) is some \((b, \bm{w})\), and the primal
+searches over all of them.
+
+What changes is the role of the scale. In the hard-margin SVM, \((b,
+\bm{w})\) and \(c \cdot (b, \bm{w})\) were the same candidate. Here they
+have the same hyperplane but different strips (half-width \(1 /
+\norm{\bm{w}}\) versus \(1 / (c \norm{\bm{w}})\)), hence different
+\(\xi_n\) and a different objective value. The scale of \((b, \bm{w})\) is
+no longer free: it is how the primal chooses the width of the strip.
+
+Why is the strip there, and why does the size of \(\xi_n\) tell us where an
+example lies? We answer this in three steps.
+
+\paragraph{Step 1: the strip comes from the hyperplane.} Any \((b,
+\bm{w})\) gives a hyperplane \(\bm{w}^\top \bm{z} + b = 0\) and two parallel
+hyperplanes \(\bm{w}^\top \bm{z} + b = +1\) and \(\bm{w}^\top \bm{z} + b =
+-1\), one on each side. The fat boundary is the strip between these two,
+where \(\abs{\bm{w}^\top \bm{z} + b} < 1\). This is pure geometry: it holds
+for any \((b, \bm{w})\), whichever problem produced it. For the soft-margin
+SVM we use its optimal \((b, \bm{w})\).
+
+\paragraph{Step 2: \(y_n (\bm{w}^\top \bm{z}_n + b)\) says where
+\(\bm{z}_n\) is.} By \autoref{sec:standard-lm}, the distance from
+\(\bm{z}_n\) to the hyperplane is \(\abs{\bm{w}^\top \bm{z}_n + b} /
+\norm{\bm{w}}\). Multiplying by \(y_n\) adds a sign: \(y_n (\bm{w}^\top
+\bm{z}_n + b)\) is positive when \(\bm{z}_n\) is on the side of its own
+label, and negative when it is on the other side. So \(y_n (\bm{w}^\top
+\bm{z}_n + b) / \norm{\bm{w}}\) is a \emph{signed} distance, and the edge of
+the strip on the example's own side is where this number equals \(1 /
+\norm{\bm{w}}\), i.e.\ where \(y_n (\bm{w}^\top \bm{z}_n + b) = 1\). This
+gives:
+\begin{itemize}
+    \item \(y_n (\bm{w}^\top \bm{z}_n + b) \ge 1\): on or beyond its own
+        edge, i.e.\ outside the strip (or on its edge), correct side;
+    \item \(0 < y_n (\bm{w}^\top \bm{z}_n + b) < 1\): between the hyperplane
+        and its own edge, i.e.\ inside the strip, correct side;
+    \item \(y_n (\bm{w}^\top \bm{z}_n + b) = 0\): on the hyperplane;
+    \item \(y_n (\bm{w}^\top \bm{z}_n + b) < 0\): on the other side, i.e.\
+        misclassified.
+\end{itemize}
+
+\paragraph{Step 3: \(\xi_n\) turns this into a violation.} We saw that at
+the optimum \(\xi_n = \max\bigl(0, 1 - y_n (\bm{w}^\top \bm{z}_n +
+b)\bigr)\). So \(\xi_n\) is how far \(y_n (\bm{w}^\top \bm{z}_n + b)\) falls
+below \(1\), and each range of \(\xi_n\) matches one line of Step 2:
+\begin{itemize}
+    \item \(\xi_n = 0\) \(\iff\) \(y_n (\bm{w}^\top \bm{z}_n + b) \ge 1\):
+        outside the strip or on its edge;
+    \item \(0 < \xi_n < 1\) \(\iff\) \(0 < y_n (\bm{w}^\top \bm{z}_n + b) <
+        1\): inside the strip, still correct (the circle in the picture);
+    \item \(\xi_n = 1\) \(\iff\) \(y_n (\bm{w}^\top \bm{z}_n + b) = 0\): on
+        the hyperplane;
+    \item \(\xi_n > 1\) \(\iff\) \(y_n (\bm{w}^\top \bm{z}_n + b) < 0\):
+        misclassified.
+\end{itemize}
+Measured as a distance, the gap between the example and its own edge is
+\(\xi_n / \norm{\bm{w}}\); this is the arrow in the picture.
+
+How does this differ from the hard-margin SVM? In the hard-margin SVM,
+\(y_n (\bm{w}^\top \bm{z}_n + b) \ge 1\) is required for every example. So
+no example lies inside the strip, and its edges pass through the closest
+examples. Here examples may lie inside
+the strip. The edges are no longer `where the closest examples are', but
+the lines beyond which an example pays nothing. The half-width \(1 /
+\norm{\bm{w}}\) of the strip is chosen by the SVM itself, which trades a
+wide strip against the total violation.
+
+\begin{itemize}
+    \item The parameter \(\hlr{C}\) is the trade-off of \green{large margin}
+        \& \hlp{margin violation}:
+        \begin{itemize}
+            \item large \(\hlr{C}\): want less \hlp{margin violation};
+            \item small \(\hlr{C}\): want \green{large margin}.
+        \end{itemize}
+    \item The problem is a \hlo{QP} of \(\hlo{\tilde{d}} + 1 + N\)
+        variables, \(2N\) constraints.
+\end{itemize}
+
+When \(C\) is very large, any violation becomes too expensive, and we are
+back to the hard-margin SVM. To count the size of the QP: the variables are
+\(b\), the \(\tilde{d}\) entries of \(\bm{w}\), and one \(\xi_n\) for each
+example; the constraints are the \(N\) margin constraints plus the \(N\)
+constraints \(\xi_n \ge 0\).
+
+The number of variables still contains \(\tilde{d}\). In
+\autoref{sec:lagrange-dual} we removed \(\tilde{d}\) by moving to the dual
+problem, so the natural next step is to try the same here.
+
+\begin{question}
+    Next: remove dependence on \(\hlo{\tilde{d}}\) by soft-margin SVM primal
+    \(\Rightarrow\) \hlo{\textbf{dual}}?
+\end{question}
+
+\Needspace{8\baselineskip}
+\begin{exercise}[Fun Time]
+    At the optimal solution of
+    \[
+        \begin{aligned}
+            \min_{b, \bm{w}, \bm{\xi}} \quad & \frac{1}{2} \bm{w}^\top
+                \bm{w} + C \cdot \sum_{n=1}^N \xi_n\\
+            \text{s.t.} \quad & y_n (\bm{w}^\top \bm{z}_n + b) \ge 1 - \xi_n
+                \text{ and } \xi_n \ge 0 \text{ for all } n,
+        \end{aligned}
+    \]
+    assume that \(y_1 (\bm{w}^\top \bm{z}_1 + b) = -10\). What is the
+    corresponding \(\xi_1\)?
+    \begin{enumerate}[(1)]
+        \item \(1\);
+        \item \(11\);
+        \item \(21\);
+        \item \(31\).
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (2). \(\xi_1\) is simply \(1 - y_1 (\bm{w}^\top \bm{z}_1 + b)\) when
+    \(y_1 (\bm{w}^\top \bm{z}_1 + b) \le 1\). Here that is \(1 - (-10) =
+    11\). This is the formula \(\xi_n = \max\bigl(0, 1 - y_n (\bm{w}^\top
+    \bm{z}_n + b)\bigr)\) from above.
+\end{proof}
+
+\section{Dual Problem}\label{sec:soft-dual}
+
+\source{slides p.7--11}
+
+We now repeat the steps of \autoref{sec:lagrange-dual} for the soft-margin
+problem. Almost everything goes through as before. The only new things are
+the variables \(\xi_n\) and their constraints \(\xi_n \ge 0\).
+
+\subsection{Lagrange Dual}
+
+\[
+    \begin{aligned}
+        \text{primal:} \quad \min_{b, \bm{w}, \bm{\xi}} \quad & \frac{1}{2}
+            \bm{w}^\top \bm{w} + C \cdot \sum_{n=1}^N \xi_n\\
+        \text{s.t.} \quad & \dvar{y_n (\bm{w}^\top \bm{z}_n + b) \ge 1 -
+            \xi_n} \text{ and } \hlb{\xi_n \ge 0} \text{ for all } n
+    \end{aligned}
+\]
+
+The primal has two kinds of constraint, so we need two kinds of Lagrange
+multiplier:
+\begin{itemize}
+    \item \(\dvar{\alpha_n}\) for the margin constraint (red), as in the
+        hard-margin case;
+    \item \(\hlb{\beta_n}\) for the new constraint \(\hlb{\xi_n \ge 0}\)
+        (blue).
+\end{itemize}
+As in \autoref{sec:lagrange-dual}, we write each constraint in the form
+`something \(\le 0\)', multiply it by its multiplier, and add it to the
+objective. The margin constraint becomes \(1 - \xi_n - y_n (\bm{w}^\top
+\bm{z}_n + b) \le 0\), and \(\xi_n \ge 0\) becomes \(-\xi_n \le 0\). This
+gives the Lagrange function with Lagrange multipliers \(\dvar{\alpha_n}\) and
+\(\hlb{\beta_n}\):
+\[
+    \begin{aligned}
+        \mathcal{L}(b, \bm{w}, \bm{\xi}, \dvar{\bm{\alpha}},
+            \hlb{\bm{\beta}}) &= \frac{1}{2} \bm{w}^\top \bm{w} + C \cdot
+            \sum_{n=1}^N \xi_n\\
+        &\quad \dvar{{} + \sum_{n=1}^N \alpha_n \cdot \bigl( 1 - \xi_n - y_n
+            (\bm{w}^\top \bm{z}_n + b) \bigr)} \hlb{{} + \sum_{n=1}^N
+            \beta_n \cdot (-\xi_n)}.
+    \end{aligned}
+\]
+
+The reasoning is the same as in \autoref{lem:svm-minmax}. If we maximize
+\(\mathcal{L}\) over all \(\alpha_n \ge 0\) and \(\beta_n \ge 0\), the
+result is \(+\infty\) whenever some constraint is broken, and it is just the
+primal objective when all constraints hold. So minimizing that maximum over
+\((b, \bm{w}, \bm{\xi})\) is the primal problem. The primal is a convex QP,
+and it always has a feasible point (take any \((b, \bm{w})\) and make every
+\(\xi_n\) large enough), so by strong duality (\autoref{fact:strong-duality})
+we may swap \(\min\) and \(\max\). What we want is the Lagrange dual
+\[
+    \max_{\dvar{\alpha_n \ge 0}, \; \hlb{\beta_n \ge 0}} \left( \min_{b,
+    \bm{w}, \bm{\xi}} \mathcal{L}(b, \bm{w}, \bm{\xi}, \dvar{\bm{\alpha}},
+    \hlb{\bm{\beta}}) \right).
+\]
+
+\subsection{Simplify \texorpdfstring{\(\xi_n\)}{xi} and \texorpdfstring{\(\hlb{\beta_n}\)}{beta}}
+
+\[
+    \max_{\dvar{\alpha_n \ge 0}, \; \hlb{\beta_n \ge 0}} \left( \min_{b,
+    \bm{w}, \bm{\xi}} \frac{1}{2} \bm{w}^\top \bm{w} + C \cdot \sum_{n=1}^N
+    \xi_n \dvar{{} + \sum_{n=1}^N \alpha_n \cdot \bigl( 1 - \xi_n - y_n
+    (\bm{w}^\top \bm{z}_n + b) \bigr)} \hlb{{} + \sum_{n=1}^N \beta_n \cdot
+    (-\xi_n)} \right)
+\]
+
+The inner \(\min\) is over \(b\), \(\bm{w}\) and \(\bm{\xi}\), with no
+constraints. We deal with \(\xi_n\) first, in the same way that
+\autoref{sec:lagrange-dual} dealt with \(b\).
+\begin{itemize}
+    \item The inner problem is unconstrained, so at its optimum
+        \(\frac{\partial \mathcal{L}}{\partial \xi_n} = 0 = C -
+        \dvar{\alpha_n} - \hlb{\beta_n}\).
+    \item There is no loss of optimality if solving with the
+        \textbf{implicit} constraint \(\hlb{\beta_n} = C - \dvar{\alpha_n}\)
+        and the \textbf{explicit} constraint \(0 \le \dvar{\alpha_n} \le
+        \hlb{C}\): \(\hlb{\beta_n}\) is removed.
+\end{itemize}
+
+Why may we add this constraint? Collect the terms of \(\mathcal{L}\) that
+contain \(\xi_n\): they are \(C \xi_n - \alpha_n \xi_n - \beta_n \xi_n = (C
+- \alpha_n - \beta_n) \xi_n\). This is a straight line in \(\xi_n\).
+\begin{itemize}
+    \item If its slope \(C - \alpha_n - \beta_n\) is not zero, we can make
+        \(\mathcal{L}\) as small as we like by moving \(\xi_n\) to \(+\infty\)
+        or \(-\infty\). The inner \(\min\) is then \(-\infty\), and the outer
+        \(\max\) would never choose such \((\bm{\alpha}, \bm{\beta})\).
+    \item So we lose nothing by keeping only the multipliers with \(C -
+        \alpha_n - \beta_n = 0\), i.e.\ \(\beta_n = C - \alpha_n\).
+\end{itemize}
+Once \(\beta_n = C - \alpha_n\), the condition \(\beta_n \ge 0\) becomes
+\(\alpha_n \le C\). Together with \(\alpha_n \ge 0\) this gives \(0 \le
+\alpha_n \le C\). After that, \(\beta_n\) no longer carries any information
+of its own, so it disappears from the problem.
+
+\hlp{\(\bm{\xi}\) \textbf{can also be removed :-)}}, \hlp{like how we
+removed \(b\)}. With \(C - \alpha_n - \beta_n = 0\), every term that
+contains \(\xi_n\) has coefficient zero, so the whole last sum drops out:
+\[
+    \max_{0 \le \dvar{\alpha_n} \le C, \; \hlb{\beta_n} = C -
+    \dvar{\alpha_n}} \left( \min_{b, \bm{w}, \bm{\xi}} \frac{1}{2}
+    \bm{w}^\top \bm{w} + \sum_{n=1}^N \dvar{\alpha_n \bigl( 1 - y_n
+    (\bm{w}^\top \bm{z}_n + b) \bigr)} + \cancel{\sum_{n=1}^N (C -
+    \dvar{\alpha_n} - \hlb{\beta_n}) \cdot \xi_n} \right)
+\]
+
+\subsection{Other Simplifications}
+
+\[
+    \max_{0 \le \dvar{\alpha_n} \le C, \; \hlb{\beta_n} = C -
+    \dvar{\alpha_n}} \left( \min_{b, \bm{w}} \frac{1}{2} \bm{w}^\top \bm{w}
+    + \sum_{n=1}^N \dvar{\alpha_n \bigl( 1 - y_n (\bm{w}^\top \bm{z}_n + b)
+    \bigr)} \right)
+\]
+
+\hlp{\textbf{Familiar? :-)}}
+\begin{itemize}
+    \item The inner problem is the \hlp{\textbf{same as hard-margin SVM}}
+        (\autoref{sec:lagrange-dual}).
+    \item \(\frac{\partial \mathcal{L}}{\partial b} = 0\): no loss of
+        optimality if solving with constraint \(\sum_{n=1}^N
+        \dvar{\alpha_n} y_n = 0\).
+    \item \(\frac{\partial \mathcal{L}}{\partial w_i} = 0\): no loss of
+        optimality if solving with constraint \(\bm{w} = \sum_{n=1}^N
+        \dvar{\alpha_n} y_n \bm{z}_n\).
+\end{itemize}
+
+Compare this with \autoref{sec:lagrange-dual}. The expression inside the
+\(\min\) is exactly the hard-margin one. The only difference is outside: each
+\(\alpha_n\) now has the upper limit \(C\). Therefore the standard dual can
+be derived \hlp{using the same steps as \autoref{sec:lagrange-dual}}. Using
+the two constraints above, \(b\) drops out, and \(\sum_n \alpha_n y_n
+\bm{w}^\top \bm{z}_n = \bm{w}^\top \bm{w}\). The objective becomes
+\(-\frac{1}{2} \norm{\sum_n \alpha_n y_n \bm{z}_n}^2 + \sum_n \alpha_n\).
+Multiplying by \(-1\) turns the \(\max\) into a \(\min\).
+
+\subsection{Standard Soft-Margin SVM Dual}
+
+\begin{definition}[Standard soft-margin SVM dual]
+    \[
+        \begin{aligned}
+            \min_{\dvar{\bm{\alpha}}} \quad & \frac{1}{2} \sum_{n=1}^N
+                \sum_{m=1}^N \dvar{\alpha_n \alpha_m} y_n y_m \bm{z}_n^\top
+                \bm{z}_m - \sum_{n=1}^N \dvar{\alpha_n}\\
+            \text{subject to} \quad & \sum_{n=1}^N y_n \dvar{\alpha_n} = 0;\\
+            & 0 \le \dvar{\alpha_n} \le C, \text{ for } n = 1, 2, \dots ,
+                N;\\
+            \text{implicitly} \quad & \bm{w} = \sum_{n=1}^N \dvar{\alpha_n}
+                y_n \bm{z}_n;\\
+            & \hlb{\beta_n} = C - \dvar{\alpha_n}, \text{ for } n = 1, 2,
+                \dots , N.
+        \end{aligned}
+    \]
+\end{definition}
+
+The only difference to hard-margin is the \hlb{upper bound} on
+\(\dvar{\alpha_n}\). This upper bound is what makes the problem `soft'. In
+the hard-margin dual, an example that cannot be separated would push its
+\(\alpha_n\) towards infinity, and the dual would have no finite solution.
+Here no \(\alpha_n\) can exceed \(C\), so no single example can take over
+the solution.
+
+\begin{moral}
+    Another (convex) \hlo{\textbf{QP}}, with \(\hlo{N}\) variables \&
+    \(\hlo{2N + 1}\) constraints.
+\end{moral}
+
+The \(2N + 1\) constraints are one equality \(\sum_n y_n \alpha_n = 0\),
+\(N\) lower bounds \(\alpha_n \ge 0\), and \(N\) upper bounds \(\alpha_n \le
+C\). The number of variables no longer depends on \(\tilde{d}\), which was
+the goal.
+
+\begin{exercise}[Fun Time]
+    In the soft-margin SVM, assume that we want to increase the parameter
+    \(C\) by \(2\). How shall the corresponding dual problem be changed?
+    \begin{enumerate}[(1)]
+        \item the upper bound of \(\alpha_n\) shall be halved;
+        \item the upper bound of \(\alpha_n\) shall be decreased by \(2\);
+        \item the upper bound of \(\alpha_n\) shall be increased by \(2\);
+        \item the upper bound of \(\alpha_n\) shall be doubled.
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (3). Because \(C\) is exactly the upper bound of \(\alpha_n\), increasing
+    \(C\) by \(2\) in the primal problem is equivalent to increasing the
+    upper bound by \(2\) in the dual problem.
+\end{proof}
+
+\section{Messages behind Soft-Margin SVM}\label{sec:soft-messages}
+
+\source{slides p.12--16}
+
+We have the dual. This section turns it into an algorithm, works out how to
+compute \(b\), and explains what the solution \(\alpha_n\) tells us about
+each example.
+
+\subsection{Kernel Soft-Margin SVM}
+
+In the dual, \(\bm{z}_n\) appears only in inner products
+\(\bm{z}_n^\top \bm{z}_m\). So, exactly as in \autoref{sec:kernel-trick}, we
+can replace each of them by a kernel \(K(\bm{x}_n, \bm{x}_m)\).
+
+\begin{algorithm}[H]
+    \caption{\hlp{\textbf{Kernel}} Soft-Margin \hlo{SV}M}\label{alg:kernel-soft-svm}
+    \(\dvar{q_{n,m}} = y_n y_m \hlp{K}(\bm{x}_n, \bm{x}_m)\);
+        \(\dvar{\bm{p}} = -\bm{1}_N\); \(\green{(\mathrm{A}, \bm{c})}\) for
+        \green{equ./lower-bound/}\hlb{\textbf{upper-bound}}
+        \green{constraints}\;
+    \(\bm{\alpha} \gets \mathrm{QP}(\dvar{\mathrm{Q}_{\mathrm{D}}},
+        \dvar{\bm{p}}, \green{\mathrm{A}}, \green{\bm{c}})\)\;
+    \(b \gets\) ?\;
+    \Return\ \hlo{SVs} and their \(\alpha_n\) as well as \(b\) such that for
+        new \(\bm{x}\),
+        \(g_{\mathrm{SVM}}(\bm{x}) = \sign \left( \sum_{\hlo{\text{SV}}
+        \text{ indices } n} \alpha_n \hlo{y_n} \hlp{K}(\hlo{\bm{x}_n},
+        \bm{x}) + b \right)\)\;
+\end{algorithm}
+
+\begin{itemize}
+    \item It is \hlb{almost} the same as hard-margin
+        (\autoref{alg:kernel-hard-svm}).
+    \item It is more flexible than hard-margin: the \textbf{primal/dual}
+        are \textbf{always solvable}.
+\end{itemize}
+
+The only change from \autoref{alg:kernel-hard-svm} is in line~1: we add
+\(N\) more constraints for the upper bounds \(\alpha_n \le C\). The second
+point is a real gain. If the data cannot be separated in \(\mathcal{Z}\),
+the hard-margin problem has no solution at all. The soft-margin problem
+always has one: the primal always has a feasible point, as we saw, and in
+the dual every \(\alpha_n\) is confined to the interval \([0, C]\).
+
+\begin{question}
+    Remaining question: \hlo{step \textcircled{3}}?
+\end{question}
+
+\subsection{Solving for \texorpdfstring{\(b\)}{b}}\label{sec:soft-solve-b}
+
+In the hard-margin case we got \(b\) from complementary slackness
+(\autoref{sec:solving-dual}). The soft-margin problem has one such condition
+for each kind of multiplier. The first is for \(\alpha_n\). The second
+comes from \(\beta_n \xi_n = 0\); since \(\beta_n = C - \alpha_n\), it reads
+\((C - \alpha_n) \xi_n = 0\).
+
+\begin{center}
+    \begin{tabular}{@{}l@{\qquad}l@{}}
+        \textbf{hard-margin SVM} & \textbf{soft-margin SVM}\\[2pt]
+        complementary slackness: & complementary slackness:\\
+        \(\dvar{\alpha_n} \bigl( 1 - y_n (\bm{w}^\top \bm{z}_n + b) \bigr)
+            = 0\) &
+            \(\dvar{\alpha_n} \bigl( 1 - \hlp{\xi_n} - y_n (\bm{w}^\top
+            \bm{z}_n + b) \bigr) = 0\)\\
+        & \((C - \dvar{\alpha_n}) \hlp{\xi_n} = 0\)\\[4pt]
+        \textbullet\ SV (\(\dvar{\alpha_s} > 0\)) & \textbullet\ SV
+            (\(\dvar{\alpha_s} > 0\))\\
+        \quad \(\Rightarrow b = y_s - \bm{w}^\top \bm{z}_s\) & \quad
+            \(\Rightarrow b = y_s - y_s \hlp{\xi_s} - \bm{w}^\top
+            \bm{z}_s\)\\
+        & \textbullet\ \textbf{free} (\(\dvar{\alpha_s} < C\))\\
+        & \quad \(\Rightarrow \hlp{\xi_s} = 0\)
+    \end{tabular}
+\end{center}
+
+Let us go through the right-hand column step by step.
+\begin{enumerate}
+    \item Take an SV, i.e.\ an example \(s\) with \(\alpha_s > 0\). The
+        first condition then forces the bracket to be zero: \(y_s
+        (\bm{w}^\top \bm{z}_s + b) = 1 - \xi_s\).
+    \item Multiply both sides by \(y_s\) (and use \(y_s^2 = 1\)). This
+        gives \(b = y_s - y_s \xi_s - \bm{w}^\top \bm{z}_s\).
+    \item This formula contains \(\xi_s\), which we do not know. The second
+        condition helps here: if also \(\alpha_s < C\), then \(C - \alpha_s
+        > 0\), so \(\xi_s\) must be \(0\).
+\end{enumerate}
+An SV with \(0 < \alpha_s < C\) is called a \vocab{free} SV. For a free SV
+the formula becomes \(b = y_s - \bm{w}^\top \bm{z}_s\), and we compute
+\(\bm{w}^\top \bm{z}_s\) with the kernel.
+
+\begin{moral}
+    Solve unique \(b\) with \hlp{free SV \((\bm{x}_s, y_s)\)}:
+    \[
+        b = \hlp{y_s} - \sum_{\hlo{\text{SV}} \text{ indices } n}
+        \dvar{\alpha_n} y_n K(\bm{x}_n, \hlp{\bm{x}_s})
+    \]
+    \gone{--- range of \(b\) otherwise.}
+\end{moral}
+
+What does `range of \(b\) otherwise' mean? If there is no free SV, every
+\(\alpha_n\) is either \(0\) or \(C\), and the conditions above give only
+inequalities for \(b\), not an equation:
+\begin{itemize}
+    \item an example with \(\alpha_n = 0\) has \(\xi_n = 0\), so \(y_n
+        (\bm{w}^\top \bm{z}_n + b) \ge 1\);
+    \item an example with \(\alpha_n = C\) has \(y_n (\bm{w}^\top \bm{z}_n +
+        b) = 1 - \xi_n \le 1\).
+\end{itemize}
+Each inequality is a lower or an upper bound on \(b\). Together they give an
+interval.
+
+Why is every \(b\) in this interval optimal? Keep the optimal
+\(\bm{\alpha}\), and with it \(\bm{w}\). Pick any \(b\) in the interval and
+set \(\xi_n = \max\bigl(0, 1 - y_n (\bm{w}^\top \bm{z}_n + b)\bigr)\). Then
+all the KKT conditions hold.
+\begin{itemize}
+    \item The primal constraints hold because of how \(\xi_n\) was chosen.
+    \item The conditions that do not involve \(b\) --- \(0 \le \alpha_n \le
+        C\), \(\sum_n y_n \alpha_n = 0\), \(\bm{w} = \sum_n \alpha_n y_n
+        \bm{z}_n\) and \(\beta_n = C - \alpha_n\) --- are already met by the
+        optimal \(\bm{\alpha}\).
+    \item The two complementary slackness conditions are exactly the
+        inequalities above. If \(\alpha_n = 0\), the bound \(y_n
+        (\bm{w}^\top \bm{z}_n + b) \ge 1\) makes \(\xi_n = 0\). If \(\alpha_n
+        = C\), the bound \(y_n (\bm{w}^\top \bm{z}_n + b) \le 1\) makes
+        \(\xi_n = 1 - y_n (\bm{w}^\top \bm{z}_n + b)\), so the bracket in
+        the first condition is zero.
+\end{itemize}
+For a convex QP like this one, the KKT conditions are not only necessary
+but also sufficient; the proof after \autoref{fact:kkt} goes through
+unchanged. So \((b, \bm{w}, \bm{\xi})\) is optimal. A \(b\) outside the
+interval breaks one of the inequalities, so it is not.
+
+This case is rare in practice; SVM software then simply picks a value inside
+the interval.
+
+
+\subsection{Soft-Margin Gaussian SVM in Action}
+
+The three pictures show a soft-margin Gaussian SVM with the same \(\gamma\)
+and three different values of \(C\). In each picture, blue is the region
+predicted \(+1\) and red the region predicted \(-1\). The darker strip around
+the boundary is the fat boundary; any example inside it has \(\xi_n > 0\).
+
+\begin{note}
+    The data are the 40 examples of the Gaussian SVM pictures in
+    \autoref{sec:gaussian-kernel}, with three labels flipped to act as noise:
+    two circles became crosses (one in the middle of the circles, one on the
+    right edge), and one cross on the lower right became a circle. We
+    measured the points from the slides and solved the SVMs ourselves.
+\end{note}
+
+\begin{center}
+    \begin{tabular}{@{}c@{\hspace{1.2em}}c@{\hspace{1.2em}}c@{}}
+        \ksvmpanel[3.6]{\smsvmBi}{\smsvmData}{} &
+        \ksvmpanel[3.6]{\smsvmBii}{\smsvmData}{} &
+        \ksvmpanel[3.6]{\smsvmBiii}{\smsvmData}{}\\[4pt]
+        \(C = 1\) & \(C = 10\) & \(C = 100\)
+    \end{tabular}
+\end{center}
+
+Read the pictures from left to right.
+\begin{itemize}
+    \item \(C = 1\): violations are cheap. The boundary is smooth and the
+        strip is wide. Three training examples are misclassified, including
+        the lone cross among the circles and the circle on the lower right.
+    \item \(C = 10\): violations cost more, so the boundary bends to fix
+        some of them. One training error is left.
+    \item \(C = 100\): there are no training errors. The boundary even draws
+        a small island around the lone cross among the circles.
+\end{itemize}
+The cross inside that island is one of the noisy labels, so the right-hand
+picture is fitting noise.
+\begin{itemize}
+    \item Large \(C\) \(\Longrightarrow\) less \hlb{noise tolerance}
+        \(\Longrightarrow\) \hlo{`overfit'?}
+    \item \hlo{\textbf{Warning: SVM can still overfit :-(}}
+\end{itemize}
+
+In other words, \(C\) behaves like \(\gamma\) in
+\autoref{sec:gaussian-kernel}: if it is too large, the SVM overfits. Both
+parameters have to be chosen with care.
+
+\begin{moral}
+    Soft-margin Gaussian SVM: need \hlo{careful selection of \((\gamma,
+    C)\)}.
+\end{moral}
+
+\subsection{Physical Meaning of \texorpdfstring{\(\alpha_n\)}{alpha}}
+
+Where an example lies relative to the fat boundary is decided by the number
+\(y_n (\bm{w}^\top \bm{z}_n + b)\), as explained in
+\autoref{sec:soft-geometry}: \(\ge 1\) means outside the strip or on its
+edge, \(= 1\) exactly on the edge, and \(< 1\) inside the strip or on the
+wrong side.
+We could compute this number for every example. But we do not have to: the
+two complementary slackness conditions
+\[
+    \dvar{\alpha_n} \hlo{\bigl( 1 - \hlp{\xi_n} - y_n (\bm{w}^\top \bm{z}_n +
+    b) \bigr)} = 0, \qquad (C - \dvar{\alpha_n}) \hlp{\xi_n} = 0
+\]
+connect it to \(\alpha_n\), which the dual has already given us. So the
+value of \(\alpha_n\) alone tells us which of these cases are possible.
+
+\begin{center}
+    \begin{minipage}[c]{0.56\textwidth}
+        \begin{itemize}
+            \item \textbf{non SV} (\(0 = \dvar{\alpha_n}\)):
+                \(\hlp{\xi_n} = 0\), `away from'/\gone{on} \hlo{fat
+                boundary};
+            \item \(\square\) \textbf{free SV} (\(0 < \dvar{\alpha_n} <
+                C\)): \(\hlp{\xi_n} = 0\), on \hlo{fat boundary}, locates
+                \(b\);
+            \item \(\triangle\) \textbf{bounded SV} (\(\dvar{\alpha_n} =
+                C\)): \(\hlp{\xi_n} =\) violation amount,
+                `violate'/\gone{on} \hlo{fat boundary}.
+        \end{itemize}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[c]{0.4\textwidth}
+        \centering
+        \softAlphaPanel
+    \end{minipage}
+\end{center}
+
+Why does each line hold? In every case we use the second condition to find
+\(\xi_n\), and then the first condition (or the primal constraint \(y_n
+(\bm{w}^\top \bm{z}_n + b) \ge 1 - \xi_n\)) to find \(y_n (\bm{w}^\top
+\bm{z}_n + b)\).
+\begin{itemize}
+    \item \textbf{Non SV, \(\alpha_n = 0\).}
+        \begin{itemize}
+            \item Second condition: \(C - \alpha_n = C > 0\), so \(\xi_n =
+                0\).
+            \item First condition: it reads \(0 \cdot (\ldots) = 0\), which
+                says nothing. We use the primal constraint instead: \(y_n
+                (\bm{w}^\top \bm{z}_n + b) \ge 1 - \xi_n = 1\).
+            \item So the example is outside the strip, or exactly on its
+                edge.
+        \end{itemize}
+    \item \textbf{Free SV, \(0 < \alpha_n < C\).}
+        \begin{itemize}
+            \item Second condition: \(C - \alpha_n > 0\), so \(\xi_n = 0\).
+            \item First condition: \(\alpha_n > 0\), so the bracket must be
+                zero: \(y_n (\bm{w}^\top \bm{z}_n + b) = 1 - \xi_n = 1\).
+            \item So the example is exactly on the edge of the strip. This
+                is an equation, not an inequality, which is why a free SV
+                pins down \(b\) (\autoref{sec:soft-solve-b}).
+        \end{itemize}
+    \item \textbf{Bounded SV, \(\alpha_n = C\).}
+        \begin{itemize}
+            \item Second condition: \(C - \alpha_n = 0\), so it reads \(0
+                \cdot \xi_n = 0\) and says nothing about \(\xi_n\).
+            \item First condition: \(\alpha_n = C > 0\), so the bracket must
+                be zero: \(\xi_n = 1 - y_n (\bm{w}^\top \bm{z}_n + b)\).
+            \item Since \(\xi_n \ge 0\), this means \(y_n (\bm{w}^\top
+                \bm{z}_n + b) \le 1\): the example is on the edge, inside the
+                strip, or on the wrong side. Which of these it is cannot be
+                read from \(\alpha_n\); we need \(b\) to compute \(\xi_n\),
+                and then the list in \autoref{sec:soft-geometry} tells us
+                where the example lies.
+        \end{itemize}
+\end{itemize}
+
+These conclusions go in one direction only: from \(\alpha_n\) to the
+position. The reverse does not always work. An example exactly on the edge
+of the strip can have \(\alpha_n = 0\), any value in \((0, C)\), or \(\alpha_n
+= C\), because all three cases allow \(y_n (\bm{w}^\top \bm{z}_n + b) = 1\).
+That is what the greyed-out `\gone{on} fat boundary' in the first and third
+lines of the slide refers to.
+
+\begin{note}
+    The fifteen points are measured from the slide, and the SVM (with \(C =
+    100\)) is solved by us. The squares and triangles come from our
+    solution. They agree with the deck except for two crosses at the left
+    edge of the strip, which are almost equally far from the line, so the
+    measurement cannot tell which of them lies exactly on the edge.
+\end{note}
+
+\begin{moral}
+    \(\dvar{\alpha_n}\) can be used for \hlr{\textbf{data analysis}}.
+\end{moral}
+
+For example, the bounded SVs are the examples the SVM gave up on, or could
+only partly fit. If we suspect that some labels are wrong, they are the
+first examples to check.
+
+\begin{exercise}[Fun Time]
+    For a data set of size \(10000\), after solving SVM, assume that there
+    are \(1126\) support vectors, and \(1000\) of those support vectors are
+    bounded. What is the possible range of \(\Ein(g_{\mathrm{SVM}})\) in
+    terms of \(0/1\) error?
+    \begin{enumerate}[(1)]
+        \item \(0.0000 \le \Ein(g_{\mathrm{SVM}}) \le 0.1000\);
+        \item \(0.1000 \le \Ein(g_{\mathrm{SVM}}) \le 0.1126\);
+        \item \(0.1126 \le \Ein(g_{\mathrm{SVM}}) \le 0.5000\);
+        \item \(0.1126 \le \Ein(g_{\mathrm{SVM}}) \le 1.0000\).
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (1). The bounded support vectors are the only ones that could violate the
+    fat boundary: \(\xi_n \ge 0\). If \(\xi_n \ge 1\), then the violation
+    causes a \(0/1\) error on the example. On the other hand, it is also
+    possible that \(\xi_n < 1\), and in that case the violation does not
+    cause a \(0/1\) error. So anywhere from none to all \(1000\) of them can
+    be errors, which gives \(0 \le \Ein \le 1000/10000\).
+\end{proof}
+
+\section{Model Selection}\label{sec:soft-model-selection}
+
+\source{slides p.17--21}
+
+The soft-margin Gaussian SVM has two parameters, \(C\) and \(\gamma\), and
+we have seen that both can cause overfitting. How should we choose them? This
+is the model selection problem of \autoref{sec:model-selection}, and the
+standard answer is validation. At the end of the section we will also find a
+cheap shortcut that works only for the SVM.
+
+\subsection{Practical Need: Model Selection}
+
+The nine pictures below train the soft-margin Gaussian SVM on the same noisy
+data, one picture for each combination of \(C\) and \(\gamma\). The columns
+go from \(C = 1\) to \(C = 100\); the rows go from large \(\gamma\) (top) to
+small \(\gamma\) (bottom). The middle row is the three pictures from the
+previous section.
+
+\begin{center}
+    \begin{minipage}[c]{0.56\textwidth}
+        \centering
+        \smsvmgrid{}{}{}{}{}{}{}{}{}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[c]{0.4\textwidth}
+        \begin{itemize}
+            \item complicated even for \(\hlo{(C, \gamma)}\)
+                \hlo{\textbf{of Gaussian SVM}}
+            \item more combinations if including other kernels or
+                parameters
+        \end{itemize}
+    \end{minipage}
+\end{center}
+
+\begin{note}
+    The slides do not give the values of \(\gamma\). The values shown are in
+    our own coordinates (the box is \([-1, 1]^2\)), chosen so that each
+    picture matches the deck's.
+\end{note}
+
+In the top row (large \(\gamma\)) the boundary winds around almost every
+example, whatever \(C\) is. The bottom-left picture (small \(\gamma\), small
+\(C\)) has the smoothest boundary. But which one will predict best on
+\emph{new} data? We cannot tell by looking; \autoref{sec:visual-choices}
+explained why choosing by eye is dangerous. With other kernels there would be
+even more to choose, such as \((\gamma, \zeta, Q)\) for the polynomial
+kernel.
+
+\begin{moral}
+    How to select? \hlo{\textbf{Validation :-)}}
+\end{moral}
+
+\subsection{Selection by Cross Validation}
+
+Treat each combination \((C, \gamma)\) as one model. \(V\)-fold cross
+validation (\autoref{sec:vfold}) gives each model a score \(\Ecv(C,
+\gamma)\), an estimate of its \(\Eout\). The numbers on the panels are the
+deck's \(\Ecv\) values.
+
+\begin{center}
+    \begin{minipage}[c]{0.56\textwidth}
+        \centering
+        \smsvmgrid{0.3500}{0.3250}{0.3250}{0.2000}{0.2250}{0.2750}%
+            {\hlo{\textbf{0.1750}}}{0.2250}{0.2000}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[c]{0.4\textwidth}
+        \begin{itemize}
+            \item \(\Ecv(C, \gamma)\): `non-smooth' function of \((C,
+                \gamma)\) --- \hlo{\textbf{difficult to optimize}}
+            \item proper models can be chosen by \hlo{\textbf{\(V\)-fold
+                cross validation}} on \hlo{\textbf{a few grid values of
+                \((C, \gamma)\)}}
+        \end{itemize}
+    \end{minipage}
+\end{center}
+
+Why is \(\Ecv\) `non-smooth'? It is an average of \(0/1\) errors, so when
+\((C, \gamma)\) changes a little, \(\Ecv\) either stays the same or jumps.
+There is no gradient to follow, so we cannot optimize it the way we optimize
+a smooth error. The practical method is a grid search: try a few values of
+each parameter (often a factor of \(10\) apart, as here), compute \(\Ecv\)
+for every combination, and keep the best one. Here that is the bottom-left
+model, with \(\Ecv = 0.1750\).
+
+\begin{moral}
+    \(\Ecv\): very popular criteria for soft-margin SVM.
+\end{moral}
+
+\subsection{Leave-One-Out CV Error for SVM}
+
+\begin{recall}
+    \(\Eloocv = \Ecv\) with \(N\) folds (\autoref{sec:loocv}).
+\end{recall}
+
+Leave-one-out CV is the most expensive kind of cross validation: for each
+model it trains \(N\) times, once with each example left out. For the SVM,
+however, most of those trainings are unnecessary, and this gives a cheap
+upper bound on \(\Eloocv\).
+
+\begin{center}
+    \begin{minipage}[c]{0.56\textwidth}
+        \begin{theorem}[Claim]\label{thm:loocv-sv}
+            \[
+                \Eloocv \le \frac{\#\text{SV}}{N}.
+            \]
+        \end{theorem}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[c]{0.4\textwidth}
+        \centering
+        \svmtoysolution\\[2pt]
+        {\small motivation from hard-margin SVM: only \hlo{\textbf{SVs
+        needed}}}
+    \end{minipage}
+\end{center}
+
+The idea comes from the toy example of \autoref{sec:svm}, shown on the
+right. Only the three boxed examples (the SVs) determine the fattest
+hyperplane. If we remove the fourth example and train again, we get exactly
+the same hyperplane, and it still classifies the removed example correctly.
+So that example contributes \(0\) to \(\Eloocv\). The proof below shows that
+this holds for every non-SV.
+
+\begin{proof}
+    Look at the example \(\hlb{(\bm{x}_N, y_N)}\); any other example works
+    the same way after renumbering. Write \(F(\alpha_1, \dots, \alpha_N) =
+    \frac{1}{2} \sum_n \sum_m \alpha_n \alpha_m q_{n,m} - \sum_n \alpha_n\)
+    for the dual objective. Training on all \(N\) examples minimizes \(F\)
+    over \(\alpha_1, \dots, \alpha_N\) subject to \(\sum_{n=1}^N y_n \alpha_n
+    = 0\) and \(0 \le \alpha_n \le C\). Training with \((\bm{x}_N, y_N)\) left
+    out is the same problem without \(\alpha_N\): minimize \(F(\alpha_1,
+    \dots, \alpha_{N-1}, 0)\) subject to \(\sum_{n=1}^{N-1} y_n \alpha_n = 0\)
+    and \(0 \le \alpha_n \le C\).
+    \begin{itemize}
+        \item Suppose its optimal \(\dvar{\alpha_N = 0}\) (non-SV). We claim
+            that \(\dvar{(\alpha_1, \alpha_2, \dots , \alpha_{N-1})}\) is
+            \dvar{still optimal} when \hlb{leaving out \((\bm{x}_N,
+            y_N)\)}, i.e.\ it solves the smaller problem.
+
+            First, it satisfies the constraints of the smaller problem:
+            \(\sum_{n<N} y_n \alpha_n = \sum_n y_n \alpha_n = 0\) because
+            \(\alpha_N = 0\), and each \(\alpha_n\) is still in \([0, C]\).
+            Second, its objective value is the same as that of the full
+            \(\bm{\alpha}\), because every term with \(\alpha_N\) is zero.
+
+            The key: \textbf{what if there's better} \(\alpha_n\) for the
+            smaller problem? Add \(\alpha_N = 0\) back to it as the
+            \(N\)-th entry. The result satisfies the constraints of the full
+            problem and has the same, smaller value of \(F\). It would beat
+            the optimal \(\bm{\alpha}\) of the full problem, which is
+            impossible.
+        \item So for the SVM, \(\hlb{g^-} = g\) when \hlb{leaving out
+            non-SV}: the same \(\alpha_n\) give the same \(\bm{w} = \sum_n
+            \alpha_n y_n \bm{z}_n\), and the same \(b\).
+        \item Therefore
+            \[
+                e_{\text{non-SV}} = \err(\hlb{g^-}, \hlb{\text{non-SV}}) =
+                \err(g, \hlb{\text{non-SV}}) = 0.
+            \]
+            The last error is \(0\) because a non-SV has \(\xi_n = 0\), so
+            \(y_n (\bm{w}^\top \bm{z}_n + b) \ge 1\): \(g\) classifies it
+            correctly.
+        \item For an SV we only know \(e_{\hlo{\text{SV}}} \le 1\).
+    \end{itemize}
+    Adding up, only the SVs can contribute errors, and each contributes at
+    most \(1\): \(\Eloocv = \frac{1}{N} \sum_n e_n \le
+    \frac{\#\text{SV}}{N}\).
+\end{proof}
+
+\begin{remark}
+    The proof says `the same \(\bm{w}\) and the same \(b\)'. But the smaller
+    problem may have several optimal solutions. Is \(g^-\) then really
+    \(g\)?
+    \begin{itemize}
+        \item \(\bm{w}\) is always the same. The optimal \(\bm{w}\) of the
+            primal is unique, because \(\frac{1}{2} \bm{w}^\top \bm{w}\) is
+            strictly convex, and every optimal \(\bm{\alpha}\) gives this
+            \(\bm{w}\) through \(\bm{w} = \sum_n \alpha_n y_n \bm{z}_n\).
+        \item \(b\) is the same if \(g\) has a free SV. That example is
+            still a free SV in the smaller problem, since its
+            \(\alpha_n\) did not change, and it fixes \(b\) by
+            \autoref{sec:soft-solve-b}.
+        \item Without a free SV, \(b\) is only known to lie in an interval,
+            and removing a non-SV can make this interval wider. The \(b\)
+            used by \(g\) is still optimal for the smaller problem, but the
+            solver may pick another one. Then \(g^- \ne g\), and \(g^-\) may
+            misclassify the removed example, so \(e_{\text{non-SV}} = 0\)
+            is no longer guaranteed.
+    \end{itemize}
+    So the bound holds when the solver picks the same \(b\) in both
+    trainings. Since free SVs almost always exist, this is rarely a concern
+    in practice.
+\end{remark}
+
+\begin{moral}
+    Scaled \#SV bounds leave-one-out CV error.
+\end{moral}
+
+\subsection{Selection by \texorpdfstring{\#}{\#}SV}
+
+Cross validation is expensive: \(V\)-fold CV trains every model \(V\) times,
+and leave-one-out CV trains it \(N\) times. \autoref{thm:loocv-sv} offers a
+cheaper quantity.
+
+\begin{definition}
+    For parameters \((C, \gamma)\), train the soft-margin SVM once on all
+    \(N\) examples. Its \vocab{number of support vectors}
+    \(n_{\mathrm{SV}}(C, \gamma)\) is the number of examples with
+    \(\alpha_n > 0\) in the solution.
+\end{definition}
+
+By \autoref{thm:loocv-sv}, \(\Eloocv(C, \gamma) \le n_{\mathrm{SV}}(C,
+\gamma) / N\). So one training per model gives an upper bound on its
+leave-one-out error. The idea of this section is to use \(n_{\mathrm{SV}}\)
+in place of \(\Ecv\) when \(\Ecv\) is too costly. The numbers on the panels
+are the deck's \(n_{\mathrm{SV}}\) values for the same nine models as
+before, with \(N = 40\).
+
+\begin{center}
+    \begin{minipage}[c]{0.56\textwidth}
+        \centering
+        \smsvmgrid{38}{37}{37}{27}{21}{\hlo{\textbf{17}}}%
+            {21}{18}{19}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[c]{0.4\textwidth}
+        \begin{itemize}
+            \item \(n_{\mathrm{SV}}(C, \gamma)\): `non-smooth' function of
+                \((C, \gamma)\) --- \hlo{\textbf{difficult to optimize}}
+            \item \hlo{\textbf{just an upper bound!}}
+            \item dangerous models can be ruled out by
+                \hlo{\(\bm{n_{\mathrm{SV}}}\)} on \hlo{\textbf{a few grid
+                values of} \((C, \gamma)\)}
+        \end{itemize}
+    \end{minipage}
+\end{center}
+
+The three bullets say how \(n_{\mathrm{SV}}\) can and cannot be used.
+\begin{itemize}
+    \item \textbf{It is non-smooth.} \(n_{\mathrm{SV}}\) is a count, so it
+        jumps as \((C, \gamma)\) changes, just like \(\Ecv\). We again
+        evaluate it on a small grid instead of optimizing it.
+    \item \textbf{It is only an upper bound.} A small \(n_{\mathrm{SV}}\)
+        means a small bound, not a small error. So we should not pick the
+        model with the smallest \(n_{\mathrm{SV}}\). Here the smallest
+        count, \(17\) at \(\gamma = 5\), \(C = 100\), belongs to the model
+        whose \(\Ecv = 0.2750\) is the worst in the bottom two rows.
+    \item \textbf{It can rule out bad models.} A large \(n_{\mathrm{SV}}\)
+        is a warning. In the top row, \(37\) or \(38\) of the \(40\)
+        examples are SVs. The bound \(38/40 = 0.95\) says nothing useful,
+        and a model that needs almost every example as an SV is memorizing
+        the data; its boundary winds around each example. We can discard
+        these models without running any CV.
+\end{itemize}
+In short, \(n_{\mathrm{SV}}\) filters out dangerous models cheaply; choosing
+among the remaining ones is still the job of \(\Ecv\), if we can afford it.
+
+\begin{note}
+    Our own solutions give slightly different counts: \(39, 39, 39\) / \(28,
+    24, 20\) / \(23, 19, 17\). The small differences come from the unknown
+    coordinates of the deck and from the solver's tolerance.
+\end{note}
+
+\begin{moral}
+    \(n_{\mathrm{SV}}\): often used as a \hlo{\textbf{safety check}} if computing
+    \(\Ecv\) is too time-consuming.
+\end{moral}
+
+\begin{exercise}[Fun Time]
+    For a data set of size \(10000\), after solving SVM on some parameters,
+    assume that there are \(1126\) support vectors, and \(1000\) of those
+    support vectors are bounded. Which of the following \emph{cannot} be
+    \(\Eloocv\) with those parameters?
+    \begin{enumerate}[(1)]
+        \item \(0.0000\);
+        \item \(0.0805\);
+        \item \(0.1111\);
+        \item \(0.5566\).
+    \end{enumerate}
+\end{exercise}
+
+\begin{proof}[Reference Answer]
+    (4). Note that the upper bound of \(\Eloocv\) is \(1126 / 10000 =
+    0.1126\) by \autoref{thm:loocv-sv}.
+\end{proof}
+
+\hrulebar
+
+\subsection*{Summary}
+
+\begin{description}
+    \item[Motivation and Primal Problem] \hlo{\textbf{add margin violations
+        \(\bm{\xi_n}\)}}.
+    \item[Dual Problem] \hlo{\textbf{upper-bound \(\bm{\alpha_n}\) by
+        \(\bm{C}\)}}.
+    \item[Messages behind Soft-Margin SVM] \hlo{\textbf{bounded/free SVs for
+        data analysis}}.
+    \item[Model Selection] \hlo{\textbf{cross-validation, or approximately
+        \(\bm{n_{\mathrm{SV}}}\)}}.
+\end{description}
+
+The soft-margin SVM lets examples violate the margin and pays \(C \xi_n\)
+for each violation, where \(\xi_n = \max\bigl(0, 1 - y_n (\bm{w}^\top
+\bm{z}_n + b)\bigr)\). This looks a lot like an error measure plus a
+regularizer, the form we met in regularization. The next chapter follows
+that idea. It reads the soft-margin SVM as a regularized model, compares it
+with logistic regression, and builds a kernel version of logistic
+regression. \hlo{\textbf{Next: other kernel models for soft binary
+classification.}}
